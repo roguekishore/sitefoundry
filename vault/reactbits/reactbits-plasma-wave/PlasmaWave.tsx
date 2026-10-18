@@ -674,7 +674,7 @@ export default function PlasmaWave({
       for (const entry of Object.values(programs)) gl.deleteProgram(entry.program);
       gl.deleteBuffer(buffer);
       gl.deleteVertexArray(vao);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
     };
   }, []);
 

@@ -1608,7 +1608,7 @@ const Topography = ({
       [terrain, fieldProgram, sculptProgram, downProgram, blurProgram, compositeProgram, markerProgram].forEach(
         program => program && gl.deleteProgram(program.program)
       );
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
     };
   }, [generation]);
 

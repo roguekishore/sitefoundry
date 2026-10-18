@@ -651,7 +651,7 @@ const LightPillar = ({
       gl.deleteProgram(compositeProgram.program);
       gl.deleteBuffer(buffer);
       gl.deleteVertexArray(vao);
-      if (!gl.isContextLost()) gl.getExtension('WEBGL_lose_context')?.loseContext();
+      if (!gl.isContextLost()) { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
     };
   }, [generation]);
 

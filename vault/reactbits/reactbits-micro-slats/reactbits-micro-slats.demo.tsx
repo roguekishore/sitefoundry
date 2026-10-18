@@ -3,7 +3,7 @@ import MicroSlats from "./MicroSlats"
 
 export default function Demo() {
   return (
-    <div className="relative flex h-[500px] w-full items-center justify-center overflow-hidden">
+    <div className="relative flex h-[500px] w-full items-center justify-center overflow-hidden dark bg-background">
       <MicroSlats />
     </div>
   )

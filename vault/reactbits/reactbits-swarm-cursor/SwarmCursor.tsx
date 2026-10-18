@@ -981,7 +981,7 @@ const SwarmCursor = ({
       gl.deleteBuffer(extraBuffer);
       gl.deleteVertexArray(vao);
       gl.deleteProgram(shader.program);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
     };
   }, []);
 

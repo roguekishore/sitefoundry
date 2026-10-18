@@ -836,7 +836,7 @@ const DitherVeil = ({
       container.removeEventListener('pointerdown', onDown);
       container.removeEventListener('pointerleave', onLeave);
       container.removeEventListener('pointercancel', onLeave);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, [src]);

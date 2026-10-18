@@ -974,7 +974,7 @@ const CrystalizedBall = ({
     const gl = renderer.gl;
     const gl2 = gl as unknown as WebGL2RenderingContext;
     if (!renderer.isWebgl2) {
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       return undefined;
     }
     const canvas = gl.canvas;
@@ -1542,7 +1542,7 @@ const CrystalizedBall = ({
       wakeRef.current = null;
       disposeDust();
       disposeTarget(sceneTarget);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, []);
