@@ -42,7 +42,7 @@ export function StripeQuote({ quotes, interval = 7, rule = "none", className }: 
 
   const q = quotes[active];
   return (
-    <StripeFrame rule={rule} className={className} innerClassName="px-0 pt-16 lg:pt-20">
+    <StripeFrame rule={rule} className={className} padded={false} innerClassName="pt-16 lg:pt-20">
       <figure key={active} className="mx-auto max-w-[52rem] animate-[stripe-quote-in_600ms_ease-out] px-gutter text-center motion-reduce:animate-none">
         <blockquote className="font-display text-xl leading-[1.25] font-light tracking-[-0.01em] text-balance text-muted-foreground lg:text-[1.625rem] lg:leading-[1.12]">
           “{q.quote}”

@@ -13,7 +13,9 @@ export interface StripeFrameProps {
   id?: string;
   /** classes for the full-width outer band (background, the dark class…) */
   className?: string;
-  /** classes for the framed column (padding…) */
+  /** pad the column with the page gutter; turn off when rows inside need to run edge to edge */
+  padded?: boolean;
+  /** classes for the framed column (vertical padding…) */
   innerClassName?: string;
 }
 
@@ -21,12 +23,13 @@ export interface StripeFrameProps {
  * The page column with Stripe's drawn edges: content sits inside a centred column whose left
  * and right sides are faint vertical hairlines, so stacked sections read as one framed sheet.
  */
-export function StripeFrame({ children, rails = true, rule = "none", as: Tag = "section", id, className, innerClassName }: StripeFrameProps) {
+export function StripeFrame({ children, rails = true, rule = "none", as: Tag = "section", id, padded = true, className, innerClassName }: StripeFrameProps) {
   return (
     <Tag id={id} className={cn("relative bg-background font-sans text-foreground", className)}>
       <div
         className={cn(
-          "relative mx-auto max-w-page px-gutter",
+          "relative mx-auto max-w-page",
+          padded && "px-gutter",
           rails && "sm:border-x sm:border-border",
           rule === "solid" && "border-t border-border",
           rule === "dashed" && "border-t border-dashed border-border",

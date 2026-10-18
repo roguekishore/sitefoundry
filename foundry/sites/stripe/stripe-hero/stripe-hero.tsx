@@ -33,7 +33,7 @@ export interface StripeHeroProps {
 const logoStyles = {
   bold: "font-sans font-bold tracking-[-0.04em]",
   light: "font-sans font-light tracking-[-0.02em]",
-  serif: "font-serif italic font-semibold",
+  serif: "font-display italic font-semibold tracking-[-0.03em]",
   caps: "font-sans font-extrabold uppercase tracking-[0.08em] text-[0.8em]",
   rounded: "font-display font-semibold tracking-[-0.03em] lowercase",
 };

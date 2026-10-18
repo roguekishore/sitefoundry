@@ -89,3 +89,17 @@ Components: `stripe-button`, `stripe-heading`, `stripe-frame`, `stripe-segment`,
 - Customer logos are text wordmarks set in the theme font; story/news images are CSS art.
 - Not built: the nav mega-menus (the chevrons are decoration), the counter that ticks in
   the hero (it's a static figure prop).
+
+## Where the recreation differs (and why)
+
+- **Imagery is CSS art** (`stripe-art`): petals, sunset bands, roads from above, a shop
+  window… stand in for the original's photography; the event banner uses the ribbon as
+  stage light instead of a keynote photo.
+- **Logos are text wordmarks** in mixed weights; app/warehouse tiles use lucide icons.
+- **Hanken Grotesk is a touch wider** than Söhne, so headlines wrap a word earlier.
+- The **hero counter is static** (the original ticks up live).
+- The **stats band** starts light on phones too (the original's phone capture showed it
+  dark); its switch is hidden on phones.
+- The **scale** threads are a flowing wave; the original's desktop art is faint ripples.
+- Vignettes in the solutions tiles are scaled up with CSS `zoom` on desktop to keep the
+  original's tiny-type proportions.
