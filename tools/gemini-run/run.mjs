@@ -10,8 +10,8 @@
 //     packages there, so --yolo can't touch main.
 //  3. Starts a local forwarder. The CLI talks to it instead of Google; it sends each request on to
 //     Vertex's global endpoint (Argon isn't reachable through the API key's automatic region),
-//     removes any tier header (Standard only), and adds up tokens and cost. At --max-usd it stops
-//     the run.
+//     removes any tier header (Standard only), puts screenshots a tool returns where Argon accepts
+//     them, and adds up tokens and cost. At --max-usd it stops the run.
 //  4. Starts that worktree's gallery on port 4410 (4400 is left for yours).
 //  5. Runs `gemini --yolo` headless with the skill as the prompt. If it crashes (a network error
 //     can end a headless run), it starts again up to 3 times and continues from what's on disk.
@@ -157,12 +157,45 @@ function errorObject(status, body) {
   return JSON.stringify({ error: { code: status, status: "UNAVAILABLE", message: `gemini-run forwarder: ${body.slice(0, 300) || "no body"}` } });
 }
 
+/**
+ * When a tool returns an image (read_file on a PNG), the CLI puts the image inside the tool's answer
+ * only for models named gemini-3-*. For any other model it sends the image as a separate part after
+ * the answer, which Argon rejects with 400 "Requests ending with a model turn are not supported".
+ * This moves such images inside the answer they follow. Returns how many it moved.
+ */
+function nestToolImages(request) {
+  let moved = 0;
+  for (const content of request.contents ?? []) {
+    if (!Array.isArray(content.parts)) continue;
+    const parts = [];
+    let answer; // the tool answer that images from here on belong to
+    for (const part of content.parts) {
+      if (part.functionResponse) {
+        answer = part.functionResponse;
+        parts.push(part);
+      } else if (answer && (part.inlineData || part.fileData)) {
+        (answer.parts ??= []).push(part);
+        moved++;
+      } else {
+        answer = undefined;
+        parts.push(part);
+      }
+    }
+    content.parts = parts;
+  }
+  return moved;
+}
+
 const forwarder = http.createServer((req, res) => {
   const no = ++requestNo;
   const t0 = Date.now();
   const reused = (req.socket.requestsServed = (req.socket.requestsServed ?? 0) + 1) > 1;
   let sent = 0;
-  req.on("data", (c) => (sent += c.length));
+  const chunks = [];
+  req.on("data", (c) => {
+    sent += c.length;
+    chunks.push(c);
+  });
   req.on("error", (e) => note(`#${no} request error ${e.code ?? e.message} after ${Date.now() - t0} ms, ${sent} bytes in, reused socket: ${reused}`));
 
   // The CLI asks for /v1/publishers/...; Vertex's global endpoint wants /v1/projects/<p>/locations/global/publishers/...
@@ -238,7 +271,21 @@ const forwarder = http.createServer((req, res) => {
       upstream.destroy();
     }
   });
-  req.pipe(upstream);
+  // The whole request is read first, so tool images can be moved (see nestToolImages).
+  req.on("end", () => {
+    let body = Buffer.concat(chunks);
+    if (/:(stream)?generateContent\b/i.test(path) && !headers["content-encoding"]) {
+      try {
+        const request = JSON.parse(body.toString("utf8"));
+        if (nestToolImages(request) > 0) body = Buffer.from(JSON.stringify(request), "utf8");
+      } catch {
+        // not JSON: send it as it came
+      }
+    }
+    upstream.removeHeader("transfer-encoding");
+    upstream.setHeader("content-length", body.length);
+    upstream.end(body);
+  });
 });
 // Node closes idle connections after 5 s by default. The CLI reuses its connection between
 // turns and can send just as it closes ("fetch failed sending request"), so keep them open.
@@ -313,9 +360,13 @@ function summary(extra = "") {
 // ---------- smoke test ----------
 
 if (smoke) {
-  // Several turns with a pause of more than 5 s between them: the case that broke the first real run.
+  // Several turns with a pause of more than 5 s between them (the case that broke the first real
+  // run), and a git-ignored screenshot read as an image (the case that broke the second).
   say(`smoke test: a few turns of ${model} through the forwarder`);
-  const code = await runGemini(REPO, 'Run the shell command `node -e "setTimeout(()=>{},7000)"`, then read the file package.json, then reply with the single word OK.');
+  const code = await runGemini(
+    REPO,
+    'Run the shell command `node -e "setTimeout(()=>{},7000)"`, then read the image foundry/sites/clerk/_reference/ours-390-fold.png with your file-reading tool, then reply with OK followed by one short sentence saying what the image shows.',
+  );
   cleanup();
   summary(`exit code     ${code}`);
   process.exit(code ?? 1);
@@ -335,6 +386,10 @@ if (!existsSync(worktree)) {
   say(`worktree ${worktree} on ${branch}`);
 } else {
   say(`reusing worktree ${worktree}`);
+}
+// A worktree made before main had .geminiignore gets main's copy, untracked (merging adds it anyway).
+if (!existsSync(join(worktree, ".geminiignore"))) {
+  writeFileSync(join(worktree, ".geminiignore"), readFileSync(join(REPO, ".geminiignore")));
 }
 say("installing packages in the worktree…");
 const install = spawnSync("pnpm install --frozen-lockfile --prefer-offline", { cwd: worktree, shell: true, stdio: "inherit" });
@@ -372,7 +427,7 @@ Recreate ${url} as the slug "${slug}". Read .claude/skills/recreate-site/SKILL.m
 Differences from the skill, because this run is unattended:
 - Never ask. Where the skill says to ask or stop, choose the sensible default, carry on, and list the choice in your final report.
 - The gallery is already running at http://localhost:${GALLERY_PORT}. Do not start another one. Wherever the skill says localhost:4400, use localhost:${GALLERY_PORT}.
-- Look at the screenshots by reading the PNG files with your file-reading tool.
+- Look at the screenshots by reading the PNG files with your file-reading tool. It can read the git-ignored \`_reference/ours-*\` files; read those directly rather than making copies.
 - This folder is a git worktree on branch ${branch}. Commit as the skill says. Never push, switch branches, or touch files outside this folder.
 - Never change git configuration (no \`git config\`): it is shared with the main repo. If a commit fails, report the error instead.
 - Finish with the skill's report.`;
@@ -405,7 +460,10 @@ cleanup();
 
 const hours = ((Date.now() - started) / 3600e3).toFixed(1);
 const commits = git(worktree, "log", "--oneline", `main..${branch}`).stdout.trim() || "(none)";
-const left = git(worktree, "status", "--porcelain").stdout.trim();
+const left = git(worktree, "status", "--porcelain")
+  .stdout.split("\n")
+  .filter((l) => l.trim() && l !== "?? .geminiignore") // the runner's own copy, see above
+  .join("\n");
 summary(
   [
     `duration      ${hours} h, exit code ${code}${stopped ? " (stopped on purpose)" : ""}`,
