@@ -1,34 +1,43 @@
 # SITEFOUNDRY
 
 **Role (the user's word, 2026-10-18):** recreate websites the user gives as inspiration,
-faithfully and mobile-first, one folder per site (e.g. `huly/`). The landing page alone is
-enough to start. Unsteered AI sites come out generic; steering from a real inspiration is
-the point of this directory.
+faithfully and mobile-first, one folder per site (e.g. `foundry/sites/huly/`). The landing
+page alone is enough. Unsteered AI sites come out generic; steering from a real inspiration
+is the point of this directory.
 
-- Every component of a recreated site must be **exportable and importable** on its own
-  (e.g. a `huly` header), so it can become a building block for later custom sites.
-- All blocks must be **viewable on one gallery page** so the user can pick from them.
-- **Independent of MaverickCloud.** Don't follow the non-fixed formats in
-  `..\MAVERICKCLOUD\`; nothing there constrains this directory.
+- Every component of a recreated site is **exportable** on its own and becomes a building
+  block for later custom sites. All blocks are viewable in the gallery for picking.
+- The same directory mirrors **React Bits and shadcn** (+ shadcn's directory registries)
+  into `vault/`. 21st.dev skipped for now.
+- **Independent of MaverickCloud.** Nothing in `..\MAVERICKCLOUD\` constrains this repo.
+- **Private.** Local now; a private GitHub repo (user's account, name to come) and a
+  login-gated cloud copy for phone browsing come later. No public registries.
 
-**Architecture: still being discussed with the user.** Don't scaffold until it's agreed.
-Agreed so far (2026-10-18):
+## Read first
 
-- Our own **private** registry with **our own CLI** (`foundry add <block>`); no shadcn CLI or
-  `components.json`. shadcn is only one of the mirrored sources. Source of
-  truth: a private GitHub repo on the user's current account; a local process for daily use.
-- The same directory also **mirrors React Bits and shadcn (+ its directory registries)**
-  locally. 21st.dev skipped for now.
-- The gallery is also served as a **private, login-gated site** so the user can browse
-  blocks from a phone.
-- We build **our own MCP** for searching and adding blocks, running both locally and in
-  the cloud (behind auth).
-- Built in from day one: item versions + `foundry.lock` in customer projects; token names
-  only added, never renamed; a `schema` version field; blocks build to static HTML; all
-  content via typed props with a generated props description; `foundry check`; npm
-  version-clash warnings. **Skipped (user):** vault provenance tracking.
-- The foundry is the single access point for **every creative**: our blocks, the vault
-  (shadcn, React Bits, …), themes, fonts and other assets.
+- [`README.md`](README.md): setup and commands
+- [`CONTRACT.md`](CONTRACT.md): how to write an item; `pnpm check` enforces it
+- [`foundry/tokens.md`](foundry/tokens.md): the token names (only ever added, never renamed)
+- [`PLAN.md`](PLAN.md): phases and who owns what
+
+## Built (phases 0–3 and 6)
+
+Workspace (pnpm) · item format v1 · `pnpm check` · `pnpm build:registry` · `foundry` CLI
+(our own, no shadcn CLI) · gallery (Vite, port 4400) · MCP server (stdio). Tested end to
+end in fresh Vite (npm) and Astro (pnpm) projects, and through a scripted MCP client.
+
+## Gotchas found while building
+
+- **TypeScript stays on 6.x**: TS 7 has no JavaScript API, which the props generator and
+  the checker use.
+- **Windows shells eat `^`**: package-manager arguments are quoted (it once installed
+  `x.0.0` releases silently, e.g. a Fraunces build with only the italic font).
+- **Registry npm ranges are the versions we tested with** (`^5.3.0`), not `^5.0.0`;
+  an older minor already in a project is a note, a different major is a clash.
+- **JS entrance animations render `opacity:0` in static HTML**: such blocks need `hydrate`
+  (Astro `client:*`), and the checker enforces it. Prefer CSS entrance animations.
+- The MCP must never write to stdout (it carries the protocol): package-manager output is
+  captured, and its private gallery starts with logging off.
 
 ## Working rules
 
@@ -36,3 +45,4 @@ Agreed so far (2026-10-18):
 - Never suggest or critique pricing unless asked.
 - The user writes Java and is not a frontend specialist: keep code readable and explain
   frontend choices plainly.
+- Recreate a site's design language, never its text, logos, images or code.
