@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Clerk notched band",
+  "description": "A full-width dark band whose top and bottom edges step in with 45° shoulders, so the light sections above and below appear to dip into it like tabs. Wrap any section content in it.",
+  "category": "background",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "band",
+    "section",
+    "dark",
+    "notch",
+    "geometric",
+    "divider"
+  ],
+  "notes": [
+    "tone=\"dark\" (default) adds the dark class; set edgeTop/edgeBottom to the colour of the neighbouring sections so the notches show it",
+    "the notches line up with the content column (page width minus gutters)"
+  ],
+  "entry": "clerk-band.tsx",
+  "source": "foundry",
+  "name": "clerk-band",
+  "files": [
+    {
+      "path": "clerk-band.css",
+      "content": "/* The notched outline of clerk-band. --x is where the shoulder starts: the edge of the\n   content column (page width minus gutters), never closer than one gutter to the screen\n   edge. The shoulder is 44px tall and 40px wide. */\n.clerk-band {\n  --x: max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)));\n  --d: 2.75rem;\n  --w: 2.5rem;\n}\n\n.clerk-band-top {\n  clip-path: polygon(\n    0 0, var(--x) 0, calc(var(--x) + var(--w)) var(--d), calc(100% - var(--x) - var(--w)) var(--d),\n    calc(100% - var(--x)) 0, 100% 0, 100% 100%, 0 100%\n  );\n}\n\n.clerk-band-bottom {\n  clip-path: polygon(\n    0 0, 100% 0, 100% 100%, calc(100% - var(--x)) 100%, calc(100% - var(--x) - var(--w)) calc(100% - var(--d)),\n    calc(var(--x) + var(--w)) calc(100% - var(--d)), var(--x) 100%, 0 100%\n  );\n}\n\n.clerk-band-both {\n  clip-path: polygon(\n    0 0, var(--x) 0, calc(var(--x) + var(--w)) var(--d), calc(100% - var(--x) - var(--w)) var(--d),\n    calc(100% - var(--x)) 0, 100% 0, 100% 100%, calc(100% - var(--x)) 100%,\n    calc(100% - var(--x) - var(--w)) calc(100% - var(--d)), calc(var(--x) + var(--w)) calc(100% - var(--d)),\n    var(--x) 100%, 0 100%\n  );\n}\n\n@media (min-width: 64rem) {\n  .clerk-band {\n    --w: 2.75rem;\n  }\n}\n"
+    },
+    {
+      "path": "clerk-band.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./clerk-band.css\";\n\nexport interface ClerkBandProps {\n  children: ReactNode;\n  /** step the top edge in (the section above dips into the band) */\n  notchTop?: boolean;\n  /** step the bottom edge in (the section below rises into the band) */\n  notchBottom?: boolean;\n  /** colour of the section above, shown inside the top notch */\n  edgeTop?: \"background\" | \"card\";\n  /** colour of the section below, shown inside the bottom notch */\n  edgeBottom?: \"background\" | \"card\";\n  /** dark forces the dark colours (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  id?: string;\n  className?: string;\n}\n\nconst edge = { background: \"bg-background\", card: \"bg-card\" };\n\nexport function ClerkBand({\n  children,\n  notchTop = true,\n  notchBottom = true,\n  edgeTop = \"card\",\n  edgeBottom = \"background\",\n  tone = \"dark\",\n  id,\n  className,\n}: ClerkBandProps) {\n  return (\n    <section id={id} className=\"relative isolate\">\n      {/* the neighbours' colours, showing through the notches */}\n      {notchTop && <div aria-hidden className={cn(\"absolute inset-x-0 top-0 -z-10 h-12\", edge[edgeTop])} />}\n      {notchBottom && <div aria-hidden className={cn(\"absolute inset-x-0 bottom-0 -z-10 h-12\", edge[edgeBottom])} />}\n      <div\n        className={cn(\n          \"clerk-band relative overflow-hidden bg-background text-foreground\",\n          tone === \"dark\" && \"dark\",\n          notchTop && \"clerk-band-top pt-11\",\n          notchBottom && \"clerk-band-bottom pb-11\",\n          notchTop && notchBottom && \"clerk-band-both\",\n          className,\n        )}\n      >\n        {children}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "notchTop",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "step the top edge in (the section above dips into the band)"
+    },
+    {
+      "name": "notchBottom",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "step the bottom edge in (the section below rises into the band)"
+    },
+    {
+      "name": "edgeTop",
+      "type": "enum",
+      "required": false,
+      "default": "card",
+      "description": "colour of the section above, shown inside the top notch"
+    },
+    {
+      "name": "edgeBottom",
+      "type": "enum",
+      "required": false,
+      "default": "background",
+      "description": "colour of the section below, shown inside the bottom notch"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the dark colours (as on the original); inherit follows the page"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c0f38a2386c8786d273a5312fd500e7cbb59496f6d4bd94c6610563f9133601"
+}

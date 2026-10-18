@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly connected cards",
+  "description": "A pale band with an indented heading and a loose, scattered grid of near-black cards in three widths. Each card leads with a two-tone caption at the top and a glowing mock UI below: checklist, event, block menu, chat, voice call, project panel.",
+  "category": "features",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "dark-cards",
+    "grid",
+    "scattered",
+    "light",
+    "glow",
+    "mock-ui"
+  ],
+  "notes": [
+    "the band follows the page's mode; the cards are always dark",
+    "widths sum per row to 12 on wide screens: e.g. four narrow, then wide + medium"
+  ],
+  "entry": "huly-metabrain.tsx",
+  "source": "foundry",
+  "name": "huly-metabrain",
+  "files": [
+    {
+      "path": "huly-metabrain.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HulyCard } from \"@foundry/huly-card\";\nimport { HulyHeading } from \"@foundry/huly-heading\";\nimport { HulyMock, type HulyMockProps } from \"@foundry/huly-mock\";\n\nexport interface HulyMetabrainCard {\n  /** bold first words of the caption */\n  title: string;\n  /** rest of the caption */\n  text?: string;\n  visual?: HulyMockProps;\n  /** width on wide screens, out of a 12-column grid: narrow 3 · medium 5 · wide 7 */\n  span?: \"narrow\" | \"medium\" | \"wide\";\n  /** nudges the card down a little on wide screens, for the scattered look */\n  drop?: boolean;\n}\n\nexport interface HulyMetabrainProps {\n  title: string | string[];\n  text?: string;\n  cards: HulyMetabrainCard[];\n  className?: string;\n}\n\nconst SPAN = {\n  narrow: \"lg:col-span-3 lg:h-[15.5rem]\",\n  medium: \"lg:col-span-5 lg:h-[14.5rem]\",\n  wide: \"lg:col-span-7 lg:h-[14.5rem]\",\n};\n\nexport function HulyMetabrain({ title, text, cards, className }: HulyMetabrainProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-hidden bg-background py-section text-foreground lg:py-40\", className)}>\n      <div aria-hidden className=\"pointer-events-none absolute inset-0 -z-10\">\n        <div className=\"absolute top-[40%] left-[30%] h-[26rem] w-[44rem] rounded-full bg-glow/10 blur-3xl\" />\n      </div>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <HulyHeading title={title} text={text} className=\"lg:pl-48\" textClassName=\"max-w-[38rem]\" />\n        <div className=\"mt-8 grid gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-12 lg:gap-5\">\n          {cards.map((card) => (\n            <HulyCard\n              key={card.title}\n              title={card.title}\n              text={card.text}\n              captionAt=\"top\"\n              visual={card.visual && <HulyMock {...card.visual} />}\n              className={cn(\"h-[13.25rem]\", SPAN[card.span ?? \"narrow\"], card.drop && \"lg:mt-8\")}\n            />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "huly-card",
+    "huly-heading",
+    "huly-mock"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "cards",
+      "type": "HulyMetabrainCard[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7c7a6b56cc5a44e11852b573f7555f9fbafec7c32a23615b12d0b1fa0ad1f3c8"
+}

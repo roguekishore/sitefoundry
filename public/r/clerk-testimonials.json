@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk testimonial wall",
+  "description": "Left: a 32px heading, muted copy, a copyable agent pill and one featured quote under an outlined quote mark. Right: two columns of white post-style cards (13px text, small square avatar, name and handle) drifting slowly upward at different speeds over a faint dot grid, fading out at the top and bottom. One column on phones.",
+  "category": "testimonials",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "marquee",
+    "vertical-scroll",
+    "light",
+    "soft-shadow",
+    "social-proof",
+    "dot-grid"
+  ],
+  "notes": [
+    "the columns are a CSS marquee: they pause on hover and stand still with reduced motion",
+    "avatars are props (the demo uses initials on tinted tiles)"
+  ],
+  "entry": "clerk-testimonials.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "clerk-testimonials",
+  "files": [
+    {
+      "path": "clerk-testimonials.css",
+      "content": "/* The testimonial columns drift upward forever: each holds its cards twice and slides by half\n   its height, so the loop is seamless. Paused on hover, still with reduced motion. */\n.clerk-wall-col {\n  animation: clerk-wall-up var(--clerk-wall-speed, 60s) linear infinite;\n}\n.clerk-wall:hover .clerk-wall-col {\n  animation-play-state: paused;\n}\n\n@keyframes clerk-wall-up {\n  to { transform: translateY(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .clerk-wall-col {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "clerk-testimonials.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ClerkCommand, type ClerkCommandProps } from \"@foundry/clerk-command\";\nimport \"./clerk-testimonials.css\";\n\nexport interface ClerkTestimonial {\n  /** the post; a list makes several paragraphs */\n  text: string | string[];\n  name: string;\n  /** handle or role under the name */\n  handle: string;\n  /** small square avatar (img or initials) */\n  avatar: ReactNode;\n}\n\nexport interface ClerkTestimonialsProps {\n  title: string;\n  text?: string;\n  /** copyable agent pill under the copy (see clerk-command; shown as a pill) */\n  command?: ClerkCommandProps;\n  /** one larger quote on the left, under an outlined quote mark */\n  featured?: { quote: string; name: string; role: string; avatar: ReactNode };\n  /** the posts in the drifting columns (alternating between the two) */\n  items: ClerkTestimonial[];\n  /** seconds for one full loop of the first column */\n  speed?: number;\n  className?: string;\n}\n\nfunction QuoteMark() {\n  return (\n    <svg aria-hidden viewBox=\"0 0 32 24\" className=\"h-6 w-8 fill-none stroke-foreground/20\">\n      <path d=\"M2 22V12C2 6 5 2.5 11 1.5l.8 2.6C8.5 5 7 7 7 10h5v12H2Zm17 0V12c0-6 3-9.5 9-10.5l.8 2.6C25.5 5 24 7 24 10h5v12H19Z\" />\n    </svg>\n  );\n}\n\nfunction Post({ t }: { t: ClerkTestimonial }) {\n  const paragraphs = Array.isArray(t.text) ? t.text : [t.text];\n  return (\n    <figure className=\"rounded-xl bg-card p-5 shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_2px_4px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_12px_32px_-8px_color-mix(in_oklab,var(--foreground)_8%,transparent)]\">\n      <blockquote className=\"space-y-5 text-[0.8125rem] leading-5 text-foreground\">\n        {paragraphs.map((p, i) => (\n          <p key={i} className=\"whitespace-pre-line\">\n            {p}\n          </p>\n        ))}\n      </blockquote>\n      <figcaption className=\"mt-6 flex items-center gap-3\">\n        <span className=\"flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md\">{t.avatar}</span>\n        <span>\n          <span className=\"block text-[0.8125rem] leading-5 font-medium text-foreground\">{t.name}</span>\n          <span className=\"block text-[0.6875rem] text-muted-foreground\">{t.handle}</span>\n        </span>\n      </figcaption>\n    </figure>\n  );\n}\n\nfunction Column({ items, speed, offset, className }: { items: ClerkTestimonial[]; speed: number; offset: number; className?: string }) {\n  return (\n    <div className={cn(\"min-w-0 flex-1\", className)}>\n      <div\n        className=\"clerk-wall-col flex flex-col gap-4\"\n        style={{ \"--clerk-wall-speed\": `${speed}s`, animationDelay: `-${offset}s` } as CSSProperties}\n      >\n        {[...items, ...items].map((t, i) => (\n          <div key={i} aria-hidden={i >= items.length || undefined}>\n            <Post t={t} />\n          </div>\n        ))}\n      </div>\n    </div>\n  );\n}\n\nexport function ClerkTestimonials({ title, text, command, featured, items, speed = 60, className }: ClerkTestimonialsProps) {\n  const left = items.filter((_, i) => i % 2 === 0);\n  const right = items.filter((_, i) => i % 2 === 1);\n  return (\n    <section className={cn(\"overflow-x-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page items-center gap-12 px-gutter py-[calc(var(--section-y)*0.6)] lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-24 lg:py-section\">\n        <div>\n          <h2 className=\"font-display text-[1.375rem] leading-8 font-semibold tracking-[-0.015em] lg:text-[2rem] lg:leading-10\">{title}</h2>\n          {text && <p className=\"mt-4 text-base leading-6 text-pretty text-muted-foreground\">{text}</p>}\n          {command && <ClerkCommand {...command} variant=\"pill\" className=\"mt-6\" />}\n          {featured && (\n            <figure className=\"mt-12 border-t border-dotted border-foreground/15 pt-12 lg:mt-24 lg:border-0 lg:pt-0\">\n              <QuoteMark />\n              <blockquote className=\"mt-4 text-[0.8125rem] leading-5 text-foreground\">{featured.quote}</blockquote>\n              <figcaption className=\"mt-4 flex items-center gap-3\">\n                <span className=\"flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md\">{featured.avatar}</span>\n                <span>\n                  <span className=\"block text-[0.8125rem] leading-5 font-medium\">{featured.name}</span>\n                  <span className=\"block text-[0.6875rem] text-muted-foreground\">{featured.role}</span>\n                </span>\n              </figcaption>\n            </figure>\n          )}\n        </div>\n\n        <div className=\"clerk-wall relative -mx-gutter px-gutter sm:mx-0 sm:px-0\">\n          {/* a faint dot grid behind the cards */}\n          <div\n            aria-hidden\n            className=\"absolute -inset-8 bg-[radial-gradient(color-mix(in_oklab,var(--foreground)_10%,transparent)_1px,transparent_1px)] [background-size:6px_6px] [mask-image:radial-gradient(closest-side,black,transparent)]\"\n          />\n          <div className=\"relative flex h-[38rem] gap-4 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] lg:h-[35rem]\">\n            <Column items={items} speed={speed} offset={0} className=\"sm:hidden\" />\n            <Column items={left} speed={speed} offset={0} className=\"max-sm:hidden\" />\n            <Column items={right} speed={speed * 1.2} offset={speed * 0.3} className=\"max-sm:hidden\" />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "clerk-command",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "command",
+      "type": "any",
+      "required": false,
+      "description": "copyable agent pill under the copy (see clerk-command; shown as a pill)"
+    },
+    {
+      "name": "featured",
+      "type": "{ quote: string; name: string; role: string; avatar: ReactNode; }",
+      "required": false,
+      "description": "one larger quote on the left, under an outlined quote mark"
+    },
+    {
+      "name": "items",
+      "type": "ClerkTestimonial[]",
+      "required": true,
+      "description": "the posts in the drifting columns (alternating between the two)"
+    },
+    {
+      "name": "speed",
+      "type": "number",
+      "required": false,
+      "default": "60",
+      "description": "seconds for one full loop of the first column"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "58a73ab4678c3d5abfb74380602c0b13266114e3d2c6c1b21ed8e9a64b781781"
+}

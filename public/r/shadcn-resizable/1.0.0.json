@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Resizable",
+  "description": "Accessible resizable panel groups and layouts with keyboard support.",
+  "category": "layout",
+  "source": "shadcn",
+  "license": "MIT",
+  "tags": [
+    "ui",
+    "resizable"
+  ],
+  "notes": [
+    "the demo shows upstream's 4 examples"
+  ],
+  "entry": "resizable.tsx",
+  "hydrate": "load",
+  "name": "shadcn-resizable",
+  "files": [
+    {
+      "path": "resizable.tsx",
+      "content": "\"use client\"\n\nimport { cn } from \"@foundry/foundry-utils\"\nimport { GripVerticalIcon } from \"lucide-react\"\nimport * as ResizablePrimitive from \"react-resizable-panels\"\n\nfunction ResizablePanelGroup({\n  className,\n  ...props\n}: ResizablePrimitive.GroupProps) {\n  return (\n    <ResizablePrimitive.Group\n      data-slot=\"resizable-panel-group\"\n      className={cn(\n        \"flex h-full w-full aria-[orientation=vertical]:flex-col\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nfunction ResizablePanel({ ...props }: ResizablePrimitive.PanelProps) {\n  return <ResizablePrimitive.Panel data-slot=\"resizable-panel\" {...props} />\n}\n\nfunction ResizableHandle({\n  withHandle,\n  className,\n  ...props\n}: ResizablePrimitive.SeparatorProps & {\n  withHandle?: boolean\n}) {\n  return (\n    <ResizablePrimitive.Separator\n      data-slot=\"resizable-handle\"\n      className={cn(\n        \"relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:outline-hidden aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full aria-[orientation=horizontal]:after:left-0 aria-[orientation=horizontal]:after:h-1 aria-[orientation=horizontal]:after:w-full aria-[orientation=horizontal]:after:translate-x-0 aria-[orientation=horizontal]:after:-translate-y-1/2 [&[aria-orientation=horizontal]>div]:rotate-90\",\n        className\n      )}\n      {...props}\n    >\n      {withHandle && (\n        <div className=\"z-10 flex h-4 w-3 items-center justify-center rounded-xs border bg-border\">\n          <GripVerticalIcon className=\"size-2.5\" />\n        </div>\n      )}\n    </ResizablePrimitive.Separator>\n  )\n}\n\nexport { ResizableHandle, ResizablePanel, ResizablePanelGroup }\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react-resizable-panels": "^4.14.5"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "collapsedSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Panel size when collapsed; defaults to 0%."
+    },
+    {
+      "name": "collapsedThreshold",
+      "type": "string | number",
+      "required": false,
+      "description": "Distance a collapsible panel must be resized past its `minSize` to collapse,\nor past its `collapsedSize` to expand.\nDefaults to half the distance between `collapsedSize` and `minSize`.\n\nFor example if a panel declares `collapsedSize=\"5%\"`, `collapsedThreshold=\"5%\"`, and `minSize=\"25%\"`,\nit will collapse when resized below 20% and expand when resized above 10%.\n\nℹ️ Interpretation rules:\n- Numbers are interpreted as pixels (e.g. `minSize={200}` is 200 pixels)\n- Strings without explicit units are interpreted as percentage (e.g. `minSize=\"50\"` is 50 percent)\n- Use explicit units (e.g. \"px\", \"%\", \"em\", \"rem\", \"vh\", or \"vw\") to change interpretation"
+    },
+    {
+      "name": "collapsible",
+      "type": "boolean",
+      "required": false,
+      "description": "This panel can be collapsed.\n\nℹ️ A collapsible panel will collapse when its size is less than the specified `minSize`"
+    },
+    {
+      "name": "defaultSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Default size of Panel within its parent group; default is auto-assigned based on the total number of Panels.\n\nℹ️ Interpretation rules:\n- Numbers are interpreted as pixels (e.g. `defaultSize={200}` is 200 pixels)\n- Strings without explicit units are interpreted as percentage (e.g. `defaultSize=\"50\"` is 50 percent)\n- Use explicit units (e.g. \"px\", \"%\", \"em\", \"rem\", \"vh\", or \"vw\") to change interpretation\n\n⚠️ Percentage based sizes may cause slight layout shift when server-rendering.\nFor more information see the documentation."
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "When disabled, a panel cannot be resized either directly or indirectly (by resizing another panel)."
+    },
+    {
+      "name": "elementRef",
+      "type": "Ref<HTMLDivElement | null>",
+      "required": false,
+      "description": "Ref attached to the root `HTMLDivElement`."
+    },
+    {
+      "name": "groupResizeBehavior",
+      "type": "enum",
+      "required": false,
+      "description": "How should this Panel behave if the parent Group is resized?\nDefaults to `preserve-relative-size`.\n\n- `preserve-relative-size`: Retain the current relative size (as a percentage of the Group)\n- `preserve-pixel-size`: Retain its current size (in pixels)\n\nℹ️ Panel min/max size constraints may impact this behavior.\n\n⚠️ A Group must contain at least one Panel with `preserve-relative-size` resize behavior."
+    },
+    {
+      "name": "maxSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Maximum size of Panel within its parent group; defaults to `\"100%\"`.\n\nℹ️ Interpretation rules:\n- Numbers are interpreted as pixels (e.g. `maxSize={200}` is 200 pixels)\n- Strings without explicit units are interpreted as percentage (e.g. `maxSize=\"50\"` is 50 percent)\n- Use explicit units (e.g. \"px\", \"%\", \"em\", \"rem\", \"vh\", or \"vw\") to change interpretation"
+    },
+    {
+      "name": "minSize",
+      "type": "string | number",
+      "required": false,
+      "description": "Minimum size of Panel within its parent group; defaults to 0%.\n\nℹ️ Interpretation rules:\n- Numbers are interpreted as pixels (e.g. `minSize={200}` is 200 pixels)\n- Strings without explicit units are interpreted as percentage (e.g. `minSize=\"50\"` is 50 percent)\n- Use explicit units (e.g. \"px\", \"%\", \"em\", \"rem\", \"vh\", or \"vw\") to change interpretation"
+    },
+    {
+      "name": "onResize",
+      "type": "((panelSize: PanelSize, id: string | number, prevPanelSize: PanelSize) => void) | undefined",
+      "required": false,
+      "description": "Called when panel sizes change.\n@param panelSize Panel size (both as a percentage of the parent Group and in pixels)\n@param id Panel id (if one was provided as a prop)\n@param prevPanelSize Previous panel size (will be undefined on mount)"
+    },
+    {
+      "name": "panelRef",
+      "type": "Ref<PanelImperativeHandle | null>",
+      "required": false,
+      "description": "Exposes the following imperative API:\n- `collapse(): void`\n- `expand(): void`\n- `getSize(): PanelSize`\n- `isCollapsed(): boolean`\n- `resize(size: number | string): void`\n\nℹ️ The `usePanelRef` and `usePanelCallbackRef` hooks are exported for convenience use in TypeScript projects."
+    }
+  ],
+  "hash": "14ed64cc9350cdf57a55e0e2ee0eb9f9ccf4b854bffdd52d3c0eeef8900353cf"
+}

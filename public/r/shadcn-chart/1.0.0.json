@@ -1,0 +1,897 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Chart",
+  "description": "Beautiful charts. Built using Recharts. Copy and paste into your apps.",
+  "category": "chart",
+  "source": "shadcn",
+  "license": "MIT",
+  "tags": [
+    "ui",
+    "chart"
+  ],
+  "notes": [
+    "charts: recharts",
+    "the demo shows upstream's 6 examples"
+  ],
+  "entry": "chart.tsx",
+  "hydrate": "load",
+  "name": "shadcn-chart",
+  "files": [
+    {
+      "path": "chart.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\nimport { cn } from \"@foundry/foundry-utils\"\nimport * as RechartsPrimitive from \"recharts\"\nimport type { TooltipValueType } from \"recharts\"\n\n// Format: { THEME_NAME: CSS_SELECTOR }\nconst THEMES = { light: \"\", dark: \".dark\" } as const\n\nconst INITIAL_DIMENSION = { width: 320, height: 200 } as const\ntype TooltipNameType = number | string\n\nexport type ChartConfig = Record<\n  string,\n  {\n    label?: React.ReactNode\n    icon?: React.ComponentType\n  } & (\n    | { color?: string; theme?: never }\n    | { color?: never; theme: Record<keyof typeof THEMES, string> }\n  )\n>\n\ntype ChartContextProps = {\n  config: ChartConfig\n}\n\nconst ChartContext = React.createContext<ChartContextProps | null>(null)\n\nfunction useChart() {\n  const context = React.useContext(ChartContext)\n\n  if (!context) {\n    throw new Error(\"useChart must be used within a <ChartContainer />\")\n  }\n\n  return context\n}\n\nfunction ChartContainer({\n  id,\n  className,\n  children,\n  config,\n  initialDimension = INITIAL_DIMENSION,\n  ...props\n}: React.ComponentProps<\"div\"> & {\n  config: ChartConfig\n  children: React.ComponentProps<\n    typeof RechartsPrimitive.ResponsiveContainer\n  >[\"children\"]\n  initialDimension?: {\n    width: number\n    height: number\n  }\n}) {\n  const uniqueId = React.useId()\n  const chartId = `chart-${id ?? uniqueId.replace(/:/g, \"\")}`\n\n  return (\n    <ChartContext.Provider value={{ config }}>\n      <div\n        data-slot=\"chart\"\n        data-chart={chartId}\n        className={cn(\n          \"flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden\",\n          className\n        )}\n        {...props}\n      >\n        <ChartStyle id={chartId} config={config} />\n        <RechartsPrimitive.ResponsiveContainer\n          initialDimension={initialDimension}\n        >\n          {children}\n        </RechartsPrimitive.ResponsiveContainer>\n      </div>\n    </ChartContext.Provider>\n  )\n}\n\nconst ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {\n  const colorConfig = Object.entries(config).filter(\n    ([, config]) => config.theme ?? config.color\n  )\n\n  if (!colorConfig.length) {\n    return null\n  }\n\n  return (\n    <style\n      dangerouslySetInnerHTML={{\n        __html: Object.entries(THEMES)\n          .map(\n            ([theme, prefix]) => `\n${prefix} [data-chart=${id}] {\n${colorConfig\n  .map(([key, itemConfig]) => {\n    const color =\n      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ??\n      itemConfig.color\n    return color ? `  --color-${key}: ${color};` : null\n  })\n  .join(\"\\n\")}\n}\n`\n          )\n          .join(\"\\n\"),\n      }}\n    />\n  )\n}\n\nconst ChartTooltip = RechartsPrimitive.Tooltip\n\nfunction ChartTooltipContent({\n  active,\n  payload,\n  className,\n  indicator = \"dot\",\n  hideLabel = false,\n  hideIndicator = false,\n  label,\n  labelFormatter,\n  labelClassName,\n  formatter,\n  color,\n  nameKey,\n  labelKey,\n}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &\n  React.ComponentProps<\"div\"> & {\n    hideLabel?: boolean\n    hideIndicator?: boolean\n    indicator?: \"line\" | \"dot\" | \"dashed\"\n    nameKey?: string\n    labelKey?: string\n  } & Omit<\n    RechartsPrimitive.DefaultTooltipContentProps<\n      TooltipValueType,\n      TooltipNameType\n    >,\n    \"accessibilityLayer\"\n  >) {\n  const { config } = useChart()\n\n  const tooltipLabel = React.useMemo(() => {\n    if (hideLabel || !payload?.length) {\n      return null\n    }\n\n    const [item] = payload\n    const key = `${labelKey ?? item?.dataKey ?? item?.name ?? \"value\"}`\n    const itemConfig = getPayloadConfigFromPayload(config, item, key)\n    const value =\n      !labelKey && typeof label === \"string\"\n        ? (config[label]?.label ?? label)\n        : itemConfig?.label\n\n    if (labelFormatter) {\n      return (\n        <div className={cn(\"font-medium\", labelClassName)}>\n          {labelFormatter(value, payload)}\n        </div>\n      )\n    }\n\n    if (!value) {\n      return null\n    }\n\n    return <div className={cn(\"font-medium\", labelClassName)}>{value}</div>\n  }, [\n    label,\n    labelFormatter,\n    payload,\n    hideLabel,\n    labelClassName,\n    config,\n    labelKey,\n  ])\n\n  if (!active || !payload?.length) {\n    return null\n  }\n\n  const nestLabel = payload.length === 1 && indicator !== \"dot\"\n\n  return (\n    <div\n      className={cn(\n        \"grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl\",\n        className\n      )}\n    >\n      {!nestLabel ? tooltipLabel : null}\n      <div className=\"grid gap-1.5\">\n        {payload\n          .filter((item) => item.type !== \"none\")\n          .map((item, index) => {\n            const key = `${nameKey ?? item.name ?? item.dataKey ?? \"value\"}`\n            const itemConfig = getPayloadConfigFromPayload(config, item, key)\n            const indicatorColor = color ?? item.payload?.fill ?? item.color\n\n            return (\n              <div\n                key={index}\n                className={cn(\n                  \"flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground\",\n                  indicator === \"dot\" && \"items-center\"\n                )}\n              >\n                {formatter && item?.value !== undefined && item.name ? (\n                  formatter(item.value, item.name, item, index, item.payload)\n                ) : (\n                  <>\n                    {itemConfig?.icon ? (\n                      <itemConfig.icon />\n                    ) : (\n                      !hideIndicator && (\n                        <div\n                          className={cn(\n                            \"shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)\",\n                            {\n                              \"h-2.5 w-2.5\": indicator === \"dot\",\n                              \"w-1\": indicator === \"line\",\n                              \"w-0 border-[1.5px] border-dashed bg-transparent\":\n                                indicator === \"dashed\",\n                              \"my-0.5\": nestLabel && indicator === \"dashed\",\n                            }\n                          )}\n                          style={\n                            {\n                              \"--color-bg\": indicatorColor,\n                              \"--color-border\": indicatorColor,\n                            } as React.CSSProperties\n                          }\n                        />\n                      )\n                    )}\n                    <div\n                      className={cn(\n                        \"flex flex-1 justify-between leading-none\",\n                        nestLabel ? \"items-end\" : \"items-center\"\n                      )}\n                    >\n                      <div className=\"grid gap-1.5\">\n                        {nestLabel ? tooltipLabel : null}\n                        <span className=\"text-muted-foreground\">\n                          {itemConfig?.label ?? item.name}\n                        </span>\n                      </div>\n                      {item.value != null && (\n                        <span className=\"font-mono font-medium text-foreground tabular-nums\">\n                          {typeof item.value === \"number\"\n                            ? item.value.toLocaleString()\n                            : String(item.value)}\n                        </span>\n                      )}\n                    </div>\n                  </>\n                )}\n              </div>\n            )\n          })}\n      </div>\n    </div>\n  )\n}\n\nconst ChartLegend = RechartsPrimitive.Legend\n\nfunction ChartLegendContent({\n  className,\n  hideIcon = false,\n  payload,\n  verticalAlign = \"bottom\",\n  nameKey,\n}: React.ComponentProps<\"div\"> & {\n  hideIcon?: boolean\n  nameKey?: string\n} & RechartsPrimitive.DefaultLegendContentProps) {\n  const { config } = useChart()\n\n  if (!payload?.length) {\n    return null\n  }\n\n  return (\n    <div\n      className={cn(\n        \"flex items-center justify-center gap-4\",\n        verticalAlign === \"top\" ? \"pb-3\" : \"pt-3\",\n        className\n      )}\n    >\n      {payload\n        .filter((item) => item.type !== \"none\")\n        .map((item, index) => {\n          const key = `${nameKey ?? item.dataKey ?? \"value\"}`\n          const itemConfig = getPayloadConfigFromPayload(config, item, key)\n\n          return (\n            <div\n              key={index}\n              className={cn(\n                \"flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground\"\n              )}\n            >\n              {itemConfig?.icon && !hideIcon ? (\n                <itemConfig.icon />\n              ) : (\n                <div\n                  className=\"h-2 w-2 shrink-0 rounded-[2px]\"\n                  style={{\n                    backgroundColor: item.color,\n                  }}\n                />\n              )}\n              {itemConfig?.label}\n            </div>\n          )\n        })}\n    </div>\n  )\n}\n\n// Helper to extract item config from a payload.\nfunction getPayloadConfigFromPayload(\n  config: ChartConfig,\n  payload: unknown,\n  key: string\n) {\n  if (typeof payload !== \"object\" || payload === null) {\n    return undefined\n  }\n\n  const payloadPayload =\n    \"payload\" in payload &&\n    typeof payload.payload === \"object\" &&\n    payload.payload !== null\n      ? payload.payload\n      : undefined\n\n  let configLabelKey: string = key\n\n  if (\n    key in payload &&\n    typeof payload[key as keyof typeof payload] === \"string\"\n  ) {\n    configLabelKey = payload[key as keyof typeof payload] as string\n  } else if (\n    payloadPayload &&\n    key in payloadPayload &&\n    typeof payloadPayload[key as keyof typeof payloadPayload] === \"string\"\n  ) {\n    configLabelKey = payloadPayload[\n      key as keyof typeof payloadPayload\n    ] as string\n  }\n\n  return configLabelKey in config ? config[configLabelKey] : config[key]\n}\n\nexport {\n  ChartContainer,\n  ChartTooltip,\n  ChartTooltipContent,\n  ChartLegend,\n  ChartLegendContent,\n  ChartStyle,\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1",
+    "recharts": "^3.10.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "dangerouslySetInnerHTML",
+      "type": "{ __html: string; }",
+      "required": false
+    },
+    {
+      "name": "onCopy",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCopyCapture",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCut",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCutCapture",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPaste",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPasteCapture",
+      "type": "AdaptChildClipboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionEnd",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionEndCapture",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionStart",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionStartCapture",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionUpdate",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCompositionUpdateCapture",
+      "type": "AdaptChildCompositionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onFocus",
+      "type": "AdaptChildFocusEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onFocusCapture",
+      "type": "AdaptChildFocusEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onBlur",
+      "type": "AdaptChildFocusEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onBlurCapture",
+      "type": "AdaptChildFocusEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onChange",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onChangeCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onBeforeInput",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onBeforeInputCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onInput",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onInputCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onReset",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onResetCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSubmit",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSubmitCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onInvalid",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onInvalidCapture",
+      "type": "AdaptChildFormEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoad",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onError",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onErrorCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyDown",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyDownCapture",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyPress",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyPressCapture",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyUp",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onKeyUpCapture",
+      "type": "AdaptChildKeyboardEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAbort",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAbortCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCanPlay",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCanPlayCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCanPlayThrough",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onCanPlayThroughCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDurationChange",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDurationChangeCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEmptied",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEmptiedCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEncrypted",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEncryptedCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEnded",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onEndedCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadedData",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadedDataCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadedMetadata",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadedMetadataCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadStart",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLoadStartCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPause",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPauseCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPlay",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPlayCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPlaying",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPlayingCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onProgress",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onProgressCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onRateChange",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onRateChangeCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSeeked",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSeekedCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSeeking",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSeekingCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onStalled",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onStalledCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSuspend",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSuspendCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTimeUpdate",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTimeUpdateCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onVolumeChange",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onVolumeChangeCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onWaiting",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onWaitingCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAuxClick",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAuxClickCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onClickCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onContextMenu",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onContextMenuCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDoubleClick",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDoubleClickCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDrag",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragEnd",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragEndCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragEnter",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragEnterCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragExit",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragExitCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragLeave",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragLeaveCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragOver",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragOverCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragStart",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDragStartCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDrop",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onDropCapture",
+      "type": "AdaptChildDragEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseDown",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseDownCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseMove",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseMoveCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseOut",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseOutCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseOver",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseOverCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseUp",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onMouseUpCapture",
+      "type": "AdaptChildMouseEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSelect",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onSelectCapture",
+      "type": "AdaptChildReactEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchCancel",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchCancelCapture",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchEnd",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchEndCapture",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchMove",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchMoveCapture",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchStart",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTouchStartCapture",
+      "type": "AdaptChildTouchEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerDown",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerDownCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerMove",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerMoveCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerUp",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerUpCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerCancel",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerCancelCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerEnter",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerLeave",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerOver",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerOverCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerOut",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerOutCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onGotPointerCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onGotPointerCaptureCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLostPointerCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onLostPointerCaptureCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onScroll",
+      "type": "AdaptChildUIEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onScrollCapture",
+      "type": "AdaptChildUIEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onWheel",
+      "type": "AdaptChildWheelEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onWheelCapture",
+      "type": "AdaptChildWheelEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationStart",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationStartCapture",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationEnd",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationEndCapture",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationIteration",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onAnimationIterationCapture",
+      "type": "AdaptChildAnimationEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTransitionEnd",
+      "type": "AdaptChildTransitionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onTransitionEndCapture",
+      "type": "AdaptChildTransitionEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerEnterCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "onPointerLeaveCapture",
+      "type": "AdaptChildPointerEventHandler<LegendPayload, ReactElement<unknown, string | JSXElementConstructor<any>>>",
+      "required": false
+    },
+    {
+      "name": "content",
+      "type": "ContentType",
+      "required": false,
+      "description": "Renders the content of the legend.\n\nThis should return HTML elements, not SVG elements.\n\n- If not set, the {@link DefaultLegendContent } component is used.\n- If set to a React element, this element will be cloned and extra props will be passed in.\n- If set to a function, the function will be called and should return HTML elements.\n@example <Legend content={CustomizedLegend} />\n@example <Legend content={renderLegend} />"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "description": "The layout of legend items inside the legend container.\n\nWhen `auto` then the layout is decided based on the `position` prop:\n- in `left`|`right` positions, the layout is vertical\n- otherwise horizontal\n- if position is undefined, also horizontal\n\n`auto` value is new since 3.10\n@defaultValue auto"
+    },
+    {
+      "name": "wrapperStyle",
+      "type": "CSSProperties",
+      "required": false,
+      "description": "CSS styles to be applied to the wrapper `div` element."
+    },
+    {
+      "name": "width",
+      "type": "string | number",
+      "required": false,
+      "description": "Width of the legend.\nAccept CSS style string values like `100%` or `fit-content`, or number values like `400`."
+    },
+    {
+      "name": "height",
+      "type": "string | number",
+      "required": false,
+      "description": "Height of the legend.\nAccept CSS style string values like `100%` or `fit-content`, or number values like `400`."
+    },
+    {
+      "name": "payloadUniqBy",
+      "type": "UniqueOption<LegendPayload>",
+      "required": false
+    },
+    {
+      "name": "onBBoxUpdate",
+      "type": "((box: ElementOffset | null) => void)",
+      "required": false
+    },
+    {
+      "name": "portal",
+      "type": "HTMLElement | null",
+      "required": false,
+      "description": "If portal is defined, then Legend will use this element as a target\nfor rendering using React Portal.\n\nIf this is undefined then Legend renders inside the recharts-wrapper element.\n@see {@link https://react.dev/reference/react-dom/createPortal}"
+    },
+    {
+      "name": "itemSorter",
+      "type": "LegendItemSorter | null",
+      "required": false,
+      "description": "Sorts Legend items. Defaults to `value` which means it will sort alphabetically\nby the label.\n\nIf `null` is provided then the payload is not sorted. Be aware that without sort,\nthe order of items may change between renders!\n@defaultValue value"
+    },
+    {
+      "name": "verticalAlign",
+      "type": "enum",
+      "required": false,
+      "description": "@deprecated use `position` instead which has more options, is more flexible and has more intuitive default styles.\n@description The alignment of the whole Legend container:\n\n- `bottom`: shows the Legend below chart, and chart height reduces automatically to make space for it.\n- `top`: shows the Legend above chart, and chart height reduces automatically.\n- `middle`:  shows the Legend in the middle of chart, covering other content, and chart height remains unchanged.\nThe exact behavior changes depending on `align` prop.\n@defaultValue bottom\n@see {@link https://recharts.github.io/examples/LegendPosition/ Legend position playground}"
+    },
+    {
+      "name": "position",
+      "type": "CartesianPosition",
+      "required": false,
+      "description": "The position of the legend relative to the chart.\nIf this is defined, it overrides `align` and `verticalAlign`.\n@since 3.10"
+    },
+    {
+      "name": "offset",
+      "type": "number",
+      "required": false,
+      "description": "The offset to the specified `position`. Direction of the offset depends on the position.\n@since 3.10"
+    }
+  ],
+  "hash": "c1393af615911aaa0283db8bf19015d4a4c886aa4dba9e5ae69ec47afc9aba7d"
+}

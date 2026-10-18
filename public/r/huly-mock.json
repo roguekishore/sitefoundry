@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Huly mock UI",
+  "description": "Ten small product-UI vignettes drawn from divs, lit by soft glows: command palette over a keyboard, day planner, schedule, notification bell in a halftone ring, checklist, event card, block menu, voice call, chat, project panel.",
+  "category": "card",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "mock-ui",
+    "illustration",
+    "dark",
+    "glow",
+    "halftone",
+    "saas",
+    "app"
+  ],
+  "notes": [
+    "made to fill a dark card (huly-card); it reads the dark colours of the surrounding .dark element",
+    "people are initials in gradient circles, no photos"
+  ],
+  "entry": "huly-mock.tsx",
+  "source": "foundry",
+  "name": "huly-mock",
+  "files": [
+    {
+      "path": "huly-mock.tsx",
+      "content": "import {\n  Bell,\n  Calendar,\n  Check,\n  Clock,\n  FileText,\n  ListTodo,\n  MessageSquare,\n  Mic,\n  Paperclip,\n  Plus,\n  Search,\n  SendHorizontal,\n  Star,\n  Type,\n  Users,\n  X,\n  type LucideIcon,\n} from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { Avatar, AvatarStack, Glow, Halftone, lightPanel, panel } from \"./parts\";\n\n/** Command palette floating over a keyboard, lit from above in the highlight colour. */\nexport interface CommandMock {\n  kind: \"command\";\n  /** text in the search field */\n  placeholder: string;\n  /** small label over the list */\n  label: string;\n  /** rows of the list; the first is shown selected */\n  actions: { label: string; key: string }[];\n}\n/** A light \"today\" column of task cards between two dimmed columns. */\nexport interface PlannerMock {\n  kind: \"planner\";\n  heading: string;\n  tasks: { tag: string; title: string; meta: string; people?: string[] }[];\n}\n/** Calendar grid with a large event card and a smaller one. */\nexport interface ScheduleMock {\n  kind: \"schedule\";\n  events: { time: string; title: string; note?: string; people?: string[] }[];\n  /** label of the join button on the first event */\n  action?: string;\n}\n/** Bell in a dark disc inside a slowly turning halftone ring of light. */\nexport interface BellMock {\n  kind: \"bell\";\n  /** number on the badge */\n  count: string;\n}\n/** A staggered checklist; done items are struck through. */\nexport interface TasksMock {\n  kind: \"tasks\";\n  items: { label: string; done?: boolean }[];\n}\n/** An event card with a shadow card behind it, hanging from a timeline. */\nexport interface EventMock {\n  kind: \"event\";\n  title: string;\n  time: string;\n  people: string[];\n  more?: string;\n}\n/** A block-insert menu, like a document editor's slash menu. */\nexport interface MenuMock {\n  kind: \"menu\";\n  heading: string;\n  items: { label: string; hint: string }[];\n}\n/** A glowing microphone with people around it. */\nexport interface VoiceMock {\n  kind: \"voice\";\n  /** initials, up to eight */\n  people: string[];\n}\n/** Two chat bubbles and a message field. */\nexport interface ChatMock {\n  kind: \"chat\";\n  messages: { mention: string; text: string; initials: string; mine?: boolean }[];\n  placeholder: string;\n}\n/** A light project panel between dimmed ones. */\nexport interface ProjectMock {\n  kind: \"project\";\n  title: string;\n  item: string;\n  members: string;\n  people: string[];\n  rows: string[];\n}\n\nexport type HulyMockProps = (\n  | CommandMock\n  | PlannerMock\n  | ScheduleMock\n  | BellMock\n  | TasksMock\n  | EventMock\n  | MenuMock\n  | VoiceMock\n  | ChatMock\n  | ProjectMock\n) & { className?: string };\n\nconst KEYS = [\"QWERTYUIOP\", \"ASDFGHJKL\", \"ZXCVBNM\"];\n\n/** Fills its parent (give the parent a size). Reads the colours of the surrounding .dark element. */\nexport function HulyMock(props: HulyMockProps) {\n  return (\n    <div aria-hidden className={cn(\"relative h-full w-full overflow-hidden text-foreground select-none\", props.className)}>\n      {render(props)}\n    </div>\n  );\n}\n\nfunction render(p: HulyMockProps) {\n  switch (p.kind) {\n    case \"command\": {\n      const lit = new Set(p.actions.map((a) => a.key.toUpperCase()));\n      return (\n        <>\n          <Glow className=\"top-[-30%] left-1/2 h-[70%] w-[45%] -translate-x-1/2 bg-highlight/70\" />\n          <div className=\"absolute top-0 left-1/2 h-[45%] w-24 -translate-x-1/2 bg-linear-to-b from-highlight/80 to-transparent blur-xl\" />\n          <Halftone className=\"[mask-image:radial-gradient(70%_60%_at_50%_10%,black,transparent)]\" />\n          <div className=\"absolute inset-x-0 top-[44%] flex flex-col items-center gap-1.5 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]\">\n            {KEYS.map((row) => (\n              <div key={row} className=\"flex gap-1.5\">\n                {row.split(\"\").map((k) => (\n                  <span\n                    key={k}\n                    className={cn(\n                      \"flex size-7 items-center justify-center rounded-md border border-foreground/10 bg-foreground/5 text-[0.5625rem] text-foreground/40\",\n                      lit.has(k) && \"border-highlight/40 bg-highlight/20 text-highlight\",\n                    )}\n                  >\n                    {k}\n                  </span>\n                ))}\n              </div>\n            ))}\n          </div>\n          <div className={cn(panel, \"absolute top-[9%] left-1/2 w-[17rem] -translate-x-1/2 p-1.5 text-xs lg:top-[16%]\")}>\n            <div className=\"flex items-center gap-2 rounded-lg bg-foreground/5 px-2.5 py-2\">\n              <Search className=\"size-3.5 text-foreground/50\" />\n              <span className=\"border-l border-foreground/20 pl-2\">{p.placeholder}</span>\n              <X className=\"ml-auto size-3.5 text-foreground/40\" />\n            </div>\n            <p className=\"px-2 pt-3 pb-1.5 text-[0.5625rem] tracking-wide text-foreground/45 uppercase\">{p.label}</p>\n            {p.actions.map((a, i) => (\n              <div key={a.label} className={cn(\"flex items-center rounded-md px-2 py-1.5\", i === 0 ? \"bg-foreground/10\" : \"text-foreground/55\")}>\n                {a.label}\n                <kbd className=\"ml-auto rounded border border-foreground/15 px-1 text-[0.5625rem] text-foreground/60\">{a.key}</kbd>\n              </div>\n            ))}\n          </div>\n        </>\n      );\n    }\n\n    case \"planner\":\n      return (\n        <>\n          <Glow className=\"top-[-20%] left-[40%] h-1/2 w-1/2 bg-glow/40\" />\n          <Halftone className=\"[mask-image:linear-gradient(to_bottom,black,transparent_70%)]\" />\n          <div className={cn(panel, \"absolute top-[18%] left-[-8%] h-40 w-48 opacity-50\")} />\n          <div className={cn(panel, \"absolute top-[18%] right-[-8%] h-40 w-48 opacity-50\")} />\n          <div className={cn(lightPanel, \"absolute top-[12%] left-1/2 w-[15rem] -translate-x-1/2 p-2 text-[0.6875rem]\")}>\n            <div className=\"flex items-center justify-between px-1.5 pt-0.5 pb-2 text-xs font-semibold\">\n              {p.heading}\n              <Plus className=\"size-3.5 opacity-50\" />\n            </div>\n            <div className=\"space-y-1.5\">\n              {p.tasks.map((t, i) => (\n                <div key={t.title} className=\"rounded-lg bg-foreground p-2 shadow-sm shadow-background/20\">\n                  <span className={cn(\"rounded px-1.5 py-px text-[0.5625rem] font-medium\", i === 0 ? \"bg-destructive/15 text-destructive\" : \"bg-highlight/20 text-highlight-foreground\")}>\n                    {t.tag}\n                  </span>\n                  <p className=\"mt-1.5 leading-snug font-medium\">{t.title}</p>\n                  <div className=\"mt-1.5 flex items-center gap-2 text-[0.5625rem] opacity-55\">\n                    <Calendar className=\"size-3\" />\n                    {t.meta}\n                    {t.people && <AvatarStack people={t.people} className=\"ml-auto [&>span]:size-4 [&>span]:text-[0.375rem] [&>span]:ring-foreground\" />}\n                  </div>\n                </div>\n              ))}\n            </div>\n          </div>\n        </>\n      );\n\n    case \"schedule\":\n      return (\n        <>\n          <div className=\"absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_6%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--foreground)_6%,transparent)_1px,transparent_1px)] bg-size-[56px_44px]\" />\n          <Glow className=\"top-[-10%] left-[10%] h-1/2 w-1/2 bg-glow/30\" />\n          {p.events[0] && (\n            <div className={cn(lightPanel, \"absolute top-[12%] left-[8%] w-[13.5rem] p-3 text-[0.6875rem] lg:left-[12%]\")}>\n              <p className=\"text-[0.625rem] opacity-55\">{p.events[0].time}</p>\n              <p className=\"mt-2 leading-snug font-medium\">{p.events[0].title}</p>\n              {p.events[0].note && <p className=\"mt-1 text-[0.625rem] opacity-55\">{p.events[0].note}</p>}\n              <div className=\"mt-3 flex items-center justify-between\">\n                {p.action && <span className=\"rounded-full bg-glow/25 px-2.5 py-1 text-[0.625rem] font-medium text-glow\">+ {p.action}</span>}\n                {p.events[0].people && <AvatarStack people={p.events[0].people} className=\"[&>span]:size-5 [&>span]:ring-foreground\" />}\n              </div>\n            </div>\n          )}\n          {p.events[1] && (\n            <div className={cn(panel, \"absolute top-[34%] right-[6%] w-44 border-l-2 border-l-highlight p-2.5 text-[0.625rem] lg:right-[14%]\")}>\n              <p className=\"leading-snug\">{p.events[1].title}</p>\n              <p className=\"mt-1 text-foreground/50\">{p.events[1].time}</p>\n              {p.events[1].people && <AvatarStack people={p.events[1].people} className=\"mt-2 [&>span]:size-4 [&>span]:text-[0.375rem]\" />}\n            </div>\n          )}\n        </>\n      );\n\n    case \"bell\":\n      return (\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"absolute size-64 animate-[spin_24s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,var(--glow),transparent_25%,var(--highlight)_45%,transparent_60%,var(--chart-3)_80%,var(--glow))] opacity-80 blur-md [mask-image:radial-gradient(closest-side,transparent_38%,black_55%,transparent_100%)] motion-reduce:animate-none\" />\n          <Halftone className=\"[mask-image:radial-gradient(closest-side,transparent_25%,black_45%,transparent_75%)]\" />\n          <div className=\"relative flex size-20 items-center justify-center rounded-full bg-background shadow-[inset_0_1px_0_color-mix(in_oklab,var(--foreground)_15%,transparent),0_0_0_1px_color-mix(in_oklab,var(--glow)_40%,transparent)]\">\n            <Bell className=\"size-9 fill-foreground/85 text-foreground/85\" strokeWidth={1.25} />\n            <span className=\"absolute top-4 right-3.5 rounded-full bg-highlight px-1 text-[0.5625rem] font-semibold text-highlight-foreground\">{p.count}</span>\n          </div>\n        </div>\n      );\n\n    case \"tasks\":\n      return (\n        <>\n          <Glow className=\"bottom-[-30%] left-[-20%] h-[90%] w-[70%] bg-glow/70\" />\n          <div className=\"absolute top-[34%] left-[22%] flex flex-col gap-3 text-[0.6875rem]\">\n            {p.items.map((t, i) => (\n              <div\n                key={t.label}\n                className={cn(panel, \"flex w-56 items-center gap-2.5 px-3 py-2.5\", i === 1 && \"-ml-10\", i === 2 && \"opacity-50\")}\n              >\n                <span className={cn(\"flex size-4 items-center justify-center rounded border border-foreground/40\", t.done && \"border-foreground bg-foreground\")}>\n                  {t.done && <Check className=\"size-3 text-background\" strokeWidth={3} />}\n                </span>\n                <span className={cn(t.done && \"text-foreground/50 line-through\")}>{t.label}</span>\n              </div>\n            ))}\n          </div>\n        </>\n      );\n\n    case \"event\":\n      return (\n        <>\n          <Halftone className=\"[mask-image:radial-gradient(60%_60%_at_70%_40%,black,transparent)]\" />\n          <div className=\"absolute top-[36%] left-[calc(30%+10rem)] h-full w-px bg-foreground/15\" />\n          <div className={cn(panel, \"absolute top-[50%] left-[38%] h-20 w-44 opacity-60\")}>\n            <AvatarStack people={p.people.slice(0, 3)} className=\"absolute bottom-3 left-3 [&>span]:size-4 [&>span]:text-[0.375rem]\" />\n          </div>\n          <div className={cn(panel, \"absolute top-[30%] left-[16%] w-48 border-l-2 border-l-foreground/60 p-3 text-[0.6875rem]\")}>\n            <p className=\"leading-snug\">{p.title}</p>\n            <p className=\"mt-1 text-[0.625rem] text-foreground/50\">{p.time}</p>\n            <AvatarStack people={p.people} more={p.more} className=\"mt-2.5 [&>span]:size-5\" />\n          </div>\n        </>\n      );\n\n    case \"menu\":\n      return (\n        <>\n          <Glow className=\"top-[-30%] right-[-20%] h-[80%] w-[60%] bg-glow/80\" />\n          <div className={cn(panel, \"absolute top-[38%] left-1/2 w-60 -translate-x-1/2 p-2 text-[0.6875rem]\")}>\n            <p className=\"px-1.5 pb-2 text-[0.625rem] text-foreground/45\">{p.heading}</p>\n            {p.items.map((it, i) => {\n              const Icon: LucideIcon = [Type, ListTodo, FileText][i % 3];\n              return (\n                <div key={it.label} className={cn(\"flex items-center gap-2.5 rounded-md p-1.5\", i > 1 && \"opacity-50\")}>\n                  <span className=\"flex size-7 items-center justify-center rounded-md border border-foreground/15 bg-foreground/5\">\n                    <Icon className=\"size-3.5\" />\n                  </span>\n                  <span>\n                    <span className=\"block\">{it.label}</span>\n                    <span className=\"block text-[0.5625rem] text-foreground/45\">{it.hint}</span>\n                  </span>\n                </div>\n              );\n            })}\n          </div>\n        </>\n      );\n\n    case \"voice\": {\n      const spots = [\"left-[8%] top-[55%]\", \"left-[22%] top-[78%]\", \"left-[30%] top-[46%]\", \"right-[30%] top-[46%]\", \"right-[22%] top-[76%]\", \"right-[8%] top-[55%]\", \"left-[4%] top-[88%]\", \"right-[4%] top-[86%]\"];\n      return (\n        <>\n          <Glow className=\"bottom-[-55%] left-1/2 h-[90%] w-[85%] -translate-x-1/2 bg-glow/90\" />\n          <Glow className=\"bottom-[-40%] left-1/2 h-[60%] w-[45%] -translate-x-1/2 bg-chart-5/60\" />\n          {p.people.slice(0, 8).map((pp, i) => (\n            <Avatar key={i} initials={pp} index={i} className={cn(\"absolute size-11 text-xs\", spots[i], i > 5 && \"opacity-40 blur-[1px]\")} />\n          ))}\n          <div className=\"absolute top-[58%] left-1/2 flex size-[4.5rem] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-[0_0_0_2px_color-mix(in_oklab,var(--glow)_70%,transparent),0_0_32px_color-mix(in_oklab,var(--glow)_80%,transparent)]\">\n            <Mic className=\"size-7\" strokeWidth={1.5} />\n          </div>\n        </>\n      );\n    }\n\n    case \"chat\":\n      return (\n        <>\n          <Glow className=\"right-[-10%] bottom-[-40%] h-[80%] w-[70%] bg-highlight/50\" />\n          <Halftone className=\"[mask-image:linear-gradient(to_bottom,transparent,black)]\" />\n          <div className=\"absolute inset-x-5 top-[34%] space-y-3 text-[0.6875rem] lg:inset-x-6\">\n            {p.messages.map((m, i) => (\n              <div key={i} className={cn(\"flex items-end gap-2\", m.mine ? \"flex-row-reverse pl-10\" : \"pr-10\")}>\n                <Avatar initials={m.initials} index={i + 2} className=\"size-6\" />\n                <p className={cn(\"max-w-[11rem] rounded-xl px-2.5 py-2 leading-snug\", m.mine ? lightPanel : panel)}>\n                  <span className={m.mine ? \"opacity-55\" : \"text-highlight\"}>{m.mention}</span> {m.text}\n                </p>\n              </div>\n            ))}\n          </div>\n          <div className=\"absolute inset-x-5 bottom-4 flex items-center rounded-full border border-foreground/10 bg-foreground/8 px-3.5 py-2 text-[0.6875rem] text-foreground/45 lg:inset-x-6\">\n            {p.placeholder}\n            <SendHorizontal className=\"ml-auto size-3.5\" />\n          </div>\n        </>\n      );\n\n    case \"project\":\n      return (\n        <>\n          <Glow className=\"top-[-30%] right-[-10%] h-[70%] w-[60%] bg-highlight/45\" />\n          <div className={cn(panel, \"absolute top-[44%] left-[2%] h-40 w-48 p-3 text-[0.625rem] text-foreground/40\")}>\n            <div className=\"h-2 w-10 rounded bg-foreground/15\" />\n            <div className=\"mt-6 h-2 w-24 rounded bg-foreground/10\" />\n          </div>\n          <div className={cn(panel, \"absolute top-[44%] right-[2%] h-40 w-48\")} />\n          <div className={cn(lightPanel, \"absolute top-[34%] left-1/2 w-56 -translate-x-1/2 p-2.5 text-[0.6875rem]\")}>\n            <div className=\"flex items-center justify-between px-0.5 pb-2 text-xs font-semibold\">\n              {p.title}\n              <Star className=\"size-3.5 fill-highlight text-highlight\" />\n            </div>\n            <div className=\"rounded-lg bg-foreground p-2\">\n              <p className=\"font-medium\">{p.item}</p>\n              <div className=\"mt-1.5 flex items-center gap-1.5 text-[0.5625rem] opacity-60\">\n                <Users className=\"size-3\" />\n                {p.members}\n                <AvatarStack people={p.people} className=\"ml-auto [&>span]:size-4 [&>span]:text-[0.375rem] [&>span]:ring-foreground\" />\n              </div>\n              <div className=\"mt-2 space-y-1.5 border-t border-background/10 pt-2 text-[0.625rem] opacity-70\">\n                {p.rows.map((r, i) => {\n                  const Icon: LucideIcon = [FileText, MessageSquare, Paperclip, Clock][i % 4];\n                  return (\n                    <div key={r} className=\"flex items-center gap-1.5\">\n                      <Icon className=\"size-3\" />\n                      {r}\n                    </div>\n                  );\n                })}\n              </div>\n            </div>\n          </div>\n        </>\n      );\n  }\n}\n\n"
+    },
+    {
+      "path": "parts.tsx",
+      "content": "// Small pieces shared by the mock vignettes.\nimport { cn } from \"@foundry/foundry-utils\";\n\nconst TONES = [\n  \"from-glow to-chart-5\",\n  \"from-highlight to-chart-1\",\n  \"from-chart-2 to-chart-3\",\n  \"from-chart-4 to-highlight\",\n  \"from-chart-3 to-glow\",\n  \"from-chart-5 to-chart-1\",\n];\n\n/** A person: initials in a gradient circle. */\nexport function Avatar({ initials, index = 0, className }: { initials: string; index?: number; className?: string }) {\n  return (\n    <span\n      className={cn(\n        \"inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-linear-to-br text-[0.5625rem] font-semibold text-foreground ring-2 ring-background\",\n        TONES[index % TONES.length],\n        className,\n      )}\n    >\n      {initials}\n    </span>\n  );\n}\n\nexport function AvatarStack({ people, more, className }: { people: string[]; more?: string; className?: string }) {\n  return (\n    <span className={cn(\"flex items-center\", className)}>\n      {people.map((p, i) => (\n        <Avatar key={i} initials={p} index={i} className={i > 0 ? \"-ml-2\" : undefined} />\n      ))}\n      {more && <span className=\"ml-1.5 text-[0.625rem] text-current/60\">{more}</span>}\n    </span>\n  );\n}\n\n/** Dotted halftone texture, faded by a mask. */\nexport function Halftone({ className }: { className?: string }) {\n  return (\n    <div\n      aria-hidden\n      className={cn(\n        \"pointer-events-none absolute inset-0 bg-[radial-gradient(color-mix(in_oklab,var(--foreground)_14%,transparent)_0.6px,transparent_0.6px)] bg-size-[4px_4px]\",\n        className,\n      )}\n    />\n  );\n}\n\n/** A soft coloured light. Position and colour come from className. */\nexport function Glow({ className }: { className?: string }) {\n  return <div aria-hidden className={cn(\"pointer-events-none absolute rounded-full blur-3xl\", className)} />;\n}\n\nexport const panel = \"rounded-xl border border-foreground/10 bg-popover/90 shadow-xl shadow-background/70 backdrop-blur\";\nexport const lightPanel = \"rounded-xl bg-foreground/85 text-background shadow-xl shadow-background/60 backdrop-blur\";\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "kind",
+      "type": "enum",
+      "required": true
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": true,
+      "description": "text in the search field"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "small label over the list"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; key: string; }[]",
+      "required": true,
+      "description": "rows of the list; the first is shown selected"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tasks",
+      "type": "{ tag: string; title: string; meta: string; people?: string[] | undefined; }[]",
+      "required": true
+    },
+    {
+      "name": "events",
+      "type": "{ time: string; title: string; note?: string | undefined; people?: string[] | undefined; }[]",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "label of the join button on the first event"
+    },
+    {
+      "name": "count",
+      "type": "string",
+      "required": true,
+      "description": "number on the badge"
+    },
+    {
+      "name": "items",
+      "type": "{ label: string; done?: boolean | undefined; }[] | { label: string; hint: string; }[]",
+      "required": true
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "time",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "people",
+      "type": "string[]",
+      "required": true,
+      "description": "initials, up to eight"
+    },
+    {
+      "name": "more",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "messages",
+      "type": "{ mention: string; text: string; initials: string; mine?: boolean | undefined; }[]",
+      "required": true
+    },
+    {
+      "name": "item",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "members",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "rows",
+      "type": "string[]",
+      "required": true
+    }
+  ],
+  "hash": "dfdeeab970e62f81fc1b534ff5090d98f2cda2156861f4fff5ca5948aefb3b71"
+}

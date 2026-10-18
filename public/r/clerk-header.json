@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk header",
+  "description": "An optional black announcement strip, then a floating, rounded 42px bar that sticks 8px from the top: logo, a hairline divider, small nav links with chevrons, and 'sign in | sign up' at the right. Frosted near-white with a hairline-and-soft-shadow outline; it turns dark by itself while it floats over a dark section. On phones a two-line menu button opens the links inside the bar.",
+  "category": "header",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "floating",
+    "frosted",
+    "minimal",
+    "light",
+    "announcement"
+  ],
+  "notes": [
+    "sticky: put it at the top level of the page so it sticks for the whole scroll",
+    "surface paints the strip behind the bar's resting place (card for a white hero, background otherwise)",
+    "the chevrons are decoration, not dropdowns"
+  ],
+  "entry": "clerk-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "clerk-header",
+  "files": [
+    {
+      "path": "clerk-header.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { Caret } from \"@foundry/clerk-button\";\n\nexport interface ClerkHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron after the label */\n  hasMenu?: boolean;\n}\n\nexport interface ClerkHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** logo (an svg or img, wordmark included) */\n  logo: ReactNode;\n  homeHref?: string;\n  links: ClerkHeaderLink[];\n  /** small links at the right end, split by hairlines (e.g. sign in, sign up) */\n  actions?: { label: string; href: string }[];\n  /** thin black strip above the bar */\n  announcement?: { text: string; link?: { label: string; href: string } };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  /** colour behind the bar where it rests at the top: match the first section under it */\n  surface?: \"card\" | \"background\" | \"none\";\n  className?: string;\n}\n\nconst surfaces = { card: \"bg-card\", background: \"bg-background\", none: \"\" };\n\nexport function ClerkHeader({\n  brand,\n  logo,\n  homeHref = \"/\",\n  links,\n  actions = [],\n  announcement,\n  menuLabel = \"Menu\",\n  surface = \"card\",\n  className,\n}: ClerkHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [overDark, setOverDark] = useState(false);\n  const bar = useRef<HTMLElement>(null);\n\n  // While floating, look at what's under the bar and go dark over dark sections.\n  useEffect(() => {\n    let frame = 0;\n    const check = () => {\n      frame = 0;\n      const el = bar.current;\n      if (!el) return;\n      const r = el.getBoundingClientRect();\n      // hide the header for a moment so the hit test finds what's underneath it\n      el.style.visibility = \"hidden\";\n      const under = document.elementFromPoint(r.left + r.width / 2, r.top + 21);\n      el.style.visibility = \"\";\n      setOverDark(!!under?.closest(\".dark\"));\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(check);\n    };\n    check();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => {\n      window.removeEventListener(\"scroll\", onScroll);\n      if (frame) cancelAnimationFrame(frame);\n    };\n  }, []);\n\n  return (\n    <>\n      {announcement && (\n        <div className=\"dark bg-background text-foreground\">\n          <p className=\"mx-auto flex h-10 max-w-page items-center justify-center gap-4 px-gutter text-[0.8125rem] font-medium whitespace-nowrap\">\n            <span className=\"truncate\">{announcement.text}</span>\n            {announcement.link && (\n              <>\n                <span aria-hidden className=\"h-4 w-px bg-border\" />\n                <a href={announcement.link.href} className=\"group/a flex items-center gap-2.5 transition-colors hover:text-foreground/75\">\n                  {announcement.link.label}\n                  <Caret className=\"size-1.5 opacity-70 transition-transform duration-300 group-hover/a:translate-x-0.5 motion-reduce:transition-none\" />\n                </a>\n              </>\n            )}\n          </p>\n        </div>\n      )}\n      {/* the strip behind the bar's resting place; it scrolls away, the bar doesn't */}\n      <div aria-hidden className={cn(\"h-[3.125rem]\", surfaces[surface])} />\n      <header\n        ref={bar}\n        className={cn(\n          \"sticky top-2 z-40 -mt-[2.625rem] mx-auto w-full max-w-[calc(var(--page-width)-2*var(--page-gutter)+1.75rem)] px-2 lg:px-0\",\n          className,\n        )}\n      >\n        <div\n          className={cn(\n            \"rounded-xl bg-background/90 text-foreground backdrop-blur-md transition-[background-color,color,box-shadow] duration-500 ease-out motion-reduce:transition-none\",\n            \"shadow-[inset_0_0_0_0.5px_color-mix(in_oklab,var(--card)_90%,transparent),0_0_0_0.5px_color-mix(in_oklab,var(--foreground)_15%,transparent),0_2px_3px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_4px_6px_color-mix(in_oklab,var(--foreground)_4%,transparent)]\",\n            overDark && \"dark\",\n          )}\n        >\n          <div className=\"flex h-[2.625rem] items-center py-2 pr-2 pl-3\">\n            <a href={homeHref} aria-label={brand} className=\"flex items-center text-foreground [&_svg]:h-[1.375rem] [&_svg]:w-auto\">\n              {logo}\n            </a>\n            <span aria-hidden className=\"mx-3 hidden h-6 w-px bg-border lg:block\" />\n            <nav className=\"hidden items-center lg:flex\">\n              {links.map((link) => (\n                <a\n                  key={link.href}\n                  href={link.href}\n                  className=\"flex h-7 items-center gap-1 rounded-md px-3 text-[0.8125rem] font-medium transition-colors duration-200 hover:bg-foreground/5\"\n                >\n                  {link.label}\n                  {link.hasMenu && <ChevronDown className=\"size-3.5 opacity-60\" strokeWidth={2} />}\n                </a>\n              ))}\n            </nav>\n\n            <div className=\"ml-auto flex items-center\">\n              {actions.map((a, i) => (\n                <span key={a.href} className=\"flex items-center\">\n                  {i > 0 && <span aria-hidden className=\"h-4 w-px bg-border\" />}\n                  <a href={a.href} className=\"flex h-7 items-center rounded-md px-3 text-[0.8125rem] font-medium transition-colors duration-200 hover:bg-foreground/5\">\n                    {a.label}\n                  </a>\n                </span>\n              ))}\n              <button\n                type=\"button\"\n                aria-label={menuLabel}\n                aria-expanded={open}\n                onClick={() => setOpen((o) => !o)}\n                className=\"relative ml-1 size-7 rounded-md hover:bg-foreground/5 lg:hidden\"\n              >\n                {/* two short bars that cross into an X */}\n                <span\n                  className={cn(\n                    \"absolute left-1/2 h-px w-3.5 -translate-x-1/2 bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n                    open ? \"top-[13.5px] rotate-45\" : \"top-[11px]\",\n                  )}\n                />\n                <span\n                  className={cn(\n                    \"absolute left-1/2 h-px w-3.5 -translate-x-1/2 bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n                    open ? \"top-[13.5px] -rotate-45\" : \"top-[16px]\",\n                  )}\n                />\n              </button>\n            </div>\n          </div>\n\n          {open && (\n            <nav className=\"border-t border-border px-3 pt-2 pb-3 lg:hidden\">\n              {links.map((link) => (\n                <a\n                  key={link.href}\n                  href={link.href}\n                  onClick={() => setOpen(false)}\n                  className=\"flex items-center justify-between border-b border-border py-3 text-[0.9375rem] font-medium last:border-0\"\n                >\n                  {link.label}\n                  {link.hasMenu && <ChevronDown className=\"size-4 opacity-50\" strokeWidth={1.75} />}\n                </a>\n              ))}\n            </nav>\n          )}\n        </div>\n      </header>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "clerk-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "logo (an svg or img, wordmark included)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "ClerkHeaderLink[]",
+      "required": true
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small links at the right end, split by hairlines (e.g. sign in, sign up)"
+    },
+    {
+      "name": "announcement",
+      "type": "{ text: string; link?: { label: string; href: string; }; }",
+      "required": false,
+      "description": "thin black strip above the bar"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "surface",
+      "type": "enum",
+      "required": false,
+      "default": "card",
+      "description": "colour behind the bar where it rests at the top: match the first section under it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "264704d3d01a0cd6347cb74279eaa242ec3202c53d6694ee2dabe880a8ae3aeb"
+}

@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Stripe button",
+  "description": "Small-cornered rectangular button: indigo fill, white with a soft shadow, hairline outline, a ghost for dark bands, or a plain link. The chevron after the label grows a stem and nudges right on hover.",
+  "category": "button",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "link",
+    "arrow",
+    "hover",
+    "minimal",
+    "fintech"
+  ],
+  "notes": [
+    "also exports HoverArrow, the hover chevron on its own (put it inside a `group`)"
+  ],
+  "entry": "stripe-button.tsx",
+  "source": "foundry",
+  "name": "stripe-button",
+  "files": [
+    {
+      "path": "stripe-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface StripeButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: indigo fill · white: white fill with indigo text and a soft shadow ·\n   * outline: hairline border with indigo text · ghost: hairline border in the text colour\n   * (for dark bands) · link: plain indigo text\n   */\n  variant?: \"primary\" | \"white\" | \"outline\" | \"ghost\" | \"link\";\n  /** sm: 40px tall, 14px text (headers) · md: 48px tall, 16px text */\n  size?: \"sm\" | \"md\";\n  /** the small chevron after the label that grows a stem on hover */\n  arrow?: boolean;\n  /** stretch to the full width on phones (as the original's CTAs do) */\n  fullOnMobile?: boolean;\n  /** label for screen readers when the visible label is not enough */\n  ariaLabel?: string;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-10 px-4 text-sm\",\n  md: \"h-12 px-6 text-base\",\n};\n\nconst variants = {\n  primary: \"bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary)_85%,var(--foreground))]\",\n  white:\n    \"bg-background text-primary shadow-[0_3px_6px_0_color-mix(in_oklab,var(--foreground)_6%,transparent),0_15px_35px_0_color-mix(in_oklab,var(--foreground)_8%,transparent)] hover:text-foreground\",\n  outline: \"border border-primary/25 bg-background text-primary hover:border-primary/60\",\n  ghost: \"border border-foreground/25 text-foreground hover:border-foreground/60\",\n  link: \"h-auto! px-0! text-primary hover:text-foreground\",\n};\n\n/** The chevron that grows a short stem and nudges right when its parent `.group` is hovered. */\nexport function HoverArrow({ className }: { className?: string }) {\n  return (\n    <svg\n      aria-hidden\n      viewBox=\"0 0 10 10\"\n      className={cn(\"ml-2 inline-block size-[0.55em] shrink-0 overflow-visible stroke-current\", className)}\n      fill=\"none\"\n      strokeWidth={1.7}\n    >\n      <path d=\"M0 5h7\" className=\"opacity-0 transition-opacity duration-150 group-hover:opacity-100 motion-reduce:transition-none\" />\n      <path\n        d=\"M1 1l4 4-4 4\"\n        className=\"transition-transform duration-150 group-hover:translate-x-[3px] motion-reduce:transition-none\"\n      />\n    </svg>\n  );\n}\n\nexport function StripeButton({\n  children,\n  href,\n  variant = \"primary\",\n  size = \"md\",\n  arrow = true,\n  fullOnMobile = false,\n  ariaLabel,\n  onClick,\n  className,\n}: StripeButtonProps) {\n  const classes = cn(\n    \"group inline-flex shrink-0 items-center justify-center rounded-md font-sans font-normal whitespace-nowrap\",\n    \"transition-[background-color,color,border-color] duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    fullOnMobile && \"w-full sm:w-auto\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {arrow && <HoverArrow />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} aria-label={ariaLabel} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} aria-label={ariaLabel} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: indigo fill · white: white fill with indigo text and a soft shadow ·\noutline: hairline border with indigo text · ghost: hairline border in the text colour\n(for dark bands) · link: plain indigo text"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 40px tall, 14px text (headers) · md: 48px tall, 16px text"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "the small chevron after the label that grows a stem on hover"
+    },
+    {
+      "name": "fullOnMobile",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "stretch to the full width on phones (as the original's CTAs do)"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "label for screen readers when the visible label is not enough"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "478537b0f9468cc6722c1bfe4a83b7b7c3952eaa41e5d7094b89264c26448651"
+}

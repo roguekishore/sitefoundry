@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly code sync",
+  "description": "A charcoal band with a quieter medium-weight heading, a code-host window mock (tabs, pull-request list with coloured labels) floating on a blue glow, and a 3×2 grid of points with glowing gradient icons and light two-line titles.",
+  "category": "features",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "integration",
+    "developer",
+    "mock-ui",
+    "dark",
+    "glow",
+    "grid",
+    "saas"
+  ],
+  "notes": [
+    "dark by default (tone=\"dark\" adds the dark class); its band uses the dark card colour",
+    "the window is a generic code host, not any real product's UI"
+  ],
+  "entry": "huly-github.tsx",
+  "source": "foundry",
+  "name": "huly-github",
+  "files": [
+    {
+      "path": "huly-github.tsx",
+      "content": "import type { ComponentType, ReactNode } from \"react\";\nimport {\n  BookOpen,\n  ChartLine,\n  CircleDot,\n  CirclePlay,\n  Code,\n  GitPullRequest,\n  Inbox,\n  Menu,\n  Plus,\n  Search,\n  Shield,\n  SquareTerminal,\n} from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HulyHeading } from \"@foundry/huly-heading\";\n\nexport interface HulyRepoItem {\n  title: string;\n  /** small coloured label after the title */\n  label?: { text: string; tone: \"bug\" | \"feature\" };\n  /** line under the title, e.g. \"opened 2 hours ago by lena\" */\n  meta: string;\n}\n\nexport interface HulyGithubProps {\n  title: string | string[];\n  text?: string;\n  /** the code-host window under the heading */\n  repo: {\n    /** mark at the top left of the window */\n    logo?: ReactNode;\n    owner: string;\n    name: string;\n    /** text in the search box */\n    search?: string;\n    /** tab row; counts show as small pills */\n    tabs: { label: string; count?: string }[];\n    /** index of the underlined tab */\n    active?: number;\n    /** list rows; they fade out toward the bottom */\n    items: HulyRepoItem[];\n  };\n  /** grid of points under the window (three columns on wide screens) */\n  features: { icon: ComponentType<{ className?: string; strokeWidth?: number }>; title: string; text: string }[];\n  /** dark forces the dark colours (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  className?: string;\n}\n\nconst TAB_ICONS = [Code, CircleDot, GitPullRequest, CirclePlay, BookOpen, Shield, ChartLine];\nconst LABEL = {\n  bug: \"border-destructive/50 bg-destructive/15 text-destructive\",\n  feature: \"border-glow/50 bg-glow/15 text-glow\",\n};\n\nexport function HulyGithub({ title, text, repo, features, tone = \"dark\", className }: HulyGithubProps) {\n  const active = repo.active ?? 0;\n  return (\n    <section className={cn(\"relative isolate overflow-hidden bg-card py-section text-foreground lg:py-40\", tone === \"dark\" && \"dark\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"lg:px-32\">\n          <HulyHeading title={title} text={text} weight=\"medium\" mutedText textClassName=\"max-w-[35rem]\" />\n\n          {/* the repository window */}\n          <div aria-hidden className=\"relative mt-10 lg:mt-24\">\n            <div className=\"absolute inset-x-[-4%] top-[30%] bottom-[-14%] -z-10 rounded-[50%] bg-glow/35 blur-3xl lg:inset-x-[10%] lg:bg-glow/15\" />\n            <div className=\"absolute inset-x-[-2%] -bottom-6 -z-10 h-16 bg-[radial-gradient(color-mix(in_oklab,var(--glow)_80%,transparent)_1px,transparent_1.5px)] bg-size-[7px_7px] [mask-image:radial-gradient(50%_60%_at_50%_0%,black,transparent)]\" />\n            <div className=\"overflow-hidden rounded-xl border border-foreground/10 bg-background shadow-2xl shadow-background\">\n              <div className=\"flex items-center gap-2.5 px-3 pt-3 lg:gap-3 lg:px-4 lg:pt-4\">\n                <span className=\"flex size-6 items-center justify-center rounded-md border border-foreground/15 lg:size-8\">\n                  <Menu className=\"size-3.5 lg:size-4\" />\n                </span>\n                <span className=\"flex size-6 items-center justify-center [&_svg]:size-5 lg:size-8 lg:[&_svg]:size-7\">{repo.logo}</span>\n                <span className=\"truncate text-[0.6875rem] lg:text-sm\">\n                  <span className=\"text-foreground/75\">{repo.owner}</span>\n                  <span className=\"mx-1.5 text-foreground/40\">/</span>\n                  <span className=\"font-medium\">{repo.name}</span>\n                </span>\n                {repo.search && (\n                  <span className=\"ml-auto hidden w-60 items-center gap-2 rounded-md border border-foreground/15 px-2.5 py-1.5 text-sm text-foreground/70 md:flex\">\n                    <Search className=\"size-4\" />\n                    {repo.search}\n                    <SquareTerminal className=\"ml-auto size-4 text-foreground/50\" />\n                  </span>\n                )}\n                <span className={cn(\"flex items-center gap-2\", !repo.search && \"ml-auto\", repo.search && \"md:ml-0 ml-auto\")}>\n                  {[Plus, CircleDot, GitPullRequest].map((Icon, i) => (\n                    <span key={i} className=\"hidden size-8 items-center justify-center rounded-md border border-foreground/15 lg:flex\">\n                      <Icon className=\"size-4 text-foreground/70\" />\n                    </span>\n                  ))}\n                  <span className=\"relative flex size-6 items-center justify-center rounded-md border border-foreground/15 lg:size-8\">\n                    <Inbox className=\"size-3.5 text-foreground/70 lg:size-4\" />\n                    <span className=\"absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-glow lg:size-2\" />\n                  </span>\n                  <span className=\"size-6 rounded-full bg-linear-to-br from-highlight to-chart-4 lg:size-8\" />\n                </span>\n              </div>\n\n              <div className=\"mt-3 flex gap-4 overflow-hidden border-b border-foreground/10 px-3 text-[0.625rem] whitespace-nowrap lg:mt-4 lg:gap-7 lg:px-4 lg:text-sm\">\n                {repo.tabs.map((tab, i) => {\n                  const Icon = TAB_ICONS[i % TAB_ICONS.length];\n                  return (\n                    <span key={tab.label} className={cn(\"flex items-center gap-1.5 pb-2 lg:pb-3\", i === active ? \"border-b-2 border-highlight text-foreground\" : \"text-foreground/75\")}>\n                      <Icon className=\"size-3 lg:size-4\" />\n                      {tab.label}\n                      {tab.count && <span className=\"rounded-full bg-foreground/15 px-1.5 text-[0.5625rem] lg:text-xs\">{tab.count}</span>}\n                    </span>\n                  );\n                })}\n              </div>\n\n              <div className=\"p-2 lg:p-4\">\n                <div className=\"overflow-hidden rounded-md border border-foreground/10 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]\">\n                  {repo.items.map((item) => (\n                    <div key={item.meta} className=\"flex gap-2 border-b border-foreground/10 px-2.5 py-2 last:border-0 lg:gap-3 lg:px-4 lg:py-3\">\n                      <span className=\"mt-0.5 hidden size-3.5 shrink-0 rounded-sm border border-foreground/25 sm:block\" />\n                      <GitPullRequest className=\"mt-0.5 size-3 shrink-0 text-chart-2 lg:size-4\" />\n                      <div className=\"min-w-0\">\n                        <p className=\"flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.6875rem] font-medium lg:text-[0.9375rem]\">\n                          {item.title}\n                          {item.label && (\n                            <span className={cn(\"rounded-full border px-1.5 text-[0.5625rem] leading-4 font-normal lg:text-xs\", LABEL[item.label.tone])}>\n                              {item.label.text}\n                            </span>\n                          )}\n                        </p>\n                        <p className=\"mt-0.5 text-[0.5625rem] text-foreground/50 lg:mt-1 lg:text-[0.8125rem]\">{item.meta}</p>\n                      </div>\n                    </div>\n                  ))}\n                </div>\n              </div>\n            </div>\n          </div>\n\n          <div className=\"mt-14 grid gap-y-10 sm:grid-cols-2 sm:gap-x-12 lg:mt-24 lg:grid-cols-3 lg:gap-x-16 lg:gap-y-16\">\n            {features.map(({ icon: Icon, title: t, text: body }) => (\n              <div key={t} className=\"relative\">\n                <span className=\"relative flex size-9 items-center justify-center lg:size-12\">\n                  <span aria-hidden className=\"absolute -inset-10 -z-10 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_22%,transparent),transparent)]\" />\n                  <span className=\"flex size-full items-center justify-center rounded-lg bg-linear-to-br from-glow to-chart-3 text-foreground shadow-lg shadow-glow/25\">\n                    <Icon className=\"size-5 lg:size-6\" strokeWidth={1.75} />\n                  </span>\n                </span>\n                <h3 className=\"mt-3 font-display text-xl leading-none font-medium tracking-[-0.02em] text-balance lg:mt-7 lg:max-w-[9em] lg:text-[2rem] lg:font-normal\">{t}</h3>\n                <p className=\"mt-2 max-w-[18rem] text-[0.9375rem] leading-snug text-muted-foreground lg:mt-4 lg:text-base\">{body}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "huly-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "repo",
+      "type": "{ logo?: ReactNode; owner: string; name: string; search?: string | undefined; tabs: { label: string; count?: string | undefined; }[]; active?: number | undefined; items: HulyRepoItem[]; }",
+      "required": true,
+      "description": "the code-host window under the heading"
+    },
+    {
+      "name": "features",
+      "type": "{ icon: ComponentType<{ className?: string | undefined; strokeWidth?: number | undefined; }>; title: string; text: string; }[]",
+      "required": true,
+      "description": "grid of points under the window (three columns on wide screens)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the dark colours (as on the original); inherit follows the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "21c79dc47386e986148c093b8b40a892d0ac3b026b8cc9e98bc16dbedb98f95a"
+}

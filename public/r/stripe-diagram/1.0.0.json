@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe integration diagram",
+  "description": "Deep-navy section with a two-tone heading over an integration diagram on a faint dotted grid: a row of system chips feeding a glowing brand tile through dashed indigo connectors and small indigo labels, app tiles on the left, a warehouse tile on the right, and a branch of processor tiles below.",
+  "category": "features",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "diagram",
+    "integrations",
+    "dark",
+    "navy",
+    "developers",
+    "dotted-grid"
+  ],
+  "notes": [
+    "dark by default (adds the dark class); tone=\"inherit\" follows the page",
+    "the app and warehouse tiles are decorative lucide icons, not real logos",
+    "phones: the same diagram, compacted; the app-directory label hides"
+  ],
+  "entry": "stripe-diagram.tsx",
+  "source": "foundry",
+  "name": "stripe-diagram",
+  "files": [
+    {
+      "path": "stripe-diagram.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Cloud, ExternalLink, Hexagon, Layers, Snowflake, Triangle } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\n\nexport interface StripeDiagramProps {\n  /** the bright lead sentence */\n  title: string;\n  /** the softer sentences after it */\n  rest?: string;\n  /** systems along the top (ERP, CRM…) */\n  sources: string[];\n  /** the brand at the centre of the diagram */\n  brand: string;\n  /** labels on the connectors */\n  labels: {\n    /** left link from the top row */\n    sdk: string;\n    /** right link from the top row */\n    events: string;\n    /** link to the app tiles on the left */\n    apps: string;\n    /** link to the data warehouse on the right */\n    pipeline: string;\n    /** link down to the processors */\n    routing: string;\n  };\n  /** small tiles along the bottom (processors) */\n  processors: string[];\n  /** dark forces the deep-navy band (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  className?: string;\n}\n\nconst dash = \"border-dashed border-primary/60\";\n\nfunction Label({ children, icon }: { children: ReactNode; icon?: ReactNode }) {\n  return (\n    <span className=\"relative z-10 inline-flex items-center gap-1.5 rounded-sm bg-primary px-3 py-1.5 text-xs font-normal whitespace-nowrap text-primary-foreground\">\n      {children}\n      {icon}\n    </span>\n  );\n}\n\nfunction AppTiles() {\n  const tiles = [\n    { Icon: Cloud, c: \"bg-chart-5 text-foreground\" },\n    { Icon: Layers, c: \"bg-card text-foreground\" },\n    { Icon: Hexagon, c: \"bg-foreground text-primary\" },\n    { Icon: Triangle, c: \"bg-destructive text-primary-foreground\" },\n  ];\n  return (\n    <div className=\"relative z-10 grid grid-cols-[repeat(3,2.5rem)] gap-1.5 rounded-sm bg-card/70 p-1.5 lg:grid-cols-[repeat(3,2.25rem)]\">\n      {[null, tiles[0], tiles[1], null, tiles[2], tiles[3]].map((t, i) =>\n        t ? (\n          <span key={i} className={cn(\"flex aspect-square items-center justify-center rounded-sm\", t.c)}>\n            <t.Icon className=\"size-4\" strokeWidth={2} />\n          </span>\n        ) : (\n          <span key={i} className=\"aspect-square rounded-sm border border-border bg-background/40\" />\n        ),\n      )}\n    </div>\n  );\n}\n\n/**\n * Integration diagram on a faint dotted grid: a row of systems feeding the brand tile through\n * dashed connectors and indigo labels, app tiles on the left, a data warehouse on the right,\n * and a branch of processors below.\n */\nexport function StripeDiagram({ title, rest, sources, brand, labels, processors, tone = \"dark\", className }: StripeDiagramProps) {\n  return (\n    <StripeFrame rule=\"solid\" className={cn(tone === \"dark\" && \"dark\", className)} innerClassName=\"pt-14 pb-16 lg:pt-20 lg:pb-20\">\n      <StripeHeading as=\"h3\" size=\"sub\" lead={title} rest={rest} className=\"max-w-[44rem]\" />\n\n      <div className=\"relative mt-10 lg:mt-14\">\n        {/* dotted grid, fading at the edges */}\n        <div\n          aria-hidden\n          className=\"absolute inset-0 bg-[radial-gradient(color-mix(in_oklab,var(--foreground)_18%,transparent)_1px,transparent_1px)] [mask-image:radial-gradient(70%_70%_at_50%_50%,black,transparent)] bg-[size:12px_12px] lg:-inset-x-4\"\n        />\n\n        <div className=\"relative mx-auto flex max-w-[48rem] flex-col items-center py-4 text-foreground lg:py-6\">\n          {/* the systems along the top */}\n          <div className=\"relative z-10 flex flex-wrap justify-center gap-1.5 rounded-sm bg-card/70 p-1.5\">\n            {sources.map((s) => (\n              <span key={s} className=\"rounded-sm bg-secondary px-3 py-2 text-xs font-normal lg:px-4\">\n                {s}\n              </span>\n            ))}\n          </div>\n\n          {/* two links down from the top row, closing into a U under the brand */}\n          <div className=\"relative grid w-[78%] grid-cols-2 lg:w-[56%]\">\n            <div className={cn(\"h-8 border-l\", dash)} />\n            <div className={cn(\"h-8 border-r\", dash)} />\n            <div className=\"-ml-[3.5rem] w-28 text-center\">\n              <Label>{labels.sdk}</Label>\n            </div>\n            <div className=\"-mr-[4.5rem] w-36 justify-self-end text-center\">\n              <Label>{labels.events}</Label>\n            </div>\n            <div className={cn(\"col-span-2 h-10 border-x border-b\", dash)} />\n          </div>\n\n          {/* middle row: apps — brand — warehouse, on a dashed line */}\n          <div className=\"relative -mt-7 grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 lg:gap-0\">\n            <div className={cn(\"absolute inset-x-[8%] top-1/2 border-t\", dash)} />\n            <div className=\"relative flex flex-col items-center gap-3 lg:flex-row lg:justify-start lg:gap-6\">\n              <AppTiles />\n              <span className=\"hidden lg:inline-flex\">\n                <Label icon={<ExternalLink className=\"size-3\" />}>{labels.apps}</Label>\n              </span>\n            </div>\n            <div className=\"relative z-10 flex size-20 items-center justify-center rounded-md bg-linear-to-br from-primary/70 to-card font-display text-lg font-bold tracking-[-0.05em] shadow-[0_0_40px_-8px_var(--primary)] ring-1 ring-primary/40 lg:size-[4.5rem]\">\n              {brand}\n            </div>\n            <div className=\"relative flex flex-col items-center gap-3 lg:flex-row lg:justify-end lg:gap-6\">\n              <Label>{labels.pipeline}</Label>\n              <span className=\"relative z-10 flex size-10 items-center justify-center rounded-sm bg-chart-5 text-foreground lg:size-9\">\n                <Snowflake className=\"size-5\" strokeWidth={2} />\n              </span>\n            </div>\n          </div>\n\n          {/* down to routing and the processors */}\n          <div className={cn(\"h-8 border-l\", dash)} />\n          <Label>{labels.routing}</Label>\n          <div className={cn(\"h-4 border-l\", dash)} />\n          <div className=\"relative flex gap-3\">\n            <div className={cn(\"absolute top-0 right-[1.25rem] left-[1.25rem] border-t\", dash)} />\n            {processors.map((p, i) => (\n              <div key={`${p}-${i}`} className=\"flex flex-col items-center\">\n                <div className={cn(\"h-4 border-l\", dash)} />\n                <span className=\"flex size-10 items-center justify-center rounded-sm bg-secondary text-[0.6875rem] font-normal\">{p}</span>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-frame",
+    "stripe-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bright lead sentence"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the softer sentences after it"
+    },
+    {
+      "name": "sources",
+      "type": "string[]",
+      "required": true,
+      "description": "systems along the top (ERP, CRM…)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand at the centre of the diagram"
+    },
+    {
+      "name": "labels",
+      "type": "{ sdk: string; events: string; apps: string; pipeline: string; routing: string; }",
+      "required": true,
+      "description": "labels on the connectors"
+    },
+    {
+      "name": "processors",
+      "type": "string[]",
+      "required": true,
+      "description": "small tiles along the bottom (processors)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the deep-navy band (as on the original); inherit follows the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3f57104394c98534f5decefdc9edc8331f7dcf3b3c180aec09ca313e534e4a5c"
+}

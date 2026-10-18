@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Stripe ribbon",
+  "description": "A flowing ribbon of light made of dozens of thin strokes, shading from sky blue through orange and pink to violet with a fine fibrous sheen. Sweeps from the top centre to the right edge, or fans up from the bottom like stage light. Drifts slowly.",
+  "category": "background",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "ribbon",
+    "gradient",
+    "wave",
+    "colourful",
+    "art",
+    "svg",
+    "animated"
+  ],
+  "notes": [
+    "colours come from chart-1, chart-2, chart-3 and chart-5: themes with muted chart colours give a muted ribbon",
+    "pure SVG + a CSS drift; no canvas or JavaScript, renders in static HTML"
+  ],
+  "entry": "stripe-ribbon.tsx",
+  "source": "foundry",
+  "name": "stripe-ribbon",
+  "files": [
+    {
+      "path": "stripe-ribbon.css",
+      "content": "/* Motion for stripe-ribbon. Switched off by motion-reduce: classes in the markup. */\n@keyframes stripe-ribbon-drift {\n  0% { transform: translate(0, 0) rotate(0deg) scale(1); }\n  50% { transform: translate(-14px, 10px) rotate(-1.2deg) scale(1.02); }\n  100% { transform: translate(10px, -6px) rotate(0.8deg) scale(1.01); }\n}\n\n.stripe-ribbon-drift {\n  transform-box: view-box;\n}\n"
+    },
+    {
+      "path": "stripe-ribbon.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./stripe-ribbon.css\";\n\nexport interface StripeRibbonProps {\n  /**\n   * sweep: one broad ribbon falling from the top centre to the right edge (the hero) ·\n   * arc: a fan of ribbons rising from the bottom like stage light (banners, panels)\n   */\n  shape?: \"sweep\" | \"arc\";\n  /** how many fibres make up the ribbon; fewer is lighter to render */\n  fibres?: number;\n  /** let the ribbon drift slowly (off under reduced motion) */\n  animate?: boolean;\n  className?: string;\n}\n\n// Colour across the ribbon's width, from its inner edge to its outer edge. Theme colours only:\n// chart-5 (sky), chart-1 (orange), chart-2 (pink), chart-3 (violet).\nconst STOPS = [\"--chart-5\", \"--chart-3\", \"--chart-1\", \"--chart-1\", \"--chart-2\", \"--chart-2\", \"--chart-3\"];\n\nfunction colourAt(k: number): string {\n  const pos = k * (STOPS.length - 1);\n  const i = Math.min(Math.floor(pos), STOPS.length - 2);\n  const mix = Math.round((pos - i) * 100);\n  return `color-mix(in oklab, var(${STOPS[i + 1]}) ${mix}%, var(${STOPS[i]}))`;\n}\n\nconst lerp = (a: number, b: number, k: number) => a + (b - a) * k;\n\ninterface Fibre {\n  d: string;\n  colour: string;\n  width: number;\n  opacity: number;\n}\n\n/** One fibre of the sweep: a cubic curve from the top centre to the right edge. */\nfunction sweep(n: number): Fibre[] {\n  return Array.from({ length: n }, (_, i) => {\n    const k = i / (n - 1);\n    const p0 = [lerp(470, 1040, k), -80];\n    const c1 = [lerp(540, 1080, k), lerp(240, 170, k)];\n    const c2 = [lerp(760, 1120, k), lerp(480, 360, k)];\n    const p3 = [1320, lerp(560, 900, k)];\n    const wobble = Math.sin(i * 12.9898) * 0.5 + 0.5; // stable pseudo-random, the fibre texture\n    return {\n      d: `M${p0} C${c1} ${c2} ${p3}`,\n      colour: colourAt(k),\n      width: lerp(9, 16, wobble),\n      opacity: lerp(0.55, 0.95, wobble),\n    };\n  });\n}\n\n/** Fibres of the arc: nested curves rising from the bottom and fanning out, like stage light. */\nfunction arc(n: number): Fibre[] {\n  return Array.from({ length: n }, (_, i) => {\n    const k = i / (n - 1);\n    const r = lerp(260, 900, k);\n    const wobble = Math.sin(i * 78.233) * 0.5 + 0.5;\n    return {\n      d: `M${-120} ${900 - r * 0.15} C${300} ${820 - r * 0.9} ${900} ${820 - r * 0.9} ${1320} ${900 - r * 0.15}`,\n      colour: colourAt(k),\n      width: lerp(6, 14, wobble),\n      opacity: lerp(0.45, 0.9, wobble),\n    };\n  });\n}\n\n/**\n * Stripe's flowing ribbon of light, drawn as many thin SVG strokes in the theme's chart\n * colours. Fills its box (position it with className); the sweep anchors to the top right.\n */\nexport function StripeRibbon({ shape = \"sweep\", fibres = 64, animate = true, className }: StripeRibbonProps) {\n  const lines = shape === \"sweep\" ? sweep(fibres) : arc(fibres);\n  return (\n    <svg\n      aria-hidden\n      viewBox=\"0 0 1200 800\"\n      preserveAspectRatio={shape === \"sweep\" ? \"xMaxYMin slice\" : \"xMidYMax slice\"}\n      className={cn(\"pointer-events-none block\", className)}\n    >\n      <defs>\n        <filter id={`stripe-ribbon-soft-${shape}`} x=\"-10%\" y=\"-10%\" width=\"120%\" height=\"120%\">\n          <feGaussianBlur stdDeviation=\"2\" />\n        </filter>\n      </defs>\n      <g\n        fill=\"none\"\n        strokeLinecap=\"round\"\n        className={cn(\"stripe-ribbon-drift origin-center\", animate && \"animate-[stripe-ribbon-drift_14s_ease-in-out_infinite_alternate] motion-reduce:animate-none\")}\n      >\n        <g filter={`url(#stripe-ribbon-soft-${shape})`}>\n          {lines.map((f, i) => (\n            <path key={i} d={f.d} style={{ stroke: f.colour }} strokeWidth={f.width} strokeOpacity={f.opacity} />\n          ))}\n        </g>\n        {/* fine light threads over the colour: the fibrous sheen */}\n        {lines.map((f, i) =>\n          i % 3 === 0 ? (\n            <path key={`t${i}`} d={f.d} className=\"stroke-background\" strokeWidth={0.6} strokeOpacity={0.22} />\n          ) : null,\n        )}\n      </g>\n    </svg>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "shape",
+      "type": "enum",
+      "required": false,
+      "default": "sweep",
+      "description": "sweep: one broad ribbon falling from the top centre to the right edge (the hero) ·\narc: a fan of ribbons rising from the bottom like stage light (banners, panels)"
+    },
+    {
+      "name": "fibres",
+      "type": "number",
+      "required": false,
+      "default": "64",
+      "description": "how many fibres make up the ribbon; fewer is lighter to render"
+    },
+    {
+      "name": "animate",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "let the ribbon drift slowly (off under reduced motion)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a7993ec40c3e4673d9e3fc59e3d396f97d8a064fef183d7cef94ac063e5cb338"
+}

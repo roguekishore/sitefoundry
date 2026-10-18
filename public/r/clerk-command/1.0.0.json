@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Clerk agent command",
+  "description": "A copyable one-line prompt for coding agents. Tab style: a dark folder tab with an S-curved edge (a stack of small round marks and a label) sitting on a pale, softly shadowed mono command bar with a copy button. Pill style: a compact grey pill with the marks, the label and a copy icon.",
+  "category": "button",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "command",
+    "copy",
+    "mono",
+    "developer",
+    "ai",
+    "tab",
+    "pill",
+    "minimal"
+  ],
+  "notes": [
+    "copies to the clipboard and swaps the icon for a tick, so it needs JavaScript"
+  ],
+  "entry": "clerk-command.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "clerk-command",
+  "files": [
+    {
+      "path": "clerk-command.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Check, ChevronRight, Copy } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ClerkCommandProps {\n  /** label on the tab or pill (e.g. \"Build with agents\") */\n  label: string;\n  /** the text that gets copied; shown in the bar in the tab style */\n  command: string;\n  /** small round marks stacked before the label (agent or tool logos) */\n  marks?: ReactNode[];\n  /** screen-reader label of the copy button */\n  copyLabel?: string;\n  /** tab: dark folder tab over a command bar · pill: compact grey pill */\n  variant?: \"tab\" | \"pill\";\n  className?: string;\n}\n\nfunction Marks({ marks }: { marks: ReactNode[] }) {\n  return (\n    <span className=\"flex items-center\">\n      {marks.map((m, i) => (\n        <span\n          key={i}\n          className={cn(\n            \"flex size-[1.125rem] items-center justify-center overflow-hidden rounded-full ring-2 ring-current [&_svg]:size-3\",\n            i > 0 && \"-ml-1.5\",\n          )}\n          style={{ zIndex: marks.length - i }}\n        >\n          {m}\n        </span>\n      ))}\n    </span>\n  );\n}\n\nexport function ClerkCommand({ label, command, marks = [], copyLabel = \"Copy\", variant = \"tab\", className }: ClerkCommandProps) {\n  const [copied, setCopied] = useState(false);\n\n  useEffect(() => {\n    if (!copied) return;\n    const t = setTimeout(() => setCopied(false), 1600);\n    return () => clearTimeout(t);\n  }, [copied]);\n\n  const copy = () => {\n    navigator.clipboard?.writeText(command).then(() => setCopied(true), () => {});\n  };\n  const Icon = copied ? Check : Copy;\n\n  if (variant === \"pill\") {\n    return (\n      <button\n        type=\"button\"\n        onClick={copy}\n        aria-label={`${copyLabel}: ${command}`}\n        className={cn(\n          \"inline-flex h-[1.875rem] items-center gap-2 rounded-full bg-muted pr-2.5 pl-1.5 text-[0.8125rem] font-medium text-foreground transition-colors duration-200 hover:bg-accent [&>span:first-child]:text-muted\",\n          className,\n        )}\n      >\n        <Marks marks={marks} />\n        {label}\n        <Icon className=\"size-3.5 text-muted-foreground\" strokeWidth={1.75} />\n      </button>\n    );\n  }\n\n  return (\n    <div className={cn(\"w-full max-w-[27.25rem]\", className)}>\n      {/* the folder tab; its S-curved right edge is a small svg */}\n      <div className=\"flex h-10 items-start\">\n        <div className=\"flex h-full items-start gap-2 rounded-tl-[0.875rem] bg-foreground pt-1.5 pl-2 text-[0.8125rem] font-medium text-background [&>span:first-child]:text-foreground\">\n          <Marks marks={marks} />\n          <span className=\"leading-[1.125rem]\">{label}</span>\n        </div>\n        <svg aria-hidden viewBox=\"0 0 24 40\" preserveAspectRatio=\"none\" className=\"h-10 w-6 fill-foreground\">\n          <path d=\"M0 0h2c8 0 9 4 12 12 3 8 4 16 10 16v12H0Z\" />\n        </svg>\n      </div>\n      <div className=\"relative -mt-3 flex h-[2.375rem] items-center gap-2 rounded-xl bg-background pr-1.5 pl-3 shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_2px_6px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_8px_20px_-6px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n        <ChevronRight className=\"size-3.5 shrink-0 text-muted-foreground\" strokeWidth={1.75} />\n        <code className=\"min-w-0 flex-1 truncate font-mono text-[0.8125rem] text-foreground\">{command}</code>\n        <button\n          type=\"button\"\n          onClick={copy}\n          aria-label={copyLabel}\n          className=\"flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-200 hover:bg-muted hover:text-foreground\"\n        >\n          <Icon className=\"size-3.5\" strokeWidth={1.75} />\n        </button>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "label on the tab or pill (e.g. \"Build with agents\")"
+    },
+    {
+      "name": "command",
+      "type": "string",
+      "required": true,
+      "description": "the text that gets copied; shown in the bar in the tab style"
+    },
+    {
+      "name": "marks",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "small round marks stacked before the label (agent or tool logos)"
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": false,
+      "default": "Copy",
+      "description": "screen-reader label of the copy button"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "tab",
+      "description": "tab: dark folder tab over a command bar · pill: compact grey pill"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1b0cc1e08656b9fc7986d20d05d49bdb619199ad3f414d267c887e9f533f8b7c"
+}

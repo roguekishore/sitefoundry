@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Huly pill button",
+  "description": "Uppercase pill in two styles: a light pill with a warm ember orb glowing inside its right end (slides to the centre on hover), and a dark hairline pill.",
+  "category": "button",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "glow",
+    "ember",
+    "uppercase",
+    "dark"
+  ],
+  "notes": [
+    "the glow style looks its best on a dark backdrop (put it inside a .dark section)"
+  ],
+  "entry": "huly-button.tsx",
+  "source": "foundry",
+  "name": "huly-button",
+  "files": [
+    {
+      "path": "huly-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HulyButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** glow: light pill with an ember orb inside · outline: dark pill with a hairline border */\n  variant?: \"glow\" | \"outline\";\n  /** sm: 32px tall, for headers · md: 40px tall */\n  size?: \"sm\" | \"md\";\n  /** small icon before the label (e.g. a brand mark) */\n  icon?: ReactNode;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-8 px-4 text-[0.6875rem]\",\n  md: \"h-10 px-12 text-xs\",\n};\n\nconst variants = {\n  glow: \"border border-foreground/60 bg-primary text-primary-foreground shadow-[4px_0_22px_-4px_var(--highlight)]\",\n  outline: \"border border-foreground/15 bg-background text-foreground hover:border-foreground/30\",\n};\n\nexport function HulyButton({ children, href, variant = \"outline\", size = \"md\", icon, onClick, className }: HulyButtonProps) {\n  const classes = cn(\n    \"group relative isolate inline-flex shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-full font-bold uppercase tracking-[-0.015em] whitespace-nowrap transition-colors duration-200\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    className,\n  );\n  const inner = (\n    <>\n      {variant === \"glow\" && (\n        // The ember: a soft orb that rests near the right end and slides to the middle on hover.\n        <span\n          aria-hidden\n          className=\"absolute inset-y-0 left-0 -z-10 flex w-full items-center justify-center translate-x-[38%] transition-transform duration-500 ease-out group-hover:translate-x-0 motion-reduce:transition-none\"\n        >\n          <span className=\"size-[7.5rem] shrink-0 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--highlight)_25%,var(--primary))_10%,color-mix(in_oklab,var(--highlight)_80%,var(--primary))_32%,color-mix(in_oklab,var(--highlight)_45%,transparent)_55%,transparent_92%)]\" />\n        </span>\n      )}\n      {icon && <span className=\"flex size-5 items-center justify-center [&_svg]:size-4\">{icon}</span>}\n      {children}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "outline",
+      "description": "glow: light pill with an ember orb inside · outline: dark pill with a hairline border"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 32px tall, for headers · md: 40px tall"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small icon before the label (e.g. a brand mark)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3fccbc94b50b875800a12c449e7c24bdaed79146ecb789ef6b180691c1094ff0"
+}

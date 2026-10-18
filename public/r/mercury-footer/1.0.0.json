@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mercury footer",
+  "description": "An airy footer of plain link columns (small muted headings, links in the text colour), four across on desktop and two on phones, then a hairline with a small label on the left and numbered fine print on the right.",
+  "category": "footer",
+  "site": "mercury",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "columns",
+    "fine-print",
+    "hairline",
+    "minimal",
+    "dark"
+  ],
+  "notes": [
+    "the fine-print area is optional; it suits regulated businesses with footnotes up the page"
+  ],
+  "entry": "mercury-footer.tsx",
+  "source": "foundry",
+  "name": "mercury-footer",
+  "files": [
+    {
+      "path": "mercury-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface MercuryFooterGroup {\n  /** the small muted heading */\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface MercuryFooterProps {\n  /** link columns: four across on desktop, two on phones, wrapping into more rows */\n  groups: MercuryFooterGroup[];\n  /** the small label beside the fine print, e.g. \"Notes and disclosures\" */\n  legalTitle?: string;\n  /** an unnumbered paragraph before the numbered notes */\n  legalIntro?: ReactNode;\n  /** numbered notes, matching footnote marks used up the page */\n  notes?: ReactNode[];\n  className?: string;\n}\n\n/**\n * Mercury's footer: plain link columns (muted heading, links in the text colour) with lots\n * of air, then a hairline and the fine print: a small label on the left, numbered notes on\n * the right.\n */\nexport function MercuryFooter({ groups, legalTitle, legalIntro, notes, className }: MercuryFooterProps) {\n  const hasLegal = Boolean(legalTitle || legalIntro || notes?.length);\n  return (\n    <footer className={cn(\"pt-[calc(var(--section-y)*1.2)] pb-section lg:pt-[calc(var(--section-y)*1.6)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <nav className=\"grid grid-cols-2 gap-x-4 gap-y-14 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-16\">\n          {groups.map((g) => (\n            <div key={g.title}>\n              <h2 className=\"text-sm text-muted-foreground lg:text-base\">{g.title}</h2>\n              <ul className=\"mt-3 space-y-2.5 lg:space-y-1.5\">\n                {g.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"text-base leading-[1.1] text-foreground transition-colors hover:text-muted-foreground motion-reduce:transition-none lg:leading-[1.4]\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </nav>\n\n        {hasLegal && (\n          <div className=\"mt-24 grid gap-10 border-t border-border pt-6 lg:mt-[12.5rem] lg:grid-cols-3 lg:gap-8 lg:pt-10\">\n            {legalTitle && <h2 className=\"text-[0.625rem] font-[560] text-foreground lg:text-xs\">{legalTitle}</h2>}\n            <div className=\"space-y-4 text-[0.625rem] leading-[1.4] tracking-[0.02em] text-foreground/90 lg:col-span-2 lg:col-start-2 lg:text-xs\">\n              {legalIntro && <p>{legalIntro}</p>}\n              {notes && notes.length > 0 && (\n                <ol className=\"list-decimal space-y-4 pl-4\">\n                  {notes.map((n, i) => (\n                    <li key={i}>{n}</li>\n                  ))}\n                </ol>\n              )}\n            </div>\n          </div>\n        )}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "MercuryFooterGroup[]",
+      "required": true,
+      "description": "link columns: four across on desktop, two on phones, wrapping into more rows"
+    },
+    {
+      "name": "legalTitle",
+      "type": "string",
+      "required": false,
+      "description": "the small label beside the fine print, e.g. \"Notes and disclosures\""
+    },
+    {
+      "name": "legalIntro",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an unnumbered paragraph before the numbered notes"
+    },
+    {
+      "name": "notes",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "numbered notes, matching footnote marks used up the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a9c8793818f476281b17664b64899ed0e49bd551349ba42b0bfb3657aff2bb37"
+}

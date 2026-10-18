@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk feature bento",
+  "description": "A section heading (centred or left-aligned) over a three-column masonry of 16px feature cards with tiny 13px titles and quiet mock illustrations that animate on hover. Dark tone: a near-black band with notched shoulders, a faint circuit-board backdrop and #212126 cards. Light tone: the grey page with white, softly shadowed cards.",
+  "category": "features",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "masonry",
+    "dark",
+    "light",
+    "notch",
+    "cards",
+    "developer",
+    "saas"
+  ],
+  "notes": [
+    "cards take rows/cols spans (1 or 2) and fill the grid densely, in reading order",
+    "tone=\"dark\" wraps it in clerk-band; set edgeTop/edgeBottom to the neighbouring sections' colours"
+  ],
+  "entry": "clerk-features.tsx",
+  "source": "foundry",
+  "name": "clerk-features",
+  "files": [
+    {
+      "path": "clerk-features.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ClerkBand } from \"@foundry/clerk-band\";\nimport { ClerkCard, type ClerkCardProps } from \"@foundry/clerk-card\";\nimport { ClerkHeading, type ClerkHeadingProps } from \"@foundry/clerk-heading\";\n\nexport interface ClerkFeaturesProps {\n  /** eyebrow, heading, paragraph and link above the cards */\n  heading: ClerkHeadingProps;\n  /** the cards, in reading order; spans fill the 3-column grid densely */\n  items: ClerkCardProps[];\n  /** dark: notched near-black band · light: plain section on the page colour */\n  tone?: \"dark\" | \"light\";\n  /** faint circuit-board lines behind the heading (dark tone) */\n  circuit?: boolean;\n  /** colours of the neighbouring sections, shown in the dark band's notches */\n  edgeTop?: \"background\" | \"card\";\n  edgeBottom?: \"background\" | \"card\";\n  id?: string;\n  className?: string;\n}\n\n/** Faint traces and pads, like a circuit board, fading out from the top-left. */\nfunction Circuit() {\n  return (\n    <svg\n      aria-hidden\n      className=\"pointer-events-none absolute inset-x-0 top-0 h-[36rem] w-full text-foreground/[0.045] [mask-image:radial-gradient(ellipse_70%_80%_at_25%_0%,black,transparent_75%)]\"\n      viewBox=\"0 0 1440 560\"\n      preserveAspectRatio=\"xMidYMin slice\"\n      fill=\"none\"\n      stroke=\"currentColor\"\n    >\n      <path d=\"M150 0v120l40 40h220l40-40V0M410 160v120l-40 40H260M520 0v60l30 30h170M720 90v110M190 160v200l60 60h120\" />\n      <path d=\"M940 0v80l40 40h180M1160 120v140l-40 40H980M1240 0v200\" />\n      <path d=\"M300 230h60M300 250h60M300 270h60\" strokeDasharray=\"2 4\" />\n      {[\n        [180, 70], [400, 50], [540, 120], [700, 180], [250, 300], [980, 160], [1200, 90],\n      ].map(([x, y]) => (\n        <rect key={`${x}-${y}`} x={x} y={y} width=\"22\" height=\"22\" rx=\"3\" fill=\"currentColor\" stroke=\"none\" />\n      ))}\n      {[[470, 300], [520, 250], [1100, 230]].map(([x, y]) => (\n        <circle key={`${x}-${y}`} cx={x} cy={y} r=\"4\" />\n      ))}\n    </svg>\n  );\n}\n\n// vertical padding: on the content in the dark band (the band owns its notch padding), on\n// the section itself in the light tone (so a page can trim it with className)\nconst pad = \"py-[calc(var(--section-y)*0.6)] lg:py-section\";\n\nexport function ClerkFeatures({ heading, items, tone = \"dark\", circuit = tone === \"dark\", edgeTop, edgeBottom, id, className }: ClerkFeaturesProps) {\n  const content = (\n    <div className={cn(\"relative mx-auto max-w-page px-gutter\", tone === \"dark\" && pad)}>\n      <ClerkHeading\n        {...heading}\n        fadeText={heading.fadeText ?? (tone === \"dark\" && heading.align === \"center\")}\n        textClassName={cn(heading.align === \"center\" && \"max-w-[36rem]\", heading.textClassName)}\n      />\n      <div className=\"mt-12 grid grid-flow-row-dense grid-cols-1 gap-2 md:grid-cols-2 lg:mt-16 lg:auto-rows-[16.25rem] lg:grid-cols-3\">\n        {items.map((item) => (\n          <ClerkCard key={item.title} {...item} />\n        ))}\n      </div>\n    </div>\n  );\n\n  if (tone === \"dark\") {\n    return (\n      <ClerkBand id={id} edgeTop={edgeTop} edgeBottom={edgeBottom} className={className}>\n        {circuit && <Circuit />}\n        {content}\n      </ClerkBand>\n    );\n  }\n  return (\n    <section id={id} className={cn(\"bg-background text-foreground\", pad, className)}>\n      {content}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "clerk-band",
+    "clerk-card",
+    "clerk-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "ClerkHeadingProps",
+      "required": true,
+      "description": "eyebrow, heading, paragraph and link above the cards"
+    },
+    {
+      "name": "items",
+      "type": "ClerkCardProps[]",
+      "required": true,
+      "description": "the cards, in reading order; spans fill the 3-column grid densely"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark: notched near-black band · light: plain section on the page colour"
+    },
+    {
+      "name": "circuit",
+      "type": "boolean",
+      "required": false,
+      "default": "tone === \"dark\"",
+      "description": "faint circuit-board lines behind the heading (dark tone)"
+    },
+    {
+      "name": "edgeTop",
+      "type": "enum",
+      "required": false,
+      "description": "colours of the neighbouring sections, shown in the dark band's notches"
+    },
+    {
+      "name": "edgeBottom",
+      "type": "enum",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "29e0c6d33cf6bf379dbae70394df8e648e4af5d6646486e8fbbad2eb7e9ef282"
+}

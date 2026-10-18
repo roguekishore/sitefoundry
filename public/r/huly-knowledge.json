@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly document showcase",
+  "description": "A long editorial column, set right of centre on a pale band, that behaves like a live document: a blue cursor handle after the heading, a yellow-highlighted passage under a floating dark format toolbar, an image, struck-through and greyed words with an orange cursor, a dark code block, and a blinking prompt with a small action pill.",
+  "category": "features",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "editor",
+    "documents",
+    "editorial",
+    "light",
+    "cursor",
+    "code",
+    "highlight"
+  ],
+  "notes": [
+    "the carets blink with CSS (off under reduced motion); no JavaScript",
+    "margin notes show on wide screens only"
+  ],
+  "entry": "huly-knowledge.tsx",
+  "source": "foundry",
+  "name": "huly-knowledge",
+  "files": [
+    {
+      "path": "huly-knowledge.css",
+      "content": "/* Motion for huly-knowledge: a text caret blinking. Switched off by motion-reduce: classes. */\n@keyframes huly-blink {\n  0%, 45% { opacity: 1; }\n  55%, 100% { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "huly-knowledge.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { AtSign, Bold, Camera, Copy, Italic, Lightbulb, Pencil, Plus, Strikethrough, Underline } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./huly-knowledge.css\";\n\n/** A piece of a paragraph: plain text, styled text, or the orange caret handle. */\nexport type HulyTextPiece = string | { text: string; style: \"strike\" | \"muted\" | \"bold\" } | { caret: true };\n\nexport interface HulyKnowledgeProps {\n  /** the heading; a blue caret handle sits after its last word */\n  title: string | string[];\n  /** first paragraph */\n  intro?: string;\n  /** a highlighted passage with selection handles and a floating format toolbar above it */\n  marked?: { strong: string; text: string; rest?: string };\n  /** label of the blue chip in the toolbar */\n  toolbarLabel?: string;\n  image?: { src: string; alt: string };\n  /** paragraph after the image, in pieces (strike, muted, caret) */\n  body?: HulyTextPiece[];\n  /** a code sample, shown in a dark block with simple syntax colours */\n  code?: string;\n  /** paragraph after the code */\n  outro?: string;\n  /** greyed prompt at the end, after a blinking caret */\n  placeholder?: string;\n  /** short notes in the left margin on wide screens */\n  notes?: { title: string; text: string }[];\n  className?: string;\n}\n\nconst blink = \"animate-[huly-blink_1.1s_step-end_infinite] motion-reduce:animate-none\";\nconst paragraph = \"text-lg leading-[1.375] tracking-[-0.02em] text-foreground/85 text-pretty lg:text-[1.375rem]\";\n\n/** A caret with a ring on top, like a collaborator's cursor. */\nfunction CaretHandle({ tone, ring }: { tone: \"glow\" | \"highlight\" | \"foreground\"; ring?: \"large\" | \"small\" }) {\n  const colour = { glow: \"bg-glow\", highlight: \"bg-highlight\", foreground: \"bg-foreground\" }[tone];\n  const border = { glow: \"border-glow\", highlight: \"border-highlight\", foreground: \"border-foreground\" }[tone];\n  return (\n    <span aria-hidden className={cn(\"relative mx-[0.04em] inline-block h-[0.9em] w-[2px] translate-y-[0.12em] align-baseline\", colour)}>\n      {ring && (\n        <span\n          className={cn(\n            \"absolute left-1/2 rounded-full border-2 bg-background/40 shadow-lg shadow-foreground/10 backdrop-blur-[1px]\",\n            border,\n            ring === \"large\" ? \"-top-[0.55em] size-[0.8em] -translate-x-[15%]\" : \"-top-[1.6em] size-[1.7em] -translate-x-1/2\",\n          )}\n        />\n      )}\n      <span className={cn(\"absolute -bottom-[0.18em] left-1/2 size-[0.3em] -translate-x-1/2 rounded-full\", colour)} />\n    </span>\n  );\n}\n\n/** Very small highlighter: keywords, types, strings, numbers, calls and property names. */\nfunction highlight(code: string): ReactNode[] {\n  const re =\n    /(\\/\\/[^\\n]*)|(\"[^\"\\n]*\"|'[^'\\n]*'|`[^`]*`)|\\b(interface|type|const|let|var|function|return|export|import|from|if|else|new|async|await|undefined|null|true|false)\\b|\\b([A-Z][A-Za-z0-9]*)\\b|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([a-z_$][\\w$]*)(?=\\s*\\()|\\b([a-z_$][\\w$]*)(?=\\??\\s*:)/g;\n  const out: ReactNode[] = [];\n  let last = 0;\n  let key = 0;\n  for (const m of code.matchAll(re)) {\n    if (m.index > last) out.push(code.slice(last, m.index));\n    const cls = m[1]\n      ? \"text-foreground/40\"\n      : m[2]\n        ? \"text-chart-2\"\n        : m[3]\n          ? \"text-chart-3\"\n          : m[4]\n            ? \"text-chart-1\"\n            : m[5]\n              ? \"text-chart-4\"\n              : m[6]\n                ? \"text-chart-5\"\n                : \"text-chart-1/85\";\n    out.push(\n      <span key={key++} className={cls}>\n        {m[0]}\n      </span>,\n    );\n    last = m.index + m[0].length;\n  }\n  if (last < code.length) out.push(code.slice(last));\n  return out;\n}\n\nexport function HulyKnowledge({ title, intro, marked, toolbarLabel, image, body, code, outro, placeholder, notes, className }: HulyKnowledgeProps) {\n  const lines = Array.isArray(title) ? title : [title];\n  const tools = [Bold, Italic, Underline, Strikethrough];\n  return (\n    <section className={cn(\"relative bg-background py-section text-foreground lg:py-40\", className)}>\n      <div className=\"relative mx-auto max-w-page px-gutter\">\n        {notes && notes.length > 0 && (\n          <aside className=\"absolute inset-y-0 left-0 hidden w-60 flex-col justify-evenly py-40 lg:flex\">\n            {notes.map((n) => (\n              <div key={n.title} className=\"sticky top-32 rounded-xl\">\n                <p className=\"text-[0.9375rem] font-medium tracking-[-0.01em]\">{n.title}</p>\n                <p className=\"mt-2 text-sm leading-snug text-foreground/75\">{n.text}</p>\n              </div>\n            ))}\n          </aside>\n        )}\n\n        <div className=\"max-w-[44rem] lg:ml-[24.5rem]\">\n          <h2 className=\"font-display text-[2.25rem] leading-[0.95] font-semibold tracking-[-0.04em] text-balance sm:text-6xl lg:text-[5rem] lg:leading-none lg:tracking-[-0.05em]\">\n            {lines.map((line, i) => (\n              <span key={i} className=\"sm:block\">\n                {line}\n                {i < lines.length - 1 ? \" \" : <CaretHandle tone=\"glow\" ring=\"large\" />}\n              </span>\n            ))}\n          </h2>\n\n          {intro && <p className={cn(paragraph, \"mt-6 lg:mt-12\")}>{intro}</p>}\n\n          {marked && (\n            <div className=\"relative mt-16 lg:mt-14\">\n              {/* floating format toolbar */}\n              <div aria-hidden className=\"dark absolute -top-11 left-[18%] flex items-center gap-1 rounded-lg bg-background p-1 text-foreground/70 shadow-xl shadow-foreground/15 lg:-top-12 lg:left-[30%] lg:gap-1.5 lg:p-1.5\">\n                {toolbarLabel && (\n                  <span className=\"flex h-6 items-center gap-1 rounded-md bg-glow px-2 text-xs text-foreground lg:h-7 lg:text-sm\">\n                    <Plus className=\"size-3.5\" />\n                    {toolbarLabel}\n                  </span>\n                )}\n                <span className=\"mx-1 h-5 w-px bg-foreground/15\" />\n                {tools.map((Icon, i) => (\n                  <Icon key={i} className=\"size-3.5 lg:size-4\" />\n                ))}\n                <span className=\"mx-1 h-5 w-px bg-foreground/15\" />\n                <AtSign className=\"size-3.5 lg:size-4\" />\n                <Lightbulb className=\"size-3.5 lg:size-4\" />\n              </div>\n              <p className={paragraph}>\n                <span className=\"relative\">\n                  <CaretHandle tone=\"foreground\" />\n                  <mark className=\"bg-chart-4/70 box-decoration-clone px-0.5 text-foreground/90\">\n                    <strong className=\"font-semibold text-foreground\">{marked.strong}</strong> {marked.text}\n                  </mark>\n                  <CaretHandle tone=\"foreground\" />\n                </span>\n                {marked.rest && <> {marked.rest}</>}\n              </p>\n            </div>\n          )}\n\n          {image && <img src={image.src} alt={image.alt} className=\"mt-8 aspect-[706/423] w-full rounded-xl object-cover lg:mt-10\" />}\n\n          {body && (\n            <p className={cn(paragraph, \"mt-8 lg:mt-12\")}>\n              {body.map((piece, i) =>\n                typeof piece === \"string\" ? (\n                  <span key={i}>{piece}</span>\n                ) : \"caret\" in piece ? (\n                  <CaretHandle key={i} tone=\"highlight\" ring=\"small\" />\n                ) : (\n                  <span\n                    key={i}\n                    className={cn(\n                      piece.style === \"strike\" && \"text-foreground/40 line-through\",\n                      piece.style === \"muted\" && \"text-foreground/40\",\n                      piece.style === \"bold\" && \"font-semibold text-foreground\",\n                    )}\n                  >\n                    {piece.text}\n                  </span>\n                ),\n              )}\n            </p>\n          )}\n\n          {code && (\n            <div className=\"dark relative mt-8 overflow-hidden rounded-xl bg-background text-foreground lg:mt-12\">\n              <span aria-hidden className=\"absolute top-3 right-3 flex size-8 items-center justify-center rounded-md bg-foreground/10 lg:top-5 lg:right-5\">\n                <Copy className=\"size-4\" />\n              </span>\n              <pre className=\"overflow-x-auto p-5 font-mono text-xs leading-relaxed lg:p-8 lg:text-[0.9375rem]\">\n                <code>{highlight(code)}</code>\n              </pre>\n            </div>\n          )}\n\n          {outro && <p className={cn(paragraph, \"mt-8 lg:mt-12\")}>{outro}</p>}\n\n          {placeholder && (\n            <div className=\"mt-8 lg:mt-12\">\n              <p className=\"flex items-center gap-1 text-lg text-foreground/35 lg:text-[1.375rem]\">\n                <span aria-hidden className={cn(\"relative h-7 w-[2px] bg-foreground\", blink)}>\n                  <span className=\"absolute -top-1 left-1/2 size-2 -translate-x-1/2 rounded-full bg-foreground\" />\n                </span>\n                {placeholder}\n              </p>\n              <div aria-hidden className=\"mt-3 inline-flex items-center gap-1 rounded-full bg-card p-1 shadow-lg shadow-foreground/10\">\n                <span className=\"flex size-9 items-center justify-center rounded-full bg-foreground text-background\">\n                  <Plus className=\"size-4\" />\n                </span>\n                <span className=\"flex size-9 items-center justify-center rounded-full bg-muted text-foreground/70\">\n                  <Camera className=\"size-4\" />\n                </span>\n                <span className=\"flex size-9 items-center justify-center rounded-full bg-muted text-foreground/70\">\n                  <Pencil className=\"size-4\" />\n                </span>\n              </div>\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the heading; a blue caret handle sits after its last word"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "first paragraph"
+    },
+    {
+      "name": "marked",
+      "type": "{ strong: string; text: string; rest?: string; }",
+      "required": false,
+      "description": "a highlighted passage with selection handles and a floating format toolbar above it"
+    },
+    {
+      "name": "toolbarLabel",
+      "type": "string",
+      "required": false,
+      "description": "label of the blue chip in the toolbar"
+    },
+    {
+      "name": "image",
+      "type": "{ src: string; alt: string; }",
+      "required": false
+    },
+    {
+      "name": "body",
+      "type": "HulyTextPiece[]",
+      "required": false,
+      "description": "paragraph after the image, in pieces (strike, muted, caret)"
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "required": false,
+      "description": "a code sample, shown in a dark block with simple syntax colours"
+    },
+    {
+      "name": "outro",
+      "type": "string",
+      "required": false,
+      "description": "paragraph after the code"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "greyed prompt at the end, after a blinking caret"
+    },
+    {
+      "name": "notes",
+      "type": "{ title: string; text: string; }[]",
+      "required": false,
+      "description": "short notes in the left margin on wide screens"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ab434394a729027840adbae4e95fcdbad75a6cc84573eb487031545b2ba35873"
+}

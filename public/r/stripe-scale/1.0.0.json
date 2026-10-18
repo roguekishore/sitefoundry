@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe scale metrics",
+  "description": "Deep-navy section: a two-tone heading, a field of thin pink-violet threads flowing to the right, and three big light-weight figures filled with warm-to-cool gradients over short white labels.",
+  "category": "stats",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "gradient-text",
+    "dark",
+    "navy",
+    "developers",
+    "waves"
+  ],
+  "notes": [
+    "dark by default (adds the dark class); tone=\"inherit\" follows the page",
+    "the threads drift with CSS, off under reduced motion"
+  ],
+  "entry": "stripe-scale.tsx",
+  "source": "foundry",
+  "name": "stripe-scale",
+  "files": [
+    {
+      "path": "stripe-scale.css",
+      "content": "/* Motion for stripe-scale. Switched off by motion-reduce: classes in the markup. */\n@keyframes stripe-scale-flow {\n  from { transform: translateX(0) scaleY(1); }\n  to { transform: translateX(-2%) scaleY(1.08); }\n}\n"
+    },
+    {
+      "path": "stripe-scale.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport \"./stripe-scale.css\";\n\nexport interface StripeScaleProps {\n  /** the bright lead sentence */\n  title: string;\n  /** the softer sentences after it */\n  rest?: string;\n  /** big figures with a short label each (three fit a row) */\n  metrics: { value: string; label: string }[];\n  /** dark forces the deep-navy band (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  className?: string;\n}\n\n// Each figure gets its own warm-to-cool gradient fill.\nconst fills = [\n  \"from-chart-4 via-chart-2 to-chart-2\",\n  \"from-chart-2 to-chart-3\",\n  \"from-chart-3 via-primary to-chart-5\",\n];\n\n// Flowing threads: sine waves fanning out to the right, like a ribbon of light seen side-on.\nconst THREADS = Array.from({ length: 34 }, (_, i) => {\n  const k = i / 33;\n  const amp = 20 + k * 140;\n  const y = 260 + (k - 0.5) * 60;\n  return `M0 ${y} C 300 ${y - amp}, 600 ${y + amp}, 1200 ${y - amp * 0.4}`;\n});\n\n/**\n * \"Scale\" section of the developer band: a two-tone heading, a field of flowing violet\n * threads, and big figures filled with warm-to-cool gradients.\n */\nexport function StripeScale({ title, rest, metrics, tone = \"dark\", className }: StripeScaleProps) {\n  return (\n    <StripeFrame rule=\"solid\" className={cn(tone === \"dark\" && \"dark\", className)} innerClassName=\"pt-14 pb-14 lg:pt-20 lg:pb-16\">\n      <StripeHeading as=\"h3\" size=\"sub\" lead={title} rest={rest} className=\"relative z-10 max-w-[44rem]\" />\n\n      <div className=\"relative mt-10 lg:mt-0 lg:h-[28rem]\">\n        <svg\n          aria-hidden\n          viewBox=\"0 0 1200 520\"\n          preserveAspectRatio=\"none\"\n          className=\"absolute inset-y-0 right-0 h-full w-[90%] animate-[stripe-scale-flow_10s_ease-in-out_infinite_alternate] opacity-70 motion-reduce:animate-none lg:top-[10%] lg:h-[80%] lg:w-[70%]\"\n        >\n          <defs>\n            <linearGradient id=\"stripe-scale-thread\" x1=\"0\" x2=\"1\">\n              <stop offset=\"0\" style={{ stopColor: \"var(--chart-3)\", stopOpacity: 0 }} />\n              <stop offset=\"0.5\" style={{ stopColor: \"var(--chart-2)\" }} />\n              <stop offset=\"1\" style={{ stopColor: \"var(--chart-3)\", stopOpacity: 0 }} />\n            </linearGradient>\n          </defs>\n          {THREADS.map((d, i) => (\n            <path key={i} d={d} fill=\"none\" stroke=\"url(#stripe-scale-thread)\" strokeWidth={0.8} />\n          ))}\n        </svg>\n\n        <div className=\"relative grid gap-8 lg:absolute lg:inset-x-0 lg:bottom-0 lg:grid-cols-3\">\n          {metrics.map((m, i) => (\n            <div key={m.label}>\n              <p\n                className={cn(\n                  \"w-fit bg-linear-to-r bg-clip-text pb-1 font-display text-[1.75rem] leading-none font-light tracking-[-0.01em] text-transparent lg:text-5xl lg:tracking-[-0.02em]\",\n                  fills[i % fills.length],\n                )}\n              >\n                {m.value}\n              </p>\n              <p className=\"mt-2 text-base font-normal text-foreground\">{m.label}</p>\n            </div>\n          ))}\n        </div>\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-frame",
+    "stripe-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bright lead sentence"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the softer sentences after it"
+    },
+    {
+      "name": "metrics",
+      "type": "{ value: string; label: string; }[]",
+      "required": true,
+      "description": "big figures with a short label each (three fit a row)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the deep-navy band (as on the original); inherit follows the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cf967554f2b317fa4a5f5046ab2ae2804416b149b1b11e9cff22e29eef2fbcf6"
+}

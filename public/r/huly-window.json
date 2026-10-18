@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Huly product window",
+  "description": "A dark app window drawn from divs: icon rail, sidebar, issue board with status columns and task cards, and an inbox panel. It scales as one piece, so phones see the whole window in miniature. Glowing top edge, fades out at the bottom.",
+  "category": "card",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "mock-ui",
+    "app-window",
+    "kanban",
+    "dashboard",
+    "dark",
+    "glow",
+    "saas"
+  ],
+  "notes": [
+    "always dark: adds the dark class to itself",
+    "scales with its container width (container query units); give it the width you want"
+  ],
+  "entry": "huly-window.tsx",
+  "source": "foundry",
+  "name": "huly-window",
+  "files": [
+    {
+      "path": "huly-window.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport {\n  Calendar,\n  ChartGantt,\n  CircleDot,\n  Ellipsis,\n  FileText,\n  Inbox,\n  Kanban,\n  LayoutGrid,\n  List,\n  MessageCircle,\n  Plus,\n  Search,\n  SlidersHorizontal,\n  SquareCheck,\n  Users,\n  Video,\n  X,\n} from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\ntype Tone = \"glow\" | \"highlight\" | \"chart-2\" | \"chart-5\" | \"destructive\";\n\nexport interface WindowCard {\n  title: string;\n  tags?: { label: string; tone?: Tone }[];\n  /** e.g. \"40%\" */\n  progress?: string;\n  /** initials */\n  people?: string[];\n}\n\nexport interface WindowColumn {\n  name: string;\n  count: string;\n  /** colour of the status dot */\n  tone: \"backlog\" | \"todo\" | \"progress\" | \"done\";\n  cards: WindowCard[];\n}\n\nexport interface HulyWindowProps {\n  /** mark shown in the app tile at the top of the rail */\n  logo?: ReactNode;\n  /** small stat widget under the app tile */\n  widget?: { value: string; label: string };\n  sidebar: { title: string; search: string; items: string[]; groupLabel?: string; groups?: string[] };\n  breadcrumb: string[];\n  title: string;\n  /** initials shown at the top right of the board */\n  people?: string[];\n  /** e.g. \"+5\" next to the people */\n  more?: string;\n  /** view tabs; the first is active */\n  views: string[];\n  filter?: string;\n  /** up to four status columns */\n  columns: WindowColumn[];\n  inbox?: {\n    title: string;\n    /** tabs; the first is active, the second carries the badge */\n    tabs: string[];\n    badge?: string;\n    items: { name: string; action: string; target?: string; time: string; place: string; unread?: boolean }[];\n  };\n  className?: string;\n}\n\nconst DOT = { backlog: \"bg-highlight\", todo: \"bg-foreground/80\", progress: \"bg-glow\", done: \"bg-chart-2\" };\nconst TAG: Record<Tone, string> = {\n  glow: \"bg-glow/25 text-glow\",\n  highlight: \"bg-highlight/25 text-highlight\",\n  \"chart-2\": \"bg-chart-2/20 text-chart-2\",\n  \"chart-5\": \"bg-chart-5/25 text-chart-5\",\n  destructive: \"bg-destructive/20 text-destructive\",\n};\nconst FACE = [\"from-glow to-chart-5\", \"from-highlight to-chart-1\", \"from-chart-2 to-chart-3\", \"from-chart-4 to-highlight\"];\nconst RAIL = [Inbox, SquareCheck, Calendar, Video, FileText, MessageCircle, Users];\nconst SIDE = [CircleDot, LayoutGrid, Kanban, ChartGantt, List];\nconst VIEW = [Kanban, List, ChartGantt];\nconst RING = [\"border-glow\", \"border-highlight\", \"border-destructive\", \"border-chart-2\"];\n\nfunction Faces({ people, className }: { people: string[]; className?: string }) {\n  return (\n    <span className={cn(\"flex\", className)}>\n      {people.map((p, i) => (\n        <span\n          key={i}\n          className={cn(\"-ml-1.5 flex size-5 items-center justify-center rounded-full bg-linear-to-br ring-2 ring-background first:ml-0\", FACE[i % FACE.length])}\n        >\n          <span className=\"text-[0.4em] font-semibold\">{p}</span>\n        </span>\n      ))}\n    </span>\n  );\n}\n\nexport function HulyWindow({ logo, widget, sidebar, breadcrumb, title, people, more, views, filter, columns, inbox, className }: HulyWindowProps) {\n  return (\n    // The wrapper is a size container. Inside, 1em = 1/76 of its width and Tailwind's spacing\n    // is switched to em, so the whole window scales like an image (16px type at 1216px wide).\n    // Text sizes sit on leaf elements only, so they don't compound.\n    <div aria-hidden className={cn(\"dark w-full [container-type:inline-size] select-none\", className)}>\n      <div className=\"text-[1.3158cqw] [--spacing:0.25em]\">\n        <div className=\"relative overflow-hidden rounded-t-[0.9em] border border-foreground/10 border-t-foreground/60 bg-background text-foreground shadow-[0_-0.2em_2.5em_-0.2em_var(--glow)] [mask-image:linear-gradient(to_bottom,black_55%,transparent)]\">\n          <div className=\"flex h-[34em]\">\n            {/* rail */}\n            <div className=\"flex w-16 shrink-0 flex-col items-center gap-4 border-r border-foreground/8 bg-card/40 py-3\">\n              <div className=\"flex size-9 items-center justify-center rounded-[0.6em] bg-linear-to-br from-highlight/80 to-foreground/20 [&_svg]:size-5\">\n                {logo}\n              </div>\n              {widget && (\n                <div className=\"flex h-24 w-11 flex-col items-center justify-between rounded-[0.6em] border border-foreground/15 bg-linear-to-b from-foreground/5 to-highlight/40 py-2\">\n                  <span className=\"text-[0.8em]\">{widget.value}</span>\n                  <span className=\"h-0.5 w-5 rounded bg-highlight\" />\n                  <span className=\"text-[0.5em] font-semibold uppercase\">{widget.label}</span>\n                </div>\n              )}\n              {RAIL.map((Icon, i) => (\n                <Icon key={i} className={cn(\"size-4 text-foreground/45\", i === 1 && \"text-foreground\")} strokeWidth={1.5} />\n              ))}\n            </div>\n\n            {/* sidebar */}\n            <div className=\"w-52 shrink-0 border-r border-foreground/8 bg-card/40 px-3 py-3\">\n              <p className=\"px-1 pb-3 font-medium\">{sidebar.title}</p>\n              <div className=\"flex items-center gap-2 rounded-[0.5em] border border-foreground/10 px-2.5 py-1.5 text-foreground/35\">\n                <Search className=\"size-3\" />\n                <span className=\"text-[0.65em]\">{sidebar.search}</span>\n              </div>\n              <div className=\"mt-3 space-y-0.5 text-foreground/55\">\n                {sidebar.items.map((it, i) => {\n                  const Icon = SIDE[i % SIDE.length];\n                  return (\n                    <div key={it} className={cn(\"flex items-center gap-2 rounded-[0.4em] px-1.5 py-1.5\", i === 1 && \"bg-foreground/8 text-foreground\")}>\n                      <Icon className=\"size-3.5\" strokeWidth={1.5} />\n                      <span className=\"text-[0.7em]\">{it}</span>\n                    </div>\n                  );\n                })}\n              </div>\n              {sidebar.groupLabel && (\n                <p className=\"mt-4 px-1.5 pb-1.5 text-foreground/35\">\n                  <span className=\"text-[0.55em] tracking-wider uppercase\">{sidebar.groupLabel}</span>\n                </p>\n              )}\n              <div className=\"space-y-0.5 text-foreground/55\">\n                {sidebar.groups?.map((g, i) => (\n                  <div key={g} className=\"flex items-center gap-2 px-1.5 py-1.5\">\n                    <span className={cn(\"size-2.5 rounded-full border-2\", RING[i % RING.length])} />\n                    <span className=\"text-[0.7em]\">{g}</span>\n                  </div>\n                ))}\n              </div>\n            </div>\n\n            {/* board */}\n            <div className=\"min-w-0 flex-1 bg-card/20\">\n              <div className=\"flex items-start justify-between px-4 pt-3\">\n                <div>\n                  <p className=\"flex gap-1.5 text-foreground/35\">\n                    {breadcrumb.map((b, i) => (\n                      <span key={b} className={cn(\"text-[0.6em]\", i === breadcrumb.length - 1 && \"text-glow\")}>\n                        {i > 0 && <span className=\"mr-1.5 text-foreground/20\">/</span>}\n                        {b}\n                      </span>\n                    ))}\n                  </p>\n                  <p className=\"mt-1.5\">{title}</p>\n                </div>\n                <div className=\"flex items-center gap-2 pt-1\">\n                  {people && <Faces people={people} />}\n                  {more && <span className=\"text-[0.6em] text-foreground/50\">{more}</span>}\n                  <Ellipsis className=\"size-4 rotate-90 text-foreground/40\" />\n                </div>\n              </div>\n              <div className=\"mt-3 flex items-center gap-5 border-b border-foreground/8 px-4 text-foreground/45\">\n                {views.map((v, i) => {\n                  const Icon = VIEW[i % VIEW.length];\n                  return (\n                    <span key={v} className={cn(\"flex items-center gap-1.5 pb-2\", i === 0 && \"border-b border-glow text-foreground\")}>\n                      <Icon className=\"size-3.5\" strokeWidth={1.5} />\n                      <span className=\"text-[0.7em]\">{v}</span>\n                    </span>\n                  );\n                })}\n                {filter && (\n                  <span className=\"ml-auto flex items-center gap-1.5 pb-2\">\n                    <SlidersHorizontal className=\"size-3.5\" strokeWidth={1.5} />\n                    <span className=\"text-[0.65em]\">{filter}</span>\n                  </span>\n                )}\n              </div>\n              <div className=\"grid grid-cols-4 gap-3 px-4 pt-3\">\n                {columns.slice(0, 4).map((col) => (\n                  <div key={col.name} className=\"min-w-0\">\n                    <div className=\"flex items-center gap-1.5 pb-2\">\n                      <span className={cn(\"size-1.5 rounded-full\", DOT[col.tone])} />\n                      <span className=\"text-[0.6em] font-medium uppercase\">{col.name}</span>\n                      <span className=\"text-[0.6em] text-foreground/35\">· {col.count}</span>\n                      <Ellipsis className=\"ml-auto size-3.5 text-foreground/35\" />\n                    </div>\n                    <div className=\"mb-2 flex h-6 items-center justify-center rounded-[0.4em] border border-dashed border-foreground/10 text-foreground/40\">\n                      <Plus className=\"size-3\" />\n                    </div>\n                    <div className=\"space-y-2\">\n                      {col.cards.map((card) => (\n                        <div key={card.title} className=\"rounded-[0.6em] border border-foreground/8 bg-popover/80 p-2.5\">\n                          <p className=\"text-[0.65em] leading-snug text-foreground/85\">{card.title}</p>\n                          {card.tags && (\n                            <div className=\"mt-2 flex flex-wrap gap-1\">\n                              {card.tags.map((t) => (\n                                <span key={t.label} className={cn(\"flex h-4 items-center rounded-full px-1.5\", TAG[t.tone ?? \"glow\"])}>\n                                  <span className=\"text-[0.5em] font-medium\">{t.label}</span>\n                                </span>\n                              ))}\n                            </div>\n                          )}\n                          <div className=\"mt-2 flex items-center justify-between\">\n                            {card.progress && (\n                              <span className=\"flex items-center gap-1 text-foreground/50\">\n                                <span className=\"size-2.5 rounded-full border-2 border-highlight border-r-transparent\" />\n                                <span className=\"text-[0.55em]\">{card.progress}</span>\n                              </span>\n                            )}\n                            {card.people && <Faces people={card.people} className=\"ml-auto\" />}\n                          </div>\n                        </div>\n                      ))}\n                    </div>\n                  </div>\n                ))}\n              </div>\n            </div>\n\n            {/* inbox */}\n            {inbox && (\n              <div className=\"w-60 shrink-0 border-l border-foreground/8 bg-card/40 px-3 py-3\">\n                <div className=\"flex items-center justify-between px-1\">\n                  <span>{inbox.title}</span>\n                  <X className=\"size-3.5 text-foreground/40\" />\n                </div>\n                <div className=\"mt-3 flex gap-4 border-b border-foreground/8 px-1 text-foreground/40\">\n                  {inbox.tabs.map((t, i) => (\n                    <span key={t} className={cn(\"flex items-center gap-1 pb-2\", i === 0 && \"border-b border-glow text-foreground\")}>\n                      <span className=\"text-[0.65em]\">{t}</span>\n                      {i === 1 && inbox.badge && (\n                        <span className=\"flex size-3.5 items-center justify-center rounded-full bg-glow text-foreground\">\n                          <span className=\"text-[0.5em]\">{inbox.badge}</span>\n                        </span>\n                      )}\n                    </span>\n                  ))}\n                </div>\n                <div className=\"divide-y divide-foreground/8\">\n                  {inbox.items.map((it, i) => (\n                    <div key={i} className=\"flex gap-2.5 px-1 py-3\">\n                      <span className={cn(\"flex size-6 shrink-0 items-center justify-center rounded-full bg-linear-to-br\", FACE[i % FACE.length])}>\n                        <span className=\"text-[0.45em] font-semibold\">\n                          {it.name\n                            .split(\" \")\n                            .map((w) => w[0])\n                            .join(\"\")}\n                        </span>\n                      </span>\n                      <div className=\"min-w-0 flex-1\">\n                        <p className=\"text-[0.62em] leading-snug\">\n                          <span>{it.name}</span> <span className=\"text-foreground/50\">{it.action}</span> {it.target && <span>{it.target}</span>}\n                        </p>\n                        <p className=\"mt-0.5 text-[0.55em] text-foreground/35\">\n                          {it.time} · {it.place}\n                        </p>\n                      </div>\n                      {it.unread && <span className=\"mt-1 size-1.5 shrink-0 rounded-full bg-glow\" />}\n                    </div>\n                  ))}\n                </div>\n              </div>\n            )}\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "mark shown in the app tile at the top of the rail"
+    },
+    {
+      "name": "widget",
+      "type": "{ value: string; label: string; }",
+      "required": false,
+      "description": "small stat widget under the app tile"
+    },
+    {
+      "name": "sidebar",
+      "type": "{ title: string; search: string; items: string[]; groupLabel?: string | undefined; groups?: string[] | undefined; }",
+      "required": true
+    },
+    {
+      "name": "breadcrumb",
+      "type": "string[]",
+      "required": true
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "people",
+      "type": "string[]",
+      "required": false,
+      "description": "initials shown at the top right of the board"
+    },
+    {
+      "name": "more",
+      "type": "string",
+      "required": false,
+      "description": "e.g. \"+5\" next to the people"
+    },
+    {
+      "name": "views",
+      "type": "string[]",
+      "required": true,
+      "description": "view tabs; the first is active"
+    },
+    {
+      "name": "filter",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "columns",
+      "type": "WindowColumn[]",
+      "required": true,
+      "description": "up to four status columns"
+    },
+    {
+      "name": "inbox",
+      "type": "{ title: string; tabs: string[]; badge?: string; items: { name: string; action: string; target?: string; time: string; place: string; unread?: boolean | undefined; }[]; } | undefined",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f93e29b31324a94723bc4b317e34abd100fc665d1648e9273fca0bfef8f9b25e"
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Mercury heading",
+  "description": "Calm, medium-weight grotesk heading with an optional full-width hairline above it. Five sizes from the 65px hero line to small card titles, with optional chosen line breaks.",
+  "category": "text-effect",
+  "site": "mercury",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "hairline",
+    "minimal",
+    "calm",
+    "editorial"
+  ],
+  "notes": [
+    "set at in-between weights (420–480): pick a variable typeface"
+  ],
+  "entry": "mercury-heading.tsx",
+  "source": "foundry",
+  "name": "mercury-heading",
+  "files": [
+    {
+      "path": "mercury-heading.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface MercuryHeadingProps {\n  /** the heading; pass a list to choose where the lines break (from sm up) */\n  title: ReactNode | string[];\n  /** a full-width hairline above the heading, as Mercury opens most sections */\n  rule?: boolean;\n  /** heading level */\n  as?: \"h1\" | \"h2\" | \"h3\";\n  /**\n   * hero: 36 → 65px · statement: 28 → 42px (centred lines) · section: 24 → 32px ·\n   * sub: 21 → 24px (beside tab lists) · card: 21 → 28px\n   */\n  size?: \"hero\" | \"statement\" | \"section\" | \"sub\" | \"card\";\n  align?: \"start\" | \"center\";\n  className?: string;\n}\n\nconst sizes = {\n  hero: \"text-[2.25rem] leading-[1.1] font-[500] tracking-[-0.01em] lg:text-[3.75rem] lg:tracking-[-0.015em]\",\n  statement: \"text-[1.75rem] leading-[1.2] font-[500] lg:text-[2.625rem] lg:leading-[1.15] lg:tracking-[-0.01em]\",\n  section: \"text-2xl leading-[1.2] font-[540] lg:text-[2rem] lg:leading-[1.15]\",\n  sub: \"text-[1.3125rem] leading-[1.2] font-[540] lg:text-2xl\",\n  card: \"text-[1.3125rem] leading-[1.2] font-[520] lg:text-[1.75rem]\",\n};\n\n/** Mercury's heading: never bold, never tight, with a hairline above when it opens a section. */\nexport function MercuryHeading({ title, rule = false, as: Tag = \"h2\", size = \"section\", align = \"start\", className }: MercuryHeadingProps) {\n  const text = Array.isArray(title)\n    ? title.map((line, i) => (\n        <Fragment key={i}>\n          {i > 0 && <br className=\"hidden sm:block\" />}\n          {i > 0 && <span className=\"sm:hidden\"> </span>}\n          {line}\n        </Fragment>\n      ))\n    : title;\n  return (\n    <div className={cn(rule && \"border-t border-border pt-8 lg:pt-10\", className)}>\n      <Tag className={cn(\"font-display text-pretty text-foreground\", sizes[size], align === \"center\" && \"text-center text-balance\")}>{text}</Tag>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode | string[]",
+      "required": true,
+      "description": "the heading; pass a list to choose where the lines break (from sm up)"
+    },
+    {
+      "name": "rule",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "a full-width hairline above the heading, as Mercury opens most sections"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "heading level"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "hero: 36 → 65px · statement: 28 → 42px (centred lines) · section: 24 → 32px ·\nsub: 21 → 24px (beside tab lists) · card: 21 → 28px"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "start"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1d1b066aeba0a5a862b8f2ce6757ae00db0b21cf909d6694e3824b9312e5ad4e"
+}

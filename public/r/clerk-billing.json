@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk billing split",
+  "description": "Left: eyebrow, a two-line 32px heading, muted copy, a short checklist with circled ticks and a caret link. Right: a browser-window mock (traffic-light dots, centred title, a small app nav) showing a centred pricing heading and two white plan cards with a toggle, a graphite button and a ticked feature list, over a faint violet glow. On phones the window sits below and the plans scroll sideways.",
+  "category": "pricing",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "split",
+    "mock-ui",
+    "browser-window",
+    "light",
+    "soft-shadow",
+    "checklist",
+    "saas"
+  ],
+  "notes": [
+    "the plan cards are a mock (they show what a product's pricing page could look like), not a working pricing table"
+  ],
+  "entry": "clerk-billing.tsx",
+  "source": "foundry",
+  "name": "clerk-billing",
+  "files": [
+    {
+      "path": "clerk-billing.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check, CircleCheck, CircleHelp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ClerkArrowLink } from \"@foundry/clerk-arrow-link\";\nimport { ClerkButton } from \"@foundry/clerk-button\";\nimport { ClerkHeading, type ClerkHeadingProps } from \"@foundry/clerk-heading\";\n\nexport interface ClerkBillingPlan {\n  name: string;\n  /** e.g. \"$12\" */\n  price: string;\n  /** small text after the price, e.g. \"/ month\" */\n  period?: string;\n  /** label next to the (decorative) toggle, e.g. \"Billed yearly\" */\n  toggle?: string;\n  /** button label */\n  cta: string;\n  features: string[];\n}\n\nexport interface ClerkBillingProps {\n  /** eyebrow, heading and paragraph on the left (its link is ignored; use `link`) */\n  heading: ClerkHeadingProps;\n  /** small lead-in above the checklist */\n  listTitle?: string;\n  /** ticked points on the left */\n  list?: string[];\n  /** caret link under the list */\n  link?: { label: string; href: string };\n  /** the mock browser window on the right */\n  window: {\n    /** text centred in the window's title bar */\n    title: string;\n    /** the mock app's logo mark */\n    mark?: ReactNode;\n    /** links in the mock app's nav */\n    nav?: string[];\n    /** small round avatar at the nav's right end */\n    avatar?: ReactNode;\n    heading: string;\n    subheading?: string;\n    plans: ClerkBillingPlan[];\n  };\n  className?: string;\n}\n\nfunction Plan({ plan }: { plan: ClerkBillingPlan }) {\n  return (\n    <div className=\"w-[15.875rem] shrink-0 snap-center overflow-hidden rounded-lg bg-card text-left shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_4px_12px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_16px_32px_-8px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n      <div className=\"bg-muted/50 px-4 pt-5 pb-4\">\n        <p className=\"text-[0.6875rem] font-semibold text-foreground\">{plan.name}</p>\n        <p className=\"mt-3 flex items-baseline gap-1.5\">\n          <span className=\"text-lg font-semibold text-foreground\">{plan.price}</span>\n          {plan.period && <span className=\"text-[0.625rem] text-muted-foreground\">{plan.period}</span>}\n        </p>\n        {plan.toggle && (\n          <p className=\"mt-1.5 flex items-center gap-2 text-[0.625rem] font-medium text-muted-foreground\">\n            <span className=\"flex h-3 w-5 items-center rounded-full bg-foreground/15 p-0.5\">\n              <span className=\"size-2 rounded-full bg-card shadow-sm\" />\n            </span>\n            {plan.toggle}\n          </p>\n        )}\n      </div>\n      <div className=\"border-y border-border px-4 py-3\">\n        <ClerkButton block size=\"sm\" className=\"h-[1.625rem] text-[0.6875rem] font-semibold\">\n          {plan.cta}\n        </ClerkButton>\n      </div>\n      <ul className=\"space-y-2.5 px-4 py-4 text-[0.6875rem] text-foreground/85\">\n        {plan.features.map((f) => (\n          <li key={f} className=\"flex items-center gap-3\">\n            <Check className=\"size-3 text-muted-foreground\" strokeWidth={2} />\n            {f}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport function ClerkBilling({ heading, listTitle, list = [], link, window: win, className }: ClerkBillingProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-background py-[calc(var(--section-y)*0.6)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto grid max-w-page items-center gap-14 px-gutter lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-20\">\n        <div>\n          <ClerkHeading {...heading} link={undefined} />\n          {listTitle && <p className=\"mt-6 text-[0.9375rem] leading-6 text-muted-foreground\">{listTitle}</p>}\n          {list.length > 0 && (\n            <ul className=\"mt-2 space-y-2\">\n              {list.map((item) => (\n                <li key={item} className=\"flex items-center gap-3 text-[0.9375rem] leading-6 text-muted-foreground\">\n                  <CircleCheck className=\"size-3.5 shrink-0 opacity-70\" strokeWidth={1.75} />\n                  {item}\n                </li>\n              ))}\n            </ul>\n          )}\n          {link && <ClerkArrowLink {...link} className=\"mt-5\" />}\n        </div>\n\n        {/* the mock browser window */}\n        <div className=\"relative -mx-gutter overflow-hidden px-gutter sm:mx-0 sm:px-0\">\n          <div className=\"overflow-hidden rounded-xl bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_7%,transparent)] [mask-image:linear-gradient(to_bottom,black_80%,transparent)]\">\n            <div className=\"relative flex h-5 items-center justify-center border-b border-border bg-muted/40\">\n              <span className=\"absolute left-2.5 flex gap-1\">\n                {[0, 1, 2].map((i) => (\n                  <span key={i} className=\"size-[0.4375rem] rounded-full bg-foreground/10\" />\n                ))}\n              </span>\n              <span className=\"text-[0.625rem] font-medium text-foreground\">{win.title}</span>\n            </div>\n            <div className=\"flex h-10 items-center gap-5 bg-muted/40 px-6 text-[0.6875rem] font-medium text-muted-foreground\">\n              <span className=\"text-foreground [&_svg]:size-5\">{win.mark}</span>\n              {win.nav?.map((n, i) => (\n                <span key={n} className={cn(i > 1 && \"max-sm:hidden\")}>\n                  {n}\n                </span>\n              ))}\n              <span className=\"ml-auto flex items-center gap-3\">\n                <CircleHelp className=\"size-3.5\" strokeWidth={1.75} />\n                {win.avatar}\n              </span>\n            </div>\n            <div className=\"relative px-4 pt-14 pb-20 text-center\">\n              <div aria-hidden className=\"pointer-events-none absolute top-1/2 left-1/2 size-[28rem] -translate-1/2 rounded-full bg-glow/10 blur-3xl\" />\n              <p className=\"relative mx-auto max-w-[16rem] text-[1.375rem] leading-7 font-medium tracking-[-0.01em] text-balance text-foreground sm:max-w-none\">\n                {win.heading}\n              </p>\n              {win.subheading && <p className=\"relative mt-2 text-xs text-muted-foreground\">{win.subheading}</p>}\n              <div className=\"relative mt-14 -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-[calc(50%-7.9375rem)] pb-4 [scrollbar-width:none] sm:mx-0 sm:justify-center sm:px-0\">\n                {win.plans.map((p) => (\n                  <Plan key={p.name} plan={p} />\n                ))}\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "clerk-arrow-link",
+    "clerk-button",
+    "clerk-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "ClerkHeadingProps",
+      "required": true,
+      "description": "eyebrow, heading and paragraph on the left (its link is ignored; use `link`)"
+    },
+    {
+      "name": "listTitle",
+      "type": "string",
+      "required": false,
+      "description": "small lead-in above the checklist"
+    },
+    {
+      "name": "list",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "ticked points on the left"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "caret link under the list"
+    },
+    {
+      "name": "window",
+      "type": "{ title: string; mark?: ReactNode; nav?: string[] | undefined; avatar?: ReactNode; heading: string; subheading?: string | undefined; plans: ClerkBillingPlan[]; }",
+      "required": true,
+      "description": "the mock browser window on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "03dbc8e1c7d4cd9e3ffffc120d77a5b6058d8ef341f4589fe7c50ae576dc36ae"
+}

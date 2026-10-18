@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.1",
+  "type": "block",
+  "title": "Stripe story accordion",
+  "description": "Customer stories as an accordion under an optional two-tone heading and segment opener: rows with a square logo chip, a light headline and a lavender plus button; the open story slides down a wide picture and a row of facts, with an outline story button.",
+  "category": "testimonials",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-studies",
+    "accordion",
+    "light",
+    "minimal",
+    "enterprise",
+    "fintech"
+  ],
+  "notes": [
+    "React state picks the open story: needs hydration",
+    "phones show every story open, each with its own button",
+    "pictures are stripe-art stand-ins"
+  ],
+  "entry": "stripe-stories.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "stripe-stories",
+  "files": [
+    {
+      "path": "stripe-stories.tsx",
+      "content": "import { useState } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeArt, type StripeArtVariant } from \"@foundry/stripe-art\";\nimport { StripeButton } from \"@foundry/stripe-button\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport { StripeSegment, type StripeSegmentProps } from \"@foundry/stripe-segment\";\n\nexport interface StripeStory {\n  /** one to three characters for the square logo chip */\n  mark: string;\n  /** chip colours: ink (dark), sun (yellow), paper (light with a border) */\n  markTone?: \"ink\" | \"sun\" | \"paper\";\n  /** the story's headline */\n  title: string;\n  href: string;\n  /** the picture shown when the story is open */\n  art: StripeArtVariant;\n  /** short facts under the picture: a dark figure and its slate description */\n  facts: { strong: string; text: string }[];\n}\n\nexport interface StripeStoriesProps {\n  /** optional section heading above the segment (two-tone) */\n  heading?: { lead: string; rest?: string };\n  /** the segment opener: title, paragraph and button */\n  segment?: StripeSegmentProps;\n  stories: StripeStory[];\n  /** label of the story link button */\n  readLabel: string;\n  /** label of the plus button, for screen readers */\n  openLabel?: string;\n  className?: string;\n}\n\nconst tones = {\n  ink: \"bg-foreground text-background\",\n  sun: \"bg-chart-4 text-foreground\",\n  paper: \"border border-border bg-muted text-foreground\",\n};\n\n/**\n * Customer stories as an accordion: rows with a square logo chip, a light headline and a\n * lavender plus; the open story shows a wide picture and a row of facts. On phones every\n * story is open, each with its own outline button.\n */\nexport function StripeStories({ heading, segment, stories, readLabel, openLabel, className }: StripeStoriesProps) {\n  const [open, setOpen] = useState(0);\n  return (\n    <StripeFrame className={className} padded={false}>\n      {heading && (\n        <div className=\"px-gutter py-14 lg:py-24\">\n          <StripeHeading lead={heading.lead} rest={heading.rest} className=\"max-w-[47rem]\" />\n        </div>\n      )}\n      <div className={cn(\"px-gutter pb-6\", heading && \"border-t border-border pt-12 lg:pt-14\")}>\n        {segment && <StripeSegment {...segment} className=\"mb-10 lg:mb-12\" />}\n        {stories.map((s, i) => {\n          const isOpen = i === open;\n          return (\n            <div key={s.title} className={cn(\"py-4 lg:py-3\", i > 0 && \"border-t border-dashed border-border max-lg:mt-4 max-lg:pt-8\")}>\n              <div className=\"flex items-start gap-4 lg:items-center\">\n                <span className={cn(\"flex size-10 shrink-0 items-center justify-center rounded-sm font-display text-sm leading-none font-bold tracking-[-0.04em]\", tones[s.markTone ?? \"ink\"])}>\n                  {s.mark}\n                </span>\n                <h3 className=\"flex-1 font-display text-lg leading-[1.25] font-light text-foreground lg:text-[1.375rem] lg:tracking-[-0.01em]\">\n                  <button type=\"button\" className=\"text-left lg:cursor-pointer\" onClick={() => setOpen(i)} aria-expanded={isOpen}>\n                    {s.title}\n                  </button>\n                </h3>\n                <div className=\"hidden shrink-0 lg:block\">\n                  {isOpen ? (\n                    <StripeButton href={s.href} variant=\"outline\" size=\"sm\">\n                      {readLabel}\n                    </StripeButton>\n                  ) : (\n                    <button\n                      type=\"button\"\n                      onClick={() => setOpen(i)}\n                      aria-label={openLabel}\n                      className=\"flex size-9 items-center justify-center rounded-md bg-accent text-accent-foreground transition-colors duration-300 hover:bg-primary hover:text-primary-foreground\"\n                    >\n                      <Plus className=\"size-4\" strokeWidth={1.75} />\n                    </button>\n                  )}\n                </div>\n              </div>\n\n              {/* grid-rows 0fr → 1fr animates the height; phones keep every story open */}\n              <div\n                className={cn(\n                  \"grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] motion-reduce:transition-none max-lg:grid-rows-[1fr]\",\n                  isOpen ? \"lg:grid-rows-[1fr]\" : \"lg:grid-rows-[0fr]\",\n                )}\n              >\n                <div className=\"min-h-0 overflow-hidden\">\n                  <div className=\"mt-4 h-40 overflow-hidden rounded-md sm:h-72 lg:mt-3 lg:h-[26rem]\">\n                    <StripeArt variant={s.art} />\n                  </div>\n                  <div className=\"mt-4 grid gap-3 text-base font-light lg:grid-cols-[1fr_1fr_2fr] lg:gap-8\">\n                    {s.facts.map((f) => (\n                      <p key={f.strong} className=\"text-muted-foreground\">\n                        <span className=\"font-normal text-foreground\">{f.strong}</span> {f.text}\n                      </p>\n                    ))}\n                  </div>\n                  <div className=\"mt-6 lg:hidden\">\n                    <StripeButton href={s.href} variant=\"outline\">\n                      {readLabel}\n                    </StripeButton>\n                  </div>\n                  <div className=\"h-4 lg:h-8\" />\n                </div>\n              </div>\n            </div>\n          );\n        })}\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-art",
+    "stripe-button",
+    "stripe-frame",
+    "stripe-heading",
+    "stripe-segment"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "{ lead: string; rest?: string; }",
+      "required": false,
+      "description": "optional section heading above the segment (two-tone)"
+    },
+    {
+      "name": "segment",
+      "type": "any",
+      "required": false,
+      "description": "the segment opener: title, paragraph and button"
+    },
+    {
+      "name": "stories",
+      "type": "StripeStory[]",
+      "required": true
+    },
+    {
+      "name": "readLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the story link button"
+    },
+    {
+      "name": "openLabel",
+      "type": "string",
+      "required": false,
+      "description": "label of the plus button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dade5cbe7f6195e4ec3f413c91a653319feb624d427ab1fc01308c3d68098cb2"
+}

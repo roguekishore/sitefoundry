@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly hero",
+  "description": "Near-black hero with a huge white-to-lavender headline, a glowing ember pill, and a vertical blue-violet light beam that lands on a product window and flares along its top edge. A line of product areas sits underneath and scrolls as a marquee on phones.",
+  "category": "hero",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "glow",
+    "light-beam",
+    "gradient-text",
+    "product-shot",
+    "marquee",
+    "saas"
+  ],
+  "notes": [
+    "dark by default (tone=\"dark\" adds the dark class); the beam reads best on a dark backdrop",
+    "the beam, flare and marquee are CSS animations, off under reduced motion; no JavaScript",
+    "leaves room at the top for a floating header (huly-header with position=\"absolute\")"
+  ],
+  "entry": "huly-hero.tsx",
+  "source": "foundry",
+  "name": "huly-hero",
+  "files": [
+    {
+      "path": "huly-hero.css",
+      "content": "/* Motion for huly-hero. Every animation is switched off by motion-reduce: classes in the markup. */\n@keyframes huly-beam {\n  0%, 100% { opacity: 0.78; }\n  50% { opacity: 1; }\n}\n\n@keyframes huly-flare {\n  0%, 100% { transform: translateX(-50%) scaleX(0.88); opacity: 0.8; }\n  50% { transform: translateX(-50%) scaleX(1.06); opacity: 1; }\n}\n\n@keyframes huly-marquee {\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "huly-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HulyButton } from \"@foundry/huly-button\";\nimport { HulyHeading } from \"@foundry/huly-heading\";\nimport \"./huly-hero.css\";\n\nexport interface HulyHeroProps {\n  /** the page title; pass a list to choose the line breaks on wide screens */\n  title: string | string[];\n  /** one or two sentences under the title */\n  text?: string;\n  /** the glowing pill */\n  cta?: { label: string; href: string };\n  /** what the light beam lands on: usually a product window (huly-window) */\n  preview?: ReactNode;\n  /** the line under the preview: a label and a list of product areas (a marquee on phones) */\n  strip?: { label: string; items: string[] };\n  /** dark forces the dark colours (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  className?: string;\n}\n\n/** The light beam: a bright vertical line that lands on the top edge of the preview and spreads. */\nfunction Beam() {\n  const pulse = \"animate-[huly-beam_5s_ease-in-out_infinite] motion-reduce:animate-none\";\n  return (\n    <div aria-hidden className=\"pointer-events-none absolute bottom-full left-[80%] h-[23rem] w-0 lg:left-[58%] lg:h-[45rem]\">\n      {/* haze around the beam */}\n      <div className=\"absolute bottom-[12%] left-1/2 h-[90%] w-[26rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_45%,transparent),transparent)] blur-2xl lg:w-[44rem]\" />\n      <div className=\"absolute bottom-0 left-1/2 h-[65%] w-[14rem] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_60%,transparent),transparent)] blur-xl lg:w-[24rem]\" />\n      {/* soft column and the bright core */}\n      <div className={cn(\"absolute inset-y-0 left-1/2 w-8 -translate-x-1/2 bg-linear-to-b from-transparent via-glow/50 to-glow blur-lg lg:w-12\", pulse)} />\n      <div className={cn(\"absolute inset-y-0 left-1/2 w-[3px] -translate-x-1/2 bg-linear-to-b from-transparent via-foreground/80 to-foreground shadow-[0_0_14px_3px_var(--glow)]\", pulse)} />\n      {/* where it lands, the light spreads into a bell: a wide coloured one and a narrow white-hot one */}\n      <div className=\"absolute bottom-0 left-1/2 h-[42%] w-[20rem] -translate-x-1/2 bg-[radial-gradient(50%_100%_at_50%_100%,color-mix(in_oklab,var(--foreground)_80%,var(--glow))_0%,color-mix(in_oklab,var(--glow)_75%,transparent)_30%,transparent_72%)] lg:w-[40rem]\" />\n      <div className=\"absolute bottom-0 left-1/2 h-[30%] w-[5rem] -translate-x-1/2 bg-[radial-gradient(50%_100%_at_50%_100%,var(--foreground)_0%,color-mix(in_oklab,var(--foreground)_60%,transparent)_35%,transparent_75%)] blur-[2px] lg:w-[11rem]\" />\n      <div className=\"absolute bottom-0 left-1/2 h-px w-[24rem] -translate-x-1/2 bg-linear-to-r from-transparent via-foreground to-transparent lg:w-[56rem]\" />\n      {/* flare along the top edge of the preview */}\n      <div className=\"absolute -bottom-6 left-1/2 h-12 w-[28rem] origin-center animate-[huly-flare_5s_ease-in-out_infinite] rounded-[50%] bg-[radial-gradient(closest-side,var(--foreground),color-mix(in_oklab,var(--glow)_70%,transparent)_45%,transparent)] blur-md motion-reduce:animate-none lg:w-[60rem]\" />\n    </div>\n  );\n}\n\nexport function HulyHero({ title, text, cta, preview, strip, tone = \"dark\", className }: HulyHeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-hidden bg-background text-foreground\", tone === \"dark\" && \"dark\", className)}>\n      {/* a deep blue cast across the upper right, as in a dark room lit by the beam */}\n      <div\n        aria-hidden\n        className=\"pointer-events-none absolute -top-40 right-[-20%] -z-10 h-[50rem] w-[70rem] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_16%,transparent),transparent)]\"\n      />\n\n      <div className=\"mx-auto max-w-page px-gutter pt-[5.75rem] pb-10 lg:pt-[11.25rem] lg:pb-24\">\n        <div className=\"relative z-10\">\n          <HulyHeading\n            as=\"h1\"\n            size=\"hero\"\n            gradient\n            title={title}\n            text={text}\n            textClassName=\"max-w-[22rem] text-foreground/90 sm:max-w-[28rem]\"\n          />\n          {cta && (\n            <HulyButton href={cta.href} variant=\"glow\" className=\"mt-6 w-full max-w-[14rem] lg:mt-11 lg:w-60 lg:max-w-none\">\n              {cta.label}\n              <ArrowRight className=\"size-4\" strokeWidth={1.5} />\n            </HulyButton>\n          )}\n        </div>\n\n        {preview && (\n          <div className=\"relative mt-[4.75rem] lg:mt-60\">\n            <Beam />\n            <div className=\"relative\">{preview}</div>\n          </div>\n        )}\n\n        {strip && (\n          <div className={cn(preview ? \"mt-12 lg:mt-10\" : \"mt-16\")}>\n            <p className=\"text-[0.9375rem] tracking-[-0.02em] text-foreground/65\">{strip.label}</p>\n            <div className=\"mt-3 -mx-gutter overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)] lg:mx-0 lg:mt-2.5 lg:[mask-image:none]\">\n              <div className=\"flex w-max animate-[huly-marquee_26s_linear_infinite] motion-reduce:animate-none lg:w-auto lg:animate-none\">\n                {[0, 1].map((copy) => (\n                  <ul key={copy} aria-hidden={copy === 1 || undefined} className={cn(\"flex shrink-0 items-center\", copy === 1 && \"lg:hidden\")}>\n                    {strip.items.map((item, i) => (\n                      <li key={item} className=\"flex items-center text-[0.9375rem] font-semibold tracking-[-0.02em]\">\n                        <span className={cn(\"px-2.5\", i === 0 && \"lg:pl-0\")}>{item}</span>\n                        <span aria-hidden className={cn(\"size-[3px] rounded-full bg-foreground/45\", i === strip.items.length - 1 && \"lg:hidden\")} />\n                      </li>\n                    ))}\n                  </ul>\n                ))}\n              </div>\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "huly-button",
+    "huly-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the page title; pass a list to choose the line breaks on wide screens"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "one or two sentences under the title"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the glowing pill"
+    },
+    {
+      "name": "preview",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what the light beam lands on: usually a product window (huly-window)"
+    },
+    {
+      "name": "strip",
+      "type": "{ label: string; items: string[]; }",
+      "required": false,
+      "description": "the line under the preview: a label and a list of product areas (a marquee on phones)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the dark colours (as on the original); inherit follows the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "919b5de873d3d55a4022b6a680e5d35706610ef689e19a26e2bdb924b16f4184"
+}
