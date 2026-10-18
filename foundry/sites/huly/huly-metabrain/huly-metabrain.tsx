@@ -44,7 +44,7 @@ export function HulyMetabrain({ title, text, cards, className }: HulyMetabrainPr
               text={card.text}
               captionAt="top"
               visual={card.visual && <HulyMock {...card.visual} />}
-              className={cn("h-[13.25rem]", SPAN[card.span ?? "narrow"], card.drop && "lg:translate-y-8")}
+              className={cn("h-[13.25rem]", SPAN[card.span ?? "narrow"], card.drop && "lg:mt-8")}
             />
           ))}
         </div>

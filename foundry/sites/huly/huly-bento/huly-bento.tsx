@@ -44,7 +44,7 @@ export function HulyBento({ title, text, cards, className }: HulyBentoProps) {
                   title={card.title}
                   text={card.text}
                   visual={card.visual && <HulyMock {...card.visual} />}
-                  className="h-[16.5rem] lg:h-[26.25rem]"
+                  className="h-[18rem] lg:h-[26.25rem]"
                 />
               ))}
             </div>

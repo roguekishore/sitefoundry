@@ -145,7 +145,7 @@ export function HulyGithub({ title, text, repo, features, tone = "dark", classNa
                     <Icon className="size-5 lg:size-6" strokeWidth={1.75} />
                   </span>
                 </span>
-                <h3 className="mt-3 text-xl leading-none font-medium tracking-[-0.02em] text-balance lg:mt-7 lg:max-w-[9em] lg:text-[2rem] lg:font-normal">{t}</h3>
+                <h3 className="mt-3 font-display text-xl leading-none font-medium tracking-[-0.02em] text-balance lg:mt-7 lg:max-w-[9em] lg:text-[2rem] lg:font-normal">{t}</h3>
                 <p className="mt-2 max-w-[18rem] text-[0.9375rem] leading-snug text-muted-foreground lg:mt-4 lg:text-base">{body}</p>
               </div>
             ))}

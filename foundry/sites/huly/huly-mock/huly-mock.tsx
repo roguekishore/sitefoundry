@@ -140,7 +140,7 @@ function render(p: HulyMockProps) {
               </div>
             ))}
           </div>
-          <div className={cn(panel, "absolute top-[16%] left-1/2 w-[17rem] -translate-x-1/2 p-1.5 text-xs")}>
+          <div className={cn(panel, "absolute top-[9%] left-1/2 w-[17rem] -translate-x-1/2 p-1.5 text-xs lg:top-[16%]")}>
             <div className="flex items-center gap-2 rounded-lg bg-foreground/5 px-2.5 py-2">
               <Search className="size-3.5 text-foreground/50" />
               <span className="border-l border-foreground/20 pl-2">{p.placeholder}</span>
