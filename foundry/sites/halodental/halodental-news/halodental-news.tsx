@@ -79,7 +79,7 @@ export function HalodentalNews({
   className,
 }: HalodentalNewsProps) {
   return (
-    <section className={cn("bg-background py-16 text-foreground lg:py-24", className)}>
+    <section className={cn("relative bg-background py-16 text-foreground lg:py-24", className)}>
       <div className="mx-auto max-w-page px-gutter lg:px-10">
         {/* Heading + View Media Room button */}
         <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
@@ -102,8 +102,9 @@ export function HalodentalNews({
               <article
                 key={item.title}
                 className={cn(
-                  "relative grid grid-cols-1 gap-5 border-b border-border py-7 lg:grid-cols-12 lg:items-start lg:gap-8 lg:py-6",
-                  faded && "hidden opacity-30 lg:grid",
+                  "relative grid grid-cols-1 gap-5 py-7 lg:grid-cols-12 lg:items-start lg:gap-8 lg:py-6",
+                  !faded && "border-b border-border",
+                  faded && "hidden opacity-35 lg:grid",
                 )}
               >
                 {/* 4 cols: 16:9 media / press logo card */}
@@ -144,7 +145,7 @@ export function HalodentalNews({
                 {faded && (
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,var(--background)_92%)]"
+                    className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,var(--background)_90%)]"
                   />
                 )}
               </article>
@@ -154,7 +155,7 @@ export function HalodentalNews({
 
         {/* Bottom centred "View more" button */}
         {moreCta && (
-          <div className="mt-8 flex justify-center lg:mt-6">
+          <div className="mt-8 flex justify-center lg:mt-4">
             <HalodentalButton
               variant="outline"
               href={moreCta.href}
