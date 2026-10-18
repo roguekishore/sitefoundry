@@ -6,7 +6,7 @@ import { commandSample } from "../clerk-command/clerk-command.demo";
 import { ClerkHero, type ClerkHeroProps } from "./clerk-hero";
 
 export const heroSample: ClerkHeroProps = {
-  title: ["Sign-in, accounts and teams,", "done before lunch"],
+  title: ["Sign-in and accounts", "without the busywork"],
   text: "Drop-in screens and APIs for every person who uses your app.",
   command: commandSample,
   tabs: [

@@ -13,7 +13,7 @@ function Initials({ text, tone = 0 }: { text: string; tone?: number }) {
 }
 
 export const testimonialsSample: ClerkTestimonialsProps = {
-  title: "Trusted by teams that ship",
+  title: "Chosen by fast teams",
   text: "Thousands of products sign people in with Latch. Free for your first 25,000 monthly active users and 50 workspaces.",
   command: commandSample,
   featured: {

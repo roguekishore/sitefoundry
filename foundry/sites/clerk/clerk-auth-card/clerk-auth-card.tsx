@@ -71,7 +71,7 @@ export function ClerkAuthCard({ title, subtitle, providers = [], divider, fields
           </div>
         )}
 
-        <div className="space-y-6">
+        <div className={cn("space-y-6", !divider && "mt-6")}>
           {fields.map((f) => (
             <div key={f.label}>
               <p className="text-[0.8125rem] leading-6 font-medium">{f.label}</p>

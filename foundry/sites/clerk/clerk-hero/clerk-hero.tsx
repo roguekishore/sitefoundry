@@ -93,7 +93,7 @@ export function ClerkHero({ title, text, command, tabs, className }: ClerkHeroPr
             )}
             <div className="relative flex w-full max-w-[22.5rem] justify-center">
               {/* the slowly turning glow behind the card */}
-              <div aria-hidden className="absolute top-1/2 left-1/2 -z-10 size-[26rem] -translate-1/2 opacity-30 blur-3xl">
+              <div aria-hidden className="absolute top-1/2 left-1/2 -z-10 size-[26rem] -translate-1/2 opacity-45 blur-3xl">
                 <div className="clerk-hero-glow size-full rounded-full bg-conic from-glow via-chart-2 via-40% to-glow" />
               </div>
               <div key={`${tab}-${view}`} className="clerk-hero-in flex w-full justify-center">

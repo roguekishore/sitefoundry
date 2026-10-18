@@ -43,7 +43,7 @@ export function ClerkHeader({
 }: ClerkHeaderProps) {
   const [open, setOpen] = useState(false);
   const [overDark, setOverDark] = useState(false);
-  const bar = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLElement>(null);
 
   // While floating, look at what's under the bar and go dark over dark sections.
   useEffect(() => {
@@ -53,8 +53,9 @@ export function ClerkHeader({
       const el = bar.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
+      // hide the header for a moment so the hit test finds what's underneath it
       el.style.visibility = "hidden";
-      const under = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      const under = document.elementFromPoint(r.left + r.width / 2, r.top + 21);
       el.style.visibility = "";
       setOverDark(!!under?.closest(".dark"));
     };
@@ -90,13 +91,13 @@ export function ClerkHeader({
       {/* the strip behind the bar's resting place; it scrolls away, the bar doesn't */}
       <div aria-hidden className={cn("h-[3.125rem]", surfaces[surface])} />
       <header
+        ref={bar}
         className={cn(
           "sticky top-2 z-40 -mt-[2.625rem] mx-auto w-full max-w-[calc(var(--page-width)-2*var(--page-gutter)+1.75rem)] px-2 lg:px-0",
           className,
         )}
       >
         <div
-          ref={bar}
           className={cn(
             "rounded-xl bg-background/90 text-foreground backdrop-blur-md transition-[background-color,color,box-shadow] duration-500 ease-out motion-reduce:transition-none",
             "shadow-[inset_0_0_0_0.5px_color-mix(in_oklab,var(--card)_90%,transparent),0_0_0_0.5px_color-mix(in_oklab,var(--foreground)_15%,transparent),0_2px_3px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_4px_6px_color-mix(in_oklab,var(--foreground)_4%,transparent)]",
