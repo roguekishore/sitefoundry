@@ -36,7 +36,7 @@ const outletStyles = {
  */
 export function MercuryPress({ title, items, className }: MercuryPressProps) {
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <MercuryHeading rule title={title} />
         <ul className="mt-8 grid gap-8 md:grid-cols-3 lg:mt-10">

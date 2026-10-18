@@ -30,7 +30,7 @@ export interface MercuryFeaturesProps {
  */
 export function MercuryFeatures({ title, items, columns = 2, rule = true, className }: MercuryFeaturesProps) {
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         {title && <MercuryHeading rule={rule} title={title} className="[&>h2]:max-w-[37rem]" />}
         <ul className={cn("grid gap-x-8 gap-y-8 lg:gap-y-12", title && "mt-8 lg:mt-10", columns === 3 ? "md:grid-cols-3" : "md:grid-cols-2")}>

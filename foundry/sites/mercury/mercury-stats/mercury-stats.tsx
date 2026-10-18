@@ -23,7 +23,7 @@ export interface MercuryStatsProps {
  */
 export function MercuryStats({ title, stats, className }: MercuryStatsProps) {
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         {title && <MercuryHeading size="statement" align="center" title={title} className="mx-auto max-w-[38rem]" />}
         <dl className={cn("grid border-b border-border lg:grid-flow-col lg:auto-cols-fr lg:border-b-0", title && "mt-14 lg:mt-[4.5rem]")}>

@@ -100,16 +100,18 @@ function Lens() {
 function Beam() {
   return (
     <div className="absolute inset-0 bg-linear-to-b from-[color-mix(in_oklab,var(--foreground)_18%,var(--background))] to-[color-mix(in_oklab,var(--chart-3)_45%,var(--background))]">
-      {/* the glowing horizon */}
-      <div className="absolute -bottom-[30%] left-1/2 aspect-square w-[150%] -translate-x-1/2 rounded-full bg-radial from-chart-3 from-30% via-chart-3/50 via-55% to-transparent to-70% blur-md" />
+      {/* a glowing planet edge low in the frame, with haze above it */}
+      <div className="absolute top-[64%] left-1/2 h-[16%] w-[110%] -translate-x-1/2 rounded-full bg-chart-3/35 blur-2xl" />
+      <div className="absolute top-[72%] left-1/2 aspect-square w-[190%] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--chart-3)_55%,var(--background))_80%,var(--chart-3)_97%,transparent)] blur-[3px]" />
       <svg aria-hidden viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 size-full">
-        <path className="fill-chart-3/50" d="M200 120c0 150-20 260-90 320h180c-70-60-90-170-90-320Z" />
-        <g className="fill-none stroke-foreground/35" strokeWidth="1">
-          <path d="M200 60v380" />
-          <path d="M200 300c-20 80-80 140-150 200" />
-          <path d="M200 300c20 80 80 140 150 200" />
-          <path d="M200 340c-10 60-40 110-80 160" />
-          <path d="M200 340c10 60 40 110 80 160" />
+        {/* the beam: a thin line flaring out where it meets the horizon */}
+        <path className="fill-chart-3/55" d="M200 150c0 110-14 180-62 214h124c-48-34-62-104-62-214Z" />
+        <g className="fill-none stroke-foreground/30" strokeWidth="1">
+          <path d="M200 60v300" />
+          <path d="M200 360c-30 50-90 100-170 160" />
+          <path d="M200 360c30 50 90 100 170 160" />
+          <path d="M200 360c-12 50-36 100-70 160" />
+          <path d="M200 360c12 50 36 100 70 160" />
         </g>
         <g className="fill-none stroke-foreground/20" strokeWidth="6">
           <circle cx="200" cy="60" r="14" />
@@ -117,10 +119,10 @@ function Beam() {
         </g>
         <g className="fill-foreground">
           <circle cx="200" cy="60" r="5" />
-          <circle cx="200" cy="170" r="3.5" />
-          <circle cx="226" cy="420" r="2.5" />
-          <circle cx="124" cy="462" r="2.5" />
-          <circle cx="300" cy="472" r="2.5" />
+          <circle cx="200" cy="200" r="3.5" />
+          <circle cx="214" cy="330" r="2.5" />
+          <circle cx="104" cy="470" r="2.5" />
+          <circle cx="292" cy="458" r="2.5" />
         </g>
       </svg>
     </div>
@@ -188,18 +190,23 @@ function Bars({ bars = [] }: { bars?: MercuryArtBar[] }) {
 }
 
 function Print() {
-  // nested loops, each a little wider than the one inside it
-  const loops = [0, 1, 2, 3, 4, 5, 6].map((i) => {
-    const w = 14 + i * 12;
-    const top = 92 - i * 11;
-    return `M${100 - w} 190 C${100 - w} ${top + 40} ${100 - w * 0.9} ${top} 100 ${top} S${100 + w} ${top + 40} ${100 + w} ${150 + i * 4}`;
-  });
+  // nested ovals, each broken by a gap in a different place, read as a fingerprint
+  const rings = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({ rx: 8 + i * 9, ry: 12 + i * 11, gap: 0.12 + (i % 3) * 0.06, turn: (i * 47) % 360 }));
   return (
     <div className="absolute inset-0 bg-[color-mix(in_oklab,var(--foreground)_14%,color-mix(in_oklab,var(--chart-1)_10%,var(--background)))]">
-      <span className="absolute -top-[25%] left-1/2 aspect-square w-[150%] -translate-x-1/2 rounded-full shadow-[inset_0_14px_24px_color-mix(in_oklab,var(--foreground)_25%,transparent)]" />
-      <svg aria-hidden viewBox="0 0 200 220" className="absolute inset-[15%] size-[70%] fill-none stroke-foreground/45 blur-[1px]" strokeWidth="4" strokeLinecap="round">
-        {loops.map((d) => (
-          <path key={d} d={d} />
+      <span className="absolute top-[8%] left-1/2 aspect-square w-[110%] -translate-x-1/2 rounded-full shadow-[inset_0_14px_24px_color-mix(in_oklab,var(--foreground)_25%,transparent)]" />
+      <svg aria-hidden viewBox="0 0 200 220" className="absolute inset-[12%] size-[76%] fill-none stroke-foreground/50 blur-[0.8px]" strokeWidth="3.5" strokeLinecap="round">
+        {rings.map((r) => (
+          <ellipse
+            key={r.rx}
+            cx="100"
+            cy="112"
+            rx={r.rx}
+            ry={r.ry}
+            pathLength={100}
+            strokeDasharray={`${100 - r.gap * 100} ${r.gap * 100}`}
+            strokeDashoffset={r.turn % 100}
+          />
         ))}
       </svg>
     </div>

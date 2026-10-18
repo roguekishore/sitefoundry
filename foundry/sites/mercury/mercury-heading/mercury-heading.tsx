@@ -18,7 +18,7 @@ export interface MercuryHeadingProps {
 }
 
 const sizes = {
-  hero: "text-[2.25rem] leading-[1.1] font-[500] tracking-[-0.01em] lg:text-[4.085rem] lg:tracking-[-0.015em]",
+  hero: "text-[2.25rem] leading-[1.1] font-[500] tracking-[-0.01em] lg:text-[3.75rem] lg:tracking-[-0.015em]",
   statement: "text-[1.75rem] leading-[1.2] font-[500] lg:text-[2.625rem] lg:leading-[1.15] lg:tracking-[-0.01em]",
   section: "text-2xl leading-[1.2] font-[540] lg:text-[2rem] lg:leading-[1.15]",
   sub: "text-[1.3125rem] leading-[1.2] font-[540] lg:text-2xl",
