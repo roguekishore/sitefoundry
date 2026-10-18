@@ -1,0 +1,41 @@
+import type { ComponentProps as LinkStandInProps } from "react"
+// plain-React stand-in for next/link (added by the foundry mirror)
+const Link = ({ prefetch: _p, replace: _r, scroll: _s, ...props }: LinkStandInProps<"a"> & { prefetch?: boolean; replace?: boolean; scroll?: boolean }) => <a {...props} />
+import { SlashIcon } from "lucide-react"
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@foundry/shadcn-breadcrumb"
+
+export default function BreadcrumbWithCustomSeparator() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link href="/">Home</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <SlashIcon />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <Link href="/components">Components</Link>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator>
+          <SlashIcon />
+        </BreadcrumbSeparator>
+        <BreadcrumbItem>
+          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  )
+}
