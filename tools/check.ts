@@ -54,8 +54,11 @@ function hardCodedContent(path: string, content: string): string[] {
   return found;
 }
 
+const HOOK = /\buse(State|Effect|LayoutEffect|Reducer|Ref|Transition|SyncExternalStore|ReducedMotion|InView|Scroll|Animate|Animation|MotionValue|Spring|Transform|Velocity)\s*[(<]/;
+const HIDDEN = /style="[^"]*(opacity:\s*0[;"]|visibility:\s*hidden)/;
+
 /** Bundle the demo for Node and render it to HTML: what Astro and other static builds do. */
-async function renderDemo(item: ScannedItem, paths: Record<string, string>): Promise<string | undefined> {
+async function renderDemo(item: ScannedItem, paths: Record<string, string>): Promise<{ error?: string; html?: string }> {
   const out = join(ROOT, ".cache", "ssr", `${item.name}.mjs`);
   await mkdir(join(ROOT, ".cache", "ssr"), { recursive: true });
   try {
@@ -82,12 +85,11 @@ async function renderDemo(item: ScannedItem, paths: Record<string, string>): Pro
       ],
     });
     const mod = await import(pathToFileURL(out).href + `?t=${Date.now()}`);
-    if (typeof mod.default !== "function") return "the demo has no default-exported component";
-    renderToString(createElement(mod.default));
-    return undefined;
+    if (typeof mod.default !== "function") return { error: "the demo has no default-exported component" };
+    return { html: renderToString(createElement(mod.default)) };
   } catch (e) {
     const err = e as Error & { errors?: { text: string }[] };
-    return (err.errors?.map((x) => x.text).join("; ") || err.message).split("\n")[0];
+    return { error: (err.errors?.map((x) => x.text).join("; ") || err.message).split("\n")[0] };
   } finally {
     await rm(out, { force: true });
   }
@@ -152,9 +154,17 @@ async function checkItem(item: ScannedItem, ctx: { tokens: Awaited<ReturnType<ty
   if (["block", "component"].includes(meta.type) && meta.entry && !errors.some((e) => e.startsWith(`"entry"`))) {
     if (!propsOf(join(ROOT, item.dir, meta.entry))) errors.push(`no exported React component found in ${meta.entry}`);
   }
+  if (meta.hydrate && !["load", "visible", "idle"].includes(meta.hydrate)) errors.push(`"hydrate" must be load, visible or idle`);
+  if (["block", "component"].includes(meta.type) && !meta.hydrate) {
+    const hooked = item.files.find((f) => CODE.test(f.path) && HOOK.test(f.content));
+    if (hooked) style(`${hooked.path} uses React state/effects, so it only works with JavaScript: set "hydrate" in meta.json`);
+  }
   if (item.demo && !errors.length) {
-    const failure = await renderDemo(item, ctx.paths);
-    if (failure) (strict ? errors : warnings).push(`doesn't render to static HTML: ${failure}`);
+    const { error, html } = await renderDemo(item, ctx.paths);
+    if (error) (strict ? errors : warnings).push(`doesn't render to static HTML: ${error}`);
+    else if (html && HIDDEN.test(html) && !meta.hydrate) {
+      style(`its static HTML starts hidden (opacity 0) and stays hidden without JavaScript: set "hydrate", or animate in with CSS`);
+    }
   }
   return { errors, warnings };
 }

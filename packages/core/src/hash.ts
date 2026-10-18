@@ -11,6 +11,13 @@ export function sha256(content: string | Buffer): string {
     .digest("hex");
 }
 
+/** An item's identity: its files plus its metadata (except the version itself). */
+export function hashItem(meta: object & { version?: string }, files: { path: string; content: string }[]): string {
+  const { version: _version, ...rest } = meta;
+  const sorted = Object.fromEntries(Object.entries(rest).sort(([a], [b]) => a.localeCompare(b)));
+  return hashFiles([...files, { path: "\0meta", content: JSON.stringify(sorted) }]);
+}
+
 export function hashFiles(files: { path: string; content: string }[]): string {
   const h = createHash("sha256");
   for (const f of [...files].sort((a, b) => a.path.localeCompare(b.path))) {

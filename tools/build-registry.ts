@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import semver from "semver";
-import { SCHEMA, hashFiles, type IndexEntry, type RegistryItem } from "@foundry/core";
+import { SCHEMA, hashItem, type IndexEntry, type RegistryItem } from "@foundry/core";
 import { REGISTRY_DIR, ROOT, propsOf, scan, type ScannedItem } from "./lib/scan.ts";
 
 export async function writePathMap(items: ScannedItem[]): Promise<void> {
@@ -28,7 +28,7 @@ export function toRegistryItem(item: ScannedItem): RegistryItem {
     dependencies: item.dependencies,
     registryDependencies: item.imports.foundry,
     ...(props ? { props } : {}),
-    hash: hashFiles(item.files),
+    hash: hashItem(item.meta, item.files),
   };
 }
 
@@ -49,7 +49,7 @@ async function builtVersions(name: string): Promise<Map<string, string>> {
 export async function versionErrors(item: ScannedItem): Promise<string[]> {
   if (!semver.valid(item.meta.version)) return [`version "${item.meta.version}" is not a valid semver version`];
   const built = await builtVersions(item.name);
-  const hash = hashFiles(item.files);
+  const hash = hashItem(item.meta, item.files);
   const sameVersion = built.get(item.meta.version);
   if (sameVersion && sameVersion !== hash) {
     return [`files changed but version is still ${item.meta.version}; bump "version" in meta.json (built versions never change)`];

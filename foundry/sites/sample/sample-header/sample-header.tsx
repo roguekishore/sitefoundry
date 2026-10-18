@@ -16,14 +16,16 @@ export interface SampleHeaderProps {
   cta?: HeaderLink;
   /** label of the phone menu button, for screen readers */
   menuLabel?: string;
+  /** stays at the top while scrolling */
+  sticky?: boolean;
   className?: string;
 }
 
-export function SampleHeader({ brand, logoSrc, links, cta, menuLabel = "Menu", className }: SampleHeaderProps) {
+export function SampleHeader({ brand, logoSrc, links, cta, menuLabel = "Menu", sticky = true, className }: SampleHeaderProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className={cn("sticky top-0 z-40 border-b bg-background/85 backdrop-blur", className)}>
+    <header className={cn("z-40 border-b bg-background/85 backdrop-blur", sticky && "sticky top-0", className)}>
       <div className="mx-auto flex h-16 max-w-page items-center justify-between gap-6 px-gutter">
         <a href="/" className="flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
           {logoSrc ? <img src={logoSrc} alt={brand} className="h-8 w-auto" /> : brand}

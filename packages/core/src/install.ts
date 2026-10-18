@@ -25,12 +25,14 @@ export interface AddOptions {
   /** work out everything, write nothing */
   dryRun?: boolean;
   log?: Logger;
+  /** "capture" keeps the package manager's output off stdout (needed inside the MCP server) */
+  packageOutput?: "inherit" | "capture";
 }
 
 export interface AddResult {
-  added: { name: string; version: string; from?: string; files: string[] }[];
+  added: { name: string; version: string; from?: string; files: string[]; hydrate?: RegistryItem["hydrate"] }[];
   skipped: { name: string; reason: string }[];
-  packages: { installed: string[]; missing: string[]; conflicts: string[] };
+  packages: { installed: string[]; missing: string[]; conflicts: string[]; notes: string[] };
 }
 
 interface Write {
@@ -46,7 +48,7 @@ export async function add(projectDir: string, specs: string[], opts: AddOptions 
   const config = await loadConfig(projectDir);
   const lock = await loadLock(projectDir);
   const registry = openRegistry(resolveRegistry(projectDir, config.registry));
-  const result: AddResult = { added: [], skipped: [], packages: { installed: [], missing: [], conflicts: [] } };
+  const result: AddResult = { added: [], skipped: [], packages: { installed: [], missing: [], conflicts: [], notes: [] } };
 
   // 1. Resolve: requested items at the asked (or latest) version; their dependencies only if not installed yet.
   const plan = new Map<string, RegistryItem>();
@@ -110,7 +112,9 @@ export async function add(projectDir: string, specs: string[], opts: AddOptions 
   const packages = await checkPackages(projectDir, wanted);
   result.packages.conflicts = packages.conflicts;
   result.packages.missing = packages.missing;
+  result.packages.notes = packages.notes;
   for (const c of packages.conflicts) log.warn(`package clash: ${c}`);
+  for (const n of packages.notes) log.info(`note: ${n}`);
 
   if (opts.dryRun) {
     for (const item of plan.values()) {
@@ -119,6 +123,7 @@ export async function add(projectDir: string, specs: string[], opts: AddOptions 
         version: item.version,
         from: lock.items[item.name]?.version,
         files: writes.filter((w) => w.item === item).map((w) => w.path),
+        hydrate: item.hydrate,
       });
     }
     return result;
@@ -156,7 +161,7 @@ export async function add(projectDir: string, specs: string[], opts: AddOptions 
         mine.map((w) => [w.path, w.encoding === "utf8" ? sha256(w.content) : sha256(Buffer.from(w.content, "base64"))]),
       ),
     };
-    result.added.push({ name: item.name, version: item.version, from: old?.version, files: mine.map((w) => w.path) });
+    result.added.push({ name: item.name, version: item.version, from: old?.version, files: mine.map((w) => w.path), hydrate: item.hydrate });
   }
   await saveLock(projectDir, lock);
 
@@ -167,8 +172,16 @@ export async function add(projectDir: string, specs: string[], opts: AddOptions 
       const pm = packageManager(projectDir);
       const args = [pm === "npm" ? "install" : "add", ...packages.missing];
       log.info(`${pm} ${args.join(" ")}`);
-      const run = spawnSync(pm, args, { cwd: projectDir, stdio: "inherit", shell: process.platform === "win32" });
-      if (run.status !== 0) log.warn(`${pm} failed; install these yourself: ${packages.missing.join(" ")}`);
+      // Windows needs a shell for npm.cmd & co; quote each argument so cmd.exe keeps `^` in ranges.
+      const stdio = opts.packageOutput === "capture" ? "pipe" : "inherit";
+      const run =
+        process.platform === "win32"
+          ? spawnSync([pm, ...args.map((a) => `"${a}"`)].join(" "), { cwd: projectDir, stdio, shell: true, encoding: "utf8" })
+          : spawnSync(pm, args, { cwd: projectDir, stdio, encoding: "utf8" });
+      if (run.status !== 0) {
+        const detail = stdio === "pipe" ? `\n${(run.stderr || run.stdout || "").trim().split("\n").slice(-5).join("\n")}` : "";
+        log.warn(`${pm} failed; install these yourself: ${packages.missing.join(" ")}${detail}`);
+      }
       else result.packages.installed = packages.missing;
     }
   }
@@ -245,23 +258,35 @@ async function checkPackages(projectDir: string, wanted: Map<string, string>) {
   const declared: Record<string, string> = { ...pkg.peerDependencies, ...pkg.devDependencies, ...pkg.dependencies };
   const missing: string[] = [];
   const conflicts: string[] = [];
+  const notes: string[] = [];
 
+  // `range` is what the block was tested with (e.g. ^19.3.0). Same major but older is usually fine,
+  // so it's a note; a different major is a real clash.
   for (const [name, range] of wanted) {
+    const tested = semver.minVersion(range);
+    const sameMajor = tested ? sameMajorRange(tested) : range;
     const installed = await installedVersion(projectDir, name);
     if (installed) {
-      if (!semver.satisfies(installed, range)) conflicts.push(`${name}: project has ${installed}, foundry needs ${range}`);
+      if (semver.satisfies(installed, range)) continue;
+      if (semver.satisfies(installed, sameMajor)) notes.push(`${name}: project has ${installed}; the block was tested with ${range}`);
+      else conflicts.push(`${name}: project has ${installed}, the block needs ${range}`);
       continue;
     }
     const existing = declared[name];
     if (existing) {
-      if (semver.validRange(existing) && !semver.intersects(existing, range)) {
-        conflicts.push(`${name}: project asks for ${existing}, foundry needs ${range}`);
+      if (semver.validRange(existing) && !semver.intersects(existing, sameMajor)) {
+        conflicts.push(`${name}: project asks for ${existing}, the block needs ${range}`);
       }
       continue;
     }
     missing.push(`${name}@${range}`);
   }
-  return { missing, conflicts };
+  return { missing, conflicts, notes };
+}
+
+/** 19.3.1 → "^19.0.0"; 0.4.2 → "^0.4.0" (for 0.x, the minor is the breaking part). */
+function sameMajorRange(v: semver.SemVer): string {
+  return v.major > 0 ? `^${v.major}.0.0` : `^0.${v.minor}.0`;
 }
 
 async function installedVersion(projectDir: string, name: string): Promise<string | undefined> {

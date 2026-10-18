@@ -24,6 +24,11 @@ export interface ItemMeta {
   entry: string;
   /** gallery demo; never installed */
   demo?: string;
+  /**
+   * Needs JavaScript in the browser (state, effects, JS animation). In Astro, render it with
+   * `client:<hydrate>`; without it the block is inert, or hidden if it animates in.
+   */
+  hydrate?: "load" | "visible" | "idle";
 }
 
 export interface PropDoc {
