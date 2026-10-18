@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.1",
+  "type": "block",
+  "title": "Stripe integration paths",
+  "description": "Deep-navy section with a two-tone heading over three columns, each a rounded raised-navy vignette (a chat handing over a QR payment link, a staggered wall of app tiles, a code editor with autocomplete) with a bright-lead caption and a soft indigo link.",
+  "category": "features",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "developers",
+    "dark",
+    "navy",
+    "mock-ui",
+    "code",
+    "three-column"
+  ],
+  "notes": [
+    "dark by default (adds the dark class); tone=\"inherit\" follows the page",
+    "vignettes come from stripe-mock"
+  ],
+  "entry": "stripe-paths.tsx",
+  "source": "foundry",
+  "name": "stripe-paths",
+  "files": [
+    {
+      "path": "stripe-paths.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { StripeButton } from \"@foundry/stripe-button\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport { StripeMock, type StripeMockContent } from \"@foundry/stripe-mock\";\n\nexport interface StripePath {\n  /** the vignette at the top of the card */\n  mock: StripeMockContent;\n  /** the bright lead, ending in a full stop or question mark */\n  lead: string;\n  /** the softer sentence after it */\n  text: string;\n  link: { label: string; href: string };\n}\n\nexport interface StripePathsProps {\n  /** the bright lead sentence */\n  title: string;\n  /** the softer sentences after it */\n  rest?: string;\n  /** three ways in (more wrap) */\n  paths: StripePath[];\n  /** dark forces the deep-navy band (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  className?: string;\n}\n\n/**\n * \"Choose a path\" section of the developer band: a two-tone heading over three columns, each a\n * rounded vignette (no-code chat, app wall, code editor) with a caption and a link.\n */\nexport function StripePaths({ title, rest, paths, tone = \"dark\", className }: StripePathsProps) {\n  return (\n    <StripeFrame rule=\"solid\" className={cn(tone === \"dark\" && \"dark\", className)} innerClassName=\"pt-14 pb-16 lg:pt-20 lg:pb-24\">\n      <StripeHeading as=\"h3\" size=\"sub\" lead={title} rest={rest} className=\"max-w-[44rem]\" />\n      <div className=\"mt-10 grid gap-10 lg:mt-14 lg:grid-cols-3 lg:gap-4\">\n        {paths.map((p) => (\n          <div key={p.lead} className=\"min-w-0\">\n            <div className=\"h-[16.5rem] overflow-hidden rounded-md bg-card lg:h-[18.5rem]\">\n              <StripeMock mock={p.mock} />\n            </div>\n            <p className=\"mt-6 max-w-[22rem] text-base leading-[1.4] font-light text-muted-foreground lg:mt-5\">\n              <span className=\"font-normal text-foreground\">{p.lead}</span> {p.text}\n            </p>\n            <StripeButton href={p.link.href} variant=\"link\" className=\"mt-4 text-base text-[color-mix(in_oklab,var(--primary)_55%,var(--foreground))]\">\n              {p.link.label}\n            </StripeButton>\n          </div>\n        ))}\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-button",
+    "stripe-frame",
+    "stripe-heading",
+    "stripe-mock"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bright lead sentence"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the softer sentences after it"
+    },
+    {
+      "name": "paths",
+      "type": "StripePath[]",
+      "required": true,
+      "description": "three ways in (more wrap)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the deep-navy band (as on the original); inherit follows the page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a1fdae4b8d62a0b96a47fe3a987729b142e01d505da437143392b6b08e4aea8c"
+}

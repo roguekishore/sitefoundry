@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe stats band",
+  "description": "Centred light statement over four big figures between hairlines: one figure is lit at a time while a short indigo line glides along the rule above it. Below, a burst of thin indigo rays tipped with dots fans up from a warm glow. A small sun/moon switch flips the band dark.",
+  "category": "stats",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "light",
+    "dark",
+    "rays",
+    "burst",
+    "glow",
+    "animated",
+    "fintech"
+  ],
+  "notes": [
+    "the lit-figure cycle and the gliding line are CSS (desktop only); off under reduced motion, where every figure stays ink",
+    "React state for the light/dark switch: needs hydration; leave out toggleLabel to hide the switch",
+    "phones: figures in a 2×2 grid"
+  ],
+  "entry": "stripe-stats.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "stripe-stats",
+  "files": [
+    {
+      "path": "noise.ts",
+      "content": "/** Deterministic pseudo-random number in [0, 1), so the art is the same on server and client. */\nexport function noise(i: number, seed = 1): number {\n  const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;\n  return x - Math.floor(x);\n}\n"
+    },
+    {
+      "path": "stripe-stats.css",
+      "content": "/* Motion for stripe-stats. Switched off by motion-reduce: classes in the markup. */\n\n/* each figure is lit (ink) for a quarter of the cycle, slate otherwise */\n@keyframes stripe-stats-lit {\n  0%, 22% { color: var(--foreground); }\n  27%, 95% { color: var(--muted-foreground); }\n  100% { color: var(--foreground); }\n}\n\n/* the short gradient line steps along the top rule from figure to figure */\n@keyframes stripe-stats-glide {\n  0%, 22% { transform: translateX(0%); }\n  25%, 47% { transform: translateX(100%); }\n  50%, 72% { transform: translateX(200%); }\n  75%, 97% { transform: translateX(300%); }\n  100% { transform: translateX(0%); opacity: 0; }\n}\n\n@keyframes stripe-stats-breathe {\n  from { transform: scale(0.97); }\n  to { transform: scale(1.03); }\n}\n"
+    },
+    {
+      "path": "stripe-stats.tsx",
+      "content": "import { useState } from \"react\";\nimport { Moon, Sun } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport { noise } from \"./noise\";\nimport \"./stripe-stats.css\";\n\nexport interface StripeStat {\n  /** the big figure, e.g. \"135+\" */\n  value: string;\n  /** what it counts, one or two short lines */\n  label: string;\n}\n\nexport interface StripeStatsProps {\n  /** the centred statement; pass two strings to choose the line break */\n  title: string | [string, string];\n  /** four figures; one at a time is lit while the others rest in slate */\n  stats: StripeStat[];\n  /** start in the dark variant (the band's own switch flips it) */\n  dark?: boolean;\n  /** label of the light/dark switch, for screen readers; leave out to hide the switch */\n  toggleLabel?: string;\n  className?: string;\n}\n\n// The burst: rays fanning up from a point at the bottom centre, each tipped with a dot.\nconst RAYS = Array.from({ length: 150 }, (_, i) => {\n  const angle = Math.PI * (0.03 + 0.94 * noise(i, 1));\n  const length = 180 + noise(i, 2) * 340 * Math.sin(angle) ** 0.6;\n  return {\n    x: 600 + Math.cos(angle) * length * 1.5,\n    y: 600 - Math.sin(angle) * length,\n    w: 0.6 + noise(i, 3) * 1.2,\n    dot: noise(i, 4) > 0.45,\n    o: 0.45 + noise(i, 5) * 0.55,\n  };\n});\n\n/**\n * \"Backbone\" stats band: a centred light statement, four big figures between hairlines (one\n * lit at a time, with a short gradient line gliding along the rule above it), and a burst\n * of thin blue rays over a warm glow. A small sun/moon switch flips the band dark.\n */\nexport function StripeStats({ title, stats, dark: startDark = false, toggleLabel, className }: StripeStatsProps) {\n  const [dark, setDark] = useState(startDark);\n  const lines = Array.isArray(title) ? title : [title];\n  const shown = stats.slice(0, 4);\n\n  return (\n    <StripeFrame\n      className={cn(\"overflow-hidden transition-colors duration-700 motion-reduce:transition-none\", dark && \"dark\", className)}\n      innerClassName=\"px-0\"\n    >\n      {/* a cool wash behind the whole band */}\n      <div\n        aria-hidden\n        className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(90%_60%_at_50%_100%,color-mix(in_oklab,var(--chart-5)_45%,transparent),transparent_75%)] dark:bg-[radial-gradient(90%_70%_at_50%_100%,color-mix(in_oklab,var(--chart-3)_50%,transparent),transparent_80%)]\"\n      />\n\n      <div className=\"relative px-gutter pt-16 pb-10 lg:pt-28 lg:pb-20\">\n        <StripeHeading\n          size=\"display\"\n          align=\"center\"\n          lead={lines.map((l, i) => (\n            <span key={i} className=\"block\">\n              {l}\n            </span>\n          ))}\n        />\n      </div>\n\n      <div className=\"relative grid grid-cols-2 gap-y-10 px-gutter pb-10 lg:grid-cols-4 lg:border-y lg:border-border lg:px-0 lg:py-11\">\n        {/* the gliding line on the top rule, over the lit figure (desktop) */}\n        <span\n          aria-hidden\n          className=\"absolute -top-px left-0 hidden h-px w-1/4 animate-[stripe-stats-glide_12s_infinite] bg-[linear-gradient(90deg,transparent,var(--primary)_50%,transparent)] motion-reduce:animate-none lg:block\"\n        />\n        {/* phones: a hairline between the two rows */}\n        <span aria-hidden className=\"absolute inset-x-[15%] top-1/2 -mt-5 h-px bg-[linear-gradient(90deg,transparent,var(--border),transparent)] lg:hidden\" />\n        {shown.map((s, i) => (\n          <div\n            key={s.value}\n            className=\"animate-[stripe-stats-lit_12s_infinite] text-center text-foreground motion-reduce:animate-none max-lg:animate-none\"\n            style={{ animationDelay: `${i * 3 - 12}s` }}\n          >\n            <p className=\"font-display text-[1.75rem] leading-none font-light tracking-[-0.01em] tabular-nums lg:text-5xl lg:tracking-[-0.02em]\">\n              {s.value}\n            </p>\n            <p className=\"mx-auto mt-3 max-w-[11rem] text-base leading-[1.4] font-light text-balance lg:mt-3\">{s.label}</p>\n          </div>\n        ))}\n      </div>\n\n      {/* the burst */}\n      <div className=\"relative h-72 sm:h-96 lg:h-[32rem]\">\n        {toggleLabel && (\n          <button\n            type=\"button\"\n            aria-label={toggleLabel}\n            aria-pressed={dark}\n            onClick={() => setDark((d) => !d)}\n            className=\"absolute top-5 right-gutter z-10 hidden size-8 items-center justify-center rounded-md border border-border bg-background/60 text-foreground/80 backdrop-blur transition-colors hover:text-foreground sm:flex lg:right-6\"\n          >\n            {dark ? <Moon className=\"size-4\" strokeWidth={1.75} /> : <Sun className=\"size-4\" strokeWidth={1.75} />}\n          </button>\n        )}\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-full bg-[radial-gradient(40%_70%_at_50%_100%,color-mix(in_oklab,var(--chart-4)_80%,transparent),color-mix(in_oklab,var(--chart-1)_25%,transparent)_45%,transparent_80%)]\" />\n        <svg aria-hidden viewBox=\"0 0 1200 600\" preserveAspectRatio=\"xMidYMax meet\" className=\"absolute inset-0 size-full\">\n          <g className=\"origin-[50%_100%] animate-[stripe-stats-breathe_9s_ease-in-out_infinite_alternate] [transform-box:view-box] motion-reduce:animate-none\">\n            {RAYS.map((r, i) => (\n              <g key={i} opacity={r.o}>\n                <line x1={600} y1={600} x2={r.x} y2={r.y} className=\"stroke-primary\" strokeWidth={r.w} />\n                {r.dot && <circle cx={r.x} cy={r.y} r={2.2} className=\"fill-primary\" />}\n              </g>\n            ))}\n          </g>\n        </svg>\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-frame",
+    "stripe-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | [string, string]",
+      "required": true,
+      "description": "the centred statement; pass two strings to choose the line break"
+    },
+    {
+      "name": "stats",
+      "type": "StripeStat[]",
+      "required": true,
+      "description": "four figures; one at a time is lit while the others rest in slate"
+    },
+    {
+      "name": "dark",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "start in the dark variant (the band's own switch flips it)"
+    },
+    {
+      "name": "toggleLabel",
+      "type": "string",
+      "required": false,
+      "description": "label of the light/dark switch, for screen readers; leave out to hide the switch"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6e756c001811e7e7f9dad651badc5771e10d3758464986153e72d9a1a24af832"
+}

@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk logo strip",
+  "description": "A calm customer-logo row on white: five evenly spaced wordmarks on desktop, a 2×2 grid on phones. Each slot quietly swaps between two logos with a soft fade, blur and lift, staggered across the row.",
+  "category": "logos",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "light",
+    "minimal",
+    "crossfade"
+  ],
+  "notes": [
+    "logos fill five slots; logo n and n+5 share a slot and take turns (phones show the first four slots)",
+    "CSS only; with reduced motion each slot keeps its first logo"
+  ],
+  "entry": "clerk-logos.tsx",
+  "source": "foundry",
+  "name": "clerk-logos",
+  "files": [
+    {
+      "path": "clerk-logos.css",
+      "content": "/* Two logos per slot take turns: each fades in, stays for ~35% of the cycle, then fades out\n   with a little blur and lift; the other fades in only after that. The second starts half a\n   cycle later. */\n.clerk-logo-a,\n.clerk-logo-b {\n  animation: clerk-logo-swap 12s ease-in-out infinite;\n}\n.clerk-logo-b {\n  animation-delay: -6s;\n}\n\n@keyframes clerk-logo-swap {\n  0% { opacity: 0; filter: blur(4px); transform: translateY(6px); }\n  7%, 43% { opacity: 1; filter: blur(0); transform: translateY(0); }\n  50%, 100% { opacity: 0; filter: blur(4px); transform: translateY(-6px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .clerk-logo-a { animation: none; }\n  .clerk-logo-b { display: none; }\n}\n"
+    },
+    {
+      "path": "clerk-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./clerk-logos.css\";\n\nexport interface ClerkLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n}\n\nexport interface ClerkLogosProps {\n  /** up to ten logos; logo n and n+5 share a slot and take turns */\n  logos: ClerkLogo[];\n  /** colour behind the strip: card (white, continuing the hero) or background */\n  surface?: \"card\" | \"background\";\n  className?: string;\n}\n\nexport function ClerkLogos({ logos, surface = \"card\", className }: ClerkLogosProps) {\n  const slots = Array.from({ length: 5 }, (_, i) => [logos[i], logos[i + 5]] as const).filter(([a]) => a);\n  return (\n    <section className={cn(surface === \"card\" ? \"bg-card\" : \"bg-background\", \"text-foreground\", className)}>\n      <ul className=\"mx-auto grid max-w-page grid-cols-2 px-gutter pt-10 pb-16 lg:grid-cols-5 lg:py-12\">\n        {slots.map(([a, b], i) => (\n          <li key={a!.name} className={cn(\"relative grid h-[4.75rem] place-items-center lg:h-24\", i === 4 && \"hidden lg:grid\")}>\n            <span\n              className={cn(\"flex items-center [grid-area:1/1] [&_svg]:h-7 [&_svg]:w-auto\", b && \"clerk-logo-a\")}\n              style={b ? { animationDelay: `${i * 0.2}s` } : undefined}\n              aria-label={a!.name}\n              role=\"img\"\n            >\n              {a!.logo}\n            </span>\n            {b && (\n              <span\n                className=\"clerk-logo-b flex items-center [grid-area:1/1] [&_svg]:h-7 [&_svg]:w-auto\"\n                style={{ animationDelay: `${i * 0.2 - 6}s` }}\n                aria-label={b.name}\n                role=\"img\"\n              >\n                {b.logo}\n              </span>\n            )}\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "ClerkLogo[]",
+      "required": true,
+      "description": "up to ten logos; logo n and n+5 share a slot and take turns"
+    },
+    {
+      "name": "surface",
+      "type": "enum",
+      "required": false,
+      "default": "card",
+      "description": "colour behind the strip: card (white, continuing the hero) or background"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ca3e74be606c1be7a7f1509c39be4db01854d293e493dc2260568821dff25c05"
+}

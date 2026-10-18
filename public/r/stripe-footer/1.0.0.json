@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe footer",
+  "description": "Pale footer with four columns of slate links under small navy group titles, divided by dashed hairlines, an indigo sign-in link, then a region link with a globe, the copyright and a small slanted brand mark.",
+  "category": "footer",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "light",
+    "pale",
+    "minimal",
+    "dashed",
+    "sitemap"
+  ],
+  "notes": [
+    "phones: two columns",
+    "sits on the muted colour, matching stripe-cta above it"
+  ],
+  "entry": "stripe-footer.tsx",
+  "source": "foundry",
+  "name": "stripe-footer",
+  "files": [
+    {
+      "path": "stripe-footer.tsx",
+      "content": "import { Globe } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeButton } from \"@foundry/stripe-button\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\n\nexport interface StripeFooterGroup {\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface StripeFooterProps {\n  /** four columns, each with one or more link groups */\n  columns: StripeFooterGroup[][];\n  /** an indigo link at the end of the last column (e.g. sign in) */\n  action?: { label: string; href: string };\n  /** the region switcher link */\n  locale?: { label: string; href: string };\n  /** the copyright line */\n  copyright: string;\n  /** the brand's name, for the small mark at the bottom right (screen readers) */\n  brand?: string;\n  className?: string;\n}\n\n/**\n * Pale footer: four columns of slate links under small navy titles, divided by dashed\n * hairlines; a region link, the copyright and a small slanted brand mark along the bottom.\n */\nexport function StripeFooter({ columns, action, locale, copyright, brand, className }: StripeFooterProps) {\n  return (\n    <StripeFrame as=\"footer\" rule=\"dashed\" className={cn(\"bg-muted\", className)} padded={false}>\n      <div className=\"grid grid-cols-2 lg:grid-cols-4\">\n        {columns.map((groups, ci) => (\n          <div\n            key={ci}\n            className={cn(\n              \"space-y-10 px-gutter py-10 lg:space-y-14 lg:py-14\",\n              ci > 0 && \"lg:border-l lg:border-dashed lg:border-border\",\n              ci % 2 === 1 && \"border-l border-dashed border-border\",\n            )}\n          >\n            {groups.map((g) => (\n              <div key={g.title}>\n                <h3 className=\"text-sm font-normal text-foreground lg:text-[0.9375rem]\">{g.title}</h3>\n                <ul className=\"mt-4 space-y-2 lg:space-y-1.5\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"text-sm font-light text-muted-foreground transition-colors hover:text-foreground lg:text-[0.9375rem]\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n            {action && ci === columns.length - 1 && (\n              <StripeButton href={action.href} variant=\"link\" className=\"text-[0.9375rem]\">\n                {action.label}\n              </StripeButton>\n            )}\n          </div>\n        ))}\n      </div>\n      <div className=\"flex items-end justify-between border-t border-dashed border-border px-gutter py-8\">\n        <div>\n          {locale && (\n            <a href={locale.href} className=\"flex items-center gap-1.5 text-sm font-normal text-primary transition-colors hover:text-foreground\">\n              <Globe className=\"size-4\" strokeWidth={1.75} />\n              {locale.label}\n            </a>\n          )}\n          <p className=\"mt-3 text-sm font-light text-foreground\">{copyright}</p>\n        </div>\n        <span role=\"img\" aria-label={brand} className=\"block h-8 w-11 bg-foreground [clip-path:polygon(0_22%,100%_0,100%_78%,0_100%)]\" />\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-button",
+    "stripe-frame"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "StripeFooterGroup[][]",
+      "required": true,
+      "description": "four columns, each with one or more link groups"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an indigo link at the end of the last column (e.g. sign in)"
+    },
+    {
+      "name": "locale",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the region switcher link"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": false,
+      "description": "the brand's name, for the small mark at the bottom right (screen readers)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e0d64d796f2f389b92931177cad8105bd24eed48dd93636e135d0b72313a6629"
+}

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mercury feature tabs",
+  "description": "Half-and-half feature section: a calm heading over a list of rows split by hairlines, the open row marked by a bright rule and a small pale-blue dot with its text and an underlined link. A tall rounded picture (art or mock UI) fills the other half and changes with the row; on phones it sits inside the open row.",
+  "category": "features",
+  "site": "mercury",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "accordion",
+    "split",
+    "hairline",
+    "minimal",
+    "calm",
+    "dark",
+    "fintech"
+  ],
+  "notes": [
+    "click a row to open it; without JavaScript the first row stays open",
+    "set mediaSide to start to put the picture on the left (alternate it down the page)"
+  ],
+  "entry": "mercury-tabs.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "mercury-tabs",
+  "files": [
+    {
+      "path": "mercury-tabs.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MercuryButton } from \"@foundry/mercury-button\";\nimport { MercuryHeading } from \"@foundry/mercury-heading\";\n\nexport interface MercuryTab {\n  /** the row's title; bold when open, muted when closed */\n  title: string;\n  /** shown under the title when the row is open */\n  text: ReactNode;\n  /** an underlined link under the text when open */\n  link?: { label: string; href: string };\n  /** the picture for this row (art, mock UI, an image); falls back to the block's media */\n  media?: ReactNode;\n}\n\nexport interface MercuryTabsProps {\n  /** the heading over the list; pass a list of lines to choose the breaks */\n  title: string | string[];\n  /** the rows */\n  items: MercuryTab[];\n  /** the picture used when a row has none of its own */\n  media?: ReactNode;\n  /** which side the picture sits on from lg up */\n  mediaSide?: \"start\" | \"end\";\n  /** a link under the whole list, e.g. \"Take the tour\" */\n  link?: { label: string; href: string };\n  /** which row starts open */\n  defaultOpen?: number;\n  /**\n   * spread: heading at the top, list at the bottom of a tall column (beside portrait art) ·\n   * grouped: heading and list together, centred beside the picture (beside a wide mock)\n   */\n  layout?: \"spread\" | \"grouped\";\n  className?: string;\n}\n\n/**\n * Mercury's feature tabs: a heading, then a list of rows split by hairlines. The open row\n * gets a bright rule, a small pale-blue dot, its text and a link; its picture fills the\n * other half on wide screens and sits inside the row on phones.\n */\nexport function MercuryTabs({ title, items, media, mediaSide = \"end\", link, defaultOpen = 0, layout = \"spread\", className }: MercuryTabsProps) {\n  const [open, setOpen] = useState(defaultOpen);\n  const current = items[open]?.media ?? media;\n\n  return (\n    <section className={cn(\"py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]\", className)}>\n      <div className=\"mx-auto grid max-w-page items-stretch gap-8 px-gutter lg:grid-cols-2\">\n        <div\n          className={cn(\n            \"flex flex-col gap-10 lg:min-h-[38.75rem]\",\n            layout === \"spread\" ? \"justify-between\" : \"justify-center lg:gap-16\",\n            mediaSide === \"start\" && \"lg:order-2\",\n          )}\n        >\n          <MercuryHeading size=\"sub\" title={title} className=\"max-w-[30rem]\" />\n\n          <div>\n            <ul>\n              {items.map((item, i) => {\n                const isOpen = i === open;\n                return (\n                  <li key={item.title} className={cn(\"relative border-t\", isOpen ? \"border-foreground\" : \"border-border\")}>\n                    <button\n                      type=\"button\"\n                      aria-expanded={isOpen}\n                      onClick={() => setOpen(i)}\n                      className={cn(\n                        \"w-full text-left text-[0.875rem] font-[560] transition-colors duration-200 motion-reduce:transition-none lg:text-base\",\n                        isOpen ? \"pt-5 text-foreground\" : \"py-3.5 text-muted-foreground hover:text-foreground\",\n                      )}\n                    >\n                      {isOpen && <span aria-hidden className=\"absolute top-[1.625rem] -left-4 size-1.5 rounded-full bg-highlight lg:top-7\" />}\n                      {item.title}\n                    </button>\n                    {isOpen && (\n                      <div className=\"pb-8\">\n                        <p className=\"mt-1 max-w-[28rem] text-[0.875rem] leading-[1.4] text-muted-foreground lg:text-base\">{item.text}</p>\n                        {item.link && (\n                          <MercuryButton variant=\"link\" href={item.link.href} className=\"mt-5 text-[0.875rem] lg:text-base\">\n                            {item.link.label}\n                          </MercuryButton>\n                        )}\n                        {/* phones: the picture lives inside the open row */}\n                        {current && <div className=\"mt-6 aspect-square overflow-hidden rounded-xl lg:hidden\">{current}</div>}\n                      </div>\n                    )}\n                  </li>\n                );\n              })}\n            </ul>\n            {link && (\n              <MercuryButton variant=\"link\" href={link.href} className=\"mt-6 text-[0.875rem] lg:mt-8 lg:text-base\">\n                {link.label}\n              </MercuryButton>\n            )}\n          </div>\n        </div>\n\n        {current && <div className=\"hidden overflow-hidden rounded-xl lg:block\">{current}</div>}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mercury-button",
+    "mercury-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the heading over the list; pass a list of lines to choose the breaks"
+    },
+    {
+      "name": "items",
+      "type": "MercuryTab[]",
+      "required": true,
+      "description": "the rows"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the picture used when a row has none of its own"
+    },
+    {
+      "name": "mediaSide",
+      "type": "enum",
+      "required": false,
+      "default": "end",
+      "description": "which side the picture sits on from lg up"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a link under the whole list, e.g. \"Take the tour\""
+    },
+    {
+      "name": "defaultOpen",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which row starts open"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "default": "spread",
+      "description": "spread: heading at the top, list at the bottom of a tall column (beside portrait art) ·\ngrouped: heading and list together, centred beside the picture (beside a wide mock)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "991fd49b6ecd4d909111d47bf5032e2d31a911aa079ae45a09eb34e299bc7e50"
+}

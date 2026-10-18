@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk icon-grid band",
+  "description": "A near-black notched band with one or two centred columns, each with a coloured eyebrow, a two-line heading, muted copy and a caret link over a hairline grid of tall empty tiles holding thin line icons. Dashed guide lines run on past the grid, fading out.",
+  "category": "logos",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "integrations",
+    "grid",
+    "dark",
+    "notch",
+    "line-icons",
+    "minimal",
+    "developer"
+  ],
+  "notes": [
+    "made for SDK / integration lists; icons come in as props (thin line icons look best)",
+    "a group with three or fewer icons gets double-height tiles on desktop so it matches a six-icon neighbour"
+  ],
+  "entry": "clerk-frameworks.tsx",
+  "source": "foundry",
+  "name": "clerk-frameworks",
+  "files": [
+    {
+      "path": "clerk-frameworks.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ClerkBand } from \"@foundry/clerk-band\";\nimport { ClerkHeading, type ClerkHeadingProps } from \"@foundry/clerk-heading\";\n\nexport interface ClerkIconTile {\n  /** name, for screen readers and the hover title */\n  label: string;\n  /** a thin line icon */\n  icon: ReactNode;\n  href?: string;\n}\n\nexport interface ClerkIconGroup {\n  /** eyebrow, heading, text and link above the grid (always centred) */\n  heading: ClerkHeadingProps;\n  tiles: ClerkIconTile[];\n}\n\nexport interface ClerkFrameworksProps {\n  /** one or two columns */\n  groups: ClerkIconGroup[];\n  /** colours of the neighbouring sections, shown in the band's notches */\n  edgeTop?: \"background\" | \"card\";\n  edgeBottom?: \"background\" | \"card\";\n  id?: string;\n  className?: string;\n}\n\n/** Dashed guide lines continuing a grid's column lines past its edge. */\nfunction Guides({ side }: { side: \"top\" | \"bottom\" }) {\n  const mask = side === \"top\" ? \"[mask-image:linear-gradient(to_top,black,transparent)]\" : \"[mask-image:linear-gradient(to_bottom,black,transparent)]\";\n  const place = side === \"top\" ? \"bottom-full\" : \"top-full\";\n  return (\n    <div aria-hidden className={cn(\"pointer-events-none absolute inset-x-0 h-12\", place, mask)}>\n      {[0, 50, 100].map((x) => (\n        <span key={`m${x}`} className=\"absolute inset-y-0 border-l border-dashed border-foreground/15 lg:hidden\" style={{ left: `${x}%` }} />\n      ))}\n      {[0, 100 / 3, 200 / 3, 100].map((x) => (\n        <span key={`d${x}`} className=\"absolute inset-y-0 hidden border-l border-dashed border-foreground/15 lg:block\" style={{ left: `${x}%` }} />\n      ))}\n    </div>\n  );\n}\n\nexport function ClerkFrameworks({ groups, edgeTop = \"background\", edgeBottom = \"background\", id, className }: ClerkFrameworksProps) {\n  return (\n    <ClerkBand id={id} edgeTop={edgeTop} edgeBottom={edgeBottom} className={className}>\n      <div\n        className={cn(\n          \"mx-auto grid max-w-page gap-24 px-gutter py-[calc(var(--section-y)*0.75)] lg:gap-16 lg:py-section\",\n          groups.length > 1 && \"lg:grid-cols-2\",\n        )}\n      >\n        {groups.map((g, gi) => {\n          const tall = g.tiles.length <= 3;\n          return (\n            <div key={gi}>\n              <ClerkHeading {...g.heading} align=\"center\" textClassName={cn(\"max-w-md\", g.heading.textClassName)} />\n              <div className=\"relative mt-16 lg:mt-[4.75rem]\">\n                <Guides side=\"top\" />\n                <ul className=\"grid grid-cols-2 border-t border-l border-foreground/10 lg:grid-cols-3\">\n                  {g.tiles.map((t) => {\n                    const Tag = t.href ? \"a\" : \"div\";\n                    return (\n                      <li key={t.label} className=\"border-r border-b border-foreground/10\">\n                        <Tag\n                          {...(t.href ? { href: t.href } : {})}\n                          title={t.label}\n                          aria-label={t.label}\n                          className={cn(\n                            \"flex h-[8.625rem] items-center justify-center text-foreground/55 transition-colors duration-300 hover:bg-foreground/[0.025] hover:text-foreground [&_svg]:size-10 [&_svg]:stroke-1\",\n                            tall && \"lg:h-[17.25rem]\",\n                          )}\n                        >\n                          {t.icon}\n                        </Tag>\n                      </li>\n                    );\n                  })}\n                </ul>\n                <Guides side=\"bottom\" />\n              </div>\n            </div>\n          );\n        })}\n      </div>\n    </ClerkBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "clerk-band",
+    "clerk-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "ClerkIconGroup[]",
+      "required": true,
+      "description": "one or two columns"
+    },
+    {
+      "name": "edgeTop",
+      "type": "enum",
+      "required": false,
+      "default": "background",
+      "description": "colours of the neighbouring sections, shown in the band's notches"
+    },
+    {
+      "name": "edgeBottom",
+      "type": "enum",
+      "required": false,
+      "default": "background"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "60f7821ad69545eeeaca240428378f06ff6ce7ce13d4cf518bd382aa68d1c828"
+}

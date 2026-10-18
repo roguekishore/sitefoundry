@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly virtual office",
+  "description": "An off-centre editorial column on a pale band: big tight heading, a warm video-call mock (main speaker, three side tiles, round controls with a red hang-up), a larger lead paragraph and three icon points with light two-line titles.",
+  "category": "features",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "video-call",
+    "mock-ui",
+    "editorial",
+    "light",
+    "icons",
+    "offset",
+    "saas"
+  ],
+  "notes": [
+    "people are silhouettes with initials, no photos",
+    "the column is indented on wide screens; on phones it runs full width"
+  ],
+  "entry": "huly-office.tsx",
+  "source": "foundry",
+  "name": "huly-office",
+  "files": [
+    {
+      "path": "huly-office.tsx",
+      "content": "import type { ComponentType } from \"react\";\nimport { Maximize2, Mic, MicOff, PhoneOff, ScreenShare, Users, VideoOff } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HulyHeading } from \"@foundry/huly-heading\";\n\nexport interface HulyOfficePerson {\n  name: string;\n  initials: string;\n  /** shows the lit microphone badge */\n  speaking?: boolean;\n}\n\nexport interface HulyOfficeProps {\n  title: string | string[];\n  text?: string;\n  /** the video call shown under the heading */\n  call: {\n    title: string;\n    /** small line under the call title, e.g. \"4 people\" */\n    subtitle?: string;\n    /** the person filling the main tile */\n    speaker: HulyOfficePerson;\n    /** up to three people in the side tiles */\n    people: HulyOfficePerson[];\n  };\n  /** larger paragraph after the call */\n  lead?: string;\n  /** three short points with icons */\n  features: { icon: ComponentType<{ className?: string; strokeWidth?: number }>; title: string; text: string }[];\n  className?: string;\n}\n\nconst TILE = [\n  \"from-chart-3/60 via-glow/30 to-chart-5/50\",\n  \"from-highlight/50 via-chart-4/30 to-chart-1/40\",\n  \"from-chart-2/50 via-chart-3/30 to-glow/40\",\n];\n\n/** A person drawn as a soft silhouette: head and shoulders, with initials on the chest. */\nfunction Silhouette({ initials, className }: { initials: string; className?: string }) {\n  return (\n    <div className={cn(\"absolute bottom-0 left-1/2 flex -translate-x-1/2 flex-col items-center\", className)}>\n      <div className=\"aspect-square w-[42%] rounded-full bg-linear-to-b from-foreground/45 to-foreground/25\" />\n      <div className=\"-mt-[6%] flex aspect-[2/1] w-full items-center justify-center rounded-t-full bg-linear-to-b from-foreground/40 to-foreground/15 pt-[8%]\">\n        <span className=\"text-[0.7em] font-semibold tracking-wide text-foreground/90\">{initials}</span>\n      </div>\n    </div>\n  );\n}\n\nfunction MicBadge({ on }: { on?: boolean }) {\n  return (\n    <span className={cn(\"flex size-5 items-center justify-center rounded-full lg:size-6\", on ? \"bg-glow text-foreground\" : \"bg-foreground/40 text-background\")}>\n      <Mic className=\"size-3 lg:size-3.5\" />\n    </span>\n  );\n}\n\nexport function HulyOffice({ title, text, call, lead, features, className }: HulyOfficeProps) {\n  const controls = [ScreenShare, MicOff, PhoneOff, VideoOff, Maximize2];\n  return (\n    <section className={cn(\"bg-background py-section text-foreground lg:py-40\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"lg:pl-[18rem]\">\n          <HulyHeading title={title} text={text} textClassName=\"max-w-[34rem]\" />\n\n          {/* the call: always dark, like a video frame */}\n          <div aria-hidden className=\"dark relative mt-8 aspect-[16/9] overflow-hidden rounded-xl bg-background text-foreground lg:mt-12 lg:rounded-2xl\">\n            <div className=\"absolute inset-0 bg-linear-to-br from-highlight/45 via-chart-4/20 to-glow/40\" />\n            <div className=\"absolute top-[-10%] left-[20%] h-[70%] w-[30%] rounded-full bg-foreground/25 blur-3xl\" />\n            <Silhouette initials={call.speaker.initials} className=\"left-[30%] w-[34%] text-[clamp(0.75rem,3vw,2rem)]\" />\n\n            <div className=\"absolute top-[5%] left-[3%]\">\n              <p className=\"text-sm font-semibold lg:text-xl\">{call.title}</p>\n              {call.subtitle && (\n                <p className=\"mt-0.5 flex items-center gap-1 text-[0.625rem] text-foreground/75 lg:text-xs\">\n                  <Users className=\"size-3\" />\n                  {call.subtitle}\n                </p>\n              )}\n            </div>\n\n            <div className=\"absolute top-[4%] right-[2%] bottom-[4%] flex w-[22%] flex-col gap-[3%]\">\n              {call.people.slice(0, 3).map((p, i) => (\n                <div key={p.name} className={cn(\"relative flex-1 overflow-hidden rounded-md bg-linear-to-br lg:rounded-lg\", TILE[i % TILE.length])}>\n                  <Silhouette initials={p.initials} className=\"w-[46%] text-[clamp(0.4rem,1vw,0.75rem)]\" />\n                  <span className=\"absolute top-[8%] right-[6%]\">\n                    <MicBadge on={p.speaking} />\n                  </span>\n                  <span className=\"absolute bottom-[8%] left-[6%] flex items-center gap-1 text-[0.5rem] text-foreground/85 lg:text-[0.6875rem]\">\n                    <Users className=\"size-2.5\" />\n                    {p.name}\n                  </span>\n                </div>\n              ))}\n            </div>\n\n            <div className=\"absolute bottom-[4%] left-1/2 flex -translate-x-1/2 gap-1.5 lg:gap-3\">\n              {controls.map((Icon, i) => (\n                <span\n                  key={i}\n                  className={cn(\n                    \"flex size-6 items-center justify-center rounded-full shadow-lg shadow-background/30 lg:size-11\",\n                    i === 2 ? \"bg-destructive text-destructive-foreground\" : \"bg-background/60 text-foreground backdrop-blur\",\n                  )}\n                >\n                  <Icon className=\"size-3 lg:size-5\" strokeWidth={1.75} />\n                </span>\n              ))}\n            </div>\n          </div>\n\n          {lead && (\n            <p className=\"mt-10 max-w-[42rem] text-lg leading-[1.35] font-medium tracking-[-0.02em] text-foreground/85 text-pretty lg:mt-14 lg:text-[1.375rem]\">\n              {lead}\n            </p>\n          )}\n\n          <div className=\"mt-10 grid gap-9 sm:grid-cols-3 sm:gap-8 lg:mt-12\">\n            {features.map(({ icon: Icon, title: t, text: body }) => (\n              <div key={t}>\n                <span className=\"flex size-10 items-center justify-center rounded-lg bg-linear-to-br from-glow/20 to-chart-3/10 text-glow\">\n                  <Icon className=\"size-6\" strokeWidth={1.75} />\n                </span>\n                <h3 className=\"mt-3 font-display text-[1.375rem] leading-none tracking-[-0.02em] text-balance lg:mt-4 lg:max-w-[8em] lg:text-[1.75rem]\">{t}</h3>\n                <p className=\"mt-2 max-w-[17rem] text-[0.9375rem] leading-snug text-foreground/75 lg:mt-3 lg:text-base\">{body}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "huly-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "call",
+      "type": "{ title: string; subtitle?: string | undefined; speaker: HulyOfficePerson; people: HulyOfficePerson[]; }",
+      "required": true,
+      "description": "the video call shown under the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "larger paragraph after the call"
+    },
+    {
+      "name": "features",
+      "type": "{ icon: ComponentType<{ className?: string | undefined; strokeWidth?: number | undefined; }>; title: string; text: string; }[]",
+      "required": true,
+      "description": "three short points with icons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "413e26ff940fe18ab58036af80b15d1196a26ee9c05347f4918ca7bd985ae9a3"
+}

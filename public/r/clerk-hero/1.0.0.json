@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Clerk hero",
+  "description": "White hero: a tight 56px bold headline and muted line on the left, a copyable agent command tab on the right. Below, a wide hairline showcase panel: product tabs with violet dots on top, a mock UI card in the middle on a slowly turning violet-cyan glow with faded neighbours either side, and a grey segmented pill hanging off the bottom edge.",
+  "category": "hero",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "minimal",
+    "tabs",
+    "mock-ui",
+    "glow",
+    "developer",
+    "saas"
+  ],
+  "notes": [
+    "each view's content is any ReactNode; the demo uses clerk-auth-card",
+    "the faded neighbours appear from lg up; phones see only the centre card"
+  ],
+  "entry": "clerk-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "clerk-hero",
+  "files": [
+    {
+      "path": "clerk-hero.css",
+      "content": "/* Motion for clerk-hero. Both are switched off with reduced motion. */\n.clerk-hero-glow {\n  animation: clerk-hero-spin 14s linear infinite;\n}\n.clerk-hero-in {\n  animation: clerk-hero-in 0.45s cubic-bezier(0.3, 0.7, 0.2, 1) both;\n}\n\n@keyframes clerk-hero-spin {\n  to { transform: rotate(360deg); }\n}\n@keyframes clerk-hero-in {\n  from { opacity: 0; transform: translateY(8px) scale(0.985); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .clerk-hero-glow,\n  .clerk-hero-in {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "clerk-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ClerkCommand, type ClerkCommandProps } from \"@foundry/clerk-command\";\nimport { ClerkHeading } from \"@foundry/clerk-heading\";\nimport \"./clerk-hero.css\";\n\nexport interface ClerkHeroView {\n  /** label in the segmented pill under the panel */\n  label: string;\n  /** what the panel shows (e.g. a clerk-auth-card) */\n  content: ReactNode;\n}\n\nexport interface ClerkHeroTab {\n  /** label in the tab row on top of the panel */\n  label: string;\n  /** one or more views; the pill switches between them */\n  views: ClerkHeroView[];\n}\n\nexport interface ClerkHeroProps {\n  /** the headline; pass a list to choose where the lines break on wide screens */\n  title: string | string[];\n  /** the line under it */\n  text?: string;\n  /** copyable agent prompt on the right (see clerk-command) */\n  command?: ClerkCommandProps;\n  /** the showcase panel's tabs */\n  tabs: ClerkHeroTab[];\n  className?: string;\n}\n\nfunction Dot({ on }: { on: boolean }) {\n  return <span className={cn(\"size-1.5 shrink-0 rounded-full\", on ? \"bg-primary\" : \"ring-1 ring-foreground/25\")} />;\n}\n\nexport function ClerkHero({ title, text, command, tabs, className }: ClerkHeroProps) {\n  const [tab, setTab] = useState(0);\n  const [view, setView] = useState(0);\n  const views = tabs[tab]?.views ?? [];\n  const current = views[Math.min(view, views.length - 1)];\n\n  // the faded neighbours: the views before and after this one, across all tabs\n  const all = tabs.flatMap((t, ti) => t.views.map((v, vi) => ({ ti, vi, v })));\n  const at = all.findIndex((x) => x.ti === tab && x.vi === Math.min(view, views.length - 1));\n  const prev = all.length > 1 ? all[(at - 1 + all.length) % all.length] : undefined;\n  const next = all.length > 2 ? all[(at + 1) % all.length] : undefined;\n\n  return (\n    <section className={cn(\"relative isolate overflow-x-clip bg-card pt-[4.5rem] pb-8 text-card-foreground lg:pt-[6.25rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between\">\n          <ClerkHeading as=\"h1\" size=\"hero\" title={title} text={text} textClassName=\"max-w-[15rem] sm:max-w-xl\" />\n          {command && <ClerkCommand {...command} className=\"lg:mb-2\" />}\n        </div>\n\n        <div className=\"relative mt-14 rounded-[1.0625rem] bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_6%,transparent)] lg:mt-16\">\n          {/* tab row */}\n          <div role=\"tablist\" className=\"grid grid-cols-2 gap-1 border-b border-border p-1 lg:grid-cols-4\">\n            {tabs.map((t, i) => (\n              <button\n                key={t.label}\n                role=\"tab\"\n                type=\"button\"\n                aria-selected={i === tab}\n                onClick={() => {\n                  setTab(i);\n                  setView(0);\n                }}\n                className={cn(\n                  \"flex h-9 min-w-0 items-center gap-2.5 rounded-lg px-3 text-[0.8125rem] font-medium transition-colors duration-200 lg:justify-center\",\n                  i === tab ? \"bg-muted text-foreground\" : \"text-foreground/80 hover:bg-muted/60\",\n                )}\n              >\n                <Dot on={i === tab} />\n                <span className=\"truncate\">{t.label}</span>\n              </button>\n            ))}\n          </div>\n\n          {/* stage */}\n          <div className=\"relative flex min-h-[35rem] items-center justify-center overflow-hidden rounded-b-[1.0625rem] px-4 pt-12 pb-16 lg:min-h-[43.5rem]\">\n            <div aria-hidden className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,color-mix(in_oklab,var(--foreground)_2%,transparent))]\" />\n            {prev && (\n              <div aria-hidden className=\"pointer-events-none absolute top-10 left-6 hidden w-[22.5rem] origin-top-left scale-95 opacity-30 blur-[1.5px] [mask-image:linear-gradient(to_right,black,transparent)] lg:block\">\n                {prev.v.content}\n              </div>\n            )}\n            {next && (\n              <div aria-hidden className=\"pointer-events-none absolute top-24 right-6 hidden w-[22.5rem] origin-top-right scale-95 opacity-30 blur-[1.5px] [mask-image:linear-gradient(to_left,black,transparent)] lg:block\">\n                {next.v.content}\n              </div>\n            )}\n            <div className=\"relative flex w-full max-w-[22.5rem] justify-center\">\n              {/* the slowly turning glow behind the card */}\n              <div aria-hidden className=\"absolute top-1/2 left-1/2 -z-10 size-[26rem] -translate-1/2 opacity-45 blur-3xl\">\n                <div className=\"clerk-hero-glow size-full rounded-full bg-conic from-glow via-chart-2 via-40% to-glow\" />\n              </div>\n              <div key={`${tab}-${view}`} className=\"clerk-hero-in flex w-full justify-center\">\n                {current?.content}\n              </div>\n            </div>\n          </div>\n\n          {/* segmented pill hanging off the bottom edge */}\n          {views.length > 0 && (\n            <div className=\"absolute bottom-0 left-1/2 flex w-max max-w-[calc(100%-1rem)] -translate-x-1/2 translate-y-1/2 justify-center\">\n              <div role=\"tablist\" className=\"flex gap-1 overflow-x-auto rounded-full bg-muted p-1 [scrollbar-width:none]\">\n                {views.map((v, i) => (\n                  <button\n                    key={v.label}\n                    role=\"tab\"\n                    type=\"button\"\n                    aria-selected={i === view}\n                    onClick={() => setView(i)}\n                    className={cn(\n                      \"flex h-[1.875rem] shrink-0 items-center gap-2 rounded-full px-3.5 text-[0.8125rem] font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-200\",\n                      i === view\n                        ? \"bg-card text-foreground shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_1px_3px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\"\n                        : \"text-muted-foreground hover:text-foreground\",\n                    )}\n                  >\n                    <Dot on={i === view} />\n                    {v.label}\n                  </button>\n                ))}\n              </div>\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "clerk-command",
+    "clerk-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the headline; pass a list to choose where the lines break on wide screens"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "command",
+      "type": "any",
+      "required": false,
+      "description": "copyable agent prompt on the right (see clerk-command)"
+    },
+    {
+      "name": "tabs",
+      "type": "ClerkHeroTab[]",
+      "required": true,
+      "description": "the showcase panel's tabs"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7274e6b227870217d525e06ea915fa4d92ca6d80ba2ddaf3ebd10bf52e13be8f"
+}

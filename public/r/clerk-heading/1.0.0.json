@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Clerk section heading",
+  "description": "A small coloured eyebrow, a compact 32px semibold heading (or a 56px bold hero title), a muted paragraph and an optional caret link. Left-aligned or centred.",
+  "category": "text-effect",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "eyebrow",
+    "minimal",
+    "developer",
+    "tight"
+  ],
+  "notes": [
+    "fadeText fades the paragraph from foreground to muted across its width, as on the dark bands"
+  ],
+  "entry": "clerk-heading.tsx",
+  "source": "foundry",
+  "name": "clerk-heading",
+  "files": [
+    {
+      "path": "clerk-heading.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ClerkArrowLink } from \"@foundry/clerk-arrow-link\";\n\nexport interface ClerkHeadingProps {\n  /** small coloured label above the heading */\n  eyebrow?: string;\n  /** primary: brand violet · highlight: the second accent (cyan on dark) */\n  eyebrowTone?: \"primary\" | \"highlight\";\n  /** the heading; pass a list to choose where the lines break on wide screens */\n  title: string | string[];\n  /** paragraph under the heading; a list makes several paragraphs */\n  text?: string | string[];\n  /** caret link under the paragraph */\n  link?: { label: string; href: string };\n  /** h1 for the page title, h2 for sections */\n  as?: \"h1\" | \"h2\";\n  /** hero: 32px → 56px bold · section: 32px semibold */\n  size?: \"hero\" | \"section\";\n  align?: \"start\" | \"center\";\n  /** fades the paragraph from foreground to muted, left to right (the dark bands do this) */\n  fadeText?: boolean;\n  className?: string;\n  /** extra classes for the paragraph (e.g. a max width) */\n  textClassName?: string;\n}\n\nexport function ClerkHeading({\n  eyebrow,\n  eyebrowTone = \"primary\",\n  title,\n  text,\n  link,\n  as: Tag = \"h2\",\n  size = \"section\",\n  align = \"start\",\n  fadeText = false,\n  className,\n  textClassName,\n}: ClerkHeadingProps) {\n  const lines = Array.isArray(title) ? title : [title];\n  const paragraphs = text === undefined ? [] : Array.isArray(text) ? text : [text];\n  return (\n    <div className={cn(align === \"center\" && \"flex flex-col items-center text-center\", className)}>\n      {eyebrow && (\n        <p className={cn(\"mb-4 text-[0.8125rem] leading-6 font-medium\", eyebrowTone === \"primary\" ? \"text-primary\" : \"text-highlight\")}>\n          {eyebrow}\n        </p>\n      )}\n      <Tag\n        className={cn(\n          \"font-display text-balance text-foreground\",\n          size === \"hero\"\n            ? \"text-[2rem] leading-[1.12] font-semibold tracking-[-0.015em] sm:text-5xl lg:text-[3.5rem] lg:leading-[1.143] lg:font-bold lg:tracking-[-0.035em]\"\n            : \"text-[2rem] leading-10 font-semibold tracking-[-0.015em]\",\n        )}\n      >\n        {lines.map((line, i) => (\n          <span key={i} className=\"sm:block\">\n            {line}\n            {i < lines.length - 1 && \" \"}\n          </span>\n        ))}\n      </Tag>\n      {paragraphs.map((p, i) => (\n        <p\n          key={i}\n          className={cn(\n            \"max-w-xl text-[0.9375rem] leading-6 text-pretty text-muted-foreground\",\n            i === 0 ? \"mt-4\" : \"mt-3\",\n            size === \"hero\" && \"lg:text-lg lg:leading-7\",\n            fadeText && \"bg-linear-to-r from-foreground/90 from-30% to-muted-foreground to-90% bg-clip-text text-base text-transparent\",\n            textClassName,\n          )}\n        >\n          {p}\n        </p>\n      ))}\n      {link && <ClerkArrowLink {...link} className=\"mt-5\" />}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "clerk-arrow-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small coloured label above the heading"
+    },
+    {
+      "name": "eyebrowTone",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: brand violet · highlight: the second accent (cyan on dark)"
+    },
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the heading; pass a list to choose where the lines break on wide screens"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": false,
+      "description": "paragraph under the heading; a list makes several paragraphs"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "caret link under the paragraph"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "h1 for the page title, h2 for sections"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "hero: 32px → 56px bold · section: 32px semibold"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "start"
+    },
+    {
+      "name": "fadeText",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "fades the paragraph from foreground to muted, left to right (the dark bands do this)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "textClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the paragraph (e.g. a max width)"
+    }
+  ],
+  "hash": "4100647253aba306d73ad8cac1a9ee3bbbccf1292633dd0a7fa8fda68bca36ea"
+}

@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Huly bento",
+  "description": "A huge tight heading over a bento of near-black cards on a pale band: narrow + wide, then wide + narrow. Each card holds a glowing mock UI and a two-tone caption at the bottom. Soft pastel light blurs behind the grid.",
+  "category": "features",
+  "site": "huly",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "dark-cards",
+    "light",
+    "glow",
+    "mock-ui",
+    "saas"
+  ],
+  "notes": [
+    "the band follows the page's mode; the cards are always dark",
+    "cards come in pairs; an odd last card fills its row"
+  ],
+  "entry": "huly-bento.tsx",
+  "source": "foundry",
+  "name": "huly-bento",
+  "files": [
+    {
+      "path": "huly-bento.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HulyCard } from \"@foundry/huly-card\";\nimport { HulyHeading } from \"@foundry/huly-heading\";\nimport { HulyMock, type HulyMockProps } from \"@foundry/huly-mock\";\n\nexport interface HulyBentoCard {\n  /** bold first words of the caption */\n  title: string;\n  /** rest of the caption */\n  text?: string;\n  /** the mock UI that fills the card */\n  visual?: HulyMockProps;\n}\n\nexport interface HulyBentoProps {\n  title: string | string[];\n  text?: string;\n  /** cards in pairs: narrow + wide, then wide + narrow, and so on */\n  cards: HulyBentoCard[];\n  className?: string;\n}\n\nexport function HulyBento({ title, text, cards, className }: HulyBentoProps) {\n  const rows: HulyBentoCard[][] = [];\n  for (let i = 0; i < cards.length; i += 2) rows.push(cards.slice(i, i + 2));\n\n  return (\n    <section className={cn(\"relative isolate overflow-hidden bg-background py-section text-foreground lg:py-40\", className)}>\n      {/* pastel light behind the cards */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-0 -z-10\">\n        <div className=\"absolute bottom-[8%] left-[-12%] h-[32rem] w-[36rem] rounded-full bg-glow/20 blur-3xl\" />\n        <div className=\"absolute top-[30%] right-[-14%] h-[30rem] w-[34rem] rounded-full bg-highlight/12 blur-3xl\" />\n        <div className=\"absolute top-[-10%] left-1/3 h-[24rem] w-[40rem] rounded-full bg-chart-5/8 blur-3xl\" />\n      </div>\n\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <HulyHeading title={title} text={text} textClassName=\"max-w-[41rem]\" />\n        <div className=\"mt-8 space-y-4 lg:mt-10 lg:space-y-5\">\n          {rows.map((row, r) => (\n            <div key={r} className={cn(\"grid gap-4 lg:gap-5\", r % 2 === 0 ? \"lg:grid-cols-[1fr_1.8fr]\" : \"lg:grid-cols-[1.8fr_1fr]\")}>\n              {row.map((card) => (\n                <HulyCard\n                  key={card.title}\n                  title={card.title}\n                  text={card.text}\n                  visual={card.visual && <HulyMock {...card.visual} />}\n                  className=\"h-[18rem] lg:h-[26.25rem]\"\n                />\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "huly-card",
+    "huly-heading",
+    "huly-mock"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "cards",
+      "type": "HulyBentoCard[]",
+      "required": true,
+      "description": "cards in pairs: narrow + wide, then wide + narrow, and so on"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aa0e8915342a42490d48ca6e9f6a665d2f1bec2ab37965df41362366184438ab"
+}

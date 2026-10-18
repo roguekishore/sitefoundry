@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mercury hero",
+  "description": "Full-bleed misty dawn valley with a centred, medium-weight 65px headline and a soft sub line. An email field shaped as a frosted pill holds the periwinkle button; a frosted second pill sits beside it, and a small dark disclaimer bar rests at the bottom.",
+  "category": "hero",
+  "site": "mercury",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-bleed",
+    "landscape",
+    "frosted",
+    "email-capture",
+    "pill",
+    "calm",
+    "dark",
+    "fintech"
+  ],
+  "notes": [
+    "pass your own photo through backdrop; the default is CSS/SVG art drawn from theme colours",
+    "made to sit under mercury-header with overlay on"
+  ],
+  "entry": "mercury-hero.tsx",
+  "source": "foundry",
+  "name": "mercury-hero",
+  "files": [
+    {
+      "path": "mercury-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MercuryArt } from \"@foundry/mercury-art\";\nimport { MercuryButton } from \"@foundry/mercury-button\";\nimport { MercuryHeading } from \"@foundry/mercury-heading\";\n\nexport interface MercuryHeroProps {\n  /** the headline */\n  title: string;\n  /** the line under it */\n  text?: ReactNode;\n  /** the email field in the pill form */\n  email: { placeholder: string; label: string; name?: string };\n  /** the periwinkle button inside the email pill */\n  submit: string;\n  /** where the form posts (leave out to handle it yourself) */\n  action?: string;\n  /** the frosted pill beside the form */\n  secondary?: { label: string; href: string };\n  /** the small print in a dark bar at the bottom */\n  disclaimer?: string;\n  /** a full-bleed backdrop (photo or art); defaults to the misty dawn valley */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\n/**\n * Mercury's hero: a full-bleed landscape with a centred headline, a pill-shaped email\n * field holding the main button, a frosted second pill and a dark disclaimer bar at the\n * bottom. On phones the field takes the full width and the two pills sit under it.\n */\nexport function MercuryHero({ title, text, email, submit, action, secondary, disclaimer, backdrop, className }: MercuryHeroProps) {\n  return (\n    <section className={cn(\"relative isolate flex min-h-[52.75rem] flex-col overflow-hidden lg:min-h-[56.25rem]\", className)}>\n      <div className=\"absolute inset-0 -z-10\">{backdrop ?? <MercuryArt variant=\"valley\" />}</div>\n      {/* a soft shade under the header and the headline */}\n      <div aria-hidden className=\"absolute inset-x-0 top-0 -z-10 h-[45%] bg-linear-to-b from-background/45 via-background/20 to-transparent\" />\n\n      <div className=\"mx-auto w-full max-w-[60rem] px-gutter pt-[8.25rem] text-center lg:pt-[8.75rem]\">\n        <MercuryHeading as=\"h1\" size=\"hero\" align=\"center\" title={title} />\n        {text && <p className=\"mx-auto mt-3 max-w-[40rem] text-base leading-[1.35] text-foreground/90 lg:mt-4 lg:text-[1.3125rem]\">{text}</p>}\n\n        <form action={action} className=\"mt-8 grid grid-cols-2 gap-x-2 gap-y-3 lg:mt-11 lg:flex lg:items-center lg:justify-center\">\n          {/* on phones this wrapper dissolves (display: contents) so the field and button join the grid */}\n          <div className=\"contents lg:flex lg:w-[25.5rem] lg:items-center lg:rounded-full lg:bg-foreground/15 lg:p-1 lg:ring-1 lg:ring-foreground/20 lg:backdrop-blur-md lg:ring-inset\">\n            <input\n              type=\"email\"\n              name={email.name ?? \"email\"}\n              aria-label={email.label}\n              placeholder={email.placeholder}\n              className=\"col-span-2 h-10 min-w-0 rounded-full bg-foreground/15 px-5 text-base text-foreground ring-1 ring-foreground/20 backdrop-blur-md ring-inset placeholder:text-foreground/70 focus:outline-2 focus:outline-ring lg:h-10 lg:flex-1 lg:bg-transparent lg:px-4 lg:ring-0 lg:backdrop-blur-none\"\n            />\n            <MercuryButton type=\"submit\">{submit}</MercuryButton>\n          </div>\n          {secondary && (\n            <MercuryButton variant=\"glass\" href={secondary.href}>\n              {secondary.label}\n            </MercuryButton>\n          )}\n        </form>\n      </div>\n\n      {disclaimer && (\n        <p className=\"mx-gutter mt-auto mb-6 self-center rounded-lg bg-background/85 px-4 py-2.5 text-center text-[0.625rem] leading-[1.4] font-[600] text-foreground backdrop-blur-sm sm:max-w-[59rem] lg:mb-8 lg:px-10 lg:text-xs\">\n          {disclaimer}\n        </p>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "mercury-art",
+    "mercury-button",
+    "mercury-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "email",
+      "type": "{ placeholder: string; label: string; name?: string | undefined; }",
+      "required": true,
+      "description": "the email field in the pill form"
+    },
+    {
+      "name": "submit",
+      "type": "string",
+      "required": true,
+      "description": "the periwinkle button inside the email pill"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts (leave out to handle it yourself)"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the frosted pill beside the form"
+    },
+    {
+      "name": "disclaimer",
+      "type": "string",
+      "required": false,
+      "description": "the small print in a dark bar at the bottom"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a full-bleed backdrop (photo or art); defaults to the misty dawn valley"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "58fee32a44938f8cb616735b31d04c15863966f896d9f056bf9c0e41131e22b5"
+}

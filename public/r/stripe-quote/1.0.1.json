@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.1",
+  "type": "block",
+  "title": "Stripe rotating quote",
+  "description": "Centred light slate quote with a bold attribution and an indigo link, over a dashed rule of customer wordmark tabs. Quotes rotate on a timer; a violet-to-indigo line fills along the active tab's top edge.",
+  "category": "testimonials",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "tabs",
+    "logos",
+    "light",
+    "minimal",
+    "animated"
+  ],
+  "notes": [
+    "React state and a timer rotate the quotes: needs hydration; reduced motion stops the rotation (tabs still work)",
+    "wordmarks are text in the display font"
+  ],
+  "entry": "stripe-quote.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "stripe-quote",
+  "files": [
+    {
+      "path": "stripe-quote.css",
+      "content": "/* Motion for stripe-quote. Switched off by motion-reduce: classes and useReducedMotion. */\n@keyframes stripe-quote-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n@keyframes stripe-quote-in {\n  from { opacity: 0; transform: translateY(6px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "stripe-quote.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeButton } from \"@foundry/stripe-button\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport \"./stripe-quote.css\";\n\nexport interface StripeQuoteItem {\n  /** the customer's wordmark on its tab */\n  brand: string;\n  /** the quote, without quotation marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role and company */\n  role: string;\n  link?: { label: string; href: string };\n}\n\nexport interface StripeQuoteProps {\n  quotes: StripeQuoteItem[];\n  /** seconds each quote stays before the next (0 to stay put) */\n  interval?: number;\n  rule?: \"solid\" | \"dashed\" | \"none\";\n  className?: string;\n}\n\n/**\n * Centred slate quote with a bold attribution and an indigo link, over a row of customer\n * wordmark tabs. The quotes rotate; a gradient line fills along the active tab's top edge.\n */\nexport function StripeQuote({ quotes, interval = 7, rule = \"none\", className }: StripeQuoteProps) {\n  const [active, setActive] = useState(0);\n  const reduce = useReducedMotion();\n  const auto = interval > 0 && !reduce && quotes.length > 1;\n\n  useEffect(() => {\n    if (!auto) return;\n    const t = setTimeout(() => setActive((a) => (a + 1) % quotes.length), interval * 1000);\n    return () => clearTimeout(t);\n  }, [active, auto, interval, quotes.length]);\n\n  const q = quotes[active];\n  return (\n    <StripeFrame rule={rule} className={className} padded={false} innerClassName=\"pt-16 lg:pt-20\">\n      <figure key={active} className=\"mx-auto max-w-[52rem] animate-[stripe-quote-in_600ms_ease-out] px-gutter text-center motion-reduce:animate-none\">\n        <blockquote className=\"font-display text-xl leading-[1.25] font-light tracking-[-0.01em] text-balance text-muted-foreground lg:text-[1.625rem] lg:leading-[1.12]\">\n          “{q.quote}”\n        </blockquote>\n        <figcaption className=\"mt-8 text-base font-light text-muted-foreground lg:text-lg\">\n          <span className=\"font-normal text-foreground\">{q.name},</span> {q.role}\n        </figcaption>\n        {q.link && (\n          <StripeButton href={q.link.href} variant=\"link\" className=\"mt-8 text-base\">\n            {q.link.label}\n          </StripeButton>\n        )}\n      </figure>\n\n      <div role=\"tablist\" className=\"mt-14 flex overflow-x-auto border-t border-dashed border-border [scrollbar-width:none] lg:mt-16 lg:grid lg:grid-cols-4\">\n        {quotes.map((item, i) => (\n          <button\n            key={item.brand}\n            type=\"button\"\n            role=\"tab\"\n            aria-selected={i === active}\n            onClick={() => setActive(i)}\n            className={cn(\n              \"relative h-20 min-w-[50%] shrink-0 px-6 font-display text-xl font-bold tracking-[-0.04em] transition-colors duration-300 lg:min-w-0 lg:h-[4.5rem]\",\n              i === active ? \"text-foreground\" : \"text-foreground/35 hover:text-foreground/60\",\n            )}\n          >\n            {i === active && (\n              <span\n                aria-hidden\n                key={`bar-${active}`}\n                className={cn(\n                  \"absolute -top-px left-0 h-px w-full origin-left bg-linear-to-r from-chart-3 to-primary\",\n                  auto && \"animate-[stripe-quote-fill_var(--quote-interval)_linear]\",\n                )}\n                style={{ [\"--quote-interval\" as string]: `${interval}s` }}\n              />\n            )}\n            {item.brand}\n          </button>\n        ))}\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-button",
+    "stripe-frame"
+  ],
+  "props": [
+    {
+      "name": "quotes",
+      "type": "StripeQuoteItem[]",
+      "required": true
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "7",
+      "description": "seconds each quote stays before the next (0 to stay put)"
+    },
+    {
+      "name": "rule",
+      "type": "enum",
+      "required": false,
+      "default": "none"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "80b001afb93d832d077011eefe742b6d6e46eca22a7bbea503c0222522e060cd"
+}

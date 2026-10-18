@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mercury customer stories",
+  "description": "A centred three-line statement, a fading row of customer wordmarks, then one wide rounded picture card (tall on phones) with a small industry chip and the quote, name and role set over a soft shade in the lower-left. Three thin bars under the card switch stories.",
+  "category": "testimonials",
+  "site": "mercury",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "image-card",
+    "carousel",
+    "logos",
+    "calm",
+    "dark",
+    "fintech"
+  ],
+  "notes": [
+    "made for photos: the demo uses mercury-art as a stand-in",
+    "click a bar to switch; stories don't advance on their own",
+    "the quote sits over a shade drawn from the background colour, so text stays readable in both modes"
+  ],
+  "entry": "mercury-stories.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "mercury-stories",
+  "files": [
+    {
+      "path": "mercury-stories.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MercuryHeading } from \"@foundry/mercury-heading\";\nimport { MercuryLogos, type MercuryLogo } from \"@foundry/mercury-logos\";\n\nexport interface MercuryStory {\n  /** the small chip in the top corner, e.g. the customer's industry */\n  tag?: string;\n  /** the customer's words */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** the picture behind the quote (a photo or art) */\n  media: ReactNode;\n  /** label for the bar that switches to this story */\n  label: string;\n}\n\nexport interface MercuryStoriesProps {\n  /** the centred statement above; pass a list of lines to choose the breaks */\n  title: string | string[];\n  /** an optional row of customer logos under the statement */\n  logos?: MercuryLogo[];\n  /** the stories; the bars under the card switch between them */\n  stories: MercuryStory[];\n  className?: string;\n}\n\n/**\n * Mercury's customer section: a centred statement, a row of logos, then one wide picture\n * card with the quote set over a soft shade in its lower-left corner. Thin bars under the\n * card switch stories. Tall on phones, wide (2:1) on desktop.\n */\nexport function MercuryStories({ title, logos, stories, className }: MercuryStoriesProps) {\n  const [at, setAt] = useState(0);\n  const story = stories[at];\n\n  return (\n    <section className={cn(\"py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <MercuryHeading size=\"statement\" align=\"center\" title={title} className=\"mx-auto max-w-[34rem]\" />\n      </div>\n      {logos && <MercuryLogos logos={logos} className=\"mx-auto mt-10 max-w-[90rem] lg:mt-12\" />}\n\n      {story && (\n        <div className=\"mx-auto max-w-page px-gutter\">\n          <figure className=\"relative isolate mt-12 aspect-[9/16] overflow-hidden rounded-xl sm:aspect-[4/3] lg:mt-[4.5rem] lg:aspect-[2/1]\">\n            <div key={at} className=\"absolute inset-0 -z-10\">\n              {story.media}\n            </div>\n            <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-t from-background/80 via-background/25 via-45% to-transparent lg:bg-linear-to-tr lg:via-background/20 lg:via-50%\" />\n            {story.tag && <span className=\"absolute top-6 left-6 rounded-[calc(var(--radius)-8px)] bg-background px-2 py-1 text-sm text-foreground lg:top-8 lg:left-8\">{story.tag}</span>}\n            <figcaption className=\"absolute inset-x-6 bottom-8 lg:right-auto lg:bottom-9 lg:left-8 lg:max-w-[24rem]\">\n              <blockquote className=\"text-lg leading-[1.35] font-[540] -indent-[0.4em] text-foreground lg:text-[1.3125rem]\">{story.quote}</blockquote>\n              <p className=\"mt-6 text-base font-[540] text-foreground lg:mt-7 lg:text-[1.3125rem]\">{story.name}</p>\n              <p className=\"text-base text-muted-foreground lg:text-[1.3125rem]\">{story.role}</p>\n            </figcaption>\n          </figure>\n\n          {stories.length > 1 && (\n            <div className=\"mx-auto mt-8 flex max-w-[31rem] gap-2 lg:mt-10\">\n              {stories.map((s, i) => (\n                <button\n                  key={s.label}\n                  type=\"button\"\n                  aria-label={s.label}\n                  aria-pressed={i === at}\n                  onClick={() => setAt(i)}\n                  className=\"group flex-1 py-2\"\n                >\n                  <span\n                    className={cn(\n                      \"block h-[3px] rounded-full transition-colors duration-200 motion-reduce:transition-none\",\n                      i === at ? \"bg-foreground\" : \"bg-foreground/20 group-hover:bg-foreground/40\",\n                    )}\n                  />\n                </button>\n              ))}\n            </div>\n          )}\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mercury-heading",
+    "mercury-logos"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the centred statement above; pass a list of lines to choose the breaks"
+    },
+    {
+      "name": "logos",
+      "type": "MercuryLogo[]",
+      "required": false,
+      "description": "an optional row of customer logos under the statement"
+    },
+    {
+      "name": "stories",
+      "type": "MercuryStory[]",
+      "required": true,
+      "description": "the stories; the bars under the card switch between them"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4905fe4b91c703bec90f45b18f5a1737ef3cadb01eaa76bb5419b88b8d1a5cd9"
+}

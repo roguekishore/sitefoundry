@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Clerk sign-up card",
+  "description": "A mock sign-in / sign-up form built from divs: bold centred title, small muted subtitle, hairline provider buttons (one with a 'last used' tag), an 'or' rule, labelled fields (one can type itself in), a graphite submit button and a grey footer strip with a link.",
+  "category": "card",
+  "site": "clerk",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "mock-ui",
+    "form",
+    "auth",
+    "sign-in",
+    "soft-shadow",
+    "light",
+    "developer"
+  ],
+  "notes": [
+    "purely visual: nothing submits. The typing field is a CSS animation (off with reduced motion)"
+  ],
+  "entry": "clerk-auth-card.tsx",
+  "source": "foundry",
+  "name": "clerk-auth-card",
+  "files": [
+    {
+      "path": "clerk-auth-card.css",
+      "content": "/* A field that types itself in: the text is revealed one step per character, holds, then\n   clears and starts again. A blinking caret follows. Off with reduced motion\n   (motion-reduce:animate-none in the markup, plus the query below for the caret). */\n.clerk-typing {\n  display: inline-block;\n  max-width: 100%;\n  overflow: hidden;\n  border-right: 1px solid currentColor;\n  animation:\n    clerk-type 7s steps(var(--chars), end) 1s infinite,\n    clerk-caret 0.9s step-end infinite;\n}\n\n@keyframes clerk-type {\n  0% { max-width: 0; }\n  35%, 90% { max-width: calc(var(--chars) * 1ch); }\n  100% { max-width: 0; }\n}\n\n@keyframes clerk-caret {\n  50% { border-color: transparent; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .clerk-typing {\n    animation: none;\n    border-right: 0;\n  }\n}\n"
+    },
+    {
+      "path": "clerk-auth-card.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ClerkButton } from \"@foundry/clerk-button\";\nimport \"./clerk-auth-card.css\";\n\nexport interface ClerkAuthProvider {\n  label: string;\n  icon?: ReactNode;\n  /** small tag hanging off the top-right corner (e.g. \"Last used\") */\n  badge?: string;\n}\n\nexport interface ClerkAuthField {\n  label: string;\n  placeholder: string;\n  /** shown typed into the field; with `typing` it types itself in, letter by letter */\n  value?: string;\n  typing?: boolean;\n}\n\nexport interface ClerkAuthCardProps {\n  title: string;\n  subtitle?: string;\n  /** one button per sign-in provider */\n  providers?: ClerkAuthProvider[];\n  /** word on the rule between providers and fields (e.g. \"or\") */\n  divider?: string;\n  fields?: ClerkAuthField[];\n  /** label of the graphite submit button */\n  submit: string;\n  /** grey strip under the card: text plus a link label */\n  footer?: { text: string; link: string };\n  className?: string;\n}\n\nexport function ClerkAuthCard({ title, subtitle, providers = [], divider, fields = [], submit, footer, className }: ClerkAuthCardProps) {\n  return (\n    <div\n      className={cn(\n        \"w-full max-w-[22.5rem] overflow-hidden rounded-xl bg-muted text-left font-sans text-foreground\",\n        \"shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_7%,transparent),0_5px_15px_color-mix(in_oklab,var(--foreground)_8%,transparent),0_15px_35px_-5px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\",\n        className,\n      )}\n    >\n      <div className=\"rounded-b-xl bg-card px-8 pt-8 pb-10 shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_6%,transparent)] max-sm:px-6\">\n        <p className=\"text-center text-[1.0625rem] leading-6 font-bold\">{title}</p>\n        {subtitle && <p className=\"mt-1 text-center text-xs leading-[1.125rem] text-muted-foreground\">{subtitle}</p>}\n\n        {providers.length > 0 && (\n          <div className=\"mt-6 space-y-2\">\n            {providers.map((p) => (\n              <div key={p.label} className=\"relative\">\n                <ClerkButton variant=\"outline\" block icon={p.icon} className=\"h-8 font-medium\">\n                  {p.label}\n                </ClerkButton>\n                {p.badge && (\n                  <span className=\"absolute -top-2.5 right-0 rounded-md bg-muted px-1.5 py-0.5 text-[0.6875rem] leading-4 text-muted-foreground ring-1 ring-border\">\n                    {p.badge}\n                  </span>\n                )}\n              </div>\n            ))}\n          </div>\n        )}\n\n        {divider && (\n          <div className=\"my-6 flex items-center gap-4 text-[0.8125rem] text-muted-foreground\">\n            <span className=\"h-px flex-1 bg-border\" />\n            {divider}\n            <span className=\"h-px flex-1 bg-border\" />\n          </div>\n        )}\n\n        <div className={cn(\"space-y-6\", !divider && \"mt-6\")}>\n          {fields.map((f) => (\n            <div key={f.label}>\n              <p className=\"text-[0.8125rem] leading-6 font-medium\">{f.label}</p>\n              <div className=\"mt-1.5 flex h-8 items-center overflow-hidden rounded-md bg-card px-3 text-[0.8125rem] shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_11%,transparent),0_1px_1px_color-mix(in_oklab,var(--foreground)_4%,transparent)]\">\n                {f.value ? (\n                  <span\n                    className={cn(\"whitespace-nowrap\", f.typing && \"clerk-typing motion-reduce:animate-none\")}\n                    style={f.typing ? ({ \"--chars\": f.value.length } as CSSProperties) : undefined}\n                  >\n                    {f.value}\n                  </span>\n                ) : (\n                  <span className=\"text-muted-foreground\">{f.placeholder}</span>\n                )}\n              </div>\n            </div>\n          ))}\n        </div>\n\n        <ClerkButton caret block className=\"mt-8\">\n          {submit}\n        </ClerkButton>\n      </div>\n      {footer && (\n        <p className=\"py-4 text-center text-[0.8125rem] text-muted-foreground\">\n          {footer.text} <span className=\"font-medium text-foreground\">{footer.link}</span>\n        </p>\n      )}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "clerk-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "providers",
+      "type": "ClerkAuthProvider[]",
+      "required": false,
+      "default": "[]",
+      "description": "one button per sign-in provider"
+    },
+    {
+      "name": "divider",
+      "type": "string",
+      "required": false,
+      "description": "word on the rule between providers and fields (e.g. \"or\")"
+    },
+    {
+      "name": "fields",
+      "type": "ClerkAuthField[]",
+      "required": false,
+      "default": "[]"
+    },
+    {
+      "name": "submit",
+      "type": "string",
+      "required": true,
+      "description": "label of the graphite submit button"
+    },
+    {
+      "name": "footer",
+      "type": "{ text: string; link: string; }",
+      "required": false,
+      "description": "grey strip under the card: text plus a link label"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "752a3d8120af96abf7661b24858c38cebd9785d33239826ac2499d92b6e2ab11"
+}

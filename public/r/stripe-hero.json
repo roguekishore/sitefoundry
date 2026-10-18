@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe hero",
+  "description": "White hero with a broad ribbon of fibrous colour (sky, orange, pink, violet) sweeping down the top right, a small live-figure line, a light two-tone headline and an indigo button, closed by a hairline strip of customer wordmarks.",
+  "category": "hero",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "ribbon",
+    "gradient",
+    "colourful",
+    "logos",
+    "marquee",
+    "light-weight",
+    "fintech"
+  ],
+  "notes": [
+    "the ribbon reaches up behind a transparent header by underHeader px (set 0 when there's no header above)",
+    "phones show only the first sentence and a full-width button; the logo strip becomes a slow marquee",
+    "all motion is CSS, off under reduced motion; no JavaScript"
+  ],
+  "entry": "stripe-hero.tsx",
+  "source": "foundry",
+  "name": "stripe-hero",
+  "files": [
+    {
+      "path": "stripe-hero.css",
+      "content": "/* Motion for stripe-hero. Switched off by motion-reduce: classes in the markup. */\n@keyframes stripe-hero-marquee {\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "stripe-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeButton } from \"@foundry/stripe-button\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport { StripeRibbon } from \"@foundry/stripe-ribbon\";\nimport \"./stripe-hero.css\";\n\nexport interface StripeHeroLogo {\n  /** the customer's name; shown as a text wordmark when no logo is given */\n  name: string;\n  /** a real logo (svg or img) to show instead of the text */\n  logo?: ReactNode;\n  /** how the text wordmark is set, so a row of them looks like a logo wall */\n  style?: \"bold\" | \"light\" | \"serif\" | \"caps\" | \"rounded\";\n}\n\nexport interface StripeHeroProps {\n  /** the dark first sentence of the headline */\n  title: string;\n  /** the softer sentences after it (hidden on phones, as on the original) */\n  rest?: string;\n  /** a small live-figure line above the headline */\n  figure?: { label: string; value: string };\n  /** the indigo call to action */\n  action?: { label: string; href: string };\n  /** customer wordmarks in the strip under the hero */\n  logos?: StripeHeroLogo[];\n  /** how far the ribbon reaches up behind a transparent header, in px (0 for none) */\n  underHeader?: number;\n  className?: string;\n}\n\nconst logoStyles = {\n  bold: \"font-sans font-bold tracking-[-0.04em]\",\n  light: \"font-sans font-light tracking-[-0.02em]\",\n  serif: \"font-display italic font-semibold tracking-[-0.03em]\",\n  caps: \"font-sans font-extrabold uppercase tracking-[0.08em] text-[0.8em]\",\n  rounded: \"font-display font-semibold tracking-[-0.03em] lowercase\",\n};\n\nfunction Wordmark({ logo }: { logo: StripeHeroLogo }) {\n  return (\n    <span className=\"flex h-8 shrink-0 items-center justify-center text-foreground [&_img]:h-7 [&_svg]:h-7 [&_svg]:w-auto\">\n      {logo.logo ?? <span className={cn(\"text-[1.375rem] leading-none whitespace-nowrap\", logoStyles[logo.style ?? \"bold\"])}>{logo.name}</span>}\n    </span>\n  );\n}\n\n/**\n * Stripe's hero: a flowing ribbon of colour sweeping down the top right, a small live figure,\n * a light two-tone headline, an indigo button, and a strip of customer wordmarks.\n */\nexport function StripeHero({ title, rest, figure, action, logos = [], underHeader = 76, className }: StripeHeroProps) {\n  return (\n    <section className={cn(\"relative overflow-x-clip bg-background font-sans text-foreground\", className)}>\n      {/* the ribbon reaches up behind a transparent header and stops at the logo strip */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-x-0 bottom-0\" style={{ top: -underHeader }}>\n        <StripeRibbon className=\"absolute inset-0 size-full\" />\n        {/* soft white veil on the left so the headline stays readable where the ribbon passes */}\n        <div className=\"absolute inset-0 bg-linear-to-r from-background/70 via-background/10 via-45% to-transparent lg:from-background/40\" />\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter sm:border-x sm:border-border\">\n        <div className=\"pt-18 pb-22 sm:pt-24 lg:pt-32 lg:pr-56 lg:pb-36 lg:pl-26\">\n          {figure && (\n            <p className=\"text-xs font-normal text-foreground lg:text-sm\">\n              {figure.label} <span className=\"ml-1 font-light text-muted-foreground tabular-nums\">{figure.value}</span>\n            </p>\n          )}\n          <StripeHeading\n            as=\"h1\"\n            size=\"hero\"\n            lead={title}\n            rest={rest ? <span className=\"hidden sm:inline\">{rest}</span> : undefined}\n            className=\"mt-6 max-w-[60rem] lg:mt-12\"\n          />\n          {action && (\n            <div className=\"mt-10 lg:mt-10\">\n              <StripeButton href={action.href} fullOnMobile>\n                {action.label}\n              </StripeButton>\n            </div>\n          )}\n        </div>\n      </div>\n\n      {logos.length > 0 && (\n        <div className=\"relative border-y border-border bg-background\">\n          <div className=\"relative mx-auto max-w-page overflow-hidden sm:border-x sm:border-border\">\n            {/* phones: a slow marquee; desktop: one evenly spaced row */}\n            <div className=\"flex w-max animate-[stripe-hero-marquee_36s_linear_infinite] items-center gap-14 py-4 pl-gutter motion-reduce:animate-none lg:hidden\">\n              {[...logos, ...logos].map((l, i) => (\n                <Wordmark key={i} logo={l} />\n              ))}\n            </div>\n            <div className=\"hidden h-[4.5rem] items-center justify-between px-gutter lg:flex\">\n              {logos.slice(0, 8).map((l) => (\n                <Wordmark key={l.name} logo={l} />\n              ))}\n            </div>\n          </div>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-button",
+    "stripe-heading",
+    "stripe-ribbon"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the dark first sentence of the headline"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the softer sentences after it (hidden on phones, as on the original)"
+    },
+    {
+      "name": "figure",
+      "type": "{ label: string; value: string; }",
+      "required": false,
+      "description": "a small live-figure line above the headline"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the indigo call to action"
+    },
+    {
+      "name": "logos",
+      "type": "StripeHeroLogo[]",
+      "required": false,
+      "default": "[]",
+      "description": "customer wordmarks in the strip under the hero"
+    },
+    {
+      "name": "underHeader",
+      "type": "number",
+      "required": false,
+      "default": "76",
+      "description": "how far the ribbon reaches up behind a transparent header, in px (0 for none)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "10390f9a2798db9ba326353415995efac4112a1fc6ffecea73f14b75a9314738"
+}

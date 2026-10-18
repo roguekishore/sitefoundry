@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stripe solutions bento",
+  "description": "Two-tone heading over a bento of hairline-bordered product tiles (wide + narrow, three across, one full width). Each tile has a light title, a small lavender expand button and a product vignette rising out of a soft colour wash.",
+  "category": "features",
+  "site": "stripe",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "mock-ui",
+    "light",
+    "gradient",
+    "fintech",
+    "products"
+  ],
+  "notes": [
+    "phones: one tile per row at 528px tall; desktop: three columns, tiles span 1–3",
+    "vignettes come from stripe-mock; the washes use the chart colours"
+  ],
+  "entry": "stripe-solutions.tsx",
+  "source": "foundry",
+  "name": "stripe-solutions",
+  "files": [
+    {
+      "path": "stripe-solutions.tsx",
+      "content": "import { Maximize2 } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StripeFrame } from \"@foundry/stripe-frame\";\nimport { StripeHeading } from \"@foundry/stripe-heading\";\nimport { StripeMock, type StripeMockContent } from \"@foundry/stripe-mock\";\n\nexport interface StripeSolutionTile {\n  /** the tile's title, top left */\n  title: string;\n  /** where the tile leads (the whole tile is the link) */\n  href: string;\n  /** label for the corner expand button, for screen readers */\n  expandLabel?: string;\n  /** the vignette in the tile's lower part */\n  mock: StripeMockContent;\n  /** columns taken on desktop (of three) */\n  span?: 1 | 2 | 3;\n  /** the colour wash behind the vignette */\n  wash?: \"sunset\" | \"dawn\" | \"blush\" | \"pearl\" | \"lilac\" | \"none\";\n}\n\nexport interface StripeSolutionsProps {\n  /** the dark lead sentence of the heading */\n  title: string;\n  /** the softer sentence after it */\n  rest?: string;\n  tiles: StripeSolutionTile[];\n  className?: string;\n}\n\n// Soft light rising into each tile from one side, in the theme's art colours.\nconst washes = {\n  sunset:\n    \"bg-[radial-gradient(90%_70%_at_0%_100%,color-mix(in_oklab,var(--chart-3)_55%,transparent),transparent_70%),radial-gradient(80%_60%_at_60%_0%,color-mix(in_oklab,var(--chart-1)_70%,transparent),transparent_70%),radial-gradient(60%_60%_at_30%_70%,color-mix(in_oklab,var(--chart-2)_45%,transparent),transparent_80%)]\",\n  dawn: \"bg-[radial-gradient(120%_55%_at_50%_100%,color-mix(in_oklab,var(--chart-4)_70%,transparent),color-mix(in_oklab,var(--chart-1)_20%,transparent)_45%,transparent_75%)]\",\n  blush: \"bg-[radial-gradient(70%_55%_at_40%_55%,color-mix(in_oklab,var(--chart-2)_22%,transparent),transparent_75%)]\",\n  pearl: \"bg-[radial-gradient(80%_60%_at_80%_20%,color-mix(in_oklab,var(--chart-2)_20%,transparent),transparent_70%),radial-gradient(70%_60%_at_15%_70%,color-mix(in_oklab,var(--chart-5)_25%,transparent),transparent_70%)]\",\n  lilac: \"bg-[radial-gradient(100%_80%_at_100%_100%,color-mix(in_oklab,var(--chart-3)_22%,transparent),transparent_70%)]\",\n  none: \"\",\n};\n\nconst spans = { 1: \"lg:col-span-1\", 2: \"lg:col-span-2\", 3: \"lg:col-span-3\" };\n\n/**\n * \"Solutions\" bento: a two-tone heading over bordered product tiles. Each tile has a light\n * title, a small lavender expand button, and a product vignette rising out of a colour wash.\n */\nexport function StripeSolutions({ title, rest, tiles, className }: StripeSolutionsProps) {\n  return (\n    <StripeFrame className={className} innerClassName=\"pt-16 pb-12 lg:pt-28 lg:pb-24\">\n      <StripeHeading lead={title} rest={rest} className=\"max-w-[48rem] lg:max-w-[50rem]\" />\n      <div className=\"mt-10 grid gap-4 lg:mt-14 lg:grid-cols-3\">\n        {tiles.map((t) => {\n          const wide = (t.span ?? 1) >= 2;\n          return (\n            <a\n              key={t.title}\n              href={t.href}\n              className={cn(\n                \"group relative isolate flex h-[33rem] flex-col overflow-hidden rounded-lg border border-border bg-card text-card-foreground lg:h-[42rem]\",\n                spans[t.span ?? 1],\n                (t.span ?? 1) === 3 && \"lg:h-[32.5rem]\",\n              )}\n            >\n              <div className={cn(\"absolute inset-0 -z-10 transition-opacity duration-500 group-hover:opacity-80\", washes[t.wash ?? \"none\"])} />\n              <div className=\"flex items-start justify-between gap-4 p-4 lg:p-6\">\n                <StripeHeading as=\"h3\" size=\"sub\" lead={t.title} className={cn(\"max-w-[17rem]\", wide && \"lg:max-w-[26rem]\")} />\n                <span\n                  className=\"flex size-10 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground lg:size-9\"\n                >\n                  <Maximize2 aria-hidden className=\"size-3.5 -scale-x-100\" strokeWidth={2} />\n                  {t.expandLabel && <span className=\"sr-only\">{t.expandLabel}</span>}\n                </span>\n              </div>\n              {/* zoom keeps the vignette's tiny type in proportion as the tiles grow on desktop */}\n              <div className=\"relative min-h-0 flex-1 lg:[zoom:1.25]\">\n                <StripeMock\n                  mock={t.mock}\n                  className={t.mock.kind === \"checkout\" || t.mock.kind === \"platform\" ? \"\" : \"flex items-center justify-center px-6 pb-8\"}\n                />\n              </div>\n            </a>\n          );\n        })}\n      </div>\n    </StripeFrame>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stripe-frame",
+    "stripe-heading",
+    "stripe-mock"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the dark lead sentence of the heading"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the softer sentence after it"
+    },
+    {
+      "name": "tiles",
+      "type": "StripeSolutionTile[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "32b14fa83d1e9d35fc11646299038ff541e7f724ba7c11092606a71ac274c1a0"
+}
