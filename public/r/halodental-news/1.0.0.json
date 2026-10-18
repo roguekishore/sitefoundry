@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo Dental press & news",
+  "description": "Warm stone editorial press list: a section header with an outlined 'View Media Room' button, full-width hairline-divided article rows (16:9 media/logo card, title, summary, and 32px white square arrow button), a faded fourth preview row under a gradient mask, and a centred 'View more' button.",
+  "category": "features",
+  "site": "halodental",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "press",
+    "editorial",
+    "list",
+    "hairline",
+    "light",
+    "stone"
+  ],
+  "notes": [
+    "fadeLast (on by default) applies Halo's soft bottom fade over the last article row above the 'View more' button",
+    "each item accepts a custom media ReactNode or renders a clean typographic publication card / studio placeholder"
+  ],
+  "entry": "halodental-news.tsx",
+  "name": "halodental-news",
+  "files": [
+    {
+      "path": "halodental-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalButton } from \"@foundry/halodental-button\";\n\nexport interface HalodentalNewsItem {\n  /** article headline */\n  title: string;\n  /** excerpt paragraph */\n  summary: string;\n  /** article URL */\n  href: string;\n  /** accessible label for the outward arrow link */\n  linkLabel?: string;\n  /** custom 16:9 media card content */\n  media?: ReactNode;\n  /** publication wordmark text when rendering a press logo card placeholder */\n  publicationMark?: string;\n  /** optional subtitle under the publication wordmark */\n  publicationSub?: string;\n  /** dark product card style (as on the first news row) vs white press logo card */\n  mediaTone?: \"dark-studio\" | \"press-card\";\n}\n\nexport interface HalodentalNewsProps {\n  /** section title (\"Latest news\") */\n  title: string;\n  /** top-right (desktop) / top-left (mobile) outlined media room CTA */\n  headerCta?: { label: string; href: string };\n  /** list of press/news rows */\n  items: HalodentalNewsItem[];\n  /** bottom centred \"View more\" outlined CTA */\n  moreCta?: { label: string; href?: string; onClick?: () => void };\n  /** fade the last item into a soft bottom mask as on the original */\n  fadeLast?: boolean;\n  className?: string;\n}\n\nfunction NewsMediaPlaceholder({ item }: { item: HalodentalNewsItem }) {\n  if (item.mediaTone === \"dark-studio\") {\n    return (\n      <div className=\"dark relative flex aspect-[16/9] w-full items-center justify-center overflow-hidden rounded-lg bg-background text-foreground\">\n        <div className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_52%_45%,var(--secondary)_0%,transparent_70%)] opacity-85\" />\n        <div className=\"relative flex h-[78%] w-7 rotate-[15deg] flex-col items-center\">\n          <div className=\"size-9 rounded-full border-2 border-foreground/90 bg-card shadow-[0_0_16px_var(--foreground)]\" />\n          <div className=\"-mt-0.5 w-2.5 flex-1 rounded-b-full border-x border-foreground/35 bg-secondary\" />\n        </div>\n      </div>\n    );\n  }\n\n  return (\n    <div className=\"flex aspect-[16/9] w-full flex-col items-center justify-center rounded-lg bg-card px-6 text-center text-card-foreground\">\n      {item.publicationMark && (\n        <span className=\"font-display text-2xl font-bold leading-none tracking-[-0.03em] uppercase sm:text-3xl\">\n          {item.publicationMark}\n        </span>\n      )}\n      {item.publicationSub && (\n        <span className=\"mt-1.5 text-[0.6875rem] font-medium tracking-[0.18em] text-muted-foreground uppercase\">\n          {item.publicationSub}\n        </span>\n      )}\n    </div>\n  );\n}\n\n/**\n * Halo Dental's press & news section (\"Latest news\"): warm stone background with\n * full-width horizontal hairline rows. On desktop each row is a 12-column grid:\n * 4 cols 16:9 media card, 3 cols article title, 4 cols excerpt, 1 col white square arrow button.\n */\nexport function HalodentalNews({\n  title,\n  headerCta,\n  items,\n  moreCta,\n  fadeLast = true,\n  className,\n}: HalodentalNewsProps) {\n  return (\n    <section className={cn(\"relative bg-background py-16 text-foreground lg:py-24\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-10\">\n        {/* Heading + View Media Room button */}\n        <div className=\"flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center\">\n          <h2 className=\"font-display text-[2.475rem] font-normal leading-[1.08] tracking-[-0.025em] lg:text-[4rem] lg:leading-none\">\n            {title}\n          </h2>\n          {headerCta && (\n            <HalodentalButton variant=\"outline\" href={headerCta.href}>\n              {headerCta.label}\n            </HalodentalButton>\n          )}\n        </div>\n\n        {/* Hairline-divided article rows */}\n        <div className=\"mt-10 border-t border-border lg:mt-14\">\n          {items.map((item, idx) => {\n            const isLast = idx === items.length - 1;\n            const faded = fadeLast && isLast && items.length > 3;\n            return (\n              <article\n                key={item.title}\n                className={cn(\n                  \"relative grid grid-cols-1 gap-5 py-7 lg:grid-cols-12 lg:items-start lg:gap-8 lg:py-6\",\n                  !faded && \"border-b border-border\",\n                  faded && \"hidden opacity-35 lg:grid\",\n                )}\n              >\n                {/* 4 cols: 16:9 media / press logo card */}\n                <div className=\"lg:col-span-4\">\n                  {item.media ?? <NewsMediaPlaceholder item={item} />}\n                </div>\n\n                {/* 3 cols: Article title */}\n                <div className=\"lg:col-span-3 lg:col-start-6\">\n                  <h3 className=\"font-display text-[1.5625rem] font-normal leading-[1.1] tracking-[-0.015em] lg:text-[1.75rem]\">\n                    <a\n                      href={item.href}\n                      className=\"transition-colors hover:text-primary motion-reduce:transition-none\"\n                    >\n                      {item.title}\n                    </a>\n                  </h3>\n                </div>\n\n                {/* 3 cols: Summary paragraph */}\n                <div className=\"lg:col-span-3 lg:col-start-9\">\n                  <p className=\"text-[0.9125rem] leading-[1.35] text-foreground/85 lg:text-base lg:leading-[1.25]\">\n                    {item.summary}\n                  </p>\n                </div>\n\n                {/* 1 col: White square outward-arrow button */}\n                <div className=\"flex items-start lg:col-span-1 lg:col-start-12 lg:justify-end\">\n                  <HalodentalButton\n                    variant=\"icon-card\"\n                    href={item.href}\n                    ariaLabel={item.linkLabel ?? item.title}\n                  >\n                    <ArrowUpRight aria-hidden className=\"size-4\" strokeWidth={1.5} />\n                  </HalodentalButton>\n                </div>\n\n                {faded && (\n                  <div\n                    aria-hidden\n                    className=\"pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,var(--background)_90%)]\"\n                  />\n                )}\n              </article>\n            );\n          })}\n        </div>\n\n        {/* Bottom centred \"View more\" button */}\n        {moreCta && (\n          <div className=\"mt-8 flex justify-center lg:mt-4\">\n            <HalodentalButton\n              variant=\"outline\"\n              href={moreCta.href}\n              onClick={moreCta.onClick}\n            >\n              {moreCta.label}\n            </HalodentalButton>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section title (\"Latest news\")"
+    },
+    {
+      "name": "headerCta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "top-right (desktop) / top-left (mobile) outlined media room CTA"
+    },
+    {
+      "name": "items",
+      "type": "HalodentalNewsItem[]",
+      "required": true,
+      "description": "list of press/news rows"
+    },
+    {
+      "name": "moreCta",
+      "type": "{ label: string; href?: string; onClick?: (() => void); } | undefined",
+      "required": false,
+      "description": "bottom centred \"View more\" outlined CTA"
+    },
+    {
+      "name": "fadeLast",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "fade the last item into a soft bottom mask as on the original"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2fa1f7de7c20da1f913d43f66de86436d3e2c235cd94aad902170bbd4db6fb5c"
+}
