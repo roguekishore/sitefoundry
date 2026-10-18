@@ -3,7 +3,7 @@ import ShapeWaves from "./ShapeWaves"
 
 export default function Demo() {
   return (
-    <div className="relative flex h-[500px] w-full items-center justify-center overflow-hidden">
+    <div className="relative flex h-[500px] w-full items-center justify-center overflow-hidden dark bg-background">
       <ShapeWaves introKey={0} />
     </div>
   )

@@ -1015,7 +1015,7 @@ export const GridScan = ({
       [sceneBuffer, bloomBufferA, bloomBufferB].forEach(buffer => gl.deleteFramebuffer(buffer));
       gl.deleteVertexArray(vao);
       [room, down, blur, composite].forEach(item => gl.deleteProgram(item.program));
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
     };
   }, []);
 

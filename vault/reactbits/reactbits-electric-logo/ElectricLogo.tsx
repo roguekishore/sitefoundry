@@ -738,7 +738,7 @@ const ElectricLogo = ({
     const gl = renderer.gl;
     const gl2 = gl as WebGL2RenderingContext;
     if (!renderer.isWebgl2) {
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       return undefined;
     }
     gl.clearColor(0, 0, 0, 0);
@@ -1074,7 +1074,7 @@ const ElectricLogo = ({
       container.removeEventListener('pointerdown', onDown);
       container.removeEventListener('pointerleave', onLeave);
       container.removeEventListener('pointercancel', onLeave);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, []);

@@ -475,7 +475,7 @@ const FlexCarousel = ({
     });
     const gl = renderer.gl;
     if (!renderer.isWebgl2) {
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       return undefined;
     }
     gl.clearColor(0, 0, 0, 0);
@@ -1360,7 +1360,7 @@ const FlexCarousel = ({
       document.removeEventListener('visibilitychange', onVisibility);
       slots.forEach(slot => slot.dispose());
       slots = [];
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, []);

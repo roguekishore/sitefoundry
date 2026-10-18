@@ -78,6 +78,8 @@ export const DEMO_PATCHES: Record<string, (demo: string) => string> = {
       .replace(`"var(--esd-muted)"`, `"var(--muted-foreground)"`),
   // upstream's logos are react-icons nodes; plain wordmarks here
   LogoLoop: (demo) => demo.replace(/\{ title: "([^"]+)"/g, `{ node: <span className="text-2xl font-semibold">$1</span>, title: "$1"`),
+  // upstream peels its own logo image; the rebuild could only fill in a string
+  StickerPeel: (demo) => demo.replace(`imageSrc={"React Bits"}`, `imageSrc={"https://picsum.photos/seed/foundry-sticker/400/400"}`),
   // upstream passes its own logo image; paint a word instead
   MetallicPaint: (demo) => demo.replace("<MetallicPaint ", `<MetallicPaint text={"Bits"} `),
   PixelSwap: (demo) =>

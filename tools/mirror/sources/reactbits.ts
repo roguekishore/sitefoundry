@@ -59,7 +59,7 @@ export async function convertReactBits(log: (m: string) => void) {
     }
     const file = item.files[0];
     const fileName = file.path.split("/").pop()!;
-    let content = PATCHES[base] ? PATCHES[base](file.content) : file.content;
+    let content = keepContextOnRemount(PATCHES[base] ? PATCHES[base](file.content) : file.content);
     const next = replaceNext(content);
     if ("unsupported" in next) {
       skipped.push({ source: SOURCE, name: item.name, reason: `uses ${next.unsupported} (Next.js only)` });
@@ -154,6 +154,19 @@ export async function convertReactBits(log: (m: string) => void) {
   return { items, skipped, packages };
 }
 
+/**
+ * Many WebGL components draw on a <canvas> React renders, and release the GPU context in their
+ * cleanup. React's StrictMode (development) mounts, cleans up and mounts again on the same canvas,
+ * which then has a dead context: the canvas shows Chrome's broken icon. Release it only once the
+ * canvas has really left the page; a real unmount still frees it.
+ */
+function keepContextOnRemount(content: string): string {
+  return content.replaceAll(
+    "gl.getExtension('WEBGL_lose_context')?.loseContext();",
+    "{ const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }",
+  );
+}
+
 /** Upstream demos load media from reactbits.dev's /assets/; swap in public stand-ins (or drop optional ones). */
 function mapDemoAssets(demo: string): string {
   return demo.replace(/(\s[\w-]+=\{)?"(\/assets\/[^"]+)"(\})?/g, (match, attr: string | undefined, path: string, close: string | undefined) => {
@@ -196,12 +209,14 @@ function buildDemo(o: {
   const npm = [...o.imports].map(([mod, names]) => `import { ${[...names].join(", ")} } from "${mod}"`);
   const px = Math.min(Math.max(o.height?.px ?? (o.category === "Backgrounds" ? 500 : 400), 240), 720);
   const size = o.category === "Backgrounds" || !o.height?.min ? `h-[${px}px]` : `min-h-[${px}px]`;
+  // React Bits previews its backgrounds on black, and many draw light-on-transparent: give them a dark backdrop
+  const backdrop = o.category === "Backgrounds" && !/lightMode=\{true\}/.test(o.jsx) ? " dark bg-background" : "";
   const indented = o.jsx.split("\n").map((l) => "      " + l).join("\n");
   return `${o.from ? `// Rebuilt from React Bits' ${o.from}: the component with the props its preview uses.\n` : ""}${[o.importLine, o.siblingsImport, ...npm].filter(Boolean).join("\n")}
 
 export default function Demo() {
   return (
-    <div className="relative flex ${size} w-full items-center justify-center overflow-hidden">
+    <div className="relative flex ${size} w-full items-center justify-center overflow-hidden${backdrop}">
 ${indented}
     </div>
   )

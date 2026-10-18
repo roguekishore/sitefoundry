@@ -513,7 +513,7 @@ const MicroSlats = ({
     const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: false, depth: false });
     const gl = renderer.gl;
     if (!renderer.isWebgl2) {
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       return undefined;
     }
     gl.clearColor(0, 0, 0, 0);
@@ -990,7 +990,7 @@ const MicroSlats = ({
       wakeRef.current = null;
       disposeFluid();
       dispose(fieldTarget);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      { const lose = gl.getExtension('WEBGL_lose_context'); const el = gl.canvas as HTMLCanvasElement; setTimeout(() => { if (!el.isConnected) lose?.loseContext(); }); }
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
   }, []);
