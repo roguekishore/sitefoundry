@@ -27,6 +27,11 @@ export interface MercuryTabsProps {
   link?: { label: string; href: string };
   /** which row starts open */
   defaultOpen?: number;
+  /**
+   * spread: heading at the top, list at the bottom of a tall column (beside portrait art) ·
+   * grouped: heading and list together, centred beside the picture (beside a wide mock)
+   */
+  layout?: "spread" | "grouped";
   className?: string;
 }
 
@@ -35,14 +40,20 @@ export interface MercuryTabsProps {
  * gets a bright rule, a small pale-blue dot, its text and a link; its picture fills the
  * other half on wide screens and sits inside the row on phones.
  */
-export function MercuryTabs({ title, items, media, mediaSide = "end", link, defaultOpen = 0, className }: MercuryTabsProps) {
+export function MercuryTabs({ title, items, media, mediaSide = "end", link, defaultOpen = 0, layout = "spread", className }: MercuryTabsProps) {
   const [open, setOpen] = useState(defaultOpen);
   const current = items[open]?.media ?? media;
 
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto grid max-w-page items-stretch gap-8 px-gutter lg:grid-cols-2">
-        <div className={cn("flex flex-col justify-between gap-10 lg:min-h-[38.75rem]", mediaSide === "start" && "lg:order-2")}>
+        <div
+          className={cn(
+            "flex flex-col gap-10 lg:min-h-[38.75rem]",
+            layout === "spread" ? "justify-between" : "justify-center lg:gap-16",
+            mediaSide === "start" && "lg:order-2",
+          )}
+        >
           <MercuryHeading size="sub" title={title} className="max-w-[30rem]" />
 
           <div>

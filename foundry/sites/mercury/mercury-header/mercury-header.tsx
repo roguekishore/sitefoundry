@@ -39,9 +39,9 @@ export function MercuryHeader({ mark, links, login, cta, menuLabel, overlay = tr
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-[3.25rem] lg:flex">
           {links.map((l) => (
-            <a key={l.label} href={l.href} className="flex items-center gap-1 text-base font-[480] text-foreground/90 transition-colors hover:text-foreground motion-reduce:transition-none">
+            <a key={l.label} href={l.href} className="flex items-center gap-1 text-base font-[480] text-foreground transition-colors hover:text-foreground/75 motion-reduce:transition-none">
               {l.label}
-              {l.menu && <ChevronDown aria-hidden className="size-4" strokeWidth={1.5} />}
+              {l.menu && <ChevronDown aria-hidden className="size-4" strokeWidth={2} />}
             </a>
           ))}
         </nav>

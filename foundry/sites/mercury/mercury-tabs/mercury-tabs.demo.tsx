@@ -6,6 +6,7 @@ import { MercuryTabs, type MercuryTabsProps } from "./mercury-tabs";
 
 export const overviewTabs: MercuryTabsProps = {
   title: ["All of your money.", "One calm place to run it."],
+  layout: "grouped",
   items: [
     {
       title: "Accounts and savings",

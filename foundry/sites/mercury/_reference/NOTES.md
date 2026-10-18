@@ -98,3 +98,17 @@ wordmark).
   publications.
 - The huge legal footnote block is kept as a *pattern* (label + numbered fine print) with
   short placeholder notes.
+
+## After comparison (390 and 1440)
+
+Fixed: hero headline size (Hanken runs wider than Arcadia, so 60px stands in for 65px),
+heading weights raised (Hanken looks lighter at the same number), desktop section padding
+set to 0.6 × `--section-y`, the first tab section grouped instead of spread, fingerprint
+and beam art redrawn, light-mode paper panels darkened so they show on the off-white page.
+
+Still different, on purpose:
+- the first tab section's picture doesn't bleed off the right edge of the screen, and its
+  text column isn't pulled wider than the page column;
+- the hero is a drawn valley, not a photograph, and has no desk on the hill;
+- the page is ~7% shorter on desktop, mostly from the much shorter legal footnotes;
+- no scroll-in fades, auto-advancing tabs or carousel, marquee or video (per the brief).

@@ -13,7 +13,7 @@ export interface MercuryQuoteProps {
 /** A single centred pull quote in a soft, large, regular weight, with the name and role under it. */
 export function MercuryQuote({ quote, name, role, className }: MercuryQuoteProps) {
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-section", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
       <figure className="mx-auto max-w-[54rem] px-gutter text-center">
         <blockquote className="font-display text-[1.3125rem] leading-[1.2] text-balance text-muted-foreground lg:text-[1.75rem]">{quote}</blockquote>
         <figcaption className="mt-6 text-base lg:mt-8 lg:text-[1.3125rem]">

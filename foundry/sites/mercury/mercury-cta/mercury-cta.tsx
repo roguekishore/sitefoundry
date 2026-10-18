@@ -37,7 +37,7 @@ export interface MercuryCtaProps {
  */
 export function MercuryCta({ title, primary, secondary, cards, className }: MercuryCtaProps) {
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <MercuryHeading size="statement" align="center" title={title} className="mx-auto max-w-[30rem] [&>h2]:lg:text-[3.084rem]" />
         <div className="mt-6 flex flex-wrap justify-center gap-2 lg:mt-8">

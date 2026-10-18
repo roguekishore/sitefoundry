@@ -38,7 +38,7 @@ export function MercuryStories({ title, logos, stories, className }: MercuryStor
   const story = stories[at];
 
   return (
-    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.75)]", className)}>
+    <section className={cn("py-[calc(var(--section-y)*0.6)] lg:py-[calc(var(--section-y)*0.6)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <MercuryHeading size="statement" align="center" title={title} className="mx-auto max-w-[34rem]" />
       </div>
