@@ -19,7 +19,7 @@ packages/mcp/        MCP server (local, stdio)
 apps/gallery/        the picker (Vite)
 foundry/             OUR content: base/, themes/, sites/<site>/
 vault/               mirrored third-party items (shadcn, directory registries, React Bits)
-tools/               build-registry, check, screenshots
+tools/               build-registry, check
 public/r/            the built registry (generated, committed)
 ```
 
