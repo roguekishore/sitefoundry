@@ -51,7 +51,7 @@ export function StripeStats({ title, stats, dark: startDark = false, toggleLabel
   return (
     <StripeFrame
       className={cn("overflow-hidden transition-colors duration-700 motion-reduce:transition-none", dark && "dark", className)}
-      innerClassName="px-0"
+      padded={false}
     >
       {/* a cool wash behind the whole band */}
       <div

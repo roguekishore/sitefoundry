@@ -48,7 +48,7 @@ const tones = {
 export function StripeStories({ heading, segment, stories, readLabel, openLabel, className }: StripeStoriesProps) {
   const [open, setOpen] = useState(0);
   return (
-    <StripeFrame className={className} innerClassName="px-0">
+    <StripeFrame className={className} padded={false}>
       {heading && (
         <div className="px-gutter py-14 lg:py-24">
           <StripeHeading lead={heading.lead} rest={heading.rest} className="max-w-[47rem]" />
