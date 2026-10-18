@@ -24,7 +24,7 @@ function Circuit() {
   return (
     <svg
       aria-hidden
-      className="pointer-events-none absolute inset-x-0 top-0 h-[36rem] w-full text-foreground/[0.07] [mask-image:radial-gradient(ellipse_70%_80%_at_25%_0%,black,transparent_75%)]"
+      className="pointer-events-none absolute inset-x-0 top-0 h-[36rem] w-full text-foreground/[0.045] [mask-image:radial-gradient(ellipse_70%_80%_at_25%_0%,black,transparent_75%)]"
       viewBox="0 0 1440 560"
       preserveAspectRatio="xMidYMin slice"
       fill="none"
@@ -45,9 +45,13 @@ function Circuit() {
   );
 }
 
+// vertical padding: on the content in the dark band (the band owns its notch padding), on
+// the section itself in the light tone (so a page can trim it with className)
+const pad = "py-[calc(var(--section-y)*0.6)] lg:py-section";
+
 export function ClerkFeatures({ heading, items, tone = "dark", circuit = tone === "dark", edgeTop, edgeBottom, id, className }: ClerkFeaturesProps) {
   const content = (
-    <div className={cn("relative mx-auto max-w-page px-gutter py-[calc(var(--section-y)*0.6)] lg:py-section", tone === "dark" && "lg:pb-[calc(var(--section-y)*1.25)]")}>
+    <div className={cn("relative mx-auto max-w-page px-gutter", tone === "dark" && pad)}>
       <ClerkHeading
         {...heading}
         fadeText={heading.fadeText ?? (tone === "dark" && heading.align === "center")}
@@ -70,7 +74,7 @@ export function ClerkFeatures({ heading, items, tone = "dark", circuit = tone ==
     );
   }
   return (
-    <section id={id} className={cn("bg-background text-foreground", className)}>
+    <section id={id} className={cn("bg-background text-foreground", pad, className)}>
       {content}
     </section>
   );

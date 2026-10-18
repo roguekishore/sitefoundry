@@ -81,8 +81,8 @@ function Plan({ plan }: { plan: ClerkBillingPlan }) {
 
 export function ClerkBilling({ heading, listTitle, list = [], link, window: win, className }: ClerkBillingProps) {
   return (
-    <section className={cn("overflow-x-clip bg-background text-foreground", className)}>
-      <div className="mx-auto grid max-w-page items-center gap-14 px-gutter py-[calc(var(--section-y)*0.6)] lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-20 lg:py-section">
+    <section className={cn("overflow-x-clip bg-background py-[calc(var(--section-y)*0.6)] text-foreground lg:py-section", className)}>
+      <div className="mx-auto grid max-w-page items-center gap-14 px-gutter lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-20">
         <div>
           <ClerkHeading {...heading} link={undefined} />
           {listTitle && <p className="mt-6 text-[0.9375rem] leading-6 text-muted-foreground">{listTitle}</p>}

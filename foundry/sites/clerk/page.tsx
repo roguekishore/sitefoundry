@@ -26,7 +26,7 @@ export default function Page() {
       <ClerkLogos {...logosSample} />
       <ClerkFeatures {...signInFeatures} />
       <ClerkFeatures {...teamFeatures} />
-      <ClerkBilling {...billingSample} />
+      <ClerkBilling {...billingSample} className="pt-[calc(var(--section-y)*0.4)] lg:pt-0" />
       <ClerkFrameworks {...frameworksSample} />
       <ClerkTestimonials {...testimonialsSample} />
       <ClerkFooter {...footerSample} />
