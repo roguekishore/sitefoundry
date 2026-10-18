@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sample header",
+  "description": "Brand, links and a call to action. On phones the links fold into a full-width menu.",
+  "category": "header",
+  "site": "sample",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "menu",
+    "sticky"
+  ],
+  "notes": [
+    "test block for the foundry pipeline"
+  ],
+  "entry": "sample-header.tsx",
+  "source": "foundry",
+  "name": "sample-header",
+  "files": [
+    {
+      "path": "sample-header.tsx",
+      "content": "import { useState } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { Button } from \"@foundry/sample-button\";\n\nexport interface HeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface SampleHeaderProps {\n  /** business name, shown when there's no logo (and as the logo's alt text) */\n  brand: string;\n  logoSrc?: string;\n  links: HeaderLink[];\n  cta?: HeaderLink;\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  className?: string;\n}\n\nexport function SampleHeader({ brand, logoSrc, links, cta, menuLabel = \"Menu\", className }: SampleHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  return (\n    <header className={cn(\"sticky top-0 z-40 border-b bg-background/85 backdrop-blur\", className)}>\n      <div className=\"mx-auto flex h-16 max-w-page items-center justify-between gap-6 px-gutter\">\n        <a href=\"/\" className=\"flex items-center gap-2 font-display text-lg font-semibold tracking-tight\">\n          {logoSrc ? <img src={logoSrc} alt={brand} className=\"h-8 w-auto\" /> : brand}\n        </a>\n\n        <nav className=\"hidden items-center gap-1 md:flex\">\n          {links.map((link) => (\n            <a key={link.href} href={link.href} className=\"rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground\">\n              {link.label}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"flex items-center gap-2\">\n          {cta && (\n            <Button href={cta.href} className=\"hidden sm:inline-flex\">\n              {cta.label}\n            </Button>\n          )}\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"inline-flex size-10 items-center justify-center rounded-lg hover:bg-accent md:hidden\"\n          >\n            {open ? <X className=\"size-5\" /> : <Menu className=\"size-5\" />}\n          </button>\n        </div>\n      </div>\n\n      {open && (\n        <nav className=\"border-t bg-background px-gutter pb-6 pt-2 md:hidden\">\n          {links.map((link) => (\n            <a\n              key={link.href}\n              href={link.href}\n              onClick={() => setOpen(false)}\n              className=\"block border-b py-4 text-base font-medium\"\n            >\n              {link.label}\n            </a>\n          ))}\n          {cta && (\n            <Button href={cta.href} size=\"lg\" className=\"mt-6 w-full\">\n              {cta.label}\n            </Button>\n          )}\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sample-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "business name, shown when there's no logo (and as the logo's alt text)"
+    },
+    {
+      "name": "logoSrc",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "links",
+      "type": "HeaderLink[]",
+      "required": true
+    },
+    {
+      "name": "cta",
+      "type": "HeaderLink",
+      "required": false
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1c2442c3e4786ba7d0677ed3e7c5909fb52e260ecfee2c2fb724aae5636a86bf"
+}

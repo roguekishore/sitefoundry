@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sample hero",
+  "description": "Headline, supporting line, two actions and an optional photo, with a soft glow behind. Fades up on load.",
+  "category": "hero",
+  "site": "sample",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "headline",
+    "image",
+    "glow",
+    "animated"
+  ],
+  "notes": [
+    "test block for the foundry pipeline"
+  ],
+  "entry": "sample-hero.tsx",
+  "source": "foundry",
+  "name": "sample-hero",
+  "files": [
+    {
+      "path": "sample-hero.tsx",
+      "content": "import { motion, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { Button } from \"@foundry/sample-button\";\n\nexport interface HeroAction {\n  label: string;\n  href: string;\n}\n\nexport interface SampleHeroProps {\n  /** small line above the title */\n  eyebrow?: string;\n  title: string;\n  subtitle?: string;\n  primary: HeroAction;\n  secondary?: HeroAction;\n  image?: { src: string; alt: string };\n  className?: string;\n}\n\nexport function SampleHero({ eyebrow, title, subtitle, primary, secondary, image, className }: SampleHeroProps) {\n  const reduce = useReducedMotion();\n  const rise = (delay: number) =>\n    reduce\n      ? {}\n      : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as const } };\n\n  return (\n    <section className={cn(\"relative isolate overflow-hidden py-section\", className)}>\n      <div\n        aria-hidden\n        className=\"absolute -top-32 left-1/2 -z-10 size-[36rem] -translate-x-1/2 rounded-full bg-glow/25 blur-3xl\"\n      />\n      <div className=\"mx-auto grid max-w-page items-center gap-10 px-gutter md:grid-cols-2\">\n        <div>\n          {eyebrow && (\n            <motion.p {...rise(0)} className=\"mb-4 text-sm font-medium uppercase tracking-widest text-highlight\">\n              {eyebrow}\n            </motion.p>\n          )}\n          <motion.h1 {...rise(0.05)} className=\"font-display text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-5xl md:text-6xl\">\n            {title}\n          </motion.h1>\n          {subtitle && (\n            <motion.p {...rise(0.12)} className=\"mt-5 max-w-prose text-lg text-muted-foreground text-pretty\">\n              {subtitle}\n            </motion.p>\n          )}\n          <motion.div {...rise(0.2)} className=\"mt-8 flex flex-col gap-3 sm:flex-row\">\n            <Button href={primary.href} size=\"lg\">\n              {primary.label}\n            </Button>\n            {secondary && (\n              <Button href={secondary.href} size=\"lg\" variant=\"secondary\">\n                {secondary.label}\n              </Button>\n            )}\n          </motion.div>\n        </div>\n        {image && (\n          <motion.img\n            {...rise(0.15)}\n            src={image.src}\n            alt={image.alt}\n            className=\"aspect-[4/5] w-full rounded-2xl border object-cover md:aspect-square\"\n          />\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sample-button"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small line above the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "primary",
+      "type": "HeroAction",
+      "required": true
+    },
+    {
+      "name": "secondary",
+      "type": "HeroAction",
+      "required": false
+    },
+    {
+      "name": "image",
+      "type": "{ src: string; alt: string; }",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "db76570d116fce5a4e672284fb2ad4f5b2f109b832d669e83d49ddfeb37d7cbd"
+}
