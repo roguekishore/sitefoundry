@@ -2,7 +2,7 @@
 // counts what it costs while it runs.
 //
 //   node tools/gemini-run/run.mjs <url> <slug> [--model gemini-4-argon] [--max-usd 15] [--max-hours 8]
-//   node tools/gemini-run/run.mjs --smoke [--model gemini-4-argon]     one tiny request through the CLI
+//   node tools/gemini-run/run.mjs --smoke [--model gemini-4-argon]     a few tiny turns through the CLI
 //
 // In order:
 //  1. Refuses to start if the Gemini CLI is set to the Priority or Flex tier.
@@ -13,7 +13,8 @@
 //     removes any tier header (Standard only), and adds up tokens and cost. At --max-usd it stops
 //     the run.
 //  4. Starts that worktree's gallery on port 4410 (4400 is left for yours).
-//  5. Runs `gemini --yolo` headless with the skill as the prompt.
+//  5. Runs `gemini --yolo` headless with the skill as the prompt. If it crashes (a network error
+//     can end a headless run), it starts again up to 3 times and continues from what's on disk.
 //  6. Prints tokens, cost and the branch's commits. Everything is logged in tools/gemini-run/runs/.
 import { spawn, spawnSync } from "node:child_process";
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, createWriteStream } from "node:fs";
@@ -85,6 +86,11 @@ if (!existsSync(geminiJs)) fail(`Gemini CLI not found at ${geminiJs}`);
 
 const totals = { calls: 0, errors: 0, input: 0, cached: 0, output: 0, usd: 0, tiers: {}, models: {} };
 let stopRun = () => {};
+let stopped = false; // set when the run is stopped on purpose (cap, time limit, Ctrl+C), so it isn't restarted
+const stop = () => {
+  stopped = true;
+  stopRun();
+};
 
 /** The usage block of a response: the last one in a stream, or the only one in a plain reply. */
 function usageOf(body) {
@@ -131,7 +137,7 @@ function record(path, status, body) {
   if (totals.calls % 10 === 0) say(`${totals.calls} calls · $${totals.usd.toFixed(2)} so far`);
   if (totals.usd >= maxUsd) {
     say(`spending cap of $${maxUsd} reached: stopping`);
-    stopRun();
+    stop();
   }
 }
 
@@ -146,7 +152,9 @@ const forwarder = http.createServer((req, res) => {
   delete headers["x-vertex-ai-llm-request-type"];
 
   const upstream = https.request({ host: "aiplatform.googleapis.com", path, method: req.method, headers }, (up) => {
-    res.writeHead(up.statusCode, up.headers);
+    // Connection-level headers belong to the Google connection, not to ours.
+    const { connection, "keep-alive": _keepAlive, "transfer-encoding": _te, ...upHeaders } = up.headers;
+    res.writeHead(up.statusCode, upHeaders);
     let body = "";
     up.setEncoding("utf8");
     up.on("data", (chunk) => {
@@ -165,6 +173,11 @@ const forwarder = http.createServer((req, res) => {
   });
   req.pipe(upstream);
 });
+// Node closes idle connections after 5 s by default. The CLI reuses its connection between
+// turns and can send just as it closes ("fetch failed sending request"), so keep them open.
+forwarder.keepAliveTimeout = 3600e3;
+forwarder.headersTimeout = 3601e3;
+forwarder.requestTimeout = 0;
 await new Promise((ok) => forwarder.listen(0, "127.0.0.1", ok));
 const forwarderUrl = `http://127.0.0.1:${forwarder.address().port}`;
 
@@ -182,7 +195,7 @@ function cleanup() {
 }
 process.on("SIGINT", () => {
   say("interrupted");
-  stopRun();
+  stop();
 });
 
 function runGemini(cwd, prompt) {
@@ -226,8 +239,9 @@ function summary(extra = "") {
 // ---------- smoke test ----------
 
 if (smoke) {
-  say(`smoke test: one request to ${model} through the forwarder`);
-  const code = await runGemini(REPO, "Reply with the single word OK. Do not use any tools.");
+  // Several turns with a pause of more than 5 s between them: the case that broke the first real run.
+  say(`smoke test: a few turns of ${model} through the forwarder`);
+  const code = await runGemini(REPO, 'Run the shell command `node -e "setTimeout(()=>{},7000)"`, then read the file package.json, then reply with the single word OK.');
   cleanup();
   summary(`exit code     ${code}`);
   process.exit(code ?? 1);
@@ -291,11 +305,26 @@ Differences from the skill, because this run is unattended:
 const started = Date.now();
 const timer = setTimeout(() => {
   say(`${maxHours} h limit reached: stopping`);
-  stopRun();
+  stop();
 }, maxHours * 3600e3);
 
-say(`running ${model} on ${url} (cap $${maxUsd}, ${maxHours} h)`);
-const code = await runGemini(worktree, prompt);
+const resumePrompt = `${prompt}
+
+This is a restart: an earlier attempt on this task stopped partway through. Its work is on disk.
+Before doing anything else, look at what exists in foundry/sites/${slug}/, foundry/themes/${slug}/, foundry/sites/${slug}/_reference/NOTES.md and \`git log --oneline main..HEAD\`.
+Then continue from where it stopped. Do not redo finished steps, and don't capture the original again if its screenshots are already there.`;
+
+const MAX_RESTARTS = 3;
+// A reused worktree that already has this site's files continues rather than starting over.
+const hasWork = existsSync(join(worktree, "foundry/sites", slug));
+let code;
+for (let attempt = 0; attempt <= MAX_RESTARTS; attempt++) {
+  const fresh = attempt === 0 && !hasWork;
+  say(fresh ? `running ${model} on ${url} (cap $${maxUsd}, ${maxHours} h)` : `${attempt ? `restart ${attempt} of ${MAX_RESTARTS}` : "earlier work found"}: continuing from what's on disk`);
+  code = await runGemini(worktree, fresh ? prompt : resumePrompt);
+  if (code === 0 || stopped) break;
+  say(`gemini exited with code ${code}`);
+}
 clearTimeout(timer);
 cleanup();
 
@@ -304,7 +333,7 @@ const commits = git(worktree, "log", "--oneline", `main..${branch}`).stdout.trim
 const left = git(worktree, "status", "--porcelain").stdout.trim();
 summary(
   [
-    `duration      ${hours} h, exit code ${code}`,
+    `duration      ${hours} h, exit code ${code}${stopped ? " (stopped on purpose)" : ""}`,
     `branch        ${branch} in ${worktree}`,
     `commits\n${commits.replace(/^/gm, "              ")}`,
     left ? `uncommitted\n${left.replace(/^/gm, "              ")}` : "uncommitted   nothing",
