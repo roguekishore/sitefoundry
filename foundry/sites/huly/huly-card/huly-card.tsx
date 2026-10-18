@@ -16,7 +16,7 @@ export interface HulyCardProps {
 export function HulyCard({ title, text, visual, captionAt = "bottom", className }: HulyCardProps) {
   return (
     // Outer layer stays in the page's mode: it draws the pale halo around the dark card.
-    <div className={cn("rounded-[calc(var(--radius)+12px)] bg-card/70 p-1 shadow-[0_2px_24px_-8px_color-mix(in_oklab,var(--foreground)_12%,transparent)] lg:rounded-[calc(var(--radius)+22px)] lg:p-1.5", className)}>
+    <div className={cn("rounded-[calc(var(--radius)+11px)] bg-card/50 p-[3px] shadow-[0_2px_24px_-8px_color-mix(in_oklab,var(--foreground)_12%,transparent)] ring-1 ring-foreground/4 lg:rounded-[calc(var(--radius)+22px)] lg:p-1", className)}>
       <article className="dark relative isolate flex h-full min-h-56 flex-col overflow-hidden rounded-2xl bg-background text-foreground lg:rounded-[calc(var(--radius)+18px)]">
         {visual && <div className="absolute inset-0 -z-10">{visual}</div>}
         <p

@@ -68,7 +68,7 @@ export function HulyOffice({ title, text, call, lead, features, className }: Hul
           <div aria-hidden className="dark relative mt-8 aspect-[16/9] overflow-hidden rounded-xl bg-background text-foreground lg:mt-12 lg:rounded-2xl">
             <div className="absolute inset-0 bg-linear-to-br from-highlight/45 via-chart-4/20 to-glow/40" />
             <div className="absolute top-[-10%] left-[20%] h-[70%] w-[30%] rounded-full bg-foreground/25 blur-3xl" />
-            <Silhouette initials={call.speaker.initials} className="w-[34%] text-[clamp(0.75rem,3vw,2rem)]" />
+            <Silhouette initials={call.speaker.initials} className="left-[30%] w-[34%] text-[clamp(0.75rem,3vw,2rem)]" />
 
             <div className="absolute top-[5%] left-[3%]">
               <p className="text-sm font-semibold lg:text-xl">{call.title}</p>
@@ -95,7 +95,7 @@ export function HulyOffice({ title, text, call, lead, features, className }: Hul
               ))}
             </div>
 
-            <div className="absolute bottom-[4%] left-[39%] flex -translate-x-1/2 gap-1.5 lg:gap-3">
+            <div className="absolute bottom-[4%] left-1/2 flex -translate-x-1/2 gap-1.5 lg:gap-3">
               {controls.map((Icon, i) => (
                 <span
                   key={i}
@@ -122,7 +122,7 @@ export function HulyOffice({ title, text, call, lead, features, className }: Hul
                 <span className="flex size-10 items-center justify-center rounded-lg bg-linear-to-br from-glow/20 to-chart-3/10 text-glow">
                   <Icon className="size-6" strokeWidth={1.75} />
                 </span>
-                <h3 className="mt-3 text-[1.375rem] leading-none tracking-[-0.02em] text-balance lg:mt-4 lg:max-w-[8em] lg:text-[1.75rem]">{t}</h3>
+                <h3 className="mt-3 font-display text-[1.375rem] leading-none tracking-[-0.02em] text-balance lg:mt-4 lg:max-w-[8em] lg:text-[1.75rem]">{t}</h3>
                 <p className="mt-2 max-w-[17rem] text-[0.9375rem] leading-snug text-foreground/75 lg:mt-3 lg:text-base">{body}</p>
               </div>
             ))}
