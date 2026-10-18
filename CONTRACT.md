@@ -86,8 +86,8 @@ props change incompatibly). The build refuses otherwise.
 
 One `theme.css` per theme item, setting **every** token from `foundry-base` in `:root`
 (light) and every colour token in `.dark`. It may `@import` font packages
-(`@import "@fontsource-variable/inter";`). Recreated site `x` gets a theme named
-`x-theme` in `foundry/themes/x/`.
+(`@import "@fontsource-variable/inter";`). Recreated site `x` gets a theme item
+`x-theme` at `foundry/themes/x/x-theme/`, with `"site": "x"` so the gallery shows its blocks in it.
 
 ## Commands
 
