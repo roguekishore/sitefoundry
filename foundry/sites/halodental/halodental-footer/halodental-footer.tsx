@@ -86,38 +86,38 @@ export function HalodentalFooter({
           </div>
 
           {/* Middle technical wireframe diagram slot */}
-          <div aria-hidden className="relative my-10 flex items-center justify-center lg:my-8">
+          <div aria-hidden className="relative my-8 flex items-center justify-center lg:my-6">
             {diagram ?? (
               <>
                 {/* Desktop horizontal instrument wireframe */}
                 <div className="relative hidden h-72 w-full items-center justify-end pr-16 lg:flex">
                   {/* Concentric target rings around the mirror head */}
                   <div className="pointer-events-none absolute right-2 flex items-center justify-center">
-                    <div className="size-[26rem] rounded-full border border-border/15" />
-                    <div className="absolute size-[19.5rem] rounded-full border border-border/25" />
-                    <div className="absolute size-[13.5rem] rounded-full border border-border/35" />
+                    <div className="size-[26rem] rounded-full border border-border/25" />
+                    <div className="absolute size-[19.5rem] rounded-full border border-border/35" />
+                    <div className="absolute size-[13.5rem] rounded-full border border-border/50" />
                   </div>
 
                   {/* Horizontal probe body + tapered neck + circular mirror head */}
                   <div className="relative z-10 flex w-[68%] items-center">
                     {/* Handle shaft */}
-                    <div className="relative flex h-12 w-[52%] items-center rounded-l-full border border-border/65 bg-background px-6">
-                      <span className="h-full w-1.5 bg-foreground/85" />
+                    <div className="relative flex h-12 w-[52%] items-center rounded-l-full border border-foreground/70 bg-background px-6">
+                      <span className="h-full w-1.5 bg-foreground" />
                       <svg
                         viewBox="0 0 24 24"
-                        className="ml-4 size-3.5 fill-foreground/90"
+                        className="ml-4 size-4 fill-foreground"
                       >
                         <ellipse cx="9" cy="12" rx="6" ry="3" transform="rotate(-40 9 12)" />
                         <ellipse cx="15" cy="12" rx="6" ry="3" transform="rotate(-40 15 12)" />
                       </svg>
-                      <span className="ml-auto size-1.5 rounded-full bg-foreground/90" />
+                      <span className="ml-auto size-1.5 rounded-full bg-foreground" />
                     </div>
                     {/* Tapered neck */}
-                    <div className="h-7 flex-1 border-y border-border/55 bg-background" />
+                    <div className="h-6 flex-1 border-y border-foreground/65 bg-background" />
                     {/* Circular optical head */}
-                    <div className="relative -ml-1 flex size-24 shrink-0 items-center justify-center rounded-full border border-border/75 bg-background">
-                      <div className="flex size-20 items-center justify-end rounded-full border border-border/65 pr-3">
-                        <span className="size-2 rounded-full bg-foreground/90" />
+                    <div className="relative -ml-1 flex size-24 shrink-0 items-center justify-center rounded-full border border-foreground/80 bg-background">
+                      <div className="flex size-20 items-center justify-end rounded-full border border-foreground/75 pr-3">
+                        <span className="size-2 rounded-full bg-foreground" />
                       </div>
                     </div>
                   </div>
@@ -126,17 +126,17 @@ export function HalodentalFooter({
                 {/* Mobile vertical instrument wireframe */}
                 <div className="relative flex h-72 w-full flex-col items-center justify-end overflow-hidden lg:hidden">
                   <div className="pointer-events-none absolute top-4 flex items-center justify-center">
-                    <div className="size-72 rounded-full border border-border/15" />
-                    <div className="absolute size-52 rounded-full border border-border/25" />
-                    <div className="absolute size-36 rounded-full border border-border/35" />
+                    <div className="size-72 rounded-full border border-border/25" />
+                    <div className="absolute size-52 rounded-full border border-border/35" />
+                    <div className="absolute size-36 rounded-full border border-border/50" />
                   </div>
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="flex size-24 items-center justify-center rounded-full border border-border/75 bg-background">
-                      <div className="flex size-20 items-start justify-center rounded-full border border-border/65 pt-2.5">
-                        <span className="size-1.5 rounded-full bg-foreground/90" />
+                    <div className="flex size-24 items-center justify-center rounded-full border border-foreground/80 bg-background">
+                      <div className="flex size-20 items-start justify-center rounded-full border border-foreground/75 pt-2.5">
+                        <span className="size-1.5 rounded-full bg-foreground" />
                       </div>
                     </div>
-                    <div className="-mt-1 h-32 w-5 border-x border-border/55 bg-background" />
+                    <div className="-mt-1 h-32 w-5 border-x border-foreground/65 bg-background" />
                   </div>
                 </div>
               </>

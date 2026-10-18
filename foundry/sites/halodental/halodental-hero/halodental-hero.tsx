@@ -35,7 +35,7 @@ export function HalodentalHero({
     <section className={cn("px-1.5 pt-1.5 lg:px-2.5 lg:pt-2.5", className)}>
       <div
         className={cn(
-          "relative isolate flex min-h-[54rem] flex-col justify-end overflow-hidden rounded-lg bg-background text-foreground lg:min-h-[55.5rem]",
+          "relative isolate flex min-h-[51.75rem] flex-col justify-end overflow-hidden rounded-lg bg-background text-foreground lg:min-h-[55.25rem]",
           tone === "dark" && "dark",
         )}
       >
@@ -45,36 +45,58 @@ export function HalodentalHero({
           className="pointer-events-none absolute inset-0 -z-10 flex items-start justify-center overflow-hidden"
         >
           {media ?? (
-            <div className="relative flex h-[86%] w-[13.5rem] flex-col items-center sm:w-[16rem] lg:h-full lg:w-[22.5rem]">
-              {/* Anodised upper shaft with vertical studio highlight */}
-              <div className="relative flex w-full flex-1 items-center justify-center border-x border-border/20 bg-[linear-gradient(90deg,var(--card)_0%,var(--secondary)_28%,var(--foreground)_45%,var(--secondary)_64%,var(--card)_100%)] opacity-35">
+            <div className="relative flex h-[86%] w-[13.75rem] flex-col items-center sm:w-[16rem] lg:h-full lg:w-[22.75rem]">
+              {/* Anodised upper shaft with smooth cylindrical studio highlight */}
+              <div className="relative flex w-full flex-1 items-center justify-center border-x border-border/25 bg-[linear-gradient(90deg,var(--card)_0%,var(--secondary)_18%,var(--muted-foreground)_38%,var(--secondary)_62%,var(--card)_100%)] opacity-85">
+                {/* Top directional studio falloff */}
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,var(--background)_95%)] opacity-35" />
                 {/* Embossed double-oval emblem near the lower third of the upper shaft */}
-                <div className="mt-44 flex items-center justify-center opacity-45 lg:mt-48">
-                  <svg viewBox="0 0 88 56" className="h-16 w-auto stroke-foreground lg:h-20" fill="none" strokeWidth="2">
-                    <ellipse cx="29" cy="28" rx="22" ry="11" transform="rotate(-38 29 28)" />
-                    <ellipse cx="59" cy="28" rx="22" ry="11" transform="rotate(-38 59 28)" />
+                <div className="relative mt-44 flex items-center justify-center lg:mt-48">
+                  <svg
+                    viewBox="0 0 96 60"
+                    className="h-16 w-auto lg:h-20"
+                    fill="none"
+                  >
+                    <ellipse
+                      cx="33"
+                      cy="30"
+                      rx="24"
+                      ry="11.5"
+                      transform="rotate(-38 33 30)"
+                      className="fill-background/55 stroke-foreground/45"
+                      strokeWidth="2.25"
+                    />
+                    <ellipse
+                      cx="63"
+                      cy="30"
+                      rx="24"
+                      ry="11.5"
+                      transform="rotate(-38 63 30)"
+                      className="fill-background/55 stroke-foreground/45"
+                      strokeWidth="2.25"
+                    />
                   </svg>
                 </div>
               </div>
               {/* Matte light-diffuser collar */}
-              <div className="h-14 w-[96%] rounded-xs border-y border-border/40 bg-foreground/55 lg:h-20" />
+              <div className="h-14 w-[97%] rounded-xs border-y border-background/80 bg-[linear-gradient(90deg,var(--muted-foreground)_0%,var(--foreground)_42%,var(--muted-foreground)_100%)] opacity-65 lg:h-[4.75rem]" />
               {/* Lower rounded handle cap (visible on mobile, bleeds off bottom on desktop) */}
-              <div className="h-40 w-full rounded-b-[6.5rem] border-x border-b border-border/25 bg-[linear-gradient(90deg,var(--card)_0%,var(--secondary)_32%,var(--foreground)_46%,var(--secondary)_68%,var(--card)_100%)] opacity-35 lg:h-28 lg:rounded-b-none" />
+              <div className="h-44 w-full rounded-b-[7rem] border-x border-b border-border/25 bg-[linear-gradient(90deg,var(--card)_0%,var(--secondary)_22%,var(--muted-foreground)_40%,var(--secondary)_65%,var(--card)_100%)] opacity-85 lg:h-28 lg:rounded-b-none" />
             </div>
           )}
         </div>
 
         {/* Bottom foreground lockup */}
-        <div className="relative z-10 mx-auto flex w-full max-w-page flex-col justify-end px-4 pb-5 lg:px-8 lg:pb-3">
+        <div className="relative z-10 mx-auto flex w-full max-w-page flex-col justify-end px-4 pb-5 lg:px-8 lg:pb-2">
           {/* Desktop giant wordmark + right-aligned tagline */}
           <div className="hidden items-end justify-between lg:flex">
             <p
               aria-hidden
-              className="-ml-2 select-none font-display text-[17.5rem] font-normal leading-[0.78] tracking-[-0.045em] text-foreground xl:text-[19.5rem]"
+              className="-ml-2 select-none font-display text-[17.5rem] font-normal leading-[0.76] tracking-[-0.045em] text-foreground xl:text-[19.5rem]"
             >
               {displayWordmark}
             </p>
-            <h1 className="pb-2 pr-12 font-display text-[4rem] font-normal leading-none tracking-[-0.025em] text-foreground">
+            <h1 className="pb-2 pr-16 font-display text-[4rem] font-normal leading-none tracking-[-0.025em] text-foreground">
               {tagline}
             </h1>
           </div>

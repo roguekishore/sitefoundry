@@ -43,17 +43,17 @@ export function HalodentalMission({
           {title}
         </h2>
 
-        <div className="mt-10 flex flex-col items-start gap-8 sm:flex-row sm:items-end lg:mt-20 lg:gap-14">
+        <div className="mt-10 flex flex-col items-start gap-8 sm:flex-row sm:items-center lg:mt-20 lg:gap-14">
           {/* Square team portrait slot */}
-          <div className="mx-auto aspect-square w-48 shrink-0 overflow-hidden rounded-lg border border-border/25 bg-secondary sm:mx-0 lg:w-52">
+          <div className="mx-auto aspect-square w-44 shrink-0 overflow-hidden rounded-lg border border-border/30 bg-secondary sm:mx-0 lg:w-52">
             {media ?? (
-              <div className="relative flex size-full flex-col items-center justify-end overflow-hidden bg-[radial-gradient(circle_at_50%_25%,var(--foreground)_0%,var(--secondary)_70%)] p-4 opacity-80">
-                <div className="mb-auto flex w-full items-center justify-between opacity-30">
-                  <span className="h-2 w-10 rounded-xs bg-background" />
+              <div className="relative flex size-full flex-col items-center justify-end overflow-hidden bg-[linear-gradient(155deg,var(--foreground)_0%,var(--muted-foreground)_48%,var(--secondary)_100%)] p-4">
+                <div className="mb-auto flex w-full items-center justify-between opacity-35">
+                  <span className="h-1.5 w-10 rounded-xs bg-background" />
                   <span className="size-2 rounded-full bg-background" />
                 </div>
-                <Users aria-hidden className="mb-3 size-14 text-background/75" strokeWidth={1.25} />
-                <div className="h-2 w-2/3 rounded-full bg-background/40" />
+                <Users aria-hidden className="mb-3 size-14 text-background/85" strokeWidth={1.35} />
+                <div className="h-2 w-2/3 rounded-full bg-background/50" />
               </div>
             )}
           </div>
