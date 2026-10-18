@@ -64,6 +64,7 @@ const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
 const runName = smoke ? `smoke-${stamp}` : `${slug}-${stamp}`;
 const usageLog = join(RUNS, `${runName}.usage.jsonl`);
 const outputLog = join(RUNS, `${runName}.output.log`);
+const forwarderLog = join(RUNS, `${runName}.forwarder.log`); // connection problems, if any
 
 const say = (msg) => console.error(`[gemini-run] ${msg}`);
 const fail = (msg) => {
@@ -141,7 +142,29 @@ function record(path, status, body) {
   }
 }
 
+const note = (msg) => appendFileSync(forwarderLog, `${new Date().toISOString()} ${msg}\n`);
+let requestNo = 0;
+
+/** Google's error as the one JSON object the CLI's stream reader recognises: {"error": {code, status, message}}. */
+function errorObject(status, body) {
+  try {
+    const json = JSON.parse(body);
+    const error = (Array.isArray(json) ? json[0] : json)?.error;
+    if (error?.code) return JSON.stringify({ error });
+  } catch {
+    // not JSON; fall through
+  }
+  return JSON.stringify({ error: { code: status, status: "UNAVAILABLE", message: `gemini-run forwarder: ${body.slice(0, 300) || "no body"}` } });
+}
+
 const forwarder = http.createServer((req, res) => {
+  const no = ++requestNo;
+  const t0 = Date.now();
+  const reused = (req.socket.requestsServed = (req.socket.requestsServed ?? 0) + 1) > 1;
+  let sent = 0;
+  req.on("data", (c) => (sent += c.length));
+  req.on("error", (e) => note(`#${no} request error ${e.code ?? e.message} after ${Date.now() - t0} ms, ${sent} bytes in, reused socket: ${reused}`));
+
   // The CLI asks for /v1/publishers/...; Vertex's global endpoint wants /v1/projects/<p>/locations/global/publishers/...
   const path = req.url.replace(/^\/(v1[a-z0-9]*)\/publishers\//, `/$1/projects/${PROJECT}/locations/${LOCATION}/publishers/`);
   const headers = { ...req.headers };
@@ -151,25 +174,69 @@ const forwarder = http.createServer((req, res) => {
   delete headers["x-vertex-ai-llm-shared-request-type"]; // Standard tier only
   delete headers["x-vertex-ai-llm-request-type"];
 
-  const upstream = https.request({ host: "aiplatform.googleapis.com", path, method: req.method, headers }, (up) => {
-    // Connection-level headers belong to the Google connection, not to ours.
-    const { connection, "keep-alive": _keepAlive, "transfer-encoding": _te, ...upHeaders } = up.headers;
-    res.writeHead(up.statusCode, upHeaders);
+  // Streamed answers start at once. The CLI drops a request when no answer has begun within
+  // 60 s, and Argon can think for longer than that before Google sends anything. While waiting,
+  // a blank line every 20 s keeps the CLI's 5-minute idle limit from running out too; its stream
+  // reader skips blank lines between events.
+  const streaming = /:streamGenerateContent\b/.test(path) && /[?&]alt=sse\b/.test(path);
+  let atEventBoundary = true; // a blank line may only go between events, never inside one
+  let ping;
+  if (streaming) {
+    res.writeHead(200, { "content-type": "text/event-stream" });
+    ping = setInterval(() => atEventBoundary && res.write("\n"), 20e3);
+  }
+  const done = () => clearInterval(ping);
+
+  const onAnswer = (up) => {
     let body = "";
     up.setEncoding("utf8");
+    const failed = up.statusCode >= 400;
+    if (!streaming) {
+      // Connection-level headers belong to the Google connection, not to ours.
+      const { connection, "keep-alive": _keepAlive, "transfer-encoding": _te, ...upHeaders } = up.headers;
+      res.writeHead(up.statusCode, upHeaders);
+    }
     up.on("data", (chunk) => {
       body += chunk;
+      if (streaming && failed) return; // sent whole, as an error object, at the end
       res.write(chunk);
+      atEventBoundary = /\r?\n\r?\n$/.test(body);
     });
     up.on("end", () => {
-      res.end();
+      done();
+      if (streaming && failed) {
+        note(`#${no} Google answered ${up.statusCode} after ${Date.now() - t0} ms: ${body.slice(0, 200).replace(/\s+/g, " ")}`);
+        res.end(errorObject(up.statusCode, body));
+      } else {
+        res.end();
+      }
       record(path, up.statusCode, body);
     });
-  });
+  };
+  // Test only: GEMINI_RUN_TEST_DELAY_MS holds back Google's first answer, to imitate a long think.
+  const delay = no === 1 ? Number(process.env.GEMINI_RUN_TEST_DELAY_MS ?? 0) : 0;
+  const upstream = https.request({ host: "aiplatform.googleapis.com", path, method: req.method, headers }, (up) =>
+    delay ? setTimeout(() => onAnswer(up), delay) : onAnswer(up),
+  );
   upstream.on("error", (e) => {
+    done();
     totals.errors++;
-    res.writeHead(502, { "content-type": "application/json" });
-    res.end(JSON.stringify({ error: { code: 502, message: `gemini-run forwarder: ${e.message}` } }));
+    note(`#${no} Google connection error ${e.code ?? e.message} after ${Date.now() - t0} ms, ${sent} bytes in`);
+    if (!res.headersSent) {
+      res.writeHead(502, { "content-type": "application/json" });
+      res.end(errorObject(502, e.message));
+    } else if (atEventBoundary) {
+      res.end(errorObject(503, e.message)); // the CLI retries a 503
+    } else {
+      res.destroy(e);
+    }
+  });
+  res.on("close", () => {
+    done();
+    if (!res.writableFinished) {
+      note(`#${no} the CLI closed the answer before it finished, after ${Date.now() - t0} ms, reused socket: ${reused}`);
+      upstream.destroy();
+    }
   });
   req.pipe(upstream);
 });
@@ -178,6 +245,12 @@ const forwarder = http.createServer((req, res) => {
 forwarder.keepAliveTimeout = 3600e3;
 forwarder.headersTimeout = 3601e3;
 forwarder.requestTimeout = 0;
+// Requests Node rejects before they reach the handler (bad headers, resets) end up here.
+forwarder.on("clientError", (e, socket) => {
+  // ECONNRESET is the CLI closing its idle connection on exit: normal.
+  if (e.code !== "ECONNRESET") note(`client error ${e.code ?? e.message} (${e.bytesParsed ?? "?"} bytes parsed)`);
+  socket.destroy();
+});
 await new Promise((ok) => forwarder.listen(0, "127.0.0.1", ok));
 const forwarderUrl = `http://127.0.0.1:${forwarder.address().port}`;
 
@@ -231,6 +304,7 @@ function summary(extra = "") {
     extra,
     `logs          ${usageLog}`,
     `              ${outputLog}`,
+    existsSync(forwarderLog) ? `              ${forwarderLog}` : "",
   ];
   console.error(lines.filter((l) => l !== "").join("\n"));
   writeFileSync(join(RUNS, `${runName}.summary.json`), JSON.stringify({ model, url, slug, ...totals }, null, 2));
@@ -300,6 +374,7 @@ Differences from the skill, because this run is unattended:
 - The gallery is already running at http://localhost:${GALLERY_PORT}. Do not start another one. Wherever the skill says localhost:4400, use localhost:${GALLERY_PORT}.
 - Look at the screenshots by reading the PNG files with your file-reading tool.
 - This folder is a git worktree on branch ${branch}. Commit as the skill says. Never push, switch branches, or touch files outside this folder.
+- Never change git configuration (no \`git config\`): it is shared with the main repo. If a commit fails, report the error instead.
 - Finish with the skill's report.`;
 
 const started = Date.now();
