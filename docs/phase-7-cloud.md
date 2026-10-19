@@ -115,28 +115,35 @@ Left behind by these tests (delete when no longer useful): worktrees `claude-smo
 `gemini-smoke-gemini`, `claude-smoke-stop` in `D:\PROJECTS\SITEFOUNDRY-runs`, their branches
 (`claude/smoke-claude`, `gemini/smoke-gemini`, `claude/smoke-stop`), database `%TEMP%\foundry-test`.
 
-## Step C — infrastructure (Terraform in `infra/`): **TODO**
+## Step C — infrastructure (Terraform in `infra/`): **BUILT** (validated; not applied)
 
-Warden's rules apply here too (AWS-COMMAND-CENTER `CLAUDE.md`, `docs/LESSONS.md`): Terraform,
-never CloudFormation; changes go through a **saved plan the operator applies** (`! terraform
-apply tfplan`); root keys stay on the laptop (`~/Downloads/<account>.csv` pattern, see
-`terraform/bootstrap.sh` there); **never run `aws` bare** (the laptop's default profile is the
-unrelated work account `desk365`); never create an AWS Organization.
+How to plan and apply, and the rules: [`infra/README.md`](../infra/README.md). Warden's rules
+apply (AWS-COMMAND-CENTER `CLAUDE.md`, `docs/LESSONS.md`): Terraform, never CloudFormation;
+a **saved plan the operator makes and applies**; jk's root keys only from `~/Downloads/jk.csv`
+via `infra/bootstrap.sh`; **never run `aws` bare** (the default profile is the work account
+`desk365`); never create an AWS Organization.
 
-- VPC (e.g. 10.20.0.0/16), one public subnet in `ap-south-1a`, internet gateway, no NAT, no peering.
-- Preview: t4g.small, Amazon Linux 2023 arm64, fixed private IP (e.g. 10.20.0.10), EIP, root gp3 ~20 GB.
-  SG: 80/443 from anywhere; nothing else inbound (SSM for access, no SSH).
-- Run: t4g.large, fixed private IP (e.g. 10.20.0.20), `associate_public_ip_address = true`,
-  root gp3 ~40 GB, `credit_specification { cpu_credits = "standard" }`,
-  `instance_initiated_shutdown_behavior = "stop"`. SG: 4410 from the preview SG only.
-- Preview's SG must allow its outbound to the run instance; the run SG allows 4401 outbound to preview.
-- IAM: both get `AmazonSSMManagedInstanceCore` plus warden's outpost profile if warden needs it
-  (check how `./w account add` sets up `WardenOutpost`). Preview role: `ec2:StartInstances`,
-  `ec2:StopInstances` on the run instance's ARN only, `ec2:DescribeInstances` (no resource-level).
-- Tags on both instances (and the EIP, VPC): `warden:app = foundry`.
-- DNS: the user's domain is not chosen yet (proposed `foundry.themaverick.tech` +
-  `live.foundry.themaverick.tech`). Ask.
-- Warden must have `jk` (it does: in v2 since 2026-10-11).
+The user's answers (2026-10-19): the domain is **`foundry.themaverick.tech`** +
+**`live.foundry.themaverick.tech`**; DNS is in **Netlify, by hand** (Terraform makes no records;
+`terraform output dns_records` prints the two A records to add).
+
+What it creates, all tagged `warden:app = foundry`:
+
+- VPC `10.20.0.0/16`, public subnet `10.20.0.0/24` in `ap-south-1a`, internet gateway, no NAT, no peering.
+- Preview: t4g.small, AL2023 arm64, `10.20.0.10`, Elastic IP, gp3 20 GB encrypted, IMDSv2 only.
+  SG `foundry-preview`: 80/443 from anywhere, 4401 from the run SG; no SSH.
+- Run: t4g.large, `10.20.0.20`, auto-assigned public IP, gp3 40 GB encrypted, standard credits,
+  shutdown = stop, IMDSv2 only. SG `foundry-run`: 4410 from the preview SG only.
+- IAM: `FoundryPreview` (`AmazonSSMManagedInstanceCore` + `FoundryRunSwitch`: start/stop on the
+  run instance's ARN, `DescribeInstances`), `FoundryRun` (SSM only). Each instance has its own
+  profile with SSM in it, which is all warden's install button needs (DESIGN §9, case 2);
+  `WardenOutpost` is not used.
+- AMI and user-data are ignored after creation (a new AMI must not replace the preview);
+  Terraform does not hold the run instance's on/off state (the server switches it). The run
+  instance is running when created; step D provisions it then.
+
+Left for the operator: `./bootstrap.sh init`, plan, read, apply, `rm -f tfplan`, then the two A
+records in Netlify. Warden already has `jk` (v2 since 2026-10-11).
 
 ## Step D — provisioning both instances: **TODO**
 
