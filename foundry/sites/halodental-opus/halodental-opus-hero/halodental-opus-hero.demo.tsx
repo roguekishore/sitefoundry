@@ -2,7 +2,7 @@
 import { HalodentalOpusHero, type HalodentalOpusHeroProps } from "./halodental-opus-hero";
 
 export const heroSample: HalodentalOpusHeroProps = {
-  wordmark: "Lumen",
+  wordmark: "Lumo",
   tagline: "Smile Brighter",
   video: { label: "Watch the film", href: "#" },
 };

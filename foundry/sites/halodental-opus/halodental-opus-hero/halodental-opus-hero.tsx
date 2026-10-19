@@ -24,7 +24,7 @@ export interface HalodentalOpusHeroProps {
  */
 export function HalodentalOpusHero({ wordmark, tagline, video, media, className }: HalodentalOpusHeroProps) {
   return (
-    <section className={cn("p-1.5 lg:p-2.5", className)}>
+    <section className={cn("font-[450] p-1.5 lg:p-2.5", className)}>
       <div className="dark relative isolate flex h-[calc(100svh-0.75rem)] min-h-[36rem] flex-col justify-end overflow-hidden rounded-lg bg-card text-card-foreground lg:h-[calc(100svh-1.25rem)] lg:min-h-[44rem]">
         <div className="absolute inset-0 -z-10">
           {media ?? (
@@ -35,7 +35,7 @@ export function HalodentalOpusHero({ wordmark, tagline, video, media, className 
 
         <div className="grid grid-cols-1 gap-x-5 px-[calc(var(--page-gutter)-0.375rem)] pb-3 lg:grid-cols-12 lg:items-end lg:px-[calc(var(--page-gutter)-0.625rem)] lg:pb-5">
           {wordmark && (
-            <p aria-hidden className="hidden font-display text-[17.5rem] leading-[0.74] tracking-[-0.045em] lg:col-span-7 lg:block lg:pb-1.5">
+            <p aria-hidden className="hidden overflow-hidden font-display text-[min(17.5rem,19vw)] leading-[0.74] tracking-[-0.045em] whitespace-nowrap lg:col-span-7 lg:block lg:pb-1.5">
               {wordmark}
             </p>
           )}

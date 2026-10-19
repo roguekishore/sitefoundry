@@ -12,16 +12,16 @@ export const newsSample: HalodentalOpusNewsProps = {
       linkLabel: "Read: A scope that lets patients see what you see",
     },
     {
-      title: "Lumen: small tool, big picture",
+      title: "Lumo: small tool, big picture",
       text: "A long read on how one of the oldest instruments in the clinic got a camera, a light and a wireless link, and what that changes for everyday checkups.",
       href: "#",
-      linkLabel: "Read: Lumen: small tool, big picture",
+      linkLabel: "Read: Lumo: small tool, big picture",
     },
     {
-      title: "Lumen Oral Devices picks up a design prize for the Beacon",
+      title: "Lumo Oral Devices picks up a design prize for the Beacon",
       text: "The team behind the Beacon has been recognised by an international design jury for the scope's slim form and its single-gesture controls.",
       href: "#",
-      linkLabel: "Read: Lumen Oral Devices picks up a design prize",
+      linkLabel: "Read: Lumo Oral Devices picks up a design prize",
     },
     {
       title: "Why the next clinic upgrade fits in your hand",

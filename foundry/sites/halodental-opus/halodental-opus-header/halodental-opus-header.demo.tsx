@@ -3,7 +3,7 @@ import { Accessibility, Orbit } from "lucide-react";
 import { HalodentalOpusHeader, type HalodentalOpusHeaderProps } from "./halodental-opus-header";
 
 export const headerSample: HalodentalOpusHeaderProps = {
-  brand: { name: "Lumen", href: "#", emblem: <Orbit aria-hidden strokeWidth={2.25} /> },
+  brand: { name: "Lumo", href: "#", emblem: <Orbit aria-hidden strokeWidth={2.25} /> },
   links: [
     { label: "The Beacon", href: "#" },
     { label: "How it works", href: "#" },

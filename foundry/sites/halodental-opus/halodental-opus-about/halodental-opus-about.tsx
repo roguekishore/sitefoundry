@@ -23,7 +23,7 @@ export interface HalodentalOpusAboutProps {
  */
 export function HalodentalOpusAbout({ title, text, cta, media, className }: HalodentalOpusAboutProps) {
   return (
-    <section className={cn("dark bg-card py-section text-card-foreground", className)}>
+    <section className={cn("font-[450] dark bg-card py-section text-card-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <HalodentalOpusHeading title={title} size="mega" gradient className="max-w-[40rem]" />
 

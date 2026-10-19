@@ -40,7 +40,7 @@ export interface HalodentalOpusFooterProps {
  */
 export function HalodentalOpusFooter({ groups, secondary, primary, legal = [], copyright, media, className }: HalodentalOpusFooterProps) {
   return (
-    <footer className={cn("p-1.5 lg:p-2.5", className)}>
+    <footer className={cn("font-[450] p-1.5 lg:p-2.5", className)}>
       <div className="dark relative isolate flex flex-col overflow-hidden rounded-lg bg-card px-[calc(var(--page-gutter)-0.375rem)] pt-[1.875rem] pb-6 text-card-foreground lg:min-h-[29.875rem] lg:px-[calc(var(--page-gutter)-0.625rem)] lg:pb-[1.375rem]">
         <div className="grid grid-cols-2 gap-x-5 gap-y-9 lg:grid-cols-12">
           {groups.map((g) => (
@@ -49,7 +49,7 @@ export function HalodentalOpusFooter({ groups, secondary, primary, legal = [], c
               <ul className="mt-2 lg:mt-3">
                 {g.links.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className="text-base leading-[1.8] transition-opacity hover:opacity-70 motion-reduce:transition-none lg:text-[1.0625rem]">
+                    <a href={l.href} className="text-base leading-[1.8] transition-opacity hover:opacity-70 motion-reduce:transition-none">
                       {l.label}
                     </a>
                   </li>
@@ -59,7 +59,7 @@ export function HalodentalOpusFooter({ groups, secondary, primary, legal = [], c
           ))}
 
           {(secondary || primary) && (
-            <div className="col-span-2 mt-12 flex flex-col items-start gap-2.5 lg:col-span-6 lg:col-start-7 lg:mt-0 lg:flex-row lg:justify-end">
+            <div className="col-span-2 mt-6 flex flex-col items-start gap-2.5 lg:col-span-6 lg:col-start-7 lg:mt-0 lg:flex-row lg:justify-end">
               {secondary && (
                 <HalodentalOpusButton variant="outline" href={secondary.href} className="lg:h-[2.625rem]">
                   {secondary.label}
@@ -79,7 +79,7 @@ export function HalodentalOpusFooter({ groups, secondary, primary, legal = [], c
           </div>
         </div>
 
-        <div className="relative mt-auto flex flex-col items-center gap-3 pt-4 text-xs leading-[1.5] text-muted-foreground lg:flex-row lg:justify-between">
+        <div className="relative mt-auto flex flex-col items-center gap-3 pt-4 text-center text-xs leading-[1.5] text-muted-foreground lg:flex-row lg:justify-between">
           <ul className="flex gap-5 lg:gap-10">
             {legal.map((l) => (
               <li key={l.label}>

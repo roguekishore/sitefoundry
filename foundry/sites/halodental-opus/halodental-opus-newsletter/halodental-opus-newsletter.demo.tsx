@@ -6,7 +6,7 @@ export const newsletterSample: HalodentalOpusNewsletterProps = {
   email: { label: "*Your email" },
   consent: (
     <>
-      Yes, send me the Lumen newsletter. I agree that Lumen may use my details as set out in the <a href="#">privacy notice</a> and the{" "}
+      Yes, send me the Lumo newsletter. I agree that Lumo may use my details as set out in the <a href="#">privacy notice</a> and the{" "}
       <a href="#">site terms</a>.
     </>
   ),

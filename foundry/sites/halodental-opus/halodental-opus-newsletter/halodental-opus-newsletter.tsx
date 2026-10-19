@@ -24,7 +24,7 @@ export interface HalodentalOpusNewsletterProps {
  */
 export function HalodentalOpusNewsletter({ title, email, consent, submit, action, className }: HalodentalOpusNewsletterProps) {
   return (
-    <section className={cn("bg-card py-section text-card-foreground", className)}>
+    <section className={cn("font-[450] bg-card py-section text-card-foreground", className)}>
       <div className="mx-auto grid max-w-page grid-cols-1 gap-x-5 gap-y-5 px-gutter lg:grid-cols-12">
         <HalodentalOpusHeading title={title} className="lg:col-span-8 lg:max-w-[48rem]" />
 

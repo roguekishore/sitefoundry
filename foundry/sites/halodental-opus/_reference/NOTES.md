@@ -91,4 +91,4 @@ Components: `halodental-opus-button` (orange / light / outline / tile / ghost-sq
 - The original's gallery is a swiper; ours is static (first slide active) to stay JS-free.
 - Phone "about" band in the original has ~250px of empty space under the button (left over
   from a scroll animation); ours uses normal section padding.
-- All copy is for a fictional company, "Lumen Oral Devices", and its product "the Beacon".
+- All copy is for a fictional company, "Lumo Oral Devices", and its product "the Beacon".

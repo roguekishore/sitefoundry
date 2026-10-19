@@ -13,7 +13,7 @@ export const footerSample: HalodentalOpusFooterProps = {
     { label: "Site terms", href: "#" },
     { label: "Privacy notice", href: "#" },
   ],
-  copyright: "© 2026 Lumen Oral Devices, a fictional company. All rights reserved.",
+  copyright: "© 2026 Lumo Oral Devices, a fictional company. All rights reserved.",
 };
 
 export default function Demo() {
