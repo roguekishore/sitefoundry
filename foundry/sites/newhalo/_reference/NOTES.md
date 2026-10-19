@@ -1,6 +1,6 @@
 # Newhalo: design notes (recreating halodental.com, all pages)
 
-Fictional brand: **Lumora**, maker of "Lumen One", a lit, camera-carrying dental instrument.
+Fictional brand: **Brio**, maker of "Lumen One", a lit, camera-carrying dental instrument.
 Copy is ours; no logos (lucide icon + plain wordmark), partner and press names are made up.
 
 ## Design language

@@ -12,13 +12,13 @@ export const newsSample: NewhaloNewsProps = {
       linkLabel: "Read the article in The Chairside",
     },
     {
-      title: "Lumora: the mirror, reconsidered",
+      title: "Brio: the mirror, reconsidered",
       excerpt: "A century-old instrument gets a sensor, a ring of light and a wireless link, and becomes the dentist's most useful screen.",
       href: "#2",
       linkLabel: "Read the article in Northern Ledger",
     },
     {
-      title: "Lumora takes the Formfield design prize for its smart mirror",
+      title: "Brio takes the Formfield design prize for its smart mirror",
       excerpt: "The jury praised the instrument's balance, its heated glass and how quietly it fits into an existing practice.",
       href: "#3",
       linkLabel: "Read the article in Formfield Weekly",
@@ -30,7 +30,7 @@ export const newsSample: NewhaloNewsProps = {
       linkLabel: "Read the article in Clinic Review",
     },
     {
-      title: "Lumora opens its first pilot clinics",
+      title: "Brio opens its first pilot clinics",
       excerpt: "Twelve practices across three countries will use the mirror daily and feed back on everything from grip to battery life.",
       href: "#5",
       linkLabel: "Read the article in The Chairside",

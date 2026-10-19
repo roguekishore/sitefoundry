@@ -40,7 +40,7 @@ export function NewhaloFooter({ groups, ctas, legal, copyright, art, className }
             {groups.map((g, i) => (
               <div key={g.title} className={cn("lg:w-[14.4rem]", newhaloReveal("fade"))} style={newhaloRevealStyle(i)}>
                 <h2 className="font-display text-[1.56rem] leading-[1.1] lg:text-[1.75rem]">{g.title}</h2>
-                <ul className={cn("mt-3 space-y-2", i === 2 ? "text-lg lg:text-base" : "text-base")}>
+                <ul className={cn("mt-3 space-y-1.5", i === 2 ? "text-lg lg:text-base" : "text-base")}>
                   {g.links.map((l) => (
                     <li key={l.label}>
                       <a href={l.href} className="transition-colors duration-300 hover:text-primary">
@@ -60,7 +60,7 @@ export function NewhaloFooter({ groups, ctas, legal, copyright, art, className }
 
         <NewhaloMedia
           tone="glow"
-          className={cn("mx-auto my-10 aspect-square w-full max-w-[19rem] lg:absolute lg:inset-x-[32%] lg:top-[30%] lg:my-0 lg:aspect-[4] lg:w-auto lg:max-w-none", newhaloReveal("rise"))}
+          className={cn("mx-auto my-10 aspect-square w-full max-w-[19rem] lg:absolute lg:top-[36%] lg:right-[10%] lg:left-[32%] lg:my-0 lg:aspect-[4] lg:w-auto lg:max-w-none", newhaloReveal("rise"))}
         >
           {art}
         </NewhaloMedia>

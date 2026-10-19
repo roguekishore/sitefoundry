@@ -1,4 +1,4 @@
-// The Lumora landing page (recreating halodental.com's design), built only from this site's
+// The Brio landing page (recreating halodental.com's design), built only from this site's
 // blocks with each block's demo content. Light is the faithful mode.
 import { NewhaloFooter } from "@foundry/newhalo-footer";
 import { NewhaloHeader } from "@foundry/newhalo-header";

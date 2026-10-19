@@ -4,8 +4,8 @@ import { cn } from "@foundry/foundry-utils";
 export interface NewhaloMediaProps {
   /** the real image or video; it is cropped to the frame like object-fit: cover. Empty shows the placeholder. */
   children?: ReactNode;
-  /** placeholder surface: muted (a quiet token-coloured panel) or glow (a soft highlight-to-glow wash, for art slots) */
-  tone?: "muted" | "glow";
+  /** placeholder surface: muted (a quiet token-coloured panel), deep (the darker card colour), glow (a soft highlight-to-glow wash, for art slots) or warm (a full highlight-to-glow gradient, for orange photography) */
+  tone?: "muted" | "deep" | "glow" | "warm";
   /** size, aspect ratio and radius of the frame, e.g. "aspect-square rounded-lg" */
   className?: string;
   /** classes for the inner layer, e.g. a scroll-driven parallax class */
@@ -22,7 +22,7 @@ export function NewhaloMedia({ children, tone = "muted", className, innerClassNa
       <div
         className={cn(
           "absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover",
-          !children && (tone === "glow" ? "bg-radial from-glow/25 via-highlight/10 to-transparent" : "bg-muted"),
+          !children && { muted: "bg-muted", deep: "bg-card", glow: "bg-radial from-glow/25 via-highlight/10 to-transparent", warm: "bg-linear-to-r from-highlight to-glow" }[tone],
           innerClassName,
         )}
       >
