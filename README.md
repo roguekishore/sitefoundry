@@ -22,11 +22,20 @@ Optional, to type `foundry` anywhere instead of `node D:/PROJECTS/SITEFOUNDRY/pa
 pnpm gallery             # http://localhost:4400
 ```
 
-Every block, theme and recreated site. Switch device width (360–1280), theme (each block's
-own, base defaults, or any theme) and light/dark; each item shows its props, code, details
-and its install command. A recreated site plays in a real device screen (scroll inside it,
-so full-screen sections and scroll effects behave), with a tab for each extra page
-(`foundry/sites/<site>/pages/<name>.tsx`).
+Two kinds of thing, two entry points (layout: `docs/mockups/gallery-redesign.html`):
+
+- **Sites** open the site viewer: the site in a browser window at phone, tablet or desktop
+  width, every page (`foundry/sites/<site>/pages/<name>.tsx`) with working links between
+  them, and the block behind each section (hover to outline it, click to see its props and
+  install command; turn **Inspect** off to use the site's own buttons). Full screen shows
+  the site alone.
+- **Items** (blocks, components, themes) are browsed with type tabs and combinable facets
+  (source, site, category, needs JS), all kept in the URL. Each item page has one live
+  preview (device, theme, light/dark), its props, code and details, and where it's used.
+
+Ctrl K (or `/`) jumps to any site, page or item. Lists show still thumbnails, not live
+previews: `pnpm build:thumbs` makes them (only what changed), and anything not shot yet
+shows a placeholder.
 
 ## Use blocks in a customer project
 
