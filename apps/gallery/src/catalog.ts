@@ -14,7 +14,9 @@ const themeFiles = import.meta.glob<string>(
   ["../../../foundry/**/theme.css", "../../../vault/**/theme.css", "!**/_*/**", "!**/node_modules/**"],
   { query: "?inline", import: "default" },
 );
+// A site's landing page is page.tsx; any other pages it has are pages/<name>.tsx.
 const sitePages = import.meta.glob<{ default: ComponentType }>("../../../foundry/sites/*/page.tsx");
+const otherPages = import.meta.glob<{ default: ComponentType }>("../../../foundry/sites/*/pages/*.tsx");
 
 export interface Item {
   name: string;
@@ -53,8 +55,17 @@ export async function loadDemo(name: string): Promise<ComponentType | undefined>
   return load ? (await load()).default : undefined;
 }
 
-export async function loadSitePage(site: string): Promise<ComponentType | undefined> {
-  const load = sitePages[`../../../foundry/sites/${site}/page.tsx`];
+/** The pages a site has besides its landing page, e.g. ["about", "pricing"]. */
+export function sitePageNames(site: string): string[] {
+  return Object.keys(otherPages)
+    .map((key) => key.match(new RegExp(`sites/${site}/pages/([^/]+)\\.tsx$`))?.[1])
+    .filter((p): p is string => !!p)
+    .sort();
+}
+
+/** The landing page, or with `page` one of the site's other pages. */
+export async function loadSitePage(site: string, page?: string | null): Promise<ComponentType | undefined> {
+  const load = page ? otherPages[`../../../foundry/sites/${site}/pages/${page}.tsx`] : sitePages[`../../../foundry/sites/${site}/page.tsx`];
   return load ? (await load()).default : undefined;
 }
 
