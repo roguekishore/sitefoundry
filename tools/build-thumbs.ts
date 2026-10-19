@@ -1,16 +1,16 @@
 // Screenshots every item demo, theme specimen and site page for the gallery's thumbnails, so the
 // gallery can show still images instead of a live preview per card.
 //
-//   pnpm build:thumbs                       only what changed since the last run
-//   pnpm build:thumbs --force               everything again
+//   pnpm build:thumbs                       only what has no thumbnail yet (new, failed, or files gone)
+//   pnpm build:thumbs --force               everything again (with --only: just those)
 //   pnpm build:thumbs --only newhalo,aurora names containing any of these words
 //   pnpm build:thumbs --url http://localhost:4400   use a gallery that is already running
 //   pnpm build:thumbs --concurrency 6 --settle 1500 --no-sites --no-items
 //
 // Out: public/thumbs/items/<name>/<variant>.jpg, public/thumbs/sites/<site>/<page>/<variant>.jpg
 // and public/thumbs/manifest.json. Variants: desktop-light, desktop-dark, phone-light, phone-dark.
-// Each item is shot in its own theme (as the gallery's "own theme" shows it). A thing is shot again
-// only when its files, the files of the items it uses, its theme or the base styles change.
+// Each item is shot in its own theme (as the gallery's "own theme" shows it). A thing that already has
+// its thumbnails is left alone, even if its code changed since: only --force shoots it again.
 // The manifest is saved after every item, so stopping halfway (Ctrl+C) keeps what was done.
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
@@ -314,8 +314,13 @@ async function main() {
     }
   }
 
-  const todo = jobs.filter((j) => opts.force || manifest.entries[j.key]?.hash !== j.hash || manifest.entries[j.key]?.error);
-  log(`${jobs.length} things to show · ${jobs.length - todo.length} unchanged · ${todo.length} to shoot (${todo.length * VARIANTS.length} screenshots)`);
+  // already shot = has a manifest entry without an error, and its image files are still on disk
+  const hasThumbs = (key: string) => {
+    const e = manifest.entries[key];
+    return !!e && !e.error && Object.values(e.shots).every((s) => existsSync(join(OUT, s.file)));
+  };
+  const todo = jobs.filter((j) => opts.force || !hasThumbs(j.key));
+  log(`${jobs.length} things to show · ${jobs.length - todo.length} already shot · ${todo.length} to shoot (${todo.length * VARIANTS.length} screenshots)`);
   if (!todo.length) {
     await saveManifest(manifest);
     return;
