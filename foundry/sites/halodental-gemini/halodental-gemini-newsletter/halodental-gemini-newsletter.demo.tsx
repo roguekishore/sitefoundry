@@ -1,0 +1,16 @@
+import { HalodentalGeminiNewsletter, type HalodentalGeminiNewsletterProps } from "./halodental-gemini-newsletter";
+
+export const newsletterSample: HalodentalGeminiNewsletterProps = {
+  title: "Stay connected with our team and clinical trials.",
+  emailLabel: "*Email address",
+  consentLead:
+    "By subscribing to dispatches, I agree to Velo Optics processing my personal data in accordance with the",
+  privacyLink: { label: "privacy notice", href: "#privacy" },
+  consentMiddle: "and",
+  termsLink: { label: "terms of service", href: "#terms" },
+  submitLabel: "Keep me posted",
+};
+
+export default function Demo() {
+  return <HalodentalGeminiNewsletter {...newsletterSample} />;
+}

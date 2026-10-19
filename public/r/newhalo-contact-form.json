@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo contact form",
+  "description": "A contact section on paper: a 64px heading over a column of outlined fields with labels set into their borders (text, select, email, phone, message), a consent checkbox and a send button that stays greyed out until the form is valid; on the right a tall white card with a 32px prompt and a full-width orange button. Fields fade in one by one; the card rises in.",
+  "category": "contact",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "light",
+    "card",
+    "outline",
+    "reveal"
+  ],
+  "notes": [
+    "no JavaScript: the button's disabled look is CSS (:has(:invalid))"
+  ],
+  "entry": "newhalo-contact-form.tsx",
+  "source": "foundry",
+  "name": "newhalo-contact-form",
+  "files": [
+    {
+      "path": "newhalo-contact-form.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloField, type NewhaloFieldProps } from \"@foundry/newhalo-field\";\nimport { newhaloReveal, newhaloRevealStyle } from \"@foundry/newhalo-reveal\";\n\nexport interface NewhaloContactFormProps {\n  /** the 64px heading above the form */\n  title: string;\n  /** the form fields, top to bottom */\n  fields: NewhaloFieldProps[];\n  /** the consent sentence beside the checkbox (may contain links) */\n  consent: ReactNode;\n  /** the submit button's label; greyed out until the form is valid */\n  submitLabel: string;\n  /** where the form posts */\n  action?: string;\n  /** the white card on the right: a 32px line and a full-width orange button */\n  card?: { title: string; cta: { label: string; href: string } };\n  className?: string;\n}\n\n/**\n * A contact section on paper: a big heading and a column of outlined fields on the left, a\n * tall white card with a prompt and a full-width orange button on the right.\n */\nexport function NewhaloContactForm({ title, fields, consent, submitLabel, action, card, className }: NewhaloContactFormProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-y-12 px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"lg:col-span-5\">\n          <h2 className=\"max-w-[24rem] font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\">{title}</h2>\n          <form action={action} className=\"group/form mt-9 grid gap-[2.6rem] lg:mt-12\">\n            {fields.map((f, i) => (\n              <div key={f.name} className={newhaloReveal(\"fade\")} style={newhaloRevealStyle(i)}>\n                <NewhaloField {...f} />\n              </div>\n            ))}\n            <label className={cn(\"-mt-4 flex items-start gap-4 text-sm leading-normal lg:text-base [&_a]:underline [&_a]:underline-offset-2\", newhaloReveal(\"fade\"))}>\n              <input type=\"checkbox\" required className=\"mt-1 size-5 shrink-0 appearance-none rounded-sm border border-input checked:border-primary checked:bg-primary\" />\n              <span>{consent}</span>\n            </label>\n            <NewhaloButton\n              label={submitLabel}\n              type=\"submit\"\n              className=\"-mt-2 justify-self-start group-has-[:invalid]/form:pointer-events-none group-has-[:invalid]/form:bg-foreground/5 group-has-[:invalid]/form:text-foreground/30\"\n            />\n          </form>\n        </div>\n        {card && (\n          <div className={cn(\"flex min-h-60 flex-col justify-between gap-10 rounded-lg bg-card p-gutter text-card-foreground lg:col-span-3 lg:col-start-10 lg:min-h-[25rem] lg:self-start lg:p-5\", newhaloReveal(\"rise\"))}>\n            <p className=\"font-display text-[1.56rem] leading-[1.1] lg:text-[2rem]\">{card.title}</p>\n            <NewhaloButton label={card.cta.label} href={card.cta.href} block />\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-field",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 64px heading above the form"
+    },
+    {
+      "name": "fields",
+      "type": "NewhaloFieldProps[]",
+      "required": true,
+      "description": "the form fields, top to bottom"
+    },
+    {
+      "name": "consent",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the consent sentence beside the checkbox (may contain links)"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the submit button's label; greyed out until the form is valid"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "card",
+      "type": "{ title: string; cta: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the white card on the right: a 32px line and a full-width orange button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b3ffdba30f46306382e358a5d7c15ce6b8b6bdff4e0237a7212445217e9e47ad"
+}
