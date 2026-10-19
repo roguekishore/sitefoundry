@@ -7,6 +7,8 @@ import { test } from "node:test";
 import { hashPassphrase, totp } from "./auth.ts";
 import { Db } from "./db.ts";
 import { costOf } from "./prices.ts";
+import { claudeStream } from "./runner/claude.ts";
+import type { Call } from "./shared.ts";
 
 test("TOTP matches RFC 6238's SHA-1 test vector", () => {
   // The RFC's secret "12345678901234567890" in base32; at 59 s the 8-digit code is 94287082.
@@ -56,4 +58,50 @@ test("runs: claim takes the oldest queued run once, totals add up from calls", (
   assert.equal(second.text, "two");
   db.sql.close();
   rmSync(dir, { recursive: true, force: true });
+});
+
+test("Claude: a call's tokens come from the stream's message_delta, not the assistant events", () => {
+  // Cut down from a real `claude -p --output-format stream-json --verbose --include-partial-messages`
+  // (2.1.286): the assistant events say 3 and 1 output tokens, the deltas 324 and 234, and the
+  // result's own total was 558. A subagent's call (parent_tool_use_id) streams in between.
+  const start = (id: string, input: number, cached: number, written: number, parent: string | null = null) => ({
+    type: "stream_event",
+    parent_tool_use_id: parent,
+    event: { type: "message_start", message: { id, model: "claude-haiku-4-5-20251001", usage: { input_tokens: input, cache_read_input_tokens: cached, cache_creation_input_tokens: written, cache_creation: { ephemeral_5m_input_tokens: 0, ephemeral_1h_input_tokens: written }, output_tokens: 1 } } },
+  });
+  const delta = (output: number, parent: string | null = null) => ({ type: "stream_event", parent_tool_use_id: parent, event: { type: "message_delta", usage: { output_tokens: output } } });
+  const stop = (parent: string | null = null) => ({ type: "stream_event", parent_tool_use_id: parent, event: { type: "message_stop" } });
+  const said = (id: string, content: unknown[]) => ({ type: "assistant", message: { id, model: "claude-haiku-4-5-20251001", usage: { output_tokens: 3 }, content } });
+  const lines = [
+    { type: "system", subtype: "init", session_id: "s-1", model: "claude-haiku-4-5", claude_code_version: "2.1.286" },
+    start("msg_a", 10, 20674, 4834),
+    said("msg_a", [{ type: "tool_use", name: "Task", input: { description: "look around" } }]),
+    start("msg_sub", 5, 0, 100, "toolu_task"),
+    delta(324),
+    stop(),
+    said("msg_sub", [{ type: "text", text: "found two files" }]),
+    delta(40, "toolu_task"),
+    stop("toolu_task"),
+    start("msg_b", 8, 25508, 944),
+    said("msg_b", [{ type: "text", text: "The folder contains three pairs of files" }]),
+    delta(234),
+    stop(),
+    { type: "assistant", message: { id: "synthetic-1", model: "<synthetic>", usage: {}, content: [] } },
+    { type: "result", subtype: "success", is_error: false, num_turns: 2, duration_ms: 10562, total_cost_usd: 0.019 },
+  ];
+  const calls: Call[] = [];
+  const events: string[] = [];
+  const stream = claudeStream("claude-haiku-4-5", 0, null, { call: (c) => calls.push(c), event: (_k, t) => events.push(t) });
+  for (const l of lines) stream.line(JSON.stringify(l));
+  stream.recordRest();
+
+  assert.deepEqual(calls.map((c) => c.output), [324, 40, 234]);
+  assert.deepEqual(calls.map((c) => c.input), [10, 5, 8]);
+  assert.equal(calls[0].cached, 20674);
+  assert.equal(calls[0].cacheWrite, 4834);
+  // Haiku 4.5: $1 in, $0.10 cached, $2 for 1-hour cache writes, $5 out (per 1M)
+  const usd = calls.reduce((t, c) => t + c.usd, 0);
+  assert.ok(Math.abs(usd - 0.019) < 0.001, `estimate ${usd} vs Claude Code's 0.019`);
+  assert.deepEqual(stream.end(), { session: "s-1", held: undefined });
+  assert.ok(events.includes("Claude finished (success): 2 turns in 11 s, Claude Code's own figure $0.02."));
 });

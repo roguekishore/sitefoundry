@@ -3,7 +3,7 @@
 //   #/runs          the run instance's switch and every run
 //   #/runs/new      the form
 //   #/runs/<id>     one run: its log, its calls with tokens and cost, its details
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { ExternalLink, Play, Plus, Power, RotateCcw, Square } from "lucide-react";
 import type { Backend, Call, MachineInfo, Options, Run, RunEvent, RunRequest, Usage } from "../../../../packages/server/src/shared";
 import { navigate, type Route } from "../state";
@@ -82,8 +82,9 @@ function took(run: Run): string {
 const isActive = (r: Run) => r.state === "queued" || r.state === "claimed" || r.state === "running";
 
 const STATE_LABEL: Record<Run["state"], string> = { queued: "Queued", claimed: "Starting", running: "Running", done: "Done", failed: "Failed", stopped: "Stopped", held: "Held" };
-export function StateBadge({ state }: { state: Run["state"] }) {
-  return <span className={`badge run-${state}`}>{STATE_LABEL[state]}</span>;
+/** `stopping`: Stop was pressed and the runner hasn't stopped yet. */
+export function StateBadge({ state, stopping }: { state: Run["state"]; stopping?: boolean }) {
+  return <span className={`badge run-${state}`}>{stopping ? "Stopping…" : STATE_LABEL[state]}</span>;
 }
 
 function Problem({ error }: { error: ApiError }) {
@@ -258,10 +259,10 @@ function NewRun() {
         <Field label="Slug and pages" hint={slug ? `foundry/sites/${slug}/ on branch ${form.backend}/${slug}${pages.length ? `, landing page plus ${pages.join(", ")}` : ", landing page only"}` : "The slug first, then any other pages to recreate: linear pricing about"}>
           <input className="field" required autoCapitalize="none" autoCorrect="off" spellCheck={false} placeholder="linear pricing about" value={form.target} onChange={(e) => set({ target: e.target.value })} />
         </Field>
-        <Field label="Agent">
+        <Field label="Agent" group>
           <div className="seg wide">
             {(Object.keys(o.backends) as Backend[]).map((k) => (
-              <button key={k} type="button" className={form.backend === k ? "on" : ""} onClick={() => pickBackend(k)}>
+              <button key={k} type="button" className={form.backend === k ? "on" : ""} aria-pressed={form.backend === k} onClick={() => pickBackend(k)}>
                 {k === "gemini" ? "Gemini" : "Claude"}
               </button>
             ))}
@@ -315,14 +316,18 @@ function NewRun() {
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
-  return (
-    <label className="run-field">
-      <span className="lbl">{label}</span>
+/** A form field. `group` is for controls other than one input (the agent's buttons): a <label>
+ * around buttons would make the label's whole text the first button's name. */
+function Field({ label, hint, group, children }: { label: string; hint?: string; group?: boolean; children: ReactNode }) {
+  const id = useId();
+  const inner = (
+    <>
+      <span className="lbl" id={id}>{label}</span>
       {children}
       {hint && <small className="muted">{hint}</small>}
-    </label>
+    </>
   );
+  return group ? <div className="run-field" role="group" aria-labelledby={id}>{inner}</div> : <label className="run-field">{inner}</label>;
 }
 
 // ---------- #/runs/<id> ----------
@@ -362,7 +367,7 @@ function RunPage({ id }: { id: number }) {
       <div className="page-head run-head">
         <div>
           <h1>
-            {r.slug} <StateBadge state={r.state} />
+            {r.slug} <StateBadge state={r.state} stopping={isActive(r) && r.stopRequested} />
           </h1>
           <p>
             <a href={r.url} target="_blank" rel="noreferrer">

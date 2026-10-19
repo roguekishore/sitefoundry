@@ -51,6 +51,8 @@ export async function runJob(job: Job, s: RunnerSettings): Promise<void> {
     report.event("info", "Stop pressed: stopping the agent.");
     stop("user");
   });
+  // After Resume, the cap counts what the run spent before too.
+  report.usd = run.usage.usd;
   const say = (text: string) => report.event("info", text);
   const fail = async (error: string) => {
     finished = true;
@@ -206,7 +208,8 @@ export async function runJob(job: Job, s: RunnerSettings): Promise<void> {
       error: state === "failed" ? `${run.backend} exited with code ${end.code} after ${MAX_RESTARTS} restarts` : null,
       note: end.held ? `held: ${end.held}` : stopReason ? why[stopReason] : state === "done" ? `done in ${hours.toFixed(1)} h` : undefined,
     });
-    say(`${state}: $${report.usd.toFixed(2)} over ${report.allCalls.length} calls in ${hours.toFixed(1)} h`);
+    const before = run.usage.usd ? ` (with $${run.usage.usd.toFixed(2)} from before the resume)` : "";
+    say(`${state}: $${report.usd.toFixed(2)}${before}, ${report.allCalls.length} call${report.allCalls.length === 1 ? "" : "s"} this time, in ${hours.toFixed(1)} h`);
     await report.close();
   } catch (e) {
     await fail(`The runner broke: ${(e as Error).stack ?? e}`);
@@ -295,7 +298,7 @@ function commitRecord(worktree: string, run: Run, state: RunState, hours: number
     prompt: run.prompt ?? "skill",
     state,
     hours: Number(hours.toFixed(2)),
-    usd: Number(report.usd.toFixed(4)),
+    usd: Number(report.allCalls.reduce((t, c) => t + c.usd, 0).toFixed(4)), // this job only: a resumed run commits a record per job
     byModel,
     note: "usd is estimated from list prices (packages/server/src/prices.ts); on a Claude subscription it is what the API would charge",
   };
