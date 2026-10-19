@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo accordion",
+  "description": "Questions that open in place, one at a time: 24px questions with a small white plus tile that turns into an orange minus. Two looks: black hairline rows, or borderless rows where the open one becomes a white card. Answers slide open; rows fade in as they scroll into view.",
+  "category": "faq",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "accordion",
+    "faq",
+    "hairline",
+    "minimal",
+    "details",
+    "no-js"
+  ],
+  "notes": [
+    "native <details name>: exclusive opening without JavaScript (older browsers allow several open)"
+  ],
+  "entry": "newhalo-accordion.tsx",
+  "source": "foundry",
+  "name": "newhalo-accordion",
+  "files": [
+    {
+      "path": "newhalo-accordion.css",
+      "content": "/* Answers slide open (block-size from 0 to auto) where the browser supports it; elsewhere\n   they simply appear. */\n.newhalo-accordion-item {\n  interpolate-size: allow-keywords;\n}\n.newhalo-accordion-item::details-content {\n  block-size: 0;\n  overflow: clip;\n  transition: block-size 0.4s cubic-bezier(0.32, 0.94, 0.6, 1), content-visibility 0.4s allow-discrete;\n}\n.newhalo-accordion-item[open]::details-content {\n  block-size: auto;\n}\n.newhalo-accordion-item > summary::-webkit-details-marker {\n  display: none;\n}\n@media (prefers-reduced-motion: reduce) {\n  .newhalo-accordion-item::details-content { transition: none; }\n}\n"
+    },
+    {
+      "path": "newhalo-accordion.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { newhaloReveal, newhaloRevealStyle } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-accordion.css\";\n\nexport interface NewhaloAccordionItem {\n  /** the question or title, always visible */\n  question: string;\n  /** what opens underneath */\n  answer: ReactNode;\n}\n\nexport interface NewhaloAccordionProps {\n  items: NewhaloAccordionItem[];\n  /**\n   * lines: black hairline rows with a white plus tile · cards: no lines; the open item\n   * becomes a white card and its tile turns orange\n   */\n  variant?: \"lines\" | \"cards\";\n  /** a name shared by the items, so opening one closes the others */\n  group: string;\n  /** index of the item open at first; leave out for all closed */\n  openIndex?: number;\n  className?: string;\n}\n\n/**\n * Questions that open in place, one at a time (native details elements, no JavaScript).\n * The plus tile becomes a minus; answers slide open where the browser allows it.\n */\nexport function NewhaloAccordion({ items, variant = \"lines\", group, openIndex, className }: NewhaloAccordionProps) {\n  const cards = variant === \"cards\";\n  return (\n    <div className={cn(!cards && \"border-b border-foreground\", className)}>\n      {items.map((item, i) => (\n        <details\n          key={item.question}\n          name={group}\n          open={i === openIndex || undefined}\n          className={cn(\n            \"newhalo-accordion-item group/acc\",\n            newhaloReveal(\"fade\"),\n            cards ? \"rounded-lg px-gutter transition-colors duration-300 open:bg-card lg:px-[1.875rem]\" : \"border-t border-foreground\",\n          )}\n          style={newhaloRevealStyle(Math.min(i, 4))}\n        >\n          <summary className={cn(\"flex cursor-pointer list-none items-start justify-between gap-6\", cards ? \"py-[1.875rem]\" : \"py-5 lg:py-[1.875rem]\")}>\n            <span className=\"pt-1.5 font-display text-[1.3rem] leading-[1.1] lg:text-2xl\">{item.question}</span>\n            <span\n              aria-hidden\n              className={cn(\n                \"flex size-10 shrink-0 items-center justify-center rounded-sm bg-card text-foreground transition-colors duration-300\",\n                \"group-open/acc:bg-primary group-open/acc:text-primary-foreground\",\n              )}\n            >\n              <Plus strokeWidth={1.25} className=\"size-5 group-open/acc:hidden\" />\n              <Minus strokeWidth={1.25} className=\"hidden size-5 group-open/acc:block\" />\n            </span>\n          </summary>\n          <div className=\"max-w-[40rem] pb-[1.875rem] text-[0.91rem] leading-normal lg:text-base\">{item.answer}</div>\n        </details>\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "NewhaloAccordionItem[]",
+      "required": true
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "lines",
+      "description": "lines: black hairline rows with a white plus tile · cards: no lines; the open item\nbecomes a white card and its tile turns orange"
+    },
+    {
+      "name": "group",
+      "type": "string",
+      "required": true,
+      "description": "a name shared by the items, so opening one closes the others"
+    },
+    {
+      "name": "openIndex",
+      "type": "number",
+      "required": false,
+      "description": "index of the item open at first; leave out for all closed"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "38f73a1bbcde397a4a1fcd734499c8b85707762a574c7fa2146f288a25a1a6a0"
+}
