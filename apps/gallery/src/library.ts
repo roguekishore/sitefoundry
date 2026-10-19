@@ -2,6 +2,7 @@
 // site page uses, each theme's colours, thumbnails, and when items were added. The preview iframe
 // doesn't need any of this, so it lives apart from catalog.ts.
 import added from "virtual:foundry-added";
+import { BASE } from "./base";
 import { byName, items, ownTheme, sitePageNames, sites, themes, type Item } from "./catalog";
 
 const pageSources = import.meta.glob<string>(["../../../foundry/sites/*/page.tsx", "../../../foundry/sites/*/pages/*.tsx"], {
@@ -147,7 +148,7 @@ export type Thumbs = Map<string, ThumbEntry>;
 let thumbsPromise: Promise<Thumbs> | undefined;
 /** Every thumbnail there is, by "items/<name>" or "sites/<site>/<page>". Missing ones show a placeholder. */
 export function loadThumbs(): Promise<Thumbs> {
-  thumbsPromise ??= fetch("/thumbs/manifest.json")
+  thumbsPromise ??= fetch(`${BASE}thumbs/manifest.json`)
     .then((r) => (r.ok ? r.json() : { entries: {} }))
     .then((m: { entries: Record<string, Partial<ThumbEntry>> }) => new Map(Object.entries(m.entries).map(([k, e]) => [k, { at: e.at ?? "", shots: e.shots ?? {} }])))
     .catch(() => new Map());

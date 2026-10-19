@@ -2,6 +2,7 @@
 // scales it to fit (see Stage in ui.tsx). Theme, mode and the inspector's state go to the frame
 // by message, so changing them doesn't reload it; only a different target does.
 import { useEffect, useId, useMemo, useRef, useState, type MutableRefObject } from "react";
+import { BASE } from "./base";
 
 export interface Target {
   item?: string;
@@ -50,7 +51,7 @@ export function PreviewFrame({ target, width, height, theme, mode, inspect, onHe
   const src = useMemo(() => {
     const q = new URLSearchParams({ id, theme: latest.current.theme, mode: latest.current.mode });
     for (const [k, v] of Object.entries(target)) if (v) q.set(k, v);
-    return `/preview.html?${q}`;
+    return `${BASE}preview.html?${q}`;
   }, [id, target.item, target.site, target.page, target.specimen]);
 
   useEffect(() => {

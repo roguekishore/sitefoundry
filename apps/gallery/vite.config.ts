@@ -114,7 +114,8 @@ export default defineConfig({
     ],
     dedupe: ["react", "react-dom"],
   },
-  server: { port: 4400, fs: { allow: [ROOT] } },
+  // The run pages talk to the foundry server (`pnpm serve`); in dev the gallery passes those requests on.
+  server: { port: 4400, fs: { allow: [ROOT] }, proxy: { "/api": "http://127.0.0.1:4401", "/p/": "http://127.0.0.1:4401" } },
   preview: { port: 4400 },
   build: {
     outDir: join(here, "dist"),
