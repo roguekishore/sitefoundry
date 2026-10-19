@@ -8,7 +8,7 @@ export const heroSample: NewhaloHeroProps = {
 
 export const productHeroSample: NewhaloHeroProps = {
   wordmark: "Brio",
-  title: "One instrument",
+  title: "Lumen One",
   titleSize: "xl",
   tone: "warm",
 };

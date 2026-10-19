@@ -43,7 +43,7 @@ export function NewhaloDownloads({ title, packs, images, className }: NewhaloDow
         <ul className="grid gap-2.5 lg:col-span-7 lg:col-start-6">
           {images.map((img) => (
             <li key={img.href} className={cn("relative", newhaloReveal("bloom"))}>
-              <NewhaloMedia tone="deep" className="aspect-[1.78] rounded-lg">
+              <NewhaloMedia tone="deep" className="dark aspect-[1.78] rounded-lg">
                 {img.media}
               </NewhaloMedia>
               <a

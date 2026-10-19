@@ -150,3 +150,17 @@ sequence inside the pinned lighting section (media; its frame is pinned and we p
 - Accordions use native `<details name="…">`, so only one opens at a time without JS.
 - Dark panels wrap themselves in `.dark`, so they stay black on the paper theme.
 - The product sub-nav is fixed at the bottom of the window (it is there in every scroll frame).
+
+## Round 1 (all pages captured; static shots taken with reduced motion so scroll reveals show their end state)
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| landing hero | ok | giant wordmark ("Lumora") ran into the title | drift 0→108px ✓ | yes: brand renamed **Brio**, shorter word |
+| landing hero | placeholder graphite, original video near-black | same | – | yes: new `deep` tone (card colour) |
+| footer | ok | links 32px apart (orig 29); art strip too narrow | clip + fade + rise ✓ | yes |
+| product hero | title leading lost (class merge dropped leading-none) | "One instrument" too long for the right column | ✓ | yes |
+| pricing steps | dotted connector missing (dot pattern on a 1px line) | same | – | yes: dotted borders |
+| contact / company showcase | – | cards graphite, original white | rise ✓ | yes: foreground-coloured cards |
+| media room | – | picture placeholders white on paper | bloom ✓, sticky ✓ | yes: frames get their own dark context |
+| faq / legal | **page 1060px / 613px wide at 360** (tile row widened the grid) | ok | sticky ✓ | yes: grid-cols-1 |
+| heights | all sections within ~5% of the original (product care +90px, FAQ teaser +110px: content) | | | accepted |
+| motion | | | every inventory row shows in our capture (scrubbed hero, reveals, blooms, drifts, pinned sequence, sticky columns, footer clip, Lenis) | ✓ |

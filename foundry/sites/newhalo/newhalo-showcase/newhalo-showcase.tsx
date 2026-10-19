@@ -62,12 +62,12 @@ export function NewhaloShowcase({ title, titleSize = "md", cards, controlLabels 
                 <>
                   <span className="flex items-start justify-between gap-4">
                     <span className="font-display text-[1.56rem] leading-[1.1] lg:text-[1.75rem]">{c.title}</span>
-                    {c.href && <ArrowUpRight aria-hidden strokeWidth={1} className="size-5 shrink-0 text-card-foreground/70" />}
+                    {c.href && <ArrowUpRight aria-hidden strokeWidth={1} className="size-5 shrink-0 text-background/70" />}
                   </span>
                   <span className="text-sm leading-normal lg:text-base">{c.text}</span>
                 </>
               );
-              const classes = "flex h-[25rem] flex-col justify-between rounded-lg bg-card p-5 text-card-foreground";
+              const classes = "flex h-[25rem] flex-col justify-between rounded-lg bg-foreground p-5 text-background";
               return (
                 <li key={c.title} className={cn("w-[min(20.3rem,82vw)] shrink-0", !slider && "w-full", newhaloReveal("rise"))} style={newhaloRevealStyle(i)}>
                   {c.href ? (
