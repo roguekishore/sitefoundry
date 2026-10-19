@@ -1,6 +1,7 @@
-// An iframe that renders a preview at a real device width, scaled down to fit when the screen is
-// narrower, and grown to the content's height. Theme and mode change without reloading it.
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+// One live preview: an iframe showing preview.html at a real device width. Whoever places it
+// scales it to fit (see Stage in ui.tsx). Theme, mode and the inspector's state go to the frame
+// by message, so changing them doesn't reload it; only a different target does.
+import { useEffect, useId, useMemo, useRef, useState, type MutableRefObject } from "react";
 
 export interface Target {
   item?: string;
@@ -10,92 +11,93 @@ export interface Target {
   specimen?: string;
 }
 
-interface FrameProps {
+export interface InspectState {
+  enabled: boolean;
+  hover: string | null;
+  selected: string | null;
+}
+
+/** Messages a frame sends besides its height: sections, hover, select, navigate (see inspect.ts). */
+export type FrameMessage = { type: string; [key: string]: unknown };
+export interface FrameApi {
+  post(message: object): void;
+}
+
+interface Props {
   target: Target;
   /** device width in CSS px */
   width: number;
+  /** a device screen this tall, the page scrolling inside it; without it the frame grows to its content */
+  height?: number;
   theme: string;
   mode: "light" | "dark";
-  /** clip the (scaled) frame to this height: thumbnails */
-  maxHeight?: number;
-  /** thumbnails aren't clickable inside */
-  inert?: boolean;
-  /** only load once scrolled near */
-  lazy?: boolean;
-  /**
-   * A real device screen: the frame keeps this height and the page scrolls inside it, so
-   * window-sized sections (100svh), sticky parts and scroll effects work. Without it the frame
-   * grows to the content's height (fine for single blocks).
-   */
-  viewportHeight?: number;
+  inspect?: InspectState;
+  onHeight?: (height: number) => void;
+  onMessage?: (message: FrameMessage) => void;
+  api?: MutableRefObject<FrameApi | null>;
+  title?: string;
 }
 
-export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy, viewportHeight }: FrameProps) {
+export function PreviewFrame({ target, width, height, theme, mode, inspect, onHeight, onMessage, api, title = "preview" }: Props) {
   const id = useId();
-  const box = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
-  const [available, setAvailable] = useState(width);
-  const [height, setHeight] = useState(maxHeight ?? 640);
-  const [visible, setVisible] = useState(!lazy);
-  const look = useRef({ theme, mode });
-  look.current = { theme, mode };
+  const [contentHeight, setContentHeight] = useState(480);
+  const [loaded, setLoaded] = useState(false);
+  // the latest values, for callbacks that outlive a render
+  const latest = useRef({ theme, mode, inspect, onHeight, onMessage });
+  latest.current = { theme, mode, inspect, onHeight, onMessage };
 
-  // Reload only when what's shown changes; theme and mode go by message.
   const src = useMemo(() => {
-    const q = new URLSearchParams({ id, theme: look.current.theme, mode: look.current.mode });
+    const q = new URLSearchParams({ id, theme: latest.current.theme, mode: latest.current.mode });
     for (const [k, v] of Object.entries(target)) if (v) q.set(k, v);
     return `/preview.html?${q}`;
   }, [id, target.item, target.site, target.page, target.specimen]);
 
   useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => setAvailable(entry.contentRect.width));
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+    setLoaded(false);
+  }, [src]);
 
-  useEffect(() => {
-    if (visible || !box.current) return;
-    const observer = new IntersectionObserver(([entry]) => entry.isIntersecting && setVisible(true), { rootMargin: "400px" });
-    observer.observe(box.current);
-    return () => observer.disconnect();
-  }, [visible]);
+  const post = (message: object) => frame.current?.contentWindow?.postMessage(message, "*");
+  if (api) api.current = { post };
+  const sendLook = () => void post({ type: "foundry:look", theme: latest.current.theme, mode: latest.current.mode });
+  const sendInspect = () => {
+    if (latest.current.inspect) post({ type: "foundry:inspect", ...latest.current.inspect });
+  };
+
+  useEffect(sendLook, [theme, mode]);
+  useEffect(sendInspect, [inspect?.enabled, inspect?.hover, inspect?.selected]);
 
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
-      if (e.data?.type === "foundry:height" && e.data.id === id) setHeight(Math.max(80, e.data.height));
+      const data = e.data as FrameMessage & { id?: string; height?: number };
+      if (data?.id !== id) return;
+      if (data.type === "foundry:height") {
+        const h = Math.max(80, Number(data.height));
+        setContentHeight(h);
+        latest.current.onHeight?.(h);
+      } else {
+        if (data.type === "foundry:sections") sendInspect();
+        latest.current.onMessage?.(data);
+      }
     };
     addEventListener("message", onMessage);
     return () => removeEventListener("message", onMessage);
   }, [id]);
 
-  const sendLook = () => frame.current?.contentWindow?.postMessage({ type: "foundry:look", ...look.current }, "*");
-  useEffect(sendLook, [theme, mode]);
-
-  const frameHeight = viewportHeight ?? height;
-  const scale = Math.min(1, available / width);
-  const shownHeight = Math.min(frameHeight * scale, maxHeight ?? Infinity);
-
   return (
-    <div ref={box} className="w-full overflow-hidden" style={{ height: shownHeight }}>
-      {visible && (
-        <iframe
-          ref={frame}
-          src={src}
-          title="preview"
-          onLoad={sendLook}
-          tabIndex={inert ? -1 : undefined}
-          className="block origin-top-left border-0 bg-transparent"
-          style={{
-            width,
-            height: frameHeight,
-            transform: `scale(${scale})`,
-            marginLeft: scale === 1 ? Math.max(0, (available - width) / 2) : 0,
-            pointerEvents: inert ? "none" : undefined,
-          }}
-        />
-      )}
-    </div>
+    <>
+      <iframe
+        ref={frame}
+        src={src}
+        title={title}
+        onLoad={() => {
+          sendLook();
+          sendInspect();
+          setLoaded(true);
+        }}
+        style={{ width, height: height ?? contentHeight }}
+      />
+      {!loaded && <div className="frame-loading">Loading preview…</div>}
+    </>
   );
 }

@@ -3,12 +3,16 @@
 //   preview.html?site=<site>[&page=<name>]&…        preview.html?specimen=<theme>&…
 import { StrictMode, useEffect, useState, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
-import { loadDemo, loadSitePage, loadThemeCss } from "./catalog";
+import { loadDemo, loadSitePage, loadThemeCss, sitePageNames } from "./catalog";
+import { startInspector, watchSections } from "./inspect";
 import { ThemeSpecimen } from "./specimen";
 import "./preview.css";
 
 const params = new URLSearchParams(location.search);
 const frameId = params.get("id") ?? "";
+const siteParam = params.get("site");
+// before anything renders, so no click can navigate the frame away
+startInspector(frameId, siteParam ? ["landing", ...sitePageNames(siteParam)] : null);
 
 async function applyTheme(theme: string | null, mode: string | null) {
   document.documentElement.classList.toggle("dark", mode === "dark");
@@ -52,6 +56,7 @@ function Preview() {
   // Tell automation (tools/build-thumbs.ts) the preview has rendered, or failed to.
   useEffect(() => {
     if (Component || error) document.documentElement.dataset.foundryReady = error ? "error" : "ready";
+    if (Component) watchSections();
   }, [Component, error]);
 
   // Tell the gallery how tall the content is, so the frame can fit it.
