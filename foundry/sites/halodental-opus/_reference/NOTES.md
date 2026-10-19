@@ -91,4 +91,8 @@ Components: `halodental-opus-button` (orange / light / outline / tile / ghost-sq
 - The original's gallery is a swiper; ours is static (first slide active) to stay JS-free.
 - Phone "about" band in the original has ~250px of empty space under the button (left over
   from a scroll animation); ours uses normal section padding.
+- In the dark sibling the white newsletter strip becomes pure black (it's `bg-card`), so the
+  footer's frame melts into it there. Light mode is unaffected.
+- The fictional brand has four letters so the giant hero wordmark keeps the original's
+  proportions (the first try, a five-letter name, ran into the tagline).
 - All copy is for a fictional company, "Lumo Oral Devices", and its product "the Beacon".

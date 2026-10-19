@@ -65,10 +65,11 @@ export function HalodentalOpusProduct({ title, text, features, cta, slides, acti
         </div>
 
         <div className="lg:col-span-7 lg:col-start-6 lg:grid lg:grid-cols-7 lg:items-center lg:gap-x-5">
-          <div className="aspect-[670/655] overflow-hidden rounded-t-lg bg-foreground lg:col-span-6">
+          {/* the photo frame always uses the dark palette: a black backdrop in light and dark mode */}
+          <div className="dark aspect-[670/655] overflow-hidden rounded-t-lg bg-card lg:col-span-6">
             {current?.media ?? (
               // placeholder for the product photo: a soft light on a dark backdrop
-              <div aria-hidden className="size-full bg-radial-[ellipse_40%_45%_at_55%_40%] from-background/22 via-background/6 to-transparent" />
+              <div aria-hidden className="size-full bg-radial-[ellipse_40%_45%_at_55%_40%] from-foreground/22 via-foreground/6 to-transparent" />
             )}
           </div>
           {slides.length > 1 && (
@@ -80,7 +81,7 @@ export function HalodentalOpusProduct({ title, text, features, cta, slides, acti
                   aria-current={i === active || undefined}
                   className={cn(
                     "relative size-[3.875rem] overflow-hidden rounded-lg lg:aspect-square lg:size-auto lg:w-full",
-                    i === active ? "bg-foreground" : "bg-muted opacity-60",
+                    i === active ? "dark bg-card" : "bg-muted opacity-60",
                   )}
                 >
                   {s.media}
