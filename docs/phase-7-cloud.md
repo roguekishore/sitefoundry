@@ -72,30 +72,48 @@ Code:
 
 Commands: `pnpm build:server`, `pnpm --filter gallery build`, `pnpm serve` (http://127.0.0.1:4401,
 no login, local runner). In dev, `pnpm gallery` passes `/api` and `/p/` to port 4401.
-`pnpm --filter @foundry/server test` (4 tests: TOTP RFC vector, costs, claim/totals).
+`pnpm --filter @foundry/server test` (5 tests: TOTP RFC vector, costs, claim/totals, Claude call usage).
 
 Verified on 2026-10-19: API probes; one Claude run end to end (Haiku, own prompt, run #1 in a
 temporary database): worktree, install, the run's gallery, Claude, 3 calls logged with the
 estimate matching Claude Code's own ($0.0301 vs $0.03), usage record committed, preview built
 and served at `/p/smoke-claude/` with the right asset paths.
 
-Left behind by that test (delete when no longer useful): worktree
-`D:\PROJECTS\SITEFOUNDRY-runs\claude-smoke-claude`, branch `claude/smoke-claude`, database
-`%TEMP%\foundry-test`.
+## Step B — finish verifying locally: **DONE** (except 5, the user's call)
 
-## Step B — finish verifying locally: **TODO** (next)
+Verified on 2026-10-19, in the test database `%TEMP%\foundry-test` (runs #2 and #3):
 
-1. **Look at the run pages in a browser**: never done yet. 390 px and 1440 px, light and dark:
-   `#/runs`, `#/runs/new`, `#/runs/<id>` with a long log. Fix what's off.
-2. **One Gemini run through the run page**, own prompt, `gemini-3.8-flash`, cap $0.50 (a few
-   cents; the user's earlier smoke runs cost $0.02–0.06). Checks the ported forwarder.
-3. **Stop and Resume** on a run in progress; the spending cap stopping a run (set it low).
-4. **The login**: `node packages/server/dist/server.mjs setup-login` with a passphrase on
-   stdin, set the two variables, log in with an authenticator code; unit tests cover only TOTP.
+1. **Run pages in a browser**, 390 px and 1440 px, light and dark: `#/runs`, `#/runs/new`,
+   `#/runs/<id>` (scripted Playwright screenshots). Fixed: the hidden sidebar's shadow showed as a
+   grey strip on the left at phone width (whole gallery); the Agent switch sat inside a `<label>`,
+   so its first button was named "Agent Claude Gemini CLI…" (now a labelled group with
+   `aria-pressed`); the badge says "Stopping…" between Stop and the runner stopping. The log
+   follows its newest line while a run goes (measured).
+2. **Gemini through the run page** (run #2, `gemini-3.8-flash`, own prompt): 7 calls, $0.05,
+   commit, usage record, preview at `/p/smoke-gemini/`. The ported forwarder works.
+3. **Stop, Resume, the cap** (run #3, Claude Haiku, 8 files with a commit each): Stop pressed in
+   the page after note4 → stopped, record committed, preview built; cap lowered to just above
+   what it had spent, Resume → stopped by the cap after one call; cap raised, Resume → note5–8,
+   done, nothing redone; three usage records on the branch. Fixed: **the cap only counted the
+   current job**, so a resumed run could spend its cap again (the runner now starts from the
+   run's total; each job's usage record still holds only its own calls).
+4. **The login**: `setup-login`, then in a browser: wrong code refused, right code in
+   (`foundry_session`, HttpOnly, SameSite=Lax), logout ends the session, 5 failures lock it
+   for a minute even with the right code.
 5. A real `/recreate-site` run with pages (e.g. `linear pricing`) is the user's call (cost).
    **It needs the other session's uncommitted `SKILL.md`** (pages support): the runner passes
    `$ARGUMENTS = "<url> <slug> <page…>"`. That change and `.geminiignore`, `capture.mjs`,
    `tools/gemini-run/run.mjs` belong to session `sitefoundry-8a`; don't commit them as yours.
+
+Also fixed: **Claude's output tokens were undercounted** (2–3 per call). Claude Code's
+`assistant` events carry the usage from the start of each message; the runner now also passes
+`--include-partial-messages` and takes each call's final usage from the stream's `message_delta`
+(checked against Claude Code's own total: 324 + 234 = 558). The `result` event's totals can't be
+used instead: after `--resume` they add up the whole session. A unit test covers it.
+
+Left behind by these tests (delete when no longer useful): worktrees `claude-smoke-claude`,
+`gemini-smoke-gemini`, `claude-smoke-stop` in `D:\PROJECTS\SITEFOUNDRY-runs`, their branches
+(`claude/smoke-claude`, `gemini/smoke-gemini`, `claude/smoke-stop`), database `%TEMP%\foundry-test`.
 
 ## Step C — infrastructure (Terraform in `infra/`): **TODO**
 
@@ -169,9 +187,12 @@ outposts updated first; check its `docs/STATE.md`.
 
 ## Known gaps and risks
 
-- Not verified yet: `Ec2Machine`, the `live.` proxy and its WebSocket pass-through, the login
-  in a browser, Claude's usage-limit detection (a regex on its error text → state `held`),
-  the warden files against a real outpost.
+- Not verified yet: `Ec2Machine`, the `live.` proxy and its WebSocket pass-through, Claude's
+  usage-limit detection (a regex on its error text → state `held`), the warden files against a
+  real outpost.
+- The login lockout is one counter for everyone: someone hammering the login page from the
+  internet keeps the owner locked out too while it lasts. Per-address counting needs Caddy's
+  `X-Forwarded-For` trusted; not done.
 - The agent runs as the same Linux user as the runner, so a determined agent could read the
   Vertex key from the runner's environment. Accepted for now; a separate user for the
   forwarder would close it.
