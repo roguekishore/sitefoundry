@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo Dental product showcase",
+  "description": "12-column hardware feature section on warm stone paper: a 4-column specification stack on the left (64px heading, body copy, 4 hairline-bordered spec rows with icons, and an orange CTA button) paired with a 670×670 square media frame and a 3-thumbnail selector strip on the right.",
+  "category": "features",
+  "site": "halodental",
+  "license": "proprietary",
+  "tags": [
+    "product",
+    "features",
+    "specifications",
+    "gallery",
+    "hardware",
+    "minimal"
+  ],
+  "notes": [
+    "Pass media and thumbnails props to replace the default studio square and thumbnail placeholders",
+    "Thumbnails sit in a vertical column to the right of the main square on desktop and in a horizontal row below it on phones"
+  ],
+  "entry": "halodental-product.tsx",
+  "source": "foundry",
+  "name": "halodental-product",
+  "files": [
+    {
+      "path": "halodental-product.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Camera, Droplets, Feather, Sun } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalButton } from \"@foundry/halodental-button\";\n\nexport interface HalodentalSpecItem {\n  /** icon identifier from the built-in medical/optics set */\n  icon?: \"light\" | \"antifog\" | \"camera\" | \"weight\";\n  /** specification text */\n  label: string;\n}\n\nexport interface HalodentalProductProps {\n  /** two-line section heading */\n  title: string;\n  /** introductory paragraph below the heading */\n  description: string;\n  /** bordered specification rows */\n  specs: HalodentalSpecItem[];\n  /** primary orange CTA button below the specification table */\n  cta: {\n    label: string;\n    href: string;\n  };\n  /** optional award label shown in the corner of the default studio placeholder */\n  awardLabel?: string;\n  /** main square product media slot (670×670 on desktop, 348×348 on phones) */\n  media?: ReactNode;\n  /** optional custom thumbnail nodes (3 square slots) */\n  thumbnails?: ReactNode[];\n  className?: string;\n}\n\nconst specIcons = {\n  light: Sun,\n  antifog: Droplets,\n  camera: Camera,\n  weight: Feather,\n};\n\nfunction DefaultProductMedia({ awardLabel }: { awardLabel?: string }) {\n  return (\n    <div className=\"dark relative size-full overflow-hidden bg-background text-foreground\">\n      {/* Soft radial studio spotlight */}\n      <div\n        aria-hidden\n        className=\"absolute inset-0 bg-[radial-gradient(circle_at_56%_52%,var(--secondary)_0%,var(--card)_42%,var(--background)_78%)]\"\n      />\n      {/* Stylized angled optical wand silhouette */}\n      <div aria-hidden className=\"absolute inset-0 flex items-center justify-center\">\n        <div className=\"relative h-[72%] w-5 rotate-18 rounded-full bg-gradient-to-b from-foreground/40 via-foreground/20 to-foreground/45 ring-1 ring-foreground/25\">\n          <div className=\"absolute -top-9 left-1/2 size-12 -translate-x-1/2 rounded-full border-2 border-foreground/80 bg-background/60\" />\n          <div className=\"absolute bottom-3 inset-x-0.5 h-1.5 rounded-full bg-foreground/90\" />\n        </div>\n      </div>\n      {awardLabel && (\n        <div className=\"absolute right-5 bottom-5 flex items-center gap-2 text-xs text-foreground/90 lg:right-8 lg:bottom-7\">\n          <span aria-hidden className=\"size-6 rounded-full bg-glow\" />\n          <span className=\"font-normal tracking-tight\">{awardLabel}</span>\n        </div>\n      )}\n    </div>\n  );\n}\n\nfunction DefaultThumbnails() {\n  return [\n    <div\n      key=\"thumb-1\"\n      className=\" size-full rounded-lg border border-primary p-[3px]\"\n    >\n      <div className=\"dark relative size-full overflow-hidden rounded-[5px] bg-background\">\n        <div className=\"absolute inset-0 bg-[radial-gradient(circle_at_55%_55%,var(--secondary)_0%,var(--background)_75%)]\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <span className=\"h-9 w-1.5 rotate-18 rounded-full bg-foreground/60\" />\n        </div>\n      </div>\n    </div>,\n    <div\n      key=\"thumb-2\"\n      className=\"relative size-full overflow-hidden rounded-lg bg-secondary/90\"\n    >\n      <div className=\"absolute inset-0 flex items-center justify-center\">\n        <span className=\"size-6 rounded-full border border-foreground/20\" />\n      </div>\n    </div>,\n    <div\n      key=\"thumb-3\"\n      className=\"relative size-full overflow-hidden rounded-lg bg-muted-foreground/25\"\n    >\n      <div className=\"absolute inset-0 flex items-center justify-center\">\n        <span className=\"h-7 w-1.5 -rotate-24 rounded-full bg-foreground/20\" />\n      </div>\n    </div>,\n  ];\n}\n\n/**\n * Halo Dental's 12-column product section: 4-col spec stack on the left, 7-col square media + thumbs on the right.\n */\nexport function HalodentalProduct({\n  title,\n  description,\n  specs,\n  cta,\n  awardLabel = \"reddot winner 2024\",\n  media,\n  thumbnails,\n  className,\n}: HalodentalProductProps) {\n  const thumbItems = thumbnails ?? DefaultThumbnails();\n\n  return (\n    <section className={cn(\"bg-background py-[var(--section-y)] px-[var(--page-gutter)] text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-[var(--page-width)] grid-cols-1 items-start lg:grid-cols-12 lg:gap-x-5\">\n        <div className=\"lg:col-span-4 lg:pb-10\">\n          <h2 className=\"font-display text-[2.47rem] leading-[1.1] font-normal tracking-[-0.015em] lg:max-w-[9ch] lg:text-[4rem] lg:leading-none\">\n            {title}\n          </h2>\n          <p className=\"mt-2.5 text-[0.91rem] leading-[1.5] font-normal text-foreground lg:mt-5 lg:text-base lg:leading-[1.5]\">\n            {description}\n          </p>\n\n          <ul className=\"mt-[30px] w-full border-b border-border lg:mt-10\">\n            {specs.map((item) => {\n              const Icon = specIcons[item.icon ?? \"light\"];\n              return (\n                <li\n                  key={item.label}\n                  className=\"flex h-[43px] items-center gap-3.5 border-t border-border text-[0.91rem] font-normal text-foreground lg:h-[44px] lg:text-base\"\n                >\n                  <Icon aria-hidden className=\"size-4 shrink-0 text-foreground\" strokeWidth={1.5} />\n                  <span>{item.label}</span>\n                </li>\n              );\n            })}\n          </ul>\n\n          <div className=\"mt-[30px] lg:mt-10\">\n            <HalodentalButton variant=\"primary\" href={cta.href}>\n              {cta.label}\n            </HalodentalButton>\n          </div>\n        </div>\n\n        <div className=\"mt-[30px] lg:col-span-7 lg:col-start-6 lg:mt-0\">\n          <div className=\"flex flex-col items-center gap-y-2.5 lg:flex-row lg:gap-x-5\">\n            <div className=\"aspect-square w-full overflow-hidden rounded-lg lg:size-[670px] lg:shrink-0\">\n              {media ?? <DefaultProductMedia awardLabel={awardLabel} />}\n            </div>\n\n            <ul aria-label=\"Product gallery thumbnails\" className=\"flex shrink-0 items-center gap-1.5 lg:w-[95px] lg:flex-col lg:gap-2.5\">\n              {thumbItems.map((thumb, idx) => (\n                <li key={idx} className=\"size-[68px] overflow-hidden rounded-lg lg:size-[95px]\">\n                  {thumb}\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "two-line section heading"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": true,
+      "description": "introductory paragraph below the heading"
+    },
+    {
+      "name": "specs",
+      "type": "HalodentalSpecItem[]",
+      "required": true,
+      "description": "bordered specification rows"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "primary orange CTA button below the specification table"
+    },
+    {
+      "name": "awardLabel",
+      "type": "string",
+      "required": false,
+      "default": "reddot winner 2024",
+      "description": "optional award label shown in the corner of the default studio placeholder"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "main square product media slot (670×670 on desktop, 348×348 on phones)"
+    },
+    {
+      "name": "thumbnails",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "optional custom thumbnail nodes (3 square slots)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "42723e43a9ff1b0b77a9feedeeb7d8225e981b9eb053d74c2e21ab41710048a5"
+}
