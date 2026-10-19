@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo media slot",
+  "description": "A frame that crops an image or video like object-fit: cover; empty, it is a plain muted panel or a soft glow wash of the same size and shape. Takes an inner class so blocks can drift the picture inside the frame on scroll.",
+  "category": "card",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "frame",
+    "minimal"
+  ],
+  "notes": [
+    "give the frame its size, aspect ratio and radius through className"
+  ],
+  "entry": "newhalo-media.tsx",
+  "source": "foundry",
+  "name": "newhalo-media",
+  "files": [
+    {
+      "path": "newhalo-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NewhaloMediaProps {\n  /** the real image or video; it is cropped to the frame like object-fit: cover. Empty shows the placeholder. */\n  children?: ReactNode;\n  /** placeholder surface: muted (a quiet token-coloured panel), deep (the darker card colour), glow (a soft highlight-to-glow wash, for art slots) or warm (a full highlight-to-glow gradient, for orange photography) */\n  tone?: \"muted\" | \"deep\" | \"glow\" | \"warm\";\n  /** size, aspect ratio and radius of the frame, e.g. \"aspect-square rounded-lg\" */\n  className?: string;\n  /** classes for the inner layer, e.g. a scroll-driven parallax class */\n  innerClassName?: string;\n}\n\n/**\n * A media slot: a frame that crops whatever goes in it. Without content it is a plain\n * placeholder surface of the same size and shape.\n */\nexport function NewhaloMedia({ children, tone = \"muted\", className, innerClassName }: NewhaloMediaProps) {\n  return (\n    <div className={cn(\"relative overflow-clip\", className)}>\n      <div\n        className={cn(\n          \"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n          !children && { muted: \"bg-muted\", deep: \"bg-card\", glow: \"bg-radial from-glow/25 via-highlight/10 to-transparent\", warm: \"bg-linear-to-r from-highlight to-glow\" }[tone],\n          innerClassName,\n        )}\n      >\n        {children}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the real image or video; it is cropped to the frame like object-fit: cover. Empty shows the placeholder."
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "placeholder surface: muted (a quiet token-coloured panel), deep (the darker card colour), glow (a soft highlight-to-glow wash, for art slots) or warm (a full highlight-to-glow gradient, for orange photography)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, aspect ratio and radius of the frame, e.g. \"aspect-square rounded-lg\""
+    },
+    {
+      "name": "innerClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the inner layer, e.g. a scroll-driven parallax class"
+    }
+  ],
+  "hash": "87616245d285466ffd4d8827503adb32e1065bbf50e3cc18016a2981a81aa99e"
+}

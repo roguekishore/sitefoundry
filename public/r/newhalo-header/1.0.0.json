@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo header",
+  "description": "A fixed, see-through header for black first screens: large wordmark left, small centred links (the current one orange with a dot), a white button and two quiet squares right. It slides away as you scroll down and returns on solid black when you scroll up. Phones get a short button and a menu square that opens a full-height list.",
+  "category": "header",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "dark",
+    "minimal",
+    "hide-on-scroll",
+    "mobile-menu"
+  ],
+  "notes": [
+    "made for a black first section (the hero panel or a page hero): it is transparent at the top",
+    "always dark (wraps itself in .dark)"
+  ],
+  "entry": "newhalo-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "newhalo-header",
+  "files": [
+    {
+      "path": "newhalo-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Menu, PersonStanding, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\n\nexport interface NewhaloHeaderLink {\n  label: string;\n  href: string;\n  /** the current page: orange, with a small dot underneath */\n  active?: boolean;\n}\n\nexport interface NewhaloHeaderProps {\n  /** the wordmark, set large in the display face */\n  brand: string;\n  /** an icon shown before the wordmark (e.g. a lucide icon) */\n  brandIcon?: ReactNode;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** the centred navigation (desktop) and the menu panel (phones) */\n  links: NewhaloHeaderLink[];\n  /** the white button at the right; shortLabel is used on phones */\n  cta: { label: string; shortLabel?: string; href: string };\n  /** a small language switch next to the button (desktop) */\n  language?: { label: string; href: string };\n  /** screen-reader name of the accessibility button; leave out to hide it */\n  accessibilityLabel?: string;\n  /** screen-reader names of the menu button */\n  menuLabels?: { open: string; close: string };\n  className?: string;\n}\n\nconst ease = \"ease-[cubic-bezier(0.32,0.94,0.6,1)]\";\n\n/**\n * A fixed, see-through header on a black context: wordmark left, small centred links, a white\n * button and two quiet squares right. It slides away while you scroll down and comes back,\n * on solid black, as soon as you scroll up. On phones a menu square opens a full-height panel.\n */\nexport function NewhaloHeader({\n  brand,\n  brandIcon,\n  brandHref = \"/\",\n  links,\n  cta,\n  language,\n  accessibilityLabel,\n  menuLabels = { open: \"Open menu\", close: \"Close menu\" },\n  className,\n}: NewhaloHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [solid, setSolid] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      setSolid(y > 40);\n      setHidden(y > 120 && y > last);\n      last = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  return (\n    <header\n      className={cn(\n        \"dark fixed inset-x-0 top-0 z-50 text-foreground transition-[transform,background-color] duration-400 motion-reduce:transition-none\",\n        ease,\n        hidden && !open && \"-translate-y-full\",\n        (solid || open) && \"bg-background\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto flex h-18 max-w-page items-center gap-4 px-gutter lg:h-30\">\n        <a href={brandHref} className=\"mr-auto flex items-center gap-2 font-display text-[2.25rem] leading-none tracking-[-0.02em] lg:gap-3 lg:text-5xl\">\n          {brandIcon && <span className=\"flex [&_svg]:size-9 lg:[&_svg]:size-11\">{brandIcon}</span>}\n          {brand}\n        </a>\n\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 lg:block\">\n          <ul className=\"flex gap-10\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a\n                  href={l.href}\n                  aria-current={l.active ? \"page\" : undefined}\n                  className={cn(\n                    \"relative block py-2 text-base leading-none transition-colors duration-300 hover:text-primary motion-reduce:transition-none\",\n                    ease,\n                    l.active && \"text-primary after:absolute after:-bottom-1 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-primary\",\n                  )}\n                >\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        <div className=\"flex items-center gap-2.5\">\n          <NewhaloButton label={cta.label} href={cta.href} variant=\"light\" className=\"hidden lg:inline-flex\" />\n          <NewhaloButton label={cta.shortLabel ?? cta.label} href={cta.href} variant=\"light\" className=\"lg:hidden\" />\n          {language && <NewhaloButton label={language.label} href={language.href} variant=\"quiet\" className=\"hidden w-10 px-0 lg:inline-flex\" />}\n          {accessibilityLabel && (\n            <NewhaloButton label={accessibilityLabel} variant=\"quiet\" iconOnly icon={<PersonStanding strokeWidth={1.5} />} className=\"hidden lg:inline-flex\" />\n          )}\n          <button\n            type=\"button\"\n            aria-expanded={open}\n            aria-label={open ? menuLabels.close : menuLabels.open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"flex size-10 items-center justify-center rounded-sm bg-foreground/10 lg:hidden\"\n          >\n            {open ? <X aria-hidden strokeWidth={1.25} className=\"size-6\" /> : <Menu aria-hidden strokeWidth={1.25} className=\"size-6\" />}\n          </button>\n        </div>\n      </div>\n\n      {open && (\n        <nav className=\"h-[calc(100svh-4.5rem)] overflow-y-auto px-gutter pt-6 pb-10 lg:hidden\">\n          <ul className=\"border-b border-border\">\n            {links.map((l) => (\n              <li key={l.href} className=\"border-t border-border\">\n                <a href={l.href} aria-current={l.active ? \"page\" : undefined} className={cn(\"block py-4 font-display text-[1.75rem] leading-tight\", l.active && \"text-primary\")}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {language && <NewhaloButton label={language.label} href={language.href} variant=\"quiet\" className=\"mt-8\" />}\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set large in the display face"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an icon shown before the wordmark (e.g. a lucide icon)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "NewhaloHeaderLink[]",
+      "required": true,
+      "description": "the centred navigation (desktop) and the menu panel (phones)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; shortLabel?: string | undefined; href: string; }",
+      "required": true,
+      "description": "the white button at the right; shortLabel is used on phones"
+    },
+    {
+      "name": "language",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a small language switch next to the button (desktop)"
+    },
+    {
+      "name": "accessibilityLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader name of the accessibility button; leave out to hide it"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": false,
+      "default": "{ open: \"Open menu\", close: \"Close menu\" }",
+      "description": "screen-reader names of the menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "33b3de074c7c8a4787df76cc2fdf2cfbf2da2bc9ef0673a9ef6491f221be7098"
+}

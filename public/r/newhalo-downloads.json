@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo press kit",
+  "description": "A press-kit section on paper: a sticky left column with a 64px heading and white download cards (24px name, small caption, orange 'download' bar with an icon square), and on the right a stack of wide dark pictures with 8px corners, each with a small orange download tile in its corner. Pictures bloom in (fade + 1.1→1) as they scroll into view.",
+  "category": "gallery",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "downloads",
+    "press",
+    "media",
+    "gallery",
+    "sticky",
+    "light",
+    "reveal"
+  ],
+  "notes": [
+    "the left column sticks below the header while the pictures scroll past (desktop)"
+  ],
+  "entry": "newhalo-downloads.tsx",
+  "source": "foundry",
+  "name": "newhalo-downloads",
+  "files": [
+    {
+      "path": "newhalo-downloads.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Download } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal } from \"@foundry/newhalo-reveal\";\n\nexport interface NewhaloDownloadsProps {\n  /** the 64px heading in the sticky column */\n  title: string;\n  /** the packs in the sticky column: a 24px name, a small caption, an orange download button */\n  packs: { title: string; caption: string; href: string; buttonLabel: string }[];\n  /** the big pictures on the right, each with its own download tile */\n  images: { media?: ReactNode; href: string; label: string }[];\n  className?: string;\n}\n\n/**\n * A press-kit section on paper: on the left a sticky column with a heading and white download\n * cards; on the right a stack of wide dark pictures with 8px corners, each with a small orange\n * download tile in its corner. Pictures bloom in as they scroll into view.\n */\nexport function NewhaloDownloads({ title, packs, images, className }: NewhaloDownloadsProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-y-12 px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"lg:sticky lg:top-24 lg:col-span-3 lg:self-start\">\n          <h2 className=\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\">{title}</h2>\n          <ul className=\"mt-6 grid gap-2.5 lg:mt-7\">\n            {packs.map((p) => (\n              <li key={p.title} className=\"rounded-lg bg-card p-5 text-card-foreground\">\n                <h3 className=\"font-display text-2xl leading-[1.1]\">{p.title}</h3>\n                <p className=\"mt-2 text-xs\">{p.caption}</p>\n                <a href={p.href} download className=\"group/dl mt-8 flex h-10 items-center justify-between rounded-sm bg-primary pl-[0.9375rem] text-base text-primary-foreground transition-colors duration-300 hover:text-background\">\n                  {p.buttonLabel}\n                  <span aria-hidden className=\"mr-1 flex size-8 items-center justify-center rounded-sm bg-foreground/10\">\n                    <Download strokeWidth={1.25} className=\"size-4 transition-transform duration-300 group-hover/dl:translate-y-0.5\" />\n                  </span>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n        <ul className=\"grid gap-2.5 lg:col-span-7 lg:col-start-6\">\n          {images.map((img) => (\n            <li key={img.href} className={cn(\"relative\", newhaloReveal(\"bloom\"))}>\n              <NewhaloMedia tone=\"deep\" className=\"dark aspect-[1.78] rounded-lg\">\n                {img.media}\n              </NewhaloMedia>\n              <a\n                href={img.href}\n                download\n                aria-label={img.label}\n                className=\"absolute top-2.5 right-2.5 flex size-10 items-center justify-center rounded-sm bg-primary text-primary-foreground transition-colors duration-300 hover:text-background\"\n              >\n                <Download aria-hidden strokeWidth={1.25} className=\"size-4\" />\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 64px heading in the sticky column"
+    },
+    {
+      "name": "packs",
+      "type": "{ title: string; caption: string; href: string; buttonLabel: string; }[]",
+      "required": true,
+      "description": "the packs in the sticky column: a 24px name, a small caption, an orange download button"
+    },
+    {
+      "name": "images",
+      "type": "{ media?: ReactNode; href: string; label: string; }[]",
+      "required": true,
+      "description": "the big pictures on the right, each with its own download tile"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ee261a25a04deff5434ddb22d5c54ef366565b4e732aa52ae54198e9f67ad8b3"
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo pinned room",
+  "description": "A window-tall, pale picture of a treatment room under a 100px dark heading. On desktop it pins for about two extra screens of scrolling while the picture pans upward underneath; a caption with two square orange arrows sits bottom-left and switches between short points.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "pinned",
+    "sticky",
+    "scroll",
+    "pan",
+    "parallax",
+    "light",
+    "fullscreen",
+    "slider"
+  ],
+  "notes": [
+    "the pinned panel is sized by the window (h-svh) inside a 330svh wrapper on desktop; phones get one window-tall panel",
+    "made for a pale picture: the heading uses the foreground colour",
+    "the caption arrows need JavaScript (hydrate: visible)"
+  ],
+  "entry": "newhalo-pricing-integration.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "newhalo-pricing-integration",
+  "files": [
+    {
+      "path": "newhalo-pricing-integration.css",
+      "content": "/* The tall wrapper drives a timeline; while the window-sized panel is pinned, the picture\n   inside it pans upward. */\n.newhalo-pricing-integration {\n  view-timeline-name: --newhalo-pricing-integration;\n}\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-pricing-integration-pan {\n      animation: newhalo-pricing-integration-pan linear both;\n      animation-timeline: --newhalo-pricing-integration;\n      animation-range: contain 0% contain 100%;\n    }\n  }\n}\n@keyframes newhalo-pricing-integration-pan {\n  from { transform: translateY(0); }\n  to { transform: translateY(-22%); }\n}\n"
+    },
+    {
+      "path": "newhalo-pricing-integration.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport \"./newhalo-pricing-integration.css\";\n\nexport interface NewhaloPricingIntegrationProps {\n  /** the 100px heading over the picture */\n  title: string;\n  /** captions that take turns at the bottom left, switched with the arrows */\n  slides: { title: string; text: string }[];\n  /** screen-reader names of the arrows */\n  controlLabels?: { previous: string; next: string };\n  /** the big, pale room picture; empty shows the placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A pinned, window-tall picture of a pale treatment room: on desktop it stays put for about two\n * more screens of scrolling while the picture pans upward underneath a big dark heading. A\n * caption with two square arrows sits bottom-left.\n */\nexport function NewhaloPricingIntegration({ title, slides, controlLabels = { previous: \"Previous\", next: \"Next\" }, media, className }: NewhaloPricingIntegrationProps) {\n  const [index, setIndex] = useState(0);\n  const slide = slides[index];\n  const arrow = \"flex size-10 items-center justify-center rounded-sm bg-primary text-primary-foreground transition-colors duration-300 disabled:bg-foreground/5 disabled:text-foreground/30\";\n\n  return (\n    <section className={cn(\"newhalo-pricing-integration relative bg-background text-foreground lg:h-[330svh]\", className)}>\n      <div className=\"relative min-h-svh overflow-clip lg:sticky lg:top-0 lg:h-svh\">\n        <NewhaloMedia className=\"absolute inset-x-0 top-0 h-full lg:h-[128%]\" innerClassName=\"newhalo-pricing-integration-pan\">\n          {media}\n        </NewhaloMedia>\n        <div className=\"relative mx-auto flex min-h-svh max-w-page flex-col px-gutter pt-12 pb-10 lg:h-full lg:pt-[8.4rem]\">\n          <h2 className=\"max-w-[40rem] font-display text-[3.125rem] leading-[0.95] tracking-[-0.015em] lg:text-[6.25rem]\">{title}</h2>\n          {slide && (\n            <div className=\"mt-auto max-w-[22rem]\">\n              <h3 className=\"font-display text-[1.3rem] leading-tight lg:text-2xl\">{slide.title}</h3>\n              <p className=\"mt-2 text-[0.91rem] leading-normal lg:text-base\">{slide.text}</p>\n              {slides.length > 1 && (\n                <div className=\"mt-8 flex gap-2.5\">\n                  <button type=\"button\" aria-label={controlLabels.previous} disabled={index === 0} onClick={() => setIndex((i) => i - 1)} className={arrow}>\n                    <ArrowLeft aria-hidden strokeWidth={1.25} className=\"size-5\" />\n                  </button>\n                  <button type=\"button\" aria-label={controlLabels.next} disabled={index === slides.length - 1} onClick={() => setIndex((i) => i + 1)} className={arrow}>\n                    <ArrowRight aria-hidden strokeWidth={1.25} className=\"size-5\" />\n                  </button>\n                </div>\n              )}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 100px heading over the picture"
+    },
+    {
+      "name": "slides",
+      "type": "{ title: string; text: string; }[]",
+      "required": true,
+      "description": "captions that take turns at the bottom left, switched with the arrows"
+    },
+    {
+      "name": "controlLabels",
+      "type": "{ previous: string; next: string; }",
+      "required": false,
+      "default": "{ previous: \"Previous\", next: \"Next\" }",
+      "description": "screen-reader names of the arrows"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the big, pale room picture; empty shows the placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "df49821fbb73861b68af00b86d57901ec21481a1d227f1fda23a1cca4c4dda3b"
+}

@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo legal text",
+  "description": "A long text page on paper: sticky white topic tiles on the left (the section in view turns orange), the text on the right with 64px section headings, 32px and 24px sub-headings, 16px body and plain bullet lists. On phones the tiles become a sideways row that sticks to the top of the window.",
+  "category": "faq",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "legal",
+    "terms",
+    "privacy",
+    "prose",
+    "sticky",
+    "scroll-spy",
+    "light"
+  ],
+  "notes": [
+    "the orange tile follows your scrolling (hydrate: visible); the tiles link to the sections either way"
+  ],
+  "entry": "newhalo-legal.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "newhalo-legal",
+  "files": [
+    {
+      "path": "newhalo-legal.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloTiles } from \"@foundry/newhalo-tiles\";\n\nexport interface NewhaloLegalPart {\n  /** a sub-heading: level 3 is 32px, level 4 is 24px */\n  heading?: string;\n  level?: 3 | 4;\n  /** paragraphs under it */\n  paragraphs?: string[];\n  /** a bullet list after the paragraphs */\n  bullets?: string[];\n}\n\nexport interface NewhaloLegalSection {\n  /** the anchor id the tile links to */\n  id: string;\n  /** the tile label and the section's 64px heading */\n  title: string;\n  parts: NewhaloLegalPart[];\n}\n\nexport interface NewhaloLegalProps {\n  sections: NewhaloLegalSection[];\n  className?: string;\n}\n\n/**\n * A long legal text on paper: sticky topic tiles on the left (the section you are reading is\n * orange), the text on the right with 64px section headings, 32/24px sub-headings, 16px body\n * and bullet lists. On phones the tiles become a sideways row that sticks to the top.\n */\nexport function NewhaloLegal({ sections, className }: NewhaloLegalProps) {\n  const [active, setActive] = useState(0);\n\n  useEffect(() => {\n    const els = sections.map((s) => document.getElementById(s.id)).filter((e): e is HTMLElement => !!e);\n    const io = new IntersectionObserver(\n      (entries) => {\n        for (const e of entries) if (e.isIntersecting) setActive(els.indexOf(e.target as HTMLElement));\n      },\n      { rootMargin: \"-30% 0px -60% 0px\" },\n    );\n    els.forEach((el) => io.observe(el));\n    return () => io.disconnect();\n  }, [sections]);\n\n  return (\n    <section className={cn(\"bg-background pt-1.5 pb-section text-foreground lg:pt-section\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"sticky top-1.5 z-10 lg:top-30 lg:col-span-4 lg:self-start\">\n          <NewhaloTiles items={sections.map((s) => ({ label: s.title, href: `#${s.id}` }))} activeIndex={active} />\n        </div>\n        <div className=\"mt-16 lg:col-span-7 lg:col-start-6 lg:mt-0\">\n          {sections.map((s) => (\n            <article key={s.id} id={s.id} className=\"scroll-mt-24 pb-14 last:pb-0\">\n              <h2 className=\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\">{s.title}</h2>\n              {s.parts.map((p, i) => (\n                <div key={i} className=\"mt-7 text-sm leading-normal lg:text-base\">\n                  {p.heading &&\n                    (p.level === 4 ? (\n                      <h4 className=\"mb-5 font-display text-xl leading-[1.1] lg:text-2xl\">{p.heading}</h4>\n                    ) : (\n                      <h3 className=\"mb-6 font-display text-[1.56rem] leading-[1.1] lg:text-[2rem]\">{p.heading}</h3>\n                    ))}\n                  <div className=\"space-y-3\">\n                    {p.paragraphs?.map((t) => (\n                      <p key={t}>{t}</p>\n                    ))}\n                  </div>\n                  {p.bullets && (\n                    <ul className=\"mt-6 list-disc space-y-3 pl-5 marker:text-foreground\">\n                      {p.bullets.map((b) => (\n                        <li key={b}>{b}</li>\n                      ))}\n                    </ul>\n                  )}\n                </div>\n              ))}\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-tiles"
+  ],
+  "props": [
+    {
+      "name": "sections",
+      "type": "NewhaloLegalSection[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6b33093796ade96e971a8bb46c7f51389fdd72d3c023de546bef4cf2197f758d"
+}
