@@ -69,14 +69,18 @@ Host github.com
   StrictHostKeyChecking accept-new
 CONF
   chown "$user:$user" "$home/.ssh/config" && chmod 600 "$home/.ssh/config"
-  if as "$user" "git ls-remote $REPO_URL HEAD" >/dev/null 2>&1; then
+  local why
+  if why=$(as "$user" "git ls-remote $REPO_URL HEAD" 2>&1); then
     say "deploy key accepted by GitHub ($mode)"
     return 0
   fi
   local flag=""
   [[ "$mode" == rw ]] && flag=" --allow-write"
   echo
-  echo "GitHub does not accept this machine's key yet. Its public key:"
+  echo "GitHub did not let this machine in. git said:"
+  echo "$why" | tail -n 5
+  echo
+  echo "Its public key:"
   echo
   cat "$home/.ssh/id_ed25519.pub"
   echo
@@ -101,12 +105,14 @@ clone_or_pull() {
 # instance's own role and writes /run/foundry/secrets.env (0600), which the unit reads.
 # So rotating a secret = put-parameter + restart the service.
 write_env_script() {
-  local role=$1 names
+  local role=$1 owner names
   if [[ $role == preview ]]; then
+    owner=foundry
     names='FOUNDRY_PASSPHRASE_HASH=/foundry/preview/passphrase-hash
 FOUNDRY_TOTP_SECRET=/foundry/preview/totp-secret
 FOUNDRY_RUNNER_TOKEN=/foundry/shared/runner-token'
   else
+    owner=runner
     names='FOUNDRY_RUNNER_TOKEN=/foundry/shared/runner-token
 FOUNDRY_VERTEX_KEY=/foundry/run/vertex-key
 CLAUDE_CODE_OAUTH_TOKEN=/foundry/run/claude-oauth-token'
@@ -116,7 +122,7 @@ CLAUDE_CODE_OAUTH_TOKEN=/foundry/run/claude-oauth-token'
 # Written by infra/provision. Reads this instance's secrets into /run/foundry/secrets.env.
 set -euo pipefail
 export AWS_DEFAULT_REGION=$REGION
-install -d -m 700 /run/foundry
+install -d -m 700 -o $owner -g $owner /run/foundry
 umask 077
 out=/run/foundry/secrets.env.new
 : > "\$out"
@@ -132,6 +138,7 @@ while IFS== read -r var param; do
 done <<'NAMES'
 $names
 NAMES
+chown $owner:$owner "\$out"
 mv "\$out" /run/foundry/secrets.env
 SCRIPT
   chmod 755 /usr/local/bin/foundry-env

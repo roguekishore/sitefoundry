@@ -5,11 +5,12 @@ REPO_DIR=/home/runner/sitefoundry
 WORKTREES=/home/runner/sitefoundry-runs
 SERVER_URL=http://10.20.0.10:4401
 
+base_packages
+
 say "user and deploy key"
 make_user runner
 deploy_key runner "foundry-run (write)" rw
 
-base_packages
 install_node
 
 say "libraries for headless Chromium"
@@ -74,9 +75,8 @@ Environment=FOUNDRY_GALLERY_HOST=0.0.0.0
 Environment=FOUNDRY_FETCH=1
 Environment=FOUNDRY_PUSH=1
 Environment=FOUNDRY_SELF_SHUTDOWN_MINUTES=30
-EnvironmentFile=/run/foundry/secrets.env
 ExecStartPre=+/usr/local/bin/foundry-env
-ExecStart=/opt/node/bin/node packages/server/dist/runner.mjs
+ExecStart=/bin/bash -c 'set -a; . /run/foundry/secrets.env; exec /opt/node/bin/node packages/server/dist/runner.mjs'
 Restart=always
 RestartSec=5
 

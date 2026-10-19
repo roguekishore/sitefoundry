@@ -4,11 +4,12 @@ RUN_INSTANCE_ID=i-0ab154c93b3356c22
 REPO_DIR=/home/foundry/sitefoundry
 DATA_DIR=/var/lib/foundry
 
+base_packages
+
 say "user and deploy key"
 make_user foundry
 deploy_key foundry "foundry-preview (read only)" ro
 
-base_packages
 install_node
 
 say "swap (the gallery build needs more than 2 GB)"
@@ -51,9 +52,8 @@ Environment=AWS_REGION=$REGION
 Environment=FOUNDRY_WARDEN_RUNS_DIR=/var/lib/warden-runs
 Environment=FOUNDRY_LIVE_TARGET=http://10.20.0.20:4410
 Environment=FOUNDRY_LIVE_URL=https://live.$DOMAIN/
-EnvironmentFile=/run/foundry/secrets.env
 ExecStartPre=+/usr/local/bin/foundry-env
-ExecStart=/opt/node/bin/node packages/server/dist/server.mjs
+ExecStart=/bin/bash -c 'set -a; . /run/foundry/secrets.env; exec /opt/node/bin/node packages/server/dist/server.mjs'
 Restart=always
 RestartSec=5
 
