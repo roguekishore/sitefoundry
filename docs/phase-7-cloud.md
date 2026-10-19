@@ -158,6 +158,41 @@ Warden already has `jk` (v2 since 2026-10-11).
 
 ## Step D — provisioning both instances: **TODO**
 
+**The user's decisions (2026-10-19), and what was found, before any of it was written:**
+
+- **The operator runs every SSM script** with `!` (warden's rule holds: jk's root keys are only
+  theirs to use). Planned: `infra/aws.sh` (reads `~/Downloads/jk.csv`, sets `MSYS_NO_PATHCONV=1`,
+  never a profile) and `infra/ssm.sh <preview|run> <script>` (sends the script base64-encoded
+  with CRs stripped, via a `file://` JSON in `cygpath -w` form, then polls and prints the output;
+  SSM keeps only 24,000 characters of stdout, so the scripts log to a file and print a summary).
+- **Secrets go through Parameter Store** (SecureString, `aws/ssm` key), never inline in SSM
+  commands: `/foundry/preview/passphrase-hash`, `/foundry/preview/totp-secret`,
+  `/foundry/shared/runner-token`, `/foundry/run/vertex-key` (`GOOGLE_API_KEY` in the laptop's
+  `~/.gemini/.env`), `/foundry/run/claude-oauth-token` (from `claude setup-token`: the laptop
+  can't open SSM sessions, so no interactive `/login`). `infra/secrets.sh` runs in the user's
+  own terminal (`!` has no stdin; `setup-login` reads the passphrase from it), and only sets
+  what is missing. A root `ExecStartPre=+` script on each instance writes the 0600 env file from
+  them at every start, so rotating a secret is put-parameter + restart.
+- **Terraform change needed:** `AmazonSSMManagedInstanceCore` already allows `ssm:GetParameter*`
+  on `*`, so "each role reads only its own" needs explicit **Deny** policies (standalone):
+  the run role denied `/foundry/preview/*` (the agent there could otherwise read the login),
+  the preview role denied `/foundry/run/*`. The user was told this is a small Terraform change.
+- **Deploy keys:** made on each instance (ed25519, per user); `gh` is logged in on the laptop as
+  `roguekishore`, so `gh repo deploy-key add --repo roguekishore/sitefoundry` (`--allow-write`
+  for the run instance) can add them. The provision scripts stop before cloning until the key
+  is there, and are safe to rerun.
+- **AL2023 specifics:** Node 24 from the nodejs.org linux-arm64 tarball into `/opt/node`
+  (`npm root -g` must work: `runner/gemini.ts` finds the Gemini CLI with it); pnpm 12.14 (the
+  laptop's); Caddy from its GitHub release (not in dnf), Caddyfile `foundry.themaverick.tech,
+  live.foundry.themaverick.tech { reverse_proxy 127.0.0.1:4401 }` (Caddy keeps Host, so the
+  server's `live.` check works); server `FOUNDRY_HOST=0.0.0.0` (the SG admits 4401 only from
+  the run SG), `FOUNDRY_COOKIE_DOMAIN=foundry.themaverick.tech` (covers `live.`, whose proxy
+  needs the login). **Playwright's `--with-deps` is apt-only**: install Chromium's libraries with
+  dnf and prove it with a headless launch. Claude Code via its native installer as `runner`
+  (`~/.local/bin` on the unit's PATH). Git identity on the run instance: the laptop's
+  (`Kishore N E`, `git config user.email`).
+- `public/r/` is committed, so the preview needs no registry build; thumbnails stay missing.
+
 Write it as scripts in `infra/` run over SSM (`aws ssm send-command`, laptop can't open SSM
 sessions: the session-manager plugin isn't installed).
 
