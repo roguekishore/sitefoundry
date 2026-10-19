@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Copy, Monitor, Moon, Smartphone, Sun, Tablet, Zap } from "lucide-react";
 import { installCommand, type Item } from "./catalog";
+import { BASE } from "./base";
 import { PreviewFrame, type Target } from "./frame";
 import {
   loadThumbs,
@@ -64,7 +65,7 @@ export function Thumb({ thumbKey, prefer = "desktop", aspect = 16 / 10, label }:
   const pxPerCss = shot.width / viewport.w;
   const cropped = Math.min(shot.contentHeight || viewport.h, viewport.h) * pxPerCss;
   const shotAspect = shot.width / cropped;
-  const src = `/thumbs/${shot.file}?at=${encodeURIComponent(entry.at)}`;
+  const src = `${BASE}thumbs/${shot.file}?at=${encodeURIComponent(entry.at)}`;
   return (
     <div className="thumb" style={{ aspectRatio: aspect }}>
       <div className="backdrop" style={{ backgroundImage: `url("${src}")` }} />

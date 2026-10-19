@@ -6,6 +6,7 @@ import type { IndexEntry, RegistryItem } from "@foundry/core";
 import { byName, installCommand, registryIndex } from "../catalog";
 import { MiniItem } from "../cards";
 import { library, pageLabel, themeFor, titleCase, usedOn } from "../library";
+import { BASE } from "../base";
 import { useSettings } from "../state";
 import { Badges, CmdBox, DeviceSeg, ItemStage, ThemeButton } from "../ui";
 
@@ -44,7 +45,7 @@ export function ItemPage({ name }: { name: string }) {
     .sort((a, b) => Number(b.meta.site === item.meta.site) - Number(a.meta.site === item.meta.site))
     .slice(0, 5);
   const deps = (entry?.registryDependencies ?? []).filter((d) => byName.has(d));
-  const fullScreen = target ? `/preview.html?${new URLSearchParams({ ...target, theme, mode: settings.mode })}` : "";
+  const fullScreen = target ? `${BASE}preview.html?${new URLSearchParams({ ...target, theme, mode: settings.mode })}` : "";
 
   return (
     <div className="page">
@@ -208,7 +209,7 @@ function Code({ name }: { name: string }) {
   const [built, setBuilt] = useState<RegistryItem>();
   const [file, setFile] = useState(0);
   useEffect(() => {
-    fetch(`/r/${name}.json`)
+    fetch(`${BASE}r/${name}.json`)
       .then((r) => r.json())
       .then(setBuilt)
       .catch(() => setBuilt(undefined));

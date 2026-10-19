@@ -2,6 +2,7 @@
 // New items appear without touching gallery code: drop a folder with meta.json into foundry/ or vault/.
 import type { ComponentType } from "react";
 import type { IndexEntry, ItemMeta } from "@foundry/core";
+import { BASE } from "./base";
 
 const metaFiles = import.meta.glob<ItemMeta>(
   ["../../../foundry/**/meta.json", "../../../vault/**/meta.json", "!**/_*/**", "!**/node_modules/**"],
@@ -89,7 +90,7 @@ export function ownTheme(item: Item | undefined): string | undefined {
 /** The built registry (props, versions, npm packages). Items not built yet are simply missing. */
 let indexPromise: Promise<Map<string, IndexEntry>> | undefined;
 export function registryIndex(): Promise<Map<string, IndexEntry>> {
-  indexPromise ??= fetch("/r/index.json")
+  indexPromise ??= fetch(`${BASE}r/index.json`)
     .then((r) => (r.ok ? r.json() : { items: [] }))
     .then((data: { items: IndexEntry[] }) => new Map(data.items.map((i) => [i.name, i])))
     .catch(() => new Map());

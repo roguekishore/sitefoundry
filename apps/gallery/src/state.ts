@@ -4,6 +4,7 @@
 //   #/browse?type=&source=&site=&category=&js=&q=&sort=
 //   #/item/<name>               one item          #/site/<site>[/<page>][?block=<name>]
 //   #/full/<site>/<page>?device=phone|tablet|desktop   the site alone, full screen
+//   #/runs  #/runs/new  #/runs/<id>                     runs (they need the foundry server)
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type Device = "phone" | "tablet" | "desktop";

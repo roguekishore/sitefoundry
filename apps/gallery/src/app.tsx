@@ -2,13 +2,14 @@
 // and the current view. Sites open the site viewer; items (blocks, components, themes) open an
 // item page. Layout follows docs/mockups/gallery-redesign.html.
 import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { Box, House, LayoutTemplate, Menu, Moon, Palette, Search, Sun } from "lucide-react";
+import { Box, House, LayoutTemplate, Menu, Moon, Palette, Play, Search, Sun } from "lucide-react";
 import { byName, items } from "./catalog";
 import { library, pageLabel, pagesOf, SOURCE_COLOUR, SOURCE_LABEL, SOURCES, siteColour, siteLabel, siteList, sourceOf, TYPE_LABEL } from "./library";
 import { openOverlay, setSettings, useDarkChrome, useRoute, type Route } from "./state";
 import { Browse, browseTitle, readBrowse } from "./views/browse";
 import { ItemPage } from "./views/item";
 import { Overview, Sites } from "./views/overview";
+import { RunsPage } from "./views/runs";
 import { Overlays } from "./views/search";
 import { FullSite, SiteViewer, sitePageOf } from "./views/site";
 
@@ -34,6 +35,7 @@ export function App() {
   else if (head === "full" && route.parts[1]) view = <FullSite route={route} />;
   else if (head === "browse") view = <Browse route={route} />;
   else if (head === "sites") view = <Sites />;
+  else if (head === "runs") view = <RunsPage route={route} />;
   else view = <Overview />;
 
   return (
@@ -95,6 +97,7 @@ function Sidebar({ route }: { route: Route }) {
         {typeLink("block", LayoutTemplate)}
         {typeLink("component", Box)}
         {typeLink("theme", Palette)}
+        {link("#/runs", <Play className="i" />, "Runs", null, head === "runs")}
       </nav>
       <nav className="nav-group">
         <h6>Sources</h6>
@@ -122,6 +125,7 @@ function Crumbs({ route }: { route: Route }) {
   const [head, a] = route.parts;
   let list: [string, string?][] = [["Overview"]];
   if (head === "sites") list = [["Overview", "#/"], ["Sites"]];
+  if (head === "runs") list = a ? [["Overview", "#/"], ["Runs", "#/runs"], [a === "new" ? "New run" : `Run #${a}`]] : [["Overview", "#/"], ["Runs"]];
   if (head === "browse") list = [["Overview", "#/"], [browseTitle(readBrowse(route.q))]];
   if (head === "item") {
     const type = byName.get(a)?.meta.type ?? "";
