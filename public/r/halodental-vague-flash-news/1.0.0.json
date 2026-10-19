@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo Dental press & news list",
+  "description": "Editorial press feed on warm stone paper: a 64px heading paired with an outline CTA at the top, followed by hairline-bordered 12-column article rows (3-col rounded thumbnail card, 3-col headline at column 6, 3-col abstract at column 9, and an outward arrow button at column 12) with a faded fourth row and a centred 'View more' button.",
+  "category": "blog",
+  "site": "halodental-vague-flash",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "press",
+    "editorial",
+    "list",
+    "minimal"
+  ],
+  "notes": [
+    "Pass a custom media ReactNode per item to replace the default studio or press-card placeholder",
+    "When fadeLast is true (default), the final row fades behind a gradient veil with the 'View more' outline button"
+  ],
+  "entry": "halodental-vague-flash-news.tsx",
+  "source": "foundry",
+  "name": "halodental-vague-flash-news",
+  "files": [
+    {
+      "path": "halodental-vague-flash-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalVagueFlashButton } from \"@foundry/halodental-vague-flash-button\";\n\nexport interface HalodentalVagueFlashNewsItem {\n  /** article headline */\n  title: string;\n  /** short summary paragraph */\n  excerpt: string;\n  /** article URL */\n  href: string;\n  /** optional custom thumbnail media node (325×180 on desktop, 348×193 on phones) */\n  media?: ReactNode;\n  /** built-in placeholder style when media is omitted */\n  placeholderStyle?: \"studio-dark\" | \"press-stacked\" | \"press-serif\" | \"press-tech\";\n  /** text rendered inside the press-card placeholder */\n  placeholderLabel?: string;\n}\n\nexport interface HalodentalVagueFlashNewsProps {\n  /** section heading */\n  title: string;\n  /** top-right outline button */\n  headerCta?: {\n    label: string;\n    href: string;\n  };\n  /** list of press/news rows */\n  items: HalodentalVagueFlashNewsItem[];\n  /** bottom centred outline button */\n  moreCta?: {\n    label: string;\n    href: string;\n  };\n  /** fade the final item behind the 'View more' gradient veil (default true) */\n  fadeLast?: boolean;\n  className?: string;\n}\n\nfunction DefaultNewsMedia({\n  style = \"press-stacked\",\n  label = \"PRESS\",\n}: {\n  style?: HalodentalVagueFlashNewsItem[\"placeholderStyle\"];\n  label?: string;\n}) {\n  if (style === \"studio-dark\") {\n    return (\n      <div\n        aria-hidden\n        className=\"dark relative size-full overflow-hidden bg-background text-foreground\"\n      >\n        <div className=\"absolute inset-0 bg-[radial-gradient(circle_at_54%_52%,var(--secondary)_0%,var(--background)_75%)]\" />\n        <div className=\"absolute inset-0 flex items-center justify-center\">\n          <div className=\"relative h-[74%] w-3.5 rotate-18 rounded-full bg-foreground/35 ring-1 ring-foreground/30\">\n            <span className=\"absolute -top-5 left-1/2 size-7 -translate-x-1/2 rounded-full border-2 border-foreground/80\" />\n          </div>\n        </div>\n      </div>\n    );\n  }\n\n  if (style === \"press-serif\") {\n    return (\n      <div\n        aria-hidden\n        className=\"grid size-full place-items-center bg-card px-6 text-center text-card-foreground\"\n      >\n        <span className=\"font-display text-2xl leading-none font-bold tracking-tight uppercase lg:text-[1.7rem]\">\n          {label}\n        </span>\n      </div>\n    );\n  }\n\n  if (style === \"press-tech\") {\n    return (\n      <div\n        aria-hidden\n        className=\"grid size-full place-items-center bg-card px-6 text-center text-card-foreground\"\n      >\n        <span className=\"font-display text-xl leading-none font-normal tracking-[0.14em] text-muted-foreground uppercase\">\n          {label}\n        </span>\n      </div>\n    );\n  }\n\n  const parts = label.split(\" \");\n  return (\n    <div\n      aria-hidden\n      className=\"flex size-full flex-col items-start justify-center bg-card px-12 text-card-foreground lg:px-14\"\n    >\n      {parts.map((part, i) => (\n        <span\n          key={i}\n          className=\"font-display text-[2.25rem] leading-[0.92] font-bold tracking-tight uppercase lg:text-[2.5rem]\"\n        >\n          {part}\n        </span>\n      ))}\n    </div>\n  );\n}\n\n/**\n * Halo Dental's 12-column press & news feed with hairline row dividers and a faded 'View more' footer.\n */\nexport function HalodentalVagueFlashNews({\n  title,\n  headerCta,\n  items,\n  moreCta,\n  fadeLast = true,\n  className,\n}: HalodentalVagueFlashNewsProps) {\n  return (\n    <section\n      className={cn(\n        \"relative bg-background pt-[var(--section-y)] pb-5 text-foreground lg:pb-20\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[var(--page-width)]\">\n        <header className=\"flex flex-wrap items-center justify-between gap-5 px-[var(--page-gutter)]\">\n          <h2 className=\"font-display text-[2.47rem] leading-[1.1] font-normal tracking-[-0.015em] lg:text-[4rem] lg:leading-none\">\n            {title}\n          </h2>\n          {headerCta && (\n            <div className=\"w-full lg:w-auto lg:pt-3\">\n              <HalodentalVagueFlashButton variant=\"outline\" href={headerCta.href}>\n                {headerCta.label}\n              </HalodentalVagueFlashButton>\n            </div>\n          )}\n        </header>\n\n        <ul className=\"mt-[30px] lg:mt-[60px]\">\n          {items.map((item, idx) => {\n            const isFaded = fadeLast && idx === items.length - 1;\n            return (\n              <li\n                key={item.title}\n                className={cn(\n                  \"px-[var(--page-gutter)]\",\n                  isFaded &&\n                    \"max-h-[104px] overflow-hidden opacity-25 pointer-events-none select-none lg:max-h-[240px]\",\n                )}\n              >\n                <a\n                  href={item.href}\n                  className=\"group flex flex-col gap-y-5 border-t border-border py-[30px] transition-colors lg:grid lg:min-h-[240px] lg:grid-cols-12 lg:items-start lg:gap-x-5\"\n                >\n                  <div className=\"h-[193px] w-full overflow-hidden rounded-lg bg-card lg:col-span-3 lg:h-[180px]\">\n                    {item.media ?? (\n                      <DefaultNewsMedia\n                        style={item.placeholderStyle}\n                        label={item.placeholderLabel}\n                      />\n                    )}\n                  </div>\n\n                  <h3 className=\"font-display text-[1.56rem] leading-[1.1] font-normal tracking-[-0.01em] text-foreground lg:col-span-3 lg:col-start-6 lg:text-[1.75rem] lg:leading-[1.1]\">\n                    {item.title}\n                  </h3>\n\n                  <p className=\"text-[0.91rem] leading-[1.5] font-normal text-foreground lg:col-span-3 lg:col-start-9 lg:text-base lg:leading-[1.5]\">\n                    {item.excerpt}\n                  </p>\n\n                  <div className=\"flex lg:col-span-1 lg:col-start-12 lg:justify-end\">\n                    <span className=\"grid size-10 place-items-center rounded-[var(--radius)] bg-card text-card-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground lg:bg-transparent lg:text-foreground\">\n                      <ArrowUpRight aria-hidden className=\"size-4\" strokeWidth={1.5} />\n                    </span>\n                  </div>\n                </a>\n              </li>\n            );\n          })}\n        </ul>\n\n        {moreCta && (\n          <footer className=\"relative z-10 flex justify-center px-[var(--page-gutter)] pt-6 pb-5 lg:-mt-28 lg:bg-gradient-to-t lg:from-background lg:via-background/90 lg:to-transparent lg:pt-24 lg:pb-3\">\n            <HalodentalVagueFlashButton variant=\"outline\" href={moreCta.href}>\n              {moreCta.label}\n            </HalodentalVagueFlashButton>\n          </footer>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-vague-flash-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section heading"
+    },
+    {
+      "name": "headerCta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "top-right outline button"
+    },
+    {
+      "name": "items",
+      "type": "HalodentalVagueFlashNewsItem[]",
+      "required": true,
+      "description": "list of press/news rows"
+    },
+    {
+      "name": "moreCta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "bottom centred outline button"
+    },
+    {
+      "name": "fadeLast",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "fade the final item behind the 'View more' gradient veil (default true)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d518b46e78439269b106c2caf7b1dbd49956995cf16df3c361fa0f7fe8fd1b82"
+}

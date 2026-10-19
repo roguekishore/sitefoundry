@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo Dental news list",
+  "description": "Press list on cream: a 64px heading with an outline button, then rows ruled with 1px black lines, each holding a 16:9 thumbnail, a 28px headline, a short summary and a small white arrow tile, all snapped to a 12-column grid. The last row fades out under a centred outline button.",
+  "category": "blog",
+  "site": "halodental-opus",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "press",
+    "list",
+    "ruled",
+    "editorial",
+    "light",
+    "cream",
+    "minimal",
+    "grid"
+  ],
+  "notes": [
+    "pass photos or publication logos through items[].media; the empty tile is white (card)",
+    "leave out `more` to show every row at full strength"
+  ],
+  "entry": "halodental-opus-news.tsx",
+  "source": "foundry",
+  "name": "halodental-opus-news",
+  "files": [
+    {
+      "path": "halodental-opus-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalOpusButton } from \"@foundry/halodental-opus-button\";\nimport { HalodentalOpusHeading } from \"@foundry/halodental-opus-heading\";\n\nexport interface HalodentalOpusNewsItem {\n  /** the story's headline */\n  title: string;\n  /** a short summary */\n  text: string;\n  /** where the arrow tile links */\n  href: string;\n  /** screen-reader label for the arrow tile */\n  linkLabel: string;\n  /** a 16:9 photo or a publication's logo on white; empty → a white tile */\n  media?: ReactNode;\n}\n\nexport interface HalodentalOpusNewsProps {\n  /** the heading */\n  title: string;\n  /** the outline button beside (desktop) or under (phones) the heading */\n  link?: { label: string; href: string };\n  /** the stories, one ruled row each */\n  items: HalodentalOpusNewsItem[];\n  /** the outline button centred under the list; the last row fades out above it */\n  more?: { label: string; href: string };\n  className?: string;\n}\n\n/**\n * Halo Dental's news list: a big heading with an outline button, then rows ruled with\n * 1px ink lines. Each row on the 12-column grid: a 16:9 thumbnail (3 columns), the\n * headline (3), a summary (3) and a small white arrow tile at the end. With `more`, the\n * last row fades into the page under a centred button. On phones each row stacks.\n */\nexport function HalodentalOpusNews({ title, link, items, more, className }: HalodentalOpusNewsProps) {\n  return (\n    <section className={cn(\"font-[450] bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex flex-col items-start gap-4 lg:flex-row lg:items-end lg:justify-between\">\n          <HalodentalOpusHeading title={title} />\n          {link && (\n            <HalodentalOpusButton variant=\"outline\" href={link.href} className=\"lg:mb-1.5 lg:h-[2.625rem]\">\n              {link.label}\n            </HalodentalOpusButton>\n          )}\n        </div>\n\n        <ul className=\"mt-8 lg:mt-[3.25rem]\">\n          {items.map((item, i) => {\n            const faded = more && items.length > 1 && i === items.length - 1;\n            return (\n              <li\n                key={item.title}\n                aria-hidden={faded || undefined}\n                className={cn(\n                  \"grid grid-cols-1 gap-x-5 border-t border-foreground pt-5 pb-[1.875rem] lg:grid-cols-12 lg:py-[1.875rem]\",\n                  faded && \"pointer-events-none max-h-32 overflow-hidden mask-b-from-0% mask-b-to-80% opacity-30 lg:max-h-none\",\n                )}\n              >\n                <div className=\"aspect-[348/193] overflow-hidden rounded-lg bg-card lg:col-span-3 lg:aspect-[325/180]\">{item.media}</div>\n                <HalodentalOpusHeading as=\"h3\" size=\"card\" title={item.title} className=\"mt-6 lg:col-span-3 lg:col-start-6 lg:mt-0\" />\n                <p className=\"mt-5 text-[0.9375rem] leading-[1.45] lg:col-span-3 lg:mt-1 lg:text-base lg:leading-normal\">{item.text}</p>\n                <HalodentalOpusButton variant=\"card\" href={item.href} ariaLabel={item.linkLabel} className=\"mt-5 justify-self-start lg:col-start-12 lg:mt-0 lg:justify-self-end\">\n                  <ArrowUpRight aria-hidden className=\"size-4\" strokeWidth={1.25} />\n                </HalodentalOpusButton>\n              </li>\n            );\n          })}\n        </ul>\n\n        {more && (\n          <div className={cn(\"flex justify-center\", items.length > 1 ? \"-mt-12 lg:-mt-[3.25rem]\" : \"mt-8\")}>\n            <HalodentalOpusButton variant=\"outline\" href={more.href} className=\"relative lg:h-[2.625rem]\">\n              {more.label}\n            </HalodentalOpusButton>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-opus-button",
+    "halodental-opus-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button beside (desktop) or under (phones) the heading"
+    },
+    {
+      "name": "items",
+      "type": "HalodentalOpusNewsItem[]",
+      "required": true,
+      "description": "the stories, one ruled row each"
+    },
+    {
+      "name": "more",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button centred under the list; the last row fades out above it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c07fc8ecabfc634718159a63f73b57100d549974a6571902e7fbb3a27b2e0826"
+}

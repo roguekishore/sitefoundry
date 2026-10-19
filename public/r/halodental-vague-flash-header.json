@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo Dental header",
+  "description": "Edge-to-edge top bar: paired-capsule emblem and wordmark on the left, a centred 6-item navigation row on desktop, and a white contrast CTA plus 40×40 locale and accessibility squares on the right. Phones show a compact white CTA and a three-line disclosure menu button.",
+  "category": "header",
+  "site": "halodental-vague-flash",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "overlay",
+    "dark",
+    "minimal",
+    "hardware"
+  ],
+  "notes": [
+    "overlay (true by default) positions the header over the dark hero box and applies .dark token colours",
+    "Mobile navigation uses a native <details> element so it works in static HTML without JavaScript"
+  ],
+  "entry": "halodental-vague-flash-header.tsx",
+  "source": "foundry",
+  "name": "halodental-vague-flash-header",
+  "files": [
+    {
+      "path": "halodental-vague-flash-header.tsx",
+      "content": "import { Accessibility } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalVagueFlashButton } from \"@foundry/halodental-vague-flash-button\";\nimport { HalodentalVagueFlashMark, type HalodentalVagueFlashMarkProps } from \"@foundry/halodental-vague-flash-mark\";\n\nexport interface HalodentalVagueFlashNavItem {\n  label: string;\n  href: string;\n}\n\nexport interface HalodentalVagueFlashHeaderProps {\n  /** brand mark configuration on the left */\n  mark: HalodentalVagueFlashMarkProps;\n  /** centred navigation links on desktop, disclosure list on mobile */\n  nav: HalodentalVagueFlashNavItem[];\n  /** primary white contrast button on the right */\n  cta: {\n    label: string;\n    /** shorter label shown on phones (e.g. \"Reserve\") */\n    mobileLabel?: string;\n    href: string;\n  };\n  /** two-letter locale button shown on desktop (e.g. \"Fr\") */\n  locale?: { label: string; href: string };\n  /** show the 40×40 accessibility icon button on desktop */\n  showAccessibility?: boolean;\n  /** accessible label for the mobile menu button */\n  menuLabel?: string;\n  /** lie transparently on top of the hero (default true) */\n  overlay?: boolean;\n  className?: string;\n}\n\n/**\n * Halo Dental's top bar: 76px tall on phones, 100px tall on desktop, aligned to --page-gutter.\n */\nexport function HalodentalVagueFlashHeader({\n  mark,\n  nav,\n  cta,\n  locale,\n  showAccessibility = true,\n  menuLabel = \"Toggle menu\",\n  overlay = true,\n  className,\n}: HalodentalVagueFlashHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"dark z-20 w-full text-foreground\",\n        overlay ? \"absolute inset-x-0 top-0 bg-transparent\" : \"relative bg-background\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto flex h-[4.75rem] max-w-[var(--page-width)] items-center justify-between px-[var(--page-gutter)] pt-4 pb-5 lg:relative lg:h-[6.25rem] lg:pt-10 lg:pb-5\">\n        <HalodentalVagueFlashMark {...mark} className=\"relative z-10 shrink-0\" />\n\n        <nav aria-label=\"Main navigation\" className=\"hidden lg:absolute lg:left-1/2 lg:block lg:-translate-x-1/2\">\n          <ul className=\"flex items-center gap-x-10 text-base font-normal text-foreground\">\n            {nav.map((item) => (\n              <li key={item.label}>\n                <a\n                  href={item.href}\n                  className=\"inline-flex h-10 items-center transition-colors duration-150 hover:text-primary\"\n                >\n                  {item.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        <div className=\"ml-auto flex items-center gap-x-2.5\">\n          <HalodentalVagueFlashButton variant=\"contrast\" href={cta.href} className=\"lg:hidden\">\n            {cta.mobileLabel ?? cta.label}\n          </HalodentalVagueFlashButton>\n          <HalodentalVagueFlashButton variant=\"contrast\" href={cta.href} className=\"hidden lg:inline-flex\">\n            {cta.label}\n          </HalodentalVagueFlashButton>\n\n          {locale && (\n            <HalodentalVagueFlashButton\n              variant=\"ghost-square\"\n              href={locale.href}\n              className=\"hidden capitalize lg:inline-flex\"\n            >\n              {locale.label}\n            </HalodentalVagueFlashButton>\n          )}\n\n          {showAccessibility && (\n            <HalodentalVagueFlashButton\n              variant=\"ghost-square\"\n              ariaLabel=\"Accessibility options\"\n              className=\"hidden lg:inline-flex\"\n            >\n              <Accessibility className=\"size-4\" strokeWidth={1.5} />\n            </HalodentalVagueFlashButton>\n          )}\n\n          <details className=\"group relative lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"grid size-10 cursor-pointer list-none place-items-center rounded-[var(--radius)] bg-foreground/10 text-foreground transition-colors hover:bg-foreground/20 [&::-webkit-details-marker]:hidden\"\n            >\n              <span aria-hidden className=\"flex h-[11px] w-5 flex-col justify-between\">\n                <span className=\"h-px w-full bg-current\" />\n                <span className=\"h-px w-full bg-current\" />\n                <span className=\"h-px w-full bg-current\" />\n              </span>\n            </summary>\n            <div className=\"absolute top-12 right-0 z-30 w-64 rounded-lg border border-border bg-card p-4 text-card-foreground\">\n              <ul className=\"flex flex-col gap-1\">\n                {nav.map((item) => (\n                  <li key={item.label}>\n                    <a\n                      href={item.href}\n                      className=\"block rounded-[var(--radius)] px-3 py-2 text-sm text-card-foreground hover:bg-secondary\"\n                    >\n                      {item.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-vague-flash-button",
+    "halodental-vague-flash-mark"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "HalodentalVagueFlashMarkProps",
+      "required": true,
+      "description": "brand mark configuration on the left"
+    },
+    {
+      "name": "nav",
+      "type": "HalodentalVagueFlashNavItem[]",
+      "required": true,
+      "description": "centred navigation links on desktop, disclosure list on mobile"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; mobileLabel?: string | undefined; href: string; }",
+      "required": true,
+      "description": "primary white contrast button on the right"
+    },
+    {
+      "name": "locale",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "two-letter locale button shown on desktop (e.g. \"Fr\")"
+    },
+    {
+      "name": "showAccessibility",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the 40×40 accessibility icon button on desktop"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Toggle menu",
+      "description": "accessible label for the mobile menu button"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "lie transparently on top of the hero (default true)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eaea3c07f4ab9f3bdeb7ca7bc4d172c1921d52e91baf3798cec4025c191478fd"
+}

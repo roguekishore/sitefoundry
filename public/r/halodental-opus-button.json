@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Halo Dental button",
+  "description": "Squarish 40px buttons with 4px corners and a regular-weight label: orange fill with ink text, a solid light fill for black panels, a 1px outline, a see-through square tile and a small card square for arrow links. Optional leading icon in a darker square.",
+  "category": "button",
+  "site": "halodental-opus",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "square",
+    "minimal",
+    "orange",
+    "flat"
+  ],
+  "notes": [
+    "light and tile are meant for black panels (put them inside an element with the `dark` class)",
+    "icon-only buttons need ariaLabel"
+  ],
+  "entry": "halodental-opus-button.tsx",
+  "source": "foundry",
+  "name": "halodental-opus-button",
+  "files": [
+    {
+      "path": "halodental-opus-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HalodentalOpusButtonProps {\n  /** the label; leave empty for an icon-only square (give it an `ariaLabel`) */\n  children?: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: orange fill with ink text · light: solid foreground fill (white on a black\n   * panel) · outline: 1px foreground border, no fill · tile: a quiet see-through square\n   * (menu, language, accessibility) · card: a small card-coloured square (arrow links)\n   */\n  variant?: \"primary\" | \"light\" | \"outline\" | \"tile\" | \"card\";\n  /** an icon in a slightly darker square at the start, as on the \"play\" button */\n  lead?: ReactNode;\n  /** screen-reader label, needed when there's no visible text */\n  ariaLabel?: string;\n  /** the button's type when it isn't a link (e.g. \"submit\" inside a form) */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst variants = {\n  primary: \"bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary)_88%,var(--primary-foreground))]\",\n  light: \"bg-foreground text-background hover:bg-foreground/85\",\n  outline: \"border border-foreground text-foreground hover:bg-foreground hover:text-background\",\n  tile: \"bg-foreground/10 text-foreground hover:bg-foreground/20\",\n  card: \"bg-card text-card-foreground/60 hover:text-card-foreground\",\n};\n\n/**\n * Halo Dental's button: 40px tall, 4px corners, regular-weight 16px label, no shadow.\n * Hover only shifts the colour. Icon-only buttons become 40px squares.\n */\nexport function HalodentalOpusButton({ children, href, variant = \"primary\", lead, ariaLabel, type = \"button\", className }: HalodentalOpusButtonProps) {\n  const square = children == null || children === \"\";\n  const classes = cn(\n    \"inline-flex h-10 shrink-0 items-center justify-center rounded-sm text-base leading-none whitespace-nowrap transition-colors duration-200 motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    square ? \"w-10\" : lead ? \"pr-[0.9375rem]\" : \"px-[0.9375rem]\",\n    variants[variant],\n    className,\n  );\n  const inner = (\n    <>\n      {lead && (\n        <span aria-hidden className=\"mr-[1.125rem] flex h-full w-9 items-center justify-center rounded-l-sm bg-primary-foreground/10\">\n          {lead}\n        </span>\n      )}\n      {children}\n    </>\n  );\n  return href ? (\n    <a href={href} aria-label={ariaLabel} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} aria-label={ariaLabel} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the label; leave empty for an icon-only square (give it an `ariaLabel`)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: orange fill with ink text · light: solid foreground fill (white on a black\npanel) · outline: 1px foreground border, no fill · tile: a quiet see-through square\n(menu, language, accessibility) · card: a small card-coloured square (arrow links)"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an icon in a slightly darker square at the start, as on the \"play\" button"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label, needed when there's no visible text"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link (e.g. \"submit\" inside a form)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "14b174d1317b27023ea563f366b4cbbd8086e7557dbd970dcb0e2f3160a379a3"
+}
