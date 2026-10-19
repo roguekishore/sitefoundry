@@ -10,8 +10,9 @@ is the point of this directory.
 - The same directory mirrors **React Bits and shadcn** (+ shadcn's directory registries)
   into `vault/`. 21st.dev skipped for now.
 - **Independent of MaverickCloud.** Nothing in `..\MAVERICKCLOUD\` constrains this repo.
-- **Private.** Local now; a private GitHub repo (user's account, name to come) and a
-  login-gated cloud copy for phone browsing come later. No public registries.
+- **Private.** Remote `roguekishore/sitefoundry` (private); push only when the user says.
+  The cloud (a login-gated preview instance and an on-demand run instance) is phase 7 of
+  [`PLAN.md`](PLAN.md). No public registries, no S3.
 
 ## Read first
 

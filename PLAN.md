@@ -1,7 +1,7 @@
 # PLAN
 
-Agreed with the user 2026-10-18. Local only for now; the cloud comes later. Repo name: the
-user will give it later (local git only until then).
+Agreed with the user 2026-10-18. Remote: `https://github.com/roguekishore/sitefoundry.git`
+(private), set 2026-10-19; nothing is pushed until the user says so.
 
 ## Stack
 
@@ -34,7 +34,8 @@ public/r/            the built registry (generated, committed)
 | 4 | Huly recreation | another agent, **ready to start** | faithful at 390 px and desktop; every block standalone |
 | 5 | Vault mirror (shadcn + directory registries + React Bits) | another agent, **ready to start** | vault items live in the gallery and install with `foundry add` |
 | 6 | MCP (local): search / get / preview / add / theme | this agent | **done** (scripted MCP client) |
-| 7 | Cloud: host, login, per-device tokens, S3 assets, remote MCP | later | phone access works |
+| 7 | Cloud: preview instance, run instance, run page, warden widget (below) | this agent, **in progress** | a run started from the phone lands as a branch you can browse |
+| 8 | Remote MCP, per-device tokens | **held** (user, 2026-10-19) | |
 
 Folders per agent: Huly → `foundry/sites/huly/`, `foundry/themes/huly/`. Vault →
 `vault/`, `tools/mirror/`, plus its npm packages in the root `package.json`. The gallery
@@ -46,3 +47,33 @@ Item versions (immutable once built) + `foundry.lock` in customer projects · to
 only added, never renamed · `schema` version field · blocks render to static HTML ·
 content only through typed props, with a generated props description · `foundry check` ·
 npm version-clash warnings · a licence field per item. Skipped (user): vault provenance.
+
+## Phase 7: the cloud (agreed with the user 2026-10-19)
+
+Two EC2 instances in **jk** (`400730734202`, `ap-south-1`), in a VPC of their own (no
+peering: jk's own VPC is peered to clasher's database).
+
+| | Preview | Run |
+|---|---|---|
+| Instance | t4g.small, always on | t4g.large, on only while there is work |
+| Address | Elastic IP + a domain | auto-assigned public IP (outbound only) |
+| Inbound | 443/80 (Caddy) | the live gallery port, from the preview instance only |
+| Holds | gallery, run page, login, runs database | Claude login, pnpm store, worktrees |
+
+- **The foundry server** (`packages/server`): login, the built gallery, the run page and an
+  API, over SQLite. Run → calls (one row per model call) → events.
+- **A run:** URL + "slug and pages" + backend (Gemini or Claude) + model + effort → the
+  preview server queues it and starts the run instance → the runner takes the job over the
+  private network, runs it in a worktree on `<backend>/<slug>`, reports every call back,
+  commits the site and its usage record, pushes the branch → the preview instance builds
+  the branch as a preview to browse before merging from the laptop.
+- **Gemini** goes through the forwarder from `tools/gemini-run/run.mjs` (Standard tier,
+  Vertex global endpoint, the key stays in the forwarder). **Claude** is Claude Code
+  `-p --dangerously-skip-permissions --output-format stream-json`, logged in on the run
+  instance; on a subscription, cost is what the API would have charged.
+- **No S3** (user): git carries the work, and each run commits its usage record, so the
+  database can be rebuilt from git.
+- **Warden:** both instances tagged `warden:app=foundry`; the preview server writes
+  `/var/lib/warden-runs/foundry-*.json` (D45); a Foundry dashboard widget in warden.
+- Local first: the same server and runner run on the laptop; the cloud comes after one
+  Gemini and one Claude run from the run page work there.
