@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo statement",
+  "description": "A full-bleed black band with a huge amber-to-red gradient heading that fills in from the left as it scrolls into view, a small rounded square photo beside a short paragraph and orange button, and a tall art slot on the right. On phones it stacks: heading, centred photo, text, button, art.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "dark",
+    "gradient-text",
+    "orange",
+    "big-type",
+    "reveal",
+    "scroll",
+    "split"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark); the gradient runs from the theme's highlight to its glow",
+    "the art slot was a 3D dot field in the original: put a canvas, video or image there"
+  ],
+  "entry": "newhalo-statement.tsx",
+  "source": "foundry",
+  "name": "newhalo-statement",
+  "files": [
+    {
+      "path": "newhalo-statement.css",
+      "content": "/* The amber→red gradient heading. While it scrolls in, the gradient spreads from the left\n   over a dim copy of the text. */\n.newhalo-statement-heading {\n  background-image: linear-gradient(90deg, var(--highlight), var(--glow)), linear-gradient(color-mix(in oklab, var(--foreground) 14%, transparent), color-mix(in oklab, var(--foreground) 14%, transparent));\n  background-size: 100% 100%, 100% 100%;\n  background-repeat: no-repeat;\n  background-clip: text;\n  -webkit-background-clip: text;\n  color: transparent;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-statement-heading {\n      animation: newhalo-statement-fill linear both;\n      animation-timeline: view();\n      animation-range: entry 10% cover 45%;\n    }\n  }\n}\n\n@keyframes newhalo-statement-fill {\n  from { background-size: 0% 100%, 100% 100%; }\n}\n"
+    },
+    {
+      "path": "newhalo-statement.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-statement.css\";\n\nexport interface NewhaloStatementProps {\n  /** the 100px gradient heading (highlight into glow) */\n  title: string;\n  /** the short paragraph next to the photo */\n  body: string;\n  /** the orange button under it */\n  cta: { label: string; href: string };\n  /** the small square photo; empty shows the placeholder */\n  photo?: ReactNode;\n  /** the tall artwork on the right (a 3D or canvas piece); empty shows a glow placeholder */\n  art?: ReactNode;\n  className?: string;\n}\n\n/**\n * A full-bleed black band: a huge gradient heading that fills in from the left as it scrolls\n * into view, a small rounded photo beside a paragraph and an orange button, and a tall art\n * slot on the right (below everything on phones).\n */\nexport function NewhaloStatement({ title, body, cta, photo, art, className }: NewhaloStatementProps) {\n  return (\n    <section className={cn(\"dark bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-y-20 px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"lg:col-span-6 lg:flex lg:flex-col lg:justify-between\">\n          <h2 className=\"newhalo-statement-heading font-display text-[3.125rem] leading-[0.95] tracking-[-0.015em] lg:text-[6.25rem]\">{title}</h2>\n          <div className=\"mt-15 flex flex-col gap-12 lg:mt-24 lg:flex-row lg:items-end lg:gap-[3.125rem]\">\n            <NewhaloMedia className={cn(\"mx-auto size-41 shrink-0 rounded-lg lg:mx-0 lg:size-[13.125rem]\", newhaloReveal(\"bloom\"))}>{photo}</NewhaloMedia>\n            <div className={cn(\"max-w-[20.5rem]\", newhaloReveal(\"fade\"))}>\n              <p className=\"text-[0.91rem] leading-normal lg:text-base\">{body}</p>\n              <NewhaloButton label={cta.label} href={cta.href} className=\"mt-5\" />\n            </div>\n          </div>\n        </div>\n        <NewhaloMedia tone=\"glow\" className=\"aspect-[0.85] w-full lg:col-span-4 lg:col-start-9\">\n          {art}\n        </NewhaloMedia>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 100px gradient heading (highlight into glow)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the short paragraph next to the photo"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the orange button under it"
+    },
+    {
+      "name": "photo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small square photo; empty shows the placeholder"
+    },
+    {
+      "name": "art",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall artwork on the right (a 3D or canvas piece); empty shows a glow placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "152d2f559e03bd69d0f3ffebe0644f7fbd159b2a1f6b3402b05dde5168c24a32"
+}

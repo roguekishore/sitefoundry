@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo form field",
+  "description": "An outlined 40px form field with 4px corners and its small label set into a gap in the top border. Text, email, phone, a multi-line message box or a select with a thin chevron. The 30% hairline darkens on hover and turns orange on focus.",
+  "category": "contact",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "form",
+    "input",
+    "field",
+    "outline",
+    "minimal",
+    "legend"
+  ],
+  "notes": [
+    "works on light and dark panels (uses input / foreground / ring tokens)"
+  ],
+  "entry": "newhalo-field.tsx",
+  "source": "foundry",
+  "name": "newhalo-field",
+  "files": [
+    {
+      "path": "newhalo-field.tsx",
+      "content": "import { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NewhaloFieldProps {\n  /** the small label that sits in a gap of the top border */\n  label: string;\n  /** the form field's name */\n  name: string;\n  /** text-like input types, a multi-line textarea, or a select */\n  kind?: \"text\" | \"email\" | \"tel\" | \"textarea\" | \"select\";\n  /** for kind \"select\": the choices */\n  options?: string[];\n  /** grey hint inside the empty field (for select: the first, empty choice) */\n  placeholder?: string;\n  /** marks it required and puts an asterisk before the label */\n  required?: boolean;\n  className?: string;\n}\n\nconst control =\n  \"w-full bg-transparent px-[0.9375rem] text-base text-foreground placeholder:text-foreground/60 focus:outline-none\";\n\n/**\n * An outlined form field whose label is set into the top border (a fieldset legend). The\n * border is a 30% hairline that darkens on hover and turns the ring colour on focus.\n */\nexport function NewhaloField({ label, name, kind = \"text\", options = [], placeholder, required, className }: NewhaloFieldProps) {\n  return (\n    <fieldset\n      className={cn(\n        \"relative -mt-2 rounded-sm border border-input transition-colors duration-300 ease-[cubic-bezier(0.32,0.94,0.6,1)] hover:border-foreground focus-within:border-ring motion-reduce:transition-none\",\n        className,\n      )}\n    >\n      <legend className=\"ml-2.5 px-1 text-xs leading-none\">\n        <label htmlFor={`newhalo-${name}`}>\n          {required && \"*\"}\n          {label}\n        </label>\n      </legend>\n      {kind === \"textarea\" ? (\n        <textarea id={`newhalo-${name}`} name={name} required={required} placeholder={placeholder} rows={5} className={cn(control, \"-mt-1 block min-h-32 resize-y py-2\")} />\n      ) : kind === \"select\" ? (\n        <div className=\"relative\">\n          <select id={`newhalo-${name}`} name={name} required={required} defaultValue=\"\" className={cn(control, \"h-9 appearance-none pb-1 text-foreground/70\")}>\n            <option value=\"\" disabled>\n              {placeholder}\n            </option>\n            {options.map((o) => (\n              <option key={o} value={o}>\n                {o}\n              </option>\n            ))}\n          </select>\n          <ChevronDown aria-hidden strokeWidth={1.25} className=\"pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-[60%]\" />\n        </div>\n      ) : (\n        <input id={`newhalo-${name}`} name={name} type={kind} required={required} placeholder={placeholder} className={cn(control, \"h-9 pb-1\")} />\n      )}\n    </fieldset>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label that sits in a gap of the top border"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the form field's name"
+    },
+    {
+      "name": "kind",
+      "type": "enum",
+      "required": false,
+      "default": "text",
+      "description": "text-like input types, a multi-line textarea, or a select"
+    },
+    {
+      "name": "options",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "for kind \"select\": the choices"
+    },
+    {
+      "name": "placeholder",
+      "type": "string",
+      "required": false,
+      "description": "grey hint inside the empty field (for select: the first, empty choice)"
+    },
+    {
+      "name": "required",
+      "type": "boolean",
+      "required": false,
+      "description": "marks it required and puts an asterisk before the label"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6ce2a223718af11a8148984e9fe2343ed7809740eba1a9969e23182fc2e5251e"
+}
