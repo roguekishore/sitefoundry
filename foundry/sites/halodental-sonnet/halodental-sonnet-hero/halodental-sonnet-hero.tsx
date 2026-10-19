@@ -31,7 +31,7 @@ export function HalodentalSonnetHero({ wordmark, tagline, play, media, className
           )}
         </div>
 
-        <span aria-hidden className="absolute bottom-[-3.5rem] left-8 hidden font-display text-[17.5rem] leading-none tracking-[-0.03em] select-none lg:block">
+        <span aria-hidden className="absolute bottom-[-2.4rem] left-8 hidden font-display text-[17.5rem] leading-none tracking-[-0.03em] select-none lg:block">
           {wordmark}
         </span>
 
