@@ -13,9 +13,9 @@ export interface HalodentalMarkProps {
 
 function DefaultEmblem() {
   return (
-    <svg aria-hidden viewBox="0 0 68 38" className="h-[1.9375rem] w-[3.35rem] shrink-0 fill-current lg:h-10 lg:w-[4.25rem]">
-      <ellipse cx="21" cy="19" rx="18" ry="8.5" transform="rotate(-38 21 19)" />
-      <ellipse cx="45" cy="19" rx="18" ry="8.5" transform="rotate(-38 45 19)" />
+    <svg aria-hidden viewBox="0 0 72 38" className="h-[1.9375rem] w-[3.6rem] shrink-0 fill-current lg:h-10 lg:w-[4.5rem]">
+      <ellipse cx="22" cy="19" rx="19.5" ry="9" transform="rotate(-38 22 19)" />
+      <ellipse cx="48" cy="19" rx="19.5" ry="9" transform="rotate(-38 48 19)" />
     </svg>
   );
 }
@@ -27,12 +27,12 @@ export function HalodentalMark({ name, emblem, href, className }: HalodentalMark
   const inner = (
     <>
       {emblem ?? <DefaultEmblem />}
-      <span className="font-display text-[2rem] leading-none font-normal tracking-[-0.02em] lg:text-[2.625rem]">
+      <span className="font-display text-[2rem] leading-none font-normal tracking-[-0.025em] lg:text-[2.625rem]">
         {name}
       </span>
     </>
   );
-  const classes = cn("inline-flex items-center gap-3 text-foreground lg:gap-4", className);
+  const classes = cn("inline-flex items-center gap-2.5 text-foreground lg:gap-3.5", className);
   return href ? (
     <a href={href} aria-label={name} className={classes}>
       {inner}

@@ -127,8 +127,8 @@ export function HalodentalFooter({
   className,
 }: HalodentalFooterProps) {
   return (
-    <footer className={cn("dark relative overflow-hidden bg-background text-foreground", className)}>
-      <div className="mx-auto flex min-h-[803px] max-w-[var(--page-width)] flex-col justify-between px-[var(--page-gutter)] pt-9 pb-6 lg:min-h-[497px] lg:pt-10 lg:pb-7">
+    <footer className={cn("bg-card p-[6px] lg:p-[10px]", className)}>
+      <div className="dark relative mx-auto flex min-h-[791px] max-w-[var(--page-width)] flex-col justify-between overflow-hidden rounded-lg bg-background px-[15px] pt-9 pb-6 text-foreground lg:min-h-[487px] lg:px-[30px] lg:pt-10 lg:pb-7">
         <div className="relative z-10 grid grid-cols-6 gap-y-[30px] lg:grid-cols-12 lg:gap-x-5">
           {columns.map((col) => (
             <div key={col.title} className="col-span-3 lg:col-span-2">
@@ -140,7 +140,7 @@ export function HalodentalFooter({
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="underline decoration-foreground/50 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+                      className="underline-offset-4 transition-colors hover:text-primary hover:underline"
                     >
                       {link.label}
                     </a>
@@ -176,7 +176,7 @@ export function HalodentalFooter({
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className="underline decoration-foreground/50 underline-offset-4 transition-colors hover:text-primary"
+                  className="underline-offset-4 transition-colors hover:text-primary hover:underline"
                 >
                   {link.label}
                 </a>
