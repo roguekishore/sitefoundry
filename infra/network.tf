@@ -86,7 +86,7 @@ resource "aws_vpc_security_group_ingress_rule" "preview_server_from_run" {
 
 resource "aws_vpc_security_group_ingress_rule" "run_gallery_from_preview" {
   security_group_id            = aws_security_group.run.id
-  description                  = "the server proxies live.<domain> to the run's gallery"
+  description                  = "the foundry server proxies the live gallery" # AWS allows no < > or ' here
   ip_protocol                  = "tcp"
   from_port                    = local.gallery_port
   to_port                      = local.gallery_port
