@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ArrowLeft, Check, Copy, Moon, Search, Sun } from "lucide-react";
+import { ArrowLeft, Check, Copy, ExternalLink, Moon, Search, Sun } from "lucide-react";
 import type { IndexEntry, RegistryItem } from "@foundry/core";
-import { byName, installCommand, items, ownTheme, registryIndex, sites, themes, type Item } from "./catalog";
+import { byName, installCommand, items, ownTheme, registryIndex, sitePageNames, sites, themes, type Item } from "./catalog";
 import { DeviceFrame } from "./frame";
 
 const WIDTHS = [360, 390, 430, 768, 1280];
+/** Screen height of a typical device at each width: site pages scroll inside a screen this tall. */
+const SCREEN_HEIGHTS: Record<number, number> = { 360: 780, 390: 844, 430: 932, 768: 1024, 1280: 800 };
 const PAGE = 24;
 
 // ---------- settings (remembered per browser) and routing ----------
@@ -62,7 +64,7 @@ export function App() {
 
   let page: ReactNode;
   if (route[0] === "item" && route[1]) page = <ItemPage name={route[1]} settings={settings} set={set} />;
-  else if (route[0] === "site" && route[1]) page = <SitePage site={route[1]} settings={settings} set={set} />;
+  else if (route[0] === "site" && route[1]) page = <SitePage site={route[1]} page={route[2]} settings={settings} set={set} />;
   else page = <ListPage query={query} settings={settings} set={set} />;
 
   return (
@@ -328,22 +330,41 @@ function Details({ entry }: { entry: IndexEntry }) {
 
 // ---------- a whole recreated site ----------
 
-function SitePage({ site, settings, set }: { site: string; settings: Settings; set: (p: Partial<Settings>) => void }) {
+function SitePage({ site, page, settings, set }: { site: string; page?: string; settings: Settings; set: (p: Partial<Settings>) => void }) {
   const siteTheme = themes.find((t) => t.meta.site === site)?.name ?? "none";
   const theme = settings.theme === "own" ? siteTheme : settings.theme;
   const blocks = items.filter((i) => i.meta.site === site && i.meta.type !== "theme");
+  const pages = sitePageNames(site);
+  const fullScreen = `/preview.html?${new URLSearchParams({ site, ...(page ? { page } : {}), theme, mode: settings.mode })}`;
   return (
     <div className="space-y-5">
       <a href="#/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="size-4" /> All items
       </a>
       <h1 className="text-2xl font-semibold tracking-tight">{site}</h1>
+      {pages.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {["", ...pages].map((p) => (
+            <a
+              key={p || "landing"}
+              href={`#/site/${site}${p ? `/${p}` : ""}`}
+              className={`rounded-lg border px-3 py-1.5 text-sm ${(page ?? "") === p ? "bg-foreground text-background" : "hover:bg-accent"}`}
+            >
+              {p || "landing"}
+            </a>
+          ))}
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <WidthPicker settings={settings} set={set} />
         <ThemePicker settings={settings} set={set} />
+        <a href={fullScreen} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+          <ExternalLink className="size-3.5" /> Full screen
+        </a>
       </div>
+      <p className="text-xs text-muted-foreground">Scroll inside the frame: it's a {settings.width}×{SCREEN_HEIGHTS[settings.width] ?? 844} screen.</p>
       <div className="overflow-hidden rounded-xl border">
-        <DeviceFrame target={{ site }} width={settings.width} theme={theme} mode={settings.mode} />
+        <DeviceFrame target={{ site, page }} width={settings.width} theme={theme} mode={settings.mode} viewportHeight={SCREEN_HEIGHTS[settings.width] ?? 844} />
       </div>
       <h2 className="pt-4 text-sm font-medium text-muted-foreground">Its blocks</h2>
       <div className="flex flex-wrap gap-2">

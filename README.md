@@ -24,7 +24,9 @@ pnpm gallery             # http://localhost:4400
 
 Every block, theme and recreated site. Switch device width (360–1280), theme (each block's
 own, base defaults, or any theme) and light/dark; each item shows its props, code, details
-and its install command.
+and its install command. A recreated site plays in a real device screen (scroll inside it,
+so full-screen sections and scroll effects behave), with a tab for each extra page
+(`foundry/sites/<site>/pages/<name>.tsx`).
 
 ## Use blocks in a customer project
 

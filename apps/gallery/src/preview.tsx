@@ -1,6 +1,6 @@
 // The page inside every preview iframe: one demo (or one site page) in one theme and mode.
 //   preview.html?item=<name>&theme=<name|none>&mode=light|dark&id=<frame id>
-//   preview.html?site=<site>&…        preview.html?specimen=<theme>&…
+//   preview.html?site=<site>[&page=<name>]&…        preview.html?specimen=<theme>&…
 import { StrictMode, useEffect, useState, type ComponentType } from "react";
 import { createRoot } from "react-dom/client";
 import { loadDemo, loadSitePage, loadThemeCss } from "./catalog";
@@ -32,11 +32,11 @@ function Preview() {
     const load = item
       ? loadDemo(item)
       : site
-        ? loadSitePage(site)
+        ? loadSitePage(site, params.get("page"))
         : Promise.resolve(specimen ? ThemeSpecimen : undefined);
     applyTheme(params.get("theme") ?? specimen, params.get("mode"))
       .then(() => load)
-      .then((c) => (c ? setComponent(() => c) : setError("Nothing to show: no demo for this item.")))
+      .then((c) => (c ? setComponent(() => c) : setError(site ? "Nothing to show: no such page." : "Nothing to show: no demo for this item.")))
       .catch((e: Error) => setError(e.message));
   }, []);
 
@@ -48,6 +48,11 @@ function Preview() {
     addEventListener("message", onMessage);
     return () => removeEventListener("message", onMessage);
   }, []);
+
+  // Tell automation (tools/build-thumbs.ts) the preview has rendered, or failed to.
+  useEffect(() => {
+    if (Component || error) document.documentElement.dataset.foundryReady = error ? "error" : "ready";
+  }, [Component, error]);
 
   // Tell the gallery how tall the content is, so the frame can fit it.
   useEffect(() => {

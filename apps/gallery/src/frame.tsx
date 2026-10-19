@@ -5,6 +5,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 export interface Target {
   item?: string;
   site?: string;
+  /** one of the site's other pages; the landing page when empty */
+  page?: string;
   specimen?: string;
 }
 
@@ -20,9 +22,15 @@ interface FrameProps {
   inert?: boolean;
   /** only load once scrolled near */
   lazy?: boolean;
+  /**
+   * A real device screen: the frame keeps this height and the page scrolls inside it, so
+   * window-sized sections (100svh), sticky parts and scroll effects work. Without it the frame
+   * grows to the content's height (fine for single blocks).
+   */
+  viewportHeight?: number;
 }
 
-export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy }: FrameProps) {
+export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy, viewportHeight }: FrameProps) {
   const id = useId();
   const box = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLIFrameElement>(null);
@@ -37,7 +45,7 @@ export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy
     const q = new URLSearchParams({ id, theme: look.current.theme, mode: look.current.mode });
     for (const [k, v] of Object.entries(target)) if (v) q.set(k, v);
     return `/preview.html?${q}`;
-  }, [id, target.item, target.site, target.specimen]);
+  }, [id, target.item, target.site, target.page, target.specimen]);
 
   useEffect(() => {
     const el = box.current;
@@ -65,8 +73,9 @@ export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy
   const sendLook = () => frame.current?.contentWindow?.postMessage({ type: "foundry:look", ...look.current }, "*");
   useEffect(sendLook, [theme, mode]);
 
+  const frameHeight = viewportHeight ?? height;
   const scale = Math.min(1, available / width);
-  const shownHeight = Math.min(height * scale, maxHeight ?? Infinity);
+  const shownHeight = Math.min(frameHeight * scale, maxHeight ?? Infinity);
 
   return (
     <div ref={box} className="w-full overflow-hidden" style={{ height: shownHeight }}>
@@ -80,7 +89,7 @@ export function DeviceFrame({ target, width, theme, mode, maxHeight, inert, lazy
           className="block origin-top-left border-0 bg-transparent"
           style={{
             width,
-            height,
+            height: frameHeight,
             transform: `scale(${scale})`,
             marginLeft: scale === 1 ? Math.max(0, (available - width) / 2) : 0,
             pointerEvents: inert ? "none" : undefined,
