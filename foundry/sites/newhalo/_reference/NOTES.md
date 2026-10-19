@@ -164,3 +164,18 @@ sequence inside the pinned lighting section (media; its frame is pinned and we p
 | faq / legal | **page 1060px / 613px wide at 360** (tile row widened the grid) | ok | sticky ✓ | yes: grid-cols-1 |
 | heights | all sections within ~5% of the original (product care +90px, FAQ teaser +110px: content) | | | accepted |
 | motion | | | every inventory row shows in our capture (scrubbed hero, reveals, blooms, drifts, pinned sequence, sticky columns, footer clip, Lenis) | ✓ |
+
+## Round 2
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| landing text gallery | ok | at exactly 1024 the 96px thumbnails stuck out of the 12th column | – | yes: thumbs size to the column, max 96px |
+| footer | ok | at 1024 three 230px columns + buttons overflowed | – | yes: 184px columns below 1280 |
+| pricing steps | vertical dotted connector ✓ | horizontal dotted connector ✓ | – | ✓ |
+| partner / event cards | – | white, as the original | rise ✓ | ✓ |
+| faq / legal | fit at 360 / 768 / 1024 | ✓ | sticky tiles ✓ | ✓ |
+| product hero | title leading back to 1.0 | "Lumen One" fits the right column | drift ✓ | ✓ |
+| re-theme | | `newhalo-text-gallery` and `newhalo-statement` under sample-ember: serif display, rounded corners, ember colours, gradient follows highlight→glow | | ✓ |
+
+Remaining, accepted: section heights differ where our copy is shorter or longer (FAQ teaser, care);
+the static section crops from capture.mjs show CSS scroll reveals in their start state (blank), so
+the comparison used scroll frames plus reduced-motion element screenshots of our own pages.

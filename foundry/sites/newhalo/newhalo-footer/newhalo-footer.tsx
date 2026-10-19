@@ -38,7 +38,7 @@ export function NewhaloFooter({ groups, ctas, legal, copyright, art, className }
         <div className="relative z-10 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between">
           <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:flex lg:gap-0">
             {groups.map((g, i) => (
-              <div key={g.title} className={cn("lg:w-[14.4rem]", newhaloReveal("fade"))} style={newhaloRevealStyle(i)}>
+              <div key={g.title} className={cn("lg:w-[11.5rem] xl:w-[14.4rem]", newhaloReveal("fade"))} style={newhaloRevealStyle(i)}>
                 <h2 className="font-display text-[1.56rem] leading-[1.1] lg:text-[1.75rem]">{g.title}</h2>
                 <ul className={cn("mt-3 space-y-1.5", i === 2 ? "text-lg lg:text-base" : "text-base")}>
                   {g.links.map((l) => (

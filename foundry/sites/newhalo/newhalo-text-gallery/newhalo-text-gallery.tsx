@@ -88,7 +88,7 @@ export function NewhaloTextGallery({ id, title, body, features, cta, slides, cla
                     aria-pressed={i === active}
                     onClick={() => setActive(i)}
                     className={cn(
-                      "block size-15 rounded-md p-0.5 transition-opacity duration-300 lg:size-24",
+                      "block size-15 rounded-md p-0.5 transition-opacity duration-300 lg:aspect-square lg:size-auto lg:w-full lg:max-w-24",
                       i === active ? "ring-2 ring-primary ring-inset" : "opacity-40 hover:opacity-70",
                     )}
                   >
