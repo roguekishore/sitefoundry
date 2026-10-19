@@ -115,7 +115,7 @@ Left behind by these tests (delete when no longer useful): worktrees `claude-smo
 `gemini-smoke-gemini`, `claude-smoke-stop` in `D:\PROJECTS\SITEFOUNDRY-runs`, their branches
 (`claude/smoke-claude`, `gemini/smoke-gemini`, `claude/smoke-stop`), database `%TEMP%\foundry-test`.
 
-## Step C — infrastructure (Terraform in `infra/`): **BUILT** (validated; not applied)
+## Step C — infrastructure (Terraform in `infra/`): **DONE** (applied 2026-10-19)
 
 How to plan and apply, and the rules: [`infra/README.md`](../infra/README.md). Warden's rules
 apply (AWS-COMMAND-CENTER `CLAUDE.md`, `docs/LESSONS.md`): Terraform, never CloudFormation;
@@ -142,8 +142,19 @@ What it creates, all tagged `warden:app = foundry`:
   Terraform does not hold the run instance's on/off state (the server switches it). The run
   instance is running when created; step D provisions it then.
 
-Left for the operator: `./bootstrap.sh init`, plan, read, apply, `rm -f tfplan`, then the two A
-records in Netlify. Warden already has `jk` (v2 since 2026-10-11).
+Applied by the operator on 2026-10-19 (25 resources; the first apply failed on one security
+group rule's description, which AWS limits to `a-zA-Z0-9. _-:/()#,@[]+=&;{}!$*`):
+
+| | |
+|---|---|
+| Elastic IP | `52.66.74.57` (A records for `foundry.` and `live.foundry.themaverick.tech`, Netlify, by hand) |
+| Preview | `i-0fb1d61725ce2b0ef`, `10.20.0.10` |
+| Run | `i-0ab154c93b3356c22`, `10.20.0.20` (running since creation, until step D is done) |
+| VPC | `vpc-0744365f9e7e3df8e`, subnet `subnet-0b897524571729b82` |
+| SGs | `foundry-preview` `sg-0b9327bdcbdcfbb01`, `foundry-run` `sg-0a3882882c9bd66b2` |
+
+State is `infra/terraform.tfstate` (local, gitignored); the operator keeps a copy in `~/foundry-tfstate.bak`.
+Warden already has `jk` (v2 since 2026-10-11).
 
 ## Step D — provisioning both instances: **TODO**
 
