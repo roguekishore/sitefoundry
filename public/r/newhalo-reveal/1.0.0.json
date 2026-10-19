@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo scroll reveal",
+  "description": "CSS-only scroll-driven reveals: fade, a 60px or 50px rise, a 1.15→1 zoom, a scrubbed 1.1→1 bloom, a soft left-to-right text wipe, hairlines that draw in from the left, and a parallax drift for pictures inside their frames. Staggers by shifting each item's range a little later.",
+  "category": "text-effect",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "parallax",
+    "fade",
+    "stagger",
+    "css"
+  ],
+  "notes": [
+    "uses animation-timeline: view(); browsers without it, and reduced motion, show everything in place",
+    "use the wrapper, or put newhaloReveal(effect) and newhaloRevealStyle(step) on your own element",
+    "crop drifting pictures with overflow-clip, not overflow-hidden"
+  ],
+  "entry": "newhalo-reveal.tsx",
+  "source": "foundry",
+  "name": "newhalo-reveal",
+  "files": [
+    {
+      "path": "newhalo-reveal.css",
+      "content": "/* Scroll-driven reveals, all CSS. Each class ties an animation to the element's own trip\n   through the window (animation-timeline: view()). Browsers without scroll-driven\n   animations, and anyone who prefers reduced motion, see everything in place.\n   --newhalo-step (0, 1, 2 …) shifts an item's range a little later, for staggered lists.\n   rise distances can be changed with --newhalo-rise (default 60px / 50px).\n   --newhalo-drift sets how far \"drift\" travels (default 34px each way). */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-reveal-fade,\n    .newhalo-reveal-rise,\n    .newhalo-reveal-rise-sm,\n    .newhalo-reveal-zoom,\n    .newhalo-reveal-settle,\n    .newhalo-reveal-sweep,\n    .newhalo-reveal-draw,\n    .newhalo-reveal-bloom {\n      animation-timing-function: cubic-bezier(0.32, 0.94, 0.6, 1);\n      animation-fill-mode: both;\n      animation-timeline: view();\n      animation-range: entry calc(5% + var(--newhalo-step, 0) * 6%) cover calc(25% + var(--newhalo-step, 0) * 6%);\n    }\n    .newhalo-reveal-fade { animation-name: newhalo-reveal-fade; }\n    .newhalo-reveal-rise { animation-name: newhalo-reveal-rise; }\n    .newhalo-reveal-rise-sm { animation-name: newhalo-reveal-rise-sm; }\n    .newhalo-reveal-zoom { animation-name: newhalo-reveal-zoom; }\n    .newhalo-reveal-settle { animation-name: newhalo-reveal-settle; }\n    .newhalo-reveal-draw { animation-name: newhalo-reveal-draw; transform-origin: left; }\n\n    /* sweep wipes text in from the left through a soft-edged mask */\n    .newhalo-reveal-sweep {\n      animation-name: newhalo-reveal-sweep;\n      animation-timing-function: linear;\n      mask-image: linear-gradient(90deg, var(--foreground) 40%, transparent 60%);\n      mask-size: 250% 100%;\n      mask-repeat: no-repeat;\n    }\n\n    /* bloom is scrubbed over a longer stretch: from the bottom edge to half-way up */\n    .newhalo-reveal-bloom {\n      animation-name: newhalo-reveal-bloom;\n      animation-timing-function: linear;\n      animation-range: entry 0% cover 50%;\n    }\n\n    /* drift is scrubbed for the whole trip: the picture slides inside its frame */\n    .newhalo-reveal-drift {\n      animation: newhalo-reveal-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes newhalo-reveal-fade {\n  from { opacity: 0; }\n}\n@keyframes newhalo-reveal-rise {\n  from { opacity: 0; transform: translateY(var(--newhalo-rise, 60px)); }\n}\n@keyframes newhalo-reveal-rise-sm {\n  from { opacity: 0; transform: translateY(var(--newhalo-rise, 50px)); }\n}\n@keyframes newhalo-reveal-zoom {\n  from { opacity: 0; transform: scale(1.15); }\n}\n@keyframes newhalo-reveal-settle {\n  from { transform: scale(1.15); }\n}\n@keyframes newhalo-reveal-bloom {\n  from { opacity: 0; transform: scale(1.1); }\n}\n@keyframes newhalo-reveal-draw {\n  from { transform: scaleX(0); }\n}\n@keyframes newhalo-reveal-sweep {\n  from { mask-position: 100% 0; }\n  to { mask-position: 0 0; }\n}\n@keyframes newhalo-reveal-drift {\n  from { transform: translateY(calc(-1 * var(--newhalo-drift, 34px))); }\n  to { transform: translateY(var(--newhalo-drift, 34px)); }\n}\n"
+    },
+    {
+      "path": "newhalo-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./newhalo-reveal.css\";\n\n/**\n * fade: opacity 0→1 · rise: fade + 60px lift · rise-sm: fade + 50px lift · zoom: fade + scale\n * 1.15→1 · settle: scale 1.15→1 only (a picture inside its frame) · bloom: fade + scale\n * 1.1→1, scrubbed over a longer stretch · sweep: text wiped in from the left through a soft\n * mask · draw: a line growing from the left (scaleX 0→1) · drift: a parallax slide inside a\n * frame, scrubbed for the whole trip through the window\n */\nexport type NewhaloRevealEffect = \"fade\" | \"rise\" | \"rise-sm\" | \"zoom\" | \"settle\" | \"bloom\" | \"sweep\" | \"draw\" | \"drift\";\n\n/** The class for an effect, to put straight on an element without a wrapper. */\nexport function newhaloReveal(effect: NewhaloRevealEffect) {\n  return `newhalo-reveal-${effect}`;\n}\n\n/** Inline style for a staggered item (step 0, 1, 2 …) and/or a drift distance in px. */\nexport function newhaloRevealStyle(step = 0, drift?: number): CSSProperties {\n  return { \"--newhalo-step\": step, ...(drift !== undefined && { \"--newhalo-drift\": `${drift}px` }) } as CSSProperties;\n}\n\nexport interface NewhaloRevealProps {\n  /** what happens as it enters the window */\n  effect?: NewhaloRevealEffect;\n  /** stagger position in a list: each step starts a little later */\n  step?: number;\n  /** for drift: how far the content slides each way, in px */\n  drift?: number;\n  /** the element to render */\n  as?: \"div\" | \"li\" | \"span\" | \"p\";\n  children?: ReactNode;\n  className?: string;\n}\n\n/** Wraps content in a CSS scroll-driven reveal. Static HTML and old browsers show it in place. */\nexport function NewhaloReveal({ effect = \"fade\", step = 0, drift, as: Tag = \"div\", children, className }: NewhaloRevealProps) {\n  return (\n    <Tag className={cn(newhaloReveal(effect), className)} style={newhaloRevealStyle(step, drift)}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "effect",
+      "type": "enum",
+      "required": false,
+      "default": "fade",
+      "description": "what happens as it enters the window"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position in a list: each step starts a little later"
+    },
+    {
+      "name": "drift",
+      "type": "number",
+      "required": false,
+      "description": "for drift: how far the content slides each way, in px"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9da3af61e00a85da27015aec34a54d03e1c517cc171ac5a5b63816f6c96595f4"
+}
