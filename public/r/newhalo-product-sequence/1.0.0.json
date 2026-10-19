@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo pinned sequence",
+  "description": "A pinned product story on black: a window-tall dark picture stays fixed while a 100px white heading and then a few short captions (line icon, 24px title, paragraph) scroll past it on the left. Each caption fades and rises in at the middle of the window and dims as it leaves; the picture blooms in at the start.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "pinned",
+    "sticky",
+    "scroll",
+    "sequence",
+    "dark",
+    "captions",
+    "reveal",
+    "product"
+  ],
+  "notes": [
+    "about 2.5–3 screens tall; the picture is sized by the window (h-svh) and sticks",
+    "the original scrubs an image sequence inside the pinned frame: put a canvas or video in the media slot",
+    "always dark (wraps itself in .dark)"
+  ],
+  "entry": "newhalo-product-sequence.tsx",
+  "source": "foundry",
+  "name": "newhalo-product-sequence",
+  "files": [
+    {
+      "path": "newhalo-product-sequence.css",
+      "content": "/* Over the pinned picture, each caption fades in as it reaches the middle of the window and\n   fades out again as it leaves. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-product-sequence-caption {\n      animation: newhalo-product-sequence-caption linear both;\n      animation-timeline: view();\n      animation-range: cover 10% cover 90%;\n    }\n  }\n}\n@keyframes newhalo-product-sequence-caption {\n  0% { opacity: 0; transform: translateY(40px); }\n  30%, 65% { opacity: 1; transform: none; }\n  100% { opacity: 0.12; transform: translateY(-20px); }\n}\n"
+    },
+    {
+      "path": "newhalo-product-sequence.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-product-sequence.css\";\n\nexport interface NewhaloProductSequenceProps {\n  /** the anchor id (for the sub-navigation) */\n  id?: string;\n  /** the 100px heading over the first screen */\n  title: string;\n  /** the captions that pass by over the pinned picture */\n  steps: { title: string; text: string; icon?: ReactNode }[];\n  /** the picture (or image sequence) that stays pinned; empty shows the placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A pinned product story: a window-tall dark picture stays fixed while a 100px heading and then\n * a few short captions scroll past it on the left, each fading in at the middle of the window\n * and dimming as it leaves.\n */\nexport function NewhaloProductSequence({ id, title, steps, media, className }: NewhaloProductSequenceProps) {\n  return (\n    <section id={id} className={cn(\"dark relative bg-background text-foreground\", className)}>\n      <div className=\"sticky top-0 h-svh overflow-clip\">\n        <NewhaloMedia tone=\"deep\" className={cn(\"absolute inset-0\", newhaloReveal(\"bloom\"))}>\n          {media}\n        </NewhaloMedia>\n      </div>\n      <div className=\"relative -mt-[100svh] mx-auto max-w-page px-gutter\">\n        <h2 className=\"max-w-[46rem] pt-section font-display text-[3.125rem] leading-[0.95] tracking-[-0.015em] lg:text-[6.25rem]\">{title}</h2>\n        <ol className=\"pt-[40svh] pb-[20svh]\">\n          {steps.map((s) => (\n            <li key={s.title} className=\"flex min-h-[60svh] items-center\">\n              <div className=\"newhalo-product-sequence-caption max-w-[20rem]\">\n                {s.icon && <span className=\"mb-6 flex size-12 items-center [&_svg]:size-10 [&_svg]:stroke-1\">{s.icon}</span>}\n                <h3 className=\"font-display text-[1.3rem] leading-[1.1] lg:text-2xl\">{s.title}</h3>\n                <p className=\"mt-3 text-[0.91rem] leading-normal lg:text-base\">{s.text}</p>\n              </div>\n            </li>\n          ))}\n        </ol>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the anchor id (for the sub-navigation)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 100px heading over the first screen"
+    },
+    {
+      "name": "steps",
+      "type": "{ title: string; text: string; icon?: ReactNode; }[]",
+      "required": true,
+      "description": "the captions that pass by over the pinned picture"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the picture (or image sequence) that stays pinned; empty shows the placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cd3e48c2d3fd779d1888b9f2f40ad0f8ae56ac2ebb98fdfdfab0f9c018ff8306"
+}

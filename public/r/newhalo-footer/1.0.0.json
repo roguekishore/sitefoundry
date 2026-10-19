@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo footer",
+  "description": "A black footer panel inset 6–10px from the window edge with 8px corners. As it scrolls in it clips from a full-bleed rectangle into the inset panel, the link columns fade in and the wide art strip rises 60px. Three link columns with 28px headings top left, an outlined and an orange button top right, legal links and copyright in 12px along the bottom; on phones it all stacks with a square art slot.",
+  "category": "footer",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "inset-panel",
+    "clip-path",
+    "reveal",
+    "minimal",
+    "links"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark)",
+    "the art slot held a fine line drawing of the product in the original"
+  ],
+  "entry": "newhalo-footer.tsx",
+  "source": "foundry",
+  "name": "newhalo-footer",
+  "files": [
+    {
+      "path": "newhalo-footer.css",
+      "content": "/* The footer panel starts as a full-bleed black rectangle and draws itself in to a panel\n   inset from the window edge with rounded corners as it scrolls into view. */\n.newhalo-footer-panel {\n  clip-path: inset(var(--newhalo-footer-inset) round var(--radius));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-footer-panel {\n      animation: newhalo-footer-clip linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 90%;\n    }\n  }\n}\n\n@keyframes newhalo-footer-clip {\n  from { clip-path: inset(0 round 0); }\n}\n"
+    },
+    {
+      "path": "newhalo-footer.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal, newhaloRevealStyle } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-footer.css\";\n\nexport interface NewhaloFooterGroup {\n  /** the 28px column heading */\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface NewhaloFooterProps {\n  /** two or three link columns */\n  groups: NewhaloFooterGroup[];\n  /** the outlined button (first) and the orange one (second), top right */\n  ctas: { label: string; href: string }[];\n  /** small links along the bottom left */\n  legal: { label: string; href: string }[];\n  /** the copyright line, bottom right */\n  copyright: string;\n  /** the wide line drawing across the middle; empty shows a glow placeholder */\n  art?: ReactNode;\n  className?: string;\n}\n\n/**\n * A black panel inset 6–10px from the window with 8px corners. It clips in from full-bleed as\n * it enters view; link columns fade in and the art strip rises. Columns top left, two buttons\n * top right, a wide art slot in the middle, legal links and copyright along the bottom.\n */\nexport function NewhaloFooter({ groups, ctas, legal, copyright, art, className }: NewhaloFooterProps) {\n  const [outline, primary] = ctas;\n  return (\n    <footer className={cn(\"dark\", className)} style={{ \"--newhalo-footer-inset\": \"clamp(6px, 0.7vw, 10px)\" } as CSSProperties}>\n      <div className=\"newhalo-footer-panel relative flex min-h-[50rem] flex-col overflow-clip bg-background px-gutter py-7 text-foreground lg:min-h-[31rem] lg:p-10\">\n        <div className=\"relative z-10 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between\">\n          <div className=\"grid grid-cols-2 gap-x-6 gap-y-10 lg:flex lg:gap-0\">\n            {groups.map((g, i) => (\n              <div key={g.title} className={cn(\"lg:w-[11.5rem] xl:w-[14.4rem]\", newhaloReveal(\"fade\"))} style={newhaloRevealStyle(i)}>\n                <h2 className=\"font-display text-[1.56rem] leading-[1.1] lg:text-[1.75rem]\">{g.title}</h2>\n                <ul className={cn(\"mt-3 space-y-1.5\", i === 2 ? \"text-lg lg:text-base\" : \"text-base\")}>\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"transition-colors duration-300 hover:text-primary\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n          <div className=\"flex flex-col items-start gap-2.5 lg:flex-row\">\n            {outline && <NewhaloButton label={outline.label} href={outline.href} variant=\"outline\" className=\"border-foreground hover:border-primary\" />}\n            {primary && <NewhaloButton label={primary.label} href={primary.href} />}\n          </div>\n        </div>\n\n        <NewhaloMedia\n          tone=\"glow\"\n          className={cn(\"mx-auto my-10 aspect-square w-full max-w-[19rem] lg:absolute lg:top-[36%] lg:right-[10%] lg:left-[32%] lg:my-0 lg:aspect-[4] lg:w-auto lg:max-w-none\", newhaloReveal(\"rise\"))}\n        >\n          {art}\n        </NewhaloMedia>\n\n        <div className=\"relative z-10 mt-auto flex flex-col items-center gap-4 text-xs text-foreground/80 lg:flex-row lg:justify-between\">\n          <ul className=\"flex gap-5 lg:gap-10\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"transition-colors duration-300 hover:text-foreground\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <p>{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "NewhaloFooterGroup[]",
+      "required": true,
+      "description": "two or three link columns"
+    },
+    {
+      "name": "ctas",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the outlined button (first) and the orange one (second), top right"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "small links along the bottom left"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line, bottom right"
+    },
+    {
+      "name": "art",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the wide line drawing across the middle; empty shows a glow placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4022f253190a8de9efb27b804db3e36c9255f41dfc13d69b33288c95c8df7a0b"
+}

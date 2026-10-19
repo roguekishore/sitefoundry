@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo header",
+  "description": "A transparent top bar that lies on a black hero: big logo left, plain white links centred, a white pill-less button, a language square and (on phones) a three-line menu square on the right. The phone menu is a native disclosure panel.",
+  "category": "header",
+  "site": "halodental-sonnet",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "dark",
+    "overlay",
+    "minimal",
+    "transparent"
+  ],
+  "notes": [
+    "made for a dark backdrop: it switches itself to the dark tokens, so it needs a dark hero behind it",
+    "overlay by default: it lies on top of the next block"
+  ],
+  "entry": "halodental-sonnet-header.tsx",
+  "source": "foundry",
+  "name": "halodental-sonnet-header",
+  "files": [
+    {
+      "path": "halodental-sonnet-header.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalSonnetButton } from \"@foundry/halodental-sonnet-button\";\nimport { HalodentalSonnetMark, type HalodentalSonnetMarkProps } from \"@foundry/halodental-sonnet-mark\";\n\nexport interface HalodentalSonnetHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface HalodentalSonnetHeaderProps {\n  /** the logo lockup */\n  mark: HalodentalSonnetMarkProps;\n  /** the centred navigation (desktop) and the phone panel's list */\n  links: HalodentalSonnetHeaderLink[];\n  /** the white button on the right */\n  cta: HalodentalSonnetHeaderLink;\n  /** the small square beside it, e.g. a language switch */\n  language?: HalodentalSonnetHeaderLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  /** lie on top of the next block (a hero behind it) instead of pushing it down */\n  overlay?: boolean;\n  className?: string;\n}\n\n/**\n * The top bar: transparent, logo left, links centred, a white button and a quiet square on\n * the right. It is always dark-toned (white on black). On phones, a three-line square opens a\n * simple panel (no JavaScript: a native disclosure).\n */\nexport function HalodentalSonnetHeader({ mark, links, cta, language, menuLabel, overlay = true, className }: HalodentalSonnetHeaderProps) {\n  return (\n    <header className={cn(\"dark relative z-20 h-[4.5rem] text-foreground lg:h-[7.5rem]\", overlay && \"-mb-[4.5rem] lg:-mb-[7.5rem]\", className)}>\n      <div className=\"flex h-full items-center justify-between px-[1.3rem] lg:px-10\">\n        <HalodentalSonnetMark {...mark} />\n\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className=\"text-base text-foreground transition-colors hover:text-foreground/70 motion-reduce:transition-none\">\n              {l.label}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"flex items-center gap-2.5\">\n          <HalodentalSonnetButton variant=\"light\" href={cta.href}>\n            {cta.label}\n          </HalodentalSonnetButton>\n          {language && (\n            <HalodentalSonnetButton variant=\"quiet\" href={language.href} className=\"hidden w-10 px-0 lg:inline-flex\">\n              {language.label}\n            </HalodentalSonnetButton>\n          )}\n          <details className=\"group relative lg:hidden\">\n            <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center rounded-sm bg-foreground/10 [&::-webkit-details-marker]:hidden\">\n              <span aria-hidden className=\"flex w-5 flex-col gap-1\">\n                <span className=\"h-px bg-current transition-transform group-open:translate-y-[5px] group-open:rotate-45 motion-reduce:transition-none\" />\n                <span className=\"h-px bg-current group-open:opacity-0\" />\n                <span className=\"h-px bg-current transition-transform group-open:-translate-y-[5px] group-open:-rotate-45 motion-reduce:transition-none\" />\n              </span>\n            </summary>\n            <nav className=\"absolute top-12 right-0 flex w-56 flex-col rounded-sm bg-card p-2 text-card-foreground\">\n              {links.map((l) => (\n                <a key={l.label} href={l.href} className=\"rounded-sm px-3 py-2.5 text-base hover:bg-accent\">\n                  {l.label}\n                </a>\n              ))}\n              {language && (\n                <a href={language.href} className=\"rounded-sm px-3 py-2.5 text-base hover:bg-accent\">\n                  {language.label}\n                </a>\n              )}\n            </nav>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-sonnet-button",
+    "halodental-sonnet-mark"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "HalodentalSonnetMarkProps",
+      "required": true,
+      "description": "the logo lockup"
+    },
+    {
+      "name": "links",
+      "type": "HalodentalSonnetHeaderLink[]",
+      "required": true,
+      "description": "the centred navigation (desktop) and the phone panel's list"
+    },
+    {
+      "name": "cta",
+      "type": "HalodentalSonnetHeaderLink",
+      "required": true,
+      "description": "the white button on the right"
+    },
+    {
+      "name": "language",
+      "type": "HalodentalSonnetHeaderLink",
+      "required": false,
+      "description": "the small square beside it, e.g. a language switch"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "lie on top of the next block (a hero behind it) instead of pushing it down"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eb099ff8e3f17dd2cc38ae8651dd8d1ccba24438ef03247aca7c143b5ad7249b"
+}

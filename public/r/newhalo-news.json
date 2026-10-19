@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo news list",
+  "description": "A press list on paper: a 64px heading with an outlined button, then black-hairline rows of thumbnail (1.81:1, 8px corners), headline, summary and a small arrow tile. Rows rise in 50px as they scroll into view while thumbnails settle from 1.15×; the hovered row lightens edge to edge and its arrow turns orange. The last row fades out under a 'more' button. On phones each row stacks.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "press",
+    "list",
+    "light",
+    "hairline",
+    "reveal",
+    "hover",
+    "load-more"
+  ],
+  "notes": [
+    "needs JavaScript only for the 'more' button (hydrate: visible)"
+  ],
+  "entry": "newhalo-news.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "newhalo-news",
+  "files": [
+    {
+      "path": "newhalo-news.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal, newhaloRevealStyle } from \"@foundry/newhalo-reveal\";\n\nexport interface NewhaloNewsItem {\n  /** the headline */\n  title: string;\n  /** two to five lines of summary */\n  excerpt: string;\n  /** where the arrow button goes */\n  href: string;\n  /** screen-reader name of the arrow button */\n  linkLabel: string;\n  /** the 1.81:1 thumbnail; empty shows the placeholder */\n  media?: ReactNode;\n}\n\nexport interface NewhaloNewsProps {\n  /** the 64px section heading */\n  title: string;\n  /** the outlined button beside the heading */\n  cta?: { label: string; href: string };\n  /** all stories; the first `initial` show in full, the next one fades out under \"more\" */\n  items: NewhaloNewsItem[];\n  /** how many rows show before \"more\" */\n  initial?: number;\n  /** the label of the button that shows more rows */\n  moreLabel: string;\n  className?: string;\n}\n\n/**\n * A press list on paper: a 64px heading with an outlined button, then hairline-separated rows\n * (thumbnail · headline · summary · arrow tile). The row under the cursor lightens and its arrow\n * turns orange. The last visible row fades out under a \"more\" button that reveals the next ones.\n */\nexport function NewhaloNews({ title, cta, items, initial = 3, moreLabel, className }: NewhaloNewsProps) {\n  const [shown, setShown] = useState(initial);\n  const visible = items.slice(0, shown);\n  const teaser = items[shown];\n\n  const row = (item: NewhaloNewsItem, faded?: boolean) => (\n    <li\n      key={item.href + item.title}\n      aria-hidden={faded || undefined}\n      className={cn(\n        \"group/row relative grid gap-y-5 border-t border-foreground py-5 transition-[background-color,box-shadow] duration-300 lg:grid-cols-12 lg:gap-x-6 lg:py-[1.875rem]\",\n        \"shadow-card/60 [clip-path:inset(0_-100vmax)] hover:bg-card/60 hover:shadow-[0_0_0_100vmax]\",\n        faded && \"pointer-events-none max-h-40 overflow-clip [mask-image:linear-gradient(var(--foreground),transparent)] opacity-40\",\n      )}\n    >\n      <NewhaloMedia className={cn(\"aspect-[1.81] rounded-lg lg:col-span-3\", newhaloReveal(\"fade\"))} innerClassName={newhaloReveal(\"settle\")}>\n        {item.media}\n      </NewhaloMedia>\n      <h3 className={cn(\"font-display text-[1.56rem] leading-[1.1] lg:col-span-3 lg:col-start-6 lg:text-[1.75rem]\", newhaloReveal(\"rise-sm\"))}>{item.title}</h3>\n      <p className={cn(\"text-[0.91rem] leading-normal lg:col-span-3 lg:text-base\", newhaloReveal(\"rise-sm\"))} style={newhaloRevealStyle(1)}>\n        {item.excerpt}\n      </p>\n      <div className={cn(\"lg:col-span-1 lg:flex lg:justify-end\", newhaloReveal(\"fade\"))}>\n        <a\n          href={item.href}\n          tabIndex={faded ? -1 : undefined}\n          aria-label={item.linkLabel}\n          className=\"flex size-10 items-center justify-center rounded-sm bg-card text-foreground/60 transition-colors duration-300 group-hover/row:bg-primary group-hover/row:text-primary-foreground\"\n        >\n          <ArrowUpRight aria-hidden strokeWidth={1.25} className=\"size-5\" />\n        </a>\n      </div>\n    </li>\n  );\n\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className={cn(\"flex flex-col items-start gap-5 lg:flex-row lg:items-start lg:justify-between\", newhaloReveal(\"rise\"))}>\n          <h2 className=\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\">{title}</h2>\n          {cta && <NewhaloButton label={cta.label} href={cta.href} variant=\"outline\" />}\n        </div>\n        <ul className={cn(\"mt-8 lg:mt-14\", !teaser && \"border-b border-foreground\")}>\n          {visible.map((item) => row(item))}\n          {teaser && row(teaser, true)}\n        </ul>\n        {teaser && (\n          <div className={cn(\"mt-5 flex justify-center\", newhaloReveal(\"rise\"))}>\n            <NewhaloButton label={moreLabel} variant=\"outline\" onClick={() => setShown((n) => n + 3)} />\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 64px section heading"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outlined button beside the heading"
+    },
+    {
+      "name": "items",
+      "type": "NewhaloNewsItem[]",
+      "required": true,
+      "description": "all stories; the first `initial` show in full, the next one fades out under \"more\""
+    },
+    {
+      "name": "initial",
+      "type": "number",
+      "required": false,
+      "default": "3",
+      "description": "how many rows show before \"more\""
+    },
+    {
+      "name": "moreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label of the button that shows more rows"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8fc0498da7f21cf577fea91d0402ccdd5dfd178917612112b6b5a054925c2e14"
+}
