@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo feature bento",
+  "description": "A black product section: a 100px white heading that wipes in, a wide scene slot, then a bento of graphite cards with 8px corners and 2px gaps (two per row, some full width and taller). Each card has a 24px title, a short paragraph, a close-up slot in its lower part and a small white icon that sends out thin cobalt rings on a loop. Cards bloom in (1.1→1) and their text rises 30px.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "dark",
+    "cards",
+    "pulse",
+    "loop",
+    "reveal",
+    "product"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark)",
+    "the rings use chart-4 (cobalt in this theme)",
+    "the scene slot held a 3D product with hotspots in the original"
+  ],
+  "entry": "newhalo-product-features.tsx",
+  "source": "foundry",
+  "name": "newhalo-product-features",
+  "files": [
+    {
+      "path": "newhalo-product-features.css",
+      "content": "/* Two thin rings pulse out of each small icon, one after the other, forever. */\n.newhalo-product-features-ring {\n  animation: newhalo-product-features-pulse 2.6s cubic-bezier(0.32, 0.94, 0.6, 1) infinite;\n}\n.newhalo-product-features-ring + .newhalo-product-features-ring {\n  animation-delay: 1.3s;\n}\n@keyframes newhalo-product-features-pulse {\n  0% { opacity: 0.9; transform: scale(0.7); }\n  100% { opacity: 0; transform: scale(1.6); }\n}\n@media (prefers-reduced-motion: reduce) {\n  .newhalo-product-features-ring { animation: none; opacity: 0.5; }\n}\n"
+    },
+    {
+      "path": "newhalo-product-features.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-product-features.css\";\n\nexport interface NewhaloProductFeature {\n  /** the 24px title */\n  title: string;\n  /** a short paragraph under it */\n  text: string;\n  /** the small icon top right (e.g. a lucide icon); rings pulse out of it */\n  icon: ReactNode;\n  /** a close-up filling the lower part of the card; empty shows the placeholder */\n  media?: ReactNode;\n  /** span the full width (a taller card) */\n  wide?: boolean;\n}\n\nexport interface NewhaloProductFeaturesProps {\n  /** the anchor id (for the sub-navigation) */\n  id?: string;\n  /** the 100px heading */\n  title: string;\n  /** the big product scene under the heading; empty shows the placeholder */\n  scene?: ReactNode;\n  /** the bento cards: two per row, or one when wide */\n  features: NewhaloProductFeature[];\n  className?: string;\n}\n\n/**\n * A black product section: a 100px white heading, a wide scene slot, then a bento of graphite\n * cards (two per row, some full width) each with a title, a paragraph, a close-up slot and a\n * small icon that sends out pulsing cobalt rings. Cards bloom in; titles rise.\n */\nexport function NewhaloProductFeatures({ id, title, scene, features, className }: NewhaloProductFeaturesProps) {\n  return (\n    <section id={id} className={cn(\"dark bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <h2 className={cn(\"max-w-[52rem] font-display text-[3.125rem] leading-[0.95] tracking-[-0.015em] lg:text-[6.25rem]\", newhaloReveal(\"sweep\"))}>{title}</h2>\n        <NewhaloMedia tone=\"glow\" className=\"-mx-gutter mt-10 aspect-square lg:mt-0 lg:aspect-[1.85]\">\n          {scene}\n        </NewhaloMedia>\n        <ul className=\"mt-6 grid gap-0.5 lg:mt-0 lg:grid-cols-2\">\n          {features.map((f, i) => (\n            <li\n              key={f.title}\n              className={cn(\"relative isolate h-[29rem] overflow-clip rounded-lg bg-card text-card-foreground lg:h-[28.75rem]\", f.wide && \"lg:col-span-2 lg:h-[37.5rem]\", newhaloReveal(\"bloom\"))}\n            >\n              <NewhaloMedia className=\"absolute inset-x-0 top-[38%] bottom-0 -z-10 opacity-50\">{f.media}</NewhaloMedia>\n              <div className=\"flex items-start justify-between gap-6 p-gutter lg:p-[1.875rem]\">\n                <div className={cn(\"max-w-[21rem]\", newhaloReveal(\"rise\"))} style={{ \"--newhalo-rise\": \"30px\" } as CSSProperties}>\n                  <h3 className=\"font-display text-[1.3rem] leading-[1.1] lg:text-2xl\">{f.title}</h3>\n                  <p className=\"mt-3 text-[0.91rem] leading-normal lg:mt-4 lg:text-base\">{f.text}</p>\n                </div>\n                <span aria-hidden className=\"relative mr-2 flex size-10 shrink-0 items-center justify-center rounded-full bg-foreground text-background [&_svg]:size-4\">\n                  <span className=\"newhalo-product-features-ring absolute -inset-2 rounded-full border border-chart-4\" />\n                  <span className=\"newhalo-product-features-ring absolute -inset-2 rounded-full border border-chart-4\" />\n                  {f.icon}\n                </span>\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the anchor id (for the sub-navigation)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 100px heading"
+    },
+    {
+      "name": "scene",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the big product scene under the heading; empty shows the placeholder"
+    },
+    {
+      "name": "features",
+      "type": "NewhaloProductFeature[]",
+      "required": true,
+      "description": "the bento cards: two per row, or one when wide"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2f09e04fcf9a968585c559c91a47088639b98811fecda3921e1eb59be7c6335c"
+}
