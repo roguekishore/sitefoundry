@@ -66,7 +66,7 @@ export function NewhaloHero({ title, titleSize = "md", wordmark, play, media, to
             titleSize === "xl" ? "lg:left-[67%]" : "lg:left-[58.8%]",
           )}
         >
-          <h1 className={cn("font-display leading-none tracking-[-0.01em]", titleSize === "xl" ? "text-[3.1rem] lg:text-[6.25rem] lg:leading-[0.95]" : "text-[2.5rem] lg:text-[4rem]")}>
+          <h1 className={cn("font-display leading-none tracking-[-0.01em]", titleSize === "xl" ? "text-[3.1rem] leading-none lg:text-[6.25rem] lg:leading-[0.95]" : "text-[2.5rem] leading-none lg:text-[4rem]")}>
             {title}
           </h1>
           {play && <NewhaloButton label={play.label} href={play.href} icon={<Play strokeWidth={1.25} />} className="lg:hidden" />}

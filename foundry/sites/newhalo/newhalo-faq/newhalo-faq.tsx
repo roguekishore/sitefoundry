@@ -29,7 +29,7 @@ export function NewhaloFaq({ topics, aside, className }: NewhaloFaqProps) {
   const topic = topics[active];
   return (
     <section className={cn("bg-background pt-1.5 pb-section text-foreground lg:pt-section", className)}>
-      <div className="mx-auto grid max-w-page px-gutter lg:grid-cols-12 lg:gap-x-6">
+      <div className="mx-auto grid max-w-page grid-cols-1 px-gutter lg:grid-cols-12 lg:gap-x-6">
         <div className="lg:col-span-4">
           <NewhaloTiles items={topics.map((t) => ({ label: t.label }))} activeIndex={active} onSelect={setActive} />
         </div>

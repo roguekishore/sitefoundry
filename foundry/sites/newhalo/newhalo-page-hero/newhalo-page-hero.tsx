@@ -67,9 +67,9 @@ export function NewhaloPageHero({ title, detail, aside, steps, withMedia, media,
             {steps.map((s, i) => (
               <li key={s.title} className="relative grid grid-cols-[2.5rem_1fr] gap-x-[1.4rem] lg:block">
                 {/* phones: a vertical dotted line down to the next step */}
-                {i < steps.length - 1 && <span aria-hidden className="newhalo-page-hero-dots absolute top-11 -bottom-7 left-5 w-px lg:hidden" />}
+                {i < steps.length - 1 && <span aria-hidden className="absolute top-11 -bottom-7 left-5 border-l border-dotted border-foreground/60 lg:hidden" />}
                 {/* desktop: a horizontal dotted line from the square to the next one */}
-                <span aria-hidden className={cn("newhalo-page-hero-dots absolute top-5 left-11 hidden h-px lg:block", i < steps.length - 1 ? "-right-4" : "right-0")} />
+                <span aria-hidden className={cn("absolute top-5 left-11 hidden border-t border-dotted border-foreground/60 lg:block", i < steps.length - 1 ? "-right-4" : "right-0")} />
                 <span className={cn("relative flex size-10 items-center justify-center rounded-sm text-base", i === 0 ? "bg-primary text-primary-foreground" : "bg-card text-card-foreground")}>{i + 1}</span>
                 <div className="lg:mt-[1.1rem]">
                   <h2 className="font-display text-[1.3rem] leading-tight font-bold lg:text-2xl">{s.title}</h2>
