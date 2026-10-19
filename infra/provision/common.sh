@@ -122,8 +122,13 @@ out=/run/foundry/secrets.env.new
 : > "\$out"
 while IFS== read -r var param; do
   [[ -n "\$var" ]] || continue
-  value=\$(aws ssm get-parameter --name "\$param" --with-decryption --query Parameter.Value --output text)
-  echo "\$var=\$value" >> "\$out"
+  # the Claude token is optional: left out, Claude runs fail and Gemini is unaffected
+  if value=\$(aws ssm get-parameter --name "\$param" --with-decryption --query Parameter.Value --output text 2>/dev/null); then
+    echo "\$var=\$value" >> "\$out"
+  elif [[ \$var != CLAUDE_CODE_OAUTH_TOKEN ]]; then
+    echo "foundry-env: cannot read \$param" >&2
+    exit 1
+  fi
 done <<'NAMES'
 $names
 NAMES
