@@ -146,7 +146,7 @@ export function HalodentalNews({
                 className={cn(
                   "px-[var(--page-gutter)]",
                   isFaded &&
-                    "max-h-[104px] overflow-hidden opacity-25 pointer-events-none select-none lg:max-h-[240px]",
+                    "max-h-[76px] overflow-hidden opacity-25 pointer-events-none select-none [mask-image:linear-gradient(to_bottom,black_10%,transparent_95%)] lg:max-h-[240px]",
                 )}
               >
                 <a

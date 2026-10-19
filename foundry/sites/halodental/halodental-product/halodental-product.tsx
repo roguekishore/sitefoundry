@@ -67,16 +67,18 @@ function DefaultThumbnails() {
   return [
     <div
       key="thumb-1"
-      className="dark relative size-full overflow-hidden rounded-[6px] bg-background ring-2 ring-primary"
+      className=" size-full rounded-lg border border-primary p-[3px]"
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_55%,var(--secondary)_0%,var(--background)_75%)]" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="h-9 w-1.5 rotate-18 rounded-full bg-foreground/60" />
+      <div className="dark relative size-full overflow-hidden rounded-[5px] bg-background">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_55%_55%,var(--secondary)_0%,var(--background)_75%)]" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="h-9 w-1.5 rotate-18 rounded-full bg-foreground/60" />
+        </div>
       </div>
     </div>,
     <div
       key="thumb-2"
-      className="relative size-full overflow-hidden rounded-[6px] bg-secondary/90"
+      className="relative size-full overflow-hidden rounded-lg bg-secondary/90"
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="size-6 rounded-full border border-foreground/20" />
@@ -84,7 +86,7 @@ function DefaultThumbnails() {
     </div>,
     <div
       key="thumb-3"
-      className="relative size-full overflow-hidden rounded-[6px] bg-muted-foreground/25"
+      className="relative size-full overflow-hidden rounded-lg bg-muted-foreground/25"
     >
       <div className="absolute inset-0 flex items-center justify-center">
         <span className="h-7 w-1.5 -rotate-24 rounded-full bg-foreground/20" />
@@ -112,7 +114,7 @@ export function HalodentalProduct({
     <section className={cn("bg-background py-[var(--section-y)] px-[var(--page-gutter)] text-foreground", className)}>
       <div className="mx-auto grid max-w-[var(--page-width)] grid-cols-1 items-start lg:grid-cols-12 lg:gap-x-5">
         <div className="lg:col-span-4 lg:pb-10">
-          <h2 className="font-display text-[2.47rem] leading-[1.1] font-normal tracking-[-0.015em] text-balance lg:text-[4rem] lg:leading-none">
+          <h2 className="font-display text-[2.47rem] leading-[1.1] font-normal tracking-[-0.015em] lg:max-w-[9ch] lg:text-[4rem] lg:leading-none">
             {title}
           </h2>
           <p className="mt-2.5 text-[0.91rem] leading-[1.5] font-normal text-foreground lg:mt-5 lg:text-base lg:leading-[1.5]">
@@ -147,9 +149,9 @@ export function HalodentalProduct({
               {media ?? <DefaultProductMedia awardLabel={awardLabel} />}
             </div>
 
-            <ul aria-label="Product gallery thumbnails" className="flex shrink-0 items-center gap-2.5 lg:w-[95px] lg:flex-col">
+            <ul aria-label="Product gallery thumbnails" className="flex shrink-0 items-center gap-1.5 lg:w-[95px] lg:flex-col lg:gap-2.5">
               {thumbItems.map((thumb, idx) => (
-                <li key={idx} className="size-[60px] overflow-hidden rounded-lg lg:size-[95px]">
+                <li key={idx} className="size-[68px] overflow-hidden rounded-lg lg:size-[95px]">
                   {thumb}
                 </li>
               ))}

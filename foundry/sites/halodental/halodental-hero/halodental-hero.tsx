@@ -54,7 +54,7 @@ export function HalodentalHero({ wordmark, title, videoCta, media, className }: 
 
         <div className="relative z-10 grid grid-cols-1 items-end gap-y-3 lg:grid-cols-12 lg:gap-x-5">
           <div aria-hidden className="pointer-events-none hidden select-none lg:col-span-6 lg:block">
-            <span className="block font-display text-[15.25rem] leading-[0.76] font-normal tracking-[-0.035em] text-foreground">
+            <span className="-ml-2 block font-display text-[16.75rem] leading-[0.76] font-normal tracking-[-0.035em] text-foreground">
               {wordmark}
             </span>
           </div>
