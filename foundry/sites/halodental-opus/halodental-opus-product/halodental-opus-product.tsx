@@ -42,7 +42,7 @@ export interface HalodentalOpusProductProps {
 export function HalodentalOpusProduct({ title, text, features, cta, slides, active = 0, className }: HalodentalOpusProductProps) {
   const current = slides[active];
   return (
-    <section className={cn("bg-background py-section text-foreground", className)}>
+    <section className={cn("font-[450] bg-background py-section text-foreground", className)}>
       <div className="mx-auto grid max-w-page grid-cols-1 gap-x-5 gap-y-[4.5rem] px-gutter lg:grid-cols-12">
         <div className="lg:col-span-4">
           <HalodentalOpusHeading title={title} />

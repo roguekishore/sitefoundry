@@ -26,7 +26,8 @@ export function HalodentalOpusHeading({ title, as: Tag = "h2", size = "section",
   return (
     <Tag
       className={cn(
-        "font-display font-normal text-balance",
+        "font-display font-normal",
+        size !== "card" && "text-balance",
         sizes[size],
         gradient && "bg-linear-to-r from-highlight to-glow bg-clip-text pb-[0.08em] text-transparent",
         className,

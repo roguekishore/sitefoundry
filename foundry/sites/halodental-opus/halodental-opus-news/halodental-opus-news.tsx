@@ -37,7 +37,7 @@ export interface HalodentalOpusNewsProps {
  */
 export function HalodentalOpusNews({ title, link, items, more, className }: HalodentalOpusNewsProps) {
   return (
-    <section className={cn("bg-background py-section text-foreground", className)}>
+    <section className={cn("font-[450] bg-background py-section text-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-end lg:justify-between">
           <HalodentalOpusHeading title={title} />
@@ -57,13 +57,13 @@ export function HalodentalOpusNews({ title, link, items, more, className }: Halo
                 aria-hidden={faded || undefined}
                 className={cn(
                   "grid grid-cols-1 gap-x-5 border-t border-foreground pt-5 pb-[1.875rem] lg:grid-cols-12 lg:py-[1.875rem]",
-                  faded && "pointer-events-none max-h-36 overflow-hidden mask-b-from-0% mask-b-to-90% opacity-25 lg:max-h-40",
+                  faded && "pointer-events-none max-h-32 overflow-hidden mask-b-from-0% mask-b-to-80% opacity-30 lg:max-h-none",
                 )}
               >
                 <div className="aspect-[348/193] overflow-hidden rounded-lg bg-card lg:col-span-3 lg:aspect-[325/180]">{item.media}</div>
                 <HalodentalOpusHeading as="h3" size="card" title={item.title} className="mt-6 lg:col-span-3 lg:col-start-6 lg:mt-0" />
                 <p className="mt-5 text-[0.9375rem] leading-[1.45] lg:col-span-3 lg:mt-1 lg:text-base lg:leading-normal">{item.text}</p>
-                <HalodentalOpusButton variant="card" href={item.href} ariaLabel={item.linkLabel} className="mt-5 lg:col-start-12 lg:mt-0 lg:justify-self-end">
+                <HalodentalOpusButton variant="card" href={item.href} ariaLabel={item.linkLabel} className="mt-5 justify-self-start lg:col-start-12 lg:mt-0 lg:justify-self-end">
                   <ArrowUpRight aria-hidden className="size-4" strokeWidth={1.25} />
                 </HalodentalOpusButton>
               </li>
@@ -72,7 +72,7 @@ export function HalodentalOpusNews({ title, link, items, more, className }: Halo
         </ul>
 
         {more && (
-          <div className={cn("flex justify-center", items.length > 1 ? "-mt-16 lg:-mt-[5.5rem]" : "mt-8")}>
+          <div className={cn("flex justify-center", items.length > 1 ? "-mt-12 lg:-mt-[3.25rem]" : "mt-8")}>
             <HalodentalOpusButton variant="outline" href={more.href} className="relative lg:h-[2.625rem]">
               {more.label}
             </HalodentalOpusButton>

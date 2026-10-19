@@ -41,7 +41,7 @@ export interface HalodentalOpusHeaderProps {
  */
 export function HalodentalOpusHeader({ brand, links, cta, ctaShort, tiles = [], menuLabel, overlay = true, className }: HalodentalOpusHeaderProps) {
   return (
-    <header className={cn("dark relative z-20 pt-1.5 text-foreground lg:pt-2.5", overlay && "-mb-[4.25rem] lg:-mb-[6.875rem]", className)}>
+    <header className={cn("font-[450] dark relative z-20 pt-1.5 text-foreground lg:pt-2.5", overlay && "-mb-[4.25rem] lg:-mb-[6.875rem]", className)}>
       <div className="relative flex h-[3.875rem] items-center justify-between px-gutter lg:h-[6.25rem]">
         <a href={brand.href} className="flex items-center gap-2.5 lg:gap-3">
           {brand.emblem && <span className="flex text-foreground [&>svg]:size-[2.125rem] lg:[&>svg]:size-10">{brand.emblem}</span>}
