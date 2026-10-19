@@ -70,3 +70,56 @@ resource "aws_iam_instance_profile" "run" {
   name = "FoundryRun"
   role = aws_iam_role.run.name
 }
+
+# Secrets live in Parameter Store under /foundry/. AmazonSSMManagedInstanceCore already
+# allows ssm:GetParameter* on everything, so "each instance reads only its own" needs an
+# explicit Deny (a Deny beats any Allow). /foundry/shared/ (the runner token) is open to both.
+#   /foundry/preview/*  the login (passphrase hash, TOTP secret): the agent on the run
+#                       instance must never read it
+#   /foundry/run/*      the Vertex key and the Claude token: the internet-facing preview
+#                       must never hold them
+data "aws_caller_identity" "me" {}
+
+locals {
+  parameter_arn = "arn:aws:ssm:${var.region}:${data.aws_caller_identity.me.account_id}:parameter"
+}
+
+data "aws_iam_policy_document" "run_denied" {
+  statement {
+    sid       = "NotThePreviewsSecrets"
+    effect    = "Deny"
+    actions   = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath", "ssm:DescribeParameters"]
+    resources = ["${local.parameter_arn}/foundry/preview/*", "${local.parameter_arn}/foundry/preview"]
+  }
+}
+
+data "aws_iam_policy_document" "preview_denied" {
+  statement {
+    sid       = "NotTheRunInstancesSecrets"
+    effect    = "Deny"
+    actions   = ["ssm:GetParameter", "ssm:GetParameters", "ssm:GetParametersByPath", "ssm:DescribeParameters"]
+    resources = ["${local.parameter_arn}/foundry/run/*", "${local.parameter_arn}/foundry/run"]
+  }
+}
+
+resource "aws_iam_policy" "run_denied" {
+  name        = "FoundryRunDenied"
+  description = "The foundry run instance cannot read the preview's secrets"
+  policy      = data.aws_iam_policy_document.run_denied.json
+}
+
+resource "aws_iam_policy" "preview_denied" {
+  name        = "FoundryPreviewDenied"
+  description = "The foundry preview instance cannot read the run instance's secrets"
+  policy      = data.aws_iam_policy_document.preview_denied.json
+}
+
+resource "aws_iam_role_policy_attachment" "run_denied" {
+  role       = aws_iam_role.run.name
+  policy_arn = aws_iam_policy.run_denied.arn
+}
+
+resource "aws_iam_role_policy_attachment" "preview_denied" {
+  role       = aws_iam_role.preview.name
+  policy_arn = aws_iam_policy.preview_denied.arn
+}
