@@ -34,7 +34,7 @@ Two kinds of thing, two entry points (layout: `docs/mockups/gallery-redesign.htm
   preview (device, theme, light/dark), its props, code and details, and where it's used.
 
 Ctrl K (or `/`) jumps to any site, page or item. Lists show still thumbnails, not live
-previews: `pnpm build:thumbs` makes them (only what changed), and anything not shot yet
+previews: `pnpm build:thumbs` makes them (only the ones missing; `--force` redoes all), and anything not shot yet
 shows a placeholder.
 
 ## Use blocks in a customer project
