@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo product sub-navigation",
+  "description": "A 60px graphite bar of in-page links for long product pages, with a lighter 'reserve →' segment at its right end. It fades in once the first screen is scrolled past and floats 10px above the bottom of the window; the section in view gets a short orange bar under its name. On phones it sits at the top and folds into a dropdown showing the current section.",
+  "category": "header",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "navigation",
+    "subnav",
+    "fixed",
+    "scroll-spy",
+    "dark",
+    "anchors",
+    "product"
+  ],
+  "notes": [
+    "links point at section ids on the same page",
+    "always dark (wraps itself in .dark); needs JavaScript (hydrate: load)"
+  ],
+  "entry": "newhalo-product-subnav.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "newhalo-product-subnav",
+  "files": [
+    {
+      "path": "newhalo-product-subnav.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ArrowRight, ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NewhaloProductSubnavProps {\n  /** in-page anchors (\"#features\" …); the one in view is underlined in orange */\n  links: { label: string; href: string }[];\n  /** the lighter segment at the right end */\n  cta: { label: string; href: string };\n  /** screen-reader name of the phone dropdown */\n  menuLabel?: string;\n  className?: string;\n}\n\n/**\n * A graphite in-page navigation bar for long product pages. It appears once the first screen\n * is scrolled past and stays fixed 10px above the bottom of the window (at the top on phones,\n * where it folds into a dropdown). The section in view is underlined in orange.\n */\nexport function NewhaloProductSubnav({ links, cta, menuLabel = \"Sections\", className }: NewhaloProductSubnavProps) {\n  const [shown, setShown] = useState(false);\n  const [active, setActive] = useState(0);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    const onScroll = () => setShown(window.scrollY > window.innerHeight * 0.85);\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    const els = links.map((l) => document.querySelector<HTMLElement>(l.href)).filter((e): e is HTMLElement => !!e);\n    const io = new IntersectionObserver(\n      (entries) => {\n        for (const e of entries) if (e.isIntersecting) setActive(links.findIndex((l) => l.href === `#${e.target.id}`));\n      },\n      { rootMargin: \"-45% 0px -50% 0px\" },\n    );\n    els.forEach((el) => io.observe(el));\n    return () => {\n      window.removeEventListener(\"scroll\", onScroll);\n      io.disconnect();\n    };\n  }, [links]);\n\n  const current = links[Math.max(0, active)];\n\n  return (\n    <nav\n      aria-label={menuLabel}\n      className={cn(\n        \"dark fixed inset-x-1.5 top-1.5 z-40 text-foreground transition-[transform,opacity] duration-400 ease-[cubic-bezier(0.32,0.94,0.6,1)] motion-reduce:transition-none lg:inset-x-2.5 lg:top-auto lg:bottom-2.5\",\n        shown ? \"translate-y-0 opacity-100\" : \"pointer-events-none -translate-y-4 opacity-0 lg:translate-y-4\",\n        className,\n      )}\n    >\n      <div className=\"flex h-15 overflow-clip rounded-sm bg-card\">\n        {/* phones: the current section, opening a list */}\n        <button type=\"button\" aria-expanded={open} onClick={() => setOpen((o) => !o)} className=\"flex flex-1 items-center justify-between px-5 text-base lg:hidden\">\n          {current?.label}\n          <ChevronDown aria-hidden strokeWidth={1} className={cn(\"size-6 transition-transform\", open && \"rotate-180\")} />\n        </button>\n        {/* desktop: every section in a row */}\n        <ul className=\"hidden flex-1 items-stretch gap-10 px-5 lg:flex\">\n          {links.map((l, i) => (\n            <li key={l.href} className=\"relative flex items-center\">\n              <a href={l.href} className=\"text-base leading-none transition-colors hover:text-primary\">\n                {l.label}\n              </a>\n              <span aria-hidden className={cn(\"absolute inset-x-0 bottom-0 h-1 rounded-t-sm bg-primary transition-transform duration-300\", i === active ? \"scale-x-100\" : \"scale-x-0\")} />\n            </li>\n          ))}\n        </ul>\n        <a href={cta.href} className=\"group/cta flex w-[48%] items-center justify-between bg-muted px-[0.9375rem] text-base lg:w-[11.9rem] lg:px-6\">\n          {cta.label}\n          <ArrowRight aria-hidden strokeWidth={1} className=\"hidden size-6 transition-transform duration-300 group-hover/cta:translate-x-1 lg:block\" />\n        </a>\n      </div>\n      {open && (\n        <ul className=\"mt-0.5 rounded-sm bg-card py-2 lg:hidden\">\n          {links.map((l, i) => (\n            <li key={l.href}>\n              <a href={l.href} onClick={() => setOpen(false)} className={cn(\"block px-5 py-2.5 text-base\", i === active && \"text-primary\")}>\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      )}\n    </nav>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "links",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "in-page anchors (\"#features\" …); the one in view is underlined in orange"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the lighter segment at the right end"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Sections",
+      "description": "screen-reader name of the phone dropdown"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b6549c60e99b1b5d6ed5afe449ca4a3540eb4364191e169d04df6129dc0dccd0"
+}

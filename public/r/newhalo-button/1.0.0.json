@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo button",
+  "description": "A 40px button with 4px corners in five looks: hot orange with black text, thin outline, solid foreground fill, a quiet translucent square and a card-coloured arrow tile. On hover the label rolls up and out while a copy rolls in from below (0.35s), and the colours shift (0.3s, a soft ease-out).",
+  "category": "button",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "orange",
+    "minimal",
+    "square",
+    "hover",
+    "roll"
+  ],
+  "notes": [
+    "light and quiet are meant for black panels: wrap them in a .dark area",
+    "the label is a string so the hover copy can be made; pass an icon for the play-style button"
+  ],
+  "entry": "newhalo-button.tsx",
+  "source": "foundry",
+  "name": "newhalo-button",
+  "files": [
+    {
+      "path": "newhalo-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NewhaloButtonProps {\n  /** the visible words; on hover they roll up and a copy rolls in from below */\n  label: string;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: orange fill, black text that turns light on hover · outline: thin foreground\n   * border that turns orange on hover · light: foreground fill (white on black panels) ·\n   * quiet: a faint translucent square (language switch, icon buttons) · tile: a card-coloured\n   * square (the arrow buttons in lists) that turns orange on hover\n   */\n  variant?: \"primary\" | \"outline\" | \"light\" | \"quiet\" | \"tile\";\n  /** an icon in its own darker square at the left (the play button) */\n  icon?: ReactNode;\n  /** show only the icon (label becomes the screen-reader name) */\n  iconOnly?: boolean;\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  /** greys it out and blocks clicks (a form button before the form is filled in) */\n  disabled?: boolean;\n  /** stretch to the full width of its container */\n  block?: boolean;\n  /** called on click (buttons only) */\n  onClick?: () => void;\n  className?: string;\n}\n\nconst variants = {\n  primary: \"bg-primary text-primary-foreground hover:text-background\",\n  outline: \"border border-foreground text-foreground hover:border-primary\",\n  light: \"bg-foreground text-background\",\n  quiet: \"bg-foreground/10 text-foreground hover:bg-foreground/20\",\n  tile: \"bg-card text-card-foreground hover:bg-primary hover:text-primary-foreground\",\n};\n\n// The original's easing: colours 0.3s cubic-bezier(0.32,0.94,0.6,1); the label roll 0.35s.\nconst ease = \"ease-[cubic-bezier(0.32,0.94,0.6,1)]\";\n\n/** The 40px button with 4px corners, regular weight, and a label that rolls up on hover. */\nexport function NewhaloButton({ label, href, variant = \"primary\", icon, iconOnly, type = \"button\", disabled, block, onClick, className }: NewhaloButtonProps) {\n  const classes = cn(\n    \"group/btn inline-flex h-10 shrink-0 items-center justify-center rounded-sm text-base leading-none whitespace-nowrap\",\n    \"transition-[color,background-color,border-color] duration-300 motion-reduce:transition-none\",\n    ease,\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    iconOnly ? \"w-10\" : icon ? \"gap-4 pr-4\" : \"px-[0.9375rem]\",\n    variants[variant],\n    disabled && \"pointer-events-none bg-foreground/5 text-foreground/30\",\n    block && \"w-full\",\n    className,\n  );\n  const inner = (\n    <>\n      {icon && (\n        <span aria-hidden className={cn(\"flex size-10 items-center justify-center [&_svg]:size-4\", !iconOnly && \"rounded-l-sm bg-foreground/10\")}>\n          {icon}\n        </span>\n      )}\n      {iconOnly ? (\n        <span className=\"sr-only\">{label}</span>\n      ) : (\n        <span className=\"relative block overflow-clip py-1\">\n          <span className={cn(\"block transition-[transform,opacity] duration-[350ms] group-hover/btn:-translate-y-full group-hover/btn:opacity-0 motion-reduce:transition-none\", ease)}>{label}</span>\n          <span\n            aria-hidden\n            className={cn(\"absolute inset-x-0 top-1 block translate-y-full opacity-0 transition-[transform,opacity] delay-75 duration-[350ms] group-hover/btn:translate-y-0 group-hover/btn:opacity-100 motion-reduce:transition-none\", ease)}\n          >\n            {label}\n          </span>\n        </span>\n      )}\n    </>\n  );\n  return href && !disabled ? (\n    <a href={href} className={classes} aria-label={iconOnly ? label : undefined}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} disabled={disabled} onClick={onClick} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the visible words; on hover they roll up and a copy rolls in from below"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: orange fill, black text that turns light on hover · outline: thin foreground\nborder that turns orange on hover · light: foreground fill (white on black panels) ·\nquiet: a faint translucent square (language switch, icon buttons) · tile: a card-coloured\nsquare (the arrow buttons in lists) that turns orange on hover"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an icon in its own darker square at the left (the play button)"
+    },
+    {
+      "name": "iconOnly",
+      "type": "boolean",
+      "required": false,
+      "description": "show only the icon (label becomes the screen-reader name)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "greys it out and blocks clicks (a form button before the form is filled in)"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the full width of its container"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false,
+      "description": "called on click (buttons only)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d1d8282277e2249be7fcb146e3ff1e3fee4ed28e7c269b54d2548927730fe89d"
+}
