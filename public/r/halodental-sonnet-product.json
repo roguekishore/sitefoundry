@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Halo product feature",
+  "description": "A product section on the paper background: a big two-line title, a short paragraph, a list of specs with small icons between hairlines and an orange button on the left; a large near-square photo on the right with a column of three small thumbnails (a row under the photo on phones).",
+  "category": "features",
+  "site": "halodental-sonnet",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "product",
+    "specs",
+    "list",
+    "hairline",
+    "paper",
+    "minimal"
+  ],
+  "notes": [
+    "the thumbnails are a static strip: the first is marked, they do not switch the big photo",
+    "media and thumbnails are slots; empty they are muted placeholders"
+  ],
+  "entry": "halodental-sonnet-product.tsx",
+  "source": "foundry",
+  "name": "halodental-sonnet-product",
+  "files": [
+    {
+      "path": "halodental-sonnet-product.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HalodentalSonnetButton } from \"@foundry/halodental-sonnet-button\";\nimport { HalodentalSonnetHeading } from \"@foundry/halodental-sonnet-heading\";\nimport { HalodentalSonnetMedia } from \"@foundry/halodental-sonnet-media\";\n\nexport interface HalodentalSonnetProductSpec {\n  /** a small icon, e.g. from lucide-react (size-4) */\n  icon: ReactNode;\n  /** the spec in a few words */\n  text: string;\n}\n\nexport interface HalodentalSonnetProductProps {\n  /** the title; a list sets the line breaks */\n  title: string | string[];\n  /** the paragraph under the title */\n  text: string;\n  /** spec rows with an icon each, divided by hairlines */\n  specs: HalodentalSonnetProductSpec[];\n  /** the orange button */\n  action: { label: string; href: string };\n  /** the large photo. Empty shows the placeholder. */\n  media?: ReactNode;\n  /** how many small thumbnails to show beside or under the photo (0 hides them) */\n  thumbnails?: number;\n  className?: string;\n}\n\n/** One product, told in text and specs on the left and in pictures on the right. */\nexport function HalodentalSonnetProduct({ title, text, specs, action, media, thumbnails = 3, className }: HalodentalSonnetProductProps) {\n  return (\n    <section className={cn(\"py-section\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-10 px-gutter lg:grid-cols-[minmax(0,28rem)_1fr] lg:gap-[8.5rem] lg:px-10\">\n        <div className=\"flex flex-col items-start lg:pt-4\">\n          <HalodentalSonnetHeading title={title} />\n          <p className=\"mt-4 max-w-[34rem] text-[0.9rem] leading-[1.5] lg:mt-8 lg:text-base\">{text}</p>\n          <ul className=\"mt-6 w-full lg:mt-8\">\n            {specs.map((s, i) => (\n              <li key={i} className=\"flex items-center gap-3 border-t border-border py-3 text-sm last:border-b\">\n                <span className=\"text-foreground\">{s.icon}</span>\n                {s.text}\n              </li>\n            ))}\n          </ul>\n          <HalodentalSonnetButton href={action.href} size=\"sm\" className=\"mt-6 lg:mt-8 lg:h-10\">\n            {action.label}\n          </HalodentalSonnetButton>\n        </div>\n\n        <div className=\"flex flex-col gap-3 lg:flex-row lg:items-start lg:gap-6\">\n          <HalodentalSonnetMedia ratio=\"1 / 0.98\" className=\"lg:flex-1\">\n            {media}\n          </HalodentalSonnetMedia>\n          {thumbnails > 0 && (\n            <div className=\"grid grid-cols-3 gap-3 lg:flex lg:w-24 lg:flex-col\">\n              {Array.from({ length: thumbnails }, (_, i) => (\n                <HalodentalSonnetMedia key={i} ratio=\"1\" className={cn(i === 0 ? \"ring-2 ring-primary ring-inset\" : \"opacity-50\")} />\n              ))}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "halodental-sonnet-button",
+    "halodental-sonnet-heading",
+    "halodental-sonnet-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets the line breaks"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the title"
+    },
+    {
+      "name": "specs",
+      "type": "HalodentalSonnetProductSpec[]",
+      "required": true,
+      "description": "spec rows with an icon each, divided by hairlines"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the orange button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large photo. Empty shows the placeholder."
+    },
+    {
+      "name": "thumbnails",
+      "type": "number",
+      "required": false,
+      "default": "3",
+      "description": "how many small thumbnails to show beside or under the photo (0 hides them)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ec2a4e24425bf41894dab570d899589b27ec351b869168a220bdd9bc8b6a980a"
+}

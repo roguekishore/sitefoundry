@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo hero",
+  "description": "A window-tall black panel inset 6–10px from the edge with 8px corners, filled edge to edge by a video slot that drifts down ~108px as you scroll the first screen. A giant 280px wordmark sits bottom-left on desktop, a 64px (or two-line 100px) title bottom-right, and an orange play button trails the cursor; on phones the title and play button stack bottom-left.",
+  "category": "hero",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "fullscreen",
+    "video",
+    "parallax",
+    "cursor-follow",
+    "giant-type",
+    "inset-panel"
+  ],
+  "notes": [
+    "sized by the window (h-svh); pair it with newhalo-header, which floats over it",
+    "always dark (wraps itself in .dark); tone warm suits an orange video"
+  ],
+  "entry": "newhalo-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "newhalo-hero",
+  "files": [
+    {
+      "path": "newhalo-hero.css",
+      "content": "/* The video drifts down inside its panel over the first screen of scrolling. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .newhalo-hero-drift {\n      animation: newhalo-hero-drift linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 100vh;\n    }\n  }\n}\n@keyframes newhalo-hero-drift {\n  to { transform: translateY(108px); }\n}\n\n/* The play button eases after the cursor. */\n.newhalo-hero-play {\n  transition: transform 0.6s cubic-bezier(0.32, 0.94, 0.6, 1);\n}\n@media (prefers-reduced-motion: reduce) {\n  .newhalo-hero-play { transition: none; }\n}\n"
+    },
+    {
+      "path": "newhalo-hero.tsx",
+      "content": "import { useEffect, useRef, type ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport \"./newhalo-hero.css\";\n\nexport interface NewhaloHeroProps {\n  /** the title at the bottom right (bottom left on phones) */\n  title: string;\n  /** md: one 64px line (landing) · xl: a 100px block set further right (product page) */\n  titleSize?: \"md\" | \"xl\";\n  /** the giant word along the bottom left, desktop only; leave out to hide it */\n  wordmark?: string;\n  /** the orange play button: follows the cursor on desktop, sits under the title on phones */\n  play?: { label: string; href?: string };\n  /** the photo or video filling the panel. Empty shows the placeholder. */\n  media?: ReactNode;\n  /** placeholder look: deep (near-black) panel or warm (an amber→red wash) */\n  tone?: \"deep\" | \"warm\";\n  className?: string;\n}\n\n/**\n * The first screen: one black panel inset from the window edge and exactly as tall as the\n * window, filled by a media slot that drifts down as you scroll. A giant wordmark sits on the\n * bottom left, the title bottom right; an orange play button trails the cursor.\n */\nexport function NewhaloHero({ title, titleSize = \"md\", wordmark, play, media, tone = \"deep\", className }: NewhaloHeroProps) {\n  const panel = useRef<HTMLDivElement>(null);\n  const button = useRef<HTMLDivElement>(null);\n\n  useEffect(() => {\n    const el = panel.current;\n    const btn = button.current;\n    if (!el || !btn || !window.matchMedia(\"(pointer: fine)\").matches) return;\n    const move = (e: PointerEvent) => {\n      const r = el.getBoundingClientRect();\n      btn.style.transform = `translate(${e.clientX - r.left - r.width / 2}px, ${e.clientY - r.top - r.height / 2}px)`;\n    };\n    const reset = () => (btn.style.transform = \"\");\n    el.addEventListener(\"pointermove\", move);\n    el.addEventListener(\"pointerleave\", reset);\n    return () => {\n      el.removeEventListener(\"pointermove\", move);\n      el.removeEventListener(\"pointerleave\", reset);\n    };\n  }, []);\n\n  return (\n    <section className={cn(\"dark h-svh p-1.5 sm:p-2.5\", className)}>\n      <div ref={panel} className=\"relative h-full overflow-clip rounded-lg bg-background text-foreground\">\n        <NewhaloMedia tone={tone} className=\"absolute inset-x-0 -top-28 bottom-0\" innerClassName=\"newhalo-hero-drift\">\n          {media}\n        </NewhaloMedia>\n\n        {wordmark && (\n          <span aria-hidden className=\"absolute bottom-[1.6rem] left-7 hidden font-display text-[17.5rem] leading-[0.8] tracking-[-0.03em] select-none lg:block\">\n            {wordmark}\n          </span>\n        )}\n\n        <div\n          className={cn(\n            \"absolute inset-x-[0.9rem] bottom-[0.9rem] flex flex-col items-start gap-2.5 lg:inset-x-auto lg:right-8 lg:bottom-[1.1rem]\",\n            titleSize === \"xl\" ? \"lg:left-[67%]\" : \"lg:left-[58.8%]\",\n          )}\n        >\n          <h1 className={cn(\"font-display leading-none tracking-[-0.01em]\", titleSize === \"xl\" ? \"text-[3.1rem] leading-none lg:text-[6.25rem] lg:leading-[0.95]\" : \"text-[2.5rem] leading-none lg:text-[4rem]\")}>\n            {title}\n          </h1>\n          {play && <NewhaloButton label={play.label} href={play.href} icon={<Play strokeWidth={1.25} />} className=\"lg:hidden\" />}\n        </div>\n\n        {play && (\n          <div className=\"pointer-events-none absolute top-1/2 left-1/2 hidden -translate-1/2 lg:block\">\n            <div ref={button} className=\"newhalo-hero-play\">\n              <NewhaloButton label={play.label} href={play.href} icon={<Play strokeWidth={1.25} />} className=\"pointer-events-auto\" />\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title at the bottom right (bottom left on phones)"
+    },
+    {
+      "name": "titleSize",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: one 64px line (landing) · xl: a 100px block set further right (product page)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": false,
+      "description": "the giant word along the bottom left, desktop only; leave out to hide it"
+    },
+    {
+      "name": "play",
+      "type": "{ label: string; href?: string; }",
+      "required": false,
+      "description": "the orange play button: follows the cursor on desktop, sits under the title on phones"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo or video filling the panel. Empty shows the placeholder."
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "deep",
+      "description": "placeholder look: deep (near-black) panel or warm (an amber→red wash)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dcfebcbc68ee17a5ac186b8b1ba8613b477574596f570344eb5fc2b5005267e0"
+}

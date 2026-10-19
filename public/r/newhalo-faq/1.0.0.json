@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo help centre",
+  "description": "A help centre on paper: white topic tiles in a two-column grid on the left (the chosen one orange; a sideways-scrolling row on phones), and on the right the topic's 64px heading over a black-hairline accordion with white plus tiles. Questions fade in as they scroll into view; phones end with a 'can't find it?' prompt.",
+  "category": "faq",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "tabs",
+    "tiles",
+    "light",
+    "hairline",
+    "help"
+  ],
+  "notes": [
+    "switching topics needs JavaScript (hydrate: visible); the accordion itself works without"
+  ],
+  "entry": "newhalo-faq.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "newhalo-faq",
+  "files": [
+    {
+      "path": "newhalo-faq.tsx",
+      "content": "import { useState } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloAccordion, type NewhaloAccordionItem } from \"@foundry/newhalo-accordion\";\nimport { NewhaloTiles } from \"@foundry/newhalo-tiles\";\n\nexport interface NewhaloFaqTopic {\n  /** the tile label */\n  label: string;\n  /** the 64px heading over its questions (defaults to the label) */\n  title?: string;\n  items: NewhaloAccordionItem[];\n}\n\nexport interface NewhaloFaqProps {\n  /** one tile and one question list per topic */\n  topics: NewhaloFaqTopic[];\n  /** the \"can't find it?\" prompt at the end on phones (the page hero shows it on desktop) */\n  aside?: { title: string; link: { label: string; href: string } };\n  className?: string;\n}\n\n/**\n * A help centre on paper: topic tiles on the left (a sideways row on phones), and the chosen\n * topic's 64px heading with its hairline accordion on the right.\n */\nexport function NewhaloFaq({ topics, aside, className }: NewhaloFaqProps) {\n  const [active, setActive] = useState(0);\n  const topic = topics[active];\n  return (\n    <section className={cn(\"bg-background pt-1.5 pb-section text-foreground lg:pt-section\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"lg:col-span-4\">\n          <NewhaloTiles items={topics.map((t) => ({ label: t.label }))} activeIndex={active} onSelect={setActive} />\n        </div>\n        <div className=\"mt-[4.4rem] lg:col-span-7 lg:col-start-6 lg:mt-0\">\n          <h2 className=\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\">{topic.title ?? topic.label}</h2>\n          <NewhaloAccordion key={active} items={topic.items} group={`newhalo-faq-${active}`} className=\"mt-7 lg:mt-9\" />\n        </div>\n        {aside && (\n          <div className=\"mt-20 lg:hidden\">\n            <p className=\"font-display text-[1.3rem] leading-[1.1]\">{aside.title}</p>\n            <a href={aside.link.href} className=\"mt-6 inline-flex items-center gap-2 border-b border-foreground pb-1 text-sm\">\n              {aside.link.label}\n              <ArrowRight aria-hidden strokeWidth={1} className=\"size-4\" />\n            </a>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-accordion",
+    "newhalo-tiles"
+  ],
+  "props": [
+    {
+      "name": "topics",
+      "type": "NewhaloFaqTopic[]",
+      "required": true,
+      "description": "one tile and one question list per topic"
+    },
+    {
+      "name": "aside",
+      "type": "{ title: string; link: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the \"can't find it?\" prompt at the end on phones (the page hero shows it on desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ec7f12fc35c003336fd55c3154bd8fd35d4c93d1c544b55fadd56ab64c86bc21"
+}

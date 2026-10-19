@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo page hero",
+  "description": "The black band that opens an inner page: a 100px amber-to-red title whose gradient sweeps in from the left on load, with one of three companions: a 28px question and an underlined arrow link on the right, a row of numbered square steps joined by a dotted line, or a large rounded photo on the right half (full-width on top on phones) that drifts as you scroll.",
+  "category": "hero",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "page-header",
+    "dark",
+    "gradient-text",
+    "orange",
+    "steps",
+    "big-type",
+    "load-in"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark); leaves room at the top for newhalo-header",
+    "the aside is desktop-only, as in the original (phones show the same prompt further down the page)"
+  ],
+  "entry": "newhalo-page-hero.tsx",
+  "source": "foundry",
+  "name": "newhalo-page-hero",
+  "files": [
+    {
+      "path": "newhalo-page-hero.css",
+      "content": "/* The amber→red page title; on load the gradient spreads in from the left over a dim copy. */\n.newhalo-page-hero-title {\n  background-image: linear-gradient(90deg, var(--highlight), var(--glow)), linear-gradient(color-mix(in oklab, var(--foreground) 14%, transparent), color-mix(in oklab, var(--foreground) 14%, transparent));\n  background-size: 100% 100%, 100% 100%;\n  background-repeat: no-repeat;\n  background-clip: text;\n  -webkit-background-clip: text;\n  color: transparent;\n  animation: newhalo-page-hero-fill 1.2s cubic-bezier(0.32, 0.94, 0.6, 1) 0.15s both;\n}\n@keyframes newhalo-page-hero-fill {\n  from { background-size: 0% 100%, 100% 100%; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .newhalo-page-hero-title { animation: none; }\n}\n"
+    },
+    {
+      "path": "newhalo-page-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal } from \"@foundry/newhalo-reveal\";\nimport \"./newhalo-page-hero.css\";\n\nexport interface NewhaloPageHeroStep {\n  title: string;\n  text: string;\n}\n\nexport interface NewhaloPageHeroProps {\n  /** the 100px amber→red page title */\n  title: string;\n  /** a 32px line under the title (an email address, a short claim) */\n  detail?: string;\n  /** a question and an underlined arrow link on the right (desktop) */\n  aside?: { title?: string; link: { label: string; href: string } };\n  /** numbered steps in a row, joined by a dotted line (a column on phones) */\n  steps?: NewhaloPageHeroStep[];\n  /** show a photo slot on the right half (on top on phones) */\n  withMedia?: boolean;\n  /** the photo for that slot; empty shows the placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * The black band that opens every inner page. A big gradient title that sweeps in on load,\n * with either a question-and-link aside, a row of numbered steps, or a large rounded photo on\n * the right. The site header floats over its top.\n */\nexport function NewhaloPageHero({ title, detail, aside, steps, withMedia, media, className }: NewhaloPageHeroProps) {\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <div\n        className={cn(\n          \"mx-auto grid max-w-page px-gutter lg:grid-cols-12 lg:gap-x-6\",\n          withMedia ? \"pb-20 lg:pt-30 lg:pb-30\" : \"pt-[7.4rem] pb-8 lg:pt-[12.6rem] lg:pb-8\",\n        )}\n      >\n        {withMedia && (\n          <NewhaloMedia\n            tone=\"deep\"\n            className=\"-mx-gutter aspect-[0.98] lg:order-last lg:col-span-6 lg:col-start-7 lg:-mr-5 lg:ml-0 lg:aspect-[1.03] lg:rounded-lg\"\n            innerClassName={cn(\"-inset-y-[34px]\", newhaloReveal(\"drift\"))}\n          >\n            {media}\n          </NewhaloMedia>\n        )}\n        <div className={cn(withMedia ? \"mt-10 lg:col-span-6 lg:mt-[4.4rem]\" : \"lg:col-span-8\")}>\n          <h1 className=\"newhalo-page-hero-title font-display text-[3.125rem] leading-[0.95] tracking-[-0.015em] lg:text-[6.25rem]\">{title}</h1>\n          {detail && <p className=\"mt-8 font-display text-[1.56rem] leading-tight lg:mt-12 lg:text-[2rem]\">{detail}</p>}\n        </div>\n        {aside && (\n          <div className=\"hidden lg:col-span-4 lg:col-start-9 lg:block lg:pt-3\">\n            {aside.title && <p className=\"font-display text-[1.75rem] leading-[1.1]\">{aside.title}</p>}\n            <a href={aside.link.href} className=\"group/link mt-6 inline-flex items-center gap-2 border-b border-foreground pb-1 text-base leading-none\">\n              {aside.link.label}\n              <ArrowRight aria-hidden strokeWidth={1} className=\"size-4 transition-transform duration-300 group-hover/link:translate-x-1\" />\n            </a>\n          </div>\n        )}\n        {steps && (\n          <ol className=\"mt-8 grid gap-8 lg:col-span-12 lg:mt-16 lg:grid-cols-3 lg:gap-5 lg:pb-[2.7rem]\">\n            {steps.map((s, i) => (\n              <li key={s.title} className=\"relative grid grid-cols-[2.5rem_1fr] gap-x-[1.4rem] lg:block\">\n                {/* phones: a vertical dotted line down to the next step */}\n                {i < steps.length - 1 && <span aria-hidden className=\"absolute top-11 -bottom-7 left-5 border-l border-dotted border-foreground/60 lg:hidden\" />}\n                {/* desktop: a horizontal dotted line from the square to the next one */}\n                <span aria-hidden className={cn(\"absolute top-5 left-11 hidden border-t border-dotted border-foreground/60 lg:block\", i < steps.length - 1 ? \"-right-4\" : \"right-0\")} />\n                <span className={cn(\"relative flex size-10 items-center justify-center rounded-sm text-base\", i === 0 ? \"bg-primary text-primary-foreground\" : \"bg-card text-card-foreground\")}>{i + 1}</span>\n                <div className=\"lg:mt-[1.1rem]\">\n                  <h2 className=\"font-display text-[1.3rem] leading-tight font-bold lg:text-2xl\">{s.title}</h2>\n                  <p className=\"mt-2.5 font-display text-[1.3rem] leading-[1.1] lg:text-2xl\">{s.text}</p>\n                </div>\n              </li>\n            ))}\n          </ol>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 100px amber→red page title"
+    },
+    {
+      "name": "detail",
+      "type": "string",
+      "required": false,
+      "description": "a 32px line under the title (an email address, a short claim)"
+    },
+    {
+      "name": "aside",
+      "type": "{ title?: string; link: { label: string; href: string; }; }",
+      "required": false,
+      "description": "a question and an underlined arrow link on the right (desktop)"
+    },
+    {
+      "name": "steps",
+      "type": "NewhaloPageHeroStep[]",
+      "required": false,
+      "description": "numbered steps in a row, joined by a dotted line (a column on phones)"
+    },
+    {
+      "name": "withMedia",
+      "type": "boolean",
+      "required": false,
+      "description": "show a photo slot on the right half (on top on phones)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo for that slot; empty shows the placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3289d3dcb7dd94239574b2340dd3dc0dab83beac9b8dad14c952e146f902fb39"
+}
