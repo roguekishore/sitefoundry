@@ -91,5 +91,5 @@ say "checks"
 sleep 4
 systemctl is-active foundry-runner
 journalctl -u foundry-runner -n 8 --no-pager | cut -c1-200
-echo "secrets file: $(stat -c '%a %U' /run/foundry/secrets.env), $(wc -l < /run/foundry/secrets.env) lines"
+echo "secrets file: $(stat -c '%a %U' /run/foundry/secrets.env), $(wc -l < /run/foundry/secrets.env) lines (3 with Claude, 2 without)"
 echo "done: run"

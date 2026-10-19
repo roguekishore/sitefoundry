@@ -53,11 +53,11 @@ if have /foundry/run/vertex-key; then echo "vertex key: already set"; else
   put /foundry/run/vertex-key "$KEY"
 fi
 
-# --- the Claude token
+# --- the Claude token (optional: without it Claude runs fail on the run instance and Gemini
+# is unaffected; run this script again later to add it)
 if have /foundry/run/claude-oauth-token; then echo "claude token: already set"; else
-  echo "Run \`claude setup-token\` in another terminal, then paste the token it prints."
-  read -rsp "Claude token: " TOKEN; echo
-  [[ -n "$TOKEN" ]] || { echo "empty" >&2; exit 1; }
-  put /foundry/run/claude-oauth-token "$TOKEN"
+  echo "Run \`claude setup-token\` in another terminal and paste the token, or press Enter to skip Claude."
+  read -rsp "Claude token (Enter = skip): " TOKEN; echo
+  if [[ -n "$TOKEN" ]]; then put /foundry/run/claude-oauth-token "$TOKEN"; else echo "  skipped Claude"; fi
 fi
 echo done
