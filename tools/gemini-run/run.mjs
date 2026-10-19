@@ -2,7 +2,11 @@
 // counts what it costs while it runs.
 //
 //   node tools/gemini-run/run.mjs <url> <slug> [--model gemini-4-argon] [--max-usd 15] [--max-hours 8]
+//   node tools/gemini-run/run.mjs <url> <slug> --prompt "Recreate halodental.com."   your words instead of the skill
 //   node tools/gemini-run/run.mjs --smoke [--model gemini-4-argon]     a few tiny turns through the CLI
+//
+// With --prompt the model gets only that text plus the unattended rules (never ask, stay in the
+// worktree, leave git alone), and .claude/skills/ is hidden in its worktree, so it can't find the skill.
 //
 // In order:
 //  1. Refuses to start if the Gemini CLI is set to the Priority or Flex tier.
@@ -12,12 +16,12 @@
 //     Vertex's global endpoint (Argon isn't reachable through the API key's automatic region),
 //     removes any tier header (Standard only), puts screenshots a tool returns where Argon accepts
 //     them, and adds up tokens and cost. At --max-usd it stops the run.
-//  4. Starts that worktree's gallery on port 4410 (4400 is left for yours).
+//  4. Starts that worktree's gallery on port 4410, or --port (4400 is left for yours).
 //  5. Runs `gemini --yolo` headless with the skill as the prompt. If it crashes (a network error
 //     can end a headless run), it starts again up to 3 times and continues from what's on disk.
 //  6. Prints tokens, cost and the branch's commits. Everything is logged in tools/gemini-run/runs/.
 import { spawn, spawnSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync, createWriteStream } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync, createWriteStream } from "node:fs";
 import http from "node:http";
 import https from "node:https";
 import { homedir } from "node:os";
@@ -28,7 +32,7 @@ import { fileURLToPath } from "node:url";
 
 const PROJECT = "1023705997493"; // the Google Cloud project behind the API key in ~/.gemini/.env
 const LOCATION = "global";
-const GALLERY_PORT = 4410;
+const DEFAULT_GALLERY_PORT = 4410; // --port picks another, so two runs can go side by side
 
 // USD per 1M tokens, Standard tier, as listed on 2026-10-18.
 const PRICES = {
@@ -49,10 +53,12 @@ const smoke = args.includes("--smoke");
 const model = flag("model", "gemini-4-argon");
 const maxUsd = Number(flag("max-usd", 15));
 const maxHours = Number(flag("max-hours", 8));
+const customPrompt = flag("prompt", undefined);
+const GALLERY_PORT = Number(flag("port", DEFAULT_GALLERY_PORT));
 const [url, slug] = args.filter((a, i) => !a.startsWith("--") && !args[i - 1]?.startsWith("--"));
 
 if (!smoke && (!url || !slug)) {
-  console.error("usage: node tools/gemini-run/run.mjs <url> <slug> [--model gemini-4-argon] [--max-usd 15] [--max-hours 8]");
+  console.error("usage: node tools/gemini-run/run.mjs <url> <slug> [--prompt <text>] [--model gemini-4-argon] [--port 4410] [--max-usd 15] [--max-hours 8]");
   console.error("       node tools/gemini-run/run.mjs --smoke [--model gemini-4-argon]");
   process.exit(1);
 }
@@ -354,7 +360,7 @@ function summary(extra = "") {
     existsSync(forwarderLog) ? `              ${forwarderLog}` : "",
   ];
   console.error(lines.filter((l) => l !== "").join("\n"));
-  writeFileSync(join(RUNS, `${runName}.summary.json`), JSON.stringify({ model, url, slug, ...totals }, null, 2));
+  writeFileSync(join(RUNS, `${runName}.summary.json`), JSON.stringify({ model, url, slug, prompt: customPrompt ?? "skill", ...totals }, null, 2));
 }
 
 // ---------- smoke test ----------
@@ -395,6 +401,21 @@ say("installing packages in the worktree…");
 const install = spawnSync("pnpm install --frozen-lockfile --prefer-offline", { cwd: worktree, shell: true, stdio: "inherit" });
 if (install.status !== 0) fail("pnpm install failed in the worktree");
 
+// With --prompt, the skill is taken off disk in the worktree. skip-worktree keeps git from seeing
+// the missing files as a deletion, so the model can't commit one; restoreSkills() puts them back.
+const SKILLS = ".claude/skills";
+const skillFiles = customPrompt ? git(worktree, "ls-files", "--", SKILLS).stdout.split("\n").filter(Boolean) : [];
+if (skillFiles.length) {
+  git(worktree, "update-index", "--skip-worktree", "--", ...skillFiles);
+  rmSync(join(worktree, SKILLS), { recursive: true, force: true });
+  say(`hid ${SKILLS}/ in the worktree (${skillFiles.length} files)`);
+}
+function restoreSkills() {
+  if (!skillFiles.length) return;
+  git(worktree, "update-index", "--no-skip-worktree", "--", ...skillFiles);
+  git(worktree, "checkout", "--", SKILLS);
+}
+
 // ---------- 4. gallery ----------
 
 const portInUse = await new Promise((ok) => {
@@ -414,13 +435,21 @@ const galleryUp = async () => {
 };
 if (!(await galleryUp())) {
   cleanup();
+  restoreSkills();
   fail("the worktree's gallery didn't start");
 }
 say(`gallery on http://localhost:${GALLERY_PORT}`);
 
 // ---------- 5. the run ----------
 
-const prompt = `You are running unattended: nobody will read or answer questions until you finish.
+// Your words, plus only what an unattended run needs; nothing about how to do the work.
+const customRunPrompt = `${customPrompt}
+
+You are running unattended: nobody will read or answer questions until you finish. Never ask; decide and carry on.
+- This folder is a git worktree on branch ${branch}. Never push, switch branches, change git configuration, or touch files outside this folder.
+- Port 4400 belongs to someone else. A dev server for this folder's gallery is already running at http://localhost:${GALLERY_PORT}.`;
+
+const skillPrompt = `You are running unattended: nobody will read or answer questions until you finish.
 
 Recreate ${url} as the slug "${slug}". Read .claude/skills/recreate-site/SKILL.md and follow it exactly, with $ARGUMENTS = "${url} ${slug}".
 
@@ -431,6 +460,7 @@ Differences from the skill, because this run is unattended:
 - This folder is a git worktree on branch ${branch}. Commit as the skill says. Never push, switch branches, or touch files outside this folder.
 - Never change git configuration (no \`git config\`): it is shared with the main repo. If a commit fails, report the error instead.
 - Finish with the skill's report.`;
+const prompt = customPrompt ? customRunPrompt : skillPrompt;
 
 const started = Date.now();
 const timer = setTimeout(() => {
@@ -441,12 +471,18 @@ const timer = setTimeout(() => {
 const resumePrompt = `${prompt}
 
 This is a restart: an earlier attempt on this task stopped partway through. Its work is on disk.
-Before doing anything else, look at what exists in foundry/sites/${slug}/, foundry/themes/${slug}/, foundry/sites/${slug}/_reference/NOTES.md and \`git log --oneline main..HEAD\`.
+${
+  customPrompt
+    ? "Before doing anything else, look at `git log --oneline main..HEAD` and `git status` to see what it did."
+    : `Before doing anything else, look at what exists in foundry/sites/${slug}/, foundry/themes/${slug}/, foundry/sites/${slug}/_reference/NOTES.md and \`git log --oneline main..HEAD\`.`
+}
 Then continue from where it stopped. Do not redo finished steps, and don't capture the original again if its screenshots are already there.`;
 
 const MAX_RESTARTS = 3;
-// A reused worktree that already has this site's files continues rather than starting over.
-const hasWork = existsSync(join(worktree, "foundry/sites", slug));
+// A reused worktree that already has work in it continues rather than starting over.
+const hasWork = customPrompt
+  ? git(worktree, "log", "--oneline", `main..${branch}`).stdout.trim() !== "" || git(worktree, "status", "--porcelain").stdout.trim() !== ""
+  : existsSync(join(worktree, "foundry/sites", slug));
 let code;
 for (let attempt = 0; attempt <= MAX_RESTARTS; attempt++) {
   const fresh = attempt === 0 && !hasWork;
@@ -457,6 +493,7 @@ for (let attempt = 0; attempt <= MAX_RESTARTS; attempt++) {
 }
 clearTimeout(timer);
 cleanup();
+restoreSkills();
 
 const hours = ((Date.now() - started) / 3600e3).toFixed(1);
 const commits = git(worktree, "log", "--oneline", `main..${branch}`).stdout.trim() || "(none)";
