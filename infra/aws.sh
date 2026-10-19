@@ -9,6 +9,7 @@ set -euo pipefail
 
 DOWNLOADS="${DOWNLOADS:-$HOME/Downloads}"
 export MSYS_NO_PATHCONV=1   # Git Bash would turn /foundry/... into C:/Program Files/Git/foundry/...
+export PYTHONUTF8=1 PYTHONIOENCODING=utf-8   # the Windows aws CLI chokes on non-ASCII output (systemctl prints a bullet)
 
 jk_aws() {
   local file="$DOWNLOADS/jk.csv"

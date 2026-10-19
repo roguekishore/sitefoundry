@@ -8,6 +8,8 @@
 # The scripts are joined, sent base64-encoded (no quoting trouble), and run as root with
 # `bash -e`. SSM keeps only 24,000 characters of output, so the scripts log to a file on the
 # instance and print a short summary; the full log is /var/log/foundry-provision.log there.
+# NOWAIT=1 sends the script and returns at once (the instance carries on without the laptop);
+# the result is read later with the command printed.
 # The operator runs this with !, because it uses jk's root keys.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -34,29 +36,44 @@ else
   BODY="$(cat "$@" | tr -d '\r')"
 fi
 B64="$(printf '%s\n' "$BODY" | base64 -w0)"
-
 JSON="$(mktemp)"
 trap 'rm -f "$JSON"' EXIT
-# Decode to a file, run it, print the tail of its output, and exit with the script's own status.
-printf '{"commands":["echo %s | base64 -d > /tmp/foundry-ssm.sh; bash -e /tmp/foundry-ssm.sh > /tmp/foundry-ssm.out 2>&1; rc=$?; tail -c 20000 /tmp/foundry-ssm.out; rm -f /tmp/foundry-ssm.sh /tmp/foundry-ssm.out; exit $rc"]}' "$B64" > "$JSON"
+# Decode to a file and run it with its output going straight to SSM's stdout capture, which
+# updates while the script runs, so the polling loop below can print it as it appears.
+printf '{"commands":["echo %s | base64 -d > /tmp/foundry-ssm.sh; bash -e /tmp/foundry-ssm.sh 2>&1; rc=$?; rm -f /tmp/foundry-ssm.sh; exit $rc"]}' "$B64" > "$JSON"
 
 echo "instance $ID ($NAME)"
 CMD="$(jk_aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
   --parameters "file://$(cygpath -w "$JSON")" --timeout-seconds 1800 \
   --query 'Command.CommandId' --output text)"
-echo "command $CMD, waiting"
+if [[ "${NOWAIT:-}" == 1 ]]; then
+  echo "command $CMD sent; not waiting. Read the result later with:"
+  echo "  ./aws.sh ssm get-command-invocation --command-id $CMD --instance-id $ID --query '[Status,StandardOutputContent,StandardErrorContent]' --output text"
+  exit 0
+fi
+echo "command $CMD, running (output appears as the script prints it)"
 
+shown=0 waited=0 quiet_for=0
 while :; do
   STATUS="$(jk_aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" \
     --query 'Status' --output text 2>/dev/null || echo Pending)"
+  OUT="$(jk_aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" \
+    --query 'StandardOutputContent' --output text 2>/dev/null || true)"
+  [[ "$OUT" == None ]] && OUT=""
+  total=$(printf '%s' "$OUT" | grep -c '' || true)
+  if (( total > shown )); then
+    printf '%s\n' "$OUT" | tail -n +$((shown + 1))
+    shown=$total quiet_for=0
+  else
+    quiet_for=$((quiet_for + 6))
+    (( quiet_for % 30 == 0 )) && echo "   ... still going (${waited}s, $STATUS)"
+  fi
   case "$STATUS" in
-    Pending|InProgress|Delayed) sleep 5 ;;
+    Pending|InProgress|Delayed) sleep 6; waited=$((waited + 6)) ;;
     *) break ;;
   esac
 done
 
-jk_aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" \
-  --query 'StandardOutputContent' --output text
 ERR="$(jk_aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" \
   --query 'StandardErrorContent' --output text)"
 [[ -z "$ERR" || "$ERR" == None ]] || { echo "--- stderr ---"; echo "$ERR"; }
