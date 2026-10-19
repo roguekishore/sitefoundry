@@ -16,7 +16,7 @@ export function headerFor(active?: string): NewhaloHeaderProps {
 }
 
 export const headerSample: NewhaloHeaderProps = {
-  brand: "Lumora",
+  brand: "Brio",
   brandIcon: <Orbit strokeWidth={2.25} />,
   brandHref: "#",
   links: navLinks,

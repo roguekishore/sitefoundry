@@ -16,8 +16,8 @@ export interface NewhaloHeroProps {
   play?: { label: string; href?: string };
   /** the photo or video filling the panel. Empty shows the placeholder. */
   media?: ReactNode;
-  /** placeholder look: muted panel or a warm glow wash */
-  tone?: "muted" | "glow";
+  /** placeholder look: deep (near-black) panel or warm (an amber→red wash) */
+  tone?: "deep" | "warm";
   className?: string;
 }
 
@@ -26,7 +26,7 @@ export interface NewhaloHeroProps {
  * window, filled by a media slot that drifts down as you scroll. A giant wordmark sits on the
  * bottom left, the title bottom right; an orange play button trails the cursor.
  */
-export function NewhaloHero({ title, titleSize = "md", wordmark, play, media, tone = "muted", className }: NewhaloHeroProps) {
+export function NewhaloHero({ title, titleSize = "md", wordmark, play, media, tone = "deep", className }: NewhaloHeroProps) {
   const panel = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLDivElement>(null);
 

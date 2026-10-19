@@ -1,16 +1,16 @@
 import { NewhaloHero, type NewhaloHeroProps } from "./newhalo-hero";
 
 export const heroSample: NewhaloHeroProps = {
-  wordmark: "Lumora",
+  wordmark: "Brio",
   title: "Every smile, lit",
   play: { label: "Watch the film" },
 };
 
 export const productHeroSample: NewhaloHeroProps = {
-  wordmark: "Lumen",
+  wordmark: "Brio",
   title: "One instrument",
   titleSize: "xl",
-  tone: "glow",
+  tone: "warm",
 };
 
 export default function Demo() {

@@ -19,6 +19,8 @@ export interface NewhaloTextGallerySlide {
 }
 
 export interface NewhaloTextGalleryProps {
+  /** the anchor id (for an in-page navigation) */
+  id?: string;
   /** the 64px heading */
   title: string;
   /** one or more paragraphs under it */
@@ -37,12 +39,12 @@ export interface NewhaloTextGalleryProps {
  * a big square picture on the right with a column of thumbnails. The heading wipes in, the
  * list lines draw from the left, the gallery blooms in and the picture drifts in its frame.
  */
-export function NewhaloTextGallery({ title, body, features, cta, slides, className }: NewhaloTextGalleryProps) {
+export function NewhaloTextGallery({ id, title, body, features, cta, slides, className }: NewhaloTextGalleryProps) {
   const [active, setActive] = useState(0);
   const thumbs = slides.length > 1;
 
   return (
-    <section className={cn("bg-background py-section text-foreground", className)}>
+    <section id={id} className={cn("bg-background py-section text-foreground", className)}>
       <div className="mx-auto grid max-w-page gap-y-[4.4rem] px-gutter lg:grid-cols-12 lg:gap-x-6">
         <div className="lg:col-span-4">
           <h2 className={cn("font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none", newhaloReveal("sweep"))}>{title}</h2>

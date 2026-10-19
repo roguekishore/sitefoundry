@@ -5,7 +5,7 @@ export const newsletterSample: NewhaloNewsletterProps = {
   emailLabel: "Work email",
   consent: (
     <>
-      Yes, send me the occasional update. Lumora handles my details as set out in the <a href="#privacy-policy">privacy notice</a> and the{" "}
+      Yes, send me the occasional update. Brio handles my details as set out in the <a href="#privacy-policy">privacy notice</a> and the{" "}
       <a href="#terms-of-use">site terms</a>.
     </>
   ),

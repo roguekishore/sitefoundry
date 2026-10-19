@@ -17,6 +17,7 @@ export const textGallerySample: NewhaloTextGalleryProps = {
 };
 
 export const cameraSample: NewhaloTextGalleryProps = {
+  id: "sensor",
   title: "The sensor",
   body: [
     "A 900 × 900 sensor sits right behind the glass: sharp, evenly lit frames every time, without reaching for a separate intraoral camera.",

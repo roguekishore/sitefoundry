@@ -2,7 +2,7 @@ import { NewhaloFooter, type NewhaloFooterProps } from "./newhalo-footer";
 
 export const footerSample: NewhaloFooterProps = {
   groups: [
-    { title: "Lumora", links: [{ label: "About", href: "#company" }, { label: "Jobs", href: "#" }] },
+    { title: "Brio", links: [{ label: "About", href: "#company" }, { label: "Jobs", href: "#" }] },
     {
       title: "Help",
       links: [
@@ -21,7 +21,7 @@ export const footerSample: NewhaloFooterProps = {
     { label: "Site terms", href: "#terms-of-use" },
     { label: "Privacy notice", href: "#privacy-policy" },
   ],
-  copyright: "© 2026 Lumora Instruments. All rights reserved.",
+  copyright: "© 2026 Brio Instruments. All rights reserved.",
 };
 
 export default function Demo() {
