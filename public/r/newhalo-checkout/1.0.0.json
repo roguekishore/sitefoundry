@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo reservation step",
+  "description": "The first step of a reservation flow on a window-tall black screen: a wordmark beside a dark breadcrumb pill of steps, a 64px amber-to-red question that sweeps in on load, a short paragraph, three square dark choice cards with radio rings (the picked one gets an orange ring), and a 'next' button pinned to the bottom that lights up orange once something is picked. A tall art column fills the right on desktop.",
+  "category": "contact",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "checkout",
+    "form",
+    "steps",
+    "dark",
+    "gradient-text",
+    "radio",
+    "cards",
+    "fullscreen"
+  ],
+  "notes": [
+    "sized by the window (min-h-svh); it has its own small header, so leave newhalo-header off this page",
+    "no JavaScript: the button wakes up with :has(:checked)"
+  ],
+  "entry": "newhalo-checkout.tsx",
+  "source": "foundry",
+  "name": "newhalo-checkout",
+  "files": [
+    {
+      "path": "newhalo-checkout.css",
+      "content": "/* The amber→red question; its gradient sweeps in from the left on load. */\n.newhalo-checkout-title {\n  background-image: linear-gradient(90deg, var(--highlight), var(--glow)), linear-gradient(color-mix(in oklab, var(--foreground) 14%, transparent), color-mix(in oklab, var(--foreground) 14%, transparent));\n  background-size: 100% 100%, 100% 100%;\n  background-repeat: no-repeat;\n  background-clip: text;\n  -webkit-background-clip: text;\n  color: transparent;\n  animation: newhalo-checkout-fill 1.2s cubic-bezier(0.32, 0.94, 0.6, 1) 0.15s both;\n}\n@keyframes newhalo-checkout-fill {\n  from { background-size: 0% 100%, 100% 100%; }\n}\n@media (prefers-reduced-motion: reduce) {\n  .newhalo-checkout-title { animation: none; }\n}\n"
+    },
+    {
+      "path": "newhalo-checkout.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport \"./newhalo-checkout.css\";\n\nexport interface NewhaloCheckoutProps {\n  /** the wordmark at the top left */\n  brand: string;\n  /** an icon before the wordmark */\n  brandIcon?: ReactNode;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** the step names in the breadcrumb pill; the first is the current one */\n  steps: string[];\n  /** the 64px amber→red question */\n  title: string;\n  /** the paragraph under it */\n  intro: string;\n  /** the name shared by the choice radios */\n  name: string;\n  /** the choice cards */\n  choices: string[];\n  /** the bottom button: greyed out until a choice is picked (pure CSS) */\n  continueLabel: string;\n  /** where the form goes next */\n  action?: string;\n  /** the tall artwork on the right; empty shows a glow placeholder */\n  art?: ReactNode;\n  className?: string;\n}\n\n/**\n * The first step of a reservation flow on a window-tall black screen: a wordmark and a step\n * breadcrumb pill, a big gradient question, three dark choice cards with radio rings, and a\n * \"continue\" button that wakes up once a card is picked. A tall art column fills the right.\n */\nexport function NewhaloCheckout({ brand, brandIcon, brandHref = \"/\", steps, title, intro, name, choices, continueLabel, action, art, className }: NewhaloCheckoutProps) {\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <form action={action} className=\"group/form mx-auto grid min-h-svh max-w-page px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"flex flex-col pt-5 pb-10 lg:col-span-7 lg:pt-10\">\n          <div className=\"flex flex-wrap items-center gap-x-5 gap-y-4\">\n            <a href={brandHref} className=\"flex items-center gap-2 font-display text-[2.25rem] leading-none tracking-[-0.02em] lg:gap-3 lg:text-5xl\">\n              {brandIcon && <span className=\"flex [&_svg]:size-9 lg:[&_svg]:size-11\">{brandIcon}</span>}\n              {brand}\n            </a>\n            <ol className=\"flex h-[2.6rem] items-center gap-2 overflow-x-auto rounded-sm bg-card px-5 text-[0.81rem] whitespace-nowrap text-foreground/70 [scrollbar-width:none]\">\n              {steps.map((s, i) => (\n                <li key={s} className=\"flex items-center gap-2\">\n                  {i > 0 && <ChevronRight aria-hidden strokeWidth={1} className=\"size-3.5\" />}\n                  <span aria-current={i === 0 ? \"step\" : undefined} className={cn(i === 0 && \"font-bold text-foreground\")}>\n                    {s}\n                  </span>\n                </li>\n              ))}\n            </ol>\n          </div>\n\n          <h1 className=\"newhalo-checkout-title mt-14 max-w-[28rem] font-display text-[2.5rem] leading-none tracking-[-0.01em] lg:mt-[4.2rem] lg:text-[4rem]\">{title}</h1>\n          <p className=\"mt-5 max-w-[27.5rem] text-[0.91rem] leading-normal lg:mt-6 lg:text-base\">{intro}</p>\n\n          <fieldset className=\"mt-10 grid grid-cols-1 gap-0.5 sm:grid-cols-3 lg:max-w-[42.5rem]\">\n            {choices.map((c) => (\n              <label\n                key={c}\n                className=\"relative flex h-24 cursor-pointer items-end rounded-lg bg-card p-5 text-base ring-primary transition-shadow duration-300 hover:ring-1 has-checked:ring-1 sm:aspect-square sm:h-auto\"\n              >\n                <input type=\"radio\" name={name} value={c} required className=\"peer sr-only\" />\n                <span aria-hidden className=\"absolute top-5 right-5 size-5 rounded-full border border-foreground/60 transition-colors peer-checked:border-[6px] peer-checked:border-primary\" />\n                {c}\n              </label>\n            ))}\n          </fieldset>\n\n          <button\n            type=\"submit\"\n            className=\"mt-12 h-10 w-full rounded-sm bg-primary text-base text-primary-foreground transition-colors duration-300 group-has-[:invalid]/form:pointer-events-none group-has-[:invalid]/form:bg-card group-has-[:invalid]/form:text-foreground/40 sm:w-[13.1rem] lg:mt-auto\"\n          >\n            {continueLabel}\n          </button>\n        </div>\n        <NewhaloMedia tone=\"glow\" className=\"hidden lg:col-span-4 lg:col-start-9 lg:block\">\n          {art}\n        </NewhaloMedia>\n      </form>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-media"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark at the top left"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an icon before the wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "steps",
+      "type": "string[]",
+      "required": true,
+      "description": "the step names in the breadcrumb pill; the first is the current one"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 64px amber→red question"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the name shared by the choice radios"
+    },
+    {
+      "name": "choices",
+      "type": "string[]",
+      "required": true,
+      "description": "the choice cards"
+    },
+    {
+      "name": "continueLabel",
+      "type": "string",
+      "required": true,
+      "description": "the bottom button: greyed out until a choice is picked (pure CSS)"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form goes next"
+    },
+    {
+      "name": "art",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall artwork on the right; empty shows a glow placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c7dbe0a801dc1e48c77e91356eb2b21a4f8363a4b577bfc1732c5cbea0e9426"
+}

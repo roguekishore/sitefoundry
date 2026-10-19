@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Newhalo topic tiles",
+  "description": "A topic picker made of white 80px tiles, two to a row with 2px gaps: label bottom-left, a thin arrow bottom-right that nudges on hover, the current tile filled orange. On phones the tiles become a single sideways-scrolling row.",
+  "category": "card",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "tiles",
+    "navigation",
+    "tabs",
+    "light",
+    "minimal",
+    "orange"
+  ],
+  "notes": [
+    "give tiles an href for anchor links, or onSelect for tab-like buttons"
+  ],
+  "entry": "newhalo-tiles.tsx",
+  "source": "foundry",
+  "name": "newhalo-tiles",
+  "files": [
+    {
+      "path": "newhalo-tiles.tsx",
+      "content": "import { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NewhaloTile {\n  label: string;\n  /** makes the tile a link (e.g. \"#section-id\"); without it the tile is a button */\n  href?: string;\n}\n\nexport interface NewhaloTilesProps {\n  items: NewhaloTile[];\n  /** the current tile, filled orange */\n  activeIndex?: number;\n  /** called with the tile's index when a button tile is pressed */\n  onSelect?: (index: number) => void;\n  className?: string;\n}\n\n/**\n * A topic picker: white tiles with a label at the bottom left and a thin arrow at the bottom\n * right, two to a row on desktop, the current one orange. On phones they become one row\n * that scrolls sideways, edge to edge.\n */\nexport function NewhaloTiles({ items, activeIndex = 0, onSelect, className }: NewhaloTilesProps) {\n  return (\n    <ul\n      className={cn(\n        \"-mx-[calc(var(--page-gutter)-6px)] flex snap-x gap-0.5 overflow-x-auto px-1.5 [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-2 lg:overflow-visible lg:px-0\",\n        className,\n      )}\n    >\n      {items.map((t, i) => {\n        const classes = cn(\n          \"group/tile flex h-12 w-[9.2rem] shrink-0 snap-start items-end justify-between rounded-sm px-2.5 pb-1.5 text-left text-sm leading-none transition-colors duration-300 lg:h-20 lg:w-full lg:pb-2.5 lg:text-base\",\n          i === activeIndex ? \"bg-primary text-primary-foreground\" : \"bg-card text-card-foreground hover:bg-accent\",\n        );\n        const inner = (\n          <>\n            <span className=\"max-w-[9rem] leading-[1.05]\">{t.label}</span>\n            <ArrowRight aria-hidden strokeWidth={1} className=\"hidden size-6 shrink-0 transition-transform duration-300 group-hover/tile:translate-x-1 lg:block\" />\n          </>\n        );\n        return (\n          <li key={t.label} className=\"lg:contents\">\n            {t.href ? (\n              <a href={t.href} aria-current={i === activeIndex || undefined} className={classes}>\n                {inner}\n              </a>\n            ) : (\n              <button type=\"button\" aria-pressed={i === activeIndex} onClick={() => onSelect?.(i)} className={classes}>\n                {inner}\n              </button>\n            )}\n          </li>\n        );\n      })}\n    </ul>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "NewhaloTile[]",
+      "required": true
+    },
+    {
+      "name": "activeIndex",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "the current tile, filled orange"
+    },
+    {
+      "name": "onSelect",
+      "type": "((index: number) => void)",
+      "required": false,
+      "description": "called with the tile's index when a button tile is pressed"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7d1f4e28588ea9cf03dd5aa09f311d9f019c5e9e73001bf5ff45f308799bca59"
+}

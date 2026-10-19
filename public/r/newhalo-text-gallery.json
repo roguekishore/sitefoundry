@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Newhalo text and gallery",
+  "description": "A product section on paper: a 64px heading, paragraphs, a hairline list with small line icons and an orange button on the left; a big square picture on the right with a column of 96px thumbnails (a row under it on phones). The heading wipes in, list lines draw from the left one after another, the gallery blooms in (1.1→1) and the picture drifts inside its frame; thumbnails zoom in staggered.",
+  "category": "features",
+  "site": "newhalo",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "gallery",
+    "split",
+    "light",
+    "hairline",
+    "list",
+    "reveal",
+    "parallax",
+    "thumbnails"
+  ],
+  "notes": [
+    "one slide hides the thumbnails; leave cta out for a plain text block",
+    "icons are optional: without them the list is plain hairline rows"
+  ],
+  "entry": "newhalo-text-gallery.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "newhalo-text-gallery",
+  "files": [
+    {
+      "path": "newhalo-text-gallery.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NewhaloButton } from \"@foundry/newhalo-button\";\nimport { NewhaloMedia } from \"@foundry/newhalo-media\";\nimport { newhaloReveal, newhaloRevealStyle } from \"@foundry/newhalo-reveal\";\n\nexport interface NewhaloTextGalleryFeature {\n  /** the line of text */\n  label: string;\n  /** a small line icon before it (e.g. a lucide icon); leave out for a plain list */\n  icon?: ReactNode;\n}\n\nexport interface NewhaloTextGallerySlide {\n  /** the photo; empty shows the placeholder */\n  media?: ReactNode;\n  /** screen-reader name of its thumbnail button */\n  label: string;\n}\n\nexport interface NewhaloTextGalleryProps {\n  /** the anchor id (for an in-page navigation) */\n  id?: string;\n  /** the 64px heading */\n  title: string;\n  /** one or more paragraphs under it */\n  body: string[];\n  /** the hairline-separated list */\n  features: NewhaloTextGalleryFeature[];\n  /** the orange button under the list; leave out to hide it */\n  cta?: { label: string; href: string };\n  /** the square pictures on the right; two or more add a thumbnail strip to switch between them */\n  slides: NewhaloTextGallerySlide[];\n  className?: string;\n}\n\n/**\n * Text on the left (heading, paragraphs, a hairline list with small icons, an orange button),\n * a big square picture on the right with a column of thumbnails. The heading wipes in, the\n * list lines draw from the left, the gallery blooms in and the picture drifts in its frame.\n */\nexport function NewhaloTextGallery({ id, title, body, features, cta, slides, className }: NewhaloTextGalleryProps) {\n  const [active, setActive] = useState(0);\n  const thumbs = slides.length > 1;\n\n  return (\n    <section id={id} className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-y-[4.4rem] px-gutter lg:grid-cols-12 lg:gap-x-6\">\n        <div className=\"lg:col-span-4\">\n          <h2 className={cn(\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.01em] lg:text-[4rem] lg:leading-none\", newhaloReveal(\"sweep\"))}>{title}</h2>\n          <div className={cn(\"mt-2 space-y-4 text-[0.91rem] leading-normal lg:mt-5 lg:text-base\", newhaloReveal(\"fade\"))}>\n            {body.map((p) => (\n              <p key={p}>{p}</p>\n            ))}\n          </div>\n          <ul className=\"mt-6 lg:mt-10\">\n            {features.map((f, i) => (\n              <li key={f.label} className={cn(\"relative flex min-h-11 items-center gap-6 py-2.5 text-base leading-tight\", newhaloReveal(\"fade\"))} style={newhaloRevealStyle(i)}>\n                <span aria-hidden className={cn(\"absolute inset-x-0 top-0 h-px bg-foreground\", newhaloReveal(\"draw\"))} style={newhaloRevealStyle(i)} />\n                {f.icon && <span className=\"flex size-5 shrink-0 items-center [&_svg]:size-5 [&_svg]:stroke-[1.25]\">{f.icon}</span>}\n                {f.label}\n              </li>\n            ))}\n            <li aria-hidden className={cn(\"h-px bg-foreground\", newhaloReveal(\"draw\"))} style={newhaloRevealStyle(features.length)} />\n          </ul>\n          {cta && <NewhaloButton label={cta.label} href={cta.href} className=\"mt-8 lg:mt-10\" />}\n        </div>\n\n        <div className=\"lg:col-span-7 lg:col-start-6 lg:mt-0 lg:grid lg:grid-cols-subgrid\">\n          <div className={cn(\"relative aspect-square overflow-clip rounded-lg lg:col-span-6\", newhaloReveal(\"bloom\"))}>\n            {slides.map((s, i) => (\n              <NewhaloMedia\n                key={s.label}\n                className={cn(\"absolute inset-0 transition-opacity duration-600 ease-[cubic-bezier(0.66,0,0.34,1)] motion-reduce:transition-none\", i !== active && \"opacity-0\")}\n                innerClassName={cn(\"-inset-y-[34px]\", newhaloReveal(\"drift\"))}\n              >\n                {s.media}\n              </NewhaloMedia>\n            ))}\n          </div>\n          {thumbs && (\n            <ul className=\"mt-4 flex justify-center gap-1.5 lg:col-span-1 lg:mt-0 lg:flex-col lg:justify-center lg:gap-2.5\">\n              {slides.map((s, i) => (\n                <li key={s.label} className={newhaloReveal(\"zoom\")} style={newhaloRevealStyle(i)}>\n                  <button\n                    type=\"button\"\n                    aria-label={s.label}\n                    aria-pressed={i === active}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"block size-15 rounded-md p-0.5 transition-opacity duration-300 lg:aspect-square lg:size-auto lg:w-full lg:max-w-24\",\n                      i === active ? \"ring-2 ring-primary ring-inset\" : \"opacity-40 hover:opacity-70\",\n                    )}\n                  >\n                    <NewhaloMedia className=\"size-full rounded-sm\">{s.media}</NewhaloMedia>\n                  </button>\n                </li>\n              ))}\n            </ul>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "newhalo-button",
+    "newhalo-media",
+    "newhalo-reveal"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the anchor id (for an in-page navigation)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the 64px heading"
+    },
+    {
+      "name": "body",
+      "type": "string[]",
+      "required": true,
+      "description": "one or more paragraphs under it"
+    },
+    {
+      "name": "features",
+      "type": "NewhaloTextGalleryFeature[]",
+      "required": true,
+      "description": "the hairline-separated list"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the orange button under the list; leave out to hide it"
+    },
+    {
+      "name": "slides",
+      "type": "NewhaloTextGallerySlide[]",
+      "required": true,
+      "description": "the square pictures on the right; two or more add a thumbnail strip to switch between them"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "256bbe1636eac2ed6d9c44eb39a97bf5f6fcb47270c32ee2440528a543dd21fb"
+}
