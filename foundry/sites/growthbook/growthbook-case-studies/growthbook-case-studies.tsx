@@ -42,8 +42,8 @@ export function GrowthbookCaseStudies({ title, cta, stories, carouselLabel, auto
           <GrowthbookRail />
           {/* the middle rule fades out under the heading */}
           <span aria-hidden className="absolute top-0 left-1/2 hidden h-64 w-px bg-linear-to-b from-border to-transparent lg:block" />
-          <div className="flex flex-col gap-8 px-10 lg:flex-row lg:items-start lg:justify-between lg:pr-10">
-            <h2 className="max-w-[26rem] font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]">
+          <div className="flex flex-col gap-8 pl-10 lg:flex-row lg:items-start lg:justify-between lg:pr-10">
+            <h2 className="max-w-[26rem] pr-4 font-display lg:pr-0 text-4xl leading-[1.2] font-normal lg:text-[3.5rem]">
               {title.map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -51,7 +51,7 @@ export function GrowthbookCaseStudies({ title, cta, stories, carouselLabel, auto
               ))}
             </h2>
             {cta && (
-              <GrowthbookButton href={cta.href} variant="outline" arrow blockOnMobile className="-mr-10 lg:mr-0">
+              <GrowthbookButton href={cta.href} variant="outline" arrow blockOnMobile>
                 {cta.label}
               </GrowthbookButton>
             )}

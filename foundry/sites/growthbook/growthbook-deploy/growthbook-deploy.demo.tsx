@@ -12,13 +12,13 @@ export const deploySample: GrowthbookDeployProps = {
     {
       icon: <CloudSun strokeWidth={1.25} className="text-glow" />,
       title: ["Northvane", "Hosted"],
-      body: "We run it, you use it: always current, nothing to patch, reads straight from your warehouse.",
+      body: "Always current, nothing to patch, warehouse-native.",
       cta: { label: "Try it free", href: "#" },
     },
     {
       icon: <ServerCog strokeWidth={1.25} className="text-highlight" />,
       title: ["Northvane on", "Your Servers"],
-      body: "The very same product, running entirely inside your own cloud account or data centre.",
+      body: "Same product, fully inside your own cloud or on site.",
       cta: { label: "Get the package", href: "#" },
     },
   ],

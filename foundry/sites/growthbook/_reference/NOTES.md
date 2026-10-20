@@ -111,3 +111,60 @@ Lenis smooth scroll (capture lists it, but plain scrolling keeps blocks independ
 - **Carousels** are native horizontal scroll-snap tracks (swipeable, keyboard-scrollable) with a
   small autoplay; no Swiper.
 - Gutter: `--page-gutter` 1rem (390 capture: rule at x=16); blocks double it from `md`.
+- Dark `--chart-3` is the teal (`#008573`), not mint, so the teal "why" card keeps its colour inside
+  the dark scope.
+- Sample wordmarks use only the theme's faces (display, mono): there is no serif token.
+- Card gradients for the "why" carousel are token gradients (background→chart-2, card→primary,
+  chart-3→highlight); the art inside them is a placeholder slot.
+
+## Comparison round 1
+
+Heights (1440 / 390, original → ours): header 120→121 / 158→152 · hero 1065→1067 / 905→911 ·
+logos+features+cases 3708→3756 / 3872→3755 · deploy 973→1025 / 1515→1617 · integrations+why+scale
+2285→2314 / 2286→2392 · resources 811→811 / 1509→1545 · SDKs 655→618 / 1054→1068 · testimonials
+768→739 / 841→758 · CTA 865→863 / 706→724 · footer 715→667 / 1473→1524. Nothing is window-sized in
+either. Overflow: fits at 360/768/1024 in both. Motion list in ours: sticky header, logo marquee
+loop, rail (ViewTimeline), case-logo unblur (ViewTimeline), integration loops, pin pulse, CTA edge
+float: every inventory row shows up.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| deploy | stats spaced 200px apart (orig 178) | cards 51px taller: body wraps to two lines (orig one) | — | yes: shorter sample copy, stat top padding 76px |
+| case studies | outline button stops 40px short of the right rule | — | logos show blurred in full-page crops (pre-state below the fold; plays in scroll frames) | button yes; blur is a capture artefact of scroll-driven reveals |
+| why | heading runs to the right rule | — | — | yes: right padding |
+| scale | — | sample title broke "bill" onto its own line; guide lines shorter than the original's and not fading at the top; pins off the last line | pulse ok | yes |
+| SDKs | — | code block one line shorter (section 37px short) | — | yes: five-line sample |
+| CTA | — | headline wrapped to two lines (orig one) | float ok | yes: wider text column |
+| footer | matches | left column items 25–45px higher than the original | — | yes: spacing |
+| testimonials | 83px shorter (shorter quotes) | 29px shorter | — | bottom padding yes; phone height follows quote length |
+| logos / demos | — | `font-serif` wordmarks fell back to a system serif (no serif token) | — | yes: display/mono tokens |
+| header | sticky header covers section crops at 390 | matches | hide-on-scroll desktop only, as the original | n/a (original is sticky at 390 too) |
+| hero | matches (4-line headline, stacked buttons, full-bleed panel) | matches; screenshot placeholder white slab where original has screenshot + chat overlay | — | n/a (media) |
+
+## Comparison round 2
+
+Heights now (1440 / 390, original → ours): logos+features+cases 3708→3756 / 3872→3755 · deploy
+973→998 / 1515→1529 · integrations+why+scale 2285→2234 / 2286→2435 · SDKs 655→646 / 1054→1096 ·
+testimonials 768→767 / 841→758 · footer 715→723 / 1473→1524; the rest unchanged from round 1.
+Motion list: header slides up ~100–120px at desktop on scroll down (original 0→-120); logos
+marquee; rail scrubbed down each framed section (seen mid-travel in scroll frames); case logos
+blur 8px→0 / opacity .2→1 on entering view; integration columns loop vertically (rows on phones);
+pin halos pulse; CTA edge light floats (15s). Hover: primary bg darkens, outline border → text
+colour, nav links → violet, all 0.25s ease.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| page | **overflowed at 360/768** (integrations grid column sized itself to the marquee rows; then 2px from the scale pin halos and a tight phone header) | — | — | yes: `grid-cols-1`, scale section `overflow-x-clip`, header gap 16px on phones; capture now says fits at 360/768/1024 |
+| case studies | button reaches the right rule | heading had wrapped to four lines after the round-1 padding | — | yes |
+| deploy | — | body copy one line, cards 496px like the original | — | yes |
+| scale | — | title two balanced lines; guide lines fade in from the top; pins sit on the last guide line | pulse | yes |
+| CTA | — | one-line headline | float | yes |
+| integrations + why + scale (390) | 150px taller in total: our phone headings wrap to three lines where the original's shorter words take two | — | — | left as is (copy length, not layout) |
+| testimonials (390) | 83px shorter: our first quote is shorter | — | — | left as is (content) |
+
+Re-theme check: `growthbook-features` and `growthbook-case-studies` previewed under
+`sample-ember`: the frame rules, rail, buttons, dark cards and placeholder washes all take the
+ember palette and its serif display face; nothing stays violet.
+
+Stopping here: each section pair reads as the same design at a glance (apart from content and the
+media placeholders, which match in place, size and shape), and the motion checks pass.

@@ -35,11 +35,11 @@ export function GrowthbookFooter({ brand, brandIcon, blurb, socials, badges, col
       <div className="mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter pt-12 pb-8 md:px-[calc(var(--page-gutter)*2)] lg:pt-14 lg:pb-14">
         <div className="grid gap-y-16 lg:grid-cols-[25.25rem_minmax(0,1fr)] lg:gap-x-[4.5rem] lg:gap-y-12">
           <div>
-            <p className="flex items-center gap-2 text-[2rem] leading-none font-medium tracking-[-0.02em] lg:ml-2.5">
+            <p className="flex items-center gap-2 text-[2rem] leading-none font-medium tracking-[-0.02em] lg:mt-5 lg:ml-2.5">
               {brandIcon && <span className="flex text-primary [&_svg]:size-8">{brandIcon}</span>}
               {brand}
             </p>
-            <p className="mt-6 text-sm leading-[1.75]">{blurb}</p>
+            <p className="mt-6 text-sm leading-[1.75] lg:mt-9">{blurb}</p>
           </div>
 
           <nav className="grid grid-cols-2 gap-x-5 gap-y-10 lg:row-span-2 lg:grid-cols-5 lg:pt-2">
@@ -62,7 +62,7 @@ export function GrowthbookFooter({ brand, brandIcon, blurb, socials, badges, col
 
           <div>
             {socials && (
-              <ul className="flex gap-12 pl-4 lg:-mt-2">
+              <ul className="flex gap-12 pl-4 lg:mt-2">
                 {socials.map((s) => (
                   <li key={s.label}>
                     <a href={s.href} aria-label={s.label} className="flex text-foreground/55 transition-colors duration-250 hover:text-foreground motion-reduce:transition-none [&_svg]:size-7">
@@ -73,7 +73,7 @@ export function GrowthbookFooter({ brand, brandIcon, blurb, socials, badges, col
               </ul>
             )}
             {badges && (
-              <ul className="mt-10 flex gap-2">
+              <ul className="mt-10 flex gap-2 lg:mt-12">
                 {badges.map((b) => (
                   <li
                     key={b.label}

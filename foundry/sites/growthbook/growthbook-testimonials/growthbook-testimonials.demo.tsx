@@ -26,7 +26,7 @@ export const testimonialsSample: GrowthbookTestimonialsProps = {
     },
     {
       company: "Ottergrove",
-      logo: <Mark className="font-serif text-[1.625rem] tracking-[0.12em] uppercase">Ottergrove</Mark>,
+      logo: <Mark className="font-mono text-[1.625rem] tracking-[0.12em] uppercase">Ottergrove</Mark>,
       quote: "We finally have a shared way to run experiments that respects how our volunteers and engineers work: open, self-hosted, private by default and wired into the warehouse we already had.",
       name: "Tomás Ferreira",
       role: "Staff Engineer, Ottergrove",

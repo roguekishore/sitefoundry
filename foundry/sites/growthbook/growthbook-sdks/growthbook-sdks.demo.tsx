@@ -15,7 +15,7 @@ export const sdksSample: GrowthbookSdksProps = {
       label: "Plain HTML",
       name: "One script tag",
       icon: <Code2 strokeWidth={1.75} />,
-      code: '<script defer\n  data-project="YOUR_PROJECT_KEY"\n  src="https://cdn.example.com/northvane/loader.js"\n></script>',
+      code: '<script defer\n  data-project="YOUR_PROJECT_KEY"\n  data-region="eu-west"\n  src="https://cdn.example.com/northvane/loader.min.js"\n></script>',
     },
     {
       label: "React",

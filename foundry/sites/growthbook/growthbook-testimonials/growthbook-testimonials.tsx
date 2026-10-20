@@ -26,7 +26,7 @@ export function GrowthbookTestimonials({ quotes, carouselLabel, prevLabel, nextL
   return (
     <section className={cn("dark overflow-x-clip bg-linear-to-br from-popover to-background text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]">
-        <div className="relative border-l border-border pt-12 pb-40 lg:pt-20 lg:pb-40">
+        <div className="relative border-l border-border pt-12 pb-40 lg:pt-20 lg:pb-[11.75rem]">
           <GrowthbookRail />
           <GrowthbookTrack
             label={carouselLabel}

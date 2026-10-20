@@ -40,7 +40,7 @@ export function GrowthbookDeploy({ stats, options, className }: GrowthbookDeploy
         <div className="border-l border-border pb-20 lg:pt-32 lg:pb-32">
           <dl className="grid lg:grid-cols-4">
             {stats.map((s) => (
-              <div key={s.value} className="border-b border-border pt-[5.5rem] pb-8 lg:h-[9.375rem] lg:border-b-0 lg:border-l lg:pt-0 lg:pb-0 lg:pl-5 lg:first:border-l-0">
+              <div key={s.value} className="border-b border-border pt-[4.75rem] pb-8 lg:h-[9.375rem] lg:border-b-0 lg:border-l lg:pt-0 lg:pb-0 lg:pl-5 lg:first:border-l-0">
                 <dt className="sr-only">{s.label}</dt>
                 <dd className="font-display text-4xl leading-[1.2] lg:text-[2.5rem] lg:leading-[1.3]">{s.value}</dd>
                 <dd className="mt-3 max-w-[15rem] font-mono text-sm leading-[1.75] lg:mt-2 lg:text-base">{s.label}</dd>
