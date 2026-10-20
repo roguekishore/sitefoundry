@@ -1,0 +1,53 @@
+/* Fallback: a swipeable row. With scroll timelines: the track slides by its overflow while the
+   section crosses the window, and a little bar under it shows how far (phones only). */
+.growthbook-v2-cases-viewport {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+.growthbook-v2-cases-viewport > ul > li {
+  scroll-snap-align: start;
+}
+@supports not (animation-timeline: view()) {
+  .growthbook-v2-cases-progress { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .growthbook-v2-cases-progress { display: none; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .growthbook-v2-cases-viewport {
+      overflow-x: clip;
+      overflow-y: visible;
+    }
+    .growthbook-v2-cases-track {
+      animation: growthbook-v2-cases-slide linear both;
+      animation-timeline: --growthbook-v2-cases;
+      animation-range: cover 15% cover 85%;
+    }
+    .growthbook-v2-cases-thumb {
+      animation: growthbook-v2-cases-thumb linear both;
+      animation-timeline: --growthbook-v2-cases;
+      animation-range: cover 15% cover 85%;
+    }
+    .growthbook-v2-cases-logo {
+      animation: growthbook-v2-cases-sharpen linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+@keyframes growthbook-v2-cases-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(min(0px, calc(100cqw - 100%))); }
+}
+@keyframes growthbook-v2-cases-thumb {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100cqw - 100%)); }
+}
+@keyframes growthbook-v2-cases-sharpen {
+  from { filter: blur(6px); opacity: 0.4; }
+  to { filter: blur(0); opacity: 1; }
+}
