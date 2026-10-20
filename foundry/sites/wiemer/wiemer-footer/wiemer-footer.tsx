@@ -36,9 +36,9 @@ export function WiemerFooter({ brand, homeHref = "/", tagline, columns, card, co
         </a>
         <p className="mt-6 text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em] md:col-span-6 md:mt-0 lg:col-span-4 lg:col-start-9">{tagline}</p>
 
-        {card && <WiemerTeaserCard {...card} className="mt-8 md:col-span-6 md:col-start-7 md:row-start-2 md:mt-[5.5rem] lg:col-span-4 lg:col-start-9" />}
+        {card && <WiemerTeaserCard {...card} className="mt-8 md:col-span-6 md:col-start-7 md:row-start-2 md:mt-[4.5rem] lg:col-span-4 lg:col-start-9" />}
 
-        <nav className="mt-10 grid gap-8 md:col-span-6 md:row-start-2 md:mt-[5.5rem] md:grid-cols-3 md:gap-4 lg:col-span-6">
+        <nav className="mt-10 grid gap-8 md:col-span-6 md:row-start-2 md:mt-[4.5rem] md:grid-cols-3 md:gap-4 lg:col-span-6">
           {columns.map((col) => (
             <div key={col.title}>
               <p className="text-[15px] font-medium tracking-[-0.015em] text-muted-foreground">{col.title}</p>
@@ -59,7 +59,7 @@ export function WiemerFooter({ brand, homeHref = "/", tagline, columns, card, co
           ))}
         </nav>
 
-        <div className="mt-14 flex flex-col gap-3.5 text-[15px] font-medium tracking-[-0.015em] md:col-span-12 md:mt-[6.5rem] md:flex-row md:justify-between">
+        <div className="mt-12 flex flex-col gap-3.5 text-[15px] font-medium tracking-[-0.015em] md:col-span-12 md:mt-[6.5rem] md:flex-row md:justify-between">
           <p>{copyright}</p>
           <p>{credit}</p>
         </div>

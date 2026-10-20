@@ -131,3 +131,47 @@ Copy is in English, in the original's short, plain, first-person-founder voice.
 - **Specs tabs** need state for the sliding pill → `hydrate: "visible"`. The spec table is
   the same for all tabs, as in the original.
 - **agb** page skipped (404 at capture time).
+
+## Verification
+
+**About the section crops.** Our `ours-<w>-section-NN.png` crops come out empty below the
+first screen: they are cut from one full-page screenshot taken at scroll 0, where every CSS
+scroll-driven reveal is still in its "not yet entered" state. (The original's GSAP reveals
+had already fired.) So the comparison below uses the scroll frames (`-scroll-NN`), which show
+each section in place, plus the section heights from `ours-design.md`. Browsers without
+scroll-driven animations, and static HTML, show everything in place.
+
+### Round 1 (landing)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | orange bar, wordmark + arrow link: matches | transparent, light text, solid after hero: matches | hides on scroll down (-100px) ✓ | – |
+| hero | 844 = 100svh ✓; photo + launch line + card | 1350 = 150svh ✓; subline wrapped to 3 lines (original 2) | parallax -30→115px ✓ (orig -30→113); copy fades out ✓ | shorter subline ✓ |
+| intro | 1170 vs 1094: greeting wrapped to 3 lines (Hanken is wider than Neue Montreal) | 1777 vs 1797 ✓; column on cols 9–12 at x=956 ✓ | letters rise 150px ✓ (orig 157), subline 30px ✓, paragraphs 24px ✓, track -2225→-468px ✓ (orig -2255→-415) | shorter greeting ✓ |
+| waitlist | 883 vs 908 ✓ | 1591 vs 1575 ✓; dot pitch 120px from the window edge (orig 113px inside the 40px gutters) | heading letters rise ✓, tag fades ✓; dot hover trail ✓ | dots inside gutters ✓ |
+| video band | 693 ✓ | 810 ✓ | – | – |
+| about | 1136 vs 1095 | 1033 vs 975 (our paragraphs run a line longer) | drift ±46px ✓, letters, rise, link fade ✓ | left: content length |
+| photo band | 585 ✓ | 1035 ✓; hotspots at the same places | drift ±60px (orig: none recorded on the landing, -81→39 on kontakt); plus scale 1.1 + rotate 45° on hover ✓ | – |
+| specs | 1210 vs 1211 ✓ | 1588 vs 1563 ✓; drawing frame 620px (orig 696); mm labels regular (orig bold) | letters rise ✓; pill slides 0.6s ✓ | frame 56vw, bold labels ✓ |
+| footer | 987 vs 930 | 534 vs 512; columns row 24px low | underline grows on hover ✓ | spacing tightened ✓ |
+| overflow | fits at 360/768/1024 ✓ | | | |
+
+### Round 2 (landing again; kontakt and warteliste first round)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | ✓ | subline two lines ✓ | ✓ | – |
+| intro | 1100 vs 1094 ✓; subline still 2 lines (orig 1) | ✓ | ✓ | shorter subline ✓ |
+| waitlist | ✓ | dot centres at x=97, 210… ✓ (orig 97, 210…) | ✓ | – |
+| specs | ✓ | frame ✓, bold labels ✓ | ✓ | – |
+| footer | 979 ✓ | 518 vs 512 ✓ | ✓ | – |
+| kontakt: header | solid near-white bar with hairline ✓ | ✓ | hides on scroll down ✓ | – |
+| kontakt: form | heading wrapped to 2 lines (orig 1) | 1535 incl. header vs 1504 ✓; card 414px on the dot field ✓; tag sits 24px lower (orig section padding is smaller on this page) | dots ✓ | shorter heading ✓; padding left |
+| kontakt: photo | 585 ✓ | 960 (3:2) ✓ | drift ✓ | – |
+| warteliste | 72 + 883 ✓ | 72 + 1591 vs 1559 ✓ | ✓ | – |
+| re-theme | `wiemer-specs` and `wiemer-waitlist` under `sample-ember`: re-colour and re-type cleanly; specs mixed `foreground` and `primary-foreground` ink on the band | | | specs uses primary-foreground throughout ✓ |
+| dark mode | whole landing in `.dark`: graphite page, orange band kept, light text on the hero | | | – |
+
+Left as is: the about section runs ~40–60px taller than the original (longer sample
+paragraphs); kontakt's top padding is the shared `--section-y` rather than the original's
+slightly smaller one on that page.

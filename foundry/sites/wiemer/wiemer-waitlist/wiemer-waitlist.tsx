@@ -50,26 +50,28 @@ export function WiemerWaitlist({ tag, title, text, formTitle, prices, email, con
         <p className="mt-2 max-w-[30rem] text-[max(16px,1.2vw)] leading-[1.3] font-medium tracking-[-0.015em] md:mt-4">{text}</p>
       </div>
 
-      <WiemerDotField className="mx-auto mt-12 max-w-page px-gutter lg:mt-16">
-        <form action={action} method="post" className="mx-auto w-full max-w-[30rem] rounded-xl bg-card p-6 text-card-foreground md:rounded-2xl md:p-8">
-          <h3 className="text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em]">{formTitle}</h3>
-          <dl className="mt-5 grid gap-6 rounded-lg bg-muted p-6 sm:grid-cols-2">
-            {prices.map((p) => (
-              <div key={p.name}>
-                <dt className="font-mono text-[22px] leading-none">{p.price}</dt>
-                <dd className="mt-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.015em] whitespace-pre-line">
-                  {p.name}
-                  {"\n"}
-                  {p.note}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <WiemerField label={email.label} name="email" type="email" placeholder={email.placeholder} required className="mt-10" />
-          <WiemerConsent label={consent} className="mt-6" />
-          <WiemerSubmit label={submit} className="mt-8" />
-        </form>
-      </WiemerDotField>
+      <div className="mx-auto mt-12 max-w-page px-gutter lg:mt-16">
+        <WiemerDotField>
+          <form action={action} method="post" className="mx-auto w-full max-w-[30rem] rounded-xl bg-card p-6 text-card-foreground md:rounded-2xl md:p-8">
+            <h3 className="text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em]">{formTitle}</h3>
+            <dl className="mt-5 grid gap-6 rounded-lg bg-muted p-6 sm:grid-cols-2">
+              {prices.map((p) => (
+                <div key={p.name}>
+                  <dt className="font-mono text-[22px] leading-none">{p.price}</dt>
+                  <dd className="mt-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.015em] whitespace-pre-line">
+                    {p.name}
+                    {"\n"}
+                    {p.note}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <WiemerField label={email.label} name="email" type="email" placeholder={email.placeholder} required className="mt-10" />
+            <WiemerConsent label={consent} className="mt-6" />
+            <WiemerSubmit label={submit} className="mt-8" />
+          </form>
+        </WiemerDotField>
+      </div>
     </section>
   );
 }

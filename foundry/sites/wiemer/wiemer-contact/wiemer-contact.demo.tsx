@@ -2,7 +2,7 @@ import { WiemerContact, type WiemerContactProps } from "./wiemer-contact";
 
 export const contactSample: WiemerContactProps = {
   tag: "Write to us",
-  title: "Something on your mind?",
+  title: "Got a question?",
   text: "Ask away. We reply to every message within two working days.",
   fields: {
     name: { label: "Name", placeholder: "Your name" },
