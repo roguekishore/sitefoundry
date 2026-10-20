@@ -1,0 +1,60 @@
+/* Phones: one rounded sky panel, everything in the flow, a soft rise-in on load.
+   ≥1024px: the panel is window-sized and sticks inside a wrapper about two windows tall;
+   while it is pinned the media grows from its 580×326 slot to (almost) the whole panel, a
+   black wash fades up to 75% and the text turns white. */
+
+.roveia-v2-hero-rise {
+  animation: roveia-v2-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes roveia-v2-hero-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (min-width: 1024px) {
+  /* the media starts in the middle of the row, which sits 5.5rem below the panel's centre */
+  .roveia-v2-hero-media {
+    position: absolute;
+    inset: calc(50% + 5.5rem - 163px) calc(50% - 290px) calc(50% - 5.5rem - 163px);
+    border-radius: var(--radius);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+    .roveia-v2-hero {
+      height: 210svh;
+      view-timeline: --roveia-v2-hero block;
+    }
+    .roveia-v2-hero-media {
+      animation: roveia-v2-hero-grow linear both;
+      animation-timeline: --roveia-v2-hero;
+      animation-range: contain 0% contain 85%;
+    }
+    .roveia-v2-hero-wash {
+      animation: roveia-v2-hero-wash linear both;
+      animation-timeline: --roveia-v2-hero;
+      animation-range: contain 8% contain 90%;
+    }
+    .roveia-v2-hero-ink {
+      animation: roveia-v2-hero-ink linear both;
+      animation-timeline: --roveia-v2-hero;
+      animation-range: contain 10% contain 60%;
+    }
+  }
+}
+@keyframes roveia-v2-hero-grow {
+  to { inset: 0.625rem; border-radius: calc(var(--radius) + 0.5rem); }
+}
+@keyframes roveia-v2-hero-wash {
+  from { opacity: 0; }
+  to { opacity: 0.75; }
+}
+@keyframes roveia-v2-hero-ink {
+  from { color: var(--foreground); }
+  to { color: var(--primary-foreground); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roveia-v2-hero-rise { animation: none; }
+}
