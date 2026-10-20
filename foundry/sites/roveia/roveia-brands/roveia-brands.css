@@ -1,0 +1,81 @@
+/* Without scroll-driven animations (or with reduced motion) the roll is a still card showing
+   the first brand. With them, a 500svh track pins the card for four windows and one named
+   timeline drives everything:
+   - the list slides up one 100px row per step, so brand i sits in the middle at step i;
+   - each name's opacity falls off with its distance from the middle (1, .5, .25, .1, .05);
+   - each brand's panel and photo show for the half step either side of its own step.
+   --steps (brands − 1) is set on the track, --i (the brand's index) on each item. */
+.roveia-brands-bg:not(:first-child),
+.roveia-brands-panel:not(:first-child) {
+  visibility: hidden;
+}
+.roveia-brands-track {
+  height: auto;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .roveia-brands-track {
+      height: 500svh;
+      view-timeline-name: --roveia-brands;
+    }
+    .roveia-brands-list,
+    .roveia-brands-name,
+    .roveia-brands-bg,
+    .roveia-brands-panel {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --roveia-brands;
+    }
+    .roveia-brands-list {
+      animation-name: roveia-brands-slide;
+      animation-range: contain 0% contain 100%;
+    }
+    .roveia-brands-name {
+      animation-name: roveia-brands-falloff;
+      animation-range:
+        contain calc((var(--i) - 4) * 100% / var(--steps))
+        contain calc((var(--i) + 4) * 100% / var(--steps));
+    }
+    .roveia-brands-bg,
+    .roveia-brands-panel {
+      visibility: visible;
+      animation-name: roveia-brands-show;
+      animation-range:
+        contain calc((var(--i) - 1) * 100% / var(--steps))
+        contain calc((var(--i) + 1) * 100% / var(--steps));
+    }
+  }
+}
+
+/* the phone grid fades in as it comes into view */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .roveia-brands-fade {
+      animation: roveia-brands-fade linear both;
+      animation-timeline: view();
+      animation-range: entry 0px entry 260px;
+    }
+  }
+}
+
+@keyframes roveia-brands-slide {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc(var(--steps) * -6.25rem)); }
+}
+@keyframes roveia-brands-falloff {
+  0%, 100% { opacity: 0.05; }
+  12.5%, 87.5% { opacity: 0.1; }
+  25%, 75% { opacity: 0.25; }
+  37.5%, 62.5% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes roveia-brands-show {
+  0%, 22% { opacity: 0; }
+  38%, 62% { opacity: 1; }
+  78%, 100% { opacity: 0; }
+}
+@keyframes roveia-brands-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

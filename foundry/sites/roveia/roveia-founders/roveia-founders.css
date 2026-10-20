@@ -1,0 +1,44 @@
+/* Desktop with scroll-driven animations: a 680svh track pins the heading for almost six
+   windows, and the cards leave the grid to sit in the middle of the stage, each flying from
+   just off the right edge to just off the left while tilting 10° → −10°. Each flight takes 40%
+   of the run; they start one after another, spread over the other 60%. --steps = cards − 1.
+   Without support or with reduced motion the cards stay in a three-column grid. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .roveia-founders-track {
+      height: 680svh;
+      view-timeline-name: --roveia-founders;
+    }
+    .roveia-founders-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: clip;
+    }
+    .roveia-founders-cards {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      display: block;
+    }
+    .roveia-founders-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -14rem 0 0 -10.5rem;
+      animation: roveia-founders-fly linear both;
+      animation-timeline: --roveia-founders;
+      animation-range:
+        contain calc(var(--i) * 60% / var(--steps))
+        contain calc(var(--i) * 60% / var(--steps) + 40%);
+    }
+  }
+}
+
+@keyframes roveia-founders-fly {
+  from { transform: translateX(calc(50vw + 10.5rem + 4rem)) rotate(10deg); }
+  to { transform: translateX(calc(-50vw - 10.5rem - 8rem)) rotate(-10deg); }
+}
