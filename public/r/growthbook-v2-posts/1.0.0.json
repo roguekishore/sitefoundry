@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook latest posts (v2)",
+  "description": "A railed section whose background fades from the page colour to a pale mint: a heading, one large featured post on the left (wide gradient thumbnail, tiny mono category, 24px title, muted line) and three compact posts on the right (thumbnail beside category and title). Titles turn violet on hover. Phones stack everything with thumbnails above text.",
+  "category": "features",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "posts",
+    "news",
+    "cards",
+    "light",
+    "mint",
+    "gradient",
+    "rail",
+    "hover"
+  ],
+  "notes": [
+    "every thumbnail is a media slot (a gradient placeholder when empty)"
+  ],
+  "entry": "growthbook-v2-posts.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-posts",
+  "files": [
+    {
+      "path": "growthbook-v2-posts.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2Panel } from \"@foundry/growthbook-v2-panel\";\n\nexport interface GrowthbookV2Post {\n  /** the tiny mono label above the title */\n  category: string;\n  title: string;\n  href: string;\n  /** the 16:9 thumbnail (image); empty = a gradient placeholder */\n  media?: ReactNode;\n  /** placeholder wash when there is no media */\n  tone?: \"violet\" | \"sky\" | \"mint\" | \"navy\";\n}\n\nexport interface GrowthbookV2PostsProps {\n  title: string;\n  /** the big post on the left */\n  featured: GrowthbookV2Post & { excerpt?: string };\n  /** up to three compact posts on the right */\n  posts: GrowthbookV2Post[];\n  className?: string;\n}\n\nexport function GrowthbookV2Posts({ title, featured, posts, className }: GrowthbookV2PostsProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-linear-to-b from-background to-[color-mix(in_oklab,var(--chart-4)_30%,var(--background))] text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"border-x border-border px-10 pt-12 pb-16 lg:pt-20 lg:pb-24\">\n          <GrowthbookV2Heading size=\"card\">{title}</GrowthbookV2Heading>\n          <div className=\"mt-8 grid gap-16 lg:mt-24 lg:grid-cols-[30.5rem_minmax(0,1fr)] lg:gap-14\">\n            <a href={featured.href} className=\"group block\">\n              <GrowthbookV2Panel tone={featured.tone ?? \"violet\"} media={featured.media} className=\"aspect-[488/275]\" />\n              <p className=\"mt-8 font-mono text-[0.625rem]/[1.65] lg:mt-10\">{featured.category}</p>\n              <h3 className=\"mt-4 text-2xl/[1.5] transition-colors duration-250 group-hover:text-primary motion-reduce:transition-none\">\n                {featured.title}\n              </h3>\n              {featured.excerpt && <p className=\"mt-6 max-w-[11rem] text-base/[1.65] text-muted-foreground/80 sm:max-w-none\">{featured.excerpt}</p>}\n            </a>\n            <ul className=\"flex flex-col gap-16 lg:gap-[3.6rem]\">\n              {posts.map((p) => (\n                <li key={p.title}>\n                  <a href={p.href} className=\"group grid gap-6 sm:grid-cols-[13.6875rem_minmax(0,1fr)] sm:gap-4\">\n                    <GrowthbookV2Panel tone={p.tone ?? \"sky\"} media={p.media} className=\"aspect-[219/122]\" />\n                    <div>\n                      <p className=\"font-mono text-[0.625rem]/[1.65] sm:mt-1\">{p.category}</p>\n                      <h3 className=\"mt-2 max-w-[16rem] text-base/[1.65] transition-colors duration-250 group-hover:text-primary motion-reduce:transition-none sm:max-w-none\">\n                        {p.title}\n                      </h3>\n                    </div>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-heading",
+    "growthbook-v2-panel"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "featured",
+      "type": "GrowthbookV2Post & { excerpt?: string | undefined; }",
+      "required": true,
+      "description": "the big post on the left"
+    },
+    {
+      "name": "posts",
+      "type": "GrowthbookV2Post[]",
+      "required": true,
+      "description": "up to three compact posts on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7bff4091330de35d17e0de56174cf2818807e6d20b7eeba3159cc99ae659fbad"
+}

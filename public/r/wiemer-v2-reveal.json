@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wiemer scroll reveal (v2)",
+  "description": "CSS-only scroll-driven reveals in Wiemer's calm manner: a plain fade, a short 25px rise with a fade, and a parallax drift for pictures inside their frames. Staggers by starting each item a little later in the scroll.",
+  "category": "text-effect",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "parallax",
+    "fade",
+    "rise",
+    "stagger",
+    "css"
+  ],
+  "notes": [
+    "uses animation-timeline: view(); browsers without it, and reduced motion, show everything in place",
+    "use the wrapper, or put wiemerV2Reveal(effect) and wiemerV2RevealStyle(step) on your own element",
+    "crop drifting pictures with overflow-clip, not overflow-hidden"
+  ],
+  "entry": "wiemer-v2-reveal.tsx",
+  "source": "foundry",
+  "name": "wiemer-v2-reveal",
+  "files": [
+    {
+      "path": "wiemer-v2-reveal.css",
+      "content": "/* Scroll-driven reveals for the Wiemer blocks, all CSS. Each class ties an animation to the\n   element's own trip through the window (animation-timeline: view()). Browsers without\n   scroll-driven animations, and anyone who prefers reduced motion, see everything in place.\n   --wiemer-v2-step (0, 1, 2 …) starts an item a little later, for staggered lists.\n   Entrances end on `entry` ranges, so they always finish, even in a page's last section. */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wiemer-v2-reveal-fade,\n    .wiemer-v2-reveal-rise {\n      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);\n      animation-fill-mode: both;\n      /* the bottom 15 % of the window doesn't count, so things start once they're a little way in */\n      animation-timeline: view(block 0% 15%);\n      animation-range: entry min(60%, calc(var(--wiemer-v2-step, 0) * 15%)) entry min(100%, calc(40% + var(--wiemer-v2-step, 0) * 15%));\n    }\n    .wiemer-v2-reveal-fade { animation-name: wiemer-v2-reveal-fade; }\n    .wiemer-v2-reveal-rise { animation-name: wiemer-v2-reveal-rise; }\n\n    /* drift: a picture sliding inside its frame for the whole trip through the window */\n    .wiemer-v2-reveal-drift {\n      animation: wiemer-v2-reveal-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes wiemer-v2-reveal-fade {\n  from { opacity: 0; }\n}\n@keyframes wiemer-v2-reveal-rise {\n  from { opacity: 0; transform: translateY(var(--wiemer-v2-rise, 25px)); }\n}\n@keyframes wiemer-v2-reveal-drift {\n  from { transform: translateY(var(--wiemer-v2-drift-from, -46px)); }\n  to { transform: translateY(var(--wiemer-v2-drift-to, 46px)); }\n}\n"
+    },
+    {
+      "path": "wiemer-v2-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-v2-reveal.css\";\n\n/**\n * fade: opacity 0→1 as it comes into view · rise: fade + a 25px lift · drift: a picture\n * sliding inside its frame (parallax), scrubbed for its whole trip through the window\n */\nexport type WiemerV2RevealEffect = \"fade\" | \"rise\" | \"drift\";\n\n/** The class for an effect, to put straight on an element without a wrapper. */\nexport function wiemerV2Reveal(effect: WiemerV2RevealEffect) {\n  return `wiemer-v2-reveal-${effect}`;\n}\n\n/** Inline style: a stagger step (0, 1, 2 …) and, for drift, where it starts and ends in px. */\nexport function wiemerV2RevealStyle(step = 0, drift?: [number, number]): CSSProperties {\n  return {\n    \"--wiemer-v2-step\": step,\n    ...(drift && { \"--wiemer-v2-drift-from\": `${drift[0]}px`, \"--wiemer-v2-drift-to\": `${drift[1]}px` }),\n  } as CSSProperties;\n}\n\nexport interface WiemerV2RevealProps {\n  /** what happens as it enters the window */\n  effect?: WiemerV2RevealEffect;\n  /** stagger position in a list: each step starts a little later */\n  step?: number;\n  /** for drift: the vertical offset in px at the start and at the end of the trip */\n  drift?: [number, number];\n  /** the element to render */\n  as?: \"div\" | \"p\" | \"span\" | \"li\";\n  children?: ReactNode;\n  className?: string;\n}\n\n/** Wraps content in a CSS scroll-driven reveal. Static HTML and old browsers show it in place. */\nexport function WiemerV2Reveal({ effect = \"fade\", step = 0, drift, as: Tag = \"div\", children, className }: WiemerV2RevealProps) {\n  return (\n    <Tag className={cn(wiemerV2Reveal(effect), className)} style={wiemerV2RevealStyle(step, drift)}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "effect",
+      "type": "enum",
+      "required": false,
+      "default": "fade",
+      "description": "what happens as it enters the window"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position in a list: each step starts a little later"
+    },
+    {
+      "name": "drift",
+      "type": "[number, number]",
+      "required": false,
+      "description": "for drift: the vertical offset in px at the start and at the end of the trip"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "898c35fd39bf47a20ebdc4d51ddcee1c807598c74d6773cdb756e39e55bc73d9"
+}

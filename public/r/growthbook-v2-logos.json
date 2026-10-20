@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook logo marquee (v2)",
+  "description": "A one-line caption centred over a single row of customer wordmarks that slides slowly and endlessly to the left, on the plain page background.",
+  "category": "logos",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only; with reduced motion the row stands still",
+    "give at least six logos so the loop never shows a gap"
+  ],
+  "entry": "growthbook-v2-logos.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-logos",
+  "files": [
+    {
+      "path": "growthbook-v2-logos.css",
+      "content": "/* The list is rendered twice side by side; sliding by half the track loops seamlessly. */\n.growthbook-v2-logos-track {\n  animation: growthbook-v2-logos-slide 60s linear infinite;\n}\n\n@keyframes growthbook-v2-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-v2-logos-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./growthbook-v2-logos.css\";\n\nexport interface GrowthbookV2Logo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (svg, img or styled text), about 28px tall */\n  logo: ReactNode;\n}\n\nexport interface GrowthbookV2LogosProps {\n  /** the line above the row */\n  caption: string;\n  /** the wordmarks; six or more */\n  logos: GrowthbookV2Logo[];\n  /** seconds for one full loop */\n  duration?: number;\n  className?: string;\n}\n\nexport function GrowthbookV2Logos({ caption, logos, duration = 60, className }: GrowthbookV2LogosProps) {\n  const row = (copy: number) =>\n    logos.map((l) => (\n      <li\n        key={`${copy}-${l.name}`}\n        aria-hidden={copy > 0 || undefined}\n        className=\"flex h-10 shrink-0 items-center px-6 text-foreground lg:px-9 [&_svg]:h-7 [&_svg]:w-auto\"\n      >\n        <span role=\"img\" aria-label={copy > 0 ? undefined : l.name} className=\"flex items-center\">\n          {l.logo}\n        </span>\n      </li>\n    ));\n  return (\n    <section className={cn(\"bg-background pt-12 pb-10 text-foreground lg:pt-20 lg:pb-16\", className)}>\n      <p className=\"px-gutter text-center text-sm/[1.65] lg:text-base\">{caption}</p>\n      <div className=\"mx-auto mt-8 max-w-[calc(var(--page-width)+var(--page-gutter)*2)] overflow-clip lg:mt-12\">\n        <ul className=\"growthbook-v2-logos-track flex w-max\" style={{ animationDuration: `${duration}s` }}>\n          {row(0)}\n          {row(1)}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "the line above the row"
+    },
+    {
+      "name": "logos",
+      "type": "GrowthbookV2Logo[]",
+      "required": true,
+      "description": "the wordmarks; six or more"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "60",
+      "description": "seconds for one full loop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4d91c48c6de15946395520bc3692fd4c14578745c17b9e498ecc780170518f0a"
+}

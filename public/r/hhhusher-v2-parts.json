@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher parts list (v2)",
+  "description": "A bronze-tan list of numbered parts in big type: numbers on the left, names pushed right, hairline rules between, everything faded to 15%. Hovering a row brings it to full strength and shows that part's picture floating beside the pointer, following it down the list. Rows rise in one after another as the list arrives.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "parts",
+    "hover",
+    "cursor-follow",
+    "tan",
+    "big-type",
+    "reveal"
+  ],
+  "notes": [
+    "the band is the secondary colour",
+    "one media slot per part (a cut-out picture works best); the floating picture shows on pointer devices only",
+    "needs JavaScript for the picture that follows the pointer (hydrate: visible); the list itself works without it"
+  ],
+  "entry": "hhhusher-v2-parts.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-v2-parts",
+  "files": [
+    {
+      "path": "hhhusher-v2-parts.tsx",
+      "content": "import { useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\nimport { hhhusherV2Reveal, hhhusherV2RevealStyle } from \"@foundry/hhhusher-v2-reveal\";\n\nexport interface HhhusherV2Part {\n  name: string;\n  /** the part's picture, shown beside the pointer while its row is hovered; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface HhhusherV2PartsProps {\n  parts: HhhusherV2Part[];\n  id?: string;\n  className?: string;\n}\n\nconst pad = (n: number) => String(n + 1).padStart(2, \"0\");\n\nexport function HhhusherV2Parts({ parts, id, className }: HhhusherV2PartsProps) {\n  const [hovered, setHovered] = useState<number | null>(null);\n  const listRef = useRef<HTMLDivElement>(null);\n  const floatRef = useRef<HTMLDivElement>(null);\n\n  // the floating picture's position follows the pointer, set straight on its style (no re-render)\n  const follow = (e: PointerEvent) => {\n    const box = listRef.current?.getBoundingClientRect();\n    if (!box || !floatRef.current) return;\n    floatRef.current.style.setProperty(\"--hh-x\", `${e.clientX - box.left}px`);\n    floatRef.current.style.setProperty(\"--hh-y\", `${e.clientY - box.top}px`);\n  };\n\n  return (\n    <section id={id} className={cn(\"bg-secondary pt-section pb-[calc(var(--section-y)*1)] text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div ref={listRef} className=\"relative\" onPointerMove={follow} onPointerLeave={() => setHovered(null)}>\n          <ol className=\"border-b border-secondary-foreground/25\">\n            {parts.map((part, i) => (\n              <li key={part.name} onPointerEnter={() => setHovered(i)} className={cn(hhhusherV2Reveal(\"rise\"), \"border-t border-secondary-foreground/25\")} style={hhhusherV2RevealStyle(i * 0.5, 50)}>\n                <div\n                  className={cn(\n                    \"flex items-start justify-between gap-8 py-2 font-display text-[1.82rem] leading-[1.15] font-[570] tracking-[-0.02em] transition-opacity lg:items-center lg:py-0 lg:text-[3.5625rem] lg:leading-[1.38]\",\n                    hhhusherV2Ease,\n                    hovered === i ? \"opacity-100\" : \"opacity-[0.15] hover:opacity-100\",\n                  )}\n                >\n                  <span>{pad(i)}</span>\n                  <span className=\"max-w-[65%] text-right lg:max-w-none\">{part.name}</span>\n                </div>\n              </li>\n            ))}\n          </ol>\n\n          {/* the picture beside the pointer (pointer devices only) */}\n          <div\n            ref={floatRef}\n            aria-hidden\n            className={cn(\n              \"pointer-events-none absolute top-0 left-0 z-10 hidden w-[19.4rem] transition-opacity duration-300 [@media(hover:hover)]:lg:block\",\n              hovered === null ? \"opacity-0\" : \"opacity-100\",\n            )}\n            style={{ transform: \"translate(calc(var(--hh-x, 0px) - 50%), calc(var(--hh-y, 0px) - 50%))\" } as CSSProperties}\n          >\n            {parts.map((part, i) => (\n              <div key={part.name} className={cn(\"aspect-[0.88] [&>*]:size-full [&>*]:object-contain\", i === hovered ? \"block\" : \"hidden\")}>\n                {part.media ?? <div className=\"size-full rounded-lg bg-secondary-foreground/15\" />}\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "parts",
+      "type": "HhhusherV2Part[]",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c3b77cce350206f680fbd2f1454096b617c1757202fd7d39ad13c20811ce61cf"
+}

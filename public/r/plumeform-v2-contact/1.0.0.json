@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform contact split (v2)",
+  "description": "On paper: at the left an eyebrow, heavy heading and slate paragraph, a set of pill choices (the chosen one solid ink, the others soft) and a short teal-dotted list that changes with the choice; at the right a glass form panel in mint fog with labelled rounded fields, a textarea, a full-width ink pill button and a small note. The list and the message label swap in with a quick fade when the choice changes; everything rises into view.",
+  "category": "contact",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "split",
+    "pills",
+    "segmented",
+    "glass",
+    "pastel",
+    "reveal",
+    "light",
+    "interactive"
+  ],
+  "notes": [
+    "needs JavaScript for the choice pills (hydrate: visible); without it the first choice shows",
+    "the form posts to action with the field names you give; wire it to your own endpoint"
+  ],
+  "entry": "plumeform-v2-contact.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "plumeform-v2-contact",
+  "files": [
+    {
+      "path": "plumeform-v2-contact.css",
+      "content": "/* The list and the message label swap in when a different choice is picked. */\n@media (prefers-reduced-motion: no-preference) {\n  .plumeform-v2-contact-swap {\n    animation: plumeform-v2-contact-swap 340ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n}\n\n@keyframes plumeform-v2-contact-swap {\n  from { opacity: 0; transform: translateY(6px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "plumeform-v2-contact.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Panel } from \"@foundry/plumeform-v2-panel\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\nimport \"./plumeform-v2-contact.css\";\n\nexport interface PlumeformV2ContactChoice {\n  label: string;\n  /** the points listed under the pills while this choice is picked */\n  points: string[];\n  /** the label and placeholder of the message field for this choice */\n  messageLabel: string;\n  messagePlaceholder?: string;\n}\n\nexport interface PlumeformV2ContactField {\n  name: string;\n  label: string;\n  /** shown after the label in a lighter weight, e.g. \"(optional)\" */\n  hint?: string;\n  type?: \"email\" | \"text\";\n  placeholder?: string;\n  required?: boolean;\n}\n\nexport interface PlumeformV2ContactProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body?: ReactNode;\n  /** the pill choices; the first is picked to begin with */\n  choices: PlumeformV2ContactChoice[];\n  /** the label of the choice group, for screen readers */\n  choicesLabel?: string;\n  /** short fields above the message */\n  fields: PlumeformV2ContactField[];\n  /** the message field's name */\n  messageName?: string;\n  submitLabel: string;\n  /** a small line under the button */\n  note?: string;\n  /** where the form posts */\n  action?: string;\n  id?: string;\n  className?: string;\n}\n\nconst input =\n  \"w-full rounded-[calc(var(--radius)/2)] border border-input bg-card px-4 text-base text-foreground placeholder:text-muted-foreground/70 transition-[border-color,box-shadow] duration-150 focus:border-primary focus:shadow-[0_0_0_3px_color-mix(in_oklab,var(--ring)_20%,transparent)] focus:outline-none\";\n\nexport function PlumeformV2Contact({\n  eyebrow,\n  title,\n  body,\n  choices,\n  choicesLabel = \"What it's about\",\n  fields,\n  messageName = \"message\",\n  submitLabel,\n  note,\n  action,\n  id,\n  className,\n}: PlumeformV2ContactProps) {\n  const [picked, setPicked] = useState(0);\n  const choice = choices[picked];\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background px-gutter py-[calc(var(--section-y)*0.75)] text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-[calc(var(--page-width)-2*var(--page-gutter))] gap-14 lg:grid-cols-2 lg:gap-x-24\">\n        <div className=\"max-w-xl\">\n          <PlumeformV2Heading eyebrow={eyebrow} title={title} body={body} />\n          <PlumeformV2Reveal step={1} className=\"mt-8\">\n            <div role=\"group\" aria-label={choicesLabel} className=\"flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap\">\n              {choices.map((c, i) => (\n                <button\n                  key={c.label}\n                  type=\"button\"\n                  aria-pressed={i === picked}\n                  onClick={() => setPicked(i)}\n                  className={cn(\n                    \"h-10 rounded-full px-4 text-[0.8125rem] font-bold transition-colors duration-200\",\n                    i === picked ? \"bg-foreground text-background\" : \"border border-border bg-secondary text-secondary-foreground hover:bg-accent\",\n                  )}\n                >\n                  {c.label}\n                </button>\n              ))}\n            </div>\n            <ul key={picked} className=\"plumeform-v2-contact-swap mt-7 space-y-3 text-[0.9375rem] leading-relaxed text-muted-foreground\">\n              {choice.points.map((p) => (\n                <li key={p} className=\"relative pl-4\">\n                  <span aria-hidden className=\"absolute top-[0.6em] left-0 size-1 rounded-full bg-primary\" />\n                  {p}\n                </li>\n              ))}\n            </ul>\n          </PlumeformV2Reveal>\n        </div>\n\n        <PlumeformV2Reveal step={1} className=\"mx-0 sm:mx-auto sm:w-full sm:max-w-md lg:max-w-none\">\n          <PlumeformV2Panel fog=\"mint\" padding=\"lg\">\n            <form action={action} method=\"post\" className=\"grid gap-4\">\n              {fields.map((f) => (\n                <label key={f.name} className=\"grid gap-2\">\n                  <span className=\"text-xs font-bold\">\n                    {f.label}\n                    {f.hint && <span className=\"font-normal text-muted-foreground\"> {f.hint}</span>}\n                  </span>\n                  <input name={f.name} type={f.type ?? \"text\"} placeholder={f.placeholder} required={f.required} className={cn(input, \"h-12\")} />\n                </label>\n              ))}\n              <label className=\"grid gap-2\">\n                <span key={picked} className=\"plumeform-v2-contact-swap text-xs font-bold\">\n                  {choice.messageLabel}\n                </span>\n                <textarea name={messageName} rows={5} placeholder={choice.messagePlaceholder} className={cn(input, \"min-h-[9.5rem] py-3 leading-relaxed\")} />\n              </label>\n              <PlumeformV2Button type=\"submit\" block size=\"lg\" arrow className=\"mt-1\">\n                {submitLabel}\n              </PlumeformV2Button>\n              {note && <p className=\"text-center text-xs text-muted-foreground\">{note}</p>}\n            </form>\n          </PlumeformV2Panel>\n        </PlumeformV2Reveal>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button",
+    "plumeform-v2-heading",
+    "plumeform-v2-panel",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "choices",
+      "type": "PlumeformV2ContactChoice[]",
+      "required": true,
+      "description": "the pill choices; the first is picked to begin with"
+    },
+    {
+      "name": "choicesLabel",
+      "type": "string",
+      "required": false,
+      "default": "What it's about",
+      "description": "the label of the choice group, for screen readers"
+    },
+    {
+      "name": "fields",
+      "type": "PlumeformV2ContactField[]",
+      "required": true,
+      "description": "short fields above the message"
+    },
+    {
+      "name": "messageName",
+      "type": "string",
+      "required": false,
+      "default": "message",
+      "description": "the message field's name"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "a small line under the button"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "04952ca01f017fdbc5208ac1536e3bc71da49f4bd2e44239305c4652d0ba6bc0"
+}

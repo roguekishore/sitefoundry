@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher product hero (v2)",
+  "description": "A near-black product page opening: on the left a 1.7:1 picture in a hairline 5px frame, a row of four thumbnails and thin bronze arrows (a 1/4 counter on phones); on the right a light, large two-line product name, a price row (struck-through old price, bold new price, an outlined discount tag and a mono 'limited' note), two paragraphs, then a grey quantity stepper with cream square buttons, a yellow checkout button and a small mono guarantee.",
+  "category": "hero",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "product",
+    "shop",
+    "gallery",
+    "price",
+    "dark",
+    "yellow",
+    "mono",
+    "stepper"
+  ],
+  "notes": [
+    "always dark (forces the dark class); sits under the fixed hhhusher-v2-header",
+    "one media slot per picture; thumbnails reuse them",
+    "needs JavaScript for the gallery and the stepper (hydrate: load); without it the first picture and quantity 1 show"
+  ],
+  "entry": "hhhusher-v2-product-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "hhhusher-v2-product-hero",
+  "files": [
+    {
+      "path": "hhhusher-v2-product-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Minus, MoveLeft, MoveRight, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button, hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\n\nexport interface HhhusherV2ProductPicture {\n  /** what the picture shows, for screen readers (and the empty placeholder's label) */\n  label: string;\n  /** the picture; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface HhhusherV2ProductHeroProps {\n  /** the product name; use \\n to break it into two lines */\n  name: string;\n  /** the current price, as shown (e.g. \"$289 USD\") */\n  price: string;\n  /** the old price, struck through */\n  oldPrice?: string;\n  /** the outlined tag next to the price (e.g. \"-15%\") */\n  tag?: string;\n  /** the small mono note after the tag */\n  tagNote?: string;\n  /** one or more paragraphs under the price */\n  paragraphs: string[];\n  /** pictures for the gallery (up to four thumbnails show) */\n  pictures: HhhusherV2ProductPicture[];\n  /** the yellow checkout button */\n  checkout: { label: string; href: string };\n  /** the small mono guarantee next to (desktop) or under (phone) the button */\n  note?: string;\n  /** screen-reader labels for the arrows and the stepper */\n  labels?: { previous: string; next: string; less: string; more: string; quantity: string };\n  id?: string;\n  className?: string;\n}\n\nexport function HhhusherV2ProductHero({ name, price, oldPrice, tag, tagNote, paragraphs, pictures, checkout, note, labels, id, className }: HhhusherV2ProductHeroProps) {\n  const [active, setActive] = useState(0);\n  const [qty, setQty] = useState(1);\n  const count = pictures.length;\n  const go = (step: number) => setActive((a) => (a + step + count) % count);\n\n  return (\n    <section id={id} className={cn(\"dark bg-card text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-10 px-gutter pt-[4.5rem] pb-16 lg:grid-cols-[53.5%_minmax(0,1fr)] lg:gap-[5.4%] lg:pt-[7.9rem] lg:pb-[4.7rem]\">\n        {/* gallery */}\n        <div>\n          <div className=\"relative aspect-[1.7] overflow-clip rounded-lg border border-border bg-muted\">\n            {pictures.map((p, i) => (\n              <div\n                key={p.label}\n                role=\"img\"\n                aria-label={p.label}\n                aria-hidden={i !== active}\n                className={cn(\"absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none [&>*]:size-full [&>*]:object-cover\", i === active ? \"opacity-100\" : \"opacity-0\")}\n              >\n                {p.media}\n              </div>\n            ))}\n          </div>\n          <div className=\"mt-4 grid grid-cols-[repeat(4,2.1rem)] gap-3 lg:grid-cols-4 lg:gap-3\">\n            {pictures.slice(0, 4).map((p, i) => (\n              <button\n                key={p.label}\n                type=\"button\"\n                onClick={() => setActive(i)}\n                aria-label={p.label}\n                aria-pressed={i === active}\n                className={cn(\n                  \"aspect-[1.54] overflow-clip rounded-sm border bg-muted transition-[border-color,opacity] lg:rounded-md [&>*]:size-full [&>*]:object-cover\",\n                  hhhusherV2Ease,\n                  i === active ? \"border-glow\" : \"border-transparent opacity-70 hover:opacity-100\",\n                )}\n              >\n                {p.media}\n              </button>\n            ))}\n          </div>\n          <div className=\"mt-8 flex items-center justify-between lg:mt-9 lg:justify-end\">\n            <p className=\"font-mono text-[0.85rem] font-bold lg:hidden\">\n              {active + 1}\n              <span className=\"text-glow\">/{count}</span>\n            </p>\n            <div className=\"flex gap-8 text-glow lg:gap-11\">\n              <button type=\"button\" onClick={() => go(-1)} aria-label={labels?.previous} className=\"transition-colors hover:text-foreground\">\n                <MoveLeft className=\"size-7 lg:size-11\" strokeWidth={1.2} />\n              </button>\n              <button type=\"button\" onClick={() => go(1)} aria-label={labels?.next} className=\"transition-colors hover:text-foreground\">\n                <MoveRight className=\"size-7 lg:size-11\" strokeWidth={1.2} />\n              </button>\n            </div>\n          </div>\n        </div>\n\n        {/* details */}\n        <div className=\"lg:pt-[3.6rem]\">\n          <h1 className=\"font-display text-[2.6rem] leading-[1.15] font-normal tracking-[-0.01em] whitespace-pre-line lg:text-[2.6875rem] lg:leading-[1.16]\">{name}</h1>\n          <div className=\"mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 lg:mt-7\">\n            {oldPrice && <s className=\"font-display text-[1.3rem] font-bold text-muted-foreground lg:text-[1.5rem]\">{oldPrice}</s>}\n            <span className=\"font-display text-[1.3rem] font-bold lg:text-[1.5rem]\">{price}</span>\n            {tag && <span className=\"rounded-sm border border-foreground px-1.5 py-0.5 font-display text-[0.75rem] font-bold\">{tag}</span>}\n            {tagNote && <span className=\"pl-1 font-mono text-[0.72rem] font-bold uppercase\">{tagNote}</span>}\n          </div>\n          <div className=\"mt-10 space-y-5 font-display text-[1.04rem] leading-[1.45] font-[570] tracking-[-0.01em] lg:mt-[4.4rem] lg:text-[1.125rem] lg:leading-[1.47]\">\n            {paragraphs.map((p) => (\n              <p key={p}>{p}</p>\n            ))}\n          </div>\n          <div className=\"mt-10 flex flex-col gap-4 lg:mt-[3.1rem] lg:flex-row lg:items-center\">\n            <div className=\"flex h-12 items-center justify-between rounded-sm bg-foreground/25 px-1.5 lg:w-[9.2rem]\">\n              <button type=\"button\" aria-label={labels?.less} onClick={() => setQty((q) => Math.max(1, q - 1))} className={cn(\"flex size-[2.4rem] items-center justify-center rounded-sm bg-foreground text-background transition-colors hover:bg-background hover:text-foreground\", hhhusherV2Ease)}>\n                <Minus className=\"size-5\" strokeWidth={1.75} />\n              </button>\n              <output aria-label={labels?.quantity} className=\"font-display text-[1.1rem] font-[570]\">{qty}</output>\n              <button type=\"button\" aria-label={labels?.more} onClick={() => setQty((q) => q + 1)} className={cn(\"flex size-[2.4rem] items-center justify-center rounded-sm bg-foreground text-background transition-colors hover:bg-background hover:text-foreground\", hhhusherV2Ease)}>\n                <Plus className=\"size-5\" strokeWidth={1.75} />\n              </button>\n            </div>\n            <HhhusherV2Button href={checkout.href} className=\"h-12 w-full lg:w-[11.9rem]\">\n              {checkout.label}\n            </HhhusherV2Button>\n            {note && <p className=\"text-center font-mono text-[0.68rem] leading-[1.15] font-bold uppercase lg:max-w-[8.5rem] lg:pl-1 lg:text-left\">{note}</p>}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product name; use \\n to break it into two lines"
+    },
+    {
+      "name": "price",
+      "type": "string",
+      "required": true,
+      "description": "the current price, as shown (e.g. \"$289 USD\")"
+    },
+    {
+      "name": "oldPrice",
+      "type": "string",
+      "required": false,
+      "description": "the old price, struck through"
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the outlined tag next to the price (e.g. \"-15%\")"
+    },
+    {
+      "name": "tagNote",
+      "type": "string",
+      "required": false,
+      "description": "the small mono note after the tag"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "one or more paragraphs under the price"
+    },
+    {
+      "name": "pictures",
+      "type": "HhhusherV2ProductPicture[]",
+      "required": true,
+      "description": "pictures for the gallery (up to four thumbnails show)"
+    },
+    {
+      "name": "checkout",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the yellow checkout button"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the small mono guarantee next to (desktop) or under (phone) the button"
+    },
+    {
+      "name": "labels",
+      "type": "{ previous: string; next: string; less: string; more: string; quantity: string; }",
+      "required": false,
+      "description": "screen-reader labels for the arrows and the stepper"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "27e758bef2864f3f28e1d3f742e44c2f27762c2d642a5184b26f3e21c44638af"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer specs (v2)",
+  "description": "A spec sheet on a full accent band: a very large centred heading, a pill of small mono tabs whose dark marker slides to the chosen tab, a measured drawing with thick dimension rulers on top and at the side, and below a ruled line, a note on the left and a two-column spec table on the right.",
+  "category": "features",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "specs",
+    "table",
+    "tabs",
+    "technical",
+    "dimensions",
+    "mono",
+    "orange",
+    "accent-band",
+    "split-text",
+    "reveal"
+  ],
+  "notes": [
+    "the band is the theme's highlight colour with highlight-foreground ink: best with a bold highlight",
+    "each tab is a drawing view: give its width/height labels and aspect; the drawing itself is a slot (an outlined box when empty)",
+    "needs JavaScript for the tabs (hydrate: visible); static HTML shows the first view"
+  ],
+  "entry": "wiemer-v2-specs.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "wiemer-v2-specs",
+  "files": [
+    {
+      "path": "wiemer-v2-specs.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { wiemerV2Reveal, wiemerV2RevealStyle } from \"@foundry/wiemer-v2-reveal\";\nimport { WiemerV2SplitHeading } from \"@foundry/wiemer-v2-split-heading\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerV2SpecsView {\n  /** the tab's label (set in small uppercase mono) */\n  tab: string;\n  /** the width written above the drawing, e.g. \"420 mm\" */\n  width: string;\n  /** the height written beside it */\n  height: string;\n  /** the drawing's width divided by its height, e.g. 420 / 300 */\n  aspect: number;\n  /** the line drawing itself (an <img> or <svg>); an empty outlined box when missing */\n  media?: ReactNode;\n}\n\nexport interface WiemerV2SpecsRow {\n  /** what is measured */\n  label: string;\n  /** the value */\n  value: string;\n}\n\nexport interface WiemerV2SpecsProps {\n  /** the big centred heading */\n  heading: string;\n  /** one view per tab: a measured drawing */\n  views: WiemerV2SpecsView[];\n  /** the heading over the note at the bottom left */\n  noteTitle: string;\n  /** the note's text */\n  note: string;\n  /** the spec table at the bottom right */\n  rows: WiemerV2SpecsRow[];\n  className?: string;\n}\n\n/**\n * A spec sheet on a full accent band: a very large centred heading, a pill of mono tabs (the\n * dark marker slides to the chosen tab), a measured drawing with a width ruler on top and a\n * height ruler at the side, then a note on the left and a ruled two-column spec table on the right.\n */\nexport function WiemerV2Specs({ heading, views, noteTitle, note, rows, className }: WiemerV2SpecsProps) {\n  const [active, setActive] = useState(0);\n  const [marker, setMarker] = useState<{ left: number; top: number; width: number; height: number } | null>(null);\n  const tabs = useRef<(HTMLButtonElement | null)[]>([]);\n  const view = views[active] ?? views[0];\n\n  useEffect(() => {\n    const measure = () => {\n      const el = tabs.current[active];\n      if (el) setMarker({ left: el.offsetLeft, top: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight });\n    };\n    measure();\n    window.addEventListener(\"resize\", measure);\n    return () => window.removeEventListener(\"resize\", measure);\n  }, [active]);\n\n  return (\n    <section className={cn(\"bg-highlight px-gutter pt-section pb-9 text-highlight-foreground\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <WiemerV2SplitHeading text={heading} className=\"text-center font-display text-[4rem] leading-[1.1] font-medium tracking-[-0.02em] lg:text-[9vw] lg:tracking-[-0.008em]\" />\n\n        <div className=\"mt-10 flex justify-center lg:mt-16\">\n          <div role=\"tablist\" className=\"relative flex w-full flex-wrap justify-center gap-y-2 rounded-lg bg-highlight-foreground/10 p-3 sm:w-auto sm:rounded-md sm:p-1.5\">\n            {marker && (\n              <span\n                aria-hidden=\"true\"\n                className=\"absolute rounded-sm bg-highlight-foreground transition-all duration-300 ease-[cubic-bezier(0.38,0.005,0.215,1)] motion-reduce:transition-none\"\n                style={marker}\n              />\n            )}\n            {views.map((v, i) => (\n              <button\n                key={v.tab}\n                ref={(el) => {\n                  tabs.current[i] = el;\n                }}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={i === active}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"relative h-9 rounded-sm px-4 font-mono text-xs font-medium uppercase transition-colors duration-300\",\n                  i === active ? \"text-highlight\" : \"text-highlight-foreground/60 hover:text-highlight-foreground\",\n                  i === active && !marker && \"bg-highlight-foreground\",\n                )}\n              >\n                {v.tab}\n              </button>\n            ))}\n          </div>\n        </div>\n\n        <figure className=\"mx-auto mt-12 w-full pr-10 sm:w-[min(100%,36rem)] lg:mt-12 lg:w-[48vw] lg:pr-0\">\n          <figcaption className=\"text-center font-mono text-[0.625rem] font-medium lg:text-sm\">{view.width}</figcaption>\n          <div className=\"mt-1.5 h-0.5 bg-highlight-foreground lg:h-1\" />\n          <div className=\"h-6 border-x border-dotted border-highlight-foreground lg:h-14\" />\n          <div className=\"relative\" style={{ aspectRatio: view.aspect }}>\n            <div className=\"absolute inset-0 overflow-clip rounded-md border border-highlight-foreground bg-highlight-foreground/5 [&>img]:size-full [&>img]:object-contain [&>svg]:size-full\">{view.media}</div>\n            <div aria-hidden=\"true\" className=\"absolute inset-y-0 left-full w-6 border-y border-dotted border-highlight-foreground lg:w-14\" />\n            <div className=\"absolute inset-y-0 left-[calc(100%+1.5rem)] w-0.5 bg-highlight-foreground lg:left-[calc(100%+3.5rem)] lg:w-1\" />\n            <p className=\"absolute top-1/2 left-[calc(100%+2rem)] -translate-y-1/2 font-mono text-[0.625rem] font-medium [writing-mode:vertical-rl] lg:left-[calc(100%+4.5rem)] lg:text-sm\">{view.height}</p>\n          </div>\n        </figure>\n\n        <div className=\"mt-8 border-t border-highlight-foreground/20 lg:mt-[11rem] lg:grid lg:grid-cols-3 lg:gap-x-4\">\n          <div className=\"pt-4 lg:col-span-2 lg:pt-5\">\n            <WiemerV2SplitHeading as=\"h3\" text={noteTitle} className=\"text-xl leading-[1.2] font-medium tracking-[-0.02em] lg:text-[1.6vw]\" />\n            <p className={cn(wiemerV2Reveal(\"rise\"), \"mt-2 max-w-[46vw] text-base leading-[1.3] tracking-[-0.01em] max-lg:max-w-none lg:mt-3 lg:text-[1.2vw]\")} style={wiemerV2RevealStyle(0)}>\n              {note}\n            </p>\n          </div>\n          <dl className=\"mt-10 lg:col-start-3 lg:mt-0\">\n            {rows.map((r) => (\n              <div key={r.label} className=\"flex items-baseline justify-between gap-6 border-b border-highlight-foreground/20 py-4 text-base leading-[1.35] last:border-0 lg:text-[1.2vw]\">\n                <dt>{r.label}</dt>\n                <dd className=\"text-right\">{r.value}</dd>\n              </div>\n            ))}\n          </dl>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-v2-reveal",
+    "wiemer-v2-split-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big centred heading"
+    },
+    {
+      "name": "views",
+      "type": "WiemerV2SpecsView[]",
+      "required": true,
+      "description": "one view per tab: a measured drawing"
+    },
+    {
+      "name": "noteTitle",
+      "type": "string",
+      "required": true,
+      "description": "the heading over the note at the bottom left"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": true,
+      "description": "the note's text"
+    },
+    {
+      "name": "rows",
+      "type": "WiemerV2SpecsRow[]",
+      "required": true,
+      "description": "the spec table at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "599f79fb9d8cb3598e8d4e1d12bd386dee4f68ec8864f7bc48b00382c08abfd8"
+}

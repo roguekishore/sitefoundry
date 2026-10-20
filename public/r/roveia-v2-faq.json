@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia questions (v2)",
+  "description": "A big three-line heading on the left and a quiet list of 20px questions on the right, each with a small round ink arrow button that turns blue on hover and quarter-turns when the answer opens. No dividers, lots of air; rows fade and rise in as they enter.",
+  "category": "faq",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "light",
+    "minimal",
+    "large-type",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "open/close is a native <details>, no JavaScript needed"
+  ],
+  "entry": "roveia-v2-faq.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-faq",
+  "files": [
+    {
+      "path": "roveia-v2-faq.css",
+      "content": "/* The question rows fade and rise in one after another as they enter the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-faq-row {\n      animation: roveia-v2-faq-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 30%;\n    }\n  }\n}\n@keyframes roveia-v2-faq-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-faq.tsx",
+      "content": "import { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-faq.css\";\n\nexport interface RoveiaV2FaqItem {\n  /** the question */\n  question: string;\n  /** the answer, shown when the row opens */\n  answer: string;\n}\n\nexport interface RoveiaV2FaqProps {\n  /** the heading on the left */\n  heading: string;\n  /** the questions, top to bottom */\n  items: RoveiaV2FaqItem[];\n  className?: string;\n}\n\nexport function RoveiaV2Faq({ heading, items, className }: RoveiaV2FaqProps) {\n  return (\n    <section className={cn(\"bg-background pt-[4.5rem] pb-16 text-foreground lg:pt-12 lg:pb-[4.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:grid lg:grid-cols-[33.75rem_1fr]\">\n        <RoveiaV2Heading className=\"max-w-[22rem] lg:max-w-[28rem] lg:text-[4.375rem] lg:leading-[1.1] lg:tracking-[-0.03em]\">{heading}</RoveiaV2Heading>\n        <ul className=\"mt-10 space-y-8 lg:mt-3 lg:space-y-[3.25rem]\">\n          {items.map((item) => (\n            <li key={item.question} className=\"roveia-v2-faq-row\">\n              <details className=\"group\">\n                <summary className=\"flex cursor-pointer list-none items-start justify-between gap-6 [&::-webkit-details-marker]:hidden\">\n                  <span className=\"text-xl leading-6 tracking-[-0.03em] lg:leading-5\">{item.question}</span>\n                  <span className=\"flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-[transform,background-color] duration-300 group-open:rotate-90 group-hover:bg-primary motion-reduce:transition-none lg:mt-0.5\">\n                    <ArrowRight aria-hidden className=\"size-3\" strokeWidth={2} />\n                  </span>\n                </summary>\n                <p className=\"mt-4 max-w-[36rem] pr-14 text-base leading-6 text-muted-foreground\">{item.answer}</p>\n              </details>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading on the left"
+    },
+    {
+      "name": "items",
+      "type": "RoveiaV2FaqItem[]",
+      "required": true,
+      "description": "the questions, top to bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b8c45ad5589516e6b5e040c82ab6d86832ecc5dab38d024add26b202e875d02f"
+}

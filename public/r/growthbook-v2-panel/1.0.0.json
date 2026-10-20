@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "GrowthBook gradient panel (v2)",
+  "description": "The soft, light-filled gradient frame the original puts behind every product shot: violet, mint, sky, navy or teal washes with faint hairline guides near the edges. Empty, it is the media placeholder; children sit on top (a screenshot frame), or a media prop replaces it.",
+  "category": "card",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "gradient",
+    "violet",
+    "mint",
+    "frame",
+    "grid-lines"
+  ],
+  "notes": [
+    "radius, size and aspect ratio come from the className you pass"
+  ],
+  "entry": "growthbook-v2-panel.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-panel",
+  "files": [
+    {
+      "path": "growthbook-v2-panel.css",
+      "content": "/* Soft washes standing in for the original's grainy gradient artwork. Tokens only. */\n.growthbook-v2-panel-violet {\n  background:\n    radial-gradient(90% 70% at 0% 100%, var(--chart-4) 0%, transparent 60%),\n    radial-gradient(70% 60% at 100% 20%, color-mix(in oklab, var(--primary) 35%, var(--foreground)) 0%, transparent 70%),\n    linear-gradient(165deg, color-mix(in oklab, var(--primary) 85%, var(--card)) 0%, var(--primary) 35%, color-mix(in oklab, var(--primary) 55%, var(--foreground)) 100%);\n}\n.growthbook-v2-panel-mint {\n  background:\n    radial-gradient(80% 70% at 100% 0%, var(--chart-4) 0%, transparent 70%),\n    linear-gradient(135deg, color-mix(in oklab, var(--chart-4) 35%, var(--card)) 0%, var(--chart-4) 100%);\n}\n.growthbook-v2-panel-sky {\n  background:\n    radial-gradient(70% 60% at 0% 0%, var(--chart-5) 0%, transparent 70%),\n    radial-gradient(60% 50% at 100% 50%, color-mix(in oklab, var(--primary) 45%, var(--foreground)) 0%, transparent 75%),\n    linear-gradient(160deg, var(--glow) 0%, var(--primary) 55%, color-mix(in oklab, var(--glow) 70%, var(--card)) 100%);\n}\n.growthbook-v2-panel-navy {\n  background: linear-gradient(170deg, var(--foreground) 0%, color-mix(in oklab, var(--chart-2) 70%, var(--foreground)) 100%);\n}\n.growthbook-v2-panel-teal {\n  background: linear-gradient(160deg, var(--chart-3) 0%, color-mix(in oklab, var(--chart-3) 45%, var(--chart-4)) 55%, var(--chart-4) 100%);\n}\n\n/* In dark themes the foreground is light, so the navy wash starts from the card colour instead. */\n.dark .growthbook-v2-panel-navy,\n.dark.growthbook-v2-panel-navy {\n  background: linear-gradient(170deg, var(--card) 0%, color-mix(in oklab, var(--chart-2) 60%, var(--card)) 100%);\n}\n"
+    },
+    {
+      "path": "growthbook-v2-panel.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./growthbook-v2-panel.css\";\n\nexport interface GrowthbookV2PanelProps {\n  /** the wash: violet (default), mint, sky, navy or teal */\n  tone?: \"violet\" | \"mint\" | \"sky\" | \"navy\" | \"teal\";\n  /** faint hairline guides near the edges, as on the original's product frames */\n  grid?: boolean;\n  /** a real image or video; replaces the wash when given */\n  media?: ReactNode;\n  /** things placed on top of the wash (e.g. a screenshot frame) */\n  children?: ReactNode;\n  className?: string;\n}\n\nconst guides = [\"inset-y-0 left-[6%] w-px\", \"inset-y-0 right-[6%] w-px\", \"inset-x-0 top-[21%] h-px\", \"inset-x-0 bottom-[21%] h-px\"];\n\nexport function GrowthbookV2Panel({ tone = \"violet\", grid, media, children, className }: GrowthbookV2PanelProps) {\n  return (\n    <div className={cn(\"relative isolate overflow-clip rounded-xl\", !media && `growthbook-v2-panel-${tone}`, className)}>\n      {media ? (\n        <div className=\"absolute inset-0 [&>*]:size-full [&>img]:object-cover [&>video]:object-cover\">{media}</div>\n      ) : (\n        grid && guides.map((g) => <span key={g} aria-hidden className={cn(\"absolute -z-10 bg-card/25\", g)} />)\n      )}\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "violet",
+      "description": "the wash: violet (default), mint, sky, navy or teal"
+    },
+    {
+      "name": "grid",
+      "type": "boolean",
+      "required": false,
+      "description": "faint hairline guides near the edges, as on the original's product frames"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video; replaces the wash when given"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "things placed on top of the wash (e.g. a screenshot frame)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a2a847dff5bef53f903b906614e124aa307043bfa71199ae0e66c2fb2a0cf20c"
+}

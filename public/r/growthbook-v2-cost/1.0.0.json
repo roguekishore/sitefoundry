@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook speed and cost (v2)",
+  "description": "Text on the left (big heading, a paragraph, a violet button); on the right an airy chart area of faint column lines with two white label chips, each beside a softly pulsing glow dot (violet up top, green below). Phones put the chart under the text.",
+  "category": "features",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chart",
+    "glow",
+    "pulse",
+    "loop",
+    "split",
+    "light",
+    "rail"
+  ],
+  "notes": [
+    "the chart drawing is a media slot (an empty placeholder wash by default)",
+    "CSS-only pulse, off under reduced motion"
+  ],
+  "entry": "growthbook-v2-cost.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-cost",
+  "files": [
+    {
+      "path": "growthbook-v2-cost.css",
+      "content": ".growthbook-v2-cost-dot {\n  animation: growthbook-v2-cost-pulse 3s ease-in-out infinite;\n}\n.growthbook-v2-cost-dot-violet { --growthbook-v2-dot: var(--primary); }\n.growthbook-v2-cost-dot-green { --growthbook-v2-dot: var(--chart-3); animation-delay: -1.5s; }\n\n@keyframes growthbook-v2-cost-pulse {\n  0%, 100% { box-shadow: 0 0 0 8px color-mix(in oklab, var(--growthbook-v2-dot) 25%, transparent), 0 0 24px 14px color-mix(in oklab, var(--growthbook-v2-dot) 22%, transparent); }\n  50% { box-shadow: 0 0 0 12px color-mix(in oklab, var(--growthbook-v2-dot) 18%, transparent), 0 0 36px 22px color-mix(in oklab, var(--growthbook-v2-dot) 14%, transparent); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-v2-cost-dot {\n    animation: none;\n    box-shadow: 0 0 0 8px color-mix(in oklab, var(--growthbook-v2-dot) 25%, transparent), 0 0 24px 14px color-mix(in oklab, var(--growthbook-v2-dot) 22%, transparent);\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-cost.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\nimport \"./growthbook-v2-cost.css\";\n\nexport interface GrowthbookV2CostMarker {\n  /** the chip's text, e.g. \"4x tests\" */\n  label: string;\n  /** a small line icon in the glowing dot */\n  icon?: ReactNode;\n}\n\nexport interface GrowthbookV2CostProps {\n  /** the heading; \\n for line breaks */\n  title: string;\n  body: string;\n  action: { label: string; href: string };\n  /** the upper (violet) and lower (green) chips */\n  markers: [GrowthbookV2CostMarker, GrowthbookV2CostMarker];\n  /** the chart drawing (image or svg); empty = a faint placeholder wash */\n  media?: ReactNode;\n  className?: string;\n}\n\nfunction Marker({ marker, tone, className }: { marker: GrowthbookV2CostMarker; tone: \"violet\" | \"green\"; className?: string }) {\n  return (\n    <div className={cn(\"absolute right-0 flex items-center gap-8 lg:gap-9\", className)}>\n      <span className=\"rounded-md bg-card px-3.5 py-2.5 text-sm text-card-foreground shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_6%,transparent)]\">\n        {marker.label}\n      </span>\n      <span\n        className={cn(\n          \"growthbook-v2-cost-dot flex size-9 items-center justify-center rounded-full text-primary-foreground [&_svg]:size-4\",\n          tone === \"violet\" ? \"growthbook-v2-cost-dot-violet bg-primary\" : \"growthbook-v2-cost-dot-green bg-chart-3\",\n        )}\n      >\n        {marker.icon}\n      </span>\n    </div>\n  );\n}\n\nexport function GrowthbookV2Cost({ title, body, action, markers, media, className }: GrowthbookV2CostProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative grid border-l border-border pt-24 pb-16 lg:grid-cols-2 lg:pt-36 lg:pb-24\">\n          <GrowthbookV2RailAccent />\n          <div className=\"pl-4 lg:pl-9\">\n            <GrowthbookV2Heading className=\"whitespace-pre-line\">{title}</GrowthbookV2Heading>\n            <p className=\"mt-6 max-w-[34rem] text-sm/[1.65] text-foreground/85 lg:mt-12 lg:text-base/[1.65]\">{body}</p>\n            <GrowthbookV2Button href={action.href} arrow fullOnMobile className=\"mt-8 lg:mt-12\">\n              {action.label}\n            </GrowthbookV2Button>\n          </div>\n          <div className=\"relative mt-12 mr-6 ml-8 h-[18rem] lg:mt-0 lg:mr-20 lg:ml-28 lg:h-[30rem]\">\n            {media ? (\n              <div className=\"absolute inset-0 [&>*]:size-full [&>img]:object-contain\">{media}</div>\n            ) : (\n              <div aria-hidden className=\"absolute inset-x-0 top-[12%] bottom-0 rounded-xl bg-linear-to-tr from-chart-4/15 via-transparent to-glow/15\" />\n            )}\n            <div aria-hidden className=\"absolute inset-x-0 top-[12%] bottom-0 flex justify-between\">\n              {[0, 1, 2, 3, 4].map((i) => (\n                <span key={i} className=\"w-px bg-linear-to-b from-transparent via-border/70 to-border/40\" />\n              ))}\n            </div>\n            <Marker marker={markers[0]} tone=\"violet\" className=\"-top-1 lg:top-0\" />\n            <Marker marker={markers[1]} tone=\"green\" className=\"-bottom-5 lg:-bottom-2\" />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-heading",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n for line breaks"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true
+    },
+    {
+      "name": "markers",
+      "type": "[GrowthbookV2CostMarker, GrowthbookV2CostMarker]",
+      "required": true,
+      "description": "the upper (violet) and lower (green) chips"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the chart drawing (image or svg); empty = a faint placeholder wash"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "13430c1341d9ec6208387b2d5d6fd6e2faf2c7ad9368eb819f7b81847b56b7c6"
+}

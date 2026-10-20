@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "TypeSomething wordmark (v2)",
+  "description": "A two-weight text wordmark: a bold first word in ink run straight into a light second word in acid lime, with an optional underscore cursor. Animated, the second word types itself out letter by letter, holds, and erases again while the cursor blinks.",
+  "category": "logo",
+  "site": "typesomething-v2",
+  "license": "proprietary",
+  "tags": [
+    "logo",
+    "wordmark",
+    "typewriter",
+    "cursor",
+    "blink",
+    "loop",
+    "lime"
+  ],
+  "notes": [
+    "size it with a text size class (className); the cursor and the typing are in em, so they scale with it",
+    "CSS only; with reduced motion the full word shows and the cursor stays still"
+  ],
+  "entry": "typesomething-v2-wordmark.tsx",
+  "source": "foundry",
+  "name": "typesomething-v2-wordmark",
+  "files": [
+    {
+      "path": "typesomething-v2-wordmark.css",
+      "content": "/* The tail is clipped to a width that grows one average letter per step: types out (0–30%),\n   holds (30–75%), erases (75–90%), stays empty briefly. The cursor blinks on its own beat. */\n.typesomething-v2-wordmark-tail {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: bottom;\n  animation-name: typesomething-v2-wordmark-type;\n  animation-duration: 8s;\n  animation-iteration-count: infinite;\n}\n\n.typesomething-v2-wordmark-cursor {\n  animation: typesomething-v2-wordmark-blink 1.1s steps(1, end) infinite;\n}\n\n@keyframes typesomething-v2-wordmark-type {\n  0% { max-width: 0; }\n  30%, 75% { max-width: calc(var(--ts-chars) * 0.66em); }\n  90%, 100% { max-width: 0; }\n}\n\n@keyframes typesomething-v2-wordmark-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .typesomething-v2-wordmark-tail,\n  .typesomething-v2-wordmark-cursor {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "typesomething-v2-wordmark.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./typesomething-v2-wordmark.css\";\n\nexport interface TypesomethingV2WordmarkProps {\n  /** the bold first half, in the text colour (e.g. \"Quiet\") */\n  lead: string;\n  /** the light second half, in the brand lime (e.g. \"page\") */\n  tail: string;\n  /** text after the tail in the text colour, e.g. a full stop */\n  suffix?: string;\n  /** show the blinking \"_\" cursor after the name */\n  cursor?: boolean;\n  /** the tail types itself out, holds and erases on a loop */\n  animated?: boolean;\n  /** a small mark after the name (icon or img) */\n  mark?: ReactNode;\n  className?: string;\n}\n\n/** Bold + light two-word wordmark. Renders inline, so it can sit inside a heading. */\nexport function TypesomethingV2Wordmark({ lead, tail, suffix, cursor, animated, mark, className }: TypesomethingV2WordmarkProps) {\n  // steps(n) moves the clip one letter at a time; the clip width is n × an average letter\n  const style = animated\n    ? ({ \"--ts-chars\": tail.length, animationTimingFunction: `steps(${tail.length}, end)` } as CSSProperties)\n    : undefined;\n  return (\n    <span className={cn(\"inline-flex items-baseline whitespace-nowrap\", className)}>\n      <span className=\"font-bold tracking-[-0.02em]\">{lead}</span>\n      <span className={cn(\"font-light text-primary\", animated && \"typesomething-v2-wordmark-tail\")} style={style}>\n        {tail}\n      </span>\n      {suffix && <span>{suffix}</span>}\n      {cursor && (\n        <span aria-hidden className=\"typesomething-v2-wordmark-cursor font-light text-primary\">\n          _\n        </span>\n      )}\n      {mark && <span className=\"ml-[0.3em] inline-flex self-center [&_svg]:size-[0.9em]\">{mark}</span>}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the bold first half, in the text colour (e.g. \"Quiet\")"
+    },
+    {
+      "name": "tail",
+      "type": "string",
+      "required": true,
+      "description": "the light second half, in the brand lime (e.g. \"page\")"
+    },
+    {
+      "name": "suffix",
+      "type": "string",
+      "required": false,
+      "description": "text after the tail in the text colour, e.g. a full stop"
+    },
+    {
+      "name": "cursor",
+      "type": "boolean",
+      "required": false,
+      "description": "show the blinking \"_\" cursor after the name"
+    },
+    {
+      "name": "animated",
+      "type": "boolean",
+      "required": false,
+      "description": "the tail types itself out, holds and erases on a loop"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark after the name (icon or img)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cf10434aa676bfc97a10224412e9ff451c291334b7840546ea89151ef26dcce1"
+}

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook integrations wall (v2)",
+  "description": "A big heading, one line and an outline button on the left; on the right three columns of soft white tiles holding pale integration names, drifting slowly up and down at different speeds and fading out at the top and bottom. Phones turn the columns into three sideways-sliding rows under the text.",
+  "category": "logos",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "integrations",
+    "logos",
+    "marquee",
+    "loop",
+    "tiles",
+    "light",
+    "fade",
+    "rail"
+  ],
+  "notes": [
+    "CSS only; with reduced motion the tiles stand still",
+    "names are split into three columns in order; nine or more work best"
+  ],
+  "entry": "growthbook-v2-integrations.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-integrations",
+  "files": [
+    {
+      "path": "growthbook-v2-integrations.css",
+      "content": "/* Each lane holds its tiles twice; sliding by half loops seamlessly. Rows slide sideways on\n   phones, columns drift vertically from 1024px. The masks only use alpha, so any colour works. */\n.growthbook-v2-integrations-wall {\n  mask-image: linear-gradient(to right, transparent, var(--foreground) 12%, var(--foreground) 88%, transparent);\n}\n.growthbook-v2-integrations-lane {\n  animation: growthbook-v2-integrations-x var(--growthbook-v2-lane-time, 45s) linear infinite;\n  animation-direction: var(--growthbook-v2-lane-direction, normal);\n}\n\n@media (min-width: 1024px) {\n  .growthbook-v2-integrations-wall {\n    mask-image: linear-gradient(to bottom, transparent, var(--foreground) 18%, var(--foreground) 82%, transparent);\n  }\n  .growthbook-v2-integrations-lane {\n    animation-name: growthbook-v2-integrations-y;\n  }\n}\n\n@keyframes growthbook-v2-integrations-x {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n@keyframes growthbook-v2-integrations-y {\n  from { transform: translateY(0); }\n  to { transform: translateY(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-v2-integrations-lane { animation: none; }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-integrations.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\nimport \"./growthbook-v2-integrations.css\";\n\nexport interface GrowthbookV2Integration {\n  /** the tool's name (shown as text when there is no logo) */\n  name: string;\n  /** its logo (svg or img); drawn pale, as on the original */\n  logo?: ReactNode;\n}\n\nexport interface GrowthbookV2IntegrationsProps {\n  /** the heading; \\n for line breaks */\n  title: string;\n  body: string;\n  /** the outline button under the text */\n  action: { label: string; href: string };\n  /** the tiles; split into three lanes */\n  integrations: GrowthbookV2Integration[];\n  className?: string;\n}\n\nconst lanes: CSSProperties[] = [\n  { \"--growthbook-v2-lane-time\": \"48s\" } as CSSProperties,\n  { \"--growthbook-v2-lane-time\": \"58s\", \"--growthbook-v2-lane-direction\": \"reverse\" } as CSSProperties,\n  { \"--growthbook-v2-lane-time\": \"52s\" } as CSSProperties,\n];\n\nexport function GrowthbookV2Integrations({ title, body, action, integrations, className }: GrowthbookV2IntegrationsProps) {\n  const groups = [0, 1, 2].map((g) => integrations.filter((_, i) => i % 3 === g));\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative grid grid-cols-1 border-l border-border lg:grid-cols-2\">\n          <GrowthbookV2RailAccent />\n          <div className=\"flex flex-col pt-12 pl-10 lg:h-[46rem] lg:pt-20\">\n            <GrowthbookV2Heading className=\"whitespace-pre-line\">{title}</GrowthbookV2Heading>\n            <p className=\"mt-6 max-w-[32rem] text-sm/[1.65] lg:mt-12\">{body}</p>\n            <GrowthbookV2Button href={action.href} variant=\"outline\" arrow className=\"mt-8 self-start lg:mt-auto lg:mb-20\">\n              {action.label}\n            </GrowthbookV2Button>\n          </div>\n          <div className=\"growthbook-v2-integrations-wall mt-12 flex min-w-0 flex-col gap-2.5 overflow-clip lg:mt-0 lg:ml-2.5 lg:h-[46rem] lg:flex-row\">\n            {groups.map((group, g) => (\n              <div key={g} className=\"min-w-0 flex-1 overflow-clip\">\n                <ul className=\"growthbook-v2-integrations-lane flex w-max gap-2.5 lg:w-full lg:flex-col\" style={lanes[g]}>\n                  {[0, 1].flatMap((copy) =>\n                    group.map((it) => (\n                      <li\n                        key={`${copy}-${it.name}`}\n                        aria-hidden={copy > 0 || undefined}\n                        className=\"flex h-[6.875rem] w-32 shrink-0 items-center justify-center rounded-lg bg-card px-3 text-center text-lg font-medium text-muted-foreground/45 shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_4%,transparent)] lg:h-[10.625rem] lg:w-full lg:text-[1.375rem] [&_img]:max-h-12 [&_svg]:h-10 [&_svg]:w-auto\"\n                      >\n                        {it.logo ?? it.name}\n                      </li>\n                    )),\n                  )}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-heading",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n for line breaks"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outline button under the text"
+    },
+    {
+      "name": "integrations",
+      "type": "GrowthbookV2Integration[]",
+      "required": true,
+      "description": "the tiles; split into three lanes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b933abdc5926476dd8933626f89a27220144e6ac82d1e22c0e92223ae3ebd33b"
+}

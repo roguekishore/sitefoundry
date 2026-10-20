@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook SDK picker (v2)",
+  "description": "A lavender band split by hairline rails: heading, paragraph and violet + outline buttons on the left; on the right a white panel with a gradient edge holding a framework select, a round icon with the SDK's name, a dark code block with lime strings and a copy button, and a dotted mono docs link. Phones stack the panel under the text.",
+  "category": "features",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "sdk",
+    "code",
+    "developer",
+    "select",
+    "lavender",
+    "rail",
+    "split",
+    "copy"
+  ],
+  "notes": [
+    "needs JavaScript for the select and copy button (hydrate: visible)",
+    "the code block always uses the theme's dark colours (dark class)"
+  ],
+  "entry": "growthbook-v2-sdks.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "growthbook-v2-sdks",
+  "files": [
+    {
+      "path": "growthbook-v2-sdks.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Check, ChevronDown, Copy } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\n\nexport interface GrowthbookV2Sdk {\n  /** the option in the select */\n  option: string;\n  /** the name beside the round icon */\n  name: string;\n  /** a small icon for the round badge */\n  icon?: ReactNode;\n  /** the snippet; text in double quotes is drawn in the highlight colour */\n  code: string;\n}\n\nexport interface GrowthbookV2SdksProps {\n  /** the heading; \\n for line breaks */\n  title: string;\n  body: string;\n  /** violet button first, then outline */\n  actions: { label: string; href: string; variant?: \"primary\" | \"outline\" }[];\n  sdks: GrowthbookV2Sdk[];\n  /** the dotted mono link under the code */\n  docs: { label: string; href: string };\n  /** labels for screen readers */\n  selectLabel?: string;\n  copyLabel?: string;\n  className?: string;\n}\n\n/** Splits a snippet so quoted strings can be coloured. */\nfunction highlight(code: string) {\n  return code.split(/(\"[^\"\\n]*\")/g).map((part, i) =>\n    part.startsWith('\"') ? (\n      <span key={i} className=\"text-highlight\">\n        {part}\n      </span>\n    ) : (\n      part\n    ),\n  );\n}\n\nexport function GrowthbookV2Sdks({ title, body, actions, sdks, docs, selectLabel = \"Framework\", copyLabel = \"Copy code\", className }: GrowthbookV2SdksProps) {\n  const [index, setIndex] = useState(0);\n  const [copied, setCopied] = useState(false);\n  const sdk = sdks[index];\n  const copy = () => {\n    navigator.clipboard?.writeText(sdk.code).then(() => {\n      setCopied(true);\n      setTimeout(() => setCopied(false), 1500);\n    });\n  };\n  return (\n    <section className={cn(\"bg-secondary text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative grid border-x border-border py-14 lg:grid-cols-2 lg:py-20\">\n          <span aria-hidden className=\"absolute inset-y-0 left-1/2 hidden w-px bg-border lg:block\" />\n          <div className=\"pr-4 pl-10 lg:pr-24\">\n            <GrowthbookV2Heading className=\"whitespace-pre-line\">{title}</GrowthbookV2Heading>\n            <p className=\"mt-4 text-base/[1.65] lg:mt-6\">{body}</p>\n            <div className=\"mt-12 flex flex-col gap-3 sm:flex-row lg:mt-24\">\n              {actions.map((a) => (\n                <GrowthbookV2Button\n                  key={a.label}\n                  href={a.href}\n                  variant={a.variant ?? \"primary\"}\n                  arrow={(a.variant ?? \"primary\") === \"primary\"}\n                  className=\"w-full sm:w-auto\"\n                >\n                  {a.label}\n                </GrowthbookV2Button>\n              ))}\n            </div>\n          </div>\n          <div className=\"relative mt-14 bg-card p-4 text-card-foreground lg:mt-0 lg:p-5\">\n            <GrowthbookV2RailAccent className=\"left-0\" barClassName=\"h-full lg:h-full\" />\n            <label className=\"relative block\">\n              <span className=\"sr-only\">{selectLabel}</span>\n              <select\n                value={index}\n                onChange={(e) => setIndex(Number(e.target.value))}\n                className=\"h-14 w-full appearance-none rounded-lg border border-input bg-card px-4 text-sm text-card-foreground\"\n              >\n                {sdks.map((s, i) => (\n                  <option key={s.option} value={i}>\n                    {s.option}\n                  </option>\n                ))}\n              </select>\n              <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-5 size-5 -translate-y-1/2\" strokeWidth={1.75} />\n            </label>\n            <div className=\"mt-16 flex items-center gap-2\">\n              <span className=\"dark flex size-[3.125rem] items-center justify-center rounded-full bg-background text-foreground [&_svg]:size-5\">{sdk.icon}</span>\n              <span className=\"text-base\">{sdk.name}</span>\n            </div>\n            <div className=\"dark relative mt-8 rounded-xl bg-popover px-8 py-6 text-popover-foreground lg:mt-12\">\n              <button\n                type=\"button\"\n                onClick={copy}\n                aria-label={copyLabel}\n                className=\"absolute top-3.5 right-3 flex size-[1.875rem] items-center justify-center rounded-full border border-input transition-colors duration-250 hover:bg-muted motion-reduce:transition-none\"\n              >\n                {copied ? <Check aria-hidden className=\"size-4\" /> : <Copy aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n              </button>\n              <pre className=\"font-mono text-sm/[2] break-all whitespace-pre-wrap\">{highlight(sdk.code)}</pre>\n            </div>\n            <a\n              href={docs.href}\n              className=\"mt-4 inline-block font-mono text-base text-primary underline decoration-dotted underline-offset-4 transition-colors duration-250 hover:text-foreground motion-reduce:transition-none\"\n            >\n              {docs.label}\n            </a>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-heading",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n for line breaks"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; variant?: \"primary\" | \"outline\" | undefined; }[]",
+      "required": true,
+      "description": "violet button first, then outline"
+    },
+    {
+      "name": "sdks",
+      "type": "GrowthbookV2Sdk[]",
+      "required": true
+    },
+    {
+      "name": "docs",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the dotted mono link under the code"
+    },
+    {
+      "name": "selectLabel",
+      "type": "string",
+      "required": false,
+      "default": "Framework",
+      "description": "labels for screen readers"
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": false,
+      "default": "Copy code"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "519bf52f5d72c81bee299c82443b97e76744e17bca8e983b7cab5a449f2304e1"
+}

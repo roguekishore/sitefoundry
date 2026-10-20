@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner footer (v2)",
+  "description": "A quiet two-half footer on linen paper, split by sand hairlines. Left: the wordmark at the top; the parent-company line in the accent colour, a legal note, legal links and a short sitemap at the bottom. Right: a 32px statement, an email field drawn as a single underline with a square sand button, a consent note, and a social link and contact groups at the bottom. On phones it becomes one column. Links underline and take the accent colour on hover.",
+  "category": "footer",
+  "site": "reckoner-v2",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "newsletter",
+    "subscribe",
+    "two-column",
+    "hairline",
+    "light",
+    "warm",
+    "minimal",
+    "finance"
+  ],
+  "notes": [
+    "the parent line and link hovers use the glow colour (crimson in reckoner-v2-theme)",
+    "the form is markup only: point action at your own endpoint"
+  ],
+  "entry": "reckoner-v2-footer.tsx",
+  "source": "foundry",
+  "name": "reckoner-v2-footer",
+  "files": [
+    {
+      "path": "reckoner-v2-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerV2Button } from \"@foundry/reckoner-v2-button\";\n\nexport interface ReckonerV2FooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface ReckonerV2FooterProps {\n  /** the company name: the home link's label for screen readers */\n  brand: string;\n  /** the logo (e.g. reckoner-v2-wordmark) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** the statement at the top of the right half */\n  statement: string;\n  /** the sign-up row */\n  subscribe?: {\n    /** label of the email field, for screen readers */\n    label: string;\n    placeholder: string;\n    button: string;\n    /** small print under the field */\n    consent?: string;\n    /** where the form posts */\n    action?: string;\n  };\n  /** the short sitemap */\n  sitemap: ReckonerV2FooterLink[];\n  /** contact groups: a grey label over a few links (email, phone) */\n  contacts?: { label: string; links: ReckonerV2FooterLink[] }[];\n  /** a social profile link, with a small icon */\n  social?: ReckonerV2FooterLink & { icon?: ReactNode };\n  /** the parent-company line, in the accent colour */\n  parent?: string;\n  /** the legal note (registration, copyright) */\n  legal?: string;\n  /** legal links under the note */\n  legalLinks?: ReckonerV2FooterLink[];\n  className?: string;\n}\n\nconst link =\n  \"underline-offset-2 transition-colors duration-500 ease-[ease] hover:text-glow hover:underline motion-reduce:transition-none\";\n\nexport function ReckonerV2Footer({\n  brand,\n  logo,\n  homeHref = \"/\",\n  statement,\n  subscribe,\n  sitemap,\n  contacts = [],\n  social,\n  parent,\n  legal,\n  legalLinks = [],\n  className,\n}: ReckonerV2FooterProps) {\n  return (\n    <footer className={cn(\"border-t border-border bg-background text-sm text-foreground\", className)}>\n      {/* Phones: one column, ordered with `order-*` (the two halves use display: contents).\n          Desktop: two halves split by a hairline. */}\n      <div className=\"mx-auto flex max-w-page flex-col px-gutter pt-10 pb-12 lg:grid lg:grid-cols-2 lg:px-0 lg:py-0\">\n        {/* left half */}\n        <div className=\"contents lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-border lg:pt-[3.75rem] lg:pr-10 lg:pb-[3.75rem] lg:pl-gutter\">\n          <a href={homeHref} aria-label={brand} className=\"order-1 lg:order-none flex w-fit\">\n            {logo}\n          </a>\n          <div className=\"contents lg:mt-24 lg:flex lg:items-end lg:justify-between lg:gap-10\">\n            <div className=\"order-7 lg:order-none mt-[4.5rem] lg:mt-0 lg:max-w-[22rem]\">\n              {parent && <p className=\"text-glow\">{parent}</p>}\n              {legal && <p className=\"mt-3 leading-[1.45]\">{legal}</p>}\n              {legalLinks.length > 0 && (\n                <ul className=\"mt-10 flex flex-wrap gap-x-9 gap-y-6 lg:mt-12\">\n                  {legalLinks.map((l) => (\n                    <li key={l.href}>\n                      <a href={l.href} className={link}>\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              )}\n            </div>\n            <ul className=\"order-3 lg:order-none mt-11 space-y-2.5 lg:mt-0 lg:space-y-0 lg:leading-[1.375rem]\">\n              {sitemap.map((l) => (\n                <li key={l.href}>\n                  <a href={l.href} className={link}>\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n\n        {/* right half */}\n        <div className=\"contents lg:flex lg:flex-col lg:pt-[3.75rem] lg:pr-gutter lg:pb-[3.75rem] lg:pl-10\">\n          <p className=\"order-2 lg:order-none mt-24 max-w-[23rem] font-display text-[2rem] leading-[1.1] tracking-[-0.02em] lg:mt-0\">{statement}</p>\n\n          {subscribe && (\n            <form action={subscribe.action} method=\"post\" className=\"order-4 lg:order-none mt-10 lg:mt-[8.125rem]\">\n              <div className=\"flex items-stretch\">\n                <label className=\"flex flex-1 border-b border-border\">\n                  <span className=\"sr-only\">{subscribe.label}</span>\n                  <input\n                    type=\"email\"\n                    name=\"email\"\n                    required\n                    placeholder={subscribe.placeholder}\n                    className=\"w-full min-w-0 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground\"\n                  />\n                </label>\n                <ReckonerV2Button type=\"submit\" size=\"lg\">\n                  {subscribe.button}\n                </ReckonerV2Button>\n              </div>\n              {subscribe.consent && <p className=\"mt-5 max-w-[20rem] text-xs leading-[1.4]\">{subscribe.consent}</p>}\n            </form>\n          )}\n\n          <div className=\"contents lg:mt-auto lg:grid lg:grid-cols-2 lg:items-end lg:gap-10 lg:pt-24\">\n            {social && (\n              <a href={social.href} className={cn(\"order-6 lg:order-none mt-11 flex w-fit items-center gap-1.5 lg:mt-0\", link)}>\n                {social.icon && (\n                  <span aria-hidden className=\"grid size-[1.375rem] place-items-center rounded-lg bg-foreground text-background [&_svg]:size-3.5\">\n                    {social.icon}\n                  </span>\n                )}\n                {social.label}\n                <ArrowUpRight aria-hidden className=\"size-3.5\" strokeWidth={2} />\n              </a>\n            )}\n            {contacts.length > 0 && (\n              <div className=\"order-5 lg:order-none mt-[4.25rem] space-y-10 lg:mt-0\">\n                {contacts.map((group) => (\n                  <div key={group.label}>\n                    <p className=\"text-muted-foreground\">{group.label}</p>\n                    <ul className=\"mt-2 space-y-2\">\n                      {group.links.map((l) => (\n                        <li key={l.href}>\n                          <a href={l.href} className={link}>\n                            {l.label}\n                          </a>\n                        </li>\n                      ))}\n                    </ul>\n                  </div>\n                ))}\n              </div>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-v2-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the logo (e.g. reckoner-v2-wordmark)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the statement at the top of the right half"
+    },
+    {
+      "name": "subscribe",
+      "type": "{ label: string; placeholder: string; button: string; consent?: string; action?: string; } | undefined",
+      "required": false,
+      "description": "the sign-up row"
+    },
+    {
+      "name": "sitemap",
+      "type": "ReckonerV2FooterLink[]",
+      "required": true,
+      "description": "the short sitemap"
+    },
+    {
+      "name": "contacts",
+      "type": "{ label: string; links: ReckonerV2FooterLink[]; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "contact groups: a grey label over a few links (email, phone)"
+    },
+    {
+      "name": "social",
+      "type": "(ReckonerV2FooterLink & { icon?: ReactNode; })",
+      "required": false,
+      "description": "a social profile link, with a small icon"
+    },
+    {
+      "name": "parent",
+      "type": "string",
+      "required": false,
+      "description": "the parent-company line, in the accent colour"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": false,
+      "description": "the legal note (registration, copyright)"
+    },
+    {
+      "name": "legalLinks",
+      "type": "ReckonerV2FooterLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "legal links under the note"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eba6540d94302922bdbff24a2294f66fb1529df3d2191d7763d77900a2236619"
+}

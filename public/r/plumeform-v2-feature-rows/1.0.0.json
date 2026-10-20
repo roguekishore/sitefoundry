@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform feature rows (v2)",
+  "description": "Airy alternating rows on paper: an eyebrow, a heavy two-line heading and a slate paragraph (optionally bullets with teal dots) beside a near-white glass panel floating in pastel fog. Rows sit far apart and swap sides; on phones the text comes first and the panel follows, slightly inset. An optional centred line and underlined link opens the section. Text and panels fade, rise and un-blur into view; the fog drifts with the scroll.",
+  "category": "features",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "alternating",
+    "split",
+    "glass",
+    "pastel",
+    "fog",
+    "reveal",
+    "parallax",
+    "light",
+    "airy"
+  ],
+  "notes": [
+    "each row's panel takes any node (a demo, a screenshot, a form); empty, it is a placeholder of panelHeight",
+    "the first row puts its text on the left; set startWith=\"panel\" to flip the order"
+  ],
+  "entry": "plumeform-v2-feature-rows.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-feature-rows",
+  "files": [
+    {
+      "path": "plumeform-v2-feature-rows.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Panel } from \"@foundry/plumeform-v2-panel\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2FeatureRow {\n  /** small capitals above the heading */\n  eyebrow?: string;\n  title: ReactNode;\n  /** one or more paragraphs */\n  body: ReactNode;\n  /** a short list under the body: a bold lead-in and its explanation */\n  bullets?: { title: string; text: string }[];\n  /** a link under the text */\n  link?: { label: string; href: string };\n  /** what the glass panel holds; empty shows a placeholder */\n  panel?: ReactNode;\n  /** height of the empty panel placeholder (CSS length) */\n  panelHeight?: string;\n  /** colours of the fog around the panel */\n  fog?: \"cool\" | \"warm\" | \"mint\";\n}\n\nexport interface PlumeformV2FeatureRowsProps {\n  /** a centred line above the rows */\n  intro?: string;\n  /** an underlined link under the intro line */\n  introLink?: { label: string; href: string };\n  rows: PlumeformV2FeatureRow[];\n  /** whether the first row starts with its text or its panel on the left */\n  startWith?: \"text\" | \"panel\";\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2FeatureRows({ intro, introLink, rows, startWith = \"text\", id, className }: PlumeformV2FeatureRowsProps) {\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background px-gutter pt-20 pb-[calc(var(--section-y)*0.9)] text-foreground lg:pt-[5.25rem]\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        {intro && (\n          <PlumeformV2Reveal className=\"mb-[9.5rem] text-center lg:mb-[13.5rem]\">\n            <p className=\"text-sm leading-relaxed text-muted-foreground\">{intro}</p>\n            {introLink && (\n              <PlumeformV2Button variant=\"link\" href={introLink.href} arrow className=\"mt-5\">\n                {introLink.label}\n              </PlumeformV2Button>\n            )}\n          </PlumeformV2Reveal>\n        )}\n        <div className={cn(\"grid gap-y-40 lg:gap-y-60\", !intro && \"pt-[calc(var(--section-y)*0.4)]\")}>\n          {rows.map((row, i) => {\n            const panelFirst = (i % 2 === 1) !== (startWith === \"panel\");\n            return (\n              <div key={i} className=\"grid items-start gap-y-16 lg:grid-cols-2 lg:gap-x-24\">\n                <div className={cn(\"max-w-md\", panelFirst && \"lg:order-2 lg:pl-[3.25rem]\")}>\n                  <PlumeformV2Heading eyebrow={row.eyebrow} title={row.title} body={row.body} />\n                  {row.bullets && (\n                    <PlumeformV2Reveal as=\"ul\" step={1} className=\"mt-10 space-y-3.5 text-sm leading-relaxed text-muted-foreground\">\n                      {row.bullets.map((b) => (\n                        <li key={b.title} className=\"relative pl-4\">\n                          <span aria-hidden className=\"absolute top-[0.55em] left-0 size-1 rounded-full bg-primary\" />\n                          <strong className=\"font-semibold text-foreground\">{b.title}</strong> — {b.text}\n                        </li>\n                      ))}\n                    </PlumeformV2Reveal>\n                  )}\n                  {row.link && (\n                    <PlumeformV2Reveal step={1} className=\"mt-8\">\n                      <PlumeformV2Button variant=\"link\" href={row.link.href} arrow>\n                        {row.link.label}\n                      </PlumeformV2Button>\n                    </PlumeformV2Reveal>\n                  )}\n                </div>\n                <PlumeformV2Reveal step={1} className={cn(\"mx-5 sm:mx-0 lg:pt-6\", panelFirst && \"lg:order-1\")}>\n                  <PlumeformV2Panel className=\"mx-auto w-full max-w-[28rem]\" placeholderHeight={row.panelHeight} fog={row.fog}>\n                    {row.panel}\n                  </PlumeformV2Panel>\n                </PlumeformV2Reveal>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button",
+    "plumeform-v2-heading",
+    "plumeform-v2-panel",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "a centred line above the rows"
+    },
+    {
+      "name": "introLink",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an underlined link under the intro line"
+    },
+    {
+      "name": "rows",
+      "type": "PlumeformV2FeatureRow[]",
+      "required": true
+    },
+    {
+      "name": "startWith",
+      "type": "enum",
+      "required": false,
+      "default": "text",
+      "description": "whether the first row starts with its text or its panel on the left"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0932285966c6d136e4a32ddba361311b0e013822a11c2fe14dacbe32e5f8c0e2"
+}

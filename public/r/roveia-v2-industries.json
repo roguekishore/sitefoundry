@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia sector list (v2)",
+  "description": "A quiet 32px label over a numbered list of very large (80px) sector names in regular weight, each with a tiny index; names turn brand blue on hover. On phones the sectors become dark cards with a blue glow from the top-left, an illustration slot, a paragraph and a row of client wordmarks. Rows fade and rise in as they enter.",
+  "category": "features",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "typography",
+    "large-type",
+    "light",
+    "dark-cards",
+    "hover",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "the phone cards wrap themselves in .dark, so they stay dark in a light theme",
+    "descriptions, clients and media only show on the phone cards, like the original"
+  ],
+  "entry": "roveia-v2-industries.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-industries",
+  "files": [
+    {
+      "path": "roveia-v2-industries.css",
+      "content": "/* The label fades in as it scrolls up; the rows (desktop) and cards (phones) fade and rise in\n   one after another as they enter the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-industries-fade {\n      animation: roveia-v2-industries-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 40%;\n    }\n    .roveia-v2-industries-rise {\n      animation: roveia-v2-industries-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 10% cover 30%;\n    }\n  }\n}\n@keyframes roveia-v2-industries-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes roveia-v2-industries-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-industries.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-industries.css\";\n\nexport interface RoveiaV2Industry {\n  /** the sector's name, set very large on desktop */\n  title: string;\n  /** where the row links */\n  href?: string;\n  /** the paragraph on the phone card */\n  description?: string;\n  /** client wordmarks along the bottom of the phone card (text or small logos) */\n  clients?: ReactNode[];\n  /** the illustration on the phone card; a placeholder tile shows when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaV2IndustriesProps {\n  /** the small label above the list */\n  heading: string;\n  /** the sectors, numbered 01, 02, … */\n  items: RoveiaV2Industry[];\n  className?: string;\n}\n\nexport function RoveiaV2Industries({ heading, items, className }: RoveiaV2IndustriesProps) {\n  return (\n    <section className={cn(\"bg-background pt-14 pb-10 text-foreground lg:pt-[7.5rem] lg:pb-32\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RoveiaV2Heading size=\"label\" className=\"roveia-v2-industries-fade lg:pl-8\">\n          {heading}\n        </RoveiaV2Heading>\n\n        {/* desktop: a numbered list of very large names that turn blue on hover */}\n        <ul className=\"mt-[5.5rem] hidden lg:block\">\n          {items.map((item, i) => (\n            <li key={item.title} className=\"roveia-v2-industries-rise\">\n              <a href={item.href ?? \"#\"} className=\"group inline-flex items-baseline gap-4 text-foreground transition-colors duration-300 hover:text-primary motion-reduce:transition-none\">\n                <span className=\"w-4 text-base tabular-nums\">{String(i + 1).padStart(2, \"0\")}</span>\n                <span className=\"text-[5rem] leading-[1.2] font-normal tracking-[-0.025em]\">{item.title}</span>\n              </a>\n            </li>\n          ))}\n        </ul>\n\n        {/* phones: dark cards with a blue glow from the top-left */}\n        <ul className=\"mt-14 space-y-4 lg:hidden\">\n          {items.map((item, i) => (\n            <li key={item.title} className=\"roveia-v2-industries-rise dark\">\n              <a\n                href={item.href ?? \"#\"}\n                className=\"block rounded-lg bg-background bg-[linear-gradient(165deg,color-mix(in_oklab,var(--primary)_30%,transparent),transparent_69%)] px-6 pt-6 pb-6 text-foreground\"\n              >\n                <div className=\"size-[10.3rem] overflow-clip rounded-lg [&>*]:size-full [&>*]:object-contain\">\n                  {item.media ?? <div className=\"size-full bg-glow/10\" />}\n                </div>\n                <p className=\"mt-6 text-[2rem] leading-[1.2] font-light tracking-[-0.03em]\">\n                  {String(i + 1).padStart(2, \"0\")} · {item.title}\n                </p>\n                {item.description && <p className=\"mt-6 text-base leading-6 tracking-[-0.03em] text-muted-foreground\">{item.description}</p>}\n                {item.clients && item.clients.length > 0 && (\n                  <ul className=\"mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-lg text-foreground/90\">\n                    {item.clients.map((c, k) => (\n                      <li key={k}>{c}</li>\n                    ))}\n                  </ul>\n                )}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the small label above the list"
+    },
+    {
+      "name": "items",
+      "type": "RoveiaV2Industry[]",
+      "required": true,
+      "description": "the sectors, numbered 01, 02, …"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "28ec175c7801d1c936494157bd21aa3f86e2b05afa574525d260bf27cae3c6dc"
+}

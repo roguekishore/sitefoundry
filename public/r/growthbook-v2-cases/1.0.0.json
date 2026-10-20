@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook case studies (v2)",
+  "description": "A pale lavender band framed by hairline rails: a big heading with a gradient rail accent, an outline button on the right, and a row of deep ink-violet story cards (wordmark, one-line story, a big result, a mono read link) that slides sideways as you scroll down the page. Each wordmark sharpens from a blur as it enters.",
+  "category": "testimonials",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "case-studies",
+    "cards",
+    "stats",
+    "carousel",
+    "scroll",
+    "scrubbed",
+    "blur",
+    "lavender",
+    "dark-cards",
+    "rail"
+  ],
+  "notes": [
+    "CSS only: the sideways slide follows the page scroll; without scroll timelines or with reduced motion the row is a plain swipe row",
+    "the cards always use the theme's dark colours (dark class)"
+  ],
+  "entry": "growthbook-v2-cases.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-cases",
+  "files": [
+    {
+      "path": "growthbook-v2-cases.css",
+      "content": "/* Fallback: a swipeable row. With scroll timelines: the track slides by its overflow while the\n   section crosses the window, and a little bar under it shows how far (phones only). */\n.growthbook-v2-cases-viewport {\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n  scrollbar-width: thin;\n}\n.growthbook-v2-cases-viewport > ul > li {\n  scroll-snap-align: start;\n}\n@supports not (animation-timeline: view()) {\n  .growthbook-v2-cases-progress { display: none; }\n}\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-v2-cases-progress { display: none; }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .growthbook-v2-cases-viewport {\n      overflow-x: clip;\n      overflow-y: visible;\n    }\n    .growthbook-v2-cases-track {\n      animation: growthbook-v2-cases-slide linear both;\n      animation-timeline: --growthbook-v2-cases;\n      animation-range: cover 15% cover 85%;\n    }\n    .growthbook-v2-cases-thumb {\n      animation: growthbook-v2-cases-thumb linear both;\n      animation-timeline: --growthbook-v2-cases;\n      animation-range: cover 15% cover 85%;\n    }\n    .growthbook-v2-cases-logo {\n      animation: growthbook-v2-cases-sharpen linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes growthbook-v2-cases-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(min(0px, calc(100cqw - 100%))); }\n}\n@keyframes growthbook-v2-cases-thumb {\n  from { transform: translateX(0); }\n  to { transform: translateX(calc(100cqw - 100%)); }\n}\n@keyframes growthbook-v2-cases-sharpen {\n  from { filter: blur(6px); opacity: 0.4; }\n  to { filter: blur(0); opacity: 1; }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-cases.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\nimport \"./growthbook-v2-cases.css\";\n\nexport interface GrowthbookV2Case {\n  /** the customer's wordmark, about 32px tall */\n  logo: ReactNode;\n  /** the customer's name, for screen readers */\n  name: string;\n  /** one sentence: what they did */\n  story: string;\n  /** the big result, e.g. \"+18%\" */\n  stat: string;\n  /** what the result measures */\n  statLabel: string;\n  /** the mono link at the bottom */\n  link: { label: string; href: string };\n}\n\nexport interface GrowthbookV2CasesProps {\n  /** the heading; \\n for line breaks */\n  title: string;\n  /** the outline button beside the heading */\n  action: { label: string; href: string };\n  /** the cards; four or more make the slide worthwhile */\n  cases: GrowthbookV2Case[];\n  className?: string;\n}\n\nexport function GrowthbookV2Cases({ title, action, cases, className }: GrowthbookV2CasesProps) {\n  return (\n    <section className={cn(\"bg-secondary text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative border-x border-border pt-12 pb-16 [timeline-scope:--growthbook-v2-cases] lg:pt-20 lg:pb-20\">\n          <div className=\"relative grid gap-10 lg:grid-cols-2 lg:gap-0\">\n            <GrowthbookV2RailAccent className=\"-left-px\" barClassName=\"h-full lg:h-full\" />\n            <GrowthbookV2Heading className=\"pl-10 lg:whitespace-pre-line\">{title}</GrowthbookV2Heading>\n            {/* the mid-page hairline, fading out below the heading row */}\n            <span aria-hidden className=\"absolute -top-20 bottom-0 left-1/2 hidden w-px bg-linear-to-b from-border to-transparent lg:block\" />\n            <div className=\"pl-10 lg:flex lg:justify-end lg:pr-10 lg:pl-0\">\n              <GrowthbookV2Button href={action.href} variant=\"outline\" arrow className=\"w-full lg:w-auto\">\n                {action.label}\n              </GrowthbookV2Button>\n            </div>\n          </div>\n\n          <div className=\"growthbook-v2-cases-viewport @container mt-12 pl-5 lg:mt-20 [view-timeline-name:--growthbook-v2-cases]\">\n            <ul className=\"growthbook-v2-cases-track dark flex w-max gap-10 pr-5\">\n              {cases.map((c) => (\n                <li\n                  key={c.name}\n                  className=\"flex w-[18.75rem] flex-col rounded-xl bg-card text-card-foreground lg:w-[25.0625rem]\"\n                >\n                  <div className=\"h-[17rem] px-6 pt-12 lg:h-[15.75rem] lg:px-9 lg:pt-12\">\n                    <span role=\"img\" aria-label={c.name} className=\"growthbook-v2-cases-logo flex h-10 items-center [&_svg]:h-8 [&_svg]:w-auto\">\n                      {c.logo}\n                    </span>\n                    <p className=\"mt-10 text-lg/[1.5]\">{c.story}</p>\n                  </div>\n                  <div className=\"border-t border-border px-6 py-6 lg:px-9\">\n                    <p className=\"text-[2.25rem]/[1.3] lg:text-[2.5rem]/[1.3]\">{c.stat}</p>\n                    <p className=\"mt-1 text-base\">{c.statLabel}</p>\n                  </div>\n                  <a\n                    href={c.link.href}\n                    className=\"flex items-center gap-3 border-t border-border px-6 py-8 font-mono text-sm transition-colors duration-250 hover:text-accent-foreground motion-reduce:transition-none lg:px-9\"\n                  >\n                    {c.link.label}\n                    <ArrowRight aria-hidden className=\"size-5\" strokeWidth={1.75} />\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n          <div aria-hidden className=\"growthbook-v2-cases-progress @container mx-5 mt-4 h-1 rounded-full bg-border lg:hidden\">\n            <div className=\"growthbook-v2-cases-thumb h-full w-1/3 rounded-full bg-foreground/30\" />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-heading",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n for line breaks"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outline button beside the heading"
+    },
+    {
+      "name": "cases",
+      "type": "GrowthbookV2Case[]",
+      "required": true,
+      "description": "the cards; four or more make the slide worthwhile"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "818b4dffba9525dce7d21f09649b3f15c05a3395740a03a1120235a2449030c9"
+}

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer card rail (v2)",
+  "description": "A full-bleed row of tall 4:5 grey product cards with soft corners, running off both edges of the page. As you scroll, the whole row drifts slowly sideways to the right.",
+  "category": "gallery",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "rail",
+    "carousel",
+    "cards",
+    "scrubbed",
+    "parallax",
+    "horizontal",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "made to follow wiemer-v2-intro directly (it has only a little top padding)",
+    "the drift is CSS scroll-driven; without support the row sits still, shifted a little left",
+    "the original's rail can also be dragged; this one only drifts"
+  ],
+  "entry": "wiemer-v2-rail.tsx",
+  "source": "foundry",
+  "name": "wiemer-v2-rail",
+  "files": [
+    {
+      "path": "wiemer-v2-rail.css",
+      "content": "/* The rail of cards sits shifted left; while it passes through the window it drifts to the\n   right, tied to the scroll (about a fifth of a pixel per pixel scrolled on desktop). */\n.wiemer-v2-rail-track {\n  transform: translateX(var(--wiemer-v2-rail-rest, -6rem));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wiemer-v2-rail-track {\n      animation: wiemer-v2-rail-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes wiemer-v2-rail-drift {\n  from { transform: translateX(var(--wiemer-v2-rail-from, -9rem)); }\n  to { transform: translateX(var(--wiemer-v2-rail-to, -3rem)); }\n}\n\n@media (min-width: 64rem) {\n  .wiemer-v2-rail-track {\n    --wiemer-v2-rail-rest: -12rem;\n    --wiemer-v2-rail-from: -26rem;\n    --wiemer-v2-rail-to: -3rem;\n  }\n}\n"
+    },
+    {
+      "path": "wiemer-v2-rail.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-v2-rail.css\";\n\nexport interface WiemerV2RailCard {\n  /** for screen readers: what the picture shows */\n  label: string;\n  /** the picture (an <img>, ideally a cut-out on a light ground); a grey card when empty */\n  media?: ReactNode;\n}\n\nexport interface WiemerV2RailProps {\n  /** the cards, left to right; give enough to run past the right edge (8 or more) */\n  cards: WiemerV2RailCard[];\n  className?: string;\n}\n\n/**\n * A full-bleed row of tall 4:5 grey cards with soft corners, running off both edges. While\n * the page scrolls, the whole row drifts slowly to the right.\n */\nexport function WiemerV2Rail({ cards, className }: WiemerV2RailProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background pt-8 pb-section\", className)}>\n      <ul className=\"wiemer-v2-rail-track flex w-max gap-3.5\">\n        {cards.map((card, i) => (\n          <li\n            key={i}\n            aria-label={card.label}\n            className=\"grid aspect-[4/5] w-[55vw] shrink-0 place-items-center overflow-clip rounded-lg bg-muted lg:w-[33vw] lg:rounded-xl [&>img]:size-full [&>img]:object-contain\"\n          >\n            {card.media}\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "cards",
+      "type": "WiemerV2RailCard[]",
+      "required": true,
+      "description": "the cards, left to right; give enough to run past the right edge (8 or more)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "458a03e10e07a23eaee23479284370d82f458bd5b19b460c8450d63db86a0706"
+}

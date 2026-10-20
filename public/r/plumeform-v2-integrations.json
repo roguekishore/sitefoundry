@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform integrations flow (v2)",
+  "description": "On paper: heading at the left, explanation and an underlined link at the right. Below, a glass panel in warm fog (a sample reply) sends dashed teal curves fanning out to a column of near-white glass cards, one per destination, each with a line icon, a bold name, an optional PLUS badge, a quiet detail at the right and a line of status text. Two rows of small grey pills (export formats, ways to share) close it. Panels and cards rise and un-blur in turn; on phones the curves give way to a plain stack.",
+  "category": "features",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "integrations",
+    "flow",
+    "diagram",
+    "dashed",
+    "glass",
+    "pastel",
+    "reveal",
+    "light"
+  ],
+  "notes": [
+    "the source panel is a slot (a live form or a screenshot), a placeholder when empty"
+  ],
+  "entry": "plumeform-v2-integrations.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-integrations",
+  "files": [
+    {
+      "path": "plumeform-v2-integrations.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Badge } from \"@foundry/plumeform-v2-badge\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Eyebrow, PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Panel } from \"@foundry/plumeform-v2-panel\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2Destination {\n  /** a line icon before the name */\n  icon?: ReactNode;\n  name: string;\n  badge?: string;\n  /** a quiet detail at the right of the card */\n  detail?: string;\n  /** a line under the name */\n  status: string;\n  /** set the status line in the mono face (e.g. an API call) */\n  mono?: boolean;\n}\n\nexport interface PlumeformV2ChipRow {\n  label: string;\n  chips: { label: string; badge?: string }[];\n}\n\nexport interface PlumeformV2IntegrationsProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body: ReactNode;\n  link?: { label: string; href: string };\n  /** what the source panel holds; empty shows a placeholder */\n  source?: ReactNode;\n  /** height of the empty source placeholder (CSS length) */\n  sourceHeight?: string;\n  destinations: PlumeformV2Destination[];\n  /** rows of small pills under the diagram */\n  chipRows?: PlumeformV2ChipRow[];\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2Integrations({\n  eyebrow,\n  title,\n  body,\n  link,\n  source,\n  sourceHeight = \"22rem\",\n  destinations,\n  chipRows,\n  id,\n  className,\n}: PlumeformV2IntegrationsProps) {\n  const n = destinations.length;\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background px-gutter py-[calc(var(--section-y)*0.8)] text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <div className=\"grid gap-8 lg:grid-cols-2 lg:items-end lg:gap-x-16\">\n          <PlumeformV2Heading eyebrow={eyebrow} title={title} className=\"max-w-xl\" />\n          <PlumeformV2Reveal step={1} className=\"max-w-md text-base leading-[1.65] text-muted-foreground lg:text-[1.0625rem]\">\n            <div>{body}</div>\n            {link && (\n              <PlumeformV2Button variant=\"link\" href={link.href} arrow className=\"mt-8\">\n                {link.label}\n              </PlumeformV2Button>\n            )}\n          </PlumeformV2Reveal>\n        </div>\n\n        <div className=\"mt-20 grid items-center gap-6 lg:mt-24 lg:grid-cols-[18.5rem_1fr_23.75rem] lg:gap-0 lg:px-8\">\n          <PlumeformV2Reveal className=\"mx-5 sm:mx-0\">\n            <PlumeformV2Panel fog=\"warm\" placeholderHeight={sourceHeight}>\n              {source}\n            </PlumeformV2Panel>\n          </PlumeformV2Reveal>\n\n          {/* dashed curves from the panel to each card (desktop only) */}\n          <div aria-hidden className=\"relative hidden h-full text-primary/45 lg:block\">\n            <span className=\"absolute top-1/2 left-0 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary\" />\n            <svg viewBox=\"0 0 100 100\" preserveAspectRatio=\"none\" className=\"absolute inset-0 size-full\">\n              {destinations.map((_, i) => {\n                const y = ((i + 0.5) / n) * 100;\n                return (\n                  <path\n                    key={i}\n                    d={`M0 50 C 45 50, 55 ${y}, 100 ${y}`}\n                    fill=\"none\"\n                    stroke=\"currentColor\"\n                    strokeWidth=\"1.25\"\n                    strokeDasharray=\"3 4\"\n                    vectorEffect=\"non-scaling-stroke\"\n                  />\n                );\n              })}\n            </svg>\n          </div>\n\n          <ul className=\"grid gap-3.5\">\n            {destinations.map((d, i) => (\n              <PlumeformV2Reveal\n                as=\"li\"\n                key={d.name}\n                step={i}\n                className=\"min-h-[7.25rem] rounded-lg border border-card/70 bg-card/75 px-4 py-3.5 shadow-[inset_1px_1px_0_color-mix(in_oklab,var(--card)_85%,transparent),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)] backdrop-blur-xl\"\n              >\n                <div className=\"flex items-center gap-2.5 [&_svg]:size-4 [&_svg]:text-muted-foreground\">\n                  {d.icon}\n                  <span className=\"text-[0.9375rem] font-bold\">{d.name}</span>\n                  {d.badge && <PlumeformV2Badge>{d.badge}</PlumeformV2Badge>}\n                  {d.detail && <span className=\"ml-auto text-[0.6875rem] text-muted-foreground\">{d.detail}</span>}\n                </div>\n                <p className={cn(\"mt-3 text-xs text-muted-foreground\", d.mono && \"font-mono text-[0.6875rem] text-foreground\")}>{d.status}</p>\n              </PlumeformV2Reveal>\n            ))}\n          </ul>\n        </div>\n\n        {chipRows && (\n          <PlumeformV2Reveal className=\"mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-5\">\n            {chipRows.map((row) => (\n              <div key={row.label} className=\"flex flex-wrap items-center gap-2\">\n                <PlumeformV2Eyebrow className=\"mr-2 text-[0.625rem] font-bold tracking-[0.2em]\">{row.label}</PlumeformV2Eyebrow>\n                {row.chips.map((c) => (\n                  <span key={c.label} className=\"flex h-7 items-center gap-2 rounded-full bg-muted px-3 text-xs text-foreground/80\">\n                    {c.label}\n                    {c.badge && <PlumeformV2Badge>{c.badge}</PlumeformV2Badge>}\n                  </span>\n                ))}\n              </div>\n            ))}\n          </PlumeformV2Reveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-badge",
+    "plumeform-v2-button",
+    "plumeform-v2-heading",
+    "plumeform-v2-panel",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "source",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what the source panel holds; empty shows a placeholder"
+    },
+    {
+      "name": "sourceHeight",
+      "type": "string",
+      "required": false,
+      "default": "22rem",
+      "description": "height of the empty source placeholder (CSS length)"
+    },
+    {
+      "name": "destinations",
+      "type": "PlumeformV2Destination[]",
+      "required": true
+    },
+    {
+      "name": "chipRows",
+      "type": "PlumeformV2ChipRow[]",
+      "required": false,
+      "description": "rows of small pills under the diagram"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8abd32732d22ed8c27345f7bd289e217fab8298122faf990367497899622ffc0"
+}

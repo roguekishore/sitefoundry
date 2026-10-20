@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher overview slider (v2)",
+  "description": "On a bronze-tan band: a big four-line tagline whose lines rise in one after another, then a wide 5px-cornered picture card with a title at the top left and tabs along the bottom: the active one is an open yellow card (number, caps title, short text, read-more link), the others narrow cream-glass tiles. Clicking a tab crossfades the picture; the picture drifts inside its frame as you scroll.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "slider",
+    "tabs",
+    "tan",
+    "yellow",
+    "glass",
+    "text-reveal",
+    "parallax",
+    "card"
+  ],
+  "notes": [
+    "the band is the secondary colour; the card forces dark so its glass tabs read",
+    "one media slot per slide (picture or video), cropped like cover",
+    "needs JavaScript to switch slides (hydrate: visible); without it the first slide shows"
+  ],
+  "entry": "hhhusher-v2-overview.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-v2-overview",
+  "files": [
+    {
+      "path": "hhhusher-v2-overview.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button, hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\nimport { HhhusherV2RevealText, hhhusherV2Reveal, hhhusherV2RevealStyle } from \"@foundry/hhhusher-v2-reveal\";\n\nexport interface HhhusherV2Slide {\n  /** shown on the tab, in caps (e.g. \"Studio\") */\n  tab: string;\n  /** the big title at the card's top left */\n  title: string;\n  /** the line under the title */\n  subtitle?: string;\n  /** the open tab's paragraph */\n  text: string;\n  /** the open tab's read-more link */\n  link?: { label: string; href: string };\n  /** the slide's picture or video, cropped like cover; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface HhhusherV2OverviewProps {\n  /** the big tagline above the card; its lines rise in one by one */\n  tagline: string;\n  /** two or three slides; the first starts open */\n  slides: HhhusherV2Slide[];\n  id?: string;\n  className?: string;\n}\n\nconst pad = (n: number) => String(n + 1).padStart(2, \"0\");\n\nexport function HhhusherV2Overview({ tagline, slides, id, className }: HhhusherV2OverviewProps) {\n  const [active, setActive] = useState(0);\n  const current = slides[active] ?? slides[0];\n\n  return (\n    <section id={id} className={cn(\"bg-secondary pt-section text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <HhhusherV2RevealText\n          as=\"h2\"\n          text={tagline}\n          className=\"max-w-[82rem] font-display text-[2.08rem] leading-[1.05] font-[570] tracking-[-0.02em] lg:text-[3.5625rem] lg:leading-[1.05]\"\n        />\n\n        <div className=\"dark relative isolate mt-16 flex h-[43.4rem] flex-col justify-between overflow-clip rounded-lg bg-card p-5 text-foreground lg:mt-[7.5rem] lg:h-[45rem] lg:p-10\">\n          {/* slides: stacked, the open one on top; each drifts inside the frame */}\n          {slides.map((slide, i) => (\n            <div\n              key={slide.tab}\n              aria-hidden={i !== active}\n              className={cn(\"absolute inset-0 -z-10 transition-opacity duration-700 ease-[cubic-bezier(0.32,0.94,0.6,1)] motion-reduce:transition-none\", i === active ? \"opacity-100\" : \"opacity-0\")}\n            >\n              <div className={cn(hhhusherV2Reveal(\"drift\"), \"absolute -inset-y-[4.5rem] inset-x-0 [&>*]:size-full [&>*]:object-cover\")}>\n                {slide.media ?? <div className=\"size-full bg-muted\" />}\n              </div>\n            </div>\n          ))}\n\n          <div>\n            <h3 className=\"font-display text-[1.56rem] leading-[1.1] font-[570] tracking-[-0.02em] lg:text-[1.8rem]\">{current.title}</h3>\n            {current.subtitle && <p className=\"mt-3 font-display text-[1.04rem] leading-[1.3] font-[570] lg:mt-4 lg:text-base\">{current.subtitle}</p>}\n          </div>\n\n          {/* tabs: the open one a yellow card, the rest narrow glass tiles */}\n          <div className={cn(hhhusherV2Reveal(\"fade\"), \"flex flex-col gap-2.5 lg:flex-row lg:items-stretch\")} role=\"tablist\">\n            {slides.map((slide, i) =>\n              i === active ? (\n                <div\n                  key={slide.tab}\n                  role=\"tab\"\n                  aria-selected\n                  className=\"flex min-h-[11rem] rounded-lg bg-primary p-2 pr-5 text-primary-foreground lg:min-h-[9.5rem] lg:w-[35rem] lg:p-6 lg:pr-24\"\n                >\n                  <div className=\"flex flex-col lg:flex-row\">\n                    <span className=\"font-mono text-[0.75rem] font-bold lg:w-[3.75rem] lg:shrink-0 lg:pt-0.5\">{pad(i)}</span>\n                    <div className=\"mt-1 pl-4 lg:mt-0 lg:pl-0\">\n                      <p className=\"font-mono text-[0.85rem] font-bold uppercase lg:text-[0.875rem]\">{slide.tab}</p>\n                      <p className=\"mt-4 text-[0.78rem] leading-[1.3] font-[570] lg:mt-3.5 lg:text-[0.875rem] lg:leading-[1.15]\">{slide.text}</p>\n                      {slide.link && (\n                        <HhhusherV2Button variant=\"link\" href={slide.link.href} className=\"mt-4 lg:mt-3\">\n                          {slide.link.label}\n                        </HhhusherV2Button>\n                      )}\n                    </div>\n                  </div>\n                </div>\n              ) : (\n                <button\n                  key={slide.tab}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={false}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"flex h-[4.5rem] items-center justify-between rounded-lg border-2 border-transparent bg-foreground/15 px-5 font-mono text-[0.75rem] font-bold uppercase backdrop-blur-md transition-[background-color,border-color] hover:border-foreground hover:bg-transparent\",\n                    \"lg:h-auto lg:w-[8.75rem] lg:flex-col lg:items-start lg:p-6\",\n                    hhhusherV2Ease,\n                  )}\n                >\n                  <span>{pad(i)}</span>\n                  <span>{slide.tab}</span>\n                </button>\n              ),\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "the big tagline above the card; its lines rise in one by one"
+    },
+    {
+      "name": "slides",
+      "type": "HhhusherV2Slide[]",
+      "required": true,
+      "description": "two or three slides; the first starts open"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aa7c267fb365c0c65ba19ccbfafe6107e39d885ea99631652d40f9dfe863386a"
+}

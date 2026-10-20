@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething chat window (v2)",
+  "description": "A big white browser-style window (a paper title bar with three dots, the first in lime) holding a chat thread: ink bubbles from the assistant on the right and baby-pink bubbles from the customer on the left, each beside a round avatar with a white ring. Messages fade in and rise 12px one by one as they scroll into view.",
+  "category": "features",
+  "site": "typesomething-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chat",
+    "conversation",
+    "demo",
+    "window",
+    "bubbles",
+    "pink",
+    "dark-bubbles",
+    "reveal",
+    "scroll-driven",
+    "stagger"
+  ],
+  "notes": [
+    "avatars are media slots: pass an img or leave them empty for placeholder circles",
+    "joined drops the top padding so it sits right under the section before it (as on the page)",
+    "the reveal is a CSS view timeline; without it, or with reduced motion, every message just shows"
+  ],
+  "entry": "typesomething-v2-chat.tsx",
+  "source": "foundry",
+  "name": "typesomething-v2-chat",
+  "files": [
+    {
+      "path": "typesomething-v2-chat.css",
+      "content": "/* Each message fades in and rises 12px as it enters the window: one by one, because each\n   follows its own view timeline. Content shows in place without scroll timelines. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .typesomething-v2-chat-message {\n      animation: typesomething-v2-chat-in linear both;\n      animation-timeline: view();\n      animation-range: entry 10% entry 80%;\n    }\n  }\n}\n\n@keyframes typesomething-v2-chat-in {\n  from { opacity: 0; transform: translateY(12px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "typesomething-v2-chat.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./typesomething-v2-chat.css\";\n\nexport interface TypesomethingV2ChatMessage {\n  /** assistant: ink bubble on the right · user: pink bubble on the left */\n  from: \"assistant\" | \"user\";\n  /** one entry per paragraph */\n  paragraphs: ReactNode[];\n  /** a bold lime link at the end of the bubble */\n  link?: { label: string; href: string };\n}\n\nexport interface TypesomethingV2ChatProps {\n  messages: TypesomethingV2ChatMessage[];\n  /** the assistant's avatar (media slot, 40px circle); empty shows a placeholder */\n  assistantAvatar?: ReactNode;\n  /** the customer's avatar (media slot, 40px circle); empty shows a placeholder */\n  userAvatar?: ReactNode;\n  /** no top padding: sits directly under the section above */\n  joined?: boolean;\n  className?: string;\n}\n\nfunction Avatar({ media, tone }: { media?: ReactNode; tone: \"assistant\" | \"user\" }) {\n  return (\n    <span\n      className={cn(\n        \"size-10 shrink-0 overflow-clip rounded-full border-2 border-card shadow-[0_4px_13px_color-mix(in_oklab,var(--foreground)_14%,transparent)] [&>img]:size-full [&>img]:object-cover\",\n        !media && (tone === \"assistant\" ? \"bg-secondary\" : \"bg-linear-to-br from-highlight to-muted\"),\n      )}\n    >\n      {media}\n    </span>\n  );\n}\n\nexport function TypesomethingV2Chat({ messages, assistantAvatar, userAvatar, joined, className }: TypesomethingV2ChatProps) {\n  return (\n    <section className={cn(\"bg-muted pb-section text-foreground lg:pb-[calc(var(--section-y)*1.75)]\", joined ? \"pt-0\" : \"pt-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"overflow-clip rounded-lg border border-border bg-card shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n          <div aria-hidden className=\"flex h-9 items-center gap-1.5 border-b border-border bg-muted px-4\">\n            <span className=\"size-2.5 rounded-full bg-primary\" />\n            <span className=\"size-2.5 rounded-full bg-foreground/20\" />\n            <span className=\"size-2.5 rounded-full bg-foreground/20\" />\n          </div>\n          <ol className=\"flex flex-col gap-4 p-4 lg:p-10\">\n            {messages.map((message, i) => {\n              const mine = message.from === \"assistant\";\n              return (\n                <li key={i} className={cn(\"typesomething-v2-chat-message flex items-start gap-3\", mine ? \"flex-row-reverse\" : \"flex-row\")}>\n                  <Avatar media={mine ? assistantAvatar : userAvatar} tone={message.from} />\n                  <div\n                    className={cn(\n                      \"min-w-0 flex-1 space-y-2.5 px-4 py-3.5 text-[0.92rem] leading-[1.55] lg:max-w-[46rem] lg:text-[0.96rem]\",\n                      mine\n                        ? \"dark rounded-[var(--radius)_var(--radius)_calc(var(--radius)*0.2)_var(--radius)] bg-background text-foreground\"\n                        : \"rounded-[var(--radius)_var(--radius)_var(--radius)_calc(var(--radius)*0.2)] bg-highlight text-highlight-foreground\",\n                    )}\n                  >\n                    {message.paragraphs.map((paragraph, j) => (\n                      <p key={j}>{paragraph}</p>\n                    ))}\n                    {message.link && (\n                      <a href={message.link.href} className=\"block truncate font-bold text-primary no-underline hover:underline\">\n                        {message.link.label}\n                      </a>\n                    )}\n                  </div>\n                </li>\n              );\n            })}\n          </ol>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "messages",
+      "type": "TypesomethingV2ChatMessage[]",
+      "required": true
+    },
+    {
+      "name": "assistantAvatar",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the assistant's avatar (media slot, 40px circle); empty shows a placeholder"
+    },
+    {
+      "name": "userAvatar",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the customer's avatar (media slot, 40px circle); empty shows a placeholder"
+    },
+    {
+      "name": "joined",
+      "type": "boolean",
+      "required": false,
+      "description": "no top padding: sits directly under the section above"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ff4b6f553df5c6fdd17344fa80606dc61726aadb6640a1a4eaf4105a57c8c5c1"
+}

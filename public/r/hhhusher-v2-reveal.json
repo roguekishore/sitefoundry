@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "HHHusher reveal (v2)",
+  "description": "The site's scroll reveals in CSS: headings whose lines rise and fade in one after another as they come up the window (each word rides its own view timeline, so a line moves together), plus fade, rise and parallax-drift classes for anything else.",
+  "category": "text-effect",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "text-reveal",
+    "line-by-line",
+    "parallax",
+    "css-only",
+    "scroll-driven"
+  ],
+  "notes": [
+    "CSS scroll-driven animations: browsers without them, and reduced motion, show everything in place",
+    "put drift on a picture inside an overflow-clip frame (not overflow-hidden, which freezes the timeline)"
+  ],
+  "entry": "hhhusher-v2-reveal.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-reveal",
+  "files": [
+    {
+      "path": "hhhusher-v2-reveal.css",
+      "content": "/* Scroll-driven reveals, all CSS. Each element animates on its own trip into the window\n   (animation-timeline: view()), with the site's easing. Without support, or with reduced\n   motion, everything simply shows.\n   --hh-step (0, 1, 2 …) starts an item a little later, for staggered lists.\n   --hh-rise sets how far \"rise\" travels (default 40px); --hh-drift the parallax (72px). */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-v2-reveal-word,\n    .hhhusher-v2-reveal-fade,\n    .hhhusher-v2-reveal-rise {\n      animation-timing-function: cubic-bezier(0.32, 0.94, 0.6, 1);\n      animation-fill-mode: both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--hh-step, 0) * 8%) entry calc(100% + var(--hh-step, 0) * 8%);\n    }\n    /* a word: the whole line it sits on rises with it, since they share a position */\n    .hhhusher-v2-reveal-word {\n      animation-name: hhhusher-v2-reveal-rise;\n      --hh-rise: 0.9em;\n      animation-range: entry 10% entry 100%;\n    }\n    .hhhusher-v2-reveal-fade { animation-name: hhhusher-v2-reveal-fade; }\n    .hhhusher-v2-reveal-rise { animation-name: hhhusher-v2-reveal-rise; }\n\n    /* drift is scrubbed for the whole trip: the picture slides inside its frame */\n    .hhhusher-v2-reveal-drift {\n      animation: hhhusher-v2-reveal-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-v2-reveal-fade {\n  from { opacity: 0; }\n}\n@keyframes hhhusher-v2-reveal-rise {\n  from { opacity: 0; transform: translateY(var(--hh-rise, 40px)); }\n}\n@keyframes hhhusher-v2-reveal-drift {\n  from { transform: translateY(calc(-1 * var(--hh-drift, 72px))); }\n  to { transform: translateY(var(--hh-drift, 72px)); }\n}\n"
+    },
+    {
+      "path": "hhhusher-v2-reveal.tsx",
+      "content": "import { Fragment, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./hhhusher-v2-reveal.css\";\n\n/** fade: opacity 0→1 · rise: fade + 40px lift · drift: a ±72px parallax slide, scrubbed */\nexport type HhhusherV2RevealEffect = \"fade\" | \"rise\" | \"drift\";\n\n/** The class for an effect, to put straight on an element without a wrapper. */\nexport function hhhusherV2Reveal(effect: HhhusherV2RevealEffect) {\n  return `hhhusher-v2-reveal-${effect}`;\n}\n\n/** Inline style for a staggered item (step 0, 1, 2 …), a rise distance and/or a drift distance, in px. */\nexport function hhhusherV2RevealStyle(step = 0, rise?: number, drift?: number): CSSProperties {\n  return {\n    \"--hh-step\": step,\n    ...(rise !== undefined && { \"--hh-rise\": `${rise}px` }),\n    ...(drift !== undefined && { \"--hh-drift\": `${drift}px` }),\n  } as CSSProperties;\n}\n\nexport interface HhhusherV2RevealTextProps {\n  /** the heading or tagline; it is split into words so each line rises on its own */\n  text: string;\n  /** the element to render */\n  as?: \"h1\" | \"h2\" | \"h3\" | \"p\" | \"span\" | \"div\";\n  className?: string;\n}\n\n/**\n * Text whose lines rise and fade in as they come up the window, top line first, the way the\n * original's split-line headings do. Pure CSS; the static HTML is the plain sentence.\n */\nexport function HhhusherV2RevealText({ text, as: Tag = \"p\", className }: HhhusherV2RevealTextProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <Tag className={className}>\n      {words.map((word, i) => (\n        <Fragment key={i}>\n          {i > 0 && \" \"}\n          <span className=\"hhhusher-v2-reveal-word inline-block\">{word}</span>\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n\nexport interface HhhusherV2RevealProps {\n  /** what happens as it enters the window */\n  effect?: HhhusherV2RevealEffect;\n  /** stagger position in a list: each step starts a little later */\n  step?: number;\n  /** for rise: how far it travels, in px (default 40) */\n  rise?: number;\n  /** for drift: how far the content slides each way, in px (default 72) */\n  drift?: number;\n  /** the element to render */\n  as?: \"div\" | \"li\" | \"span\" | \"p\";\n  children?: ReactNode;\n  className?: string;\n}\n\n/** Wraps content in a CSS scroll-driven reveal. Static HTML and old browsers show it in place. */\nexport function HhhusherV2Reveal({ effect = \"fade\", step = 0, rise, drift, as: Tag = \"div\", children, className }: HhhusherV2RevealProps) {\n  return (\n    <Tag className={cn(hhhusherV2Reveal(effect), className)} style={hhhusherV2RevealStyle(step, rise, drift)}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "effect",
+      "type": "enum",
+      "required": false,
+      "default": "fade",
+      "description": "what happens as it enters the window"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position in a list: each step starts a little later"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "description": "for rise: how far it travels, in px (default 40)"
+    },
+    {
+      "name": "drift",
+      "type": "number",
+      "required": false,
+      "description": "for drift: how far the content slides each way, in px (default 72)"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8be8898677b8d805194b03443472603f0aa03af50f4d7300471c23bc12c03f76"
+}

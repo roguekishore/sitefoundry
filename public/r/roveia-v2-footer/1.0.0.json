@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia closing CTA and footer (v2)",
+  "description": "A centred 80px closing line, a grey lead and a blue pill, over soft blurred sky-blue hills that fade back to white at the foot; under it a plain wordmark, small social icons and the copyright on the left, three link columns with grey labels on the right. The call to action fades and settles in as it enters; links turn blue on hover.",
+  "category": "footer",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "cta",
+    "light",
+    "gradient",
+    "blur",
+    "sky",
+    "minimal",
+    "reveal"
+  ],
+  "notes": [
+    "the blurred hills are soft glow shapes standing in for the original's background art"
+  ],
+  "entry": "roveia-v2-footer.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-footer",
+  "files": [
+    {
+      "path": "roveia-v2-footer.css",
+      "content": "/* The call to action fades in and settles from 96% to full size as it enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-footer-cta {\n      animation: roveia-v2-footer-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 40%;\n    }\n  }\n}\n@keyframes roveia-v2-footer-in {\n  from { opacity: 0; transform: scale(0.96); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Button } from \"@foundry/roveia-v2-button\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-footer.css\";\n\nexport interface RoveiaV2FooterColumn {\n  /** the small grey label, e.g. \"Sectors:\" */\n  label: string;\n  /** the links under it */\n  links: { label: string; href: string }[];\n}\n\nexport interface RoveiaV2FooterProps {\n  /** the big closing line */\n  heading: string;\n  /** the line under it */\n  lead?: string;\n  /** the blue pill button */\n  cta?: { label: string; href: string };\n  /** the company name, set as a plain wordmark */\n  brand: string;\n  /** small social links: an icon and a name for screen readers */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the copyright line */\n  legal?: string;\n  /** link columns on the right */\n  columns: RoveiaV2FooterColumn[];\n  className?: string;\n}\n\nexport function RoveiaV2Footer({ heading, lead, cta, brand, socials = [], legal, columns, className }: RoveiaV2FooterProps) {\n  return (\n    <footer className={cn(\"relative overflow-clip bg-background text-foreground\", className)}>\n      {/* soft blurred blue hills behind everything (a placeholder for the original's art) */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-0\">\n        <div className=\"absolute inset-x-0 top-[30%] bottom-0 bg-[linear-gradient(to_bottom,transparent,color-mix(in_oklab,var(--glow)_45%,var(--background))_55%,color-mix(in_oklab,var(--glow)_25%,var(--background))_85%,var(--background))]\" />\n        <div className=\"absolute top-[28%] -left-[10%] h-[45%] w-[45%] rounded-full bg-glow/30 blur-3xl\" />\n        <div className=\"absolute top-[34%] left-[30%] h-[40%] w-[30%] rounded-full bg-glow/20 blur-3xl\" />\n        <div className=\"absolute top-[25%] -right-[8%] h-[50%] w-[40%] rounded-full bg-glow/30 blur-3xl\" />\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter\">\n        <div className=\"roveia-v2-footer-cta flex flex-col items-center pt-16 text-center lg:pt-[7rem]\">\n          <RoveiaV2Heading size=\"statement\" className=\"max-w-[22rem] lg:max-w-[52rem] lg:leading-[1.15]\">\n            {heading}\n          </RoveiaV2Heading>\n          {lead && <p className=\"mt-8 text-base text-muted-foreground lg:mt-10\">{lead}</p>}\n          {cta && (\n            <RoveiaV2Button href={cta.href} className=\"mt-12 px-6 lg:mt-10\">\n              {cta.label}\n            </RoveiaV2Button>\n          )}\n        </div>\n\n        <div className=\"pt-[7.5rem] pb-12 lg:flex lg:items-start lg:justify-between lg:pt-[13.5rem] lg:pb-11\">\n          <div>\n            <p className=\"text-[1.375rem] font-medium tracking-[0.01em]\">{brand}</p>\n            {socials.length > 0 && (\n              <ul className=\"mt-6 flex gap-6 lg:mt-7\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className=\"block text-foreground/70 transition-colors duration-300 hover:text-primary motion-reduce:transition-none [&_svg]:size-5\">\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {legal && <p className=\"mt-10 text-sm text-foreground/60 lg:mt-14\">{legal}</p>}\n          </div>\n\n          <div className=\"mt-[4.5rem] grid grid-cols-[1fr_auto_auto] gap-x-8 lg:mt-0 lg:flex lg:gap-x-[3.25rem]\">\n            {columns.map((col) => (\n              <div key={col.label}>\n                <p className=\"text-base text-foreground/40\">{col.label}</p>\n                <ul className=\"mt-6 lg:mt-7\">\n                  {col.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"text-base leading-7 transition-colors duration-300 hover:text-primary motion-reduce:transition-none\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-button",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big closing line"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the blue pill button"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a plain wordmark"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small social links: an icon and a name for screen readers"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": false,
+      "description": "the copyright line"
+    },
+    {
+      "name": "columns",
+      "type": "RoveiaV2FooterColumn[]",
+      "required": true,
+      "description": "link columns on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "671c89b6713aed4c975f3e6767e3d4953d5c9da020e9f431d5c6998e65a5783b"
+}

@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner header (v2)",
+  "description": "A transparent bar over a merlot hero: wordmark at the left, and at the right a faintly tinted group of medium 14px links with small chevrons ending in a solid linen 'contact' button. Links tint tan on hover over half a second, and their menus fade in below. On phones it is a fixed merlot bar with a square tinted menu button that opens a full-height list of large links.",
+  "category": "header",
+  "site": "reckoner-v2",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "dropdown",
+    "fixed",
+    "transparent",
+    "warm",
+    "minimal",
+    "finance"
+  ],
+  "notes": [
+    "sits on the primary surface: put it over a primary-coloured hero (reckoner-v2-hero)",
+    "fixed at the top on phones, absolute (scrolls away) from 1024px, as on the original",
+    "desktop menus open on hover or keyboard focus with CSS; the phone menu needs JavaScript"
+  ],
+  "entry": "reckoner-v2-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "reckoner-v2-header",
+  "files": [
+    {
+      "path": "reckoner-v2-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerV2Button } from \"@foundry/reckoner-v2-button\";\n\nexport interface ReckonerV2HeaderLink {\n  label: string;\n  /** where the label itself goes (optional when it only opens a menu) */\n  href?: string;\n  /** the links in its menu; a chevron shows when there are some */\n  items?: { label: string; href: string }[];\n}\n\nexport interface ReckonerV2HeaderProps {\n  /** the company name: the home link's label for screen readers */\n  brand: string;\n  /** the logo (e.g. reckoner-v2-wordmark) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** the links in the tinted group */\n  links: ReckonerV2HeaderLink[];\n  /** the solid button at the end of the group */\n  cta?: { label: string; href: string };\n  /** labels of the phone menu button, for screen readers */\n  menuLabel?: string;\n  closeLabel?: string;\n  className?: string;\n}\n\nexport function ReckonerV2Header({\n  brand,\n  logo,\n  homeHref = \"/\",\n  links,\n  cta,\n  menuLabel = \"Open menu\",\n  closeLabel = \"Close menu\",\n  className,\n}: ReckonerV2HeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-40 bg-primary text-primary-foreground lg:absolute lg:bg-transparent\", className)}>\n      <div className=\"mx-auto flex h-20 max-w-page items-center justify-between px-gutter lg:h-auto lg:pt-5\">\n        <a href={homeHref} aria-label={brand} className=\"flex items-center\">\n          {logo}\n        </a>\n\n        {/* desktop: one tinted group of links + the contact button */}\n        <nav className=\"hidden items-center bg-primary-foreground/10 p-1 lg:flex\">\n          {links.map((link) => (\n            <div key={link.label} className=\"group/item relative\">\n              <a\n                href={link.href ?? link.items?.[0]?.href ?? \"#\"}\n                className=\"flex h-[2.625rem] items-center gap-1.5 px-5 text-sm font-medium transition-colors duration-500 hover:bg-highlight/15 motion-reduce:transition-none\"\n              >\n                {link.label}\n                {link.items?.length ? <ChevronDown aria-hidden className=\"size-3 opacity-50\" strokeWidth={2} /> : null}\n              </a>\n              {link.items?.length ? (\n                <div\n                  className={cn(\n                    \"invisible absolute top-full left-0 min-w-56 pt-2 opacity-0 transition-[opacity,visibility] duration-150 ease-[ease]\",\n                    \"group-hover/item:visible group-hover/item:opacity-100 group-focus-within/item:visible group-focus-within/item:opacity-100 motion-reduce:transition-none\",\n                  )}\n                >\n                  <ul className=\"border border-primary-foreground/10 bg-primary p-1\">\n                    {link.items.map((item) => (\n                      <li key={item.href}>\n                        <a href={item.href} className=\"block px-4 py-3 text-sm transition-colors duration-500 hover:bg-highlight/15 motion-reduce:transition-none\">\n                          {item.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ) : null}\n            </div>\n          ))}\n          {cta && (\n            <ReckonerV2Button href={cta.href} variant=\"light\" size=\"sm\" className=\"ml-1\">\n              {cta.label}\n            </ReckonerV2Button>\n          )}\n        </nav>\n\n        {/* phones: a square tinted menu button */}\n        <button\n          type=\"button\"\n          aria-label={open ? closeLabel : menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((o) => !o)}\n          className=\"grid size-10 place-items-center bg-primary-foreground/10 transition-colors duration-500 hover:bg-highlight/15 lg:hidden\"\n        >\n          {open ? <X className=\"size-5\" strokeWidth={1.25} /> : <Menu className=\"size-5\" strokeWidth={1.25} />}\n        </button>\n      </div>\n\n      {open && (\n        <nav className=\"h-[calc(100svh-5rem)] overflow-y-auto border-t border-primary-foreground/10 px-gutter pt-8 pb-10 lg:hidden\">\n          <ul className=\"space-y-8\">\n            {links.map((link) => (\n              <li key={link.label}>\n                {link.items?.length ? (\n                  <>\n                    <p className=\"text-[1.375rem] leading-none tracking-[-0.02em] text-primary-foreground/50\">{link.label}</p>\n                    <ul className=\"mt-4 space-y-4\">\n                      {link.items.map((item) => (\n                        <li key={item.href}>\n                          <a href={item.href} onClick={() => setOpen(false)} className=\"text-[1.375rem] leading-none tracking-[-0.02em]\">\n                            {item.label}\n                          </a>\n                        </li>\n                      ))}\n                    </ul>\n                  </>\n                ) : (\n                  <a href={link.href ?? \"#\"} onClick={() => setOpen(false)} className=\"text-[1.375rem] leading-none tracking-[-0.02em]\">\n                    {link.label}\n                  </a>\n                )}\n              </li>\n            ))}\n          </ul>\n          {cta && (\n            <ReckonerV2Button href={cta.href} variant=\"light\" size=\"md\" className=\"mt-10 w-full\">\n              {cta.label}\n            </ReckonerV2Button>\n          )}\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-v2-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the logo (e.g. reckoner-v2-wordmark)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "ReckonerV2HeaderLink[]",
+      "required": true,
+      "description": "the links in the tinted group"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the solid button at the end of the group"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Open menu",
+      "description": "labels of the phone menu button, for screen readers"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close menu"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47e310386bfe0b2cedf8a0ec22f622f8c7975dd75ed2a4f2502c6df0afe1215a"
+}

@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher hero (v2)",
+  "description": "A full-window dark hero: a looping product film fills the screen, and along the bottom edge sit a two-line medium-weight headline (from 40% across on desktop) and, at the right, a short paragraph over three buttons: a soft-glass play square, a cream-glass link and the yellow buy. The text rises in on load; the film drifts down at half speed as you scroll away.",
+  "category": "hero",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "fullscreen",
+    "video",
+    "parallax",
+    "load-in",
+    "glass",
+    "yellow",
+    "minimal"
+  ],
+  "notes": [
+    "always dark (forces the dark class); the media slot takes a video or image, cropped like object-fit: cover",
+    "sized by the window: 100svh",
+    "CSS only: load-in keyframes and a scroll-driven parallax, both off under reduced motion"
+  ],
+  "entry": "hhhusher-v2-hero.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-hero",
+  "files": [
+    {
+      "path": "hhhusher-v2-hero.css",
+      "content": "/* The film drifts down by half its height while the hero scrolls away (a slow parallax),\n   and the text rises in once on load. */\n.hhhusher-v2-hero {\n  view-timeline: --hhhusher-v2-hero block;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .hhhusher-v2-hero-rise {\n    animation: hhhusher-v2-hero-rise 1s cubic-bezier(0.32, 0.94, 0.6, 1) both;\n    animation-delay: calc(0.15s + var(--hh-step, 0) * 0.12s);\n  }\n\n  @supports (animation-timeline: view()) {\n    .hhhusher-v2-hero-drift {\n      animation: hhhusher-v2-hero-drift linear both;\n      animation-timeline: --hhhusher-v2-hero;\n      animation-range: exit 0% exit 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-v2-hero-rise {\n  from { opacity: 0; transform: translateY(40px); }\n}\n@keyframes hhhusher-v2-hero-drift {\n  to { transform: translateY(50%); }\n}\n"
+    },
+    {
+      "path": "hhhusher-v2-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button } from \"@foundry/hhhusher-v2-button\";\nimport \"./hhhusher-v2-hero.css\";\n\nexport interface HhhusherV2HeroProps {\n  /** the headline, two short lines (use \\n to break) */\n  heading: string;\n  /** the paragraph above the buttons */\n  text: string;\n  /** label of the soft-glass play square, for screen readers */\n  playLabel?: string;\n  /** what the play square does (open a film, etc.) */\n  onPlay?: () => void;\n  /** the cream-glass link next to the play square */\n  link?: { label: string; href: string };\n  /** the yellow buy button */\n  buy?: { label: string; href: string };\n  /** the full-window film or picture (a <video> or <img>); a dark placeholder when empty */\n  media?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\nconst step = (n: number) => ({ \"--hh-step\": n }) as CSSProperties;\n\nexport function HhhusherV2Hero({ heading, text, playLabel, onPlay, link, buy, media, id, className }: HhhusherV2HeroProps) {\n  return (\n    <section id={id} className={cn(\"hhhusher-v2-hero dark relative isolate flex min-h-svh flex-col justify-end overflow-clip bg-card text-foreground\", className)}>\n      {/* the film: fills the window, cropped like cover, drifting down as you scroll */}\n      <div className=\"hhhusher-v2-hero-drift absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n        {media ?? <div className=\"size-full bg-[radial-gradient(ellipse_60%_55%_at_55%_45%,color-mix(in_oklab,var(--glow)_14%,transparent),transparent_70%)]\" />}\n      </div>\n\n      <div className=\"mx-auto grid w-full max-w-page gap-8 px-gutter pt-40 pb-10 lg:grid-cols-[39.7%_minmax(0,1fr)_26.5%] lg:items-end lg:gap-0 lg:pb-10\">\n        <h1\n          className=\"hhhusher-v2-hero-rise font-display text-[3.12rem] leading-[0.95] font-[570] tracking-[-0.02em] whitespace-pre-line lg:col-start-2 lg:text-[4.25rem] lg:leading-[1]\"\n          style={step(0)}\n        >\n          {heading}\n        </h1>\n        <div className=\"hhhusher-v2-hero-rise lg:col-start-3\" style={step(1)}>\n          <p className=\"font-display text-[1.04rem] leading-[1.3] font-[570] tracking-[-0.02em] lg:text-[1.25rem] lg:leading-[1.15]\">{text}</p>\n          <div className=\"mt-6 flex flex-wrap gap-2.5 lg:mt-8\">\n            <HhhusherV2Button variant=\"soft\" className=\"h-10 w-[2.8rem] px-0\" label={playLabel} onClick={onPlay}>\n              <Play className=\"size-4 fill-current\" strokeWidth={0} />\n            </HhhusherV2Button>\n            {link && (\n              <HhhusherV2Button variant=\"glass\" href={link.href} className=\"h-10\">\n                {link.label}\n              </HhhusherV2Button>\n            )}\n            {buy && (\n              <HhhusherV2Button href={buy.href} className=\"h-10\">\n                {buy.label}\n              </HhhusherV2Button>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the headline, two short lines (use \\n to break)"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph above the buttons"
+    },
+    {
+      "name": "playLabel",
+      "type": "string",
+      "required": false,
+      "description": "label of the soft-glass play square, for screen readers"
+    },
+    {
+      "name": "onPlay",
+      "type": "(() => void)",
+      "required": false,
+      "description": "what the play square does (open a film, etc.)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the cream-glass link next to the play square"
+    },
+    {
+      "name": "buy",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the yellow buy button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-window film or picture (a <video> or <img>); a dark placeholder when empty"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "668a036d9fe3ae17cb9acb01272d397dc3f0decfe2a56b1d31f474b6e638e3f4"
+}

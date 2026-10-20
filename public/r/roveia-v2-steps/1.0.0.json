@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia three-step panel (v2)",
+  "description": "A charcoal rounded panel (40px radius) with a full-bleed video slot behind: a 64px white heading on the left and three steps on the right, each a dotted 28px label, a 40px light title and a small grey line. Steps fade and rise in as they enter.",
+  "category": "features",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "steps",
+    "process",
+    "dark",
+    "panel",
+    "video",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "the panel wraps itself in .dark; its colour is the theme's secondary (charcoal in Roveia)",
+    "the media slot fills the panel (object-fit: cover)"
+  ],
+  "entry": "roveia-v2-steps.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-steps",
+  "files": [
+    {
+      "path": "roveia-v2-steps.css",
+      "content": "/* Each step fades and rises 24px as it enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-steps-rise {\n      animation: roveia-v2-steps-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 10% cover 35%;\n    }\n  }\n}\n@keyframes roveia-v2-steps-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-steps.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-steps.css\";\n\nexport interface RoveiaV2Step {\n  /** the small label with the dot, e.g. \"Step 1\" */\n  label: string;\n  /** the step's name */\n  title: string;\n  /** one line about it */\n  description?: string;\n}\n\nexport interface RoveiaV2StepsProps {\n  /** the heading on the left */\n  heading: string;\n  /** the steps, top to bottom */\n  steps: RoveiaV2Step[];\n  /** the video or picture behind the whole panel; a charcoal placeholder shows when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function RoveiaV2Steps({ heading, steps, media, className }: RoveiaV2StepsProps) {\n  return (\n    <section className={cn(\"bg-background px-5 py-5\", className)}>\n      <div className=\"dark relative overflow-clip rounded-[2rem] bg-secondary text-foreground lg:rounded-[2.5rem]\">\n        <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">\n          {media ?? (\n            <div className=\"bg-[radial-gradient(ellipse_at_10%_30%,color-mix(in_oklab,var(--primary)_12%,transparent),transparent_30%),radial-gradient(ellipse_at_88%_72%,color-mix(in_oklab,var(--primary)_12%,transparent),transparent_30%)]\" />\n          )}\n        </div>\n        <div className=\"relative px-6 pt-[4.5rem] pb-20 lg:grid lg:grid-cols-[1fr_1fr] lg:px-[6.25rem] lg:pt-[5.5rem] lg:pb-20\">\n          <RoveiaV2Heading className=\"max-w-[26rem] lg:max-w-[28rem]\">{heading}</RoveiaV2Heading>\n          <ol className=\"mt-14 space-y-[4.5rem] lg:mt-0 lg:space-y-[5.5rem] lg:pl-[3.25rem]\">\n            {steps.map((s) => (\n              <li key={s.label} className=\"roveia-v2-steps-rise\">\n                <p className=\"flex items-center gap-4 text-[1.75rem] leading-[1.3] font-light tracking-[-0.03em]\">\n                  <span aria-hidden className=\"size-4 rounded-full bg-foreground\" />\n                  {s.label}\n                </p>\n                <h3 className=\"mt-10 max-w-[26rem] text-[1.75rem] leading-[1.2] font-light tracking-[-0.03em] lg:mt-12 lg:text-[2.5rem]\">{s.title}</h3>\n                {s.description && <p className=\"mt-2 text-sm leading-5 tracking-[-0.02em] text-muted-foreground\">{s.description}</p>}\n              </li>\n            ))}\n          </ol>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading on the left"
+    },
+    {
+      "name": "steps",
+      "type": "RoveiaV2Step[]",
+      "required": true,
+      "description": "the steps, top to bottom"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the video or picture behind the whole panel; a charcoal placeholder shows when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "610edd3515e28d6c786000e6abf65d25a923bf243a539868db0f5ee5cff0194f"
+}

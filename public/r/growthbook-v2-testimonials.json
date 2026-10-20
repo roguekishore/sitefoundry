@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook testimonial slider (v2)",
+  "description": "A deep navy band with round outline arrow buttons top right and a row of quotes running off the right edge: each a customer wordmark, a long quote and a muted name and role. The current quote is bright with the gradient rail accent beside it, the rest dimmed; the arrows slide the row with an eased glide.",
+  "category": "testimonials",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "carousel",
+    "slider",
+    "dark",
+    "navy",
+    "rail",
+    "fade"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows (hydrate: visible)",
+    "always uses the theme's dark colours (dark class)"
+  ],
+  "entry": "growthbook-v2-testimonials.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "growthbook-v2-testimonials",
+  "files": [
+    {
+      "path": "growthbook-v2-testimonials.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\n\nexport interface GrowthbookV2Testimonial {\n  /** the customer's wordmark, about 30px tall */\n  logo: ReactNode;\n  /** the company's name, for screen readers */\n  company: string;\n  quote: string;\n  name: string;\n  role: string;\n}\n\nexport interface GrowthbookV2TestimonialsProps {\n  testimonials: GrowthbookV2Testimonial[];\n  /** labels of the arrow buttons, for screen readers */\n  previousLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\nexport function GrowthbookV2Testimonials({ testimonials, previousLabel = \"Previous\", nextLabel = \"Next\", className }: GrowthbookV2TestimonialsProps) {\n  const [active, setActive] = useState(0);\n  const last = testimonials.length - 1;\n  const arrow =\n    \"flex size-[3.25rem] items-center justify-center rounded-full border border-input text-foreground transition-colors duration-250 hover:bg-foreground/10 disabled:opacity-40 motion-reduce:transition-none\";\n  return (\n    <section\n      className={cn(\n        \"dark overflow-x-clip bg-linear-[160deg] from-[color-mix(in_oklab,var(--background)_85%,var(--chart-2))] to-background text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"border-l border-border pt-12 pb-40 lg:pt-20 lg:pb-40\">\n          <div className=\"flex justify-end gap-2\">\n            <button type=\"button\" aria-label={previousLabel} disabled={active === 0} onClick={() => setActive((a) => Math.max(0, a - 1))} className={arrow}>\n              <ArrowLeft className=\"size-5\" strokeWidth={1.5} />\n            </button>\n            <button type=\"button\" aria-label={nextLabel} disabled={active === last} onClick={() => setActive((a) => Math.min(last, a + 1))} className={arrow}>\n              <ArrowRight className=\"size-5\" strokeWidth={1.5} />\n            </button>\n          </div>\n          <div className=\"relative mt-20 lg:mt-24\">\n            <GrowthbookV2RailAccent className=\"-left-px\" barClassName=\"h-full lg:h-full\" />\n            <div className=\"@container [clip-path:inset(0_-100vw_0_0)]\">\n              <ul\n                className=\"flex gap-10 pl-10 transition-transform duration-600 ease-[cubic-bezier(0.25,0.8,0.25,1)] [transform:translateX(calc(var(--i)*-100cqw))] motion-reduce:transition-none lg:gap-[5.5rem] lg:[transform:translateX(calc(var(--i)*-33rem))]\"\n                style={{ \"--i\": active } as CSSProperties}\n              >\n                {testimonials.map((t, i) => (\n                  <li\n                    key={t.name}\n                    aria-hidden={i !== active || undefined}\n                    className={cn(\n                      \"w-[calc(100cqw-2.5rem)] shrink-0 transition-opacity duration-300 motion-reduce:transition-none lg:w-[27.5rem]\",\n                      i === active ? \"opacity-100\" : \"opacity-45\",\n                    )}\n                  >\n                    <span role=\"img\" aria-label={t.company} className=\"flex h-[1.875rem] items-center pl-3 [&_svg]:h-7 [&_svg]:w-auto\">\n                      {t.logo}\n                    </span>\n                    <blockquote className=\"mt-[4.5rem] text-lg/[1.95] lg:mt-20 lg:text-xl/[1.75]\">{t.quote}</blockquote>\n                    <p className=\"mt-8 text-base/[1.7] text-muted-foreground lg:text-lg/[1.55]\">\n                      {t.name}\n                      <br />\n                      {t.role}\n                    </p>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "testimonials",
+      "type": "GrowthbookV2Testimonial[]",
+      "required": true
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": false,
+      "default": "Previous",
+      "description": "labels of the arrow buttons, for screen readers"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "default": "Next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b10e626f99a8a9881992ff525b3ff370ffeb21d20751e93a9241153ec93ee5f6"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner about (v2)",
+  "description": "A left-aligned section on linen paper: a small boxed eyebrow and a long 32px statement across two thirds of the page, then three equal white cards across the full width, each with an artwork slot at the top left, a long pause, a 22px title and a few lines of grey text. The statement fades in as it scrolls into view, and the cards rise 24px and fade in one after another.",
+  "category": "features",
+  "site": "reckoner-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "values",
+    "cards",
+    "three-column",
+    "light",
+    "warm",
+    "editorial",
+    "finance",
+    "reveal",
+    "stagger",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the reveals are CSS scroll-driven animations (no JavaScript); browsers without them show everything in place",
+    "cards use the card colour (white) on the background colour (linen): keep the two apart in the theme",
+    "media slots are 120×120 placeholders (80×80 on phones) until filled"
+  ],
+  "entry": "reckoner-v2-about.tsx",
+  "source": "foundry",
+  "name": "reckoner-v2-about",
+  "files": [
+    {
+      "path": "reckoner-v2-about.css",
+      "content": "/* The statement fades in while it enters the window; each card rises 24px and fades in,\n   starting a little later than the one before it (--i is the card's index). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .reckoner-v2-about-reveal {\n      animation: reckoner-v2-about-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 20% entry 100%;\n    }\n    .reckoner-v2-about-card {\n      animation: reckoner-v2-about-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(10% + var(--i, 0) * 20%) entry calc(70% + var(--i, 0) * 15%);\n    }\n  }\n}\n\n@keyframes reckoner-v2-about-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes reckoner-v2-about-rise {\n  from {\n    opacity: 0;\n    translate: 0 24px;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "reckoner-v2-about.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerV2Eyebrow } from \"@foundry/reckoner-v2-eyebrow\";\nimport \"./reckoner-v2-about.css\";\n\nexport interface ReckonerV2Value {\n  title: string;\n  /** two or three lines */\n  text: string;\n  /** a 120×120 artwork (an <img> or <svg>); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface ReckonerV2AboutProps {\n  /** the small label over the statement */\n  eyebrow?: string;\n  /** the statement: a long sentence or two */\n  title: string;\n  /** the cards: three across on desktop */\n  items: ReckonerV2Value[];\n  /** id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nexport function ReckonerV2About({ eyebrow, title, items, id, className }: ReckonerV2AboutProps) {\n  return (\n    <section id={id} className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        {eyebrow && <ReckonerV2Eyebrow label={eyebrow} />}\n        <h2 className=\"reckoner-v2-about-reveal mt-5 max-w-[55rem] font-display text-[1.375rem] leading-[1.1] font-normal tracking-[-0.02em] lg:text-[2rem]\">\n          {title}\n        </h2>\n\n        <ul className=\"mt-16 grid gap-5 lg:mt-[7.75rem] lg:grid-cols-3\">\n          {items.map((item, i) => (\n            <li\n              key={item.title}\n              style={{ \"--i\": i } as CSSProperties}\n              className=\"reckoner-v2-about-card flex flex-col bg-card px-5 py-[1.875rem] text-card-foreground lg:px-[1.875rem]\"\n            >\n              <div className=\"size-20 shrink-0 lg:size-30 [&>*]:size-full [&>*]:object-contain\">\n                {item.media ?? <div aria-hidden className=\"bg-muted\" />}\n              </div>\n              <h3 className=\"mt-12 font-display text-[1.375rem] leading-[1.2] font-normal tracking-[-0.02em] lg:mt-[4.5rem]\">{item.title}</h3>\n              <p className=\"mt-5 max-w-[22rem] text-sm leading-[1.45] text-muted-foreground lg:mt-6\">{item.text}</p>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-v2-eyebrow"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the statement"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the statement: a long sentence or two"
+    },
+    {
+      "name": "items",
+      "type": "ReckonerV2Value[]",
+      "required": true,
+      "description": "the cards: three across on desktop"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8129465e0829d17754c283fa6d74f4df3dcbca340382ad9f50e61591c6bea69b"
+}
