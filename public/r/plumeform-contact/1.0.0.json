@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform contact with topic pills",
+  "description": "On warm paper: eyebrow, bold heading and lead on the left with pill-shaped topic choices (the chosen one fills with ink) and a short dotted list; on the right a translucent glass form card over drifting mint and sky clouds, with 10px-radius fields, a full-width ink pill button and a small note. Rises in on scroll.",
+  "category": "contact",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "light",
+    "glass",
+    "clouds",
+    "pills",
+    "reveal"
+  ],
+  "notes": [
+    "topic pills are radio inputs styled with :has(), so no JavaScript",
+    "the form posts to `action`; wire it to your own handler"
+  ],
+  "entry": "plumeform-contact.tsx",
+  "source": "foundry",
+  "name": "plumeform-contact",
+  "files": [
+    {
+      "path": "plumeform-contact.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformPanel } from \"@foundry/plumeform-panel\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformContactField {\n  /** the form field name */\n  name: string;\n  label: string;\n  /** quieter text after the label, e.g. \"(optional)\" */\n  hint?: string;\n  placeholder?: string;\n  type?: \"email\" | \"text\" | \"textarea\";\n  required?: boolean;\n}\n\nexport interface PlumeformContactProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body?: ReactNode;\n  /** pills to pick what the message is about (a radio group); the first starts selected */\n  topics?: { name: string; options: string[] };\n  /** a short dotted list under the pills */\n  bullets?: string[];\n  /** where the form posts */\n  action?: string;\n  fields: PlumeformContactField[];\n  submitLabel: string;\n  /** small centred text under the button */\n  note?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\n/** Copy, topic pills and a short list on the left; a glass form card over colour clouds on the right. */\nexport function PlumeformContact({ eyebrow, title, body, topics, bullets, action, fields, submitLabel, note, id, className }: PlumeformContactProps) {\n  const autoId = useId();\n  const formId = `${id ?? autoId}-form`;\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-[60rem] items-start gap-12 px-gutter lg:grid-cols-[1fr_27rem] lg:gap-16\">\n        <div>\n          <PlumeformHeading eyebrow={eyebrow} title={title} className=\"max-w-[28rem]\">\n            {body && <div className=\"text-lg leading-[1.6]\">{body}</div>}\n          </PlumeformHeading>\n          {topics && (\n            <PlumeformReveal step={1} className=\"mt-8 flex flex-wrap gap-2\">\n              {topics.options.map((opt, i) => (\n                <label\n                  key={opt}\n                  className=\"inline-flex h-10 cursor-pointer items-center rounded-full border border-border bg-secondary px-4 text-[0.8125rem] font-bold text-secondary-foreground transition-colors duration-200 hover:bg-accent has-[:checked]:border-primary has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring\"\n                >\n                  <input type=\"radio\" name={topics.name} value={opt} defaultChecked={i === 0} form={formId} className=\"sr-only\" />\n                  {opt}\n                </label>\n              ))}\n            </PlumeformReveal>\n          )}\n          {bullets && (\n            <PlumeformReveal step={2} as=\"div\" className=\"mt-9\">\n              <ul className=\"space-y-3.5 text-[0.9375rem] text-muted-foreground\">\n                {bullets.map((b) => (\n                  <li key={b} className=\"relative pl-4 before:absolute before:top-[0.55rem] before:left-0 before:size-1.5 before:rounded-full before:bg-highlight\">\n                    {b}\n                  </li>\n                ))}\n              </ul>\n            </PlumeformReveal>\n          )}\n        </div>\n\n        <PlumeformReveal step={1}>\n          <PlumeformPanel clouds=\"c\">\n            <form id={formId} action={action} method=\"post\" className=\"space-y-5\">\n              {fields.map((f) => {\n                const inputClass =\n                  \"mt-2 block w-full rounded-[calc(var(--radius)/2)] border border-input bg-card px-4 text-[0.9375rem] font-normal text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-highlight focus:outline-none focus:ring-3 focus:ring-highlight/15\";\n                return (\n                  <label key={f.name} className=\"block text-[0.8125rem] font-bold\">\n                    {f.label}\n                    {f.hint && <span className=\"font-normal text-muted-foreground\"> {f.hint}</span>}\n                    {f.type === \"textarea\" ? (\n                      <textarea name={f.name} placeholder={f.placeholder} required={f.required} rows={5} className={cn(inputClass, \"resize-y py-3 leading-6\")} />\n                    ) : (\n                      <input name={f.name} type={f.type ?? \"text\"} placeholder={f.placeholder} required={f.required} className={cn(inputClass, \"h-[3.125rem]\")} />\n                    )}\n                  </label>\n                );\n              })}\n              <PlumeformButton type=\"submit\" block arrow size=\"lg\" className=\"h-[2.625rem] text-[0.9375rem] font-bold\">\n                {submitLabel}\n              </PlumeformButton>\n              {note && <p className=\"text-center text-xs text-muted-foreground\">{note}</p>}\n            </form>\n          </PlumeformPanel>\n        </PlumeformReveal>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-button",
+    "plumeform-heading",
+    "plumeform-panel",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "topics",
+      "type": "{ name: string; options: string[]; }",
+      "required": false,
+      "description": "pills to pick what the message is about (a radio group); the first starts selected"
+    },
+    {
+      "name": "bullets",
+      "type": "string[]",
+      "required": false,
+      "description": "a short dotted list under the pills"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "fields",
+      "type": "PlumeformContactField[]",
+      "required": true
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small centred text under the button"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "309e6ae583e950d7a542c0c5bf2f55cffa32cd73a568e449f021c0babaf9d1e6"
+}

@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform glass card grid band",
+  "description": "A near-black green band with a centred (or left) eyebrow, bold title and body, an optional paper pill with a note beside it, then a three-column grid of glass cards: a mint line icon or mint eyebrow, a bold title with an optional tier tag, and soft grey text. Heading and cards rise in with a blur, staggered across each row.",
+  "category": "features",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "grid",
+    "dark",
+    "glass",
+    "glow",
+    "reveal",
+    "stagger"
+  ],
+  "notes": [
+    "forces dark colours",
+    "backdrop is a slot for the original's WebGL art; empty shows a soft glow",
+    "CSS only"
+  ],
+  "entry": "plumeform-card-grid.tsx",
+  "source": "foundry",
+  "name": "plumeform-card-grid",
+  "files": [
+    {
+      "path": "plumeform-card-grid.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBadge } from \"@foundry/plumeform-badge\";\nimport { PlumeformBand } from \"@foundry/plumeform-band\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport { PlumeformGlassCard } from \"@foundry/plumeform-glass-card\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformCardGridCard {\n  /** a line icon (e.g. from lucide-react) above the title */\n  icon?: ReactNode;\n  /** small mint capitals above the title */\n  eyebrow?: string;\n  title: string;\n  /** a tier tag after the title, e.g. \"Plus\" */\n  badge?: string;\n  text: ReactNode;\n}\n\nexport interface PlumeformCardGridProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** the paragraph under the title */\n  body?: ReactNode;\n  /** centre the heading (and button row) or keep it on the left */\n  align?: \"center\" | \"start\";\n  /** a pill button under the heading */\n  cta?: { label: string; href: string };\n  /** a short line beside the button (under it on phones) */\n  ctaNote?: ReactNode;\n  /** the glass cards, three to a row on desktop */\n  cards: PlumeformCardGridCard[];\n  /** art behind the band (the original's WebGL fluted glass); empty shows a soft glow */\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\n/** A dark band with a heading and a grid of glass cards (icon or eyebrow, title, tier tag, text) that rise in one by one. */\nexport function PlumeformCardGrid({ eyebrow, title, body, align = \"center\", cta, ctaNote, cards, backdrop, id, className }: PlumeformCardGridProps) {\n  const center = align === \"center\";\n  return (\n    <PlumeformBand id={id} backdrop={backdrop} className={cn(\"py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <PlumeformHeading eyebrow={eyebrow} title={title} align={align} className={center ? \"max-w-[44rem]\" : \"max-w-[42rem]\"}>\n          {body}\n        </PlumeformHeading>\n\n        {(cta || ctaNote) && (\n          <PlumeformReveal\n            step={1}\n            className={cn(\"mt-10 flex flex-col items-center gap-5 lg:flex-row lg:gap-5\", center ? \"justify-center text-center\" : \"lg:items-center\")}\n          >\n            {cta && (\n              <PlumeformButton href={cta.href} arrow className=\"h-10 px-6 text-[0.9375rem]\">\n                {cta.label}\n              </PlumeformButton>\n            )}\n            {ctaNote && <p className=\"max-w-xs text-sm text-muted-foreground lg:max-w-none [&_strong]:font-bold [&_strong]:text-foreground\">{ctaNote}</p>}\n          </PlumeformReveal>\n        )}\n\n        <ul className=\"mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-3\">\n          {cards.map((card, i) => (\n            <PlumeformReveal key={card.title} as=\"li\" step={i % 3}>\n              <PlumeformGlassCard className=\"h-full px-7 py-8\">\n                {card.icon && <span className=\"mb-6 block text-highlight [&_svg]:size-7 [&_svg]:stroke-[1.5]\">{card.icon}</span>}\n                {card.eyebrow && <p className=\"mb-4 text-[0.625rem] font-bold tracking-[0.16em] text-highlight uppercase\">{card.eyebrow}</p>}\n                <h3 className={cn(\"flex flex-wrap items-center gap-2 font-bold tracking-[-0.02em]\", card.eyebrow ? \"text-xl\" : \"text-lg\")}>\n                  {card.title}\n                  {card.badge && <PlumeformBadge>{card.badge}</PlumeformBadge>}\n                </h3>\n                <div className=\"mt-3 text-sm leading-[1.65] text-muted-foreground\">{card.text}</div>\n              </PlumeformGlassCard>\n            </PlumeformReveal>\n          ))}\n        </ul>\n      </div>\n    </PlumeformBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-badge",
+    "plumeform-band",
+    "plumeform-button",
+    "plumeform-glass-card",
+    "plumeform-heading",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the paragraph under the title"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "centre the heading (and button row) or keep it on the left"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a pill button under the heading"
+    },
+    {
+      "name": "ctaNote",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a short line beside the button (under it on phones)"
+    },
+    {
+      "name": "cards",
+      "type": "PlumeformCardGridCard[]",
+      "required": true,
+      "description": "the glass cards, three to a row on desktop"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original's WebGL fluted glass); empty shows a soft glow"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d4668d6be88f93ce7be5af9c76c9c8a89629a00541fb16299ca3fa017fadad30"
+}

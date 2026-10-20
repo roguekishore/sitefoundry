@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia floating nav pill",
+  "description": "A white, fully rounded nav pill with a soft 30px shadow floating 24px from the top: wordmark left, a row of links (some with chevrons) that dim to 64% on hover, and a dark pill CTA that turns blue. On phones a slim two-line burger opens a white panel.",
+  "category": "header",
+  "site": "roveia",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "pill",
+    "floating",
+    "fixed",
+    "light",
+    "soft-shadow",
+    "minimal"
+  ],
+  "notes": [
+    "fixed by default; pass position=\"static\" to keep it in the flow",
+    "the phone menu is a <details> element, so it works without JavaScript"
+  ],
+  "entry": "roveia-header.tsx",
+  "source": "foundry",
+  "name": "roveia-header",
+  "files": [
+    {
+      "path": "roveia-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaButton } from \"@foundry/roveia-button\";\nimport { RoveiaWordmark } from \"@foundry/roveia-wordmark\";\n\nexport interface RoveiaNavLink {\n  label: string;\n  href: string;\n  /** shows a small chevron, as for a menu */\n  menu?: boolean;\n}\n\nexport interface RoveiaHeaderProps {\n  /** company name for the wordmark */\n  brand: string;\n  /** tiny mark above the wordmark's first letter */\n  brandMark?: ReactNode;\n  homeHref?: string;\n  /** the links in the middle of the pill (desktop) and in the drop-down (phones) */\n  links: RoveiaNavLink[];\n  /** the dark pill on the right */\n  cta: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  /** fixed (default) floats over the page; static stays in the flow (for previews) */\n  position?: \"fixed\" | \"static\";\n  className?: string;\n}\n\n/**\n * A floating white nav pill with a soft shadow, centred 24px from the top: wordmark, a row of\n * links (some with chevrons) and a dark \"get started\" pill that turns blue on hover. On phones\n * the links fold into a two-line burger that opens a white panel (no JavaScript: <details>).\n */\nexport function RoveiaHeader({ brand, brandMark, homeHref = \"#\", links, cta, menuLabel, position = \"fixed\", className }: RoveiaHeaderProps) {\n  return (\n    <header className={cn(position === \"fixed\" ? \"fixed inset-x-0 top-0\" : \"relative\", \"z-50 px-8 pt-4 text-foreground lg:px-gutter lg:pt-6\", className)}>\n      <div className=\"relative mx-auto flex h-12 max-w-[62.25rem] items-center justify-between rounded-full bg-card pr-2 pl-6 shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:h-14 lg:pl-7\">\n        <RoveiaWordmark name={brand} mark={brandMark} href={homeHref} />\n\n        <nav className=\"hidden items-center gap-8 lg:flex\">\n          {links.map((l) => (\n            <a\n              key={l.label}\n              href={l.href}\n              className=\"flex items-center gap-1 text-base tracking-[-0.01em] transition-opacity duration-300 hover:opacity-64 motion-reduce:transition-none\"\n            >\n              {l.label}\n              {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n            </a>\n          ))}\n        </nav>\n\n        <RoveiaButton href={cta.href} variant=\"dark\" size=\"sm\" className=\"hidden lg:inline-flex\">\n          {cta.label}\n        </RoveiaButton>\n\n        <details className=\"group lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"flex size-12 cursor-pointer list-none flex-col items-center justify-center gap-2 [&::-webkit-details-marker]:hidden\"\n          >\n            <span className=\"h-px w-12 bg-foreground transition-transform duration-300 group-open:translate-y-[4.5px] group-open:rotate-[20deg] motion-reduce:transition-none\" />\n            <span className=\"h-px w-12 bg-foreground transition-transform duration-300 group-open:-translate-y-[4.5px] group-open:-rotate-[20deg] motion-reduce:transition-none\" />\n          </summary>\n          <div className=\"absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-lg bg-card p-6 shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n            <nav className=\"flex flex-col gap-4\">\n              {links.map((l) => (\n                <a key={l.label} href={l.href} className=\"text-xl tracking-[-0.02em]\">\n                  {l.label}\n                </a>\n              ))}\n            </nav>\n            <RoveiaButton href={cta.href} block className=\"mt-6\">\n              {cta.label}\n            </RoveiaButton>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-button",
+    "roveia-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "company name for the wordmark"
+    },
+    {
+      "name": "brandMark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "tiny mark above the wordmark's first letter"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#"
+    },
+    {
+      "name": "links",
+      "type": "RoveiaNavLink[]",
+      "required": true,
+      "description": "the links in the middle of the pill (desktop) and in the drop-down (phones)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the dark pill on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "position",
+      "type": "enum",
+      "required": false,
+      "default": "fixed",
+      "description": "fixed (default) floats over the page; static stays in the flow (for previews)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1c8d9ba98f219ed0526994c27c0daeebfdb0a589d82f6203cdfb70ac1676c468"
+}

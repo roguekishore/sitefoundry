@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher product hero",
+  "description": "A dark product opener. Left, a large 1.7 photo with four thumbnails and two long thin tan arrows to step through them (phones add an n/4 counter); right, the product name in a large light weight, a price row with the old price struck through, the new one bold, an outlined tag and a mono note, two paragraphs, and a quantity stepper with cream squares beside a yellow checkout button that empties to an outline on hover.",
+  "category": "hero",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "product",
+    "ecommerce",
+    "gallery",
+    "dark",
+    "price",
+    "stepper",
+    "yellow"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark); pairs with hhhusher-header",
+    "images are placeholders until you pass media",
+    "the gallery and stepper need JavaScript (hydrate: load)"
+  ],
+  "entry": "hhhusher-product-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "hhhusher-product-hero",
+  "files": [
+    {
+      "path": "hhhusher-product-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight, Minus, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherButton, hhhusherEase, hhhusherLabel } from \"@foundry/hhhusher-button\";\n\nexport interface HhhusherProductImage {\n  /** what the picture shows, for screen readers */\n  label: string;\n  /** the photo (cropped like object-fit: cover); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface HhhusherProductHeroProps {\n  /** the product name, one entry per line */\n  title: string[];\n  /** the gallery, shown large with a row of thumbnails */\n  images: HhhusherProductImage[];\n  /** the price now, e.g. \"$289 USD\" */\n  price: string;\n  /** the old price, struck through */\n  wasPrice?: string;\n  /** a small outlined tag after the price, e.g. \"-15%\" */\n  badge?: string;\n  /** a mono note after the tag, e.g. \"This month\" */\n  priceNote?: string;\n  /** the paragraphs under the price */\n  paragraphs: string[];\n  /** the yellow checkout button */\n  checkout: { label: string; href: string };\n  /** a small mono line next to (desktop) or under (phones) the button */\n  guarantee?: string;\n  /** screen-reader names of the controls */\n  labels?: { previous: string; next: string; decrease: string; increase: string; quantity: string };\n  className?: string;\n}\n\nconst defaultLabels = { previous: \"Previous image\", next: \"Next image\", decrease: \"One less\", increase: \"One more\", quantity: \"Quantity\" };\n\n/**\n * A dark product opener. Left, a large photo with a row of thumbnails and two long thin arrows\n * (phones add an \"n/4\" counter); right, the name in a large light weight, a price row (old\n * price struck through, new price bold, an outlined tag and a mono note), two paragraphs, and a\n * quantity stepper with cream squares next to a yellow checkout button.\n */\nexport function HhhusherProductHero({ title, images, price, wasPrice, badge, priceNote, paragraphs, checkout, guarantee, labels = defaultLabels, className }: HhhusherProductHeroProps) {\n  const [index, setIndex] = useState(0);\n  const [qty, setQty] = useState(1);\n  const count = images.length;\n  const go = (step: number) => setIndex((i) => (i + step + count) % count);\n  const current = images[index];\n\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-16 px-gutter pt-[6.5rem] pb-16 lg:grid-cols-[726fr_560fr] lg:gap-[4.5rem] lg:pt-[7.875rem] lg:pb-[4.5rem]\">\n        <div className=\"flex flex-col\">\n          <div role=\"img\" aria-label={current?.label} className=\"aspect-[1.7] overflow-hidden rounded-lg border border-border bg-muted [&>*]:size-full [&>*]:object-cover\">\n            {current?.media}\n          </div>\n          <div className=\"mt-[1.1rem] grid grid-cols-4 gap-[0.8rem] lg:mt-[1.1rem] lg:gap-3\">\n            {images.map((image, i) => (\n              <button\n                key={i}\n                type=\"button\"\n                aria-label={image.label}\n                aria-current={i === index}\n                onClick={() => setIndex(i)}\n                className={cn(\n                  \"aspect-[1.54] overflow-hidden rounded-sm border bg-muted transition-[border-color,opacity] duration-300 [&>*]:size-full [&>*]:object-cover\",\n                  hhhusherEase,\n                  i === index ? \"border-glow\" : \"border-transparent opacity-70 hover:opacity-100\",\n                )}\n              >\n                {image.media}\n              </button>\n            ))}\n          </div>\n          <div className=\"mt-8 flex items-center gap-8 lg:mt-12\">\n            <span className=\"font-mono text-[0.86rem] font-bold lg:hidden\">\n              {index + 1}\n              <span className=\"text-muted-foreground\">/{count}</span>\n            </span>\n            <button type=\"button\" aria-label={labels.previous} onClick={() => go(-1)} className=\"ml-auto text-glow transition-colors duration-300 hover:text-foreground\">\n              <ArrowLeft aria-hidden className=\"h-8 w-11\" strokeWidth={1.25} />\n            </button>\n            <button type=\"button\" aria-label={labels.next} onClick={() => go(1)} className=\"text-glow transition-colors duration-300 hover:text-foreground\">\n              <ArrowRight aria-hidden className=\"h-8 w-11\" strokeWidth={1.25} />\n            </button>\n          </div>\n        </div>\n\n        <div className=\"flex flex-col lg:pt-[3.75rem]\">\n          <h1 className=\"font-display text-[2.6rem] leading-[1.1] font-normal tracking-[-0.01em] lg:text-[2.6875rem] lg:leading-[1.16]\">\n            {title.map((line, i) => (\n              <span key={i} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h1>\n          <div className=\"mt-8 flex flex-wrap items-center gap-x-3.5 gap-y-3 lg:mt-9\">\n            {wasPrice && <s className=\"text-[1.6rem] font-semibold text-muted-foreground lg:text-[1.5rem]\">{wasPrice}</s>}\n            <span className=\"text-[1.6rem] font-bold lg:text-[1.5rem]\">{price}</span>\n            {badge && <span className={cn(hhhusherLabel, \"rounded-sm border border-foreground px-1.5 py-1 font-medium\")}>{badge}</span>}\n            {priceNote && <span className={hhhusherLabel}>{priceNote}</span>}\n          </div>\n          <div className=\"mt-12 flex flex-col gap-5 text-[1.3rem] leading-[1.3] font-medium lg:mt-[4.25rem] lg:text-[1.125rem] lg:leading-[1.45]\">\n            {paragraphs.map((p, i) => (\n              <p key={i}>{p}</p>\n            ))}\n          </div>\n\n          <div className=\"mt-16 flex flex-col gap-4 lg:mt-[3.25rem] lg:flex-row lg:items-center\">\n            <div className=\"flex h-[3.6rem] items-center justify-between rounded-lg bg-muted p-1 lg:h-12 lg:w-[9.2rem]\" role=\"group\" aria-label={labels.quantity}>\n              <button\n                type=\"button\"\n                aria-label={labels.decrease}\n                onClick={() => setQty((q) => Math.max(1, q - 1))}\n                className=\"flex size-[3.1rem] items-center justify-center rounded-sm bg-foreground text-background transition-colors duration-700 hover:bg-background hover:text-foreground lg:size-[2.4rem]\"\n              >\n                <Minus aria-hidden className=\"size-6\" strokeWidth={1.5} />\n              </button>\n              <span aria-live=\"polite\" className=\"text-[1.1rem] font-medium\">\n                {qty}\n              </span>\n              <button\n                type=\"button\"\n                aria-label={labels.increase}\n                onClick={() => setQty((q) => q + 1)}\n                className=\"flex size-[3.1rem] items-center justify-center rounded-sm bg-foreground text-background transition-colors duration-700 hover:bg-background hover:text-foreground lg:size-[2.4rem]\"\n              >\n                <Plus aria-hidden className=\"size-6\" strokeWidth={1.5} />\n              </button>\n            </div>\n            <HhhusherButton href={checkout.href} size=\"lg\" className=\"h-[3.6rem] text-[0.86rem] lg:h-12 lg:px-[1.35rem] lg:text-xs\">\n              {checkout.label}\n            </HhhusherButton>\n            {guarantee && <span className=\"max-w-[9rem] self-center text-center font-mono text-[0.72rem] leading-[1.1] font-bold uppercase lg:ml-2 lg:text-left lg:text-[0.6875rem]\">{guarantee}</span>}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the product name, one entry per line"
+    },
+    {
+      "name": "images",
+      "type": "HhhusherProductImage[]",
+      "required": true,
+      "description": "the gallery, shown large with a row of thumbnails"
+    },
+    {
+      "name": "price",
+      "type": "string",
+      "required": true,
+      "description": "the price now, e.g. \"$289 USD\""
+    },
+    {
+      "name": "wasPrice",
+      "type": "string",
+      "required": false,
+      "description": "the old price, struck through"
+    },
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "a small outlined tag after the price, e.g. \"-15%\""
+    },
+    {
+      "name": "priceNote",
+      "type": "string",
+      "required": false,
+      "description": "a mono note after the tag, e.g. \"This month\""
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "the paragraphs under the price"
+    },
+    {
+      "name": "checkout",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the yellow checkout button"
+    },
+    {
+      "name": "guarantee",
+      "type": "string",
+      "required": false,
+      "description": "a small mono line next to (desktop) or under (phones) the button"
+    },
+    {
+      "name": "labels",
+      "type": "{ previous: string; next: string; decrease: string; increase: string; quantity: string; }",
+      "required": false,
+      "default": "{ previous: \"Previous image\", next: \"Next image\", decrease: \"One less\", increase: \"One more\", quantity: \"Quantity\" }",
+      "description": "screen-reader names of the controls"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d5d011b0bdfb4a3ee3795573ac838d87b67786bb35e0425c51dc556ad52148c2"
+}

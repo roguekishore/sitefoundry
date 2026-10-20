@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner header",
+  "description": "A quiet header for a dark band: wordmark left, and on desktop a faintly lifted tray at the right holding three semibold links with tiny chevrons and a solid linen button. Links tint camel over half a second on hover and open small dropdowns. On phones it stays fixed on merlot with a 40px menu square that opens a full-height panel of 22px links.",
+  "category": "header",
+  "site": "reckoner",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "dark",
+    "merlot",
+    "fixed",
+    "dropdown",
+    "minimal",
+    "finance"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark); pair it with reckoner-hero, which it floats over",
+    "fixed on phones, absolute from lg up (scrolls away with the hero, as the original does)",
+    "needs JavaScript for the phone menu (hydrate: load); dropdowns are CSS only"
+  ],
+  "entry": "reckoner-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "reckoner-header",
+  "files": [
+    {
+      "path": "reckoner-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerButton } from \"@foundry/reckoner-button\";\nimport { ReckonerWordmark, type ReckonerWordmarkProps } from \"@foundry/reckoner-wordmark\";\n\nexport interface ReckonerHeaderLink {\n  label: string;\n  href: string;\n  /** links shown in a small dropdown under this one (desktop) and indented in the phone menu */\n  children?: { label: string; href: string }[];\n}\n\nexport interface ReckonerHeaderProps {\n  /** the lockup at the left */\n  brand: ReckonerWordmarkProps;\n  /** the links in the tray (desktop) and the menu panel (phones) */\n  links: ReckonerHeaderLink[];\n  /** the solid button at the end of the tray */\n  cta: { label: string; href: string };\n  /** screen-reader names of the menu button */\n  menuLabels?: { open: string; close: string };\n  className?: string;\n}\n\n/**\n * Wordmark and a translucent nav tray over a dark band. Fixed on phones (on the band's own\n * colour), absolute from lg up so it scrolls away with the hero.\n */\nexport function ReckonerHeader({\n  brand,\n  links,\n  cta,\n  menuLabels = { open: \"Open menu\", close: \"Close menu\" },\n  className,\n}: ReckonerHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  // close the phone menu when the window grows past the phone layout\n  useEffect(() => {\n    const wide = window.matchMedia(\"(min-width: 64rem)\");\n    const onChange = () => wide.matches && setOpen(false);\n    wide.addEventListener(\"change\", onChange);\n    return () => wide.removeEventListener(\"change\", onChange);\n  }, []);\n\n  return (\n    <header className={cn(\"dark fixed inset-x-0 top-0 z-50 bg-background text-foreground lg:absolute lg:bg-transparent\", className)}>\n      <div className=\"mx-auto flex h-[5.125rem] max-w-page items-center justify-between px-gutter lg:h-[5.625rem] lg:items-start lg:pt-5\">\n        <ReckonerWordmark {...brand} className=\"lg:mt-[0.4375rem]\" />\n\n        <nav className=\"hidden items-center bg-foreground/[0.06] p-1 lg:flex\">\n          {links.map((link) => (\n            <div key={link.label} className=\"group relative\">\n              <a\n                href={link.href}\n                className=\"flex h-[2.625rem] items-center gap-1.5 px-5 text-sm font-semibold tracking-[0.01em] transition-colors duration-500 ease-[ease] hover:bg-glow/15 motion-reduce:transition-none\"\n              >\n                {link.label}\n                {link.children?.length ? <ChevronDown aria-hidden className=\"size-3 opacity-40\" /> : null}\n              </a>\n              {link.children?.length ? (\n                <ul className=\"invisible absolute top-full left-0 min-w-56 translate-y-1 bg-popover p-1 opacity-0 transition-[opacity,translate,visibility] duration-150 ease-[ease] group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none\">\n                  {link.children.map((child) => (\n                    <li key={child.label}>\n                      <a\n                        href={child.href}\n                        className=\"block px-4 py-3 text-sm text-popover-foreground transition-colors duration-500 hover:bg-glow/15\"\n                      >\n                        {child.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              ) : null}\n            </div>\n          ))}\n          <ReckonerButton href={cta.href} variant=\"primary\" className=\"ml-1 h-[2.625rem] px-5\">\n            {cta.label}\n          </ReckonerButton>\n        </nav>\n\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          aria-label={open ? menuLabels.close : menuLabels.open}\n          onClick={() => setOpen((v) => !v)}\n          className=\"flex size-10 items-center justify-center bg-foreground/[0.06] lg:hidden [&_svg]:size-5\"\n        >\n          {open ? <X strokeWidth={1.5} /> : <Menu strokeWidth={1.5} />}\n        </button>\n      </div>\n\n      {open && (\n        <nav className=\"h-[calc(100svh-5.125rem)] overflow-y-auto border-t border-border px-gutter pt-8 pb-10 lg:hidden\">\n          <ul className=\"flex flex-col gap-6\">\n            {links.map((link) => (\n              <li key={link.label}>\n                <a href={link.href} className=\"text-[1.375rem] leading-none tracking-[-0.02em]\" onClick={() => setOpen(false)}>\n                  {link.label}\n                </a>\n                {link.children?.length ? (\n                  <ul className=\"mt-4 flex flex-col gap-3 pl-4\">\n                    {link.children.map((child) => (\n                      <li key={child.label}>\n                        <a href={child.href} className=\"text-sm text-muted-foreground\" onClick={() => setOpen(false)}>\n                          {child.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                ) : null}\n              </li>\n            ))}\n          </ul>\n          <ReckonerButton href={cta.href} variant=\"primary\" block className=\"mt-10\">\n            {cta.label}\n          </ReckonerButton>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-button",
+    "reckoner-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReckonerWordmarkProps",
+      "required": true,
+      "description": "the lockup at the left"
+    },
+    {
+      "name": "links",
+      "type": "ReckonerHeaderLink[]",
+      "required": true,
+      "description": "the links in the tray (desktop) and the menu panel (phones)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the solid button at the end of the tray"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": false,
+      "default": "{ open: \"Open menu\", close: \"Close menu\" }",
+      "description": "screen-reader names of the menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3387cae478b3280fa92eb4f30957ca51844431d35a024d8238609e1749e1e202"
+}

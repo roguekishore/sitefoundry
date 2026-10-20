@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher spec sheet",
+  "description": "A dark technical spec sheet: a big two-line heading, then a table set entirely in bold mono capitals, groups divided by solid cream rules and rows by faint ones (group name, what, value right-aligned), with a short note and a yellow button in a narrow left column. Phones give each group name its own row and move the note under the table. Groups fade in as they enter; the heading rises line by line.",
+  "category": "features",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "specs",
+    "table",
+    "technical",
+    "dark",
+    "mono",
+    "product",
+    "reveal",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark)"
+  ],
+  "entry": "hhhusher-specs.tsx",
+  "source": "foundry",
+  "name": "hhhusher-specs",
+  "files": [
+    {
+      "path": "hhhusher-specs.css",
+      "content": "/* Each group of the table fades in over its first ~40% of a screen in view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-specs-row {\n      animation: hhhusher-specs-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 40vh;\n    }\n  }\n}\n\n@keyframes hhhusher-specs-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-specs.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherButton } from \"@foundry/hhhusher-button\";\nimport { HhhusherLines } from \"@foundry/hhhusher-lines\";\nimport \"./hhhusher-specs.css\";\n\nexport interface HhhusherSpecRow {\n  /** what is measured, e.g. \"Height\" */\n  label: string;\n  /** the value, e.g. \"62 mm (2.4 in)\" */\n  value: string;\n}\n\nexport interface HhhusherSpecGroup {\n  /** the group's name, e.g. \"Snares\" */\n  label: string;\n  rows: HhhusherSpecRow[];\n}\n\nexport interface HhhusherSpecsProps {\n  /** the big heading, one entry per line */\n  title: string[];\n  /** a short note beside (desktop) or under (phones) the table */\n  text: string;\n  /** the yellow button under the note */\n  cta?: { label: string; href: string };\n  /** the table, in groups */\n  groups: HhhusherSpecGroup[];\n  /** the id other links jump to */\n  id?: string;\n  className?: string;\n}\n\n/**\n * A dark spec sheet: a big two-line heading, then a table set entirely in bold mono capitals,\n * groups divided by cream rules and rows by faint ones (group name, what, value right-aligned),\n * with a short note and a yellow button in a narrow column on the left. Phones put the group\n * name on its own row and move the note under the table. Rows fade in as they enter.\n */\nexport function HhhusherSpecs({ title, text, cta, groups, id, className }: HhhusherSpecsProps) {\n  const mono = \"font-mono text-[0.86rem] leading-[1.15] font-bold uppercase lg:text-sm\";\n  return (\n    <section id={id} className={cn(\"dark bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page px-gutter lg:grid-cols-[350fr_1010fr]\">\n        <HhhusherLines\n          as=\"h2\"\n          lines={title}\n          className=\"font-display text-[2.6rem] leading-[1.05] font-medium tracking-[-0.02em] lg:col-span-2 lg:text-[4.5rem] lg:leading-[1.08]\"\n        />\n\n        <div className=\"order-3 mt-24 max-w-[19rem] lg:order-none lg:mt-[5.4rem]\">\n          <p className=\"text-[1.04rem] leading-[1.3] font-semibold lg:text-base\">{text}</p>\n          {cta && (\n            <HhhusherButton href={cta.href} className=\"mt-5 px-8 lg:mt-5\">\n              {cta.label}\n            </HhhusherButton>\n          )}\n        </div>\n\n        <div className=\"mt-16 lg:mt-[5.25rem]\">\n          {groups.map((group, g) => (\n            <div key={g} className=\"hhhusher-specs-row grid border-t-2 border-foreground lg:grid-cols-[350fr_660fr]\">\n              <h3 className={cn(mono, \"flex h-[3.75rem] items-center lg:h-[3.625rem]\")}>{group.label}</h3>\n              <dl className=\"flex flex-col\">\n                {group.rows.map((row, r) => (\n                  <div key={r} className={cn(\"flex items-center justify-between gap-6 border-t border-border py-[1.3rem] lg:min-h-[3.625rem] lg:py-2\", r === 0 && \"lg:border-t-0\")}>\n                    <dt className={mono}>{row.label}</dt>\n                    <dd className={cn(mono, \"text-right\")}>{row.value}</dd>\n                  </div>\n                ))}\n              </dl>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button",
+    "hhhusher-lines"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the big heading, one entry per line"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "a short note beside (desktop) or under (phones) the table"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the yellow button under the note"
+    },
+    {
+      "name": "groups",
+      "type": "HhhusherSpecGroup[]",
+      "required": true,
+      "description": "the table, in groups"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the id other links jump to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "44c1ba1a54dfccfdb69fac9ed3e26e8e27bbf346a51c97572965a09812cb60f1"
+}

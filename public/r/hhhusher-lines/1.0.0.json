@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "HHHusher line reveal",
+  "description": "Big text given line by line. On wide screens each line rises into place and fades in as it scrolls into view, later lines a little later and from further down; on phones the lines flow as one paragraph and fade in one after another.",
+  "category": "text-effect",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "reveal",
+    "scroll",
+    "stagger",
+    "lines",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "CSS scroll-driven (animation-timeline: view()); without support or with reduced motion the text simply shows",
+    "pass the lines as they break at 1440px; style the size through className"
+  ],
+  "entry": "hhhusher-lines.tsx",
+  "source": "foundry",
+  "name": "hhhusher-lines",
+  "files": [
+    {
+      "path": "hhhusher-lines.css",
+      "content": "/* Line-by-line rise. Each line starts its reveal a little after the one before (--hhhusher-line\n   is its index), rises from 40px plus 14px per line, and finishes ~30% of a screen after\n   entering. Phones (inline lines) only fade: translate does nothing on inline boxes.\n   Browsers without scroll-driven animations, and reduced motion, show the text in place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-line {\n      animation: hhhusher-lines-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--hhhusher-line, 0) * 25%) entry calc(100% + 30vh + var(--hhhusher-line, 0) * 25%);\n    }\n  }\n}\n\n@keyframes hhhusher-lines-rise {\n  from {\n    opacity: 0;\n    translate: 0 calc(2.5rem + var(--hhhusher-line, 0) * 0.875rem);\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-lines.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./hhhusher-lines.css\";\n\nexport interface HhhusherLinesProps {\n  /** the text, one entry per line as it breaks on a wide screen */\n  lines: string[];\n  /** the element to render */\n  as?: \"h1\" | \"h2\" | \"h3\" | \"p\";\n  /**\n   * rise: each line rises (later lines from further down) and fades in as it scrolls into view\n   * · none: no motion\n   */\n  reveal?: \"rise\" | \"none\";\n  className?: string;\n}\n\n/**\n * Text set line by line. From 64rem up each line is its own row and rises into place as it\n * scrolls into view, later lines a little later and from further down. Below that the lines\n * flow together as one paragraph (so phones break them naturally) and only fade in, in turn.\n */\nexport function HhhusherLines({ lines, as: Tag = \"p\", reveal = \"rise\", className }: HhhusherLinesProps) {\n  return (\n    <Tag className={className}>\n      {lines.map((line, i) => (\n        <span\n          key={i}\n          className={cn(\"lg:block\", reveal === \"rise\" && \"hhhusher-line\")}\n          style={{ \"--hhhusher-line\": i } as CSSProperties}\n        >\n          {line}\n          {i < lines.length - 1 && \" \"}\n        </span>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lines",
+      "type": "string[]",
+      "required": true,
+      "description": "the text, one entry per line as it breaks on a wide screen"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "p",
+      "description": "the element to render"
+    },
+    {
+      "name": "reveal",
+      "type": "enum",
+      "required": false,
+      "default": "rise",
+      "description": "rise: each line rises (later lines from further down) and fades in as it scrolls into view\n· none: no motion"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "40f5b49bae1cfe6c9edbe2fe50fd224068d47c145d8179c5f946b143ed580a25"
+}

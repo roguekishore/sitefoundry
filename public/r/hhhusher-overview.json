@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher use-case cards",
+  "description": "Dark photo cards on a camel band. A wide card carries a title top-left and a row of tabs at the bottom: the open tab is a wide yellow panel with a number, a paragraph and an arrow link, the others narrow glass tiles that outline on hover; clicking one swaps the photo with a slow fade. Below, a tall card left and two stacked cards right, each with a title, a paragraph and a yellow arrow link. Cards fade in as they enter and their photos drift slowly against the scroll.",
+  "category": "features",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "bento",
+    "tabs",
+    "dark-cards",
+    "tan",
+    "yellow",
+    "parallax",
+    "reveal",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "the band is the theme's secondary (tan); the cards wrap themselves in .dark",
+    "media per tab and per card; empty slots show a dark placeholder at the same size",
+    "no top padding of its own: it follows hhhusher-statement; add pt-section when used alone",
+    "tabs need JavaScript (hydrate: visible); without it the first tab stays open"
+  ],
+  "entry": "hhhusher-overview.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-overview",
+  "files": [
+    {
+      "path": "hhhusher-overview.css",
+      "content": "/* Each card fades in over its first ~45% of a screen in view, and the media inside drifts\n   from -72px to 72px across the whole time the card is on screen (the card crops it with\n   overflow: clip, which keeps the scroll timeline working). */\n.hhhusher-overview-card {\n  view-timeline-name: --hhhusher-overview-card;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-overview-card {\n      animation: hhhusher-overview-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 45vh;\n    }\n    .hhhusher-overview-media {\n      animation: hhhusher-overview-drift linear both;\n      animation-timeline: --hhhusher-overview-card;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-overview-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes hhhusher-overview-drift {\n  from {\n    translate: 0 -4.5rem;\n  }\n  to {\n    translate: 0 4.5rem;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-overview.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherButton, hhhusherEase, hhhusherLabel } from \"@foundry/hhhusher-button\";\nimport \"./hhhusher-overview.css\";\n\nexport interface HhhusherOverviewLink {\n  label: string;\n  href: string;\n}\n\nexport interface HhhusherOverviewTab {\n  /** the small number in the tab, e.g. \"01\" */\n  index: string;\n  /** the tab's name, in mono capitals */\n  label: string;\n  /** the big title at the card's top-left while this tab is open */\n  title: string;\n  /** one line under the title */\n  subtitle: string;\n  /** the paragraph inside the open (yellow) tab */\n  text: string;\n  /** the small arrow link inside the open tab */\n  link?: HhhusherOverviewLink;\n  /** the photo or video behind the card while this tab is open */\n  media?: ReactNode;\n}\n\nexport interface HhhusherOverviewCard {\n  title: string;\n  text: string;\n  /** the small yellow arrow link under the text */\n  link?: HhhusherOverviewLink;\n  /** the image filling the card */\n  media?: ReactNode;\n}\n\nexport interface HhhusherOverviewProps {\n  /** the tabs of the wide card (two to four) */\n  tabs: HhhusherOverviewTab[];\n  /** three cards below: a tall one on the left, two stacked on the right */\n  cards: HhhusherOverviewCard[];\n  className?: string;\n}\n\n/** A quiet placeholder for a missing photo: a dark surface with a soft wash, taller than its frame so it can drift. */\nfunction MediaSlot({ media }: { media?: ReactNode }) {\n  return (\n    <div className=\"hhhusher-overview-media absolute inset-x-0 -inset-y-[4.5rem] [&>*]:size-full [&>*]:object-cover\">\n      {media ?? <div aria-hidden className=\"bg-muted bg-[linear-gradient(160deg,var(--muted),var(--card)_70%)]\" />}\n    </div>\n  );\n}\n\n/**\n * Use-case cards on a camel band. A wide dark card shows a photo with a title top-left and a\n * row of tabs at the bottom: the open tab is a wide yellow panel with a number, a paragraph\n * and an arrow link, the others are narrow glass tiles. Below, a tall card left and two\n * stacked cards right, each a photo with a title, a paragraph and a yellow arrow link.\n * Cards fade in as they enter and their photos drift slowly against the scroll.\n */\nexport function HhhusherOverview({ tabs, cards, className }: HhhusherOverviewProps) {\n  const [active, setActive] = useState(0);\n  const current = tabs[active] ?? tabs[0];\n  const aspects = [\"aspect-[0.87]\", \"aspect-square\", \"aspect-[1.15]\"];\n\n  return (\n    <section className={cn(\"bg-secondary pb-section text-secondary-foreground lg:pb-[11.5rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col gap-[1.3rem] px-gutter lg:gap-10\">\n        <article className=\"hhhusher-overview-card dark relative flex aspect-[0.5] flex-col overflow-clip rounded-lg bg-card text-foreground lg:aspect-[1.89]\">\n          {tabs.map((tab, i) => (\n            <div key={i} className={cn(\"absolute inset-0 transition-opacity duration-700\", hhhusherEase, i === active ? \"opacity-100\" : \"opacity-0\")}>\n              <MediaSlot media={tab.media} />\n            </div>\n          ))}\n          <div className=\"relative p-[1.3rem] lg:p-10\">\n            <h3 className=\"font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[2rem]\">{current.title}</h3>\n            <p className=\"mt-3 text-[1.04rem] font-medium lg:mt-5 lg:text-base\">{current.subtitle}</p>\n          </div>\n\n          <div className=\"relative mt-auto flex flex-col gap-2.5 p-[1.3rem] lg:flex-row lg:p-10\">\n            {tabs.map((tab, i) =>\n              i === active ? (\n                <div\n                  key={i}\n                  className=\"flex flex-col gap-3 rounded-lg bg-primary p-[0.45rem] pb-6 text-primary-foreground lg:w-[35rem] lg:shrink-0 lg:flex-row lg:gap-0 lg:p-6\"\n                >\n                  <span className={cn(hhhusherLabel, \"font-medium lg:w-[3.8rem] lg:shrink-0\")}>{tab.index}</span>\n                  <div className=\"flex flex-col items-start gap-4 px-4 lg:max-w-[23.5rem] lg:gap-3 lg:px-0\">\n                    <span className={cn(hhhusherLabel, \"text-[0.86rem] lg:text-[0.875rem]\")}>{tab.label}</span>\n                    <p className=\"text-[0.82rem] leading-[1.15] font-medium lg:text-sm lg:leading-[1.15]\">{tab.text}</p>\n                    {tab.link && (\n                      <HhhusherButton href={tab.link.href} variant=\"link\">\n                        {tab.link.label}\n                      </HhhusherButton>\n                    )}\n                  </div>\n                </div>\n              ) : (\n                <button\n                  key={i}\n                  type=\"button\"\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"flex h-[4.5rem] items-center justify-between rounded-lg border-2 border-transparent bg-foreground/15 px-6 text-left text-foreground backdrop-blur-sm\",\n                    \"transition-[background-color,border-color] duration-300 hover:border-foreground hover:bg-transparent motion-reduce:transition-none\",\n                    \"lg:h-auto lg:min-h-[9.5rem] lg:w-[8.625rem] lg:flex-col lg:items-start lg:py-7\",\n                    hhhusherEase,\n                  )}\n                >\n                  <span className={cn(hhhusherLabel, \"font-medium\")}>{tab.index}</span>\n                  <span className={hhhusherLabel}>{tab.label}</span>\n                </button>\n              ),\n            )}\n          </div>\n        </article>\n\n        <div className=\"grid gap-[1.3rem] lg:grid-cols-[835fr_485fr] lg:gap-x-10 lg:gap-y-14\">\n          {cards.map((card, i) => (\n            <article\n              key={i}\n              className={cn(\n                \"hhhusher-overview-card dark relative overflow-clip rounded-lg bg-card text-foreground\",\n                aspects[i % 3],\n                i === 0 && \"lg:row-span-2 lg:aspect-auto\",\n              )}\n            >\n              <MediaSlot media={card.media} />\n              <div className=\"relative flex flex-col items-start p-[1.3rem] lg:max-w-[23rem] lg:p-10\">\n                <h3 className=\"font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[2rem]\">{card.title}</h3>\n                <p className=\"mt-2 text-[1.04rem] leading-[1.3] font-medium lg:mt-6 lg:text-base lg:leading-[1.3]\">{card.text}</p>\n                {card.link && (\n                  <HhhusherButton href={card.link.href} variant=\"link\" className=\"mt-4 text-primary lg:mt-6\">\n                    {card.link.label}\n                  </HhhusherButton>\n                )}\n              </div>\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button"
+  ],
+  "props": [
+    {
+      "name": "tabs",
+      "type": "HhhusherOverviewTab[]",
+      "required": true,
+      "description": "the tabs of the wide card (two to four)"
+    },
+    {
+      "name": "cards",
+      "type": "HhhusherOverviewCard[]",
+      "required": true,
+      "description": "three cards below: a tall one on the left, two stacked on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bd169ce6c57b79ceec371d4cbb2d28e08025057f67673f3d48a381e198a1b334"
+}

@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform hero with haloed frame",
+  "description": "A near-black green hero: a huge centred extra-bold headline, slate lead and paper pill button over a soft teal glow, then a big 33px-radius frame (a tall phone shape on mobile, wide on desktop) ringed by a spinning honey-to-mint halo. Everything rises in on load; the frame grows as you scroll and runs over the next section's top edge.",
+  "category": "hero",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "glow",
+    "halo",
+    "frame",
+    "load-in",
+    "scroll-scale",
+    "loop",
+    "centered"
+  ],
+  "notes": [
+    "forces dark colours; the frame's placeholder is the theme's foreground (paper) colour",
+    "the frame overlaps the next block: follow it with a block that has top padding",
+    "CSS only: load keyframes, a spinning conic ring, and a scroll(root) timeline for the grow"
+  ],
+  "entry": "plumeform-hero.tsx",
+  "source": "foundry",
+  "name": "plumeform-hero",
+  "files": [
+    {
+      "path": "plumeform-hero.css",
+      "content": "/* Load: the backdrop blooms in (1.6s), the title and lead rise in place, the button and the\n   frame rise and fade in (650ms). Loop: a honey-to-mint ring spins behind the frame's edge\n   (3s). Scroll: the frame grows from --plumeform-hero-from to --plumeform-hero-to over the\n   first screen while its glow fades. */\n.plumeform-hero-aurora {\n  animation: plumeform-hero-aurora 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;\n}\n.plumeform-hero-rise-in-place {\n  animation: plumeform-hero-rise-in-place 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;\n}\n.plumeform-hero-rise {\n  animation: plumeform-hero-rise 650ms cubic-bezier(0.2, 0.8, 0.2, 1) both;\n}\n.plumeform-hero-halo {\n  animation: plumeform-hero-halo 3s linear infinite;\n}\n.plumeform-hero-grow {\n  transform: scale(var(--plumeform-hero-from));\n  transform-origin: 50% 0;\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-hero-grow {\n      animation: plumeform-hero-grow linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 100vh;\n    }\n    .plumeform-hero-glow {\n      animation: plumeform-hero-glow linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 100vh;\n    }\n  }\n}\n\n@keyframes plumeform-hero-aurora {\n  from { opacity: 0; transform: scale(1.08); }\n}\n@keyframes plumeform-hero-rise-in-place {\n  from { transform: translateY(18px); }\n}\n@keyframes plumeform-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n}\n@keyframes plumeform-hero-halo {\n  to { transform: rotate(360deg); }\n}\n@keyframes plumeform-hero-grow {\n  from { transform: scale(var(--plumeform-hero-from)); }\n  to { transform: scale(var(--plumeform-hero-to)); }\n}\n@keyframes plumeform-hero-glow {\n  to { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .plumeform-hero-aurora,\n  .plumeform-hero-rise-in-place,\n  .plumeform-hero-rise,\n  .plumeform-hero-halo { animation: none; }\n}\n"
+    },
+    {
+      "path": "plumeform-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBand } from \"@foundry/plumeform-band\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport \"./plumeform-hero.css\";\n\nexport interface PlumeformHeroProps {\n  /** the big centred headline */\n  title: ReactNode;\n  /** the paragraph under it */\n  lead: ReactNode;\n  /** the pill button */\n  cta: { label: string; href: string };\n  /** small label at the frame's top left, e.g. \"A live quiz\" */\n  frameLabel?: string;\n  /** small note at the frame's top right */\n  frameNote?: string;\n  /** what the frame shows (an embedded demo, a video, a screenshot); empty shows a paper placeholder */\n  media?: ReactNode;\n  /** art behind the band (the original's WebGL fluted glass); empty shows a soft glow */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\n/**\n * Dark hero: centred extra-bold headline, lead and pill button over a glowing backdrop, then a\n * big rounded frame ringed by a spinning honey-to-mint halo. The frame starts slightly\n * scaled down and grows as the page scrolls, running over the next block's top edge.\n */\nexport function PlumeformHero({ title, lead, cta, frameLabel, frameNote, media, backdrop, className }: PlumeformHeroProps) {\n  return (\n    <PlumeformBand\n      className={cn(\"z-10 flow-root overflow-visible overflow-x-clip pt-[calc(3.75rem+2.75rem)] lg:pt-[calc(3.75rem+4.5rem)]\", className)}\n      backdrop={\n        <div className=\"plumeform-hero-aurora\">\n          {backdrop ?? (\n            <div className=\"size-full bg-[radial-gradient(60%_45%_at_50%_30%,color-mix(in_oklab,var(--glow)_55%,transparent),transparent_75%),radial-gradient(35%_50%_at_90%_60%,color-mix(in_oklab,var(--glow)_30%,transparent),transparent_70%),radial-gradient(35%_50%_at_8%_70%,color-mix(in_oklab,var(--glow)_25%,transparent),transparent_70%)]\" />\n          )}\n        </div>\n      }\n    >\n      <div className=\"mx-auto max-w-page px-gutter text-center\">\n        <h1 className=\"plumeform-hero-rise-in-place mx-auto max-w-[50rem] font-display text-[3.75rem] leading-[1.06] font-extrabold tracking-[-0.03em] text-balance lg:text-[4.5rem] lg:leading-[1.15]\">\n          {title}\n        </h1>\n        <p\n          className=\"plumeform-hero-rise-in-place mx-auto mt-7 max-w-[48rem] text-lg leading-8 text-muted-foreground lg:text-xl\"\n          style={{ animationDelay: \"80ms\" }}\n        >\n          {lead}\n        </p>\n        <div className=\"plumeform-hero-rise mt-9\" style={{ animationDelay: \"160ms\" }}>\n          <PlumeformButton href={cta.href} arrow className=\"h-10 px-6 text-[0.9375rem]\">\n            {cta.label}\n          </PlumeformButton>\n        </div>\n\n        {/* The frame: the outer box sets the layout size, the inner one rises in on load and\n            grows with the scroll. The negative bottom margin lets the band end at the frame's\n            scaled-down bottom, so the frame overruns the next block as it grows. */}\n        <div\n          className=\"plumeform-hero-rise relative mx-auto mt-11 -mb-[calc(40%-7rem)] w-full max-w-[21rem] sm:max-w-[44rem] lg:-mb-[calc(9%-1.75rem)] lg:max-w-[68.75rem]\"\n          style={{ animationDelay: \"240ms\" }}\n        >\n          <div\n            className=\"plumeform-hero-grow relative [--plumeform-hero-from:0.8] [--plumeform-hero-to:0.94] lg:[--plumeform-hero-from:0.84] lg:[--plumeform-hero-to:0.92]\"\n          >\n            <span aria-hidden className=\"plumeform-hero-glow pointer-events-none absolute -inset-10 -z-10 rounded-full bg-glow/30 blur-3xl\" />\n            <div className=\"relative isolate overflow-clip rounded-[2.0625rem] p-[3px] shadow-[0_40px_90px_-40px_color-mix(in_oklab,var(--glow)_70%,transparent)]\">\n              <span\n                aria-hidden\n                className=\"plumeform-hero-halo absolute top-1/2 left-1/2 -z-10 aspect-square w-[260%] sm:w-[180%] lg:w-[160%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,var(--chart-4),var(--highlight),var(--chart-2),var(--highlight),var(--chart-4))]\"\n              />\n              <div className=\"relative aspect-[338/680] overflow-clip rounded-[1.875rem] bg-foreground text-background sm:aspect-[4/3] lg:aspect-[1100/675]\">\n                {(frameLabel || frameNote) && (\n                  <div className=\"absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 px-5 pt-3.5 text-[0.6875rem]\">\n                    <span className=\"font-semibold\">{frameLabel}</span>\n                    <span className=\"opacity-70\">{frameNote}</span>\n                  </div>\n                )}\n                {media && <div className=\"size-full [&>*]:size-full [&>*]:object-cover\">{media}</div>}\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </PlumeformBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-band",
+    "plumeform-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big centred headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the pill button"
+    },
+    {
+      "name": "frameLabel",
+      "type": "string",
+      "required": false,
+      "description": "small label at the frame's top left, e.g. \"A live quiz\""
+    },
+    {
+      "name": "frameNote",
+      "type": "string",
+      "required": false,
+      "description": "small note at the frame's top right"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what the frame shows (an embedded demo, a video, a screenshot); empty shows a paper placeholder"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original's WebGL fluted glass); empty shows a soft glow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cb17e527cc656e64e79827c5b1ba0893a299e91f0880ef5256b5211a6d461977"
+}

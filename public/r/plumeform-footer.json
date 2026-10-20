@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform teal gradient card footer",
+  "description": "A footer card inset a few pixels from the window, rounded on top, fading from deep teal to near-black green: wordmark and tagline with a quiet link and a paper pill on the right, five columns of links under tracked capitals, a row that opens to more links, and a bottom line with copyright, legal links and an email address.",
+  "category": "footer",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "teal",
+    "gradient",
+    "card",
+    "columns",
+    "reveal"
+  ],
+  "notes": [
+    "forces dark colours over a chart-1 gradient",
+    "the expanding row is native <details>; CSS only"
+  ],
+  "entry": "plumeform-footer.tsx",
+  "source": "foundry",
+  "name": "plumeform-footer",
+  "files": [
+    {
+      "path": "plumeform-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface PlumeformFooterProps {\n  /** wordmark next to the logo */\n  brand: string;\n  /** logo mark (an svg, img or lucide icon) */\n  logo?: ReactNode;\n  homeHref?: string;\n  /** a line under the wordmark */\n  tagline?: ReactNode;\n  /** a quiet link before the button on the right */\n  secondary?: PlumeformFooterLink;\n  /** the paper pill button on the right */\n  cta?: PlumeformFooterLink;\n  /** link columns: two to a row on phones, five on desktop */\n  columns: { title: string; links: PlumeformFooterLink[] }[];\n  /** a row that opens to more links (e.g. the whole library) */\n  library?: { title: string; text?: string; links: PlumeformFooterLink[] };\n  /** the small line at the very bottom, e.g. \"© 2026 …\" */\n  copyright: string;\n  legal?: PlumeformFooterLink[];\n  /** a contact address on the right of the bottom row */\n  contact?: PlumeformFooterLink;\n  className?: string;\n}\n\n/** A card footer fading from deep teal to the darkest green with rounded top corners, inset from the window's edges. */\nexport function PlumeformFooter({ brand, logo, homeHref = \"/\", tagline, secondary, cta, columns, library, copyright, legal, contact, className }: PlumeformFooterProps) {\n  const linkClass = \"text-foreground/85 transition-colors duration-200 hover:text-foreground hover:underline hover:underline-offset-4 motion-reduce:transition-none\";\n  return (\n    <footer className={cn(\"bg-background px-2 pb-2 lg:px-4 lg:pb-0\", className)}>\n      <div\n        className=\"dark rounded-2xl bg-linear-to-b from-[color-mix(in_oklab,var(--chart-1)_80%,var(--background))] via-[color-mix(in_oklab,var(--chart-1)_45%,var(--background))] to-background text-foreground lg:rounded-b-none\"\n      >\n        <PlumeformReveal className=\"mx-auto max-w-page px-gutter pt-20 pb-12 lg:pt-24 lg:pb-14\">\n          <div className=\"flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between\">\n            <div className=\"max-w-sm\">\n              <a href={homeHref} aria-label={brand} className=\"flex items-center gap-2 text-[1.375rem] font-bold tracking-[-0.02em] [&_svg]:size-6\">\n                {logo}\n                <span>{brand}</span>\n              </a>\n              {tagline && <p className=\"mt-5 text-[0.9375rem] leading-6 text-foreground/80\">{tagline}</p>}\n            </div>\n            {(secondary || cta) && (\n              <div className=\"flex items-center gap-6\">\n                {secondary && (\n                  <a href={secondary.href} className=\"text-[0.9375rem] font-bold text-foreground/90 transition-colors hover:text-foreground hover:underline\">\n                    {secondary.label}\n                  </a>\n                )}\n                {cta && (\n                  <PlumeformButton href={cta.href} size=\"sm\" arrow className=\"h-8 text-sm\">\n                    {cta.label}\n                  </PlumeformButton>\n                )}\n              </div>\n            )}\n          </div>\n\n          <div className=\"mt-14 grid grid-cols-2 gap-x-6 gap-y-14 lg:mt-14 lg:grid-cols-5\">\n            {columns.map((col) => (\n              <div key={col.title}>\n                <p className=\"text-[0.6875rem] font-bold tracking-[0.16em] text-foreground/70 uppercase\">{col.title}</p>\n                <ul className=\"mt-6 space-y-5 text-sm\">\n                  {col.links.map((l) => (\n                    <li key={l.href + l.label}>\n                      <a href={l.href} className={linkClass}>\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n\n          {library && (\n            <details className=\"group mt-14 border-y border-border\">\n              <summary className=\"flex cursor-pointer list-none items-center justify-between gap-4 py-6 [&::-webkit-details-marker]:hidden\">\n                <span>\n                  <span className=\"block text-[0.9375rem] font-bold\">{library.title}</span>\n                  {library.text && <span className=\"mt-1 block text-[0.8125rem] text-foreground/75\">{library.text}</span>}\n                </span>\n                <Plus aria-hidden className=\"size-4 shrink-0 transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none\" strokeWidth={2} />\n              </summary>\n              <ul className=\"flex flex-wrap gap-x-6 gap-y-3 pb-6 text-sm\">\n                {library.links.map((l) => (\n                  <li key={l.href + l.label}>\n                    <a href={l.href} className={linkClass}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </details>\n          )}\n\n          <div className={cn(\"flex flex-col gap-6 text-[0.8125rem] text-foreground/80 lg:flex-row lg:items-center lg:justify-between\", library ? \"pt-8\" : \"mt-14 border-t border-border pt-8\")}>\n            <p>{copyright}</p>\n            {legal && (\n              <ul className=\"flex flex-wrap gap-x-5 gap-y-2\">\n                {legal.map((l) => (\n                  <li key={l.href + l.label}>\n                    <a href={l.href} className={linkClass}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {contact && (\n              <a href={contact.href} className={linkClass}>\n                {contact.label}\n              </a>\n            )}\n          </div>\n        </PlumeformReveal>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-button",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark next to the logo"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "logo mark (an svg, img or lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "tagline",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a line under the wordmark"
+    },
+    {
+      "name": "secondary",
+      "type": "PlumeformFooterLink",
+      "required": false,
+      "description": "a quiet link before the button on the right"
+    },
+    {
+      "name": "cta",
+      "type": "PlumeformFooterLink",
+      "required": false,
+      "description": "the paper pill button on the right"
+    },
+    {
+      "name": "columns",
+      "type": "{ title: string; links: PlumeformFooterLink[]; }[]",
+      "required": true,
+      "description": "link columns: two to a row on phones, five on desktop"
+    },
+    {
+      "name": "library",
+      "type": "{ title: string; text?: string; links: PlumeformFooterLink[]; }",
+      "required": false,
+      "description": "a row that opens to more links (e.g. the whole library)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the small line at the very bottom, e.g. \"© 2026 …\""
+    },
+    {
+      "name": "legal",
+      "type": "PlumeformFooterLink[]",
+      "required": false
+    },
+    {
+      "name": "contact",
+      "type": "PlumeformFooterLink",
+      "required": false,
+      "description": "a contact address on the right of the bottom row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0e3f5abf42913f22045f193cf2d2f27744dcea9dc6ba68642d000a56f74fcaa9"
+}

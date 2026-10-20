@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer waitlist",
+  "description": "A pale grey band with a centred orange mono tag, a huge launch heading and a short paragraph, then a near-white form card floating on a perforated-plate field of pale dots: a price box with two mono prices, an email field, a consent checkbox and a full-width blue submit bar. Heading letters rise in as it scrolls into view; dots darken where the pointer passes.",
+  "category": "cta",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "waitlist",
+    "signup",
+    "form",
+    "pricing",
+    "dots",
+    "pattern",
+    "hover",
+    "split-text",
+    "reveal",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "a plain HTML form (action prop); no JavaScript",
+    "the dot field shows from lg up; on phones the card spans the width"
+  ],
+  "entry": "wiemer-waitlist.tsx",
+  "source": "foundry",
+  "name": "wiemer-waitlist",
+  "files": [
+    {
+      "path": "wiemer-waitlist.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { WiemerDotField } from \"@foundry/wiemer-dot-field\";\nimport { WiemerConsent, WiemerField, WiemerSubmit } from \"@foundry/wiemer-field\";\nimport { WiemerSplitText, wiemerReveal } from \"@foundry/wiemer-reveal\";\nimport { WiemerTag } from \"@foundry/wiemer-tag\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerWaitlistPrice {\n  /** the price, set in mono, e.g. \"€219\" */\n  price: string;\n  /** what it buys */\n  name: string;\n  /** a small note, e.g. tax and shipping */\n  note: string;\n}\n\nexport interface WiemerWaitlistProps {\n  /** small mono label above the heading */\n  tag: string;\n  /** the huge centred heading */\n  title: string;\n  /** the paragraph under the heading */\n  text: string;\n  /** the heading inside the card */\n  formTitle: string;\n  /** one or two prices shown in the card */\n  prices: WiemerWaitlistPrice[];\n  /** the email field */\n  email: { label: string; placeholder: string };\n  /** the consent sentence next to the checkbox; may hold a link */\n  consent: ReactNode;\n  /** the submit button text */\n  submit: string;\n  /** where the form posts */\n  action?: string;\n  /** anchor id */\n  id?: string;\n  className?: string;\n}\n\n/** Launch heading and a signup card on a dotted field. */\nexport function WiemerWaitlist({ tag, title, text, formTitle, prices, email, consent, submit, action, id = \"waitlist\", className }: WiemerWaitlistProps) {\n  return (\n    <section id={id} className={cn(\"bg-muted py-section text-foreground\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter text-center\">\n        <div className={wiemerReveal(\"fade\")}>\n          <WiemerTag>{tag}</WiemerTag>\n        </div>\n        <WiemerSplitText text={title} className=\"mt-5 font-display text-[40px] leading-[1.1] font-medium tracking-[-0.025em] md:mt-8 md:text-[9vw]\" />\n        <p className=\"mt-2 max-w-[30rem] text-[max(16px,1.2vw)] leading-[1.3] font-medium tracking-[-0.015em] md:mt-4\">{text}</p>\n      </div>\n\n      <div className=\"mx-auto mt-12 max-w-page px-gutter lg:mt-16\">\n        <WiemerDotField>\n          <form action={action} method=\"post\" className=\"mx-auto w-full max-w-[30rem] rounded-xl bg-card p-6 text-card-foreground md:rounded-2xl md:p-8\">\n            <h3 className=\"text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em]\">{formTitle}</h3>\n            <dl className=\"mt-5 grid gap-6 rounded-lg bg-muted p-6 sm:grid-cols-2\">\n              {prices.map((p) => (\n                <div key={p.name}>\n                  <dt className=\"font-mono text-[22px] leading-none\">{p.price}</dt>\n                  <dd className=\"mt-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.015em] whitespace-pre-line\">\n                    {p.name}\n                    {\"\\n\"}\n                    {p.note}\n                  </dd>\n                </div>\n              ))}\n            </dl>\n            <WiemerField label={email.label} name=\"email\" type=\"email\" placeholder={email.placeholder} required className=\"mt-10\" />\n            <WiemerConsent label={consent} className=\"mt-6\" />\n            <WiemerSubmit label={submit} className=\"mt-8\" />\n          </form>\n        </WiemerDotField>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-dot-field",
+    "wiemer-field",
+    "wiemer-reveal",
+    "wiemer-tag"
+  ],
+  "props": [
+    {
+      "name": "tag",
+      "type": "string",
+      "required": true,
+      "description": "small mono label above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the huge centred heading"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the heading"
+    },
+    {
+      "name": "formTitle",
+      "type": "string",
+      "required": true,
+      "description": "the heading inside the card"
+    },
+    {
+      "name": "prices",
+      "type": "WiemerWaitlistPrice[]",
+      "required": true,
+      "description": "one or two prices shown in the card"
+    },
+    {
+      "name": "email",
+      "type": "{ label: string; placeholder: string; }",
+      "required": true,
+      "description": "the email field"
+    },
+    {
+      "name": "consent",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the consent sentence next to the checkbox; may hold a link"
+    },
+    {
+      "name": "submit",
+      "type": "string",
+      "required": true,
+      "description": "the submit button text"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "default": "waitlist",
+      "description": "anchor id"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8cc924e81518afb17b28634fb53486c7ad1dbfa11fcc7008c2b32f6763183bd5"
+}

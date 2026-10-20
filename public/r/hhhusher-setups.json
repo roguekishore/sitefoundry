@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher mic setups",
+  "description": "A dark full-bleed photo section with a column on the left: a small two-line heading, a list of numbered setups in mono capitals with grey index squares (the chosen and hovered ones turn yellow), the chosen setup's paragraph and a yellow button. Window-tall on phones, photo-shaped (1.49) on desktop. Rows fade in one after another as it enters; a newly chosen paragraph fades in.",
+  "category": "features",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "fullbleed",
+    "photo",
+    "list",
+    "selector",
+    "mono",
+    "yellow",
+    "reveal",
+    "stagger",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark); a left scrim keeps the text readable over any photo",
+    "one media slot for the section, or one per setup",
+    "choosing a setup needs JavaScript (hydrate: visible); without it the first stays chosen"
+  ],
+  "entry": "hhhusher-setups.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-setups",
+  "files": [
+    {
+      "path": "hhhusher-setups.css",
+      "content": "/* The setup rows fade in one after another as the list scrolls into view (each starts a\n   little later: --hhhusher-row is its index). A newly chosen paragraph fades in. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-setups-row {\n      animation: hhhusher-setups-fade linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--hhhusher-row, 0) * 40%) entry calc(100% + 25vh + var(--hhhusher-row, 0) * 40%);\n    }\n  }\n}\n\n.hhhusher-setups-text {\n  animation: hhhusher-setups-fade 0.4s cubic-bezier(0.32, 0.94, 0.6, 1) both;\n}\n\n@keyframes hhhusher-setups-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .hhhusher-setups-text {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-setups.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherButton, hhhusherEase, hhhusherLabel } from \"@foundry/hhhusher-button\";\nimport \"./hhhusher-setups.css\";\n\nexport interface HhhusherSetup {\n  /** the number in the small square, e.g. \"01\" */\n  index: string;\n  /** the setup's name, in mono capitals */\n  label: string;\n  /** the paragraph shown while this setup is selected */\n  text: string;\n  /** a photo for this setup (falls back to the section's media) */\n  media?: ReactNode;\n}\n\nexport interface HhhusherSetupsProps {\n  /** the small heading, one entry per line */\n  title: string[];\n  /** the selectable list */\n  setups: HhhusherSetup[];\n  /** the yellow button under the paragraph */\n  primary?: { label: string; href: string };\n  /** the photo filling the section behind the list */\n  media?: ReactNode;\n  /** the id other links jump to */\n  id?: string;\n  className?: string;\n}\n\n/**\n * A dark, full-bleed photo section with a column on the left: a small two-line heading, a list\n * of numbered setups (grey squares; the chosen one and the hovered one turn yellow), the chosen\n * setup's paragraph and a yellow button. The rows fade in one after another as it enters.\n */\nexport function HhhusherSetups({ title, setups, primary, media, id, className }: HhhusherSetupsProps) {\n  const [active, setActive] = useState(0);\n  const current = setups[active] ?? setups[0];\n  const shown = current?.media ?? media;\n\n  return (\n    <section\n      id={id}\n      className={cn(\"dark relative flex min-h-svh items-center overflow-clip bg-background text-foreground lg:min-h-0 lg:aspect-[1.49]\", className)}\n    >\n      <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">\n        {shown ?? <div aria-hidden className=\"bg-muted bg-[radial-gradient(ellipse_60%_70%_at_70%_40%,var(--card),var(--background))]\" />}\n      </div>\n      <div aria-hidden className=\"absolute inset-0 bg-gradient-to-r from-background/70 via-background/30 to-transparent\" />\n\n      <div className=\"relative mx-auto w-full max-w-page px-gutter py-10 lg:py-20\">\n        <h2 className=\"font-display text-[2.08rem] leading-[1] font-medium tracking-[-0.01em] lg:text-[2rem] lg:leading-[1.05]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </h2>\n\n        <ul className=\"mt-[1.1rem] flex flex-col gap-2.5 lg:mt-10\">\n          {setups.map((setup, i) => {\n            const on = i === active;\n            return (\n              <li key={i} className=\"hhhusher-setups-row\" style={{ \"--hhhusher-row\": i } as CSSProperties}>\n                <button type=\"button\" aria-pressed={on} onClick={() => setActive(i)} className=\"group flex items-center gap-[0.9rem] text-left lg:gap-[0.8rem]\">\n                  <span\n                    className={cn(\n                      hhhusherLabel,\n                      \"flex size-8 shrink-0 items-center justify-center rounded-sm border font-medium transition-[background-color,border-color,color] duration-300 lg:size-[1.875rem]\",\n                      hhhusherEase,\n                      on\n                        ? \"border-primary bg-primary text-primary-foreground\"\n                        : \"border-transparent bg-muted-foreground/70 text-background group-hover:bg-primary group-hover:text-primary-foreground\",\n                    )}\n                  >\n                    {setup.index}\n                  </span>\n                  <span\n                    className={cn(\n                      hhhusherLabel,\n                      \"transition-colors duration-300\",\n                      hhhusherEase,\n                      on ? \"text-primary\" : \"text-muted-foreground group-hover:text-primary\",\n                    )}\n                  >\n                    {setup.label}\n                  </span>\n                </button>\n              </li>\n            );\n          })}\n        </ul>\n\n        {current && (\n          <p key={active} className=\"hhhusher-setups-text mt-10 max-w-[45rem] text-[0.86rem] leading-[1.35] font-medium lg:mt-12 lg:text-base lg:leading-[1.3]\">\n            {current.text}\n          </p>\n        )}\n\n        {primary && (\n          <HhhusherButton href={primary.href} className=\"mt-12 lg:mt-12\">\n            {primary.label}\n          </HhhusherButton>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the small heading, one entry per line"
+    },
+    {
+      "name": "setups",
+      "type": "HhhusherSetup[]",
+      "required": true,
+      "description": "the selectable list"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the yellow button under the paragraph"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo filling the section behind the list"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the id other links jump to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "378122749ec9e545c7d07a381e9cf3f90253411abedadcd3860831ff6bb6670b"
+}

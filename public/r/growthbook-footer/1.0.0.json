@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook footer",
+  "description": "A deep navy footer: wordmark, a short company blurb, a row of soft grey social icons and two round outlined compliance badges on the left; five tidy link columns on the right (with an optional small violet NEW tag); a mono copyright and legal row at the foot. Phones stack it with a two-column link grid.",
+  "category": "footer",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "navy",
+    "links",
+    "columns",
+    "mono",
+    "badges",
+    "minimal"
+  ],
+  "notes": [
+    "forces the dark tokens (class dark)",
+    "badges are plain text in outlined circles (pass your own marks if you have them)"
+  ],
+  "entry": "growthbook-footer.tsx",
+  "source": "foundry",
+  "name": "growthbook-footer",
+  "files": [
+    {
+      "path": "growthbook-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GrowthbookFooterLink {\n  label: string;\n  href: string;\n  /** small violet tag after the label, e.g. \"NEW\" */\n  tag?: string;\n}\n\nexport interface GrowthbookFooterColumn {\n  title: string;\n  links: GrowthbookFooterLink[];\n}\n\nexport interface GrowthbookFooterProps {\n  /** wordmark text */\n  brand: string;\n  /** small mark before the wordmark */\n  brandIcon?: ReactNode;\n  blurb: string;\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** round outlined badges; each string in a badge is one line */\n  badges?: { label: string; lines: string[] }[];\n  columns: GrowthbookFooterColumn[];\n  copyright: string;\n  legal?: GrowthbookFooterLink[];\n  className?: string;\n}\n\nexport function GrowthbookFooter({ brand, brandIcon, blurb, socials, badges, columns, copyright, legal, className }: GrowthbookFooterProps) {\n  const link = \"transition-colors duration-250 ease-[ease] hover:text-glow motion-reduce:transition-none\";\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter pt-12 pb-8 md:px-[calc(var(--page-gutter)*2)] lg:pt-14 lg:pb-14\">\n        <div className=\"grid gap-y-16 lg:grid-cols-[25.25rem_minmax(0,1fr)] lg:gap-x-[4.5rem] lg:gap-y-12\">\n          <div>\n            <p className=\"flex items-center gap-2 text-[2rem] leading-none font-medium tracking-[-0.02em] lg:mt-5 lg:ml-2.5\">\n              {brandIcon && <span className=\"flex text-primary [&_svg]:size-8\">{brandIcon}</span>}\n              {brand}\n            </p>\n            <p className=\"mt-6 text-sm leading-[1.75] lg:mt-9\">{blurb}</p>\n          </div>\n\n          <nav className=\"grid grid-cols-2 gap-x-5 gap-y-10 lg:row-span-2 lg:grid-cols-5 lg:pt-2\">\n            {columns.map((c) => (\n              <div key={c.title}>\n                <p className=\"text-base\">{c.title}</p>\n                <ul className=\"mt-5 grid gap-3.5\">\n                  {c.links.map((l) => (\n                    <li key={l.label} className=\"flex items-center gap-2 text-sm leading-[1.5]\">\n                      <a href={l.href} className={link}>\n                        {l.label}\n                      </a>\n                      {l.tag && <span className=\"rounded-sm bg-primary px-1.5 py-px text-[0.625rem] leading-4 font-bold tracking-[1.5px] text-primary-foreground\">{l.tag}</span>}\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </nav>\n\n          <div>\n            {socials && (\n              <ul className=\"flex gap-12 pl-4 lg:mt-2\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className=\"flex text-foreground/55 transition-colors duration-250 hover:text-foreground motion-reduce:transition-none [&_svg]:size-7\">\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {badges && (\n              <ul className=\"mt-10 flex gap-2 lg:mt-12\">\n                {badges.map((b) => (\n                  <li\n                    key={b.label}\n                    aria-label={b.label}\n                    className=\"grid size-[4.5rem] place-items-center rounded-full border border-foreground/30 text-center text-xs leading-tight text-foreground/80 lg:size-24 lg:text-base\"\n                  >\n                    <span>\n                      {b.lines.map((l) => (\n                        <span key={l} className=\"block\">\n                          {l}\n                        </span>\n                      ))}\n                    </span>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n        </div>\n\n        <div className=\"mt-16 grid grid-cols-3 gap-4 font-mono text-xs leading-[1.75] lg:mt-[12.5rem] lg:flex lg:items-center lg:justify-between\">\n          <p>{copyright}</p>\n          {legal?.length ? (\n            <ul className=\"contents lg:flex lg:gap-8\">\n              {legal.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className={link}>\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          ) : null}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark text"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small mark before the wordmark"
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false
+    },
+    {
+      "name": "badges",
+      "type": "{ label: string; lines: string[]; }[]",
+      "required": false,
+      "description": "round outlined badges; each string in a badge is one line"
+    },
+    {
+      "name": "columns",
+      "type": "GrowthbookFooterColumn[]",
+      "required": true
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "legal",
+      "type": "GrowthbookFooterLink[]",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "66ada427b8f592071f17e956ac8d13e0907ec02e0f165f6c6a6b209c8f232bcf"
+}

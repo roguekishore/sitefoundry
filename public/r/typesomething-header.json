@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething header",
+  "description": "A sticky floating pill of white glass: a two-tone wordmark that types itself out, centred links with the current page as an acid pill, a language link and an acid CTA. While scrolling it slides up to the top edge and narrows; on phones a round acid button opens a menu panel.",
+  "category": "header",
+  "site": "typesomething",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "pill",
+    "glass",
+    "floating",
+    "acid",
+    "scroll-driven",
+    "typewriter",
+    "light"
+  ],
+  "notes": [
+    "the tuck-on-scroll uses a CSS scroll timeline on the page (scroll(root)); without support it just stays floating",
+    "phone menu is a native <details>; JavaScript only drives the typing wordmark (turn it off with typing={false})"
+  ],
+  "hydrate": "load",
+  "entry": "typesomething-header.tsx",
+  "source": "foundry",
+  "name": "typesomething-header",
+  "files": [
+    {
+      "path": "typesomething-header.css",
+      "content": "/* As the page scrolls its first 120px, the header's top inset closes (the pill meets the top\n   edge, its top corners square off) and on desktop the pill narrows. Driven by the page's\n   scroll position, no JavaScript; browsers without scroll timelines keep the resting look. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .typesomething-header {\n      animation: typesomething-header-tuck linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 120px;\n    }\n    .typesomething-header-pill {\n      animation: typesomething-header-pill-tuck linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 120px;\n    }\n    @media (min-width: 64rem) {\n      .typesomething-header-pill {\n        animation-name: typesomething-header-pill-narrow;\n      }\n    }\n  }\n}\n\n@keyframes typesomething-header-tuck {\n  to { padding-top: 0; }\n}\n\n@keyframes typesomething-header-pill-tuck {\n  to { border-top-left-radius: 0; border-top-right-radius: 0; border-top-color: transparent; }\n}\n\n@keyframes typesomething-header-pill-narrow {\n  to { max-width: 67.5rem; border-top-left-radius: 0; border-top-right-radius: 0; border-top-color: transparent; }\n}\n"
+    },
+    {
+      "path": "typesomething-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, Globe, Menu } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { TypesomethingWordmark } from \"@foundry/typesomething-wordmark\";\nimport \"./typesomething-header.css\";\n\nexport interface TypesomethingHeaderLink {\n  label: string;\n  href: string;\n  /** the page you're on: shown as an acid pill */\n  active?: boolean;\n}\n\nexport interface TypesomethingHeaderProps {\n  /** wordmark: bold first half and light second half (e.g. \"Paper\" + \"kite\") */\n  brand: { lead: string; tail: string };\n  /** small mark after the wordmark (a lucide icon or an svg) */\n  brandIcon?: ReactNode;\n  /** name of the home link, for screen readers */\n  homeLabel: string;\n  homeHref?: string;\n  /** the centred links */\n  links: TypesomethingHeaderLink[];\n  /** language switch at the right (e.g. \"EN\"); left out when empty */\n  language?: { label: string; href: string };\n  /** the acid pill at the right end */\n  cta: { label: string; href: string };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  /** the second half of the wordmark types itself out on a loop */\n  typing?: boolean;\n  className?: string;\n}\n\n/**\n * Sticky floating pill: white glass over the page, 14px in from the top. As the page scrolls\n * it slides up to the top edge and (on desktop) narrows. On phones the links fold into a\n * round acid menu button that opens a panel (native <details>, works without JavaScript).\n */\nexport function TypesomethingHeader({\n  brand,\n  brandIcon,\n  homeLabel,\n  homeHref = \"/\",\n  links,\n  language,\n  cta,\n  menuLabel = \"Menu\",\n  typing = true,\n  className,\n}: TypesomethingHeaderProps) {\n  return (\n    <header className={cn(\"typesomething-header sticky top-0 z-40 px-gutter pt-3.5 pb-3.5 text-foreground\", className)}>\n      <div className=\"typesomething-header-pill relative mx-auto flex h-[3.75rem] max-w-page items-center gap-4 rounded-[1.875rem] border border-foreground/14 bg-background/72 pr-2 pl-5 shadow-[0_8px_24px_-12px_color-mix(in_oklab,var(--foreground)_18%,transparent)] backdrop-blur-md lg:pl-6\">\n        <a href={homeHref} aria-label={homeLabel} className=\"flex items-center text-[1.3rem] [&_svg]:text-foreground\">\n          <TypesomethingWordmark lead={brand.lead} tail={brand.tail} icon={brandIcon} typing={typing} />\n        </a>\n\n        <nav className=\"mx-auto hidden items-center gap-1 lg:flex\">\n          {links.map((link) => (\n            <a\n              key={link.href}\n              href={link.href}\n              aria-current={link.active ? \"page\" : undefined}\n              className={cn(\n                \"flex h-10 items-center rounded-full px-4 text-[0.9rem] transition-colors duration-[140ms] ease-[ease] motion-reduce:transition-none\",\n                link.active ? \"bg-primary font-semibold text-primary-foreground\" : \"hover:bg-foreground/7\",\n              )}\n            >\n              {link.label}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"ml-auto hidden items-center gap-3 lg:ml-0 lg:flex\">\n          {language && (\n            <a href={language.href} className=\"flex h-10 items-center gap-1.5 rounded-full px-3 text-[0.8rem] font-semibold transition-colors duration-[140ms] hover:bg-foreground/7 [&_svg]:size-3.5\">\n              <Globe aria-hidden />\n              {language.label}\n            </a>\n          )}\n          <a\n            href={cta.href}\n            className=\"flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-[0.84rem] font-bold text-primary-foreground transition-[color,background-color] duration-[160ms] ease-[ease] hover:bg-foreground hover:text-background motion-reduce:transition-none [&_svg]:size-4\"\n          >\n            {cta.label}\n            <ArrowRight aria-hidden />\n          </a>\n        </div>\n\n        <details className=\"group ml-auto lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"grid size-11 cursor-pointer list-none place-items-center rounded-full bg-primary text-primary-foreground [&::-webkit-details-marker]:hidden [&_svg]:size-5\"\n          >\n            <Menu aria-hidden />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-lg border border-foreground/14 bg-background p-3 shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_14%,transparent)]\">\n            {links.map((link) => (\n              <a\n                key={link.href}\n                href={link.href}\n                aria-current={link.active ? \"page\" : undefined}\n                className={cn(\"flex h-12 items-center rounded-full px-4 text-base\", link.active ? \"bg-primary font-semibold text-primary-foreground\" : \"hover:bg-muted\")}\n              >\n                {link.label}\n              </a>\n            ))}\n            <div className=\"mt-2 flex items-center justify-between gap-3 border-t border-foreground/14 pt-3\">\n              {language && (\n                <a href={language.href} className=\"flex items-center gap-1.5 px-4 text-sm font-semibold [&_svg]:size-4\">\n                  <Globe aria-hidden />\n                  {language.label}\n                </a>\n              )}\n              <a href={cta.href} className=\"ml-auto flex h-11 items-center gap-2 rounded-full bg-primary px-5 text-sm font-bold text-primary-foreground [&_svg]:size-4\">\n                {cta.label}\n                <ArrowRight aria-hidden />\n              </a>\n            </div>\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "typesomething-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ lead: string; tail: string; }",
+      "required": true,
+      "description": "wordmark: bold first half and light second half (e.g. \"Paper\" + \"kite\")"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small mark after the wordmark (a lucide icon or an svg)"
+    },
+    {
+      "name": "homeLabel",
+      "type": "string",
+      "required": true,
+      "description": "name of the home link, for screen readers"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "TypesomethingHeaderLink[]",
+      "required": true,
+      "description": "the centred links"
+    },
+    {
+      "name": "language",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "language switch at the right (e.g. \"EN\"); left out when empty"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the acid pill at the right end"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "typing",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "the second half of the wordmark types itself out on a loop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1ac98da8125e19e0b906a7dcb3270a6858aa77985f60d875c635ec9d51d2e6ec"
+}

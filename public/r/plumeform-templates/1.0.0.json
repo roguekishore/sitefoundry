@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform template library",
+  "description": "On warm paper: a bold two-part heading (the second half quieter), a row of topic pills with the first in ink, then a three-column grid of white glass link cards (mint icon tile, title, meta line, arrow) that lift, gain a teal edge and nudge their arrow on hover.",
+  "category": "features",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "templates",
+    "cards",
+    "grid",
+    "light",
+    "hover",
+    "lift",
+    "pills",
+    "reveal"
+  ],
+  "notes": [
+    "the original's cards were not visible in the capture (they reveal on scroll); this layout follows its class names and the site's card style",
+    "CSS only"
+  ],
+  "entry": "plumeform-templates.tsx",
+  "source": "foundry",
+  "name": "plumeform-templates",
+  "files": [
+    {
+      "path": "plumeform-templates.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBadge } from \"@foundry/plumeform-badge\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformLink } from \"@foundry/plumeform-link\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformTemplate {\n  title: string;\n  href: string;\n  /** a line under the title, e.g. \"12 questions · 6 min\" */\n  meta?: string;\n  /** a small line icon in the tile */\n  icon?: ReactNode;\n  /** a tier tag, e.g. \"Plus\" */\n  badge?: string;\n}\n\nexport interface PlumeformTemplatesProps {\n  eyebrow?: string;\n  /** the heading; a second part can be passed as `titleAside` and shows quieter */\n  title: ReactNode;\n  titleAside?: ReactNode;\n  body?: ReactNode;\n  /** topic pills over the cards; the first shows as selected */\n  topics?: { label: string; href: string }[];\n  templates: PlumeformTemplate[];\n  link?: { label: string; href: string };\n  id?: string;\n  className?: string;\n}\n\n/** A template library on paper: heading, topic pills, then white link cards that lift on hover. */\nexport function PlumeformTemplates({ eyebrow, title, titleAside, body, topics, templates, link, id, className }: PlumeformTemplatesProps) {\n  return (\n    <section id={id} className={cn(\"bg-background pt-section pb-16 text-foreground lg:pb-20\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <PlumeformHeading\n          eyebrow={eyebrow}\n          title={\n            <>\n              {title}\n              {titleAside && (\n                <>\n                  {\" \"}\n                  <span className=\"text-muted-foreground\">{titleAside}</span>\n                </>\n              )}\n            </>\n          }\n          className=\"max-w-[40rem]\"\n        >\n          {body}\n        </PlumeformHeading>\n\n        {topics && (\n          <PlumeformReveal step={1} className=\"mt-10 flex flex-wrap gap-2\">\n            {topics.map((t, i) => (\n              <a\n                key={t.href}\n                href={t.href}\n                className={cn(\n                  \"inline-flex h-10 items-center rounded-full border px-4 text-[0.8125rem] font-bold transition-colors duration-200 motion-reduce:transition-none\",\n                  i === 0 ? \"border-primary bg-primary text-primary-foreground\" : \"border-border bg-secondary text-secondary-foreground hover:bg-accent\",\n                )}\n              >\n                {t.label}\n              </a>\n            ))}\n          </PlumeformReveal>\n        )}\n\n        <ul className=\"mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3\">\n          {templates.map((t, i) => (\n            <PlumeformReveal key={t.href} as=\"li\" step={i % 3}>\n              <a\n                href={t.href}\n                className=\"group flex h-full items-start gap-4 rounded-2xl border border-card/70 bg-linear-to-b from-card/95 to-card/75 p-6 text-card-foreground shadow-[inset_0_1px_0_var(--card),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)] transition-[transform,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-1 hover:border-highlight/30 hover:shadow-[inset_0_1px_0_var(--card),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_28px_50px_-28px_color-mix(in_oklab,var(--foreground)_50%,transparent)] motion-reduce:transition-none motion-reduce:hover:translate-y-0\"\n              >\n                {t.icon && <span className=\"grid size-11 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground [&_svg]:size-5 [&_svg]:stroke-[1.75]\">{t.icon}</span>}\n                <span className=\"min-w-0 flex-1\">\n                  <span className=\"flex flex-wrap items-center gap-2 text-base font-bold tracking-[-0.01em]\">\n                    {t.title}\n                    {t.badge && <PlumeformBadge>{t.badge}</PlumeformBadge>}\n                  </span>\n                  {t.meta && <span className=\"mt-1 block text-[0.8125rem] text-muted-foreground\">{t.meta}</span>}\n                </span>\n                <ArrowUpRight aria-hidden className=\"size-4 shrink-0 text-muted-foreground transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-highlight\" strokeWidth={1.75} />\n              </a>\n            </PlumeformReveal>\n          ))}\n        </ul>\n\n        {link && (\n          <PlumeformReveal className=\"mt-10\">\n            <PlumeformLink href={link.href}>{link.label}</PlumeformLink>\n          </PlumeformReveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-badge",
+    "plumeform-heading",
+    "plumeform-link",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the heading; a second part can be passed as `titleAside` and shows quieter"
+    },
+    {
+      "name": "titleAside",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "topics",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "description": "topic pills over the cards; the first shows as selected"
+    },
+    {
+      "name": "templates",
+      "type": "PlumeformTemplate[]",
+      "required": true
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5df35f3394539098ea171aaf584e106f205d45542a73c2965103670bd0250455"
+}

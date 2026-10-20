@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething hero",
+  "description": "Centred hero on white lit by a blush glow top-left and an acid glow on the right: an announcement pill, a huge light two-line headline, a typing line (bold verb + rotating words with a blinking acid cursor), a paragraph, two pills, and a white strip of three points hanging over the edge into a grey band.",
+  "category": "hero",
+  "site": "typesomething",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "glow",
+    "centred",
+    "typewriter",
+    "loop",
+    "pill",
+    "acid",
+    "pink",
+    "minimal"
+  ],
+  "notes": [
+    "the bottom of the block is paper-grey (muted) so the strip straddles into the next grey band; follow it with a muted section",
+    "the typing line needs JavaScript; the static HTML shows the first word"
+  ],
+  "hydrate": "load",
+  "entry": "typesomething-hero.tsx",
+  "source": "foundry",
+  "name": "typesomething-hero",
+  "files": [
+    {
+      "path": "typesomething-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { TypesomethingButton } from \"@foundry/typesomething-button\";\nimport { TypesomethingTypewriter } from \"@foundry/typesomething-typewriter\";\n\nexport interface TypesomethingHeroHighlight {\n  /** small icon in a blush circle (a lucide icon) */\n  icon?: ReactNode;\n  title: string;\n  text: string;\n}\n\nexport interface TypesomethingHeroAction {\n  label: string;\n  href: string;\n  /** primary: acid pill · outline: hairline pill */\n  variant?: \"primary\" | \"outline\";\n  /** icon after the label (e.g. an arrow) */\n  icon?: ReactNode;\n}\n\nexport interface TypesomethingHeroProps {\n  /** small pill above the headline (an announcement); left out when empty */\n  badge?: { label: string; href?: string };\n  /** the headline, one string per line */\n  title: string[];\n  /** the bold word that starts the typing line (e.g. \"Ask\") */\n  verb: string;\n  /** the words typed after it, one after another */\n  words: string[];\n  /** paragraph under the typing line */\n  lead?: string;\n  /** one or two pills under the paragraph */\n  actions?: TypesomethingHeroAction[];\n  /** three short points in the white strip at the bottom edge */\n  highlights?: TypesomethingHeroHighlight[];\n  className?: string;\n}\n\n/**\n * Centred hero on white, lit by a blush glow top-left and an acid glow on the right. A huge\n * light headline, a typing line (bold verb + rotating words), a paragraph, pills, and a white\n * strip of three points hanging over the edge into the grey band below.\n */\nexport function TypesomethingHero({ badge, title, verb, words, lead, actions = [], highlights = [], className }: TypesomethingHeroProps) {\n  const Badge = badge?.href ? \"a\" : \"span\";\n  return (\n    <section className={cn(\"relative isolate bg-muted px-gutter pb-14 text-foreground lg:pb-24\", className)}>\n      {/* the white part of the hero and its two glows; it stops part-way down the strip */}\n      <div aria-hidden className=\"absolute inset-x-0 top-0 bottom-[12rem] -z-10 overflow-clip bg-background lg:bottom-[6.75rem]\">\n        <div className=\"absolute -top-[12%] -left-[18%] size-[34rem] rounded-full bg-highlight/45 blur-[90px] dark:bg-highlight/15 lg:-top-[20%] lg:-left-[6%] lg:size-[40rem]\" />\n        <div className=\"absolute top-[10%] -right-[30%] size-[30rem] rounded-full bg-glow/40 blur-[90px] dark:bg-glow/15 lg:-top-[4%] lg:-right-[8%] lg:size-[38rem]\" />\n      </div>\n\n      <div className=\"mx-auto max-w-page pt-[4.75rem] text-center lg:pt-[8.5rem]\">\n        {badge && (\n          <Badge\n            {...(badge.href ? { href: badge.href } : {})}\n            className=\"inline-flex h-8 items-center gap-2 rounded-full border border-foreground/14 bg-background/72 pr-2.5 pl-3 text-[0.72rem] font-semibold tracking-[0.04em] uppercase transition-[border-color] duration-[180ms] ease-[ease] hover:border-foreground [&_svg]:size-3.5\"\n          >\n            <span className=\"size-2 rounded-full bg-primary shadow-[0_0_0_3px_color-mix(in_oklab,var(--primary)_30%,transparent)]\" />\n            {badge.label}\n            <ChevronRight aria-hidden className=\"opacity-50\" />\n          </Badge>\n        )}\n\n        <h1 className=\"mt-7 font-display text-[2.4375rem] leading-[1.05] font-normal tracking-[-0.055em] sm:text-6xl lg:mt-6 lg:text-[6rem] lg:leading-[1]\">\n          {title.map((line) => (\n            <span key={line} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </h1>\n\n        <p className=\"mt-6 font-display text-[2rem] leading-[1.25] tracking-[-0.04em] lg:mt-7 lg:text-[4rem]\">\n          <span className=\"font-bold\">{verb} </span>\n          <TypesomethingTypewriter words={words} reserve className=\"font-normal text-foreground/55\" cursorClassName=\"text-primary\" />\n        </p>\n\n        {lead && <p className=\"mx-auto mt-6 max-w-[34rem] text-[0.92rem] leading-[1.55] text-foreground/75 lg:mt-5 lg:max-w-[40rem] lg:text-[1.15rem]\">{lead}</p>}\n\n        {actions.length > 0 && (\n          <div className=\"mt-8 flex flex-wrap items-center justify-center gap-3 lg:mt-7\">\n            {actions.map((a) => (\n              <TypesomethingButton key={a.href} href={a.href} variant={a.variant ?? \"primary\"} icon={a.icon}>\n                {a.label}\n              </TypesomethingButton>\n            ))}\n          </div>\n        )}\n      </div>\n\n      {highlights.length > 0 && (\n        <div className=\"mx-auto mt-14 max-w-page lg:mt-12\">\n          <ul className=\"mx-auto grid max-w-[71.5rem] divide-y divide-foreground/14 rounded-lg border border-foreground/14 bg-background shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:grid-cols-3 lg:divide-x lg:divide-y-0\">\n            {highlights.map((h) => (\n              <li key={h.title} className=\"flex items-start gap-3.5 px-5 py-6 lg:px-8 lg:py-7\">\n                {h.icon && (\n                  <span className=\"grid size-7 shrink-0 place-items-center rounded-full bg-highlight text-highlight-foreground [&_svg]:size-3.5\">{h.icon}</span>\n                )}\n                <span className=\"text-left\">\n                  <span className=\"block text-[0.92rem] leading-[1.5] font-bold\">{h.title}</span>\n                  <span className=\"mt-1 block text-[0.78rem] leading-[1.55] text-foreground/72\">{h.text}</span>\n                </span>\n              </li>\n            ))}\n          </ul>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "typesomething-button",
+    "typesomething-typewriter"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ label: string; href?: string; }",
+      "required": false,
+      "description": "small pill above the headline (an announcement); left out when empty"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the headline, one string per line"
+    },
+    {
+      "name": "verb",
+      "type": "string",
+      "required": true,
+      "description": "the bold word that starts the typing line (e.g. \"Ask\")"
+    },
+    {
+      "name": "words",
+      "type": "string[]",
+      "required": true,
+      "description": "the words typed after it, one after another"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "paragraph under the typing line"
+    },
+    {
+      "name": "actions",
+      "type": "TypesomethingHeroAction[]",
+      "required": false,
+      "default": "[]",
+      "description": "one or two pills under the paragraph"
+    },
+    {
+      "name": "highlights",
+      "type": "TypesomethingHeroHighlight[]",
+      "required": false,
+      "default": "[]",
+      "description": "three short points in the white strip at the bottom edge"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d8ae33559ce999bb1bce0e182c867555239c1e793a130637d95420908142916e"
+}

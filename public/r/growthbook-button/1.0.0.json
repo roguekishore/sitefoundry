@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "GrowthBook button",
+  "description": "Tall, plain product-site buttons with an 8px radius: a solid brand violet that darkens on hover, and a hairline outline whose border turns to the text colour. Optional trailing arrow; can go full-width on phones.",
+  "category": "button",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "violet",
+    "hairline",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "58px tall at md and lg (as on the original), 44px at sm (header)",
+    "colour change 0.25s ease, as captured"
+  ],
+  "entry": "growthbook-button.tsx",
+  "source": "foundry",
+  "name": "growthbook-button",
+  "files": [
+    {
+      "path": "growthbook-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GrowthbookButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary: solid brand violet · outline: hairline border, transparent fill */\n  variant?: \"primary\" | \"outline\";\n  /** sm: 44px tall, 14px (header) · md: 58px, 14px · lg: 58px, 16px, wide (hero) */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** a right arrow after the label */\n  arrow?: boolean;\n  /** full width below the md breakpoint (the original's phone buttons) */\n  blockOnMobile?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-11 px-3 text-sm\",\n  md: \"h-[3.625rem] px-4 text-sm\",\n  lg: \"h-[3.625rem] px-11 text-base\",\n};\n\nconst variants = {\n  // hover: the violet darkened a step, as on the original\n  primary:\n    \"border-primary bg-primary text-primary-foreground hover:border-[color-mix(in_oklab,var(--primary)_82%,black)] hover:bg-[color-mix(in_oklab,var(--primary)_82%,black)]\",\n  outline: \"border-input bg-transparent text-foreground hover:border-foreground\",\n};\n\nexport function GrowthbookButton({\n  children,\n  href,\n  variant = \"primary\",\n  size = \"md\",\n  arrow,\n  blockOnMobile,\n  onClick,\n  className,\n}: GrowthbookButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center gap-3 rounded-sm border font-sans font-normal whitespace-nowrap\",\n    \"transition-[background-color,border-color,color] duration-250 ease-[ease] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    blockOnMobile && \"w-full md:w-auto\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {arrow && <ArrowRight aria-hidden className=\"size-5 shrink-0\" strokeWidth={1.75} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: solid brand violet · outline: hairline border, transparent fill"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 44px tall, 14px (header) · md: 58px, 14px · lg: 58px, 16px, wide (hero)"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "description": "a right arrow after the label"
+    },
+    {
+      "name": "blockOnMobile",
+      "type": "boolean",
+      "required": false,
+      "description": "full width below the md breakpoint (the original's phone buttons)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5bc56b8602463b9f330e9b6f010a84d3cbfbd0cde09ebb2fe1a8af1c8c807081"
+}

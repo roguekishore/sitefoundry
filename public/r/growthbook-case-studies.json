@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook case-study cards",
+  "description": "A pale lavender band framed by thin rules: a big three-line heading with an outline button opposite, then a swipeable row of deep violet-black story cards (customer wordmark, one-line story, a big result figure, a mono read-more link) that advances by itself. Wordmarks sharpen from a blur as they come into view; a multicolour light travels down the left rule.",
+  "category": "testimonials",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "case-studies",
+    "cards",
+    "carousel",
+    "autoplay",
+    "lavender",
+    "dark-cards",
+    "frame-rule",
+    "reveal",
+    "blur",
+    "scroll"
+  ],
+  "notes": [
+    "the cards force the dark tokens (class dark): card is the violet-black surface",
+    "carousel uses growthbook-track (autoplay every 4.5s, off with reduced motion); the blur-in is CSS scroll-driven"
+  ],
+  "hydrate": "visible",
+  "entry": "growthbook-case-studies.tsx",
+  "source": "foundry",
+  "name": "growthbook-case-studies",
+  "files": [
+    {
+      "path": "growthbook-case-studies.css",
+      "content": "/* The wordmarks sit inside a horizontal scroller, which would freeze a plain view() timeline\n   (it would follow the scroller, which never scrolls vertically). So the timeline is named on\n   the wrapper outside the scroller, and the wordmarks follow that. */\n.growthbook-case-studies-cards {\n  view-timeline-name: --growthbook-case-studies;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .growthbook-case-studies-logo {\n      animation: growthbook-case-studies-unblur linear both;\n      animation-timeline: --growthbook-case-studies;\n      animation-range: entry 10% entry 70%;\n    }\n  }\n}\n\n@keyframes growthbook-case-studies-unblur {\n  from {\n    filter: blur(8px);\n    opacity: 0.2;\n  }\n  to {\n    filter: blur(0);\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-case-studies.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\nimport { GrowthbookRail } from \"@foundry/growthbook-rail\";\nimport { GrowthbookTrack } from \"@foundry/growthbook-track\";\nimport \"./growthbook-case-studies.css\";\n\nexport interface GrowthbookCaseStudy {\n  /** customer name, for screen readers */\n  name: string;\n  /** customer wordmark (svg, img or styled text), about 32px tall, light on dark */\n  logo?: ReactNode;\n  /** one or two lines: what they did */\n  story: string;\n  /** the big figure, e.g. \"+18%\" */\n  figure: string;\n  /** what the figure measures */\n  figureLabel: string;\n  /** mono link at the bottom */\n  link: { label: string; href: string };\n}\n\nexport interface GrowthbookCaseStudiesProps {\n  /** the heading; each string starts a new line */\n  title: string[];\n  /** outline button opposite the heading */\n  cta?: { label: string; href: string };\n  stories: GrowthbookCaseStudy[];\n  /** accessible name of the carousel */\n  carouselLabel: string;\n  /** ms between automatic moves; 0 turns autoplay off */\n  autoplay?: number;\n  className?: string;\n}\n\nexport function GrowthbookCaseStudies({ title, cta, stories, carouselLabel, autoplay = 4500, className }: GrowthbookCaseStudiesProps) {\n  return (\n    <section className={cn(\"bg-secondary text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative border-x border-border pt-12 pb-12 lg:pt-20 lg:pb-20\">\n          <GrowthbookRail />\n          {/* the middle rule fades out under the heading */}\n          <span aria-hidden className=\"absolute top-0 left-1/2 hidden h-64 w-px bg-linear-to-b from-border to-transparent lg:block\" />\n          <div className=\"flex flex-col gap-8 pl-10 lg:flex-row lg:items-start lg:justify-between lg:pr-10\">\n            <h2 className=\"max-w-[26rem] pr-4 font-display lg:pr-0 text-4xl leading-[1.2] font-normal lg:text-[3.5rem]\">\n              {title.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </h2>\n            {cta && (\n              <GrowthbookButton href={cta.href} variant=\"outline\" arrow blockOnMobile>\n                {cta.label}\n              </GrowthbookButton>\n            )}\n          </div>\n          <div className=\"growthbook-case-studies-cards mt-12 lg:mt-20\">\n            <GrowthbookTrack\n              label={carouselLabel}\n              autoplay={autoplay || undefined}\n              slideClassName=\"w-[18.75rem] lg:w-[25rem]\"\n              trackClassName=\"gap-5 px-5 scroll-px-5 lg:gap-10\"\n              items={stories.map((s) => (\n                <article\n                  key={s.name}\n                  className=\"dark flex h-[30.5rem] flex-col rounded-lg bg-card text-card-foreground lg:h-[29.125rem]\"\n                >\n                  <div className=\"flex-1 px-6 pt-12 lg:px-9 lg:pt-11\">\n                    <div role=\"img\" aria-label={s.name} className=\"growthbook-case-studies-logo flex h-10 items-center text-card-foreground\">\n                      {s.logo}\n                    </div>\n                    <p className=\"mt-9 text-lg leading-[1.5] font-medium lg:mt-10\">{s.story}</p>\n                  </div>\n                  <div className=\"border-t border-foreground/10 px-6 py-6 lg:px-9\">\n                    <p className=\"font-display text-4xl leading-[1.3] lg:text-[2.5rem]\">{s.figure}</p>\n                    <p className=\"mt-2 text-base font-medium\">{s.figureLabel}</p>\n                  </div>\n                  <a\n                    href={s.link.href}\n                    className=\"flex items-center gap-3 border-t border-foreground/10 px-6 py-7 font-mono text-sm transition-colors duration-250 hover:text-highlight motion-reduce:transition-none lg:px-9\"\n                  >\n                    {s.link.label}\n                    <ArrowRight aria-hidden className=\"size-5\" strokeWidth={1.5} />\n                  </a>\n                </article>\n              ))}\n            />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button",
+    "growthbook-rail",
+    "growthbook-track"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading; each string starts a new line"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "outline button opposite the heading"
+    },
+    {
+      "name": "stories",
+      "type": "GrowthbookCaseStudy[]",
+      "required": true
+    },
+    {
+      "name": "carouselLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the carousel"
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "required": false,
+      "default": "4500",
+      "description": "ms between automatic moves; 0 turns autoplay off"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4acb5384c37a4ce0145e04f7b5fe99fcfab0f578f63900c47925dba941c2b540"
+}

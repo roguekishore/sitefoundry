@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook reasons carousel",
+  "description": "A big heading, then a slim vertical tab list on the left (the active tab is a white slip with the multicolour rail on its edge; the others carry a tiny mono prefix) and a row of tall gradient cards (navy-to-blue, violet, teal) that runs off the right edge of the page and advances by itself. On phones the tabs become a horizontal row with a violet underline.",
+  "category": "features",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "carousel",
+    "autoplay",
+    "gradient",
+    "cards",
+    "bleed",
+    "light",
+    "mono"
+  ],
+  "notes": [
+    "the cards force the dark tokens (class dark); tones use background→chart-2, card→primary and chart-3→highlight",
+    "each card has an art slot (bottom-left, ~150px); empty ones show a soft translucent square",
+    "the card row bleeds to the window's right edge, so the block clips horizontal overflow"
+  ],
+  "hydrate": "visible",
+  "entry": "growthbook-why.tsx",
+  "source": "foundry",
+  "name": "growthbook-why",
+  "files": [
+    {
+      "path": "growthbook-why.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookRail } from \"@foundry/growthbook-rail\";\nimport { GrowthbookTrack } from \"@foundry/growthbook-track\";\n\nexport interface GrowthbookWhyCard {\n  /** one or two lines at the top of the card */\n  title: string;\n  /** navy fading to the second chart colour, violet, or teal */\n  tone?: \"navy\" | \"violet\" | \"teal\";\n  /** art in the lower-left (~150px); a soft translucent square when empty */\n  art?: ReactNode;\n}\n\nexport interface GrowthbookWhyTab {\n  label: string;\n  /** tiny mono word before the label, e.g. \"For\" */\n  prefix?: string;\n  cards: GrowthbookWhyCard[];\n}\n\nexport interface GrowthbookWhyProps {\n  /** the heading; each string starts a new line */\n  title: string[];\n  tabs: GrowthbookWhyTab[];\n  /** accessible name of the carousel */\n  carouselLabel: string;\n  /** ms between automatic moves; 0 turns autoplay off */\n  autoplay?: number;\n  className?: string;\n}\n\nconst tones = {\n  navy: \"bg-linear-to-b from-background to-chart-2/80\",\n  violet: \"bg-linear-[160deg] from-card from-10% to-primary\",\n  teal: \"bg-linear-[160deg] from-chart-3 to-highlight\",\n};\n\nexport function GrowthbookWhy({ title, tabs, carouselLabel, autoplay = 4000, className }: GrowthbookWhyProps) {\n  const [active, setActive] = useState(0);\n  const tab = tabs[active];\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"border-l border-border pt-12 pb-[6.25rem] lg:pt-[5.5rem] lg:pb-20\">\n          <h2 className=\"max-w-[40rem] pr-4 pl-10 font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]\">\n            {title.map((line) => (\n              <span key={line} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h2>\n          <div className=\"mt-12 grid gap-12 lg:mt-[6.75rem] lg:grid-cols-[15.375rem_minmax(0,1fr)] lg:gap-[2.125rem] lg:pl-10\">\n            <div role=\"tablist\" className=\"flex overflow-x-auto pl-10 [scrollbar-width:none] lg:flex-col lg:overflow-visible lg:pl-0 [&::-webkit-scrollbar]:hidden\">\n              {tabs.map((t, i) => (\n                <button\n                  key={t.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === active}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"relative flex h-[3.75rem] shrink-0 items-center gap-2 border-b-2 px-5 text-left text-sm whitespace-nowrap transition-colors duration-250 motion-reduce:transition-none lg:h-[4.25rem] lg:border-b lg:text-base\",\n                    i === active\n                      ? \"border-primary bg-card text-card-foreground lg:border-border\"\n                      : \"border-transparent text-foreground hover:text-primary lg:border-border lg:px-2\",\n                  )}\n                >\n                  {i === active && <GrowthbookRail fixed className=\"left-0 hidden lg:block\" />}\n                  {t.prefix && <span className=\"-mt-2 font-mono text-[0.625rem]\">{t.prefix}</span>}\n                  {t.label}\n                  {i === active && <ArrowRight aria-hidden className=\"hidden size-[1.125rem] lg:block\" strokeWidth={1.5} />}\n                </button>\n              ))}\n            </div>\n            {/* the row runs past the frame to the window's right edge */}\n            <div className=\"min-w-0 lg:-mr-[calc((100vw-min(100vw,var(--page-width)+var(--page-gutter)*4))/2+var(--page-gutter)*2)]\">\n              <GrowthbookTrack\n                key={active}\n                label={carouselLabel}\n                autoplay={autoplay || undefined}\n                slideClassName=\"w-[17.5rem] lg:w-[19.8125rem]\"\n                trackClassName=\"gap-5 pl-5 scroll-pl-5 lg:pl-0 lg:scroll-pl-0\"\n                items={tab.cards.map((c) => (\n                  <article\n                    key={c.title}\n                    className={cn(\"dark relative flex h-[24.75rem] flex-col overflow-clip rounded-lg p-6 text-foreground\", tones[c.tone ?? \"navy\"])}\n                  >\n                    {/* the thin inner guide lines */}\n                    <span aria-hidden className=\"absolute top-20 bottom-6 left-6 w-px bg-linear-to-b from-transparent to-foreground/15\" />\n                    <span aria-hidden className=\"absolute right-0 bottom-6 left-6 h-px bg-foreground/15\" />\n                    <h3 className=\"max-w-[13rem] text-lg leading-[1.5] font-medium\">{c.title}</h3>\n                    <div className=\"mt-auto mb-8 size-[9.5rem] [&>*]:size-full\">\n                      {c.art ?? <div className=\"rounded-xl bg-foreground/15 [mask-image:radial-gradient(circle,black_40%,transparent_72%)]\" />}\n                    </div>\n                  </article>\n                ))}\n              />\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-rail",
+    "growthbook-track"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading; each string starts a new line"
+    },
+    {
+      "name": "tabs",
+      "type": "GrowthbookWhyTab[]",
+      "required": true
+    },
+    {
+      "name": "carouselLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the carousel"
+    },
+    {
+      "name": "autoplay",
+      "type": "number",
+      "required": false,
+      "default": "4000",
+      "description": "ms between automatic moves; 0 turns autoplay off"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0efadea662684e2a72de5d5795ec6819baca25e1ce14d56003a3264612e63e25"
+}

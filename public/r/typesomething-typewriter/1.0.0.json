@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "TypeSomething typewriter",
+  "description": "Inline text that types words letter by letter, holds, erases and moves to the next, with a hard-blinking underscore cursor. Can reserve the longest word's width so the line never shifts.",
+  "category": "text-effect",
+  "site": "typesomething",
+  "license": "proprietary",
+  "tags": [
+    "typewriter",
+    "text-effect",
+    "loop",
+    "cursor",
+    "blink",
+    "inline"
+  ],
+  "notes": [
+    "needs JavaScript for the typing; the static HTML shows the first word in full, so nothing is hidden without it",
+    "reduced motion: the first word stays, the cursor stops blinking"
+  ],
+  "hydrate": "load",
+  "entry": "typesomething-typewriter.tsx",
+  "source": "foundry",
+  "name": "typesomething-typewriter",
+  "files": [
+    {
+      "path": "typesomething-typewriter.css",
+      "content": "/* The cursor blinks on and off, hard, like a terminal (640ms per blink). */\n.typesomething-typewriter-cursor {\n  animation: typesomething-typewriter-blink 640ms steps(1, end) infinite;\n}\n\n@keyframes typesomething-typewriter-blink {\n  50% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .typesomething-typewriter-cursor { animation: none; }\n}\n"
+    },
+    {
+      "path": "typesomething-typewriter.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./typesomething-typewriter.css\";\n\nexport interface TypesomethingTypewriterProps {\n  /** the words typed one after another, then erased; one word types and erases itself on a loop */\n  words: string[];\n  /** the glyph after the text, blinking like a terminal cursor */\n  cursor?: string;\n  /** keep the width of the longest word, so nothing after it moves while it types */\n  reserve?: boolean;\n  /** milliseconds per typed letter */\n  typeMs?: number;\n  /** milliseconds per erased letter */\n  eraseMs?: number;\n  /** how long a finished word stays before it's erased (ms) */\n  holdMs?: number;\n  /** pause on an empty line before the next word (ms) */\n  gapMs?: number;\n  /** classes for the cursor (e.g. a colour) */\n  cursorClassName?: string;\n  className?: string;\n}\n\n/**\n * Types each word letter by letter, holds it, erases it and moves on. The static HTML (and\n * reduced motion) shows the first word in full; the loop starts once React hydrates.\n */\nexport function TypesomethingTypewriter({\n  words,\n  cursor = \"_\",\n  reserve = false,\n  typeMs = 90,\n  eraseMs = 45,\n  holdMs = 1800,\n  gapMs = 350,\n  cursorClassName,\n  className,\n}: TypesomethingTypewriterProps) {\n  const first = words[0] ?? \"\";\n  const [text, setText] = useState(first);\n  // the words as one string, so a new array with the same words doesn't restart the loop\n  const key = words.join(\"\\n\");\n\n  useEffect(() => {\n    const words = key ? key.split(\"\\n\") : [];\n    if (!words.length || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let index = 0;\n    let shown = words[0].length;\n    let erasing = true;\n    let timer: ReturnType<typeof setTimeout>;\n\n    // One step of the loop: erase a letter, or type a letter, or wait at either end.\n    const step = () => {\n      const word = words[index];\n      if (erasing) {\n        if (shown > 0) {\n          shown -= 1;\n          setText(word.slice(0, shown));\n          timer = setTimeout(step, eraseMs);\n        } else {\n          erasing = false;\n          index = (index + 1) % words.length;\n          timer = setTimeout(step, gapMs);\n        }\n      } else if (shown < word.length) {\n        shown += 1;\n        setText(word.slice(0, shown));\n        timer = setTimeout(step, typeMs);\n      } else {\n        erasing = true;\n        timer = setTimeout(step, holdMs);\n      }\n    };\n    timer = setTimeout(step, holdMs);\n    return () => clearTimeout(timer);\n  }, [key, typeMs, eraseMs, holdMs, gapMs]);\n\n  const longest = words.reduce((a, b) => (b.length > a.length ? b : a), \"\");\n\n  return (\n    <span className={cn(\"relative inline-flex items-baseline whitespace-nowrap\", className)}>\n      {/* screen readers hear every word once, never the typing */}\n      <span className=\"sr-only\">{words.join(\", \")}</span>\n      <span aria-hidden className={cn(reserve && \"inline-grid text-left\")}>\n        {reserve && <span className=\"invisible [grid-area:1/1]\">{longest}{cursor}</span>}\n        <span className={cn(reserve && \"[grid-area:1/1]\")}>\n          {text}\n          <span className={cn(\"typesomething-typewriter-cursor\", cursorClassName)}>{cursor}</span>\n        </span>\n      </span>\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "words",
+      "type": "string[]",
+      "required": true,
+      "description": "the words typed one after another, then erased; one word types and erases itself on a loop"
+    },
+    {
+      "name": "cursor",
+      "type": "string",
+      "required": false,
+      "default": "_",
+      "description": "the glyph after the text, blinking like a terminal cursor"
+    },
+    {
+      "name": "reserve",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "keep the width of the longest word, so nothing after it moves while it types"
+    },
+    {
+      "name": "typeMs",
+      "type": "number",
+      "required": false,
+      "default": "90",
+      "description": "milliseconds per typed letter"
+    },
+    {
+      "name": "eraseMs",
+      "type": "number",
+      "required": false,
+      "default": "45",
+      "description": "milliseconds per erased letter"
+    },
+    {
+      "name": "holdMs",
+      "type": "number",
+      "required": false,
+      "default": "1800",
+      "description": "how long a finished word stays before it's erased (ms)"
+    },
+    {
+      "name": "gapMs",
+      "type": "number",
+      "required": false,
+      "default": "350",
+      "description": "pause on an empty line before the next word (ms)"
+    },
+    {
+      "name": "cursorClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the cursor (e.g. a colour)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "57e7837812dfb350725f868fe02a49fdf393528a1912455d6cf5123675b6c3bd"
+}

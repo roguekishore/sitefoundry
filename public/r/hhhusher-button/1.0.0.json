@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "HHHusher button",
+  "description": "A 5px-cornered button with a bold mono capital label. Solid is signal yellow and empties to a yellow outline on hover; glass is a see-through tile for dark backdrops that turns into a cream outline; link is a bare label with a small arrow that dims to 70%. Colours ease over 0.3s.",
+  "category": "button",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "mono",
+    "yellow",
+    "glass",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "glass is meant for dark sections (cream at 15%)",
+    "exports hhhusherLabel and hhhusherEase class strings for the site's other blocks"
+  ],
+  "entry": "hhhusher-button.tsx",
+  "source": "foundry",
+  "name": "hhhusher-button",
+  "files": [
+    {
+      "path": "hhhusher-button.tsx",
+      "content": "import type { MouseEventHandler, ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HhhusherButtonProps {\n  /** the label, set in the mono face in capitals */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * solid: yellow fill that empties to a yellow outline on hover · glass: a see-through tile\n   * (cream at 15% on dark) that turns into an outline on hover · link: a bare label with an\n   * arrow that dims on hover\n   */\n  variant?: \"solid\" | \"glass\" | \"link\";\n  /** sm: the 32px header size · md: the 43px size used in sections · lg: the 56px checkout size */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** add the small arrow after the label (link variant shows it by default) */\n  arrow?: boolean;\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  /** called on click */\n  onClick?: MouseEventHandler<HTMLElement>;\n  /** screen-reader name, for icon-only buttons */\n  ariaLabel?: string;\n  className?: string;\n}\n\n// The original's easing for every colour change: 0.3s cubic-bezier(0.32, 0.94, 0.6, 1).\nexport const hhhusherEase = \"ease-[cubic-bezier(0.32,0.94,0.6,1)]\";\n\n/** The mono label used on every button, tab and tag: 12px bold capitals. */\nexport const hhhusherLabel = \"font-mono text-[0.78rem] leading-none font-bold tracking-normal uppercase lg:text-xs\";\n\nconst variants = {\n  solid: \"border border-primary bg-primary text-primary-foreground hover:bg-transparent hover:text-primary\",\n  glass: \"border-2 border-transparent bg-foreground/15 text-foreground hover:border-foreground hover:bg-transparent\",\n  link: \"text-current hover:opacity-70\",\n};\n\nconst sizes = {\n  sm: \"h-8 px-[1.3rem]\",\n  md: \"h-[2.6875rem] px-5\",\n  lg: \"h-14 px-6\",\n};\n\n/** A 5px-cornered button with a mono capital label: yellow, glass, or a bare arrow link. */\nexport function HhhusherButton({ children, href, variant = \"solid\", size = \"md\", arrow, type = \"button\", onClick, ariaLabel, className }: HhhusherButtonProps) {\n  const classes = cn(\n    hhhusherLabel,\n    \"inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg whitespace-nowrap\",\n    \"transition-[color,background-color,border-color,opacity] duration-300 motion-reduce:transition-none\",\n    hhhusherEase,\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variants[variant],\n    variant === \"link\" ? \"h-auto px-0\" : sizes[size],\n    className,\n  );\n  const content = (\n    <>\n      {children}\n      {(arrow ?? variant === \"link\") && <ArrowRight aria-hidden className=\"size-3\" strokeWidth={3} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick} aria-label={ariaLabel}>\n      {content}\n    </a>\n  ) : (\n    <button type={type} className={classes} onClick={onClick} aria-label={ariaLabel}>\n      {content}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label, set in the mono face in capitals"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: yellow fill that empties to a yellow outline on hover · glass: a see-through tile\n(cream at 15% on dark) that turns into an outline on hover · link: a bare label with an\narrow that dims on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: the 32px header size · md: the 43px size used in sections · lg: the 56px checkout size"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "description": "add the small arrow after the label (link variant shows it by default)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "onClick",
+      "type": "MouseEventHandler<HTMLElement>",
+      "required": false,
+      "description": "called on click"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader name, for icon-only buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "087d61ae4410fb5d0ad56528f7a7808db637355190801fb0ed574a7886153da7"
+}

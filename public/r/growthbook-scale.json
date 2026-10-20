@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook speed-and-cost chart",
+  "description": "Heading, paragraph and violet button on the left; on the right an open chart field of thin vertical guide lines with two labelled pins (a white chip beside a glowing round marker, one violet at the top, one teal at the bottom) whose halos pulse softly.",
+  "category": "features",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chart",
+    "pins",
+    "glow",
+    "pulse",
+    "loop",
+    "light",
+    "minimal",
+    "frame-rule"
+  ],
+  "notes": [
+    "the curves are an illustration: pass them as media (they fill the chart field); empty shows a faint wash",
+    "halo pulse is a CSS loop, off under reduced motion"
+  ],
+  "entry": "growthbook-scale.tsx",
+  "source": "foundry",
+  "name": "growthbook-scale",
+  "files": [
+    {
+      "path": "growthbook-scale.css",
+      "content": ".growthbook-scale-halo {\n  animation: growthbook-scale-pulse 3s ease-in-out infinite;\n}\n.growthbook-scale-pin:nth-of-type(2) .growthbook-scale-halo {\n  animation-delay: -1.5s;\n}\n\n@keyframes growthbook-scale-pulse {\n  0%,\n  100% {\n    transform: scale(1);\n    opacity: 0.55;\n  }\n  50% {\n    transform: scale(1.25);\n    opacity: 0.9;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-scale-halo {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-scale.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\nimport { GrowthbookRail } from \"@foundry/growthbook-rail\";\nimport \"./growthbook-scale.css\";\n\nexport interface GrowthbookScalePin {\n  /** chip text, e.g. \"4x tests\" */\n  label: string;\n  /** small icon inside the round marker (lucide, 16px) */\n  icon?: ReactNode;\n  /** violet (primary) or teal (highlight) */\n  tone?: \"primary\" | \"highlight\";\n}\n\nexport interface GrowthbookScaleProps {\n  /** the heading; each string starts a new line */\n  title: string[];\n  body: string;\n  cta?: { label: string; href: string };\n  /** two pins: the first sits top-right, the second bottom-right */\n  pins: [GrowthbookScalePin, GrowthbookScalePin];\n  /** the chart illustration (svg/img), filling the chart field; a faint wash when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function GrowthbookScale({ title, body, cta, pins, media, className }: GrowthbookScaleProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative grid gap-12 border-l border-border pt-4 pb-16 lg:grid-cols-2 lg:gap-10 lg:pt-14 lg:pb-32\">\n          <GrowthbookRail />\n          <div className=\"pl-4 lg:pl-9\">\n            <h2 className=\"font-display text-4xl leading-[1.25] font-normal lg:text-[3.5rem] lg:leading-[1.2]\">\n              {title.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </h2>\n            <p className=\"mt-8 max-w-[33.75rem] text-sm leading-[1.65] text-foreground/85 lg:mt-12 lg:text-base\">{body}</p>\n            {cta && (\n              <GrowthbookButton href={cta.href} arrow blockOnMobile className=\"mt-10 lg:mt-12\">\n                {cta.label}\n              </GrowthbookButton>\n            )}\n          </div>\n\n          {/* the chart field: five guide lines, the illustration, two pins */}\n          <div className=\"relative h-[24rem] mr-6 lg:mt-2 lg:mr-[5.5rem] lg:ml-[7.5rem] lg:h-[31rem]\">\n            <div aria-hidden className=\"absolute top-[6%] right-[3%] bottom-[12%] left-[6%] flex justify-between\">\n              {[0, 1, 2, 3, 4].map((i) => (\n                <span key={i} className=\"w-px bg-linear-to-b from-transparent to-border to-30%\" />\n              ))}\n            </div>\n            <div className=\"absolute top-[6%] right-[3%] bottom-[12%] left-[6%] [&>*]:size-full\">\n              {media ?? <div className=\"bg-linear-to-t from-muted/80 to-transparent\" />}\n            </div>\n            {pins.map((p, i) => (\n              <div\n                key={p.label}\n                className={cn(\n                  \"growthbook-scale-pin absolute right-0 flex items-center gap-4 lg:gap-6\",\n                  i === 0 ? \"top-0 -mr-6 lg:-mr-6\" : \"bottom-[8%] -mr-6 lg:-mr-6\",\n                )}\n              >\n                <span className=\"rounded-sm bg-card px-3 py-2 text-xs text-card-foreground lg:px-4 lg:py-2.5 lg:text-sm\">{p.label}</span>\n                <span className=\"relative grid size-8 place-items-center lg:size-12\">\n                  <span\n                    aria-hidden\n                    className={cn(\n                      \"growthbook-scale-halo absolute -inset-4 rounded-full blur-md\",\n                      p.tone === \"highlight\" ? \"bg-highlight/50\" : \"bg-primary/45\",\n                    )}\n                  />\n                  <span\n                    className={cn(\n                      \"relative grid size-full place-items-center rounded-full text-primary-foreground ring-4 [&_svg]:size-3.5 lg:[&_svg]:size-4\",\n                      p.tone === \"highlight\" ? \"bg-highlight ring-highlight/30\" : \"bg-primary ring-primary/30\",\n                    )}\n                  >\n                    {p.icon}\n                  </span>\n                </span>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button",
+    "growthbook-rail"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading; each string starts a new line"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "pins",
+      "type": "[GrowthbookScalePin, GrowthbookScalePin]",
+      "required": true,
+      "description": "two pins: the first sits top-right, the second bottom-right"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the chart illustration (svg/img), filling the chart field; a faint wash when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4e520b59c6c04a5f41e6d718fb882c4e1feba2c6972d55aee006e9873a8b8e0f"
+}

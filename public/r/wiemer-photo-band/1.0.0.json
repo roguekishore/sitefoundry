@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer photo band",
+  "description": "An edge-to-edge interior photo (2:3 on phones, nearly square or 3:2 on wide screens) that drifts gently inside its frame as you scroll. Optional white round plus buttons sit on the things in the picture; hovering turns the plus 45° and grows it, and clicking opens a small centred card with a picture, a title and a line of text.",
+  "category": "gallery",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "photo",
+    "full-bleed",
+    "parallax",
+    "hotspots",
+    "popover",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "hotspot cards use the HTML popover attribute: no JavaScript, Escape or a click outside closes them",
+    "media is a slot (an <img>, cover) slightly taller than the band; empty, it shows a soft placeholder"
+  ],
+  "entry": "wiemer-photo-band.tsx",
+  "source": "foundry",
+  "name": "wiemer-photo-band",
+  "files": [
+    {
+      "path": "wiemer-photo-band.css",
+      "content": "/* Hotspot cards fade and lift in when opened. */\n.wiemer-photo-band-card {\n  opacity: 0;\n  translate: 0 12px;\n  transition: opacity 0.3s ease, translate 0.3s ease, display 0.3s allow-discrete, overlay 0.3s allow-discrete;\n}\n.wiemer-photo-band-card:popover-open {\n  opacity: 1;\n  translate: 0 0;\n}\n@starting-style {\n  .wiemer-photo-band-card:popover-open {\n    opacity: 0;\n    translate: 0 12px;\n  }\n}\n.wiemer-photo-band-card::backdrop {\n  background: color-mix(in oklab, var(--foreground) 25%, transparent);\n}\n@media (prefers-reduced-motion: reduce) {\n  .wiemer-photo-band-card { transition: none; }\n}\n"
+    },
+    {
+      "path": "wiemer-photo-band.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { Plus, X } from \"lucide-react\";\nimport { wiemerDriftFrame, wiemerReveal, wiemerRevealStyle } from \"@foundry/wiemer-reveal\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-photo-band.css\";\n\nexport interface WiemerHotspot {\n  /** from the left edge of the photo, in % */\n  x: number;\n  /** from the top edge of the photo, in % */\n  y: number;\n  /** the card's title */\n  title: string;\n  /** the card's line of text */\n  text: string;\n  /** the card's picture (an <img>, 4:3); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface WiemerPhotoBandProps {\n  /** the photo (an <img>, cover); empty shows a placeholder */\n  media?: ReactNode;\n  /** what the photo shows, for screen readers */\n  label?: string;\n  /** shape on wide screens: tall (1440:1035, the landing band) or wide (3:2) */\n  shape?: \"tall\" | \"wide\";\n  /** plus buttons on the photo, each opening a small card */\n  hotspots?: WiemerHotspot[];\n  /** label of the close button in the hotspot cards (screen readers) */\n  closeLabel?: string;\n  className?: string;\n}\n\n/** Full-bleed drifting photo with optional plus-button hotspots. */\nexport function WiemerPhotoBand({ media, label, shape = \"tall\", hotspots = [], closeLabel = \"Close\", className }: WiemerPhotoBandProps) {\n  const uid = useId().replace(/:/g, \"\");\n  return (\n    <section\n      aria-label={label}\n      className={cn(\n        wiemerDriftFrame,\n        \"relative isolate aspect-[2/3] w-full overflow-clip bg-background\",\n        shape === \"tall\" ? \"md:aspect-[1440/1035]\" : \"md:aspect-[3/2]\",\n        className,\n      )}\n    >\n      <div\n        className={cn(wiemerReveal(\"drift\"), \"absolute inset-x-0 -top-[9%] -z-10 h-[118%] bg-linear-to-b from-muted to-glow/45 [&>img]:size-full [&>img]:object-cover\")}\n        style={wiemerRevealStyle(0, 60)}\n      >\n        {media}\n      </div>\n\n      {hotspots.map((spot, i) => {\n        const id = `wiemer-spot-${uid}-${i}`;\n        return (\n          <div key={id}>\n            <button\n              type=\"button\"\n              popoverTarget={id}\n              aria-label={spot.title}\n              className=\"absolute grid size-10 -translate-1/2 place-items-center rounded-full bg-background text-foreground transition-transform duration-300 ease-[cubic-bezier(0.38,0.005,0.215,1)] hover:scale-110 hover:rotate-45 motion-reduce:transition-none md:size-12\"\n              style={{ left: `${spot.x}%`, top: `${spot.y}%` }}\n            >\n              <Plus aria-hidden=\"true\" strokeWidth={1.5} className=\"size-4\" />\n            </button>\n            <div\n              id={id}\n              popover=\"auto\"\n              className=\"wiemer-photo-band-card m-auto w-[min(calc(100vw-2*var(--page-gutter)),27rem)] rounded-2xl bg-card p-3 text-card-foreground\"\n            >\n              <div className=\"aspect-[4/3] overflow-clip rounded-lg bg-muted [&>img]:size-full [&>img]:object-cover\">{spot.media}</div>\n              <div className=\"px-2 pt-4 pb-3\">\n                <h3 className=\"text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em]\">{spot.title}</h3>\n                <p className=\"mt-2 text-[15px] leading-[1.35] font-medium tracking-[-0.015em]\">{spot.text}</p>\n              </div>\n              <button\n                type=\"button\"\n                popoverTarget={id}\n                popoverTargetAction=\"hide\"\n                aria-label={closeLabel}\n                className=\"absolute top-5 right-5 grid size-9 place-items-center rounded-full bg-background text-foreground transition-transform duration-300 hover:rotate-90 motion-reduce:transition-none\"\n              >\n                <X aria-hidden=\"true\" strokeWidth={1.5} className=\"size-4\" />\n              </button>\n            </div>\n          </div>\n        );\n      })}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-reveal"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo (an <img>, cover); empty shows a placeholder"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "what the photo shows, for screen readers"
+    },
+    {
+      "name": "shape",
+      "type": "enum",
+      "required": false,
+      "default": "tall",
+      "description": "shape on wide screens: tall (1440:1035, the landing band) or wide (3:2)"
+    },
+    {
+      "name": "hotspots",
+      "type": "WiemerHotspot[]",
+      "required": false,
+      "default": "[]",
+      "description": "plus buttons on the photo, each opening a small card"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close",
+      "description": "label of the close button in the hotspot cards (screen readers)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bce73f1747229b3d40487b077b5812e0879eec3abd443bfa91b64f92f8a3ac1a"
+}

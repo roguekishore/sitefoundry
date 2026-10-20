@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform dark band",
+  "description": "A full-bleed section in near-black green with a backdrop slot (art or video) that fades in as the band scrolls into view; empty, it shows a soft teal glow. Tells the plumeform header to turn dark over it.",
+  "category": "background",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "dark",
+    "band",
+    "glow",
+    "backdrop",
+    "fade"
+  ],
+  "notes": [
+    "forces the dark colours by default (tone=\"inherit\" to follow the page)",
+    "the original's WebGL fluted glass is not rebuilt: pass your own art as backdrop"
+  ],
+  "entry": "plumeform-band.tsx",
+  "source": "foundry",
+  "name": "plumeform-band",
+  "files": [
+    {
+      "path": "plumeform-band.css",
+      "content": "/* The backdrop (the original's WebGL fluted glass) fades in as the band enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-band-backdrop {\n      animation: plumeform-band-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 60%;\n    }\n  }\n}\n@keyframes plumeform-band-in {\n  from { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "plumeform-band.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-band.css\";\n\nexport interface PlumeformBandProps {\n  /** art behind the band (the original has a WebGL fluted-glass canvas); empty shows a soft glow placeholder */\n  backdrop?: ReactNode;\n  /** dark forces the dark colours (as on the original); inherit follows the page */\n  tone?: \"dark\" | \"inherit\";\n  /** the element to render */\n  as?: \"section\" | \"div\" | \"footer\";\n  /** id, for in-page links */\n  id?: string;\n  children?: ReactNode;\n  className?: string;\n}\n\n/**\n * A full-bleed band in the theme's dark colours with a backdrop slot behind it. Marked\n * data-tone=\"dark\" so plumeform-header turns dark while it sits over it.\n */\nexport function PlumeformBand({ backdrop, tone = \"dark\", as: Tag = \"section\", id, children, className }: PlumeformBandProps) {\n  return (\n    <Tag\n      id={id}\n      data-tone={tone === \"dark\" ? \"dark\" : undefined}\n      className={cn(tone === \"dark\" && \"dark\", \"relative isolate overflow-clip bg-background text-foreground\", className)}\n    >\n      <div aria-hidden={backdrop ? undefined : true} className=\"plumeform-band-backdrop absolute inset-0 -z-10 overflow-clip [&>*]:size-full [&>*]:object-cover\">\n        {backdrop ?? (\n          <div className=\"bg-[radial-gradient(70%_55%_at_65%_20%,color-mix(in_oklab,var(--glow)_45%,transparent),transparent_70%),radial-gradient(50%_45%_at_10%_85%,color-mix(in_oklab,var(--glow)_25%,transparent),transparent_70%)]\" />\n        )}\n      </div>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original has a WebGL fluted-glass canvas); empty shows a soft glow placeholder"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark forces the dark colours (as on the original); inherit follows the page"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "the element to render"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ae60a8bea1c7f9c2ba3bfc98b02467438245a88a449218a106268e78eb3bce26"
+}

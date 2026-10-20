@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething footer",
+  "description": "A stone-grey footer: a big two-tone wordmark that types itself out, a tiny letter-spaced tagline, contact lines and round outline social buttons, three link columns with small bold uppercase headings, and a hairline bottom bar with copyright, underlined legal links, a badge and a round back-to-top button. Links underline in acid on hover; round buttons fill with ink.",
+  "category": "footer",
+  "site": "typesomething",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "columns",
+    "social",
+    "wordmark",
+    "typewriter",
+    "grey",
+    "light"
+  ],
+  "notes": [
+    "typing wordmark needs JavaScript (typing={false} turns it off); the static HTML shows the full name"
+  ],
+  "hydrate": "visible",
+  "entry": "typesomething-footer.tsx",
+  "source": "foundry",
+  "name": "typesomething-footer",
+  "files": [
+    {
+      "path": "typesomething-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { TypesomethingWordmark } from \"@foundry/typesomething-wordmark\";\n\nexport interface TypesomethingFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface TypesomethingFooterColumn {\n  /** small uppercase heading */\n  title: string;\n  links: TypesomethingFooterLink[];\n}\n\nexport interface TypesomethingFooterSocial {\n  /** the network's name, for screen readers */\n  label: string;\n  href: string;\n  /** its icon (a lucide icon or an svg) */\n  icon: ReactNode;\n}\n\nexport interface TypesomethingFooterProps {\n  /** wordmark: bold first half and light second half */\n  brand: { lead: string; tail: string };\n  /** large mark after the wordmark (a lucide icon or an svg) */\n  brandIcon?: ReactNode;\n  /** tiny letter-spaced line under the wordmark */\n  tagline?: string;\n  /** short lines under it (address, company) */\n  details?: string[];\n  /** label over the social icons (e.g. \"Follow us\") */\n  socialLabel?: string;\n  socials?: TypesomethingFooterSocial[];\n  /** link columns at the right */\n  columns: TypesomethingFooterColumn[];\n  /** the copyright line */\n  copyright: string;\n  /** small underlined links next to it */\n  legal?: TypesomethingFooterLink[];\n  /** small \"made with\" badge at the bottom right: an icon, a tiny label and a bold name */\n  badge?: { label: string; name?: string; href: string; icon?: ReactNode };\n  /** the round back-to-top button; its label is for screen readers */\n  top?: { label: string; href: string };\n  /** the wordmark types itself out on a loop */\n  typing?: boolean;\n  className?: string;\n}\n\n/**\n * Stone-grey footer: a big two-tone wordmark with a tiny spaced tagline, contact lines and\n * round social buttons, three link columns, and a hairline bottom bar with the copyright,\n * legal links, a small badge and a back-to-top button.\n */\nexport function TypesomethingFooter({\n  brand,\n  brandIcon,\n  tagline,\n  details = [],\n  socialLabel,\n  socials = [],\n  columns,\n  copyright,\n  legal = [],\n  badge,\n  top,\n  typing = true,\n  className,\n}: TypesomethingFooterProps) {\n  const roundButton =\n    \"grid size-9 place-items-center rounded-full border border-foreground/25 transition-[color,background-color] duration-[160ms] ease-[ease] hover:bg-foreground hover:text-background motion-reduce:transition-none [&_svg]:size-[1.1rem]\";\n  const underline = \"underline-offset-[0.3rem] decoration-primary decoration-[0.2rem] hover:underline\";\n  return (\n    <footer className={cn(\"border-t border-foreground/20 bg-secondary px-gutter text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page pt-10 lg:pt-[4.5rem]\">\n        <div className=\"grid gap-8 lg:grid-cols-[2fr_1fr_1fr_0.9fr] lg:gap-0\">\n          <div>\n            <div className=\"inline-flex flex-col items-center\">\n              <TypesomethingWordmark lead={brand.lead} tail={brand.tail} icon={brandIcon} typing={typing} cursor=\"\" className=\"text-[2.1rem] lg:text-[2.75rem] [&_svg]:size-[1.2em]\" />\n              {tagline && <span className=\"mt-2 text-[0.62rem] tracking-[0.25em]\">{tagline}</span>}\n            </div>\n            {details.length > 0 && (\n              <div className=\"mt-5 text-[0.78rem] leading-[1.6]\">\n                {details.map((d) => (\n                  <p key={d}>{d}</p>\n                ))}\n              </div>\n            )}\n            {socials.length > 0 && (\n              <div className=\"mt-7\">\n                {socialLabel && <p className=\"text-[0.72rem] tracking-[0.12em] uppercase\">{socialLabel}</p>}\n                <ul className=\"mt-3 flex flex-wrap gap-2\">\n                  {socials.map((s) => (\n                    <li key={s.href}>\n                      <a href={s.href} aria-label={s.label} className={roundButton}>\n                        {s.icon}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            )}\n          </div>\n\n          {columns.map((c) => (\n            <nav key={c.title} aria-label={c.title} className=\"lg:pt-2\">\n              <p className=\"text-[0.7rem] font-bold tracking-[0.12em] uppercase\">{c.title}</p>\n              <ul className=\"mt-5 space-y-3 lg:mt-6\">\n                {c.links.map((l) => (\n                  <li key={l.href}>\n                    <a href={l.href} className={cn(\"text-[0.92rem]\", underline)}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </nav>\n          ))}\n        </div>\n\n        <div className=\"mt-10 flex flex-col gap-4 border-t border-foreground/20 py-6 lg:mt-16 lg:flex-row lg:items-center lg:gap-8\">\n          <p className=\"text-[0.78rem] text-foreground/65\">{copyright}</p>\n          {legal.length > 0 && (\n            <ul className=\"flex flex-wrap gap-4\">\n              {legal.map((l) => (\n                <li key={l.href}>\n                  <a href={l.href} className=\"text-[0.78rem] underline underline-offset-[0.25rem] decoration-foreground/60 hover:decoration-primary\">\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          <div className=\"flex items-center justify-end gap-9 lg:ml-auto\">\n            {badge && (\n              <a href={badge.href} className=\"flex items-center gap-2 opacity-80 transition-opacity duration-[180ms] hover:opacity-100 [&_svg]:size-6\">\n                {badge.icon}\n                <span className=\"leading-[1.2]\">\n                  <span className=\"block text-[0.6rem] tracking-[0.1em] uppercase\">{badge.label}</span>\n                  {badge.name && <span className=\"block text-[0.8rem] font-bold tracking-[-0.02em]\">{badge.name}</span>}\n                </span>\n              </a>\n            )}\n            {top && (\n              <a href={top.href} aria-label={top.label} className={roundButton}>\n                <ArrowUp aria-hidden />\n              </a>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "typesomething-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ lead: string; tail: string; }",
+      "required": true,
+      "description": "wordmark: bold first half and light second half"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "large mark after the wordmark (a lucide icon or an svg)"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": false,
+      "description": "tiny letter-spaced line under the wordmark"
+    },
+    {
+      "name": "details",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "short lines under it (address, company)"
+    },
+    {
+      "name": "socialLabel",
+      "type": "string",
+      "required": false,
+      "description": "label over the social icons (e.g. \"Follow us\")"
+    },
+    {
+      "name": "socials",
+      "type": "TypesomethingFooterSocial[]",
+      "required": false,
+      "default": "[]"
+    },
+    {
+      "name": "columns",
+      "type": "TypesomethingFooterColumn[]",
+      "required": true,
+      "description": "link columns at the right"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "TypesomethingFooterLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "small underlined links next to it"
+    },
+    {
+      "name": "badge",
+      "type": "{ label: string; name?: string; href: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "small \"made with\" badge at the bottom right: an icon, a tiny label and a bold name"
+    },
+    {
+      "name": "top",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the round back-to-top button; its label is for screen readers"
+    },
+    {
+      "name": "typing",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "the wordmark types itself out on a loop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8fec634511dce6f97734476885b3304a24fa9af1eda6508d124df2a626678015"
+}
