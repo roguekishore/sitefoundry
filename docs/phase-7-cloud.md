@@ -156,7 +156,14 @@ group rule's description, which AWS limits to `a-zA-Z0-9. _-:/()#,@[]+=&;{}!$*`)
 State is `infra/terraform.tfstate` (local, gitignored); the operator keeps a copy in `~/foundry-tfstate.bak`.
 Warden already has `jk` (v2 since 2026-10-11).
 
-## Step D — provisioning both instances: **TODO**
+## Step D — provisioning both instances: **BUILT**, preview running
+
+Scripts: `infra/aws.sh`, `infra/ssm.sh`, `infra/secrets.sh`, `infra/provision/{common,preview,run}.sh`
+(how to run them: [`infra/README.md`](../infra/README.md)). Seen from the laptop on 2026-10-20:
+`https://foundry.themaverick.tech/` answers with the login page (Caddy's certificate works, the
+API says 401 without a session). **Still open:** the `live.foundry.themaverick.tech` A record
+is not in Netlify yet (the name does not resolve); the run instance's provisioning has not been
+confirmed from here; neither instance has warden's outpost yet.
 
 **The user's decisions (2026-10-19), and what was found, before any of it was written:**
 
@@ -220,16 +227,32 @@ systemd unit for `node packages/server/dist/runner.mjs`. The user then logs in t
 
 Both: install warden's outpost from warden's UI (button on the instance).
 
-## Step E — deploying: **TODO**
+## Step E — deploying: **BUILT** (2026-10-20, not run yet)
 
-`infra/deploy.sh` over SSM: on the preview, `git pull`, `pnpm install --frozen-lockfile`,
-`pnpm build:server`, `pnpm --filter gallery build`, restart the unit. The run instance pulls
-on each run (`FOUNDRY_FETCH=1`) but needs `pnpm build:server` + a restart when the runner
-changes: do it when it is next on. Thumbnails: `public/thumbs/` is git-ignored, so the cloud
+- `infra/deploy.sh` (operator, with `!`): refuses unless the laptop's `main` equals GitHub's
+  (the instances pull from GitHub, so an unpushed main would deploy an older commit), then sends
+  `provision/deploy-preview.sh` over SSM: pull, `pnpm install --frozen-lockfile`,
+  `pnpm build:server`, the gallery built into `apps/gallery/dist.next` and swapped in (no
+  half-built gallery is ever served), restart, check.
+- **The run instance updates itself**: its unit runs `/usr/local/bin/foundry-runner-update`
+  (as `runner`, `ExecStartPre=-`) before every start: fetch, and only when `origin/main` moved,
+  fast-forward, install and `pnpm build:server`. The instance is switched on per run, so each
+  run gets the current runner. A failed update is logged and the runner starts on its old build.
+  Takes effect once `provision/run.sh` has been run again (it is safe to rerun).
+- `./deploy.sh run` updates the runner now (restarts the service); refused while a `claude` or
+  `gemini` process is running there.
+
+Thumbnails: `public/thumbs/` is git-ignored, so the cloud
 gallery shows placeholders until something builds them (the run instance could run
 `pnpm build:thumbs` and send them; not decided).
 
-## Step F — the warden widget: **TODO** (in AWS-COMMAND-CENTER, its own session)
+## Step F — the warden widget: **TODO**, decisions asked (2026-10-20)
+
+Warden's rules hold there: its open decisions went to the user as a numbered list, nothing is
+built before the answers. Found: warden already has the Apps page (D43: groups resources tagged
+`warden:app=foundry`) and runs (D45, built **not shipped**: `./w ship`, then an outpost on the
+preview instance). Runs keep only the newest 10 files and the hub keeps them in memory, so
+"tokens and cost this month" needs a source that outlives them.
 
 Follow that repo's `CLAUDE.md` (decisions as numbered questions first, then D47 in
 `docs/DECISIONS.md`, spec in `docs/spec/`, ship is the operator's). Content: a Foundry

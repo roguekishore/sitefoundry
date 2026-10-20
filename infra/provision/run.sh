@@ -56,8 +56,28 @@ echo 'runner ALL=(root) NOPASSWD: /usr/sbin/shutdown -h now' > /etc/sudoers.d/ru
 chmod 440 /etc/sudoers.d/runner
 visudo -cf /etc/sudoers.d/runner >/dev/null
 
-say "secrets script and the runner service"
+say "secrets script, self-update and the runner service"
 write_env_script run
+# Runs as runner before each start: the instance is switched on per run, so this keeps the
+# runner at origin/main without a deploy step. Rebuilds only when main moved. Its failure is
+# ignored (the "-" in the unit): the runner then starts on the build it already has.
+cat > /usr/local/bin/foundry-runner-update <<SCRIPT
+#!/bin/bash
+# Written by infra/provision/run.sh. Brings $REPO_DIR to origin/main and rebuilds the runner.
+set -euo pipefail
+cd $REPO_DIR
+git fetch -q origin main
+if [[ "\$(git rev-parse HEAD)" == "\$(git rev-parse origin/main)" && -f packages/server/dist/runner.mjs ]]; then
+  echo "runner up to date at \$(git rev-parse --short HEAD)"
+  exit 0
+fi
+echo "updating the runner: \$(git rev-parse --short HEAD) -> \$(git rev-parse --short origin/main)"
+git checkout -q main
+git merge -q --ff-only origin/main
+pnpm install --frozen-lockfile --reporter=silent
+pnpm build:server
+SCRIPT
+chmod 755 /usr/local/bin/foundry-runner-update
 cat > /etc/systemd/system/foundry-runner.service <<UNIT
 [Unit]
 Description=Foundry runner (takes recreation jobs from the preview's server)
@@ -76,7 +96,9 @@ Environment=FOUNDRY_FETCH=1
 Environment=FOUNDRY_PUSH=1
 Environment=FOUNDRY_SELF_SHUTDOWN_MINUTES=30
 ExecStartPre=+/usr/local/bin/foundry-env
+ExecStartPre=-/usr/local/bin/foundry-runner-update
 ExecStart=/bin/bash -c 'set -a; . /run/foundry/secrets.env; exec /opt/node/bin/node packages/server/dist/runner.mjs'
+TimeoutStartSec=15min
 Restart=always
 RestartSec=5
 
