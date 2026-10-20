@@ -26,6 +26,7 @@ the user didn't ask for.
 **Existing slug:** if `foundry/sites/<slug>/` exists and pages are named, add those pages to
 it (reuse its theme and blocks; don't redo the landing page). If it exists and no pages are
 named, ask whether to continue that recreation or use another slug before doing anything else.
+A folder holding only `_reference/` (captured in advance, see 1) counts as new.
 
 Below, `<slug>` and `<url>` mean those values.
 
@@ -36,6 +37,15 @@ Look at one existing site under `foundry/sites/` for the shape of a finished one
 `foundry/sites/clerk/clerk-logos/` for a block with its own CSS animation.
 
 ## 1. Capture and study
+
+**Captured in advance?** If `foundry/sites/<slug>/_reference/precapture.json` exists, the
+captures are already there (made by `tools/claude-batch/precapture.mjs`, and this machine may
+not reach the site): don't run `capture.mjs` on the original and don't open it any other way.
+Its `pages` list gives each page's label (`original-pricing`), or why it couldn't be found:
+skip those and say so in the report. A page asked for that isn't in the list at all: skip it
+and say so too. Then go on to the study below.
+
+Otherwise, capture now:
 
 ```bash
 node .claude/skills/recreate-site/capture.mjs <url> foundry/sites/<slug>/_reference
@@ -190,7 +200,8 @@ Copy the design language: layout, rhythm, type, colour, depth, motion. **Never t
 ## 7. Verify
 
 1. `pnpm check <your item names…>`: 0 errors. Then `pnpm build:registry` succeeds.
-2. Start `pnpm gallery` in the background, then capture yours the same way, per page:
+2. Start `pnpm gallery` in the background (unless `http://localhost:4400` already answers:
+   then use that one and leave it running), then capture yours the same way, per page:
    ```bash
    node .claude/skills/recreate-site/capture.mjs "http://localhost:4400/preview.html?site=<slug>&theme=<slug>-theme&mode=<light|dark>" foundry/sites/<slug>/_reference ours
    node .claude/skills/recreate-site/capture.mjs "http://localhost:4400/preview.html?site=<slug>&page=<name>&theme=<slug>-theme&mode=<light|dark>" foundry/sites/<slug>/_reference ours-<name>

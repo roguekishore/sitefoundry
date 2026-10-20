@@ -72,6 +72,42 @@ pnpm check [name…]       # must report 0 errors
 pnpm build:registry      # refuses changed files without a version bump
 ```
 
+## Recreating sites in a batch
+
+`/recreate-site` for a list of sites, unattended, in two phases. The list is a JSON file that
+also holds each site's status, which both phases keep up to date
+(see `tools/claude-batch/sites.example.json`):
+
+```json
+{ "sites": [
+  { "url": "https://linear.app" },
+  { "url": "https://www.example-saas.com", "slug": "saasy", "pages": ["pricing", "about"] }
+] }
+```
+
+```bash
+# A: on a network that reaches the sites: capture the new ones
+node tools/claude-batch/precapture.mjs sites.json
+#    on another machine than B? commit and push the captures, then git pull there
+#    (crops and frames are committed on purpose; delete them once the site is recreated)
+
+# B: on any machine (Linux), as a normal user, with claude logged in to your account,
+#    after pnpm install and pnpm exec playwright install --with-deps chromium
+node tools/claude-batch/run.mjs sites.json --dry-run    # what it would do
+node tools/claude-batch/run.mjs sites.json --jobs 6     # one `claude -p` session per site, 6 at a time
+```
+
+Every session runs `claude-opus-5-5` at effort `high`, subagents included (`--model`,
+`--effort` to change). Sessions share the working tree and one gallery: `pnpm add` and git
+commits take turns through `tools/claude-batch/serial.mjs`, and the registry is built once,
+after the last session.
+
+Statuses: `new` → `captured` / `capture-failed` → `running` (`waiting-for-limit`) → `done`,
+`needs-you` (read its report), `failed`, `timed-out` or `stopped`. Set `"status": "skip"` to
+leave a site out. Phase B never opens the sites, runs with `--dangerously-skip-permissions`,
+waits out the account's usage limit and resumes, and picks up sites added to the list while it
+runs. Logs and each site's report go to `tools/claude-batch/runs/`.
+
 ## Layout
 
 | Path | |
@@ -82,4 +118,4 @@ pnpm build:registry      # refuses changed files without a version bump
 | `packages/core` | item format, registry reader, installer (shared by CLI and MCP) |
 | `packages/cli`, `packages/mcp` | `foundry` command, MCP server |
 | `apps/gallery` | the picker |
-| `tools/` | `check`, `build-registry` |
+| `tools/` | `check`, `build-registry`, `claude-batch` (batch recreation) |
