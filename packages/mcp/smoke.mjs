@@ -7,7 +7,6 @@
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createInterface } from "node:readline/promises";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { UnauthorizedError } from "@modelcontextprotocol/sdk/client/auth.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
@@ -44,20 +43,54 @@ const provider = {
     const form = new URLSearchParams(authUrl.searchParams);
     form.set("name", "smoke test");
     form.set("allow", "1");
-    if (asksPassphrase) form.set("passphrase", await passphrase());
+    if (asksPassphrase) form.set("passphrase", pass);
     const sent = await fetch(new URL("/oauth/authorize", authUrl), { method: "POST", body: form, redirect: "manual" });
     const back = sent.headers.get("location") ? new URL(sent.headers.get("location")) : null;
     code = back?.searchParams.get("code");
-    check(code, `allowed${asksPassphrase ? " with the passphrase" : " (no login on this server)"}: ${code ? "a code came back" : `HTTP ${sent.status} ${back?.searchParams.get("error_description") ?? ""}`}`);
+    if (!code) {
+      check(false, sent.status === 401 ? "that passphrase didn't match" : sent.status === 429 ? "too many tries: wait a minute" : `not allowed: HTTP ${sent.status} ${back?.searchParams.get("error_description") ?? ""}`);
+      process.exit(1);
+    }
+    check(true, `allowed${asksPassphrase ? " with the passphrase" : " (no login on this server)"}: a code came back`);
   },
 };
 
+// Asked before connecting: the SDK gives a connection 60 s, which typing mustn't eat into.
+// A server with a login sends its front page to /login.
+const hasLogin = (await fetch(new URL("/", url), { redirect: "manual" })).status === 303;
+const pass = hasLogin ? await passphrase() : "";
+
 async function passphrase() {
   if (process.env.FOUNDRY_PASSPHRASE) return process.env.FOUNDRY_PASSPHRASE;
-  const rl = createInterface({ input: process.stdin, output: process.stderr });
-  const answer = await rl.question("passphrase: ");
-  rl.close();
-  return answer;
+  if (!process.stdin.isTTY) {
+    console.error("The server has a login and there's no keyboard to type the passphrase on: run this in a terminal of your own (not with ! in Claude Code), or set FOUNDRY_PASSPHRASE.");
+    process.exit(2);
+  }
+  // Read key by key with the terminal's echo off, so the passphrase never shows.
+  process.stderr.write(`${new URL(url).host} has a login. Type the passphrase and press Enter (nothing shows while you type): `);
+  const stdin = process.stdin;
+  stdin.setRawMode(true);
+  stdin.setEncoding("utf8");
+  stdin.resume();
+  return new Promise((resolve) => {
+    let typed = "";
+    const onKey = (keys) => {
+      for (const k of keys) {
+        if (k === "\u0003") {
+          process.stderr.write("\n");
+          process.exit(130); // Ctrl+C
+        } else if (k === "\r" || k === "\n") {
+          stdin.setRawMode(false);
+          stdin.pause();
+          stdin.off("data", onKey);
+          process.stderr.write("\n");
+          return resolve(typed);
+        } else if (k === "\u007f" || k === "\b") typed = typed.slice(0, -1);
+        else typed += k;
+      }
+    };
+    stdin.on("data", onKey);
+  });
 }
 
 const connect = async () => {
