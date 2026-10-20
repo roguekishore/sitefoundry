@@ -284,6 +284,11 @@ async function receivePreview(id: number, req: IncomingMessage) {
 
 let idleSince = Date.now();
 let lastStart = 0;
+// Each queued run is told once that the instance is being switched on, and once if AWS
+// refuses (InsufficientInstanceCapacity happens now and then; the next tick tries again).
+const startTold = new Set<number>();
+const startFailTold = new Set<number>();
+const TICK_SECONDS = machine.kind === "ec2" ? 15 : 5;
 
 async function tick() {
   const active = db.runsIn(ACTIVE_STATES);
@@ -291,9 +296,19 @@ async function tick() {
 
   if (active.some((r) => r.state === "queued") && state === "off") {
     log("work queued: switching the run instance on");
-    for (const r of active.filter((r) => r.state === "queued")) db.say(r.id, "info", "Switching the run instance on.");
+    const queued = active.filter((r) => r.state === "queued");
+    for (const r of queued.filter((r) => !startTold.has(r.id))) {
+      startTold.add(r.id);
+      db.say(r.id, "info", "Switching the run instance on.");
+    }
     lastStart = Date.now();
-    await machine.start().catch((e) => log(`couldn't start the run instance: ${e.message}`));
+    await machine.start().catch((e) => {
+      log(`couldn't start the run instance: ${e.message}`);
+      for (const r of queued.filter((r) => !startFailTold.has(r.id))) {
+        startFailTold.add(r.id);
+        db.say(r.id, "warn", `AWS couldn't start the run instance (${e.message.replace(/\.$/, "")}). Trying again every ${TICK_SECONDS} s.`);
+      }
+    });
   }
 
   // A run whose runner went quiet for 15 minutes is given up on (a run that is merely slow still
@@ -512,7 +527,7 @@ server.listen(PORT, HOST, () => {
   if (!existsSync(join(GALLERY, "index.html"))) log(`the gallery isn't built yet: pnpm --filter gallery build`);
 });
 
-setInterval(() => tick().catch((e) => log(`tick: ${e.message}`)), machine.kind === "ec2" ? 15e3 : 5e3);
+setInterval(() => tick().catch((e) => log(`tick: ${e.message}`)), TICK_SECONDS * 1e3);
 if (WARDEN_DIR) setInterval(wardenSoon, 60e3);
 
 const shutdown = async () => {
