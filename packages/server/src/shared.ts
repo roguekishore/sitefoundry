@@ -115,6 +115,49 @@ export interface Job {
   resume: boolean;
 }
 
+/**
+ * A thumbnails job: the runner shoots main's gallery (`pnpm build:thumbs`, only what has no
+ * thumbnail yet) and sends public/thumbs/ to the server, which serves it at /thumbs/.
+ * queued → running → done | failed | stopped.
+ */
+export type ThumbsState = "queued" | "running" | "done" | "failed" | "stopped";
+export interface ThumbsJob {
+  id: number;
+  state: ThumbsState;
+  /** why it was queued: "deployed f0ec3bf", "asked for" */
+  reason: string;
+  /** the commit of main that was shot (set by the runner) */
+  commit: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  endedAt: string | null;
+  error: string | null;
+  /** build:thumbs' last summary line, e.g. "done in 4m 10s · 12 shot · 0 failed · 1 with warnings" */
+  summary: string | null;
+  /** its output, the last 400 lines */
+  log: string;
+  stopRequested: boolean;
+}
+/** server → runner, when the work is thumbnails (the runner tells the two apart by `thumbs`). */
+export interface ThumbsWork {
+  thumbs: ThumbsJob;
+}
+/** runner → server while a thumbnails job goes. */
+export interface ThumbsReport {
+  state?: ThumbsState;
+  commit?: string;
+  error?: string | null;
+  summary?: string;
+  lines?: string[];
+}
+/** What the Runs page shows about thumbnails. */
+export interface ThumbsInfo {
+  /** the newest job, if any */
+  latest: ThumbsJob | null;
+  /** when the server last received thumbnails (null: it has none, the gallery shows placeholders) */
+  receivedAt: string | null;
+}
+
 export type MachineState = "off" | "starting" | "on" | "stopping" | "unknown";
 export interface MachineInfo {
   state: MachineState;

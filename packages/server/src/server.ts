@@ -19,9 +19,14 @@
 //   FOUNDRY_LIVE_TARGET                 the run instance's gallery, e.g. http://10.20.0.20:4410;
 //                                       requests for host live.* are passed to it (cloud)
 //   FOUNDRY_LIVE_URL                    the link the run page shows for it
-import { spawn } from "node:child_process";
+//
+// Thumbnails: the gallery's stills (pnpm build:thumbs) are git-ignored, so the cloud gets them
+// from the run instance: a thumbnails job shoots main there and sends public/thumbs/, kept in
+// <FOUNDRY_DATA>/thumbs and served at /thumbs/ ahead of the built gallery's own (the laptop's).
+// In the cloud a job is queued at start when the deployed commit changed what the gallery shows.
+import { spawn, spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { createReadStream, createWriteStream, existsSync, mkdirSync, renameSync, rmSync, statSync } from "node:fs";
+import { createReadStream, createWriteStream, existsSync, mkdirSync, renameSync, rmSync, statSync, utimesSync } from "node:fs";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
@@ -29,7 +34,7 @@ import { fileURLToPath } from "node:url";
 import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
 import { Db } from "./db.ts";
 import { Ec2Machine, LocalMachine, type Machine } from "./machine.ts";
-import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState } from "./shared.ts";
+import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState, type ThumbsInfo, type ThumbsReport, type ThumbsWork } from "./shared.ts";
 import { writeWardenRuns } from "./warden.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -60,6 +65,7 @@ const PORT = Number(env.FOUNDRY_PORT ?? 4401);
 const DATA = resolve(env.FOUNDRY_DATA ?? join(REPO, ".foundry"));
 const GALLERY = resolve(env.FOUNDRY_GALLERY_DIST ?? join(REPO, "apps/gallery/dist"));
 const PREVIEWS = join(DATA, "previews");
+const THUMBS = join(DATA, "thumbs");
 const IDLE_MINUTES = Number(env.FOUNDRY_IDLE_MINUTES ?? 10);
 const RUNNER_TOKEN = env.FOUNDRY_RUNNER_TOKEN ?? randomBytes(24).toString("base64url");
 const LIVE_TARGET = env.FOUNDRY_LIVE_TARGET ? new URL(env.FOUNDRY_LIVE_TARGET) : null;
@@ -218,7 +224,7 @@ function validRun(body: RunRequest) {
 let runnerSeen: string | null = null;
 const TERMINAL: RunState[] = ["done", "failed", "stopped", "held"];
 
-function claim(): Job | null {
+function claim(): Job | ThumbsWork | null {
   runnerSeen = now();
   // A run already claimed or running means the runner restarted in the middle of it: hand the
   // same run back, to continue from what's on disk.
@@ -228,10 +234,78 @@ function claim(): Job | null {
     db.updateRun(unfinished.id, { reportedAt: now() });
     return { run: db.run(unfinished.id)!, resume: true };
   }
+  // The same for thumbnails: it shoots again, keeping what it shot before.
+  const shooting = db.activeThumbs();
+  if (shooting?.state === "running") {
+    db.addThumbsLog(shooting.id, ["(the runner came back in the middle of this; it starts again and keeps what it shot)"]);
+    db.updateThumbs(shooting.id, { reportedAt: now() });
+    return { thumbs: db.thumbs(shooting.id)! };
+  }
   const next = db.claimNext();
-  if (!next) return null;
-  db.say(next.run.id, "info", "Taken by the runner.");
-  return next;
+  if (next) {
+    db.say(next.run.id, "info", "Taken by the runner.");
+    return next;
+  }
+  const thumbs = db.claimThumbs();
+  return thumbs ? { thumbs } : null;
+}
+
+function reportThumbs(id: number, r: ThumbsReport): ReportReply {
+  runnerSeen = now();
+  const job = db.thumbs(id);
+  if (!job) throw new HttpError(404, "no such thumbnails job");
+  db.addThumbsLog(id, r.lines ?? []);
+  const ended = r.state && r.state !== "running" && r.state !== "queued";
+  db.updateThumbs(id, { reportedAt: now(), state: r.state, endedAt: ended ? now() : undefined, commitId: r.commit, error: r.error, summary: r.summary });
+  const fresh = db.thumbs(id)!;
+  return { stop: fresh.stopRequested || fresh.state !== "running" };
+}
+
+/** A .tar.gz from the runner, unpacked into `dest`, which it replaces whole (or not at all). */
+async function receiveTar(req: IncomingMessage, dest: string) {
+  const parent = dirname(dest);
+  const name = dest.slice(parent.length + 1);
+  const incoming = `.incoming-${name}.tar.gz`;
+  const fresh = `.${name}.new`;
+  mkdirSync(parent, { recursive: true });
+  rmSync(join(parent, fresh), { recursive: true, force: true });
+  mkdirSync(join(parent, fresh), { recursive: true });
+  await pipeline(req, createWriteStream(join(parent, incoming)));
+  // Relative paths and cwd: GNU tar on Windows reads "C:" as a remote host.
+  const code = await new Promise<number | null>((ok) => spawn("tar", ["-xzf", incoming, "-C", fresh], { cwd: parent, stdio: "ignore" }).on("exit", ok).on("error", () => ok(-1)));
+  rmSync(join(parent, incoming), { force: true });
+  if (code !== 0) {
+    rmSync(join(parent, fresh), { recursive: true, force: true });
+    throw new HttpError(400, "couldn't unpack it");
+  }
+  rmSync(dest, { recursive: true, force: true });
+  renameSync(join(parent, fresh), dest);
+}
+
+const thumbsInfo = (): ThumbsInfo => ({ latest: db.latestThumbs() ?? null, receivedAt: thumbsReceivedAt() });
+
+/** When the server last received thumbnails, or null. */
+function thumbsReceivedAt(): string | null {
+  // The folder's time, set when they arrive (the files inside keep the runner's times).
+  return existsSync(join(THUMBS, "manifest.json")) ? statSync(THUMBS).mtime.toISOString() : null;
+}
+
+/**
+ * At start in the cloud (a deploy restarts the server): queue thumbnails when the deployed commit
+ * changed what the gallery shows since the last shot, or when the server has none.
+ */
+function thumbsAfterDeploy() {
+  if (machine.kind !== "ec2" || db.activeThumbs()) return;
+  const head = spawnSync("git", ["-C", REPO, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim();
+  if (!head) return log("thumbnails: no git commit here, not queueing any");
+  const last = db.latestThumbs("done")?.commit;
+  if (last && thumbsReceivedAt()) {
+    if (last === head) return;
+    const diff = spawnSync("git", ["-C", REPO, "diff", "--quiet", last, head, "--", "foundry", "vault", "apps/gallery", "public/r", "tools/build-thumbs.ts"]);
+    if (diff.status === 0) return log(`thumbnails: nothing the gallery shows changed since ${last.slice(0, 7)}`);
+  }
+  db.addThumbs(`deployed ${head.slice(0, 7)}`);
+  log(`thumbnails queued for ${head.slice(0, 7)}`);
 }
 
 function report(id: number, r: Report): ReportReply {
@@ -261,21 +335,7 @@ function report(id: number, r: Report): ReportReply {
 async function receivePreview(id: number, req: IncomingMessage) {
   const run = db.run(id);
   if (!run) throw new HttpError(404, "no such run");
-  const incoming = join(PREVIEWS, `.incoming-${id}.tar.gz`);
-  const fresh = join(PREVIEWS, `.${run.slug}.new`);
-  rmSync(fresh, { recursive: true, force: true });
-  mkdirSync(fresh, { recursive: true });
-  await pipeline(req, createWriteStream(incoming));
-  // Relative paths and cwd: GNU tar on Windows reads "C:" as a remote host.
-  const code = await new Promise<number | null>((ok) => spawn("tar", ["-xzf", `.incoming-${id}.tar.gz`, "-C", `.${run.slug}.new`], { cwd: PREVIEWS, stdio: "ignore" }).on("exit", ok).on("error", () => ok(-1)));
-  rmSync(incoming, { force: true });
-  if (code !== 0) {
-    rmSync(fresh, { recursive: true, force: true });
-    throw new HttpError(400, "couldn't unpack the preview");
-  }
-  const dest = join(PREVIEWS, run.slug);
-  rmSync(dest, { recursive: true, force: true });
-  renameSync(fresh, dest);
+  await receiveTar(req, join(PREVIEWS, run.slug));
   db.updateRun(id, { preview: `/p/${run.slug}/` });
   db.say(id, "info", `Preview ready at /p/${run.slug}/`);
 }
@@ -288,18 +348,24 @@ let lastStart = 0;
 // refuses (InsufficientInstanceCapacity happens now and then; the next tick tries again).
 const startTold = new Set<number>();
 const startFailTold = new Set<number>();
+const thumbsStartTold = new Set<number>();
 const TICK_SECONDS = machine.kind === "ec2" ? 15 : 5;
 
 async function tick() {
   const active = db.runsIn(ACTIVE_STATES);
+  const thumbs = db.activeThumbs();
   const state = await machine.state();
 
-  if (active.some((r) => r.state === "queued") && state === "off") {
+  if ((active.some((r) => r.state === "queued") || thumbs?.state === "queued") && state === "off") {
     log("work queued: switching the run instance on");
     const queued = active.filter((r) => r.state === "queued");
     for (const r of queued.filter((r) => !startTold.has(r.id))) {
       startTold.add(r.id);
       db.say(r.id, "info", "Switching the run instance on.");
+    }
+    if (thumbs && !thumbsStartTold.has(thumbs.id)) {
+      thumbsStartTold.add(thumbs.id);
+      db.addThumbsLog(thumbs.id, ["Switching the run instance on."]);
     }
     lastStart = Date.now();
     await machine.start().catch((e) => {
@@ -321,9 +387,14 @@ async function tick() {
     }
   }
 
-  if (active.length) idleSince = Date.now();
+  if (thumbs?.state === "running") {
+    const seen = Date.parse(db.sql.prepare("SELECT reported_at FROM thumbs WHERE id = ?").get(thumbs.id)?.reported_at as string);
+    if (Date.now() - seen > 15 * 60e3) db.updateThumbs(thumbs.id, { state: "failed", endedAt: now(), error: "The runner stopped reporting for 15 minutes." });
+  }
+
+  if (active.length || thumbs) idleSince = Date.now();
   const idleMs = Math.min(Date.now() - idleSince, Date.now() - lastStart);
-  if (!db.runsIn(ACTIVE_STATES).length && state === "on" && idleMs > IDLE_MINUTES * 60e3) {
+  if (!db.runsIn(ACTIVE_STATES).length && !db.activeThumbs() && state === "on" && idleMs > IDLE_MINUTES * 60e3) {
     log(`no work for ${IDLE_MINUTES} minutes: switching the run instance off`);
     await machine.stop().catch((e) => log(`couldn't stop the run instance: ${e.message}`));
   }
@@ -369,6 +440,16 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     }
     let m = path.match(/^\/api\/runner\/runs\/(\d+)\/report$/);
     if (method === "POST" && m) return send(res, 200, report(Number(m[1]), await readJson<Report>(req)));
+    m = path.match(/^\/api\/runner\/thumbs\/(\d+)\/report$/);
+    if (method === "POST" && m) return send(res, 200, reportThumbs(Number(m[1]), await readJson<ThumbsReport>(req)));
+    m = path.match(/^\/api\/runner\/thumbs\/(\d+)\/upload$/);
+    if (method === "PUT" && m) {
+      if (!db.thumbs(Number(m[1]))) throw new HttpError(404, "no such thumbnails job");
+      await receiveTar(req, THUMBS);
+      utimesSync(THUMBS, new Date(), new Date()); // tar gave the folder the runner's time
+      db.addThumbsLog(Number(m[1]), ["The server has the thumbnails."]);
+      return send(res, 200, { ok: true });
+    }
     m = path.match(/^\/api\/runner\/runs\/(\d+)\/preview$/);
     if (method === "PUT" && m) {
       await receivePreview(Number(m[1]), req);
@@ -410,9 +491,12 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
   if (p) {
     if (!p[2]) return res.writeHead(301, { location: `/p/${p[1]}/` }).end();
     if (serveFile(res, join(PREVIEWS, p[1]), p[2])) return;
+    // A preview has no thumbnails of its own: main's show for what it shares with main.
+    if (p[2].startsWith("/thumbs/") && serveFile(res, THUMBS, p[2].slice("/thumbs".length))) return;
     return res.writeHead(404, { "content-type": "text/plain" }).end("No preview for that run (yet).");
   }
 
+  if (path.startsWith("/thumbs/") && serveFile(res, THUMBS, path.slice("/thumbs".length))) return;
   if (serveFile(res, GALLERY, path)) return;
   if (!existsSync(join(GALLERY, "index.html"))) {
     return res.writeHead(503, { "content-type": "text/plain; charset=utf-8" }).end(`The gallery isn't built yet: pnpm --filter gallery build (looked in ${GALLERY}).`);
@@ -434,11 +518,29 @@ async function api(req: IncomingMessage, res: ServerResponse, method: string, pa
       } else {
         const busy = db.runsIn(["claimed", "running"]);
         if (busy.length) throw new HttpError(409, `Run #${busy[0].id} is still going; stop it first.`);
+        if (db.activeThumbs()?.state === "running") throw new HttpError(409, "Thumbnails are being shot; stop them first.");
         await machine.stop();
       }
     }
     const info: MachineInfo = { state: await machine.state(), kind: machine.kind, runnerSeen, idleMinutes: IDLE_MINUTES };
     return send(res, 200, info);
+  }
+  if (path === "/api/thumbs") {
+    if (method === "POST") {
+      if (db.activeThumbs()) throw new HttpError(409, "Thumbnails are already queued or being shot.");
+      db.addThumbs("asked for");
+      setImmediate(() => tick().catch((e) => log(`tick: ${e.message}`)));
+    }
+    return send(res, 200, thumbsInfo());
+  }
+  if (method === "POST" && path === "/api/thumbs/stop") {
+    const job = db.activeThumbs();
+    if (job?.state === "queued") db.updateThumbs(job.id, { state: "stopped", endedAt: now() });
+    else if (job) {
+      db.updateThumbs(job.id, { stopRequested: true });
+      db.addThumbsLog(job.id, ["Stop requested; the runner stops at its next report."]);
+    }
+    return send(res, 200, thumbsInfo());
   }
   if (path === "/api/passkeys") {
     if (method === "POST") {
@@ -550,6 +652,7 @@ server.listen(PORT, HOST, () => {
   if (!existsSync(join(GALLERY, "index.html"))) log(`the gallery isn't built yet: pnpm --filter gallery build`);
 });
 
+thumbsAfterDeploy();
 setInterval(() => tick().catch((e) => log(`tick: ${e.message}`)), TICK_SECONDS * 1e3);
 if (WARDEN_DIR) setInterval(wardenSoon, 60e3);
 

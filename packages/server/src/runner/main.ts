@@ -1,4 +1,5 @@
-// The runner: asks the foundry server for work every few seconds and runs one job at a time.
+// The runner: asks the foundry server for work every few seconds and runs one job at a time:
+// a recreation run (job.ts) or a thumbnails job (thumbs.ts).
 // On the laptop the server starts it as a child process; in the cloud it is a systemd service
 // on the run instance, which the server switches on when there is work and off when idle.
 //
@@ -14,8 +15,9 @@
 import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Job } from "../shared.ts";
+import type { Job, ThumbsWork } from "../shared.ts";
 import { runJob, type RunnerSettings } from "./job.ts";
+import { runThumbs } from "./thumbs.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const env = process.env;
@@ -49,7 +51,7 @@ let stopping = false;
 process.on("SIGTERM", () => (stopping = true));
 process.on("SIGINT", () => (stopping = true));
 
-async function claim(): Promise<Job | null> {
+async function claim(): Promise<Job | ThumbsWork | null> {
   const res = await fetch(`${settings.serverUrl}/api/runner/claim`, {
     method: "POST",
     headers: { authorization: `Bearer ${settings.token}` },
@@ -57,12 +59,12 @@ async function claim(): Promise<Job | null> {
   });
   if (res.status === 204) return null;
   if (!res.ok) throw new Error(`server answered ${res.status}`);
-  return (await res.json()) as Job;
+  return (await res.json()) as Job | ThumbsWork;
 }
 
 say(`runner up: server ${settings.serverUrl}, repo ${repo}, worktrees ${settings.worktrees}`);
 while (!stopping) {
-  let job: Job | null = null;
+  let job: Job | ThumbsWork | null = null;
   try {
     job = await claim();
     lastContact = Date.now();
@@ -73,7 +75,12 @@ while (!stopping) {
       spawnSync("sudo", ["/usr/sbin/shutdown", "-h", "now"], { stdio: "inherit" });
     }
   }
-  if (job) {
+  if (job && "thumbs" in job) {
+    say(`thumbnails ${job.thumbs.id} (${job.thumbs.reason})`);
+    await runThumbs(job.thumbs, settings);
+    lastContact = Date.now();
+    say(`thumbnails ${job.thumbs.id} ended`);
+  } else if (job) {
     say(`run ${job.run.id}: ${job.run.backend} ${job.run.model} on ${job.run.url} as ${job.run.slug}${job.resume ? " (continuing)" : ""}`);
     await runJob(job, settings);
     lastContact = Date.now();

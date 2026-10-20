@@ -4,7 +4,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { NO_USAGE, type Call, type Passkey, type Run, type RunEvent, type RunState, type Usage } from "./shared.ts";
+import { NO_USAGE, type Call, type Passkey, type Run, type RunEvent, type RunState, type ThumbsJob, type ThumbsState, type Usage } from "./shared.ts";
 
 /** A passkey as stored: `Passkey` plus what checking a login needs. */
 export type StoredPasskey = Passkey & { publicKey: Uint8Array<ArrayBuffer>; counter: number; transports: string[] };
@@ -72,6 +72,20 @@ CREATE TABLE IF NOT EXISTS passkeys (
   name TEXT NOT NULL,
   created_at TEXT NOT NULL,
   last_used_at TEXT
+);
+CREATE TABLE IF NOT EXISTS thumbs (
+  id INTEGER PRIMARY KEY,
+  state TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  commit_id TEXT,
+  created_at TEXT NOT NULL,
+  started_at TEXT,
+  ended_at TEXT,
+  reported_at TEXT,
+  error TEXT,
+  summary TEXT,
+  log TEXT NOT NULL DEFAULT '',
+  stop_requested INTEGER NOT NULL DEFAULT 0
 );
 `;
 
@@ -230,7 +244,62 @@ export class Db {
     return this.sql.prepare("DELETE FROM passkeys WHERE id = ?").run(id).changes > 0;
   }
 
+  // ---------- thumbnails jobs ----------
+
+  addThumbs(reason: string): ThumbsJob {
+    const { lastInsertRowid } = this.sql.prepare("INSERT INTO thumbs (state, reason, created_at) VALUES ('queued', ?, ?)").run(reason, now());
+    return this.thumbs(Number(lastInsertRowid))!;
+  }
+  thumbs(id: number): ThumbsJob | undefined {
+    const row = this.sql.prepare("SELECT * FROM thumbs WHERE id = ?").get(id) as Row | undefined;
+    return row && this.toThumbs(row);
+  }
+  latestThumbs(state?: ThumbsState): ThumbsJob | undefined {
+    const row = (state ? this.sql.prepare("SELECT * FROM thumbs WHERE state = ? ORDER BY id DESC LIMIT 1").get(state) : this.sql.prepare("SELECT * FROM thumbs ORDER BY id DESC LIMIT 1").get()) as Row | undefined;
+    return row && this.toThumbs(row);
+  }
+  /** The queued or running one (there is at most one). */
+  activeThumbs(): ThumbsJob | undefined {
+    const row = this.sql.prepare("SELECT * FROM thumbs WHERE state IN ('queued', 'running') ORDER BY id LIMIT 1").get() as Row | undefined;
+    return row && this.toThumbs(row);
+  }
+  /** The oldest queued one, marked running in the same step. */
+  claimThumbs(): ThumbsJob | undefined {
+    const row = this.sql.prepare("UPDATE thumbs SET state = 'running', started_at = ?, reported_at = ? WHERE id = (SELECT id FROM thumbs WHERE state = 'queued' ORDER BY id LIMIT 1) RETURNING *").get(now(), now()) as Row | undefined;
+    return row && this.toThumbs(row);
+  }
+  updateThumbs(id: number, patch: Partial<Record<"state" | "commitId" | "startedAt" | "endedAt" | "reportedAt" | "error" | "summary" | "stopRequested", string | number | boolean | null>>) {
+    const entries = Object.entries(patch).filter(([, v]) => v !== undefined);
+    if (!entries.length) return;
+    const column = (k: string) => k.replace(/[A-Z]/g, (c) => "_" + c.toLowerCase());
+    const value = (v: unknown) => (typeof v === "boolean" ? Number(v) : (v as string | number | null));
+    this.sql.prepare(`UPDATE thumbs SET ${entries.map(([k]) => `${column(k)} = ?`).join(", ")} WHERE id = ?`).run(...entries.map(([, v]) => value(v)), id);
+  }
+  /** Adds output lines, keeping the last 400. */
+  addThumbsLog(id: number, lines: string[]) {
+    if (!lines.length) return;
+    const old = String((this.sql.prepare("SELECT log FROM thumbs WHERE id = ?").get(id) as Row | undefined)?.log ?? "");
+    const all = [...(old ? old.split("\n") : []), ...lines.map((l) => l.slice(0, 1000))];
+    this.sql.prepare("UPDATE thumbs SET log = ? WHERE id = ?").run(all.slice(-400).join("\n"), id);
+  }
+
   // ---------- rows → objects ----------
+
+  private toThumbs(r: Row): ThumbsJob {
+    return {
+      id: Number(r.id),
+      state: r.state as ThumbsState,
+      reason: String(r.reason),
+      commit: (r.commit_id as string) ?? null,
+      createdAt: String(r.created_at),
+      startedAt: (r.started_at as string) ?? null,
+      endedAt: (r.ended_at as string) ?? null,
+      error: (r.error as string) ?? null,
+      summary: (r.summary as string) ?? null,
+      log: String(r.log),
+      stopRequested: Boolean(r.stop_requested),
+    };
+  }
 
   private toPasskey(r: Row): StoredPasskey {
     return {

@@ -253,9 +253,8 @@ Both: install warden's outpost from warden's UI (button on the instance).
   after the build with exit 0, so the gallery wasn't swapped and the server not restarted. Each
   command now gets its own `mktemp` file.
 
-Thumbnails: `public/thumbs/` is git-ignored, so the cloud
-gallery shows placeholders until something builds them (the run instance could run
-`pnpm build:thumbs` and send them; not decided).
+Thumbnails: `public/thumbs/` is git-ignored, so the cloud gets them from the run instance (see
+"Thumbnails in the cloud" below).
 
 ## Step F — the warden widget: **SHIPPED** (2026-10-20, `warden-20261020T043204Z`)
 
@@ -303,6 +302,38 @@ and code stay, and are the only way to add the first passkey.
   `/api/passkeys` answers 401 without a session. **Next (the user)**: add a passkey on the phone at
   `https://foundry.themaverick.tech/#/passkeys`.
 
+## Thumbnails in the cloud: **BUILT** (2026-10-20), verified on the laptop, not deployed
+
+The user chose "the run instance shoots them" over the laptop uploading its own (2026-10-20).
+
+- **A thumbnails job** is queued work like a run, kept in its own table (`thumbs`): the server
+  switches the run instance on for it, the runner claims it (runs go first) and runs
+  `runner/thumbs.ts`: a detached worktree `<worktrees>/thumbs` at origin/main, `pnpm install`,
+  `pnpm build:thumbs`, then `public/thumbs/` as a .tar.gz to `PUT /api/runner/thumbs/<id>/upload`.
+  Its output goes to `POST /api/runner/thumbs/<id>/report` (the last 400 lines are kept).
+- **Only new things are shot after the first job**: the worktree and its git-ignored
+  `public/thumbs/` stay on the run instance's disk, and `build:thumbs` skips what it already has.
+  Like on the laptop, a changed item keeps its old thumbnail (only `--force` reshoots).
+- **The server keeps them in `<FOUNDRY_DATA>/thumbs`** (outside the built gallery, so a deploy
+  doesn't wipe them) and serves `/thumbs/` from there first, then the gallery's own (the laptop's
+  `pnpm serve` keeps working). Previews (`/p/<slug>/thumbs/`) fall back to them too, so a run's
+  preview shows main's thumbnails for what it shares with main.
+- **Queued by itself after a deploy** (cloud only, `FOUNDRY_MACHINE=ec2`): at start the server
+  compares the deployed commit with the last one shot and queues a job when
+  `foundry/`, `vault/`, `apps/gallery/`, `public/r/` or `tools/build-thumbs.ts` changed, or when it
+  has no thumbnails. A docs-only deploy queues nothing. **The first deploy queues the first full
+  shoot** (568 things, 4 screenshots each).
+- **The Runs page** has a Thumbnails panel: state, the commit shot, when the server received
+  them, the summary line, the output, **Shoot now** and **Stop**. Switch off is refused while
+  thumbnails are being shot.
+- Verified on 2026-10-20 on the laptop (test server, local runner, the worktree seeded with the
+  laptop's thumbnails minus one item): one item shot in 3 min (2.5 of them building the gallery),
+  27 MB sent and served; a job with nothing new; Stop while queued and while building (no
+  processes left); `/thumbs/..%2Ffoundry.db` refused. Packing 27 MB took about 30 s on Windows.
+- **Not known yet:** how long the first full shoot takes on the t4g.large (2 vCPUs, 4 tabs at a
+  time), and whether it runs out of CPU credits on the way (the instance uses standard credits,
+  which slow it to its baseline when spent).
+
 ## Known gaps and risks
 
 - **t4g.large capacity in `ap-south-1a`.** On 2026-10-20 AWS refused to start the run instance
@@ -323,8 +354,9 @@ and code stay, and are the only way to add the first passkey.
 - The agent runs as the same Linux user as the runner, so a determined agent could read the
   Vertex key from the runner's environment. Accepted for now; a separate user for the
   forwarder would close it.
-- Previews have no thumbnails, and items new on the branch have no `/r/<name>.json` (their
-  install panel is empty) because the preview doesn't rebuild the registry.
+- Previews show main's thumbnails only: items new on the branch have none, and no
+  `/r/<name>.json` either (their install panel is empty) because the preview doesn't rebuild the
+  registry.
 - On Windows the local runner is stopped with `taskkill /F`, so it can't report; the server
   refuses Switch off while a run is going.
 - `pnpm typecheck` already had errors in `vault/` and `foundry/sites/*` (CSS imports, demo
