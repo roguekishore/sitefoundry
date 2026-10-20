@@ -29,7 +29,7 @@ export function RoveiaServices({ heading, services, className }: RoveiaServicesP
   return (
     <section className={cn("roveia-services-track bg-background text-foreground", className)} style={{ "--steps": steps } as CSSProperties}>
       <div className="flex flex-col py-16 lg:sticky lg:top-0 lg:h-svh lg:justify-center lg:py-0">
-        <h2 className="roveia-services-fade px-gutter text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:px-30 lg:text-[2.5rem]">{heading}</h2>
+        <h2 className="roveia-services-fade px-gutter text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:px-30">{heading}</h2>
         <div className="roveia-services-viewport mt-14 lg:mt-20">
           <ul className="roveia-services-row flex flex-col gap-5 px-gutter lg:w-max lg:flex-row lg:px-30">
             {services.map((s, i) => (

@@ -31,7 +31,7 @@ export function RoveiaIndustries({ heading, items, className }: RoveiaIndustries
   return (
     <section className={cn("roveia-industries bg-background py-16 text-foreground lg:py-section", className)}>
       <div className="mx-auto max-w-page px-gutter">
-        <h2 className="roveia-industries-reveal text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:pl-8 lg:text-[2.5rem]">{heading}</h2>
+        <h2 className="roveia-industries-reveal text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:pl-8">{heading}</h2>
 
         {/* desktop: the big list */}
         <ul className="mt-18 hidden flex-col lg:flex">
