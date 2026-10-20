@@ -61,8 +61,8 @@ export function RoveiaBrands({ heading, brands, className }: RoveiaBrandsProps) 
                   )}
                 </div>
               ))}
-              <div className="absolute inset-0 bg-background/55" />
             </div>
+            <div aria-hidden className="absolute inset-0 bg-background/55" />
 
             <ul className="roveia-brands-list absolute top-[calc(44%-3.125rem)] left-[14.4%]">
               {brands.map((b, i) => (

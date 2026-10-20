@@ -59,7 +59,7 @@ export function RoveiaFounders({ heading, highlight, quotes, className }: Roveia
               )}
               style={{ "--i": i } as CSSProperties}
             >
-              <Quote aria-hidden className="size-7 fill-primary text-primary" strokeWidth={0} />
+              <Quote aria-hidden className="size-7 rotate-180 fill-primary text-primary" strokeWidth={0} />
               <blockquote className="mt-4 text-base leading-6 tracking-[-0.02em]">{q.quote}</blockquote>
               <p className="mt-6 text-sm leading-6 text-muted-foreground">— {q.author}</p>
               <div className="mt-6 aspect-video overflow-clip rounded-[calc(var(--radius)/3)]">

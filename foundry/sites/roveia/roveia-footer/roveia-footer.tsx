@@ -56,7 +56,7 @@ export function RoveiaFooter({ heading, subheading, cta, brand, brandMark, socia
             <ul className="mt-8 flex gap-6 lg:mt-7">
               {socials.map((s) => (
                 <li key={s.label}>
-                  <a href={s.href} aria-label={s.label} className="block opacity-80 transition-[color,opacity] duration-300 hover:text-primary hover:opacity-100 [&_svg]:size-5">
+                  <a href={s.href} aria-label={s.label} className="block opacity-80 transition-[color,opacity] duration-300 hover:text-primary hover:opacity-100 motion-reduce:transition-none [&_svg]:size-5">
                     {s.icon}
                   </a>
                 </li>

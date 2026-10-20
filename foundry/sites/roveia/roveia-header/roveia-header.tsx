@@ -35,7 +35,7 @@ export interface RoveiaHeaderProps {
  */
 export function RoveiaHeader({ brand, brandMark, homeHref = "#", links, cta, menuLabel, position = "fixed", className }: RoveiaHeaderProps) {
   return (
-    <header className={cn(position === "fixed" ? "fixed inset-x-0 top-0" : "relative", "z-50 px-4 pt-4 text-foreground lg:px-gutter lg:pt-6", className)}>
+    <header className={cn(position === "fixed" ? "fixed inset-x-0 top-0" : "relative", "z-50 px-8 pt-4 text-foreground lg:px-gutter lg:pt-6", className)}>
       <div className="relative mx-auto flex h-12 max-w-[62.25rem] items-center justify-between rounded-full bg-card pr-2 pl-6 shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:h-14 lg:pl-7">
         <RoveiaWordmark name={brand} mark={brandMark} href={homeHref} />
 

@@ -117,3 +117,53 @@ itself is the placeholders' business.
   which crops it with `overflow-clip`) rather than measuring the slot in JS.
 - Fictional content throughout: Northvane, invented clinics/brands, invented platforms in the
   partner row (lucide icons in white discs instead of real platform logos).
+
+## Comparison rounds
+
+Capture note: the `ours-*-section-NN.png` crops are taken as full-page screenshots, which
+leave every CSS view-timeline animation at its start state (reveals look blank, case cards sit
+at 90%) and stretch the svh-sized pinned sections. So sections were compared with the scroll
+frames (`ours-*-scroll-NN.png`) and with extra frames at chosen scroll offsets (a throwaway
+Playwright script outside the repo, pointed only at our own preview).
+
+### Round 1
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | pill 358 wide vs 326 | matches (pill, links, dark CTA) | fixed ✓, hover ✓ | yes: phone side padding 32px |
+| hero | matches (centred headline, full-width CTA, 16:9 slot, 2-col partners) | matches; small text tracked too tight | pinned 210svh ✓, grow + veil + light text ✓ | yes: body tracking normal |
+| industries | dark cards ✓ | heading 40px vs 32px; list 20px right of the original | fade-in ✓, hover blue ✓ | yes: heading 32px; content edge at 120px |
+| brands | wordmark grid ✓ | panel and photo vanished after the first brand | list slide ✓, falloff ✓; crossfade broken | yes: `:not(:first-child)` fallback out-ranked the @supports rule |
+| cases | 360px cards ✓ | sticky stack ✓, 0.9→1 ✓, pill ✓ | ✓ | – |
+| services | stacked ✓ | heading 40px vs 32px | pinned sideways track ✓ (0→−1380px, same as the original), focus tint + grey→colour ✓ | yes: heading 32px |
+| steps | ✓ | ✓ (grey veiled card, 64px heading, steps right) | none in either | – |
+| founders | stacked cards ✓ | quote mark was a closing "99"; heading ~70px low | pinned ✓, fly + tilt 10°→−10° ✓ | yes: mark turned, heading lifted |
+| FAQ | ✓ | heading/questions 20px right of the original | row fade ✓ | yes: page width 77.5rem (content 120…1320 at 1440) |
+| footer | ✓ | ✓ (glow smoother than the original's wave ridges) | fade/rise ✓ | glow kept smooth (decorative) |
+
+Overflow at 360 / 768 / 1024: fits (the original overflows at 360 and 1024).
+
+### Round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | pill 326 wide ✓ | ✓ | ✓ | – |
+| hero | ✓ | ✓ (tracking normal) | ✓ | – |
+| industries | ✓ | 32px heading at 152px, index at 120px ✓ | ✓ | – |
+| brands | ✓ | panel + photo crossfade per brand ✓; but the first brand arrived dark (its photo and name only lit up once the run began) | first/last items now hold their state outside the run | yes: `-first` / `-last` keyframes |
+| cases | ✓ | ✓ | ✓ | – |
+| services | ✓ | ✓ | ✓ | – |
+| steps | ✓ | ✓ | – | – |
+| founders | ✓ | heading at 300–450px like the original, "66" quote mark ✓ | ✓ | – |
+| FAQ | ✓ | heading at 120px, arrows end at 1320px ✓ | ✓ | – |
+| footer | ✓ | wordmark/columns on the 120…1320 grid ✓ | ✓ | – |
+
+Re-theme check: `roveia-hero` under `sample-ember` (light) and `roveia-services` under
+`sample-ember` (dark) read correctly in the other palette and type; the whole page in
+`roveia-theme` dark is a coherent sibling (navy wash hero, deep-blue footer glow).
+
+Remaining, by choice: placeholders instead of media (hero video, brand photos, case videos,
+service illustrations, steps video, founder videos); the custom blue "+" cursor and the
+cursor-following case pill are not rebuilt; the services focus moves first→last card rather
+than tracking the card under the window's centre; the footer glow is smooth rather than the
+original's rippled waves.
