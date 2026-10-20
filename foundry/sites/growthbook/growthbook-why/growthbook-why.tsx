@@ -45,7 +45,7 @@ export function GrowthbookWhy({ title, tabs, carouselLabel, autoplay = 4000, cla
     <section className={cn("overflow-x-clip bg-background text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]">
         <div className="border-l border-border pt-12 pb-[6.25rem] lg:pt-[5.5rem] lg:pb-20">
-          <h2 className="max-w-[40rem] pl-10 font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]">
+          <h2 className="max-w-[40rem] pr-4 pl-10 font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]">
             {title.map((line) => (
               <span key={line} className="block">
                 {line}

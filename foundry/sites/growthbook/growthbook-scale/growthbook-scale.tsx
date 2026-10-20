@@ -27,7 +27,7 @@ export interface GrowthbookScaleProps {
 
 export function GrowthbookScale({ title, body, cta, pins, media, className }: GrowthbookScaleProps) {
   return (
-    <section className={cn("bg-background text-foreground", className)}>
+    <section className={cn("overflow-x-clip bg-background text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]">
         <div className="relative grid gap-12 border-l border-border pt-4 pb-16 lg:grid-cols-2 lg:gap-10 lg:pt-14 lg:pb-32">
           <GrowthbookRail />
@@ -48,13 +48,13 @@ export function GrowthbookScale({ title, body, cta, pins, media, className }: Gr
           </div>
 
           {/* the chart field: five guide lines, the illustration, two pins */}
-          <div className="relative h-[24rem] lg:mt-10 lg:mr-14 lg:ml-[5.5rem] lg:h-[34rem]">
-            <div aria-hidden className="absolute inset-x-[8%] top-[10%] bottom-[16%] flex justify-between">
+          <div className="relative h-[24rem] mr-6 lg:mt-2 lg:mr-[5.5rem] lg:ml-[7.5rem] lg:h-[31rem]">
+            <div aria-hidden className="absolute top-[6%] right-[3%] bottom-[12%] left-[6%] flex justify-between">
               {[0, 1, 2, 3, 4].map((i) => (
-                <span key={i} className="w-px bg-border/70" />
+                <span key={i} className="w-px bg-linear-to-b from-transparent to-border to-30%" />
               ))}
             </div>
-            <div className="absolute inset-x-[8%] top-[10%] bottom-[16%] [&>*]:size-full">
+            <div className="absolute top-[6%] right-[3%] bottom-[12%] left-[6%] [&>*]:size-full">
               {media ?? <div className="bg-linear-to-t from-muted/80 to-transparent" />}
             </div>
             {pins.map((p, i) => (
@@ -62,7 +62,7 @@ export function GrowthbookScale({ title, body, cta, pins, media, className }: Gr
                 key={p.label}
                 className={cn(
                   "growthbook-scale-pin absolute right-0 flex items-center gap-4 lg:gap-6",
-                  i === 0 ? "top-[3%]" : "bottom-[10%]",
+                  i === 0 ? "top-0 -mr-6 lg:-mr-6" : "bottom-[8%] -mr-6 lg:-mr-6",
                 )}
               >
                 <span className="rounded-sm bg-card px-3 py-2 text-xs text-card-foreground lg:px-4 lg:py-2.5 lg:text-sm">{p.label}</span>

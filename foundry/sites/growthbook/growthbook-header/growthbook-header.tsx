@@ -90,7 +90,7 @@ export function GrowthbookHeader({
         </p>
       )}
       <div className="border-b border-border bg-background">
-        <nav className="mx-auto flex h-[4.125rem] max-w-[calc(var(--page-width)+var(--page-gutter)*4)] items-center gap-8 px-gutter md:px-[calc(var(--page-gutter)*2)] lg:h-[5.125rem]">
+        <nav className="mx-auto flex h-[4.125rem] max-w-[calc(var(--page-width)+var(--page-gutter)*4)] items-center gap-4 px-gutter md:px-[calc(var(--page-gutter)*2)] lg:h-[5.125rem] lg:gap-8">
           <a href={brandHref} className="flex items-center gap-1.5 text-[1.375rem] font-medium tracking-[-0.02em] text-foreground">
             {brandIcon && <span className="flex text-primary [&_svg]:size-6">{brandIcon}</span>}
             {brand}

@@ -3,7 +3,7 @@ import { Banknote, FlaskConical } from "lucide-react";
 import { GrowthbookScale, type GrowthbookScaleProps } from "./growthbook-scale";
 
 export const scaleSample: GrowthbookScaleProps = {
-  title: ["More tests, smaller", "bill"],
+  title: ["More tests, a", "smaller bill"],
   body: "Fast flags, quick experiments and analysis inside your own warehouse keep up as you add teams, agents and releases, without the price climbing with them.",
   cta: { label: "See the plans", href: "#" },
   pins: [

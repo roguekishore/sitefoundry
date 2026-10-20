@@ -35,9 +35,9 @@ export function GrowthbookCta({ title, body, primary, secondary, art, backdrop, 
             {art ?? <div className="rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_35%,transparent),transparent_65%)]" />}
           </div>
 
-          <div className="relative max-w-[30rem]">
+          <div className="relative max-w-[30rem] lg:max-w-[34rem]">
             <h2 className="font-display text-[1.75rem] leading-[1.25] font-normal lg:text-5xl lg:leading-[1.2]">{title}</h2>
-            <p className="mt-3 text-lg leading-[1.5]">{body}</p>
+            <p className="mt-3 max-w-[25rem] text-lg leading-[1.5]">{body}</p>
             <div className="mt-14 flex flex-col gap-3 md:flex-row lg:mt-12">
               <GrowthbookButton href={primary.href} arrow blockOnMobile>
                 {primary.label}

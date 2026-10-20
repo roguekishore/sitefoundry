@@ -44,7 +44,7 @@ export function GrowthbookIntegrations({ title, body, cta, tools, className }: G
   return (
     <section className={cn("bg-background text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]">
-        <div className="relative grid border-l border-border lg:grid-cols-2">
+        <div className="relative grid grid-cols-1 border-l border-border lg:grid-cols-2">
           <GrowthbookRail />
           <div className="flex flex-col items-start px-10 pt-12 lg:pt-[5.25rem] lg:pb-[4.75rem]">
             <h2 className="max-w-[32rem] font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]">
