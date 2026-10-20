@@ -32,7 +32,7 @@ export function PlumeformPanel({ media, children, aspect = "4/3", clouds = "a", 
       {clouds !== "none" && (
         <div aria-hidden className="plumeform-panel-clouds pointer-events-none absolute -inset-x-16 -inset-y-12 -z-10">
           {cloudSets[clouds].map((c) => (
-            <span key={c} className={cn("plumeform-panel-cloud absolute size-[55%] rounded-full opacity-70 blur-3xl", c)} />
+            <span key={c} className={cn("plumeform-panel-cloud absolute size-[55%] rounded-full opacity-70 blur-3xl dark:opacity-20", c)} />
           ))}
         </div>
       )}
