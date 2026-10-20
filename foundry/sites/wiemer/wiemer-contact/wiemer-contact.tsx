@@ -39,15 +39,17 @@ export function WiemerContact({ tag, title, text, fields, consent, submit, actio
         <p className="mt-3 max-w-[28rem] text-[max(16px,1.2vw)] leading-[1.3] font-medium tracking-[-0.015em] md:mt-5 md:max-w-none">{text}</p>
       </div>
 
-      <WiemerDotField className="mx-auto mt-12 max-w-page px-gutter lg:mt-16">
-        <form action={action} method="post" className="mx-auto flex w-full max-w-[26rem] flex-col gap-8 rounded-xl bg-card p-6 text-card-foreground md:rounded-2xl md:p-8 md:pb-12">
-          <WiemerField label={fields.name.label} name="name" placeholder={fields.name.placeholder} required />
-          <WiemerField label={fields.email.label} name="email" type="email" placeholder={fields.email.placeholder} required />
-          <WiemerField label={fields.message.label} name="message" placeholder={fields.message.placeholder} required multiline />
-          <WiemerConsent label={consent} />
-          <WiemerSubmit label={submit} />
-        </form>
-      </WiemerDotField>
+      <div className="mx-auto mt-12 max-w-page px-gutter lg:mt-16">
+        <WiemerDotField>
+          <form action={action} method="post" className="mx-auto flex w-full max-w-[26rem] flex-col gap-8 rounded-xl bg-card p-6 text-card-foreground md:rounded-2xl md:p-8 md:pb-12">
+            <WiemerField label={fields.name.label} name="name" placeholder={fields.name.placeholder} required />
+            <WiemerField label={fields.email.label} name="email" type="email" placeholder={fields.email.placeholder} required />
+            <WiemerField label={fields.message.label} name="message" placeholder={fields.message.placeholder} required multiline />
+            <WiemerConsent label={consent} />
+            <WiemerSubmit label={submit} />
+          </form>
+        </WiemerDotField>
+      </div>
     </section>
   );
 }

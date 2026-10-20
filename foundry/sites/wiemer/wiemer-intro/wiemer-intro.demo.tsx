@@ -3,8 +3,8 @@ import { WiemerIntro, type WiemerIntroProps } from "./wiemer-intro";
 export const introSample: WiemerIntroProps = {
   id: "raster",
   tag: "Arriving 2028",
-  title: "Good morning,\nRaster.",
-  subline: "One table, built to outlast the flat it stands in.",
+  title: "Meet the\nRaster.",
+  subline: "One table, built to stay.",
   paragraphs: [
     "The Raster does not try to be clever. It does one plain thing very well: four brushed steel rods, two perforated plates, and nothing you will ever need to replace.",
     "It sits as easily beside a reading chair as under a record player, and it looks as if it had always been there.",
