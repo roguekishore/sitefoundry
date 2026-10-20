@@ -86,7 +86,7 @@ export function PlumeformHeader({
 
   return (
     <header className={cn("sticky top-0 z-50 -mb-[3.75rem] h-[3.75rem] px-4 pt-2 lg:px-gutter", className)}>
-      <div ref={ref} className={cn(dark && "dark", "relative mx-auto max-w-page text-foreground")}>
+      <div ref={ref} className={cn(dark && "dark", "relative mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))] text-foreground")}>
         <div
           className={cn(
             "flex h-[3.25rem] items-center gap-4 rounded-full border border-border bg-card/75 pr-1.5 pl-4 backdrop-blur-xl transition-colors duration-200",

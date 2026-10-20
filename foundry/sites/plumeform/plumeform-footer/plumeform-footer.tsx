@@ -39,7 +39,6 @@ export function PlumeformFooter({ brand, logo, homeHref = "/", tagline, secondar
   return (
     <footer className={cn("bg-background px-2 pb-2 lg:px-4 lg:pb-0", className)}>
       <div
-        data-tone="dark"
         className="dark rounded-2xl bg-linear-to-b from-[color-mix(in_oklab,var(--chart-1)_80%,var(--background))] via-[color-mix(in_oklab,var(--chart-1)_45%,var(--background))] to-background text-foreground lg:rounded-b-none"
       >
         <PlumeformReveal className="mx-auto max-w-page px-gutter pt-20 pb-12 lg:pt-24 lg:pb-14">

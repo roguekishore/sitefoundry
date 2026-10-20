@@ -161,7 +161,7 @@ export function PlumeformPricing({ eyebrow, title, as = "h2", intro, sideLink, p
     <section id={id} className={cn("bg-background py-section text-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <PlumeformHeading eyebrow={eyebrow} title={title} as={as} size={as === "h1" ? "page" : "section"} className="max-w-[40rem]">
+          <PlumeformHeading eyebrow={eyebrow} title={title} as={as} size={as === "h1" ? "page" : "section"} className={as === "h1" ? "max-w-[50rem]" : "max-w-[40rem]"}>
             {intro && <div className="text-lg leading-[1.6]">{intro}</div>}
           </PlumeformHeading>
           {sideLink && (

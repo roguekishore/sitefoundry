@@ -132,3 +132,45 @@ is content-sized.
 - **Section padding** one token, `--section-y: 7rem`; feature rows add their own gap.
 - **Competitor names** in the comparison table are invented.
 - **Pages** `pricing` and `about` built from the same blocks plus `plumeform-about-intro`.
+
+## Comparison rounds
+
+Capture caveat: the original's section crops and ours are blank below the first screen
+(both use scroll reveals that a full-page screenshot never triggers), so pairs were
+compared on the scroll frames, and the lower landing blocks (templates, contact) through
+single-block previews (`preview.html?item=…`) plus the pricing and about pages.
+
+### Round 1 (landing 1440 19 327 px vs 19 216 · 390 28 356 vs 29 391)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | same pill and contents | pill 1152 px wide, original 1104 | sticky ✓, tone flips light/dark ✓ | yes: inner width = page width − 2 gutters |
+| hero | halo ring broken at the corners of the tall phone frame | dark band ran 71 px into the next section (frame's negative margin collapsed through the band) | load rise ✓, halo spin ✓, scrubbed grow 0.84→0.92 ✓, glow fade ✓ | yes: ring 260 % wide on phones; band `flow-root` |
+| hero | 4 px sideways overflow at 360 (frame glow) | – | – | yes: band `overflow-x-clip` (vertical stays visible so the frame still overruns) |
+| feature rows | panel full width (342), original 300 | ✓ layout, gaps, panel size | reveal ✓, clouds float + drift ✓ | yes: panel max 18.75rem on phones |
+| quality cards | ✓ | ✓ 3×2, CTA row | reveal + stagger ✓, backdrop fade ✓ | – |
+| embed | ✓ | heading wrapped to 3 lines (our copy longer) | ✓ | yes: shorter copy |
+| answer types | ✓ | demo card rode up into the link | ✓ | yes: card starts level with the chip groups |
+| looks | ✓ | heading wrapped to 2 lines (original 1); band 155 px taller | swap-in ✓ | yes: heading 46rem, bento gap 5rem |
+| stats, pricing (landing) | ✓ | Pro card a touch greyer than the original's teal | toggle swap ✓ | yes: dark chart-1 chroma up |
+| pricing page | ✓ | H1 wrapped to 2 lines (original 1) | – | yes: h1 variant 50rem wide |
+| footer | ✓ | header turned dark over it; the original stays light | – | yes: footer no longer marks itself dark |
+| contact | ✓ | placeholders and typed text bold (inherited from the label) | – | yes: inputs `font-normal` |
+| about | ✓ | person card split 50/50 and 43 px taller; original ~40/60 | – | yes: 2fr / 3fr, less padding |
+| halo colours | – | ring olive/teal; original bright honey + cyan | – | yes: dark chart-2/4 brighter (panel clouds dim to 20 % in dark mode) |
+
+### Round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | ✓ frame, ring, CTA | ✓ 1116 px band (original 1093), header 168→1272 | ✓ | – |
+| feature rows | ✓ | ✓ (scroll frame 2 lines up with the original's) | ✓ | – |
+| all | fits at 360 / 768 / 1024 on all three pages | – | – | – |
+
+Remaining, by choice: the fluted-glass canvases are soft glow placeholders; every mock-UI
+panel is an empty placeholder of the original's size; headings are our (shorter or longer)
+copy, so some line breaks differ; the templates cards were never visible in the capture, so
+their design follows the site's card language rather than a seen layout.
+
+Re-theme check: `plumeform-card-grid` and `plumeform-pricing` under `sample-ember` take its
+serif, browns and orange cleanly (captures `ours-ember-*`).

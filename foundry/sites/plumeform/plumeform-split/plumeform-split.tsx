@@ -71,7 +71,7 @@ export function PlumeformSplit({ intro, rows, id, className }: PlumeformSplitPro
                     </ul>
                   )}
                 </PlumeformHeading>
-                <PlumeformReveal className={cn("w-full max-w-[28rem] justify-self-center lg:mt-6", panelFirst && "lg:order-1")}>
+                <PlumeformReveal className={cn("w-full max-w-[18.75rem] justify-self-center sm:max-w-[28rem] lg:mt-6", panelFirst && "lg:order-1")}>
                   <PlumeformPanel media={row.media} aspect={row.aspect ?? "390/400"} clouds={row.clouds ?? (["a", "b", "c"] as const)[i % 3]} />
                 </PlumeformReveal>
               </div>

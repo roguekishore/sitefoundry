@@ -89,7 +89,7 @@ export function PlumeformTypes({ eyebrow, title, body, link, groups, media, aspe
             ))}
           </PlumeformReveal>
 
-          <PlumeformReveal step={1} className="lg:mt-[-2.5rem]">
+          <PlumeformReveal step={1} className="lg:mt-12">
             <div className="relative mr-4 mb-4">
               <PlumeformGlassCard className="absolute inset-0 translate-x-4 translate-y-4 opacity-40" />
               <PlumeformGlassCard className="absolute inset-0 translate-x-2 translate-y-2 opacity-70" />

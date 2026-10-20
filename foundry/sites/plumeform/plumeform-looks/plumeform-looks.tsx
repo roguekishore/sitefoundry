@@ -69,7 +69,7 @@ export function PlumeformLooks({ eyebrow, title, body, layouts, stat, themes, no
   return (
     <PlumeformBand id={id} backdrop={backdrop} className={cn("py-section", className)}>
       <div className="mx-auto max-w-page px-gutter">
-        <PlumeformHeading eyebrow={eyebrow} title={title} className="max-w-[42rem]">
+        <PlumeformHeading eyebrow={eyebrow} title={title} className="max-w-[46rem]">
           {body}
         </PlumeformHeading>
 
@@ -120,7 +120,7 @@ export function PlumeformLooks({ eyebrow, title, body, layouts, stat, themes, no
         </PlumeformReveal>
 
         {(stat || themes) && (
-          <div className="mt-24 grid gap-4 lg:mt-32 lg:grid-cols-3">
+          <div className="mt-24 grid gap-4 lg:mt-20 lg:grid-cols-3">
             {stat && (
               <PlumeformReveal>
                 <PlumeformGlassCard className="flex h-full flex-col px-8 py-8">

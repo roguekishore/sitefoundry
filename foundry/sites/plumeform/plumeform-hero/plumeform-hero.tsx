@@ -30,7 +30,7 @@ export interface PlumeformHeroProps {
 export function PlumeformHero({ title, lead, cta, frameLabel, frameNote, media, backdrop, className }: PlumeformHeroProps) {
   return (
     <PlumeformBand
-      className={cn("z-10 overflow-visible pt-[calc(3.75rem+2.75rem)] lg:pt-[calc(3.75rem+4.5rem)]", className)}
+      className={cn("z-10 flow-root overflow-visible overflow-x-clip pt-[calc(3.75rem+2.75rem)] lg:pt-[calc(3.75rem+4.5rem)]", className)}
       backdrop={
         <div className="plumeform-hero-aurora">
           {backdrop ?? (
@@ -69,7 +69,7 @@ export function PlumeformHero({ title, lead, cta, frameLabel, frameNote, media, 
             <div className="relative isolate overflow-clip rounded-[2.0625rem] p-[3px] shadow-[0_40px_90px_-40px_color-mix(in_oklab,var(--glow)_70%,transparent)]">
               <span
                 aria-hidden
-                className="plumeform-hero-halo absolute top-1/2 left-1/2 -z-10 aspect-square w-[160%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,var(--chart-4),var(--highlight),var(--chart-2),var(--highlight),var(--chart-4))]"
+                className="plumeform-hero-halo absolute top-1/2 left-1/2 -z-10 aspect-square w-[260%] sm:w-[180%] lg:w-[160%] -translate-x-1/2 -translate-y-1/2 bg-[conic-gradient(from_0deg,var(--chart-4),var(--highlight),var(--chart-2),var(--highlight),var(--chart-4))]"
               />
               <div className="relative aspect-[338/680] overflow-clip rounded-[1.875rem] bg-foreground text-background sm:aspect-[4/3] lg:aspect-[1100/675]">
                 {(frameLabel || frameNote) && (

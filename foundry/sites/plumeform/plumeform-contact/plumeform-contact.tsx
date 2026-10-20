@@ -76,7 +76,7 @@ export function PlumeformContact({ eyebrow, title, body, topics, bullets, action
             <form id={formId} action={action} method="post" className="space-y-5">
               {fields.map((f) => {
                 const inputClass =
-                  "mt-2 block w-full rounded-[calc(var(--radius)/2)] border border-input bg-card px-4 text-[0.9375rem] text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-highlight focus:outline-none focus:ring-3 focus:ring-highlight/15";
+                  "mt-2 block w-full rounded-[calc(var(--radius)/2)] border border-input bg-card px-4 text-[0.9375rem] font-normal text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-highlight focus:outline-none focus:ring-3 focus:ring-highlight/15";
                 return (
                   <label key={f.name} className="block text-[0.8125rem] font-bold">
                     {f.label}
