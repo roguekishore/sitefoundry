@@ -4,7 +4,7 @@ import { TypesomethingFooter, type TypesomethingFooterProps } from "./typesometh
 export const footerSample: TypesomethingFooterProps = {
   brand: { lead: "Paper", tail: "kite" },
   brandIcon: <BotMessageSquare strokeWidth={2} />,
-  tagline: "Drop the dashboard. Just ask.",
+  tagline: "Lose the login. Just ask.",
   details: ["paperkite.site", "made by Northlane Studio Ltd."],
   socialLabel: "Follow us",
   socials: [
@@ -24,7 +24,7 @@ export const footerSample: TypesomethingFooterProps = {
     { label: "Privacy", href: "#privacy" },
     { label: "Cookie settings", href: "#cookies" },
   ],
-  badge: { label: "Made with Paperkite", href: "#" },
+  badge: { label: "Made with", name: "Paperkite", href: "#", icon: <BotMessageSquare strokeWidth={2} /> },
   top: { label: "Back to top", href: "#" },
 };
 

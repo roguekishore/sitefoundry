@@ -3,18 +3,18 @@ import { TypesomethingHero, type TypesomethingHeroProps } from "./typesomething-
 
 export const heroSample: TypesomethingHeroProps = {
   badge: { label: "Now in open beta", href: "#beta" },
-  title: ["Drop the dashboard.", "Just ask."],
-  verb: "Ask for",
-  words: ["a new page", "a menu update", "fresh photos", "a price change"],
+  title: ["Lose the login.", "Just ask."],
+  verb: "Ask",
+  words: ["new page", "menu update", "fresh photos", "price change"],
   lead: "Paperkite runs your website from a conversation. Say what should change, check the preview, and it goes live: no admin panel, no plugins, no passwords to forget.",
   actions: [
     { label: "Start your site", href: "#start", icon: <ArrowRight /> },
     { label: "See it work", href: "#demo", variant: "outline" },
   ],
   highlights: [
-    { icon: <Zap />, title: "Quick", text: "Pages that load before the kettle clicks off." },
-    { icon: <ShieldCheck />, title: "Safe", text: "Nothing to log into, so nothing to break into." },
-    { icon: <Sparkles />, title: "Yours", text: "Built from your brand, not from a theme shop." },
+    { icon: <Zap />, title: "Quick", text: "Pages open before the kettle clicks off." },
+    { icon: <ShieldCheck />, title: "Safe", text: "No logins, no plugins, nothing to break into." },
+    { icon: <Sparkles />, title: "Yours", text: "Made from your brand, never from a theme shop." },
   ],
 };
 

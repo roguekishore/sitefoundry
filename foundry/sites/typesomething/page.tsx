@@ -22,11 +22,11 @@ export default function Page() {
     <div className="bg-muted">
       <TypesomethingHeader {...headerSample} className="-mb-[5.5rem]" />
       <TypesomethingHero {...heroSample} className="pt-[5.5rem]" />
-      <TypesomethingSteps {...stepsSample} className="pt-0 lg:pt-0" />
+      <TypesomethingSteps {...stepsSample} />
       <TypesomethingChat {...chatSample} className="pt-0 lg:pt-0" />
       <TypesomethingFeatures {...featuresSample} />
       <TypesomethingReasons {...reasonsSample} />
-      <TypesomethingCta {...ctaSample} className="pt-0 lg:pt-0" />
+      <TypesomethingCta {...ctaSample} />
       <TypesomethingFooter {...footerSample} />
     </div>
   );

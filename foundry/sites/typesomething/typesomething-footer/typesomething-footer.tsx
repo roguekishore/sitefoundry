@@ -40,8 +40,8 @@ export interface TypesomethingFooterProps {
   copyright: string;
   /** small underlined links next to it */
   legal?: TypesomethingFooterLink[];
-  /** small "made with" badge at the bottom right */
-  badge?: { label: string; href: string };
+  /** small "made with" badge at the bottom right: an icon, a tiny label and a bold name */
+  badge?: { label: string; name?: string; href: string; icon?: ReactNode };
   /** the round back-to-top button; its label is for screen readers */
   top?: { label: string; href: string };
   /** the wordmark types itself out on a loop */
@@ -73,13 +73,13 @@ export function TypesomethingFooter({
     "grid size-9 place-items-center rounded-full border border-foreground/25 transition-[color,background-color] duration-[160ms] ease-[ease] hover:bg-foreground hover:text-background motion-reduce:transition-none [&_svg]:size-[1.1rem]";
   const underline = "underline-offset-[0.3rem] decoration-primary decoration-[0.2rem] hover:underline";
   return (
-    <footer className={cn("border-t border-foreground/20 bg-secondary text-secondary-foreground", className)}>
-      <div className="mx-auto max-w-page px-gutter pt-12 lg:pt-[4.5rem]">
-        <div className="grid gap-9 lg:grid-cols-[2fr_1fr_1fr_0.9fr] lg:gap-0">
+    <footer className={cn("border-t border-foreground/20 bg-secondary px-gutter text-secondary-foreground", className)}>
+      <div className="mx-auto max-w-page pt-10 lg:pt-[4.5rem]">
+        <div className="grid gap-8 lg:grid-cols-[2fr_1fr_1fr_0.9fr] lg:gap-0">
           <div>
             <div className="inline-flex flex-col items-center">
               <TypesomethingWordmark lead={brand.lead} tail={brand.tail} icon={brandIcon} typing={typing} cursor="" className="text-[2.1rem] lg:text-[2.75rem] [&_svg]:size-[1.2em]" />
-              {tagline && <span className="mt-2 text-[0.62rem] tracking-[0.3em]">{tagline}</span>}
+              {tagline && <span className="mt-2 text-[0.62rem] tracking-[0.25em]">{tagline}</span>}
             </div>
             {details.length > 0 && (
               <div className="mt-5 text-[0.78rem] leading-[1.6]">
@@ -120,7 +120,7 @@ export function TypesomethingFooter({
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-5 border-t border-foreground/20 py-6 lg:mt-[5.5rem] lg:flex-row lg:items-center lg:gap-8">
+        <div className="mt-10 flex flex-col gap-4 border-t border-foreground/20 py-6 lg:mt-16 lg:flex-row lg:items-center lg:gap-8">
           <p className="text-[0.78rem] text-foreground/65">{copyright}</p>
           {legal.length > 0 && (
             <ul className="flex flex-wrap gap-4">
@@ -135,8 +135,12 @@ export function TypesomethingFooter({
           )}
           <div className="flex items-center justify-end gap-9 lg:ml-auto">
             {badge && (
-              <a href={badge.href} className="flex items-center gap-2 text-[0.7rem] font-semibold tracking-[0.06em] uppercase opacity-80 transition-opacity duration-[180ms] hover:opacity-100">
-                {badge.label}
+              <a href={badge.href} className="flex items-center gap-2 opacity-80 transition-opacity duration-[180ms] hover:opacity-100 [&_svg]:size-6">
+                {badge.icon}
+                <span className="leading-[1.2]">
+                  <span className="block text-[0.6rem] tracking-[0.1em] uppercase">{badge.label}</span>
+                  {badge.name && <span className="block text-[0.8rem] font-bold tracking-[-0.02em]">{badge.name}</span>}
+                </span>
               </a>
             )}
             {top && (

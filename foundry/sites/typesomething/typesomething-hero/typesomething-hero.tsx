@@ -25,7 +25,7 @@ export interface TypesomethingHeroProps {
   badge?: { label: string; href?: string };
   /** the headline, one string per line */
   title: string[];
-  /** the bold word that starts the typing line (e.g. "Ask for") */
+  /** the bold word that starts the typing line (e.g. "Ask") */
   verb: string;
   /** the words typed after it, one after another */
   words: string[];
@@ -46,14 +46,14 @@ export interface TypesomethingHeroProps {
 export function TypesomethingHero({ badge, title, verb, words, lead, actions = [], highlights = [], className }: TypesomethingHeroProps) {
   const Badge = badge?.href ? "a" : "span";
   return (
-    <section className={cn("relative isolate bg-muted pb-14 text-foreground lg:pb-24", className)}>
+    <section className={cn("relative isolate bg-muted px-gutter pb-14 text-foreground lg:pb-24", className)}>
       {/* the white part of the hero and its two glows; it stops part-way down the strip */}
-      <div aria-hidden className="absolute inset-x-0 top-0 bottom-[11.5rem] -z-10 overflow-clip bg-background lg:bottom-[6.75rem]">
-        <div className="absolute -top-[12%] -left-[18%] size-[34rem] rounded-full bg-highlight/45 blur-[90px] lg:-top-[20%] lg:-left-[6%] lg:size-[40rem]" />
-        <div className="absolute top-[10%] -right-[30%] size-[30rem] rounded-full bg-glow/40 blur-[90px] lg:-top-[4%] lg:-right-[8%] lg:size-[38rem]" />
+      <div aria-hidden className="absolute inset-x-0 top-0 bottom-[12rem] -z-10 overflow-clip bg-background lg:bottom-[6.75rem]">
+        <div className="absolute -top-[12%] -left-[18%] size-[34rem] rounded-full bg-highlight/45 blur-[90px] dark:bg-highlight/15 lg:-top-[20%] lg:-left-[6%] lg:size-[40rem]" />
+        <div className="absolute top-[10%] -right-[30%] size-[30rem] rounded-full bg-glow/40 blur-[90px] dark:bg-glow/15 lg:-top-[4%] lg:-right-[8%] lg:size-[38rem]" />
       </div>
 
-      <div className="mx-auto max-w-page px-gutter pt-[4.75rem] text-center lg:pt-[8.5rem]">
+      <div className="mx-auto max-w-page pt-[4.75rem] text-center lg:pt-[8.5rem]">
         {badge && (
           <Badge
             {...(badge.href ? { href: badge.href } : {})}
@@ -73,15 +73,15 @@ export function TypesomethingHero({ badge, title, verb, words, lead, actions = [
           ))}
         </h1>
 
-        <p className="mt-6 font-display text-[2rem] leading-[1.25] tracking-[-0.04em] lg:mt-9 lg:text-[4rem]">
+        <p className="mt-6 font-display text-[2rem] leading-[1.25] tracking-[-0.04em] lg:mt-7 lg:text-[4rem]">
           <span className="font-bold">{verb} </span>
-          <TypesomethingTypewriter words={words} className="font-normal text-foreground/55" cursorClassName="text-primary" />
+          <TypesomethingTypewriter words={words} reserve className="font-normal text-foreground/55" cursorClassName="text-primary" />
         </p>
 
-        {lead && <p className="mx-auto mt-6 max-w-[34rem] text-[0.92rem] leading-[1.55] text-foreground/75 lg:mt-7 lg:max-w-[40rem] lg:text-[1.15rem]">{lead}</p>}
+        {lead && <p className="mx-auto mt-6 max-w-[34rem] text-[0.92rem] leading-[1.55] text-foreground/75 lg:mt-5 lg:max-w-[40rem] lg:text-[1.15rem]">{lead}</p>}
 
         {actions.length > 0 && (
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:mt-7">
             {actions.map((a) => (
               <TypesomethingButton key={a.href} href={a.href} variant={a.variant ?? "primary"} icon={a.icon}>
                 {a.label}
@@ -92,10 +92,10 @@ export function TypesomethingHero({ badge, title, verb, words, lead, actions = [
       </div>
 
       {highlights.length > 0 && (
-        <div className="mx-auto mt-12 max-w-page px-gutter lg:mt-16">
+        <div className="mx-auto mt-14 max-w-page lg:mt-12">
           <ul className="mx-auto grid max-w-[71.5rem] divide-y divide-foreground/14 rounded-lg border border-foreground/14 bg-background shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:grid-cols-3 lg:divide-x lg:divide-y-0">
             {highlights.map((h) => (
-              <li key={h.title} className="flex items-start gap-3.5 px-5 py-5 lg:px-8 lg:py-7">
+              <li key={h.title} className="flex items-start gap-3.5 px-5 py-6 lg:px-8 lg:py-7">
                 {h.icon && (
                   <span className="grid size-7 shrink-0 place-items-center rounded-full bg-highlight text-highlight-foreground [&_svg]:size-3.5">{h.icon}</span>
                 )}

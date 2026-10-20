@@ -23,7 +23,7 @@ export interface TypesomethingCtaProps {
 export function TypesomethingCta({ title, text, action, note, id, className }: TypesomethingCtaProps) {
   return (
     <section id={id} className={cn("bg-muted px-gutter py-14 lg:py-[6.5rem]", className)}>
-      <div className="dark relative isolate mx-auto max-w-page overflow-clip rounded-lg bg-background px-6 py-12 text-center text-foreground shadow-[0_28px_96px_-40px_color-mix(in_oklab,var(--background)_60%,transparent)] lg:rounded-[3rem] lg:py-28">
+      <div className="dark relative isolate mx-auto max-w-page overflow-clip rounded-lg bg-background px-6 py-12 text-center text-foreground lg:rounded-[3rem] lg:py-28">
         <div
           aria-hidden
           className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,color-mix(in_oklab,var(--highlight)_18%,transparent),transparent_18rem),radial-gradient(circle_at_85%_80%,color-mix(in_oklab,var(--primary)_16%,transparent),transparent_18rem)]"
