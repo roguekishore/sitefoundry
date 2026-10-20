@@ -257,20 +257,23 @@ Thumbnails: `public/thumbs/` is git-ignored, so the cloud
 gallery shows placeholders until something builds them (the run instance could run
 `pnpm build:thumbs` and send them; not decided).
 
-## Step F — the warden widget: **TODO**, decisions asked (2026-10-20)
+## Step F — the warden widget: **SHIPPED** (2026-10-20, `warden-20261020T043204Z`)
 
-Warden's rules hold there: its open decisions went to the user as a numbered list, nothing is
-built before the answers. Found: warden already has the Apps page (D43: groups resources tagged
-`warden:app=foundry`) and runs (D45, built **not shipped**: `./w ship`, then an outpost on the
-preview instance). Runs keep only the newest 10 files and the hub keeps them in memory, so
-"tokens and cost this month" needs a source that outlives them.
+The user's answers (warden's D47): treat D45 runs as shipped; warden keeps run usage in its own
+database; a section on warden's Apps page **and** an addable widget, not a fixed card. Built in
+AWS-COMMAND-CENTER (`892254d`, `db8a352`, `d93472a`, spec `docs/spec/wp30-run-usage-and-app-widget.md`):
 
-Follow that repo's `CLAUDE.md` (decisions as numbered questions first, then D47 in
-`docs/DECISIONS.md`, spec in `docs/spec/`, ship is the operator's). Content: a Foundry
-dashboard widget labelled "Foundry", found by `warden:app=foundry` in whatever account:
-preview and run instance state (on/off), the current run (from the run files the server
-writes), tokens and cost today/this month by model. Runs (D45) must be shipped and the
-outposts updated first; check its `docs/STATE.md`.
+- a 60 s hub job keeps each run's usage per UTC day, account, app and model (schema 5), from the
+  `foundry-<id>.json` files this server already writes;
+- Apps → foundry shows health, the tagged instances (preview, run: on or off), runs, and usage
+  today and this month by model;
+- the `app` widget (catalog → Overview → App) draws that card on any dashboard for one app.
+
+Nothing names Foundry: any app with runs gets the same. Shipped with D45 on 2026-10-20 (the agent
+ran `./w ship` at the user's request; `/healthz` reports `warden-20261020T043204Z d93472a`).
+`foundry-preview` already has warden's outpost (its frames arrive), but runs reach warden only
+from outpost `a59d83e79def`: press **Update outpost** on it in warden, then add the App widget
+where wanted.
 
 ## Known gaps and risks
 
