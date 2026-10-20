@@ -39,7 +39,7 @@ export function ReckonerStrategies({ eyebrow, statement, statementTail, items, i
         <div className="flex justify-center">
           <ReckonerEyebrow label={eyebrow} />
         </div>
-        <h2 className="reckoner-strategies-reveal mx-auto mt-7 max-w-[26.25em] text-center font-display text-[1.375rem] leading-[1.1] tracking-[-0.02em] text-balance md:text-[max(1.75rem,2.222vw)]">
+        <h2 className="reckoner-strategies-reveal mx-auto mt-7 max-w-[26.25em] text-center font-display text-[1.375rem] leading-[1.1] tracking-[-0.02em] md:text-[max(1.75rem,2.222vw)]">
           {statement}
           {statementTail && <span className="text-glow"> {statementTail}</span>}
         </h2>
@@ -49,7 +49,7 @@ export function ReckonerStrategies({ eyebrow, statement, statementTail, items, i
             <a
               key={item.title}
               href={item.href}
-              className="group flex flex-col items-center justify-center rounded-sm border border-border p-5 text-center transition-colors duration-500 ease-[ease] hover:bg-accent motion-reduce:transition-none lg:p-[1.875rem]"
+              className="group flex flex-col items-center justify-center rounded-sm border border-border p-5 text-center transition-colors duration-500 ease-[ease] hover:bg-accent motion-reduce:transition-none"
             >
               <div className="size-30 overflow-clip [&>*]:size-full [&>*]:object-contain">
                 {item.art ?? <div aria-hidden className="rounded-sm border border-border bg-muted" />}

@@ -105,3 +105,47 @@ Motion inside media (the hero's candlestick artwork) is the placeholder's busine
 - The social icon in the footer is a lucide `Users` square, not the network's logo.
 - `package.json`/`pnpm-lock.yaml` were committed with other sessions' pending font
   additions in them (pnpm rewrites the whole file; they were already there).
+
+## Comparison rounds
+
+Captured `ours` from the running gallery (`preview.html?site=reckoner&theme=reckoner-theme&mode=light`).
+Section heights compared with the original's (original's inner sections split by eye:
+1440 = hero 900 · strategies ~863 · about ~937 · footer 685; 390 = hero 844 · strategies
+~1078 · about ~1331 · footer 1078).
+
+Note: our full-page section crops show the two statements and the value cards at opacity 0,
+because a full-page screenshot never scrolls them into view (CSS scroll-driven reveals); the
+scroll frames show them, and the original's crops were taken after GSAP had fired. Compared
+those sections on the scroll frames.
+
+### Round 1
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | title centred too high (335 vs ~398): a 120px bottom pad on phones the original doesn't have; `text-balance` split the phone title oddly | title block and side label in place (300–515) | scroll cue loops 500ms ✓ | yes: phone pad removed, balance only from lg |
+| hero | placeholder glow brightest just under the fixed header, leaving a visible edge | — | — | yes: glow moved lower |
+| strategies | ✓ (1080 vs ~1078) | statement balanced to ~660px wide instead of filling ~840; cards 365 tall vs 348 (30px padding; the original pads ~20 and centres) | fade-in at 420–869px vs original 425–874 ✓ | yes: no balance, p-5 at all widths |
+| about | ✓ (1319 vs ~1331) | statement ran to 5 lines vs 4 (copy length): section 983 vs ~937 | fade + rise 24px ✓, staggered | yes: copy shortened |
+| footer | 1129 vs 1078: every gap 4–12px too loose | social link top-aligned instead of bottom-aligned with the last contact line; tagline wrapped unevenly | link hover crimson + underline ✓, button → merlot ✓ | yes: gaps tightened, `lg:self-end`, tagline balanced |
+| header | fixed on merlot ✓ | tray, links, linen button in place ✓ | hover camel tint 0.5s ✓ | — |
+
+### Round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | title 398–535, three lines, as the original | ✓ | ✓ | — |
+| strategies | ✓ 1080 | 855 vs ~863; the faded tail sat alone on line 3 (copy) | ✓ | tail copy tightened |
+| about | ✓ 1319 | 948 vs ~937 (within a line of type) | ✓ | accepted |
+| footer | 1073 vs 1078 ✓ | 689 vs 685 ✓ (contact groups 32px apart) | ✓ | — |
+| page | 4317 vs 4330 | 3392 vs 3385 | all inventory rows present: fixed header (phones), two fade reveals, staggered fade+rise cards, 500ms cue loop, Lenis, every hover | — |
+
+Horizontal overflow: fits at 360 / 768 / 1024 (both rounds). The hero is marked "sized by
+the window" in ours as in the original.
+
+Re-theme check: `reckoner-strategies` (sample-ember, light) and `reckoner-hero`
+(sample-ember, dark) both pick up the other theme's fonts, colours and radius cleanly; the
+scroll-cue square was the one piece not following the radius token (fixed: `rounded-sm`).
+
+Remaining, accepted differences: the header's linen button hovers to camel rather than sand
+(sand isn't a token in the dark world); the footer legal links fit one row with our shorter
+labels where the original wraps to two; the wordmark is a sans lockup, not their serif logo.

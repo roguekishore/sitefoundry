@@ -24,13 +24,13 @@ export function ReckonerHero({ title, actions = [], scrollCue, sideLabel, media,
     <section className={cn("dark relative h-svh min-h-[34rem] overflow-clip bg-background text-foreground", className)}>
       <div aria-hidden={!media} className="absolute inset-0 [&>*]:size-full [&>*]:object-cover">
         {media ?? (
-          <div className="bg-[radial-gradient(ellipse_65%_55%_at_70%_32%,color-mix(in_oklab,var(--glow)_16%,transparent),transparent_72%),radial-gradient(ellipse_45%_40%_at_18%_78%,color-mix(in_oklab,var(--glow)_10%,transparent),transparent_70%)]" />
+          <div className="bg-[radial-gradient(ellipse_60%_50%_at_70%_45%,color-mix(in_oklab,var(--glow)_16%,transparent),transparent_72%),radial-gradient(ellipse_45%_40%_at_18%_78%,color-mix(in_oklab,var(--glow)_10%,transparent),transparent_70%)]" />
         )}
       </div>
 
       <div className="relative mx-auto flex h-full max-w-page flex-col px-gutter">
-        <div className="flex flex-1 items-center pt-[5.125rem] pb-[7.5rem] lg:pt-0 lg:pb-[5.625rem]">
-          <h1 className="max-w-[9.5em] font-display text-[3rem] leading-none font-medium text-balance md:text-[clamp(3rem,7.64vw,6.875rem)]">
+        <div className="flex flex-1 items-center pt-[5.125rem] lg:pt-0 lg:pb-[5.625rem]">
+          <h1 className="max-w-[9.5em] font-display text-[3rem] leading-none font-medium lg:text-balance md:text-[clamp(3rem,7.64vw,6.875rem)]">
             {title}
           </h1>
         </div>
@@ -50,7 +50,7 @@ export function ReckonerHero({ title, actions = [], scrollCue, sideLabel, media,
                 className="reckoner-hero-cue hidden items-center gap-3 text-sm tracking-[0.01em] text-foreground/70 transition-colors duration-500 hover:text-foreground sm:flex"
               >
                 {scrollCue.label}
-                <span className="flex size-[2.875rem] items-center justify-center border border-border [&_svg]:size-4">
+                <span className="flex size-[2.875rem] items-center justify-center rounded-sm border border-border [&_svg]:size-4">
                   <ArrowDown strokeWidth={1.5} />
                 </span>
               </a>

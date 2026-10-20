@@ -5,7 +5,7 @@ export const strategiesSample: ReckonerStrategiesProps = {
   id: "strategies",
   eyebrow: "Strategies",
   statement:
-    "Two strategies, one discipline: we underwrite every loan as though the cycle turns tomorrow, so that your capital is",
+    "Two strategies, one discipline: we underwrite every loan as though the cycle turns tomorrow, so your capital is",
   statementTail: "ready when it does",
   items: [
     {

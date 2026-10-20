@@ -55,13 +55,13 @@ export function ReckonerFooter({ brand, tagline, nav, legal, parent, copyright, 
         <div className="contents lg:flex lg:flex-col lg:border-r lg:border-border lg:py-[3.75rem] lg:pr-10 lg:pl-gutter">
           <ReckonerWordmark {...brand} tone="highlight" className="order-1 self-start lg:order-none" />
 
-          <div className="order-7 mt-[4.25rem] lg:order-none lg:mt-auto">
+          <div className="order-7 mt-[3.75rem] lg:order-none lg:mt-auto">
             {parent && <p className="text-highlight">{parent}</p>}
             <p className="mt-2.5 max-w-[19rem]">{copyright}</p>
           </div>
 
           <div className="contents lg:mt-3 lg:grid lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10">
-            <ul className="order-8 mt-11 flex flex-wrap gap-x-8 gap-y-8 lg:order-none lg:mt-0 lg:gap-x-9 lg:gap-y-4.5">
+            <ul className="order-8 mt-9 flex flex-wrap gap-x-8 gap-y-8 lg:order-none lg:mt-0 lg:gap-x-9 lg:gap-y-4.5">
               {legal.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className={linkClass}>
@@ -70,7 +70,7 @@ export function ReckonerFooter({ brand, tagline, nav, legal, parent, copyright, 
                 </li>
               ))}
             </ul>
-            <ul className="order-3 mt-11 flex flex-col gap-2.5 lg:order-none lg:mt-0 lg:gap-0.5">
+            <ul className="order-3 mt-10 flex flex-col gap-2.5 lg:order-none lg:mt-0 lg:gap-0.5">
               {nav.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className={linkClass}>
@@ -84,11 +84,11 @@ export function ReckonerFooter({ brand, tagline, nav, legal, parent, copyright, 
 
         {/* right half */}
         <div className="contents lg:flex lg:flex-col lg:py-[3.75rem] lg:pr-gutter lg:pl-10">
-          <h2 className="order-2 mt-24 max-w-[11.5em] font-display text-[2rem] leading-[1.1] tracking-[-0.02em] lg:order-none lg:mt-0 lg:text-[max(1.75rem,2.222vw)]">
+          <h2 className="order-2 mt-[5.5rem] max-w-[11.5em] text-balance font-display text-[2rem] leading-[1.1] tracking-[-0.02em] lg:order-none lg:mt-0 lg:text-[max(1.75rem,2.222vw)]">
             {tagline}
           </h2>
 
-          <form action={subscribe.action} method="post" className="order-4 mt-9 lg:order-none lg:mt-[8.125rem]">
+          <form action={subscribe.action} method="post" className="order-4 mt-8 lg:order-none lg:mt-[8.125rem]">
             <div className="flex">
               <label className="min-w-0 flex-1">
                 <span className="sr-only">{subscribe.label}</span>
@@ -109,7 +109,7 @@ export function ReckonerFooter({ brand, tagline, nav, legal, parent, copyright, 
 
           <div className="contents lg:mt-[8.125rem] lg:grid lg:grid-cols-2 lg:items-end lg:gap-10">
             {social && (
-              <a href={social.href} className={cn("group order-6 mt-11 inline-flex items-center gap-1.5 self-start lg:order-none lg:mt-0", linkClass)}>
+              <a href={social.href} className={cn("group order-6 mt-9 inline-flex items-center gap-1.5 self-start lg:order-none lg:mt-0 lg:self-end", linkClass)}>
                 {social.icon && (
                   <span className="flex size-[1.375rem] items-center justify-center rounded-sm bg-foreground text-background [&_svg]:size-3.5">
                     {social.icon}
@@ -122,7 +122,7 @@ export function ReckonerFooter({ brand, tagline, nav, legal, parent, copyright, 
                 />
               </a>
             )}
-            <div className="order-5 mt-[4.25rem] flex flex-col gap-9 lg:order-none lg:mt-0 lg:gap-10">
+            <div className="order-5 mt-14 flex flex-col gap-8 lg:order-none lg:mt-0">
               {contacts.map((group) => (
                 <div key={group.label} className="flex flex-col gap-2.5 lg:gap-0.5">
                   <p className="text-muted-foreground">{group.label}</p>
