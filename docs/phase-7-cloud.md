@@ -156,14 +156,19 @@ group rule's description, which AWS limits to `a-zA-Z0-9. _-:/()#,@[]+=&;{}!$*`)
 State is `infra/terraform.tfstate` (local, gitignored); the operator keeps a copy in `~/foundry-tfstate.bak`.
 Warden already has `jk` (v2 since 2026-10-11).
 
-## Step D — provisioning both instances: **BUILT**, preview running
+## Step D — provisioning both instances: **DONE** (2026-10-20)
 
 Scripts: `infra/aws.sh`, `infra/ssm.sh`, `infra/secrets.sh`, `infra/provision/{common,preview,run}.sh`
-(how to run them: [`infra/README.md`](../infra/README.md)). Seen from the laptop on 2026-10-20:
-`https://foundry.themaverick.tech/` answers with the login page (Caddy's certificate works, the
-API says 401 without a session). **Still open:** the `live.foundry.themaverick.tech` A record
-is not in Netlify yet (the name does not resolve); the run instance's provisioning has not been
-confirmed from here; neither instance has warden's outpost yet.
+(how to run them: [`infra/README.md`](../infra/README.md)). Checked on 2026-10-20 (the user let
+the agent run them, unattended): `https://foundry.themaverick.tech/` answers with the login page
+(Caddy's certificate works, the API says 401 without a session); Parameter Store holds the login,
+the runner token and the Vertex key, **no Claude token** (skipped, so Claude runs fail on the run
+instance until `secrets.sh` adds one); `provision/run.sh` reran clean (deploy key, Gemini CLI
+0.64.0, Claude Code 2.1.303, headless Chromium 156 launches, runner up and polling the server).
+**Still open:** the `live.foundry.themaverick.tech` A record is not in Netlify (the name does
+not resolve); neither instance has warden's outpost yet. **Found:** starting the run instance
+failed three times with `InsufficientInstanceCapacity` (t4g.large, `ap-south-1a`) before it
+started a minute later.
 
 **The user's decisions (2026-10-19), and what was found, before any of it was written:**
 

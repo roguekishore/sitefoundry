@@ -34,7 +34,7 @@ public/r/            the built registry (generated, committed)
 | 4 | Huly recreation | another agent, **ready to start** | faithful at 390 px and desktop; every block standalone |
 | 5 | Vault mirror (shadcn + directory registries + React Bits) | another agent, **ready to start** | vault items live in the gallery and install with `foundry add` |
 | 6 | MCP (local): search / get / preview / add / theme | this agent | **done** (scripted MCP client) |
-| 7 | Cloud: preview instance, run instance, run page, warden widget (below) | A–C **done**, D preview running, E built, F waits on decisions; see [`docs/phase-7-cloud.md`](docs/phase-7-cloud.md) | a run started from the phone lands as a branch you can browse |
+| 7 | Cloud: preview instance, run instance, run page, warden widget (below) | A–D **done**, E built, F waits on decisions; see [`docs/phase-7-cloud.md`](docs/phase-7-cloud.md) | a run started from the phone lands as a branch you can browse |
 | 8 | Remote MCP, per-device tokens | **held** (user, 2026-10-19) | |
 
 Folders per agent: Huly → `foundry/sites/huly/`, `foundry/themes/huly/`. Vault →
