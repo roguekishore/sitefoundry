@@ -40,7 +40,9 @@ JSON="$(mktemp)"
 trap 'rm -f "$JSON"' EXIT
 # Decode to a file and run it with its output going straight to SSM's stdout capture, which
 # updates while the script runs, so the polling loop below can print it as it appears.
-printf '{"commands":["echo %s | base64 -d > /tmp/foundry-ssm.sh; bash -e /tmp/foundry-ssm.sh 2>&1; rc=$?; rm -f /tmp/foundry-ssm.sh; exit $rc"]}' "$B64" > "$JSON"
+# A file of its own per command: bash reads a script as it goes, so a second command writing
+# the same path cut a running deploy short (and it still exited 0).
+printf '{"commands":["f=$(mktemp /tmp/foundry-ssm.XXXXXX); echo %s | base64 -d > $f; bash -e $f 2>&1; rc=$?; rm -f $f; exit $rc"]}' "$B64" > "$JSON"
 
 echo "instance $ID ($NAME)"
 CMD="$(jk_aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
