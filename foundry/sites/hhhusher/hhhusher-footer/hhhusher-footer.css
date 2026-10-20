@@ -1,0 +1,42 @@
+/* Fixed-footer look without position: fixed. While the footer scrolls into view its content
+   is shifted up by the part not yet visible (-100% -> 0), so it seems to sit still at the
+   bottom of the window while the page slides off it. The wordmark's letters then slide in
+   from the left (later letters from further) and fade in over the second half of that. */
+.hhhusher-footer {
+  view-timeline-name: --hhhusher-footer;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hhhusher-footer-inner {
+      animation: hhhusher-footer-uncover linear both;
+      animation-timeline: --hhhusher-footer;
+      animation-range: entry 0% entry 100%;
+    }
+    .hhhusher-footer-char {
+      animation: hhhusher-footer-slide linear both;
+      animation-timeline: --hhhusher-footer;
+      animation-range: entry 45% entry 100%;
+    }
+  }
+}
+
+@keyframes hhhusher-footer-uncover {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes hhhusher-footer-slide {
+  from {
+    opacity: 0;
+    translate: calc(-0.18em - var(--hhhusher-char, 0) * 0.05em) 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
