@@ -16,6 +16,8 @@ as foundry "git -C $REPO_DIR log --oneline $BEFORE..$AFTER" | head -n 20
 say "install and build"
 quiet as foundry "cd $REPO_DIR && pnpm install --frozen-lockfile"
 quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm build:server"
+# A no-op unless Playwright's version moved; then it fetches the matching Chromium.
+quiet as foundry "cd $REPO_DIR && pnpm exec playwright install chromium"
 quiet as foundry "cd $REPO_DIR/apps/gallery && rm -rf dist.next && NODE_OPTIONS=--max-old-space-size=1536 pnpm exec vite build --outDir dist.next --emptyOutDir"
 as foundry "cd $REPO_DIR/apps/gallery && rm -rf dist.old && { [[ ! -d dist ]] || mv dist dist.old; } && mv dist.next dist && rm -rf dist.old"
 

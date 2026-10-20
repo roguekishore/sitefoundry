@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { hashPassphrase, totp } from "./auth.ts";
+import { hashPassphrase, sha256, totp } from "./auth.ts";
 import { Db } from "./db.ts";
 import { costOf } from "./prices.ts";
 import { claudeStream } from "./runner/claude.ts";
@@ -56,6 +56,27 @@ test("runs: claim takes the oldest queued run once, totals add up from calls", (
   const [first, second] = db.events(a.id);
   assert.equal(db.events(a.id, first.id).length, 1);
   assert.equal(second.text, "two");
+  db.sql.close();
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test("devices: a token works until revoked; only its hash is stored", () => {
+  const dir = mkdtempSync(join(tmpdir(), "foundry-db-"));
+  const db = new Db(join(dir, "test.db"));
+  const laptop = db.addDevice("work laptop", sha256("fdy_one"));
+  const pc = db.addDevice("home pc", sha256("fdy_two"));
+  assert.deepEqual(db.devices().map((d) => d.name), ["home pc", "work laptop"]);
+  assert.equal(db.devices()[0].lastUsedAt, null);
+
+  assert.equal(db.useDevice(sha256("fdy_one")), laptop.id);
+  assert.notEqual(db.devices().find((d) => d.id === laptop.id)?.lastUsedAt, null);
+  assert.equal(db.useDevice(sha256("fdy_nope")), undefined);
+  assert.equal(db.sql.prepare("SELECT COUNT(*) AS n FROM devices WHERE token_hash LIKE 'fdy_%'").get()?.n, 0);
+
+  assert.equal(db.revokeDevice(pc.id), true);
+  assert.equal(db.revokeDevice(pc.id), false);
+  assert.equal(db.useDevice(sha256("fdy_two")), undefined);
+  assert.equal(db.useDevice(sha256("fdy_one")), laptop.id);
   db.sql.close();
   rmSync(dir, { recursive: true, force: true });
 });

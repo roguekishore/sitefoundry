@@ -35,7 +35,7 @@ public/r/            the built registry (generated, committed)
 | 5 | Vault mirror (shadcn + directory registries + React Bits) | another agent, **ready to start** | vault items live in the gallery and install with `foundry add` |
 | 6 | MCP (local): search / get / preview / add / theme | this agent | **done** (scripted MCP client) |
 | 7 | Cloud: preview instance, run instance, run page, warden widget (below) | A–F **done** (warden's outpost on the preview still to update); see [`docs/phase-7-cloud.md`](docs/phase-7-cloud.md) | a run started from the phone lands as a branch you can browse |
-| 8 | Remote MCP, per-device tokens | **held** (user, 2026-10-19) | |
+| 8 | Remote MCP (read-only), per-device tokens | **built** on branch `phase-8/remote-mcp` (2026-10-20), not deployed; see [`docs/phase-8-remote-mcp.md`](docs/phase-8-remote-mcp.md) | Claude Code on another machine searches, reads and previews items with nothing registered in a Claude account |
 
 Folders per agent: Huly → `foundry/sites/huly/`, `foundry/themes/huly/`. Vault →
 `vault/`, `tools/mirror/`, plus its npm packages in the root `package.json`. The gallery

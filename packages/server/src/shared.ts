@@ -176,6 +176,19 @@ export interface Options {
   auth: boolean;
 }
 
+/** A machine allowed to use the foundry MCP at /mcp, with a token of its own (the Devices page). */
+export interface Device {
+  id: number;
+  name: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+  revokedAt: string | null;
+}
+/** The answer to adding a device: the only time its token is shown. */
+export interface NewDevice {
+  device: Device;
+  token: string;
+}
 /** A passkey that can log in, as the passkeys page lists it. */
 export interface Passkey {
   /** the credential id (base64url) */

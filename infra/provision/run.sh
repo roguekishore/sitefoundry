@@ -13,10 +13,7 @@ deploy_key runner "foundry-run (write)" rw
 
 install_node
 
-say "libraries for headless Chromium"
-quiet dnf install -y --skip-broken nss nspr atk at-spi2-atk at-spi2-core cups-libs libdrm libxkbcommon \
-  libXcomposite libXdamage libXfixes libXrandr libXext libX11 libxcb mesa-libgbm alsa-lib pango cairo \
-  fontconfig freetype dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts google-noto-sans-fonts
+chromium_libs
 
 say "the Gemini CLI"
 if [[ ! -f "$(npm root -g)/@google/gemini-cli/bundle/gemini.js" ]]; then
@@ -46,9 +43,7 @@ say "install, build, Chromium (a few minutes the first time)"
 quiet as runner "cd $REPO_DIR && pnpm install --frozen-lockfile"
 quiet as runner "cd $REPO_DIR && pnpm build:server"
 quiet as runner "cd $REPO_DIR && pnpm exec playwright install chromium"
-CHECK="const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.setContent('<b>x</b>');console.log('headless chromium launches, version',b.version());await b.close()})().catch(e=>{console.error(e.message);process.exit(1)})"
-as runner "cd $REPO_DIR && node -e \"$CHECK\"" \
-  || { echo "Chromium does not launch: a library is missing (the message above names it)"; exit 1; }
+chromium_check runner "$REPO_DIR"
 
 say "power-off permission for the runner's self-shutdown"
 [[ -x /usr/sbin/shutdown ]] || { echo "no /usr/sbin/shutdown"; exit 1; }

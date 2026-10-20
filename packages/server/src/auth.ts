@@ -64,7 +64,8 @@ function codeMatches(code: string, secret: string): boolean {
 
 // ---------- sessions ----------
 
-const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
+/** How sessions and device tokens are kept: random tokens need no salt or slow hash. */
+export const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
 function cookieOf(req: IncomingMessage, name: string): string | undefined {
   for (const part of (req.headers.cookie ?? "").split(";")) {

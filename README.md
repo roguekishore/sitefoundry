@@ -62,6 +62,13 @@ Tools: `search`, `get` (props + code), `preview` (screenshot in any theme/width/
 `init`, `add`, `theme`, `status`, `diff`. Previews use the running gallery, or start one
 quietly.
 
+**From another machine** (no clone needed): the foundry server answers the read-only tools
+(`search`, `get`, `preview`) at `https://foundry.themaverick.tech/mcp`. Add the machine on
+the **Devices** page (`#/devices`); it shows a token once, in a config file to save on that
+machine, used per session with `claude --mcp-config ~/.foundry/mcp.json`. Nothing is
+registered in a Claude account. Check an address and token with
+`FOUNDRY_MCP_TOKEN=fdy_… node packages/mcp/smoke.mjs <url>/mcp`.
+
 ## Adding blocks
 
 Read [CONTRACT.md](CONTRACT.md) (the rules) and [foundry/tokens.md](foundry/tokens.md)

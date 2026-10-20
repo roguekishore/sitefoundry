@@ -36,6 +36,22 @@ base_packages() {
   quiet dnf install -y git tar xz gzip jq openssl
 }
 
+# Headless Chromium's system libraries (Playwright's --with-deps is apt-only). The run instance
+# needs it for the agent's captures, the preview instance for the MCP's screenshots.
+chromium_libs() {
+  say "libraries for headless Chromium"
+  quiet dnf install -y --skip-broken nss nspr atk at-spi2-atk at-spi2-core cups-libs libdrm libxkbcommon \
+    libXcomposite libXdamage libXfixes libXrandr libXext libX11 libxcb mesa-libgbm alsa-lib pango cairo \
+    fontconfig freetype dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts google-noto-sans-fonts
+}
+
+# chromium_check <user> <repo dir>: Playwright's Chromium launches there, or stop and say why.
+chromium_check() {
+  local check="const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.setContent('<b>x</b>');console.log('headless chromium launches, version',b.version());await b.close()})().catch(e=>{console.error(e.message);process.exit(1)})"
+  as "$1" "cd $2 && node -e \"$check\"" \
+    || { echo "Chromium does not launch: a library is missing (the message above names it)"; exit 1; }
+}
+
 # Node from nodejs.org into /opt/node, so `npm root -g` works for the Gemini CLI lookup.
 install_node() {
   if [[ -x /opt/node/bin/node && "$(/opt/node/bin/node -v)" == "v$NODE_VERSION" ]]; then

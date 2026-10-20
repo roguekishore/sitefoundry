@@ -11,6 +11,7 @@ make_user foundry
 deploy_key foundry "foundry-preview (read only)" ro
 
 install_node
+chromium_libs
 
 say "swap (the gallery build needs more than 2 GB)"
 if ! swapon --show | grep -q /swapfile; then
@@ -27,6 +28,10 @@ say "install and build (a few minutes the first time)"
 quiet as foundry "cd $REPO_DIR && pnpm install --frozen-lockfile"
 quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm build:server"
 quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm --filter gallery build"
+
+say "Chromium for the MCP's screenshots (the server closes it after 5 idle minutes)"
+quiet as foundry "cd $REPO_DIR && pnpm exec playwright install chromium"
+chromium_check foundry "$REPO_DIR"
 
 say "data folders"
 install -d -o foundry -g foundry -m 750 "$DATA_DIR" /var/lib/warden-runs
