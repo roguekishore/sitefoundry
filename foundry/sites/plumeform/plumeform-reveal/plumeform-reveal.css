@@ -1,0 +1,42 @@
+/* Scroll-driven entrances, CSS only. An element fades in, rises 22px and sharpens from a
+   6px blur over its first 220px in the window (animation-timeline: view()). A fixed px
+   range (not a % of the element) means tall cards that start on the first screen are
+   already settled at load. --plumeform-step (0, 1, 2 …) starts an item 40px later, for
+   staggered lists. Browsers without scroll timelines, and reduced motion, show everything
+   in place. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .plumeform-reveal-rise,
+    .plumeform-reveal-fade {
+      animation: plumeform-reveal-rise cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--plumeform-step, 0) * 40px) entry calc(220px + var(--plumeform-step, 0) * 40px);
+    }
+    .plumeform-reveal-fade {
+      animation-name: plumeform-reveal-fade;
+    }
+  }
+}
+
+@keyframes plumeform-reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+}
+@keyframes plumeform-reveal-fade {
+  from { opacity: 0; }
+}
+
+/* Content swapped by a click (a tab, a billing toggle) comes in quickly: give the new
+   content a fresh React key to replay it. */
+.plumeform-swap-in {
+  animation: plumeform-reveal-swap 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes plumeform-reveal-swap {
+  from { opacity: 0; transform: translateY(6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plumeform-swap-in { animation: none; }
+}
