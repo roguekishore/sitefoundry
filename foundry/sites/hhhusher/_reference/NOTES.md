@@ -137,3 +137,58 @@ terms page (a route-change effect, not a section), the 3D model's own rotation (
   (`#212121`) to stay on tokens (a near-match).
 - `package.json` / `pnpm-lock.yaml` were committed with other sessions' uncommitted font
   additions in them (shared files; can't split hunks unattended).
+
+## Comparison round 1 (first capture of ours; landing, then products + terms)
+
+Heights (390 / 1440, original → ours): hero 844/900 → 844/900 (both window-sized) ·
+statement + cards 2297/2384 → 2342/2321 · features 3709/3760 → 3376/3600 · mic setups
+844 (window)/965 → 844 (*not* window-sized: content too tall)/966 · FAQ 1124/963 → 940/896 ·
+reviews 972/737 → 860/725 · footer ≈600 → 607/647. Products: hero 1451/818 → 1384/836,
+statement + reviews 3438/3579 → 2963/3621 (fewer, shorter sample reviews), specs 1459/1177 →
+1440/1184, parts 854/953 → 695/936 (shorter names wrap less on phones). Terms: title band
+118/436 → 122/422. No horizontal overflow at 360/768/1024 on any page.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | same layout (wordmark, buy, menu square) | pill nav, glass squares match | hides at ~420px scroll, like the original's 443 | — |
+| hero | matches | right column started 50px left of the original's (x=992 vs 1041); placeholder a little lighter than the near-black video | load rise ok; drift measured as "50px" (it was 50 % of the element) | column → 22.5rem; placeholder lift removed; drift now 50svh — round 2 |
+| statement | matches (fades line by line) | matches (4 lines, 57px) | lines rise 40→82px, staggered; original 11→84px | — |
+| cards | matches stack and aspect ratios | matches grid; tan gap under the cards 120px vs 184px; card titles 29px vs 32px | fade + drift −72→72px, same as original | pb → 11.5rem, titles → 2rem — round 2 |
+| features | ~330px shorter | ~160px shorter | pinned frame 0.2→1 ✓, line rise ✓, copy fade ✓ | pb-section added, phone feature spacing pt-28 |
+| mic setups | not window-sized (content + padding > 633px window) | matches (966) | staggered fade ✓; hover index → yellow ✓ | phone padding py-10 |
+| FAQ | shorter by ~180px | shorter by ~70px | group fade 0.15 ✓; +/− hover fill ✓ | bottom padding 7rem / 10rem |
+| reviews | ~110px shorter | matches | rise 40px ✓ | content-driven, left |
+| footer | matches | matches; wordmark narrower (7 letters of a different shape) | uncover −100%→0 ✓; letters slide −52…−139px (original −51…−139) ✓ | — |
+| product hero | matches | matches (gallery 726×427, thumbs, arrows, stepper, checkout) | — | — |
+| review list | matches | matches (sticky label, right half) | rise 40px ✓ | — |
+| specs | matches (group row, note under table) | matches 25/75 | group fade ✓ | — |
+| parts | matches | matches 57px rows at 15 % | rise 50px ✓; floating image showed outside the section at the top-left when the pointer sat there | section → overflow-clip — round 2 |
+| page title + legal | matches | matches | none (as original) | — |
+
+## Comparison round 2 (after the round-1 fixes; landing + products recaptured)
+
+Heights now (390 / 1440): hero 844/900 window-sized ✓ · statement + cards 2342/2385 ·
+features 3448/3720 (original 3709/3760) · mic setups 844 **window-sized** ✓ / 966 · FAQ 980/936 ·
+reviews 860/725 · footer 607/647. No horizontal overflow at 360/768/1024 on any page.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | matches | copy column now at x=1040 (original 1041) | drift 0→422px (390) and 0→450px (1440), exactly the original's | ✓ |
+| cards | matches | titles 32px, tan gap under the cards 184px | fade + drift ✓ | ✓ |
+| features | ~260px shorter than the original (its intro screen has extra empty space above the heading on phones) | 40px shorter | ✓ | left: within one window of scrolling |
+| mic setups | window-sized like the original | matches | ✓ | ✓ |
+| parts | — | floating image stays inside the section | ✓ | ✓ |
+
+Re-theme check: `hhhusher-overview` and `hhhusher-faq` under `sample-ember` take its fonts,
+colours and radius (cream page, coral active tab, serif headings) and still read correctly.
+
+Still different, on purpose or by content:
+- hero/mic/product media are placeholders (token surfaces with a soft wash); the original's hero
+  video is near-black, ours is the dark `background` (#212121) since tokens can't go darker;
+- the features 3D object is a soft glow in a pinned window-sized frame;
+- the footer wordmark is shorter than the original's (our own 7-letter name);
+- sample copy lengths differ (fewer, shorter reviews and terms), so content-sized sections differ
+  in height by a few hundred px on phones;
+- the parts list's floating photo is desktop-only (the original pushes it off-screen on phones,
+  which also made that page overflow sideways at 360/768);
+- the header's currency box is display-only.
