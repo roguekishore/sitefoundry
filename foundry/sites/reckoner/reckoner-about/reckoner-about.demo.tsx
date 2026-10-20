@@ -5,7 +5,7 @@ export const aboutSample: ReckonerAboutProps = {
   id: "firm",
   eyebrow: "Our firm",
   statement:
-    "Wexmoor was started by credit analysts who had seen enough cycles to distrust easy money. We read every covenant, stress every balance sheet and report to our investors in plain numbers, every quarter, in good years and lean ones",
+    "Wexmoor was started by credit analysts who had seen enough cycles to distrust easy money. We read every covenant, stress every balance sheet and report to investors in plain numbers, every quarter",
   items: [
     {
       title: "Judgement",
