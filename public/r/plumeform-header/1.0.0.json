@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform floating nav pill",
+  "description": "A rounded glass pill floating 8px from the top and sticky for the whole page: wordmark, centred links with small chevrons, a quiet sign-in link and a pill button. It turns dark glass while over dark bands and pale glass over paper; on phones it folds to wordmark, button and a menu.",
+  "category": "header",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "pill",
+    "glass",
+    "sticky",
+    "blur",
+    "adaptive"
+  ],
+  "notes": [
+    "overlaps the next block by its own height (negative margin), so a hero runs under it",
+    "tone=\"auto\" watches for elements with data-tone=\"dark\" (plumeform-band sets it); pass initialTone=\"dark\" when the page opens on a dark band"
+  ],
+  "hydrate": "load",
+  "entry": "plumeform-header.tsx",
+  "source": "foundry",
+  "name": "plumeform-header",
+  "files": [
+    {
+      "path": "plumeform-header.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\n\nexport interface PlumeformHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron after the label (a menu on the original) */\n  hasMenu?: boolean;\n}\n\nexport interface PlumeformHeaderProps {\n  /** wordmark next to the logo; also the home link's label */\n  brand: string;\n  /** logo mark (an svg, img or lucide icon) before the wordmark */\n  logo?: ReactNode;\n  homeHref?: string;\n  /** the centred links (desktop) and the menu's links (phones) */\n  links: PlumeformHeaderLink[];\n  /** quiet text link before the button, e.g. log in */\n  secondary?: { label: string; href: string };\n  /** the pill button at the right end */\n  cta: { label: string; href: string };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  /**\n   * auto: turns dark while it sits over a band marked data-tone=\"dark\" (plumeform-band does\n   * this) and light elsewhere · light / dark: fixed\n   */\n  tone?: \"auto\" | \"light\" | \"dark\";\n  /** the tone in the static HTML, before the page's script runs (dark when the page opens on a dark hero) */\n  initialTone?: \"light\" | \"dark\";\n  className?: string;\n}\n\n/** Floating pill navigation, sticky 8px from the top, glass in light or dark depending on what's beneath it. */\nexport function PlumeformHeader({\n  brand,\n  logo,\n  homeHref = \"/\",\n  links,\n  secondary,\n  cta,\n  menuLabel = \"Menu\",\n  tone = \"auto\",\n  initialTone = \"light\",\n  className,\n}: PlumeformHeaderProps) {\n  const ref = useRef<HTMLDivElement>(null);\n  const [autoTone, setAutoTone] = useState(initialTone);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (tone !== \"auto\") return;\n    let frame = 0;\n    const update = () => {\n      frame = 0;\n      const pill = ref.current;\n      if (!pill) return;\n      const box = pill.getBoundingClientRect();\n      const y = box.top + box.height / 2;\n      let dark = false;\n      document.querySelectorAll<HTMLElement>('[data-tone=\"dark\"]').forEach((band) => {\n        const r = band.getBoundingClientRect();\n        if (r.top <= y && r.bottom >= y) dark = true;\n      });\n      setAutoTone(dark ? \"dark\" : \"light\");\n    };\n    const schedule = () => {\n      if (!frame) frame = requestAnimationFrame(update);\n    };\n    update();\n    window.addEventListener(\"scroll\", schedule, { passive: true });\n    window.addEventListener(\"resize\", schedule);\n    return () => {\n      window.removeEventListener(\"scroll\", schedule);\n      window.removeEventListener(\"resize\", schedule);\n      if (frame) cancelAnimationFrame(frame);\n    };\n  }, [tone]);\n\n  const dark = (tone === \"auto\" ? autoTone : tone) === \"dark\";\n  const linkClass =\n    \"rounded-full px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:bg-foreground/8 hover:text-foreground motion-reduce:transition-none\";\n\n  return (\n    <header className={cn(\"sticky top-0 z-50 -mb-[3.75rem] h-[3.75rem] px-4 pt-2 lg:px-gutter\", className)}>\n      <div ref={ref} className={cn(dark && \"dark\", \"relative mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))] text-foreground\")}>\n        <div\n          className={cn(\n            \"flex h-[3.25rem] items-center gap-4 rounded-full border border-border bg-card/75 pr-1.5 pl-4 backdrop-blur-xl transition-colors duration-200\",\n            \"shadow-[inset_0_1px_0_color-mix(in_oklab,var(--foreground)_8%,transparent),0_8px_24px_-14px_color-mix(in_oklab,var(--foreground)_25%,transparent)]\",\n            \"dark:bg-card/70\",\n          )}\n        >\n          <a href={homeHref} aria-label={brand} className=\"flex items-center gap-1.5 text-[1.0625rem] font-bold tracking-[-0.02em] [&_svg]:size-5 [&_svg]:text-highlight\">\n            {logo}\n            <span>{brand}</span>\n          </a>\n\n          <nav className=\"mx-auto hidden items-center gap-1 lg:flex\">\n            {links.map((link) => (\n              <a key={link.href + link.label} href={link.href} className={cn(linkClass, \"flex items-center gap-1\")}>\n                {link.label}\n                {link.hasMenu && <ChevronDown aria-hidden className=\"size-3.5 opacity-70\" />}\n              </a>\n            ))}\n          </nav>\n\n          <div className=\"ml-auto flex items-center gap-2 lg:ml-0\">\n            {secondary && (\n              <a href={secondary.href} className={cn(linkClass, \"mr-1 hidden lg:block\")}>\n                {secondary.label}\n              </a>\n            )}\n            <PlumeformButton href={cta.href} size=\"sm\" className=\"h-9 px-4 text-sm font-bold\">\n              {cta.label}\n            </PlumeformButton>\n            <button\n              type=\"button\"\n              aria-label={menuLabel}\n              aria-expanded={open}\n              onClick={() => setOpen((o) => !o)}\n              className=\"grid size-9 place-items-center rounded-full text-foreground transition-colors hover:bg-foreground/8 lg:hidden\"\n            >\n              {open ? <X className=\"size-5\" strokeWidth={1.5} /> : <Menu className=\"size-5\" strokeWidth={1.5} />}\n            </button>\n          </div>\n        </div>\n\n        {open && (\n          <nav className=\"absolute inset-x-0 top-full mt-2 grid gap-1 rounded-2xl border border-border bg-card/95 p-3 backdrop-blur-xl lg:hidden\">\n            {links.map((link) => (\n              <a key={link.href + link.label} href={link.href} className=\"rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium hover:bg-foreground/8\">\n                {link.label}\n              </a>\n            ))}\n            {secondary && (\n              <a href={secondary.href} className=\"rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium text-muted-foreground hover:bg-foreground/8\">\n                {secondary.label}\n              </a>\n            )}\n          </nav>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark next to the logo; also the home link's label"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "logo mark (an svg, img or lucide icon) before the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "PlumeformHeaderLink[]",
+      "required": true,
+      "description": "the centred links (desktop) and the menu's links (phones)"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "quiet text link before the button, e.g. log in"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the pill button at the right end"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "auto",
+      "description": "auto: turns dark while it sits over a band marked data-tone=\"dark\" (plumeform-band does\nthis) and light elsewhere · light / dark: fixed"
+    },
+    {
+      "name": "initialTone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "the tone in the static HTML, before the page's script runs (dark when the page opens on a dark hero)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "59f1df34df550abdfdc19b80e9e3dd328836dffefe3fb569763b12af113a140d"
+}

@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform plans and comparison table",
+  "description": "Pricing on warm paper: a bold heading with an underlined side link, a white plan card with teal ticks beside a deep teal gradient card with a Monthly / Yearly pill toggle (the price swaps in with a quick fade-rise), then a rounded comparison table with tracked-capital headers, the highlighted row set in ink with a small italic mark, and fine print.",
+  "category": "pricing",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "toggle",
+    "table",
+    "comparison",
+    "light",
+    "teal",
+    "reveal",
+    "swap"
+  ],
+  "notes": [
+    "use as=\"h1\" plus compare.title and compare.links on a pricing page",
+    "the featured card forces dark colours over a chart-1 gradient",
+    "the table scrolls sideways inside its card on phones",
+    "needs JavaScript for the billing toggle; static HTML shows the first price"
+  ],
+  "hydrate": "visible",
+  "entry": "plumeform-pricing.tsx",
+  "source": "foundry",
+  "name": "plumeform-pricing",
+  "files": [
+    {
+      "path": "plumeform-pricing.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformReveal, plumeformSwapIn } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformPlanPrice {\n  /** the toggle's label for this price, e.g. \"Monthly\" (only used when a plan has several) */\n  label?: string;\n  /** the amount, e.g. \"$12\" */\n  amount: string;\n  /** small text after the amount, e.g. \"/mo\" */\n  suffix?: string;\n  /** a line under the price */\n  note?: ReactNode;\n}\n\nexport interface PlumeformPlan {\n  name: string;\n  /** a line under the name */\n  description?: ReactNode;\n  /** one price, or several to switch between with a pill toggle */\n  prices: PlumeformPlanPrice[];\n  /** the featured plan is the teal card */\n  featured?: boolean;\n  cta: { label: string; href: string };\n  /** small print under the button */\n  ctaNote?: ReactNode;\n  /** what's included, one line each */\n  features: string[];\n  /** small print at the card's foot */\n  footnote?: ReactNode;\n}\n\nexport interface PlumeformCompareTable {\n  eyebrow?: string;\n  /** an optional heading over the table */\n  title?: ReactNode;\n  /** the column headings */\n  columns: string[];\n  /** one row per tool; `ours` marks the highlighted row */\n  rows: { cells: string[]; ours?: boolean }[];\n  /** a hand-written mark next to the highlighted row's name, e.g. \"← us\" */\n  oursMark?: string;\n  /** small print under the table */\n  note?: ReactNode;\n  /** a line of links under it (\"Want the long version? …\") */\n  links?: { lead?: string; items: { label: string; href: string }[] };\n}\n\nexport interface PlumeformPricingProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** h1 on a pricing page, h2 on a landing page */\n  as?: \"h1\" | \"h2\";\n  /** a paragraph under the title */\n  intro?: ReactNode;\n  /** an underlined link on the right of the heading */\n  sideLink?: { label: string; href: string };\n  /** small capitals over the plan cards, e.g. \"The plans\" */\n  plansLabel?: string;\n  /** usually two: a white card and a featured teal card */\n  plans: PlumeformPlan[];\n  compare?: PlumeformCompareTable;\n  id?: string;\n  className?: string;\n}\n\nfunction PlanCard({ plan }: { plan: PlumeformPlan }) {\n  const [index, setIndex] = useState(0);\n  const price = plan.prices[index] ?? plan.prices[0];\n  const toggle = plan.prices.length > 1;\n  const featured = plan.featured;\n\n  return (\n    <div\n      className={cn(\n        \"flex h-full flex-col rounded-2xl p-8\",\n        featured\n          ? \"dark bg-linear-[160deg] from-[color-mix(in_oklab,var(--chart-1)_85%,var(--background))] via-[color-mix(in_oklab,var(--chart-1)_62%,var(--background))] to-[color-mix(in_oklab,var(--chart-1)_32%,var(--background))] text-foreground shadow-[inset_0_1px_0_color-mix(in_oklab,var(--foreground)_24%,transparent),0_32px_64px_-24px_color-mix(in_oklab,var(--chart-1)_45%,transparent)]\"\n          : \"border border-border bg-card text-card-foreground shadow-[inset_0_1px_0_var(--card),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)]\",\n      )}\n    >\n      <div className=\"flex flex-wrap items-start justify-between gap-x-6 gap-y-4\">\n        <div className=\"min-w-0\">\n          <h3 className=\"text-xl font-bold tracking-[-0.02em]\">{plan.name}</h3>\n          {toggle && (\n            <div role=\"tablist\" className=\"mt-4 inline-flex rounded-full bg-primary/90 p-1\">\n              {plan.prices.map((p, i) => (\n                <button\n                  key={p.label ?? i}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === index}\n                  onClick={() => setIndex(i)}\n                  className={cn(\n                    \"h-9 rounded-full px-4 text-[0.8125rem] font-bold transition-colors duration-200 motion-reduce:transition-none\",\n                    i === index ? \"bg-primary-foreground text-primary\" : \"text-primary-foreground/80 hover:text-primary-foreground\",\n                  )}\n                >\n                  {p.label}\n                </button>\n              ))}\n            </div>\n          )}\n        </div>\n        <p key={index} className={cn(plumeformSwapIn, \"flex items-baseline gap-0.5 text-4xl font-extrabold tracking-[-0.03em]\", toggle && \"lg:mt-12\")}>\n          {price.amount}\n          {price.suffix && <span className=\"text-sm font-semibold tracking-normal opacity-80\">{price.suffix}</span>}\n        </p>\n      </div>\n\n      {(plan.description || price.note) && (\n        <p key={`n${index}`} className={cn(plumeformSwapIn, \"mt-2 text-sm\", featured ? \"text-foreground/90\" : \"text-muted-foreground\")}>\n          {toggle ? price.note : plan.description}\n        </p>\n      )}\n\n      {featured && (\n        <div className=\"mt-7\">\n          <PlumeformButton href={plan.cta.href} arrow className=\"h-10 px-5\">\n            {plan.cta.label}\n          </PlumeformButton>\n          {plan.ctaNote && <p className=\"mt-4 text-xs text-foreground/85\">{plan.ctaNote}</p>}\n        </div>\n      )}\n\n      <ul className={cn(\"space-y-3 text-sm\", featured ? \"mt-9\" : \"mt-8\")}>\n        {plan.features.map((f) => (\n          <li key={f} className=\"flex gap-2.5\">\n            <Check aria-hidden className={cn(\"mt-0.5 size-4 shrink-0\", featured ? \"text-foreground\" : \"text-highlight\")} strokeWidth={2.5} />\n            <span className={featured ? \"text-foreground/95\" : \"text-muted-foreground\"}>{f}</span>\n          </li>\n        ))}\n      </ul>\n\n      {!featured && (\n        <div className=\"mt-auto pt-12\">\n          <PlumeformButton href={plan.cta.href} arrow className=\"h-10 px-5\">\n            {plan.cta.label}\n          </PlumeformButton>\n          {plan.ctaNote && <p className=\"mt-4 text-xs text-muted-foreground\">{plan.ctaNote}</p>}\n        </div>\n      )}\n\n      {plan.footnote && <p className=\"mt-9 text-xs leading-5 text-foreground/85 [&_a]:font-bold [&_a]:underline\">{plan.footnote}</p>}\n    </div>\n  );\n}\n\nconst capsLabel = \"text-[0.72rem] font-semibold tracking-[0.22em] text-muted-foreground uppercase\";\n\n/**\n * Pricing on paper: heading (with a side link), a white plan card beside a deep teal featured\n * card with a Monthly / Yearly pill toggle, then a comparison table whose highlighted row is\n * set in ink, and its small print.\n */\nexport function PlumeformPricing({ eyebrow, title, as = \"h2\", intro, sideLink, plansLabel, plans, compare, id, className }: PlumeformPricingProps) {\n  return (\n    <section id={id} className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between\">\n          <PlumeformHeading eyebrow={eyebrow} title={title} as={as} size={as === \"h1\" ? \"page\" : \"section\"} className={as === \"h1\" ? \"max-w-[50rem]\" : \"max-w-[40rem]\"}>\n            {intro && <div className=\"text-lg leading-[1.6]\">{intro}</div>}\n          </PlumeformHeading>\n          {sideLink && (\n            <a href={sideLink.href} className=\"self-start border-b-2 border-highlight pb-0.5 text-sm font-bold transition-colors duration-200 hover:text-highlight lg:mb-3 lg:self-auto\">\n              {sideLink.label}\n            </a>\n          )}\n        </div>\n\n        {plansLabel && <p className={cn(capsLabel, \"mt-14\")}>{plansLabel}</p>}\n        <div className={cn(\"grid items-stretch gap-4 lg:grid-cols-2\", plansLabel ? \"mt-5\" : \"mt-16\")}>\n          {plans.map((plan, i) => (\n            <PlumeformReveal key={plan.name} step={i}>\n              <PlanCard plan={plan} />\n            </PlumeformReveal>\n          ))}\n        </div>\n\n        {compare && (\n          <PlumeformReveal className=\"mt-20 lg:mt-24\">\n            {compare.eyebrow && <p className={capsLabel}>{compare.eyebrow}</p>}\n            {compare.title && <h2 className=\"mt-6 font-display text-[2.25rem] leading-[1.06] font-bold tracking-[-0.025em] lg:text-[3rem]\">{compare.title}</h2>}\n            <div className={cn(\"overflow-x-auto rounded-2xl border border-border bg-card text-card-foreground shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_8px_24px_-12px_color-mix(in_oklab,var(--foreground)_12%,transparent)]\", compare.title ? \"mt-10\" : \"mt-5\")}>\n              <table className=\"w-full min-w-[40rem] text-left text-sm\">\n                <thead className=\"bg-secondary\">\n                  <tr>\n                    {compare.columns.map((c) => (\n                      <th key={c} scope=\"col\" className=\"px-3 py-3 text-[0.625rem] font-bold tracking-[0.16em] text-muted-foreground uppercase\">\n                        {c}\n                      </th>\n                    ))}\n                  </tr>\n                </thead>\n                <tbody>\n                  {compare.rows.map((row) => (\n                    <tr key={row.cells[0]} className={cn(row.ours ? \"bg-primary font-bold text-primary-foreground\" : \"border-t border-border\")}>\n                      {row.cells.map((cell, ci) => (\n                        <td key={ci} className={cn(\"px-3 py-4\", ci === 0 && \"font-bold\", !row.ours && ci > 0 && \"text-muted-foreground\")}>\n                          {cell}\n                          {ci === 0 && row.ours && compare.oursMark && <span className=\"ml-2 font-normal text-glow italic\">{compare.oursMark}</span>}\n                        </td>\n                      ))}\n                    </tr>\n                  ))}\n                </tbody>\n              </table>\n            </div>\n            {compare.note && <p className=\"mt-6 text-xs leading-4 text-muted-foreground\">{compare.note}</p>}\n            {compare.links && (\n              <p className=\"mt-6 text-sm text-muted-foreground\">\n                {compare.links.lead}{\" \"}\n                {compare.links.items.map((l, i) => (\n                  <span key={l.href}>\n                    {i > 0 && \" · \"}\n                    <a href={l.href} className=\"border-b border-highlight font-bold text-foreground transition-colors duration-200 hover:text-highlight\">\n                      {l.label}\n                    </a>\n                  </span>\n                ))}\n              </p>\n            )}\n          </PlumeformReveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-button",
+    "plumeform-heading",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "h1 on a pricing page, h2 on a landing page"
+    },
+    {
+      "name": "intro",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a paragraph under the title"
+    },
+    {
+      "name": "sideLink",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an underlined link on the right of the heading"
+    },
+    {
+      "name": "plansLabel",
+      "type": "string",
+      "required": false,
+      "description": "small capitals over the plan cards, e.g. \"The plans\""
+    },
+    {
+      "name": "plans",
+      "type": "PlumeformPlan[]",
+      "required": true,
+      "description": "usually two: a white card and a featured teal card"
+    },
+    {
+      "name": "compare",
+      "type": "PlumeformCompareTable",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "263ab55c3d6fb702d8a45fc8f84d137c6b888126c190c6fdfe03ccbae4343147"
+}

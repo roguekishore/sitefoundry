@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook header",
+  "description": "A violet announcement strip over a light, hairline-bottomed nav: wordmark, plain links with small chevrons, a white GitHub-stars pill, a quiet sign-in link and outline + violet buttons. Sticky; on desktop it slides up out of the way while you scroll down and comes back when you scroll up. Phones get a burger menu.",
+  "category": "header",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "hide-on-scroll",
+    "announcement",
+    "light",
+    "violet",
+    "minimal"
+  ],
+  "notes": [
+    "hide-on-scroll is desktop only (as on the original); off under reduced motion",
+    "the announcement strip is the brand primary with primary-foreground text"
+  ],
+  "hydrate": "load",
+  "entry": "growthbook-header.tsx",
+  "source": "foundry",
+  "name": "growthbook-header",
+  "files": [
+    {
+      "path": "growthbook-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\n\nexport interface GrowthbookHeaderLink {\n  label: string;\n  href: string;\n  /** shows a chevron (the original opens a menu here) */\n  menu?: boolean;\n}\n\nexport interface GrowthbookHeaderAction {\n  label: string;\n  href: string;\n}\n\nexport interface GrowthbookHeaderProps {\n  /** the strip above the nav; leave out to hide it */\n  announcement?: { text: string; linkLabel: string; href: string };\n  /** wordmark text */\n  brand: string;\n  /** small mark before the wordmark (an svg or lucide icon) */\n  brandIcon?: ReactNode;\n  brandHref?: string;\n  /** main links */\n  links: GrowthbookHeaderLink[];\n  /** the white pill with a repository's star count; leave out to hide it */\n  stars?: { icon: ReactNode; count: string; href: string; label: string };\n  /** quiet text link before the buttons */\n  signIn?: GrowthbookHeaderAction;\n  /** outline button */\n  secondary?: GrowthbookHeaderAction;\n  /** violet button */\n  primary: GrowthbookHeaderAction;\n  /** accessible labels for the phone menu button */\n  menuLabel: string;\n  closeLabel: string;\n  className?: string;\n}\n\nexport function GrowthbookHeader({\n  announcement,\n  brand,\n  brandIcon,\n  brandHref = \"/\",\n  links,\n  stars,\n  signIn,\n  secondary,\n  primary,\n  menuLabel,\n  closeLabel,\n  className,\n}: GrowthbookHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [hidden, setHidden] = useState(false);\n\n  // desktop: slide up while scrolling down (past the header's height), back on scrolling up\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (Math.abs(y - last) < 6) return;\n      setHidden(y > last && y > 120);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  const link = \"text-sm text-foreground transition-colors duration-250 ease-[ease] hover:text-primary motion-reduce:transition-none\";\n\n  return (\n    <header\n      data-hidden={hidden && !open}\n      className={cn(\n        \"sticky top-0 z-40 transition-transform duration-400 ease-[ease] motion-reduce:transition-none lg:data-[hidden=true]:-translate-y-full\",\n        className,\n      )}\n    >\n      {announcement && (\n        <p className=\"bg-primary px-gutter py-2 text-center text-sm leading-[1.65] text-primary-foreground lg:py-[0.5625rem] lg:leading-5\">\n          <span>{announcement.text}</span>\n          <ArrowRight aria-hidden className=\"ml-1 inline size-3.5 align-[-2px]\" strokeWidth={2} />\n          <a href={announcement.href} className=\"block underline underline-offset-4 hover:opacity-90 lg:ml-7 lg:inline\">\n            {announcement.linkLabel}\n          </a>\n        </p>\n      )}\n      <div className=\"border-b border-border bg-background\">\n        <nav className=\"mx-auto flex h-[4.125rem] max-w-[calc(var(--page-width)+var(--page-gutter)*4)] items-center gap-4 px-gutter md:px-[calc(var(--page-gutter)*2)] lg:h-[5.125rem] lg:gap-8\">\n          <a href={brandHref} className=\"flex items-center gap-1.5 text-[1.375rem] font-medium tracking-[-0.02em] text-foreground\">\n            {brandIcon && <span className=\"flex text-primary [&_svg]:size-6\">{brandIcon}</span>}\n            {brand}\n          </a>\n          <ul className=\"hidden items-center gap-7 lg:flex\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={cn(link, \"flex items-center gap-1.5\")}>\n                  {l.label}\n                  {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={2} />}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {stars && (\n            <a\n              href={stars.href}\n              aria-label={stars.label}\n              className=\"ml-auto flex h-11 items-center gap-3 rounded-full bg-card px-3.5 text-xs text-card-foreground shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_6%,transparent)] transition-colors duration-250 hover:text-primary lg:ml-0 [&_svg]:size-5\"\n            >\n              {stars.icon}\n              {stars.count}\n            </a>\n          )}\n          <div className=\"ml-auto hidden items-center gap-6 lg:flex\">\n            {signIn && (\n              <a href={signIn.href} className={link}>\n                {signIn.label}\n              </a>\n            )}\n            <div className=\"flex items-center gap-3\">\n              {secondary && (\n                <GrowthbookButton href={secondary.href} variant=\"outline\" size=\"sm\">\n                  {secondary.label}\n                </GrowthbookButton>\n              )}\n              <GrowthbookButton href={primary.href} size=\"sm\">\n                {primary.label}\n              </GrowthbookButton>\n            </div>\n          </div>\n          <button\n            type=\"button\"\n            aria-label={open ? closeLabel : menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen(!open)}\n            className={cn(\"grid size-10 place-items-center text-foreground lg:hidden\", !stars && \"ml-auto\")}\n          >\n            {open ? <X aria-hidden className=\"size-7\" strokeWidth={1.75} /> : <Menu aria-hidden className=\"size-7\" strokeWidth={1.75} />}\n          </button>\n        </nav>\n        {open && (\n          <div className=\"border-t border-border px-gutter pt-4 pb-6 lg:hidden\">\n            <ul className=\"divide-y divide-border\">\n              {links.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className={cn(link, \"flex items-center justify-between py-4 text-base\")}>\n                    {l.label}\n                    {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={2} />}\n                  </a>\n                </li>\n              ))}\n              {signIn && (\n                <li>\n                  <a href={signIn.href} className={cn(link, \"block py-4 text-base\")}>\n                    {signIn.label}\n                  </a>\n                </li>\n              )}\n            </ul>\n            <div className=\"mt-4 grid gap-3\">\n              {secondary && (\n                <GrowthbookButton href={secondary.href} variant=\"outline\" className=\"w-full\">\n                  {secondary.label}\n                </GrowthbookButton>\n              )}\n              <GrowthbookButton href={primary.href} className=\"w-full\">\n                {primary.label}\n              </GrowthbookButton>\n            </div>\n          </div>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button"
+  ],
+  "props": [
+    {
+      "name": "announcement",
+      "type": "{ text: string; linkLabel: string; href: string; }",
+      "required": false,
+      "description": "the strip above the nav; leave out to hide it"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark text"
+    },
+    {
+      "name": "brandIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small mark before the wordmark (an svg or lucide icon)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "GrowthbookHeaderLink[]",
+      "required": true,
+      "description": "main links"
+    },
+    {
+      "name": "stars",
+      "type": "{ icon: ReactNode; count: string; href: string; label: string; }",
+      "required": false,
+      "description": "the white pill with a repository's star count; leave out to hide it"
+    },
+    {
+      "name": "signIn",
+      "type": "GrowthbookHeaderAction",
+      "required": false,
+      "description": "quiet text link before the buttons"
+    },
+    {
+      "name": "secondary",
+      "type": "GrowthbookHeaderAction",
+      "required": false,
+      "description": "outline button"
+    },
+    {
+      "name": "primary",
+      "type": "GrowthbookHeaderAction",
+      "required": true,
+      "description": "violet button"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible labels for the phone menu button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cc5546723d5c240179adcfbe64065b356a87d0e2618f5aac60aa47d9f831c2f4"
+}

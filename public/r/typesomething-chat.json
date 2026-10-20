@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething chat demo",
+  "description": "A chat transcript inside a white app window on paper-grey, with a three-dot title bar (the first dot acid). The assistant's ink bubbles sit on the right, the user's blush bubbles on the left, each beside a round avatar with a white ring. Messages rise 12px and fade in as they scroll into view.",
+  "category": "features",
+  "site": "typesomething",
+  "license": "proprietary",
+  "tags": [
+    "chat",
+    "conversation",
+    "demo",
+    "window",
+    "bubbles",
+    "reveal",
+    "scroll-driven",
+    "pink",
+    "light"
+  ],
+  "notes": [
+    "avatars are slots (assistantAvatar, userAvatar); empty ones are grey discs",
+    "assistant bubbles use the foreground colour as their fill, so they invert under a dark theme",
+    "the reveal is a CSS view timeline; without support every message simply shows"
+  ],
+  "entry": "typesomething-chat.tsx",
+  "source": "foundry",
+  "name": "typesomething-chat",
+  "files": [
+    {
+      "path": "typesomething-chat.css",
+      "content": "/* Each message rises 12px and fades in as it enters the screen, over its first 140px of\n   travel. Scroll-driven; browsers without view timelines (and reduced motion) show every\n   message in place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .typesomething-chat-message {\n      animation: typesomething-chat-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 140px;\n    }\n  }\n}\n\n@keyframes typesomething-chat-rise {\n  from { opacity: 0; transform: translateY(12px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "typesomething-chat.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./typesomething-chat.css\";\n\nexport interface TypesomethingChatMessage {\n  /** assistant: dark bubble on the right · user: blush bubble on the left */\n  from: \"assistant\" | \"user\";\n  /** the message, one string per paragraph */\n  paragraphs: string[];\n  /** a bold link after the paragraphs (e.g. a preview address) */\n  link?: { label: string; href: string };\n}\n\nexport interface TypesomethingChatProps {\n  /** the conversation, top to bottom */\n  messages: TypesomethingChatMessage[];\n  /** the assistant's round avatar (an img or an icon); a grey disc when empty */\n  assistantAvatar?: ReactNode;\n  /** the user's round avatar (an img); a grey disc when empty */\n  userAvatar?: ReactNode;\n  /** name of the conversation, for screen readers */\n  label?: string;\n  className?: string;\n}\n\nfunction Avatar({ children }: { children?: ReactNode }) {\n  return (\n    <span className=\"size-[2.15rem] shrink-0 overflow-clip rounded-full border-2 border-background bg-muted shadow-[0_4px_12.8px_color-mix(in_oklab,var(--foreground)_14%,transparent)] lg:size-10 [&>img]:size-full [&>img]:object-cover\">\n      {children}\n    </span>\n  );\n}\n\n/**\n * A chat transcript in a white app window on paper-grey: the assistant's dark bubbles on the\n * right, the user's blush bubbles on the left, each beside a round avatar. Every message\n * rises 12px and fades in as it scrolls into view.\n */\nexport function TypesomethingChat({ messages, assistantAvatar, userAvatar, label, className }: TypesomethingChatProps) {\n  return (\n    <section aria-label={label} className={cn(\"bg-muted px-gutter py-section text-foreground lg:py-28\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <div className=\"overflow-clip rounded-lg border border-foreground/14 bg-card shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n          <div aria-hidden className=\"flex h-[2.3rem] items-center gap-1.5 border-b border-foreground/14 bg-muted px-4\">\n            <span className=\"size-2.5 rounded-full bg-primary\" />\n            <span className=\"size-2.5 rounded-full bg-foreground/20\" />\n            <span className=\"size-2.5 rounded-full bg-foreground/20\" />\n          </div>\n          <ol className=\"flex flex-col gap-4 px-[1.1rem] py-4 lg:px-10 lg:py-10\">\n            {messages.map((m, i) => {\n              const mine = m.from === \"user\";\n              return (\n                <li\n                  key={i}\n                  className={cn(\"typesomething-chat-message flex items-start gap-2.5 lg:gap-3\", mine ? \"flex-row\" : \"flex-row-reverse\")}\n                >\n                  <Avatar>{mine ? userAvatar : assistantAvatar}</Avatar>\n                  <div\n                    className={cn(\n                      \"flex-1 space-y-3 px-4 py-3.5 text-[0.78rem] leading-[1.55] lg:w-[46rem] lg:flex-none lg:text-[0.92rem]\",\n                      mine\n                        ? \"rounded-[1.5rem_1.5rem_1.5rem_0.3rem] bg-highlight text-highlight-foreground\"\n                        : \"rounded-[1.5rem_1.5rem_0.3rem_1.5rem] bg-foreground text-background\",\n                    )}\n                  >\n                    {m.paragraphs.map((p) => (\n                      <p key={p}>{p}</p>\n                    ))}\n                    {m.link && (\n                      <a href={m.link.href} className={cn(\"block font-bold underline-offset-4 hover:underline\", mine ? \"\" : \"text-primary\")}>\n                        {m.link.label}\n                      </a>\n                    )}\n                  </div>\n                </li>\n              );\n            })}\n          </ol>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "messages",
+      "type": "TypesomethingChatMessage[]",
+      "required": true,
+      "description": "the conversation, top to bottom"
+    },
+    {
+      "name": "assistantAvatar",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the assistant's round avatar (an img or an icon); a grey disc when empty"
+    },
+    {
+      "name": "userAvatar",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the user's round avatar (an img); a grey disc when empty"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "name of the conversation, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e022d1003d86249d841dd07a28869c0217ac961b80120a3151ef20fe9417910f"
+}

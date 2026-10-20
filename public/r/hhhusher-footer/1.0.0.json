@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher footer",
+  "description": "A dark footer that looks fixed under the page: as the page scrolls off it, the footer stays still and is uncovered from the bottom up. A small sign-up form left (glass field, glass button, consent checkbox), two columns of mono capital links right that turn yellow on hover, and a giant black-weight wordmark across the bottom whose letters slide in from the left as it is uncovered.",
+  "category": "footer",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "newsletter",
+    "giant-wordmark",
+    "reveal",
+    "fixed-reveal",
+    "mono",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "always dark (wraps itself in .dark)",
+    "the fixed look is a scroll-driven translate, so it needs no z-index on other blocks; without support it is an ordinary footer",
+    "the wordmark is sized to the window on phones (20vw) and 290px on desktop: keep it short"
+  ],
+  "entry": "hhhusher-footer.tsx",
+  "source": "foundry",
+  "name": "hhhusher-footer",
+  "files": [
+    {
+      "path": "hhhusher-footer.css",
+      "content": "/* Fixed-footer look without position: fixed. While the footer scrolls into view its content\n   is shifted up by the part not yet visible (-100% -> 0), so it seems to sit still at the\n   bottom of the window while the page slides off it. The wordmark's letters then slide in\n   from the left (later letters from further) and fade in over the second half of that. */\n.hhhusher-footer {\n  view-timeline-name: --hhhusher-footer;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-footer-inner {\n      animation: hhhusher-footer-uncover linear both;\n      animation-timeline: --hhhusher-footer;\n      animation-range: entry 0% entry 100%;\n    }\n    .hhhusher-footer-char {\n      animation: hhhusher-footer-slide linear both;\n      animation-timeline: --hhhusher-footer;\n      animation-range: entry 45% entry 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-footer-uncover {\n  from {\n    translate: 0 -100%;\n  }\n  to {\n    translate: 0 0;\n  }\n}\n\n@keyframes hhhusher-footer-slide {\n  from {\n    opacity: 0;\n    translate: calc(-0.18em - var(--hhhusher-char, 0) * 0.05em) 0;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-footer.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { hhhusherEase, hhhusherLabel } from \"@foundry/hhhusher-button\";\nimport \"./hhhusher-footer.css\";\n\nexport interface HhhusherFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface HhhusherFooterProps {\n  /** the small heading over the sign-up form */\n  newsletterTitle: string;\n  /** placeholder (and screen-reader name) of the email field */\n  emailPlaceholder: string;\n  /** the button next to the field */\n  subscribeLabel: string;\n  /** the consent text next to the checkbox */\n  consent: string;\n  /** where the form posts to */\n  action?: string;\n  /** link columns on the right (two columns of two in the original) */\n  columns: HhhusherFooterLink[][];\n  /** the giant wordmark across the bottom */\n  wordmark: string;\n  className?: string;\n}\n\n/**\n * A dark footer that looks fixed under the page: as the page scrolls off it, the footer stays\n * put and is uncovered from the bottom up. A small \"stay in touch\" form left (glass field, glass\n * button, consent checkbox), two columns of mono links right, and a giant black-weight wordmark\n * across the bottom whose letters slide in from the left as it is uncovered.\n */\nexport function HhhusherFooter({ newsletterTitle, emailPlaceholder, subscribeLabel, consent, action = \"#\", columns, wordmark, className }: HhhusherFooterProps) {\n  return (\n    <footer className={cn(\"hhhusher-footer dark overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"hhhusher-footer-inner mx-auto flex max-w-page flex-col px-gutter pt-[7.4rem] pb-8 lg:pt-8 lg:pb-[7.5rem]\">\n        <div className=\"grid gap-16 lg:grid-cols-2 lg:gap-10\">\n          <form action={action} className=\"flex max-w-[30rem] flex-col\">\n            <h2 className=\"font-display text-[1.3rem] leading-[1.2] font-medium tracking-[-0.01em] lg:text-2xl\">{newsletterTitle}</h2>\n            <div className=\"mt-[3.4rem] flex gap-2.5 lg:mt-7\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                required\n                placeholder={emailPlaceholder}\n                aria-label={emailPlaceholder}\n                className={cn(\n                  hhhusherLabel,\n                  \"h-[2.8rem] min-w-0 flex-1 rounded-lg bg-foreground/20 px-4 text-[1rem] text-foreground placeholder:text-foreground/50 focus:outline-2 focus:outline-ring lg:h-[2.6875rem] lg:text-xs\",\n                )}\n              />\n              <button\n                type=\"submit\"\n                className={cn(\n                  hhhusherLabel,\n                  \"h-[2.8rem] shrink-0 rounded-lg border border-foreground/20 bg-foreground/15 px-8 text-foreground/50 transition-colors duration-300 hover:border-foreground hover:text-foreground lg:h-[2.6875rem]\",\n                  hhhusherEase,\n                )}\n              >\n                {subscribeLabel}\n              </button>\n            </div>\n            <label className=\"mt-6 flex items-start gap-3 text-[0.9rem] leading-[1.45] font-semibold lg:text-sm lg:leading-[1.4]\">\n              <input type=\"checkbox\" name=\"consent\" required className=\"mt-0.5 size-[1.15rem] shrink-0 appearance-none rounded-[3px] border border-foreground checked:bg-primary\" />\n              <span>{consent}</span>\n            </label>\n          </form>\n\n          <nav className=\"grid grid-cols-2 gap-10\">\n            {columns.map((links, c) => (\n              <ul key={c} className=\"flex flex-col gap-7\">\n                {links.map((link) => (\n                  <li key={link.href + link.label}>\n                    <a href={link.href} className={cn(hhhusherLabel, \"transition-colors duration-300 hover:text-primary\", hhhusherEase)}>\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ))}\n          </nav>\n        </div>\n\n        <p aria-label={wordmark} className=\"mt-16 overflow-clip font-display text-[20vw] leading-[0.8] font-black tracking-[-0.03em] whitespace-nowrap lg:mt-[6.25rem] lg:text-[18.125rem] lg:tracking-[-0.017em]\">\n          {Array.from(wordmark).map((char, i) => (\n            <span key={i} aria-hidden className=\"hhhusher-footer-char inline-block\" style={{ \"--hhhusher-char\": i } as CSSProperties}>\n              {char}\n            </span>\n          ))}\n        </p>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button"
+  ],
+  "props": [
+    {
+      "name": "newsletterTitle",
+      "type": "string",
+      "required": true,
+      "description": "the small heading over the sign-up form"
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": true,
+      "description": "placeholder (and screen-reader name) of the email field"
+    },
+    {
+      "name": "subscribeLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button next to the field"
+    },
+    {
+      "name": "consent",
+      "type": "string",
+      "required": true,
+      "description": "the consent text next to the checkbox"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the form posts to"
+    },
+    {
+      "name": "columns",
+      "type": "HhhusherFooterLink[][]",
+      "required": true,
+      "description": "link columns on the right (two columns of two in the original)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant wordmark across the bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b32f901354314ce208d9be2f0e21ead6eaf05ad7e8fc56f95322783cfedda211"
+}

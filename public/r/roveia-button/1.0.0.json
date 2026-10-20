@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Roveia button",
+  "description": "A fully rounded pill button with a small arrow: electric blue that lightens on hover, or ink that turns blue (0.5s). 52px for heroes and CTAs, 40px for the nav and card pills.",
+  "category": "button",
+  "site": "roveia",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "blue",
+    "arrow",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "renders an <a> when href is set"
+  ],
+  "entry": "roveia-button.tsx",
+  "source": "foundry",
+  "name": "roveia-button",
+  "files": [
+    {
+      "path": "roveia-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RoveiaButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary: electric blue, lightens on hover · dark: ink pill that turns blue on hover */\n  variant?: \"primary\" | \"dark\";\n  /** sm: 40px (nav, card pills) · lg: 52px (hero and CTA) */\n  size?: \"sm\" | \"lg\";\n  /** arrow after the label: right (→, default), up-right (↗) or none */\n  arrow?: \"right\" | \"up-right\" | \"none\";\n  /** stretch to the container's width */\n  block?: boolean;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-10 gap-3 px-3 text-base tracking-[-0.02em]\",\n  lg: \"h-13 gap-4 px-10 text-base font-medium tracking-[-0.01em]\",\n};\n\nconst variants = {\n  // the original lightens its blue a step on hover; on white that is 85% of the blue\n  primary: \"bg-primary text-primary-foreground duration-300 hover:bg-primary/85\",\n  dark: \"bg-foreground text-background duration-500 hover:bg-primary hover:text-primary-foreground\",\n};\n\n/** Roveia's pill button: blue or ink, with a small arrow. */\nexport function RoveiaButton({ children, href, variant = \"primary\", size = \"lg\", arrow = \"right\", block, className }: RoveiaButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center rounded-full whitespace-nowrap transition-colors ease-out motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    block && \"w-full\",\n    className,\n  );\n  const Icon = arrow === \"up-right\" ? ArrowUpRight : ArrowRight;\n  const inner = (\n    <>\n      <span>{children}</span>\n      {arrow !== \"none\" && <Icon aria-hidden className=\"size-4 shrink-0\" strokeWidth={1.75} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: electric blue, lightens on hover · dark: ink pill that turns blue on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "sm: 40px (nav, card pills) · lg: 52px (hero and CTA)"
+    },
+    {
+      "name": "arrow",
+      "type": "enum",
+      "required": false,
+      "default": "right",
+      "description": "arrow after the label: right (→, default), up-right (↗) or none"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the container's width"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "01ed79621d0c675fc62588cc45c64cf3680a3ee867e3e74b5636b72c738aeef3"
+}

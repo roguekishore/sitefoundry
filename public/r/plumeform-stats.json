@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform at-a-glance number bento",
+  "description": "A near-black green band with a bold heading over a bento of glass cards: one tall card with a giant number at its foot, two square cards and one wide one, each number in an extra-bold paper-to-mint gradient. Cards rise in one after another with a soft blur.",
+  "category": "stats",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "bento",
+    "dark",
+    "glass",
+    "gradient-text",
+    "reveal",
+    "stagger"
+  ],
+  "notes": [
+    "forces dark colours",
+    "designed for four stats: tall, base, base, wide",
+    "CSS only"
+  ],
+  "entry": "plumeform-stats.tsx",
+  "source": "foundry",
+  "name": "plumeform-stats",
+  "files": [
+    {
+      "path": "plumeform-stats.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBand } from \"@foundry/plumeform-band\";\nimport { PlumeformGlassCard } from \"@foundry/plumeform-glass-card\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformStat {\n  /** small line above the number */\n  label: string;\n  /** the number itself, e.g. \"150\" or \"$12\" */\n  value: string;\n  /** a line under the number */\n  caption?: ReactNode;\n  /** tall: two rows high, number at the bottom (use it first) · wide: two columns · base */\n  shape?: \"tall\" | \"wide\" | \"base\";\n}\n\nexport interface PlumeformStatsProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** a bento of numbers; the classic set is one tall, two base and one wide */\n  stats: PlumeformStat[];\n  /** art behind the band (the original's WebGL fluted glass); empty shows a soft glow */\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\n/** A dark \"at a glance\" band: a bold heading over a bento of glass cards with big mint-gradient numbers. */\nexport function PlumeformStats({ eyebrow, title, stats, backdrop, id, className }: PlumeformStatsProps) {\n  return (\n    <PlumeformBand id={id} backdrop={backdrop} className={cn(\"py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <PlumeformHeading eyebrow={eyebrow} title={title} className=\"max-w-[42rem]\" />\n        <ul className=\"mt-12 grid gap-4 lg:grid-cols-3 lg:grid-rows-[minmax(14rem,auto)_minmax(14rem,auto)]\">\n          {stats.map((stat, i) => {\n            const shape = stat.shape ?? \"base\";\n            return (\n              <PlumeformReveal\n                key={stat.label}\n                as=\"li\"\n                step={i}\n                className={cn(shape === \"tall\" && \"lg:row-span-2\", shape === \"wide\" && \"lg:col-span-2\")}\n              >\n                <PlumeformGlassCard className={cn(\"flex h-full flex-col px-8 py-8\", shape === \"tall\" && \"min-h-[22rem] lg:min-h-0\")}>\n                  <p className=\"text-[0.9375rem] font-semibold text-muted-foreground\">{stat.label}</p>\n                  <p\n                    className={cn(\n                      \"bg-linear-to-b from-foreground to-highlight bg-clip-text font-display leading-none font-extrabold tracking-[-0.04em] text-transparent\",\n                      shape === \"tall\" ? \"mt-auto pt-10 text-[7rem] lg:text-[8.5rem]\" : \"mt-6 text-[4rem] lg:text-[4.5rem]\",\n                    )}\n                  >\n                    {stat.value}\n                  </p>\n                  {stat.caption && <div className={cn(\"text-[0.9375rem] text-muted-foreground\", shape === \"tall\" ? \"mt-6\" : \"mt-5\")}>{stat.caption}</div>}\n                </PlumeformGlassCard>\n              </PlumeformReveal>\n            );\n          })}\n        </ul>\n      </div>\n    </PlumeformBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-band",
+    "plumeform-glass-card",
+    "plumeform-heading",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "stats",
+      "type": "PlumeformStat[]",
+      "required": true,
+      "description": "a bento of numbers; the classic set is one tall, two base and one wide"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original's WebGL fluted glass); empty shows a soft glow"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b99f051c33f5be199ea1070ced6c8c314f9d903518b06099fa6dcbf8999b544e"
+}

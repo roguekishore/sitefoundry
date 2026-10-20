@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia pinned hero card",
+  "description": "An inset hero card washed from white to pale blue, rounded 40px at the bottom: a centred two-line 70px light headline with blue words, a stat · 16:9 media · copy-and-blue-pill row, and a row of partners in white discs. On desktop it pins for a window while the media grows to fill the card, a dark veil fades in and the text turns light.",
+  "category": "hero",
+  "site": "roveia",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "blue",
+    "gradient",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "scale",
+    "media",
+    "rounded",
+    "minimal"
+  ],
+  "notes": [
+    "desktop: 210svh tall (the card is pinned for 1.1 windows); phones: content height, no motion",
+    "the media slot is 16:9 with a 24px radius; the grow is a uniform scale, so a real video zooms",
+    "CSS scroll-driven animation only; static (everything in place) without support or with reduced motion",
+    "the text turns to primary-foreground over the media: best when that is light"
+  ],
+  "entry": "roveia-hero.tsx",
+  "source": "foundry",
+  "name": "roveia-hero",
+  "files": [
+    {
+      "path": "roveia-hero.css",
+      "content": "/* Desktop: the hero card is pinned (sticky inside a 210svh wrapper). Over the first ~0.9 of\n   the pinned scroll the 16:9 media grows from its slot until it overfills the card (which\n   crops it), a dark veil fades to 75%, and the text turns light. Phones don't move. */\n@supports (animation-timeline: view()) {\n  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n    .roveia-hero {\n      view-timeline-name: --roveia-hero;\n    }\n    .roveia-hero-media,\n    .roveia-hero-veil,\n    .roveia-hero-ink {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --roveia-hero;\n    }\n    .roveia-hero-media {\n      animation-name: roveia-hero-grow;\n      animation-range: contain 0% contain 80%;\n    }\n    .roveia-hero-veil {\n      animation-name: roveia-hero-veil;\n      animation-range: contain 30% contain 85%;\n    }\n    .roveia-hero-ink {\n      animation-name: roveia-hero-ink;\n      animation-range: contain 20% contain 60%;\n    }\n  }\n}\n\n@keyframes roveia-hero-grow {\n  from { transform: none; }\n  to { transform: translateY(-9svh) scale(3.6); }\n}\n@keyframes roveia-hero-veil {\n  from { opacity: 0; }\n  to { opacity: 0.75; }\n}\n@keyframes roveia-hero-ink {\n  from { color: var(--foreground); }\n  to { color: color-mix(in oklab, var(--primary-foreground) 82%, transparent); }\n}\n"
+    },
+    {
+      "path": "roveia-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaButton } from \"@foundry/roveia-button\";\nimport \"./roveia-hero.css\";\n\nexport interface RoveiaHeadlinePart {\n  text: string;\n  /** set this part in the brand blue */\n  highlight?: boolean;\n}\n\nexport interface RoveiaPartner {\n  name: string;\n  /** a small icon shown in a white disc (e.g. a lucide icon) */\n  icon?: ReactNode;\n}\n\nexport interface RoveiaHeroProps {\n  /** the headline, in parts; highlighted parts are blue */\n  headline: RoveiaHeadlinePart[];\n  /** the short line beside the media (desktop) or under the headline (phones) */\n  description: string;\n  cta: { label: string; href: string };\n  /** the stat on the left (desktop only): icon, big figure, label and a quieter note */\n  stat?: { icon?: ReactNode; value: string; label: string; note?: string };\n  /** label in front of the partner row */\n  partnersLabel?: string;\n  partners?: RoveiaPartner[];\n  /** the 16:9 video or image in the middle; a placeholder of the same size when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A rounded, inset hero card washed from white to pale blue: a centred two-line headline with\n * blue words, then a row of stat · 16:9 media · copy and a blue pill, then a row of partners.\n * On desktop it is pinned for a window's worth of scrolling while the media grows to fill the\n * card under a darkening veil and the text turns light. Phones get one centred column.\n */\nexport function RoveiaHero({ headline, description, cta, stat, partnersLabel, partners = [], media, className }: RoveiaHeroProps) {\n  return (\n    <section className={cn(\"roveia-hero relative bg-background text-foreground lg:h-[210svh]\", className)}>\n      <div className=\"lg:sticky lg:top-0 lg:h-svh lg:pb-4\">\n        <div className=\"roveia-hero-card relative mx-2 overflow-clip rounded-b-[calc(var(--radius)+1rem)] bg-[radial-gradient(circle_at_50%_150%,color-mix(in_oklab,var(--primary)_40%,transparent),transparent)] px-8 pt-36 pb-16 lg:mx-5 lg:flex lg:h-full lg:flex-col lg:justify-center lg:px-gutter lg:pt-30 lg:pb-16\">\n          <div className=\"roveia-hero-ink mx-auto w-full max-w-[71rem] text-foreground\">\n            <h1 className=\"relative z-10 mx-auto max-w-[66rem] text-center font-display text-[2.1875rem] leading-[1.1] font-normal tracking-[-0.05em] text-balance lg:text-[4.375rem] lg:tracking-[-0.03em]\">\n              {headline.map((part, i) => (\n                <span key={i} className={part.highlight ? \"text-primary\" : undefined}>\n                  {part.text}\n                </span>\n              ))}\n            </h1>\n\n            <div className=\"mt-12 flex flex-col lg:mt-16 lg:grid lg:grid-cols-[1fr_2.2fr_1fr] lg:items-end lg:gap-12\">\n              {stat && (\n                <div className=\"relative z-10 hidden flex-col lg:col-start-1 lg:row-start-1 lg:flex\">\n                  {stat.icon && <span className=\"mb-6 text-primary [&_svg]:size-11\">{stat.icon}</span>}\n                  <span className=\"text-[4rem] leading-none font-light tracking-[-0.04em]\">{stat.value}</span>\n                  <span className=\"mt-6 text-base\">{stat.label}</span>\n                  {stat.note && <span className=\"mt-8 text-base opacity-60\">{stat.note}</span>}\n                </div>\n              )}\n\n              <div className=\"relative z-10 order-1 flex flex-col items-center text-center lg:order-none lg:col-start-3 lg:row-start-1 lg:items-start lg:text-left\">\n                <p className=\"text-base leading-6 tracking-[-0.01em] opacity-60 lg:max-w-[12.5rem]\">{description}</p>\n                <RoveiaButton href={cta.href} block className=\"mt-8 lg:mt-10 lg:w-auto\">\n                  {cta.label}\n                </RoveiaButton>\n              </div>\n\n              <div className=\"relative z-0 order-2 mt-10 lg:order-none lg:col-start-2 lg:row-start-1 lg:mt-0\">\n                <div className=\"roveia-hero-media relative aspect-video overflow-clip rounded-lg\">\n                  {media ?? <div className=\"size-full bg-muted bg-linear-to-br from-glow/35 via-muted to-background/60\" />}\n                  <div aria-hidden className=\"roveia-hero-veil dark pointer-events-none absolute inset-0 bg-background opacity-0\" />\n                </div>\n              </div>\n            </div>\n\n            {partners.length > 0 && (\n              <div className=\"relative z-10 mt-10 flex flex-col items-center gap-6 lg:mt-16 lg:flex-row lg:justify-between lg:gap-6\">\n                {partnersLabel && <span className=\"text-base tracking-[-0.02em]\">{partnersLabel}</span>}\n                <ul className=\"grid grid-cols-2 gap-x-12 gap-y-6 lg:flex lg:flex-1 lg:justify-between lg:gap-4 lg:pl-8\">\n                  {partners.map((p) => (\n                    <li key={p.name} className=\"flex items-center gap-2 text-base lg:text-[1.0625rem]\">\n                      <span className=\"flex size-6 shrink-0 items-center justify-center rounded-full bg-card text-foreground [&_svg]:size-3.5\">\n                        {p.icon}\n                      </span>\n                      {p.name}\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-button"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "RoveiaHeadlinePart[]",
+      "required": true,
+      "description": "the headline, in parts; highlighted parts are blue"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": true,
+      "description": "the short line beside the media (desktop) or under the headline (phones)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true
+    },
+    {
+      "name": "stat",
+      "type": "{ icon?: ReactNode; value: string; label: string; note?: string; }",
+      "required": false,
+      "description": "the stat on the left (desktop only): icon, big figure, label and a quieter note"
+    },
+    {
+      "name": "partnersLabel",
+      "type": "string",
+      "required": false,
+      "description": "label in front of the partner row"
+    },
+    {
+      "name": "partners",
+      "type": "RoveiaPartner[]",
+      "required": false,
+      "default": "[]"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the 16:9 video or image in the middle; a placeholder of the same size when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ca81c91fa5a2b78932f14115309ab1b234208e4aa76fd63689573ca676b74b65"
+}

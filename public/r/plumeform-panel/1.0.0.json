@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform glass panel",
+  "description": "A 28px-radius translucent white panel with a lit edge and long soft drop, floating over blurred mint, sky and peach clouds that drift on a slow loop and rise as the panel scrolls past. Holds a media slot (placeholder when empty) or built content.",
+  "category": "card",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "glass",
+    "light",
+    "clouds",
+    "blur",
+    "parallax",
+    "loop"
+  ],
+  "notes": [
+    "best on light pages; the clouds use chart-2…4 and glow",
+    "cloud drift is a CSS view timeline; the float loop and drift stop under reduced motion"
+  ],
+  "entry": "plumeform-panel.tsx",
+  "source": "foundry",
+  "name": "plumeform-panel",
+  "files": [
+    {
+      "path": "plumeform-panel.css",
+      "content": "/* Colour clouds behind (and through) a light panel. Each cloud floats on a slow 12s loop;\n   the whole cloud layer drifts up and settles from 1.09 to 1.02 as the panel crosses the\n   window. Off under reduced motion. */\n.plumeform-panel-cloud {\n  animation: plumeform-panel-float 12s ease-in-out infinite;\n}\n.plumeform-panel-cloud:nth-child(2) { animation-delay: -4s; animation-duration: 14s; }\n.plumeform-panel-cloud:nth-child(3) { animation-delay: -8s; animation-duration: 16s; }\n\n@keyframes plumeform-panel-float {\n  0%, 100% { transform: translate(0, 0) scale(1); }\n  33% { transform: translate(14px, -10px) scale(1.06); }\n  66% { transform: translate(-10px, 12px) scale(0.96); }\n}\n\n@supports (animation-timeline: view()) {\n  .plumeform-panel-clouds {\n    animation: plumeform-panel-drift linear both;\n    animation-timeline: view();\n    animation-range: cover 0% cover 100%;\n  }\n}\n@keyframes plumeform-panel-drift {\n  from { transform: translateY(-8px) scale(1.09); }\n  to { transform: translateY(-48px) scale(1.02); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .plumeform-panel-cloud,\n  .plumeform-panel-clouds { animation: none; }\n}\n"
+    },
+    {
+      "path": "plumeform-panel.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-panel.css\";\n\n/** where the three colour clouds sit: mint + sky + peach in different corners */\nexport type PlumeformPanelClouds = \"a\" | \"b\" | \"c\" | \"none\";\n\nexport interface PlumeformPanelProps {\n  /** a picture, video or live demo for the panel; empty shows a placeholder of `aspect` */\n  media?: ReactNode;\n  /** built content instead of media (e.g. a form); fills the padded panel */\n  children?: ReactNode;\n  /** the placeholder's width / height, e.g. \"390/400\" */\n  aspect?: string;\n  /** cloud arrangement behind the panel */\n  clouds?: PlumeformPanelClouds;\n  /** inner padding: none lets media run to the panel's edge */\n  padding?: \"none\" | \"md\";\n  className?: string;\n}\n\nconst cloudSets: Record<Exclude<PlumeformPanelClouds, \"none\">, string[]> = {\n  a: [\"left-[8%] top-[45%] bg-chart-2\", \"right-[2%] bottom-[2%] bg-chart-3\", \"right-[18%] top-[-4%] bg-glow\"],\n  b: [\"right-[6%] top-[4%] bg-chart-3\", \"left-[4%] top-[26%] bg-chart-4\", \"right-[12%] bottom-[0%] bg-glow\"],\n  c: [\"left-[10%] top-[14%] bg-glow\", \"right-[0%] top-[34%] bg-chart-2\", \"left-[30%] bottom-[-6%] bg-glow\"],\n};\n\n/** Plumeform's light panel: translucent white glass with a soft drop, over drifting colour clouds. */\nexport function PlumeformPanel({ media, children, aspect = \"4/3\", clouds = \"a\", padding = \"md\", className }: PlumeformPanelProps) {\n  return (\n    <div className={cn(\"relative isolate\", className)}>\n      {clouds !== \"none\" && (\n        <div aria-hidden className=\"plumeform-panel-clouds pointer-events-none absolute -inset-x-16 -inset-y-12 -z-10\">\n          {cloudSets[clouds].map((c) => (\n            <span key={c} className={cn(\"plumeform-panel-cloud absolute size-[55%] rounded-full opacity-70 blur-3xl dark:opacity-20\", c)} />\n          ))}\n        </div>\n      )}\n      <div\n        className={cn(\n          \"relative overflow-clip rounded-2xl border border-card/70 bg-linear-to-b from-card/95 to-card/75 text-card-foreground backdrop-blur-sm\",\n          \"shadow-[inset_0_1px_0_var(--card),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)]\",\n          padding === \"md\" && \"p-6 lg:p-7\",\n        )}\n      >\n        {children ??\n          media ?? (\n            <div\n              className={cn(\"w-full bg-muted/70\", padding === \"md\" && \"rounded-[calc(var(--radius)/2)]\")}\n              style={{ aspectRatio: aspect } as CSSProperties}\n            />\n          )}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a picture, video or live demo for the panel; empty shows a placeholder of `aspect`"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "built content instead of media (e.g. a form); fills the padded panel"
+    },
+    {
+      "name": "aspect",
+      "type": "string",
+      "required": false,
+      "default": "4/3",
+      "description": "the placeholder's width / height, e.g. \"390/400\""
+    },
+    {
+      "name": "clouds",
+      "type": "enum",
+      "required": false,
+      "default": "a",
+      "description": "cloud arrangement behind the panel"
+    },
+    {
+      "name": "padding",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "inner padding: none lets media run to the panel's edge"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7c4cf765dd7b22396011bdad9b85fb7e3a54240cb995d6f4e16ee81f711283d2"
+}

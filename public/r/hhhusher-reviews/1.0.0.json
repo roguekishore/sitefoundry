@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher reviews",
+  "description": "Customer quotes on a camel band: a big two-line heading, then two reviews side by side, each a row of small yellow stars, a large medium-weight quote and the author in bold mono capitals. Reviews rise 40px and fade in as they enter; the heading rises line by line. Phones stack them.",
+  "category": "testimonials",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "reviews",
+    "stars",
+    "tan",
+    "warm",
+    "large-type",
+    "reveal",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "the band is the theme's secondary (tan)"
+  ],
+  "entry": "hhhusher-reviews.tsx",
+  "source": "foundry",
+  "name": "hhhusher-reviews",
+  "files": [
+    {
+      "path": "hhhusher-reviews.css",
+      "content": "/* Each review rises 40px and fades in over its first ~35% of a screen in view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-reviews-item {\n      animation: hhhusher-reviews-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 35vh;\n    }\n  }\n}\n\n@keyframes hhhusher-reviews-rise {\n  from {\n    opacity: 0;\n    translate: 0 2.5rem;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-reviews.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherLines } from \"@foundry/hhhusher-lines\";\nimport { HhhusherReview } from \"@foundry/hhhusher-review\";\nimport \"./hhhusher-reviews.css\";\n\nexport interface HhhusherReviewsItem {\n  quote: string;\n  author: string;\n  /** filled stars out of five */\n  rating?: number;\n}\n\nexport interface HhhusherReviewsProps {\n  /** the heading, one entry per line */\n  title: string[];\n  /** two reviews side by side on desktop (more wrap into further rows) */\n  reviews: HhhusherReviewsItem[];\n  /** screen-reader text for each star row, e.g. \"5 out of 5 stars\" */\n  ratingLabel?: string;\n  className?: string;\n}\n\n/**\n * Customer quotes on a camel band: a big two-line heading, then two reviews side by side\n * (stars, a large quote, the author in mono capitals). Each review rises 40px and fades in as\n * it enters; the heading rises in line by line.\n */\nexport function HhhusherReviews({ title, reviews, ratingLabel, className }: HhhusherReviewsProps) {\n  return (\n    <section className={cn(\"bg-secondary py-section text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-6 pb-10 lg:pt-0 lg:pb-8\">\n        <HhhusherLines\n          as=\"h2\"\n          lines={title}\n          className=\"max-w-[16rem] font-display text-[3.12rem] leading-[1.1] font-medium tracking-[-0.02em] lg:max-w-none lg:text-[4.25rem] lg:leading-[1.03]\"\n        />\n        <div className=\"mt-[3.2rem] grid gap-[3.6rem] lg:mt-[5.6rem] lg:grid-cols-2 lg:gap-x-[5.5rem] lg:gap-y-16\">\n          {reviews.map((review, i) => (\n            <HhhusherReview key={i} {...review} ratingLabel={ratingLabel} className=\"hhhusher-reviews-item\" />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-lines",
+    "hhhusher-review"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading, one entry per line"
+    },
+    {
+      "name": "reviews",
+      "type": "HhhusherReviewsItem[]",
+      "required": true,
+      "description": "two reviews side by side on desktop (more wrap into further rows)"
+    },
+    {
+      "name": "ratingLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader text for each star row, e.g. \"5 out of 5 stars\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c481175bfa62f66babf4b992dfde9c43a81d5c34e11fc856fbd14ef6d9cab56"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer hero",
+  "description": "A full-bleed interior photo one and a half windows tall (one window on phones) with a soft dark wash at the top. A huge centred light wordmark-style title and a two-line subline fill the first screen; a hairline, a short launch line on the left and a teaser card on the right sit at the bottom. The photo drifts down as you scroll (parallax) and the copy fades away as it leaves.",
+  "category": "hero",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-bleed",
+    "photo",
+    "parallax",
+    "fade",
+    "window-sized",
+    "huge-type",
+    "light-on-dark",
+    "minimal"
+  ],
+  "notes": [
+    "the light text needs a dark photo; the empty placeholder is a dark gradient for that reason",
+    "the big title shows from md up; phones see the photo with the launch line and the card",
+    "CSS scroll-driven parallax; no JavaScript"
+  ],
+  "entry": "wiemer-hero.tsx",
+  "source": "foundry",
+  "name": "wiemer-hero",
+  "files": [
+    {
+      "path": "wiemer-hero.css",
+      "content": "/* The photo layer is taller than the hero and slides down while the hero scrolls away:\n   from the top of the page (contain 0%) until the hero has fully left (exit 100%). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wiemer-hero {\n      view-timeline-name: --wiemer-hero;\n    }\n    .wiemer-hero-photo {\n      animation: wiemer-hero-photo linear both;\n      animation-timeline: --wiemer-hero;\n      animation-range: contain 0% exit 100%;\n    }\n  }\n}\n\n@keyframes wiemer-hero-photo {\n  from { transform: translateY(-30px); }\n  to { transform: translateY(115px); }\n}\n"
+    },
+    {
+      "path": "wiemer-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { wiemerReveal } from \"@foundry/wiemer-reveal\";\nimport { WiemerTeaserCard, type WiemerTeaserCardProps } from \"@foundry/wiemer-teaser-card\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-hero.css\";\n\nexport interface WiemerHeroProps {\n  /** the huge centred title (shown from md up) */\n  title: string;\n  /** one or two lines under the title */\n  subline: string;\n  /** the launch line at the bottom left; \"\\n\" breaks the line */\n  note: string;\n  /** the teaser card at the bottom right */\n  card: WiemerTeaserCardProps;\n  /** the full-bleed photo (an <img>, cover); empty shows a dark gradient placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Window-tall photo hero with a huge light title and a bottom row. */\nexport function WiemerHero({ title, subline, note, card, media, className }: WiemerHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"wiemer-hero relative isolate flex h-svh flex-col overflow-clip text-background md:h-[150svh] dark:text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"wiemer-hero-photo absolute inset-x-0 -top-10 -z-10 h-[calc(100%+10rem)] bg-linear-to-b from-glow to-foreground/85 dark:to-background [&>img]:size-full [&>img]:object-cover\">\n        {media}\n      </div>\n      <div aria-hidden=\"true\" className=\"absolute inset-0 -z-10 bg-linear-to-b from-foreground/35 to-transparent to-30% dark:from-background/50\" />\n\n      {/* first screen: title and subline */}\n      <div className={cn(wiemerReveal(\"fadeout\"), \"hidden h-svh shrink-0 flex-col items-center pt-[8.5rem] text-center md:flex\")}>\n        <h1 className=\"font-display text-[12.5vw] leading-[0.9] font-medium tracking-[-0.03em]\">{title}</h1>\n        <p className=\"mt-[2vw] max-w-[29ch] text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.02em]\">{subline}</p>\n      </div>\n\n      {/* bottom row */}\n      <div className={cn(wiemerReveal(\"fadeout\"), \"mt-auto px-gutter pb-gutter md:pb-12\")}>\n        <div className=\"grid gap-6 border-t border-current/30 pt-6 md:grid-cols-12 md:gap-x-3.5\">\n          <p className=\"text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em] whitespace-pre-line md:col-span-7\">{note}</p>\n          <WiemerTeaserCard {...card} className=\"text-card-foreground md:col-span-5 lg:col-span-4 lg:col-start-9\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-reveal",
+    "wiemer-teaser-card"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the huge centred title (shown from md up)"
+    },
+    {
+      "name": "subline",
+      "type": "string",
+      "required": true,
+      "description": "one or two lines under the title"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": true,
+      "description": "the launch line at the bottom left; \"\\n\" breaks the line"
+    },
+    {
+      "name": "card",
+      "type": "WiemerTeaserCardProps",
+      "required": true,
+      "description": "the teaser card at the bottom right"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed photo (an <img>, cover); empty shows a dark gradient placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a31d4d453cbb424280898d69bcc8e9536dad014bb3db38457f6bd569b0719971"
+}

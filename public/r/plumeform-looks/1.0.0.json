@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform layout picker and bento band",
+  "description": "A near-black green band: wide bold heading and copy, then a glass list of layouts (icon, name, tier word) beside a preview card that swaps in with a quick fade-rise when you pick one, then a bento of a giant mint-gradient number, a card of three-stripe colour swatches and three short notes with mint capitals.",
+  "category": "features",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "bento",
+    "dark",
+    "glass",
+    "swatches",
+    "gradient-text",
+    "reveal",
+    "swap"
+  ],
+  "notes": [
+    "forces dark colours; swatches take theme colour names so they re-theme",
+    "each layout's preview is a media slot (placeholder when empty)",
+    "needs JavaScript for the picker; static HTML shows the first layout"
+  ],
+  "hydrate": "visible",
+  "entry": "plumeform-looks.tsx",
+  "source": "foundry",
+  "name": "plumeform-looks",
+  "files": [
+    {
+      "path": "plumeform-looks.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBadge } from \"@foundry/plumeform-badge\";\nimport { PlumeformBand } from \"@foundry/plumeform-band\";\nimport { PlumeformGlassCard } from \"@foundry/plumeform-glass-card\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformLink } from \"@foundry/plumeform-link\";\nimport { PlumeformReveal, plumeformSwapIn } from \"@foundry/plumeform-reveal\";\n\n/** theme colours a swatch can show */\nexport type PlumeformSwatchColour = \"primary\" | \"highlight\" | \"glow\" | \"accent\" | \"muted\" | \"foreground\" | \"chart-1\" | \"chart-2\" | \"chart-3\" | \"chart-4\" | \"chart-5\";\n\nconst swatchClass: Record<PlumeformSwatchColour, string> = {\n  primary: \"bg-primary\",\n  highlight: \"bg-highlight\",\n  glow: \"bg-glow\",\n  accent: \"bg-accent\",\n  muted: \"bg-muted\",\n  foreground: \"bg-foreground\",\n  \"chart-1\": \"bg-chart-1\",\n  \"chart-2\": \"bg-chart-2\",\n  \"chart-3\": \"bg-chart-3\",\n  \"chart-4\": \"bg-chart-4\",\n  \"chart-5\": \"bg-chart-5\",\n};\n\nexport interface PlumeformLooksLayout {\n  /** name in the list */\n  name: string;\n  /** a small line icon in the list */\n  icon?: ReactNode;\n  /** tier word beside it, e.g. \"Free\" or \"Plus\" (the first one is shown in mint) */\n  tag?: string;\n  /** what the preview card says about it */\n  text: string;\n  bullets?: string[];\n  /** a picture of the layout; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface PlumeformLooksProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body?: ReactNode;\n  /** the list on the left; choosing one swaps the preview card */\n  layouts: PlumeformLooksLayout[];\n  /** the big-number card: a small label, the number, a line of text */\n  stat?: { label: string; value: string; text: ReactNode };\n  /** the wide card: a title, text and named colour swatches */\n  themes?: { title: string; text: ReactNode; swatches: { name: string; colours: PlumeformSwatchColour[] }[] };\n  /** short cards in a row: mint capitals and a sentence */\n  notes?: { eyebrow: string; text: ReactNode }[];\n  link?: { label: string; href: string };\n  /** art behind the band (the original's WebGL fluted glass); empty shows a soft glow */\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\n/**\n * A dark \"make it yours\" band: a wide heading, a selectable list of layouts beside a preview\n * card that swaps in when you pick one, then a bento of a giant gradient number, a swatch\n * card and three short notes.\n */\nexport function PlumeformLooks({ eyebrow, title, body, layouts, stat, themes, notes, link, backdrop, id, className }: PlumeformLooksProps) {\n  const [active, setActive] = useState(0);\n  const current = layouts[active] ?? layouts[0];\n\n  return (\n    <PlumeformBand id={id} backdrop={backdrop} className={cn(\"py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <PlumeformHeading eyebrow={eyebrow} title={title} className=\"max-w-[46rem]\">\n          {body}\n        </PlumeformHeading>\n\n        <PlumeformReveal step={1} className=\"mt-12 grid gap-4 lg:grid-cols-[17rem_1fr]\">\n          <PlumeformGlassCard as=\"div\" className=\"p-3\">\n            <ul role=\"tablist\" className=\"grid gap-0.5\">\n              {layouts.map((layout, i) => (\n                <li key={layout.name}>\n                  <button\n                    type=\"button\"\n                    role=\"tab\"\n                    aria-selected={i === active}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"flex h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-[0.9375rem] font-semibold transition-colors duration-200 motion-reduce:transition-none [&_svg]:size-4.5 [&_svg]:stroke-[1.5] [&_svg]:text-muted-foreground\",\n                      i === active ? \"bg-foreground/10 text-foreground\" : \"text-foreground/85 hover:bg-foreground/5\",\n                    )}\n                  >\n                    {layout.icon}\n                    <span className=\"flex-1\">{layout.name}</span>\n                    {layout.tag && <PlumeformBadge variant=\"text\" className={i === 0 ? undefined : \"text-muted-foreground\"}>{layout.tag}</PlumeformBadge>}\n                  </button>\n                </li>\n              ))}\n            </ul>\n          </PlumeformGlassCard>\n\n          <PlumeformGlassCard className=\"p-6 lg:p-8\">\n            <div key={active} className={cn(plumeformSwapIn, \"grid gap-6 md:grid-cols-[18.5rem_1fr] md:gap-6\")}>\n              <div className=\"overflow-clip rounded-xl border border-border bg-muted/60 [&>*]:size-full [&>*]:object-cover\" style={{ aspectRatio: \"295/212\" } as CSSProperties}>\n                {current.media}\n              </div>\n              <div className=\"md:pt-2\">\n                <h3 className=\"text-xl font-bold tracking-[-0.02em]\">{current.name}</h3>\n                <p className=\"mt-3 max-w-[21rem] text-base leading-[1.625] text-muted-foreground\">{current.text}</p>\n                {current.bullets && (\n                  <ul className=\"mt-5 space-y-2 text-sm text-muted-foreground\">\n                    {current.bullets.map((b) => (\n                      <li key={b} className=\"relative pl-4 before:absolute before:top-[0.5rem] before:left-0 before:size-1 before:rounded-full before:bg-highlight\">\n                        {b}\n                      </li>\n                    ))}\n                  </ul>\n                )}\n              </div>\n            </div>\n          </PlumeformGlassCard>\n        </PlumeformReveal>\n\n        {(stat || themes) && (\n          <div className=\"mt-24 grid gap-4 lg:mt-20 lg:grid-cols-3\">\n            {stat && (\n              <PlumeformReveal>\n                <PlumeformGlassCard className=\"flex h-full flex-col px-8 py-8\">\n                  <p className=\"text-sm font-semibold text-muted-foreground\">{stat.label}</p>\n                  <p className=\"mt-2 bg-linear-to-b from-foreground to-highlight bg-clip-text font-display text-[7.5rem] leading-none font-extrabold tracking-[-0.04em] text-transparent\">\n                    {stat.value}\n                  </p>\n                  <div className=\"mt-10 text-[0.9375rem] leading-6 text-muted-foreground\">{stat.text}</div>\n                </PlumeformGlassCard>\n              </PlumeformReveal>\n            )}\n            {themes && (\n              <PlumeformReveal step={1} className=\"lg:col-span-2\">\n                <PlumeformGlassCard className=\"h-full px-8 py-8\">\n                  <h3 className=\"text-xl font-bold tracking-[-0.02em]\">{themes.title}</h3>\n                  <div className=\"mt-3 text-[0.9375rem] leading-6 text-muted-foreground\">{themes.text}</div>\n                  <ul className=\"mt-7 grid grid-cols-2 gap-2 sm:grid-cols-4\">\n                    {themes.swatches.map((s) => (\n                      <li key={s.name} className=\"flex h-10 items-center gap-2.5 rounded-[calc(var(--radius)/2)] border border-foreground/25 px-1.5 text-[0.8125rem] font-semibold\">\n                        <span aria-hidden className=\"flex h-7 w-10 overflow-clip rounded-md\">\n                          {s.colours.map((c, i) => (\n                            <span key={i} className={cn(\"flex-1\", swatchClass[c])} />\n                          ))}\n                        </span>\n                        {s.name}\n                      </li>\n                    ))}\n                  </ul>\n                </PlumeformGlassCard>\n              </PlumeformReveal>\n            )}\n            {notes?.map((note, i) => (\n              <PlumeformReveal key={note.eyebrow} step={i}>\n                <PlumeformGlassCard className=\"h-full px-8 py-8\">\n                  <p className=\"text-[0.625rem] font-bold tracking-[0.16em] text-highlight uppercase\">{note.eyebrow}</p>\n                  <div className=\"mt-4 text-[0.9375rem] leading-6 text-muted-foreground\">{note.text}</div>\n                </PlumeformGlassCard>\n              </PlumeformReveal>\n            ))}\n          </div>\n        )}\n\n        {link && (\n          <PlumeformReveal className=\"mt-12\">\n            <PlumeformLink href={link.href}>{link.label}</PlumeformLink>\n          </PlumeformReveal>\n        )}\n      </div>\n    </PlumeformBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-badge",
+    "plumeform-band",
+    "plumeform-glass-card",
+    "plumeform-heading",
+    "plumeform-link",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "layouts",
+      "type": "PlumeformLooksLayout[]",
+      "required": true,
+      "description": "the list on the left; choosing one swaps the preview card"
+    },
+    {
+      "name": "stat",
+      "type": "{ label: string; value: string; text: ReactNode; }",
+      "required": false,
+      "description": "the big-number card: a small label, the number, a line of text"
+    },
+    {
+      "name": "themes",
+      "type": "{ title: string; text: ReactNode; swatches: { name: string; colours: PlumeformSwatchColour[]; }[]; }",
+      "required": false,
+      "description": "the wide card: a title, text and named colour swatches"
+    },
+    {
+      "name": "notes",
+      "type": "{ eyebrow: string; text: ReactNode; }[]",
+      "required": false,
+      "description": "short cards in a row: mint capitals and a sentence"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original's WebGL fluted glass); empty shows a soft glow"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9c4687e2c5fa966e35847b2773f8812e8d79aa55d25407cde97c1aaf278aba43"
+}

@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook hero",
+  "description": "A centred, airy product hero: a big regular-weight two-line headline in navy, a short grey lead, an outline and a violet button, then a wide rounded gradient panel holding a dark segmented tab switch and a product screenshot that rises from the panel's bottom edge. Tabs swap the screenshot.",
+  "category": "hero",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "centered",
+    "light",
+    "gradient",
+    "tabs",
+    "screenshot",
+    "violet",
+    "minimal"
+  ],
+  "notes": [
+    "each tab has its own media slot (screenshot); empty slots show a plain card-coloured placeholder at 1.94:1",
+    "the panel backdrop is a soft glow/primary/highlight gradient unless a backdrop is passed",
+    "phones hide the tab switch and show the panel full-bleed, as on the original"
+  ],
+  "hydrate": "load",
+  "entry": "growthbook-hero.tsx",
+  "source": "foundry",
+  "name": "growthbook-hero",
+  "files": [
+    {
+      "path": "growthbook-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\n\nexport interface GrowthbookHeroTab {\n  label: string;\n  /** small line icon before the label (lucide, 20px) */\n  icon?: ReactNode;\n  /** the screenshot for this tab (img or video); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface GrowthbookHeroProps {\n  /** the headline; each string is one line on desktop, the lines flow together on phones */\n  title: string[];\n  /** the lead under it */\n  lead: string;\n  /** outline button (left) */\n  secondary?: { label: string; href: string };\n  /** violet button with an arrow (right) */\n  primary: { label: string; href: string };\n  /** the segmented switch on the panel; one tab shows no switch */\n  tabs: GrowthbookHeroTab[];\n  /** fills the panel behind the screenshot (an image); a soft gradient when empty */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nexport function GrowthbookHero({ title, lead, secondary, primary, tabs, backdrop, className }: GrowthbookHeroProps) {\n  const [active, setActive] = useState(0);\n  const tab = tabs[active];\n\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-16 text-center md:px-[calc(var(--page-gutter)*2)] lg:pt-[4.5rem]\">\n        <h1 className=\"mx-auto max-w-[22rem] font-display text-[2.75rem] leading-[1.1] font-normal tracking-[-0.01em] sm:max-w-none lg:text-[4.25rem]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"lg:block\">\n              {line}\n              {i < title.length - 1 && \" \"}\n            </span>\n          ))}\n        </h1>\n        <p className=\"mx-auto mt-7 max-w-[30rem] text-sm leading-[1.65] text-foreground/85 lg:text-base\">{lead}</p>\n        <div className=\"mt-12 flex flex-col gap-3 md:flex-row md:justify-center\">\n          {secondary && (\n            <GrowthbookButton href={secondary.href} variant=\"outline\" size=\"lg\" blockOnMobile className=\"md:w-44 md:px-0\">\n              {secondary.label}\n            </GrowthbookButton>\n          )}\n          <GrowthbookButton href={primary.href} size=\"lg\" arrow blockOnMobile className=\"md:w-44 md:px-0\">\n            {primary.label}\n          </GrowthbookButton>\n        </div>\n      </div>\n\n      {/* the panel: full-bleed on phones, the 1280px container with a 12px radius from lg */}\n      <div className=\"mt-10 lg:mx-auto lg:mt-16 lg:max-w-[calc(var(--page-width)+var(--page-gutter)*4)] lg:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative isolate h-[21.25rem] overflow-clip lg:h-[37.1875rem] lg:rounded-lg\">\n          <div className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n            {backdrop ?? (\n              <div className=\"bg-primary bg-[radial-gradient(ellipse_60%_70%_at_0%_100%,var(--highlight),transparent_70%),radial-gradient(ellipse_70%_80%_at_100%_0%,var(--foreground),transparent_70%),radial-gradient(ellipse_80%_60%_at_30%_0%,var(--glow),transparent_70%)] opacity-90\" />\n            )}\n          </div>\n\n          {tabs.length > 1 && (\n            <div\n              role=\"tablist\"\n              className=\"absolute top-12 left-1/2 hidden -translate-x-1/2 gap-1 rounded-full border-2 border-foreground/80 bg-foreground/70 p-1 backdrop-blur-sm lg:flex\"\n            >\n              {tabs.map((t, i) => (\n                <button\n                  key={t.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === active}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"flex h-12 items-center gap-2.5 rounded-full px-5 text-[0.9375rem] whitespace-nowrap transition-[background-color,color] duration-300 ease-[ease] motion-reduce:transition-none [&_svg]:size-5\",\n                    i === active\n                      ? \"bg-background text-foreground\"\n                      : \"bg-background/10 text-background hover:bg-foreground/20 hover:text-background/95\",\n                  )}\n                >\n                  {t.icon}\n                  {t.label}\n                </button>\n              ))}\n            </div>\n          )}\n\n          {/* the screenshot: 860×443 (1.94:1) rising from the bottom edge; on phones it starts\n              inset from the left and runs off the right edge */}\n          <div\n            role={tabs.length > 1 ? \"tabpanel\" : undefined}\n            className=\"absolute top-6 left-8 w-[46rem] lg:top-[9.5rem] lg:left-1/2 lg:w-[53.75rem] lg:-translate-x-1/2\"\n          >\n            {tab.media ?? (\n              <div className=\"aspect-[1.94] rounded-t-lg border border-foreground/10 bg-card shadow-[0_4px_16px_color-mix(in_oklab,var(--foreground)_15%,transparent)]\" />\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the headline; each string is one line on desktop, the lines flow together on phones"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the lead under it"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "outline button (left)"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "violet button with an arrow (right)"
+    },
+    {
+      "name": "tabs",
+      "type": "GrowthbookHeroTab[]",
+      "required": true,
+      "description": "the segmented switch on the panel; one tab shows no switch"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "fills the panel behind the screenshot (an image); a soft gradient when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "86a4a58cead3ddf41b0fa4f7259d627def9345470f00a3ccd4f39e91279158dd"
+}

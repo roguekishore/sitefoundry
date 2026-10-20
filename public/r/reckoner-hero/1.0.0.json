@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner hero",
+  "description": "A window-tall merlot band with full-bleed background artwork, a huge two-line medium-weight title (110px desktop, 48px phones) at the left, centred in the space above a bottom row of two square buttons and a looping scroll cue; a faint vertical label runs down the right edge on desktop. Buttons fill with linen over half a second on hover.",
+  "category": "hero",
+  "site": "reckoner",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "merlot",
+    "fullscreen",
+    "giant-type",
+    "minimal",
+    "finance",
+    "loop"
+  ],
+  "notes": [
+    "sized by the window (h-svh); reckoner-header floats over it",
+    "always dark (wraps itself in .dark)",
+    "media fills the band like object-fit: cover; empty, it's a soft glow placeholder",
+    "CSS only; the scroll cue's loop is off under reduced motion"
+  ],
+  "entry": "reckoner-hero.tsx",
+  "source": "foundry",
+  "name": "reckoner-hero",
+  "files": [
+    {
+      "path": "reckoner-hero.css",
+      "content": "/* The scroll cue's arrow drifts down and fades, half a second each way, for ever; hovering\n   the cue holds it still. */\n.reckoner-hero-cue svg {\n  animation: reckoner-hero-cue 0.5s ease-in-out infinite alternate;\n}\n.reckoner-hero-cue:hover svg {\n  animation-play-state: paused;\n}\n\n@keyframes reckoner-hero-cue {\n  from { translate: 0 -0.1875em; opacity: 1; }\n  to { translate: 0 0.25em; opacity: 0.35; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .reckoner-hero-cue svg { animation: none; }\n}\n"
+    },
+    {
+      "path": "reckoner-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerButton } from \"@foundry/reckoner-button\";\nimport \"./reckoner-hero.css\";\n\nexport interface ReckonerHeroProps {\n  /** the big title; it balances itself over two lines on desktop */\n  title: string;\n  /** up to two buttons in the bottom row: the first filled, the second outlined */\n  actions?: { label: string; href: string }[];\n  /** the looping cue at the bottom right, linking further down the page */\n  scrollCue?: { label: string; href: string };\n  /** a faint line of text running down the right edge (desktop) */\n  sideLabel?: string;\n  /** background artwork, image or video filling the band (cropped like object-fit: cover) */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** A window-tall dark band with a giant title, two buttons and a scroll cue. */\nexport function ReckonerHero({ title, actions = [], scrollCue, sideLabel, media, className }: ReckonerHeroProps) {\n  return (\n    <section className={cn(\"dark relative h-svh min-h-[34rem] overflow-clip bg-background text-foreground\", className)}>\n      <div aria-hidden={!media} className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">\n        {media ?? (\n          <div className=\"bg-[radial-gradient(ellipse_60%_50%_at_70%_45%,color-mix(in_oklab,var(--glow)_16%,transparent),transparent_72%),radial-gradient(ellipse_45%_40%_at_18%_78%,color-mix(in_oklab,var(--glow)_10%,transparent),transparent_70%)]\" />\n        )}\n      </div>\n\n      <div className=\"relative mx-auto flex h-full max-w-page flex-col px-gutter\">\n        <div className=\"flex flex-1 items-center pt-[5.125rem] lg:pt-0 lg:pb-[5.625rem]\">\n          <h1 className=\"max-w-[9.5em] font-display text-[3rem] leading-none font-medium lg:text-balance md:text-[clamp(3rem,7.64vw,6.875rem)]\">\n            {title}\n          </h1>\n        </div>\n\n        {(actions.length > 0 || scrollCue) && (\n          <div className=\"absolute inset-x-gutter bottom-8 flex items-end justify-between gap-4 lg:bottom-[3.125rem]\">\n            <div className=\"flex flex-wrap gap-2.5\">\n              {actions.slice(0, 2).map((action, i) => (\n                <ReckonerButton key={action.label} href={action.href} variant={i === 0 ? \"secondary\" : \"outline\"}>\n                  {action.label}\n                </ReckonerButton>\n              ))}\n            </div>\n            {scrollCue && (\n              <a\n                href={scrollCue.href}\n                className=\"reckoner-hero-cue hidden items-center gap-3 text-sm tracking-[0.01em] text-foreground/70 transition-colors duration-500 hover:text-foreground sm:flex\"\n              >\n                {scrollCue.label}\n                <span className=\"flex size-[2.875rem] items-center justify-center rounded-sm border border-border [&_svg]:size-4\">\n                  <ArrowDown strokeWidth={1.5} />\n                </span>\n              </a>\n            )}\n          </div>\n        )}\n      </div>\n\n      {sideLabel && (\n        <p className=\"absolute top-[calc(50%-2.8125rem)] right-[calc(var(--page-gutter)*0.9)] hidden -translate-y-1/2 text-xs tracking-[0.01em] text-foreground/20 [writing-mode:vertical-rl] lg:block\">\n          {sideLabel}\n        </p>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big title; it balances itself over two lines on desktop"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to two buttons in the bottom row: the first filled, the second outlined"
+    },
+    {
+      "name": "scrollCue",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the looping cue at the bottom right, linking further down the page"
+    },
+    {
+      "name": "sideLabel",
+      "type": "string",
+      "required": false,
+      "description": "a faint line of text running down the right edge (desktop)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "background artwork, image or video filling the band (cropped like object-fit: cover)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9826e42eeab3284cfefd592d2c0a6393f493f035abf27f463d2d304e42bfadf9"
+}

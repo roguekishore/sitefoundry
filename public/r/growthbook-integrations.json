@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook integrations wall",
+  "description": "A heading, one line of copy and an outline button on the left; on the right three columns of pale white tiles holding faded tool names, drifting up and down at different speeds behind soft top and bottom fades. Phones show three rows sliding sideways instead.",
+  "category": "logos",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "integrations",
+    "logos",
+    "tiles",
+    "marquee",
+    "loop",
+    "vertical-marquee",
+    "light",
+    "fade",
+    "frame-rule",
+    "minimal"
+  ],
+  "notes": [
+    "tiles are split round-robin into three columns (rows on phones); each list is drawn twice to loop",
+    "CSS-only; paused on hover and off under reduced motion"
+  ],
+  "entry": "growthbook-integrations.tsx",
+  "source": "foundry",
+  "name": "growthbook-integrations",
+  "files": [
+    {
+      "path": "growthbook-integrations.css",
+      "content": "/* Each column (row on phones) holds its tiles twice; sliding it by half loops it. */\n.growthbook-integrations-col {\n  animation: growthbook-integrations-up var(--growthbook-integrations-speed, 45s) linear infinite;\n}\n.growthbook-integrations-row {\n  animation: growthbook-integrations-left var(--growthbook-integrations-speed, 45s) linear infinite;\n}\n.growthbook-integrations-col[data-reverse],\n.growthbook-integrations-row[data-reverse] {\n  animation-direction: reverse;\n}\n.growthbook-integrations-wall:hover .growthbook-integrations-col,\n.growthbook-integrations-wall:hover .growthbook-integrations-row {\n  animation-play-state: paused;\n}\n\n@keyframes growthbook-integrations-up {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(-50%);\n  }\n}\n@keyframes growthbook-integrations-left {\n  from {\n    transform: translateX(0);\n  }\n  to {\n    transform: translateX(-50%);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-integrations-col,\n  .growthbook-integrations-row {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-integrations.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\nimport { GrowthbookRail } from \"@foundry/growthbook-rail\";\nimport \"./growthbook-integrations.css\";\n\nexport interface GrowthbookIntegration {\n  /** the tool's name, for screen readers */\n  name: string;\n  /** its logo (svg/img) or styled name; drawn faded */\n  logo: ReactNode;\n}\n\nexport interface GrowthbookIntegrationsProps {\n  /** the heading; each string starts a new line */\n  title: string[];\n  body: string;\n  /** outline button at the foot of the text column */\n  cta?: { label: string; href: string };\n  /** at least six tiles; they are dealt into three columns */\n  tools: GrowthbookIntegration[];\n  className?: string;\n}\n\nconst speeds = [\"48s\", \"62s\", \"54s\"];\n\nexport function GrowthbookIntegrations({ title, body, cta, tools, className }: GrowthbookIntegrationsProps) {\n  const groups = [0, 1, 2].map((g) => tools.filter((_, i) => i % 3 === g));\n  const tile = (t: GrowthbookIntegration, copy: number, key: string, size: string) => (\n    <li\n      key={key}\n      aria-hidden={copy === 1 || undefined}\n      className={cn(\n        \"grid shrink-0 place-items-center rounded-lg bg-card text-muted-foreground/70 shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_4%,transparent)]\",\n        size,\n      )}\n    >\n      <span role=\"img\" aria-label={copy === 0 ? t.name : undefined} className=\"flex items-center opacity-80 grayscale\">\n        {t.logo}\n      </span>\n    </li>\n  );\n\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative grid grid-cols-1 border-l border-border lg:grid-cols-2\">\n          <GrowthbookRail />\n          <div className=\"flex flex-col items-start px-10 pt-12 lg:pt-[5.25rem] lg:pb-[4.75rem]\">\n            <h2 className=\"max-w-[32rem] font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]\">\n              {title.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </h2>\n            <p className=\"mt-8 max-w-[33rem] text-sm leading-[1.65] text-foreground/85 lg:mt-12 lg:text-[0.9375rem]\">{body}</p>\n            {cta && (\n              <GrowthbookButton href={cta.href} variant=\"outline\" arrow className=\"mt-8 lg:mt-auto\">\n                {cta.label}\n              </GrowthbookButton>\n            )}\n          </div>\n\n          {/* desktop: three drifting columns */}\n          <div className=\"growthbook-integrations-wall hidden h-[46.25rem] grid-cols-3 gap-2.5 overflow-clip pl-2.5 [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_80%,transparent)] lg:grid\">\n            {groups.map((g, c) => (\n              <ul\n                key={c}\n                data-reverse={c === 1 ? \"\" : undefined}\n                className=\"growthbook-integrations-col flex flex-col gap-2\"\n                style={{ \"--growthbook-integrations-speed\": speeds[c], marginTop: c === 1 ? \"-3.5rem\" : undefined } as CSSProperties}\n              >\n                {[0, 1].flatMap((copy) => g.map((t) => tile(t, copy, `${copy}-${t.name}`, \"h-[10.625rem] w-full\")))}\n              </ul>\n            ))}\n          </div>\n\n          {/* phones and tablets: three rows sliding sideways */}\n          <div className=\"growthbook-integrations-wall mt-12 grid gap-3 overflow-clip pb-2 lg:hidden\">\n            {groups.map((g, r) => (\n              <ul\n                key={r}\n                data-reverse={r === 1 ? \"\" : undefined}\n                className=\"growthbook-integrations-row flex w-max gap-2\"\n                style={{ \"--growthbook-integrations-speed\": speeds[r], marginLeft: `${-r * 2.75}rem` } as CSSProperties}\n              >\n                {[0, 1].flatMap((copy) => g.map((t) => tile(t, copy, `${copy}-${t.name}`, \"h-[6.5rem] w-[8.25rem]\")))}\n              </ul>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button",
+    "growthbook-rail"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading; each string starts a new line"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "outline button at the foot of the text column"
+    },
+    {
+      "name": "tools",
+      "type": "GrowthbookIntegration[]",
+      "required": true,
+      "description": "at least six tiles; they are dealt into three columns"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d998fee17149dcf40aa091887caa90ee205d62d7a265d42ea2c6f2ce8fd1fd05"
+}

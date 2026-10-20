@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer intro",
+  "description": "A product introduction on near-white: an orange mono tag, a huge two-line greeting at the left edge, then a narrow text column on the right third (a subline, short paragraphs and an arrow link), and below it a full-bleed row of tall 4:5 grey product cards. Letters of the greeting and subline rise out of their lines as they scroll in, paragraphs rise, and the card row slides sideways with the scroll.",
+  "category": "features",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "intro",
+    "product",
+    "split-text",
+    "reveal",
+    "marquee",
+    "scrubbed",
+    "horizontal",
+    "light",
+    "minimal",
+    "huge-type"
+  ],
+  "notes": [
+    "cards are 4:5 media slots; empty ones are muted placeholders",
+    "CSS scroll-driven; without support the row simply sits still, cropped at the right"
+  ],
+  "entry": "wiemer-intro.tsx",
+  "source": "foundry",
+  "name": "wiemer-intro",
+  "files": [
+    {
+      "path": "wiemer-intro.css",
+      "content": "/* The card row slides to the right while its strip crosses the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wiemer-intro-track {\n      animation: wiemer-intro-track linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes wiemer-intro-track {\n  from { transform: translateX(-38%); }\n  to { transform: translateX(-8%); }\n}\n"
+    },
+    {
+      "path": "wiemer-intro.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { WiemerArrowLink } from \"@foundry/wiemer-arrow-link\";\nimport { WiemerSplitText, wiemerReveal, wiemerRevealStyle } from \"@foundry/wiemer-reveal\";\nimport { WiemerTag } from \"@foundry/wiemer-tag\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-intro.css\";\n\nexport interface WiemerIntroCard {\n  /** the picture (an <img>, cover, 4:5); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface WiemerIntroProps {\n  /** small mono label above the greeting */\n  tag: string;\n  /** the huge greeting; \"\\n\" breaks the line */\n  title: string;\n  /** one line above the paragraphs */\n  subline: string;\n  /** the paragraphs of the text column */\n  paragraphs: string[];\n  /** the link under the text */\n  link: { label: string; href: string };\n  /** the cards in the sliding row (about twelve) */\n  cards: WiemerIntroCard[];\n  /** anchor id */\n  id?: string;\n  className?: string;\n}\n\n/** Greeting, a right-hand text column and a sliding row of product cards. */\nexport function WiemerIntro({ tag, title, subline, paragraphs, link, cards, id, className }: WiemerIntroProps) {\n  return (\n    <section id={id} className={cn(\"overflow-clip bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className={wiemerReveal(\"fade\")}>\n          <WiemerTag>{tag}</WiemerTag>\n        </div>\n        <WiemerSplitText text={title} className=\"mt-5 font-display text-[64px] leading-[1.1] font-medium tracking-[-0.025em] md:mt-8 md:text-[9vw]\" />\n\n        <div className=\"mt-12 grid md:grid-cols-12 md:gap-x-3.5 lg:mt-[7vw]\">\n          <div className=\"md:col-span-6 md:col-start-7 lg:col-span-4 lg:col-start-9\">\n            <WiemerSplitText as=\"h3\" size=\"sm\" text={subline} className=\"text-[max(20px,1.6vw)] leading-[1.2] font-medium tracking-[-0.03em]\" />\n            <div className=\"mt-2.5 space-y-[1.3em] text-[max(16px,1.2vw)] leading-[1.3] font-medium tracking-[-0.015em]\">\n              {paragraphs.map((p, i) => (\n                <p key={i} className={wiemerReveal(\"rise\")} style={wiemerRevealStyle(i * 20)}>\n                  {p}\n                </p>\n              ))}\n            </div>\n            <div className={cn(wiemerReveal(\"fade\"), \"mt-10\")}>\n              <WiemerArrowLink label={link.label} href={link.href} />\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <div className=\"mt-[max(5.5rem,10vw)]\">\n        <ul className=\"wiemer-intro-track flex w-max gap-2.5 md:gap-3.5\">\n          {cards.map((card, i) => (\n            <li\n              key={i}\n              className=\"aspect-[4/5] w-[55vw] shrink-0 overflow-clip rounded-xl bg-muted md:w-[33vw] md:rounded-2xl [&>img]:size-full [&>img]:object-cover\"\n            >\n              {card.media}\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-arrow-link",
+    "wiemer-reveal",
+    "wiemer-tag"
+  ],
+  "props": [
+    {
+      "name": "tag",
+      "type": "string",
+      "required": true,
+      "description": "small mono label above the greeting"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the huge greeting; \"\\n\" breaks the line"
+    },
+    {
+      "name": "subline",
+      "type": "string",
+      "required": true,
+      "description": "one line above the paragraphs"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "the paragraphs of the text column"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the link under the text"
+    },
+    {
+      "name": "cards",
+      "type": "WiemerIntroCard[]",
+      "required": true,
+      "description": "the cards in the sliding row (about twelve)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "52ad6b1e1aa8c557d4229413ac28b7274b61fc80c57faa64ea27c0ec60b94461"
+}

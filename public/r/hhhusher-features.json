@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher features",
+  "description": "A long cream section with a window-sized media frame pinned behind it all the way down (a 3D product in the original, a soft placeholder glow here) that brightens as the section arrives. The first screen has a big two-line heading at the top and a small paragraph with a yellow button lower down; then one feature per screen scrolls past in the right-hand column: a heading that rises in line by line, a paragraph that fades in, a yellow button and an arrow link.",
+  "category": "features",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "light",
+    "cream",
+    "sticky",
+    "pinned",
+    "scrollytelling",
+    "large-type",
+    "reveal",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "about one window tall per feature, plus one for the intro",
+    "media is pinned with position: sticky and cropped to the window; empty, a soft glow stands in",
+    "CSS scroll-driven; without support or with reduced motion everything shows in place"
+  ],
+  "entry": "hhhusher-features.tsx",
+  "source": "foundry",
+  "name": "hhhusher-features",
+  "files": [
+    {
+      "path": "hhhusher-features.css",
+      "content": "/* The pinned frame brightens from 20% to full as the section enters; paragraphs and buttons\n   fade in over their first ~40% of a screen in view. */\n.hhhusher-features {\n  view-timeline-name: --hhhusher-features;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-features-frame {\n      animation: hhhusher-features-wake linear both;\n      animation-timeline: --hhhusher-features;\n      animation-range: entry 0% entry 100%;\n    }\n    .hhhusher-features-fade {\n      animation: hhhusher-features-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 40vh;\n    }\n  }\n}\n\n@keyframes hhhusher-features-wake {\n  from {\n    opacity: 0.2;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes hhhusher-features-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-features.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherButton } from \"@foundry/hhhusher-button\";\nimport { HhhusherLines } from \"@foundry/hhhusher-lines\";\nimport \"./hhhusher-features.css\";\n\nexport interface HhhusherFeaturesLink {\n  label: string;\n  href: string;\n}\n\nexport interface HhhusherFeature {\n  /** the heading, one entry per line as it breaks on a wide screen */\n  title: string[];\n  /** the paragraph under it */\n  text: string;\n  /** the yellow button */\n  primary?: HhhusherFeaturesLink;\n  /** the arrow link next to it */\n  more?: HhhusherFeaturesLink;\n}\n\nexport interface HhhusherFeaturesProps {\n  /** the section heading, one entry per line */\n  title: string[];\n  /** the small paragraph low in the first screen */\n  intro: string;\n  /** the yellow button under the intro */\n  primary?: HhhusherFeaturesLink;\n  /** the arrow link under the intro */\n  more?: HhhusherFeaturesLink;\n  /** the feature blocks, one per screen, in the right-hand column */\n  features: HhhusherFeature[];\n  /** the 3D scene or image held in place behind the whole section */\n  media?: ReactNode;\n  /** the id other links jump to */\n  id?: string;\n  className?: string;\n}\n\nfunction Actions({ primary, more }: { primary?: HhhusherFeaturesLink; more?: HhhusherFeaturesLink }) {\n  if (!primary && !more) return null;\n  return (\n    <div className=\"hhhusher-features-fade mt-7 flex items-center gap-7\">\n      {primary && <HhhusherButton href={primary.href}>{primary.label}</HhhusherButton>}\n      {more && (\n        <HhhusherButton href={more.href} variant=\"link\">\n          {more.label}\n        </HhhusherButton>\n      )}\n    </div>\n  );\n}\n\n/**\n * A long cream section with a window-sized media frame pinned behind it the whole way down (a\n * 3D object in the original; a soft placeholder here). The first screen holds a big heading\n * at the top and a small paragraph with a yellow button lower down; then one feature per\n * screen scrolls past in the right-hand column: a two-line heading that rises in line by line,\n * a paragraph that fades in, a yellow button and an arrow link.\n */\nexport function HhhusherFeatures({ title, intro, primary, more, features, media, id, className }: HhhusherFeaturesProps) {\n  return (\n    <section id={id} className={cn(\"hhhusher-features relative bg-background pb-section text-foreground\", className)}>\n      <div aria-hidden={media ? undefined : true} className=\"hhhusher-features-frame pointer-events-none sticky top-0 -mb-[100svh] h-svh overflow-clip\">\n        {media ? (\n          <div className=\"size-full [&>*]:size-full [&>*]:object-cover\">{media}</div>\n        ) : (\n          <div className=\"absolute top-[18%] left-[25%] h-[42svh] w-[75%] rounded-[50%] bg-foreground/[0.07] blur-3xl lg:top-[4%] lg:left-[26%] lg:h-[92svh] lg:w-[36%]\" />\n        )}\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter\">\n        <div className=\"flex min-h-svh flex-col justify-center gap-[4.8rem] py-24 lg:justify-between lg:gap-0 lg:pt-40 lg:pb-28\">\n          <HhhusherLines\n            as=\"h2\"\n            lines={title}\n            className=\"max-w-[40rem] font-display text-[2.6rem] leading-[1.05] font-medium tracking-[-0.02em] lg:text-[4.25rem] lg:leading-[1.15]\"\n          />\n          <div className=\"max-w-[22rem]\">\n            <p className=\"hhhusher-features-fade text-[1.04rem] leading-[1.3] font-medium lg:text-base lg:leading-[1.3]\">{intro}</p>\n            <Actions primary={primary} more={more} />\n          </div>\n        </div>\n\n        {features.map((feature, i) => (\n          <article key={i} className=\"flex min-h-svh flex-col pt-28 lg:ml-[63.5%] lg:max-w-[28rem] lg:pt-28\">\n            <HhhusherLines\n              as=\"h3\"\n              lines={feature.title}\n              className=\"font-display text-[2.08rem] leading-[1.06] font-medium tracking-[-0.01em] lg:text-[3.5625rem] lg:leading-[1.05]\"\n            />\n            <p className=\"hhhusher-features-fade mt-4 text-[1.3rem] leading-[1.3] font-medium tracking-[-0.01em] lg:mt-8 lg:text-[1.25rem] lg:leading-[1.3]\">\n              {feature.text}\n            </p>\n            <Actions primary={feature.primary} more={feature.more} />\n          </article>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button",
+    "hhhusher-lines"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the section heading, one entry per line"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the small paragraph low in the first screen"
+    },
+    {
+      "name": "primary",
+      "type": "HhhusherFeaturesLink",
+      "required": false,
+      "description": "the yellow button under the intro"
+    },
+    {
+      "name": "more",
+      "type": "HhhusherFeaturesLink",
+      "required": false,
+      "description": "the arrow link under the intro"
+    },
+    {
+      "name": "features",
+      "type": "HhhusherFeature[]",
+      "required": true,
+      "description": "the feature blocks, one per screen, in the right-hand column"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the 3D scene or image held in place behind the whole section"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the id other links jump to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "579d8dd602316436238ffd2f593c462a5062e85a7f7ff831ad797eba5d8d5b53"
+}

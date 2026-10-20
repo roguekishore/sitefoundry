@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook latest posts",
+  "description": "A framed news section that fades from the page colour into a mint wash: a featured post on the left (wide rounded thumbnail, mono category, larger title, grey summary) and three compact rows on the right (small thumbnail beside a mono category and title). Thumbnails zoom gently on hover.",
+  "category": "features",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "posts",
+    "resources",
+    "cards",
+    "light",
+    "mint",
+    "gradient",
+    "hover-zoom",
+    "mono",
+    "frame-rule"
+  ],
+  "notes": [
+    "thumbnail slots are 16:9 (488×275 featured, 219×122 rows; full width on phones); empty ones show a soft placeholder",
+    "the mint wash is the accent token"
+  ],
+  "entry": "growthbook-resources.tsx",
+  "source": "foundry",
+  "name": "growthbook-resources",
+  "files": [
+    {
+      "path": "growthbook-resources.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GrowthbookPost {\n  /** mono category above the title */\n  category: string;\n  title: string;\n  href: string;\n  /** 16:9 thumbnail (img); a soft placeholder when empty */\n  image?: ReactNode;\n}\n\nexport interface GrowthbookResourcesProps {\n  title: string;\n  /** the big post on the left, with a grey summary line */\n  featured: GrowthbookPost & { summary?: string };\n  /** up to three compact rows on the right */\n  posts: GrowthbookPost[];\n  className?: string;\n}\n\nfunction Thumb({ image, className }: { image?: ReactNode; className?: string }) {\n  return (\n    <div className={cn(\"overflow-clip rounded-lg\", className)}>\n      <div className=\"size-full transition-transform duration-400 ease-[ease] group-hover:scale-105 motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover\">\n        {image ?? (\n          <div className=\"size-full bg-glow bg-[radial-gradient(ellipse_70%_90%_at_100%_0%,var(--highlight),transparent_70%),radial-gradient(ellipse_70%_80%_at_0%_100%,var(--foreground),transparent_75%)] opacity-80\" />\n        )}\n      </div>\n    </div>\n  );\n}\n\nexport function GrowthbookResources({ title, featured, posts, className }: GrowthbookResourcesProps) {\n  return (\n    <section className={cn(\"bg-linear-to-b from-background from-25% to-accent text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"border-x border-border px-10 pt-12 pb-16 lg:px-11 lg:pt-[5.25rem] lg:pb-24\">\n          <h2 className=\"font-display text-[1.75rem] leading-[1.3] font-normal lg:text-5xl lg:leading-[1.2]\">{title}</h2>\n          <div className=\"mt-10 grid gap-16 lg:mt-24 lg:grid-cols-[30.5rem_minmax(0,1fr)] lg:gap-14\">\n            <a href={featured.href} className=\"group block\">\n              <Thumb image={featured.image} className=\"aspect-[1.78]\" />\n              <p className=\"mt-9 font-mono text-[0.625rem] leading-[1.65]\">{featured.category}</p>\n              <h3 className=\"mt-5 text-2xl leading-[1.5] transition-colors duration-250 group-hover:text-primary motion-reduce:transition-none\">{featured.title}</h3>\n              {featured.summary && <p className=\"mt-5 max-w-[11rem] text-base leading-[1.65] text-muted-foreground sm:max-w-none\">{featured.summary}</p>}\n            </a>\n            <ul className=\"grid content-start gap-16 lg:gap-14\">\n              {posts.map((p) => (\n                <li key={p.title}>\n                  <a href={p.href} className=\"group grid gap-4 lg:grid-cols-[13.6875rem_minmax(0,1fr)]\">\n                    <Thumb image={p.image} className=\"aspect-[1.8]\" />\n                    <div className=\"lg:pt-0.5\">\n                      <p className=\"font-mono text-[0.625rem] leading-[1.65]\">{p.category}</p>\n                      <h3 className=\"mt-2 max-w-[14rem] text-sm leading-[1.65] transition-colors duration-250 group-hover:text-primary motion-reduce:transition-none sm:max-w-none lg:mt-3 lg:text-base\">\n                        {p.title}\n                      </h3>\n                    </div>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "featured",
+      "type": "GrowthbookPost & { summary?: string | undefined; }",
+      "required": true,
+      "description": "the big post on the left, with a grey summary line"
+    },
+    {
+      "name": "posts",
+      "type": "GrowthbookPost[]",
+      "required": true,
+      "description": "up to three compact rows on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a20bc7e01e7e7506a13e577b96d6b4726e27966302ac9880af61505b1c1c9717"
+}

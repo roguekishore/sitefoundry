@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia case-study deck",
+  "description": "Full-bleed media cards with 24px corners and the client's name (40px) and story at the bottom-left over a darkening gradient. On desktop each card is nearly a window high and sticks at the top, so the next slides up over it, growing from 90% to full size; a blue 'read the story' pill appears in the middle on hover.",
+  "category": "gallery",
+  "site": "roveia",
+  "license": "proprietary",
+  "tags": [
+    "case-studies",
+    "cards",
+    "dark",
+    "full-bleed",
+    "sticky",
+    "stack",
+    "scale",
+    "scrubbed",
+    "hover",
+    "media"
+  ],
+  "notes": [
+    "desktop: one window per card (sticky stack); phones: 360px cards in a column",
+    "one media slot per card; empty slots are dark surfaces",
+    "forces .dark on the cards",
+    "the original's pill follows the cursor; this one sits in the middle of the card"
+  ],
+  "entry": "roveia-cases.tsx",
+  "source": "foundry",
+  "name": "roveia-cases",
+  "files": [
+    {
+      "path": "roveia-cases.css",
+      "content": "/* Each card grows from 90% to full size while it comes up into the window. On desktop the\n   cards are sticky, so this is the \"next card arriving on the deck\" moment. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-cases-card {\n      animation: roveia-cases-arrive linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n@keyframes roveia-cases-arrive {\n  from { scale: 0.9; }\n  to { scale: 1; }\n}\n"
+    },
+    {
+      "path": "roveia-cases.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport \"./roveia-cases.css\";\n\nexport interface RoveiaCase {\n  /** the client's name, the card's title */\n  name: string;\n  /** what was done and what changed, two to four sentences */\n  description: string;\n  href?: string;\n  /** the full-bleed video or photo; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaCasesProps {\n  cases: RoveiaCase[];\n  /** label of the pill that appears in the middle of a card on hover */\n  linkLabel: string;\n  className?: string;\n}\n\n/**\n * Case studies as a deck of full-bleed media cards (24px corners) with the client's name and a\n * short story at the bottom-left over a darkening gradient. On desktop each card is nearly a\n * window high and sticks at the top, so the next one slides up over it, growing from 90% to\n * full size as it arrives. Hovering a card shows a blue \"read the story\" pill in its middle.\n */\nexport function RoveiaCases({ cases, linkLabel, className }: RoveiaCasesProps) {\n  return (\n    <section className={cn(\"bg-background pt-5 pb-16 text-foreground lg:pt-18 lg:pb-section\", className)}>\n      <ul className=\"flex flex-col gap-18 px-9 lg:gap-8 lg:px-9\">\n        {cases.map((c) => (\n          <li key={c.name} className=\"lg:sticky lg:top-5 lg:h-[calc(100svh-2rem)]\">\n            <a\n              href={c.href ?? \"#\"}\n              className=\"roveia-cases-card group dark relative flex h-[22.5rem] flex-col justify-end overflow-clip rounded-lg bg-background p-5.5 text-foreground lg:h-full lg:px-25 lg:pb-22\"\n            >\n              <div className=\"absolute inset-0\">{c.media ?? <div className=\"size-full bg-muted bg-linear-to-tr from-background/40 via-muted to-glow/25\" />}</div>\n              <div\n                aria-hidden\n                className=\"absolute inset-0 bg-[linear-gradient(transparent_54%,color-mix(in_oklab,var(--background)_50%,transparent)),linear-gradient(color-mix(in_oklab,var(--background)_40%,transparent),color-mix(in_oklab,var(--background)_40%,transparent))]\"\n              />\n              <span className=\"pointer-events-none absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 scale-90 opacity-0 transition-[opacity,scale] duration-300 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100 motion-reduce:transition-none lg:block\">\n                {/* a look-alike of the blue pill: a real button can't sit inside the card's link */}\n                <span className=\"inline-flex h-10 items-center gap-2 rounded-full bg-primary px-4 text-base tracking-[-0.02em] whitespace-nowrap text-primary-foreground\">\n                  {linkLabel}\n                  <ArrowUpRight aria-hidden className=\"size-4\" strokeWidth={1.75} />\n                </span>\n              </span>\n              <div className=\"relative max-w-[38rem]\">\n                <h3 className=\"text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:text-[2.5rem]\">{c.name}</h3>\n                <p className=\"mt-2 text-sm leading-5 tracking-[-0.02em] text-foreground/75 lg:mt-6 lg:text-base lg:leading-6\">{c.description}</p>\n              </div>\n            </a>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "cases",
+      "type": "RoveiaCase[]",
+      "required": true
+    },
+    {
+      "name": "linkLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the pill that appears in the middle of a card on hover"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9e4a05938fb19d43d462dab6a4cbde0924a04124bdb79a400e2df41681542c36"
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher review list",
+  "description": "A long column of reviews on a camel band: a small label on the left that stays in view, and in the right half one review after another (small yellow stars, a 28px quote, the author in bold mono), each rising 40px and fading in as it enters.",
+  "category": "testimonials",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "reviews",
+    "list",
+    "stars",
+    "tan",
+    "warm",
+    "sticky",
+    "reveal",
+    "css-scroll-driven"
+  ],
+  "notes": [
+    "the band is the theme's secondary (tan)",
+    "no top padding beyond a little: it follows hhhusher-statement"
+  ],
+  "entry": "hhhusher-review-list.tsx",
+  "source": "foundry",
+  "name": "hhhusher-review-list",
+  "files": [
+    {
+      "path": "hhhusher-review-list.css",
+      "content": "/* Each review rises 40px and fades in over its first ~35% of a screen in view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-review-list-item {\n      animation: hhhusher-review-list-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 35vh;\n    }\n  }\n}\n\n@keyframes hhhusher-review-list-rise {\n  from {\n    opacity: 0;\n    translate: 0 2.5rem;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "hhhusher-review-list.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherReview } from \"@foundry/hhhusher-review\";\nimport \"./hhhusher-review-list.css\";\n\nexport interface HhhusherReviewListItem {\n  quote: string;\n  author: string;\n  /** filled stars out of five */\n  rating?: number;\n}\n\nexport interface HhhusherReviewListProps {\n  /** the small label on the left, e.g. \"Reviews\" */\n  label: string;\n  reviews: HhhusherReviewListItem[];\n  /** screen-reader text for each star row, e.g. \"5 out of 5 stars\" */\n  ratingLabel?: string;\n  className?: string;\n}\n\n/**\n * A long column of reviews on a camel band: a small label on the left that stays in view,\n * and in the right half one review after another (stars, a 28px quote, the author in mono),\n * each rising 40px and fading in as it enters.\n */\nexport function HhhusherReviewList({ label, reviews, ratingLabel, className }: HhhusherReviewListProps) {\n  return (\n    <section className={cn(\"bg-secondary pb-section text-secondary-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-[4.4rem] px-gutter pt-6 lg:grid-cols-[1fr_1fr] lg:gap-10 lg:pt-16\">\n        <h2 className=\"self-start font-display text-[1.82rem] leading-[1.2] font-medium tracking-[-0.01em] lg:sticky lg:top-30 lg:text-[1.8125rem]\">{label}</h2>\n        <div className=\"flex flex-col gap-[3.6rem] lg:-mt-1 lg:gap-[5.6rem] lg:pl-4\">\n          {reviews.map((review, i) => (\n            <HhhusherReview key={i} {...review} ratingLabel={ratingLabel} authorStyle=\"plain\" size=\"md\" className=\"hhhusher-review-list-item\" />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-review"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label on the left, e.g. \"Reviews\""
+    },
+    {
+      "name": "reviews",
+      "type": "HhhusherReviewListItem[]",
+      "required": true
+    },
+    {
+      "name": "ratingLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader text for each star row, e.g. \"5 out of 5 stars\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7708520c6425e2c3a7785ff9e9689e93e5ec805fe34dcd17c7e8c099554626c4"
+}

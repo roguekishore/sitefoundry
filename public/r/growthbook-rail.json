@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "GrowthBook scroll rail",
+  "description": "A short multicolour light (navy, violet, white, blue, navy, teal, mint) that rides a thin vertical rule or a card's left edge, travelling down it as the section scrolls past.",
+  "category": "background",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "decoration",
+    "rule",
+    "gradient",
+    "scroll",
+    "scrubbed",
+    "scroll-driven",
+    "accent"
+  ],
+  "notes": [
+    "place it inside a relatively positioned box; it sits on that box's left edge (or right with side=\"right\")",
+    "CSS scroll-driven animation; browsers without it, and reduced motion, show it resting at the top"
+  ],
+  "entry": "growthbook-rail.tsx",
+  "source": "foundry",
+  "name": "growthbook-rail",
+  "files": [
+    {
+      "path": "growthbook-rail.css",
+      "content": "/* The rail is the view-timeline subject (it is as tall as its section); the bar inside it moves\n   from the top of the rail to the bottom while the section crosses the window. */\n.growthbook-rail {\n  view-timeline-name: --growthbook-rail;\n}\n\n.growthbook-rail-bar {\n  height: min(25rem, 70%);\n  background: linear-gradient(\n    to bottom,\n    transparent,\n    var(--foreground) 6%,\n    var(--primary) 15%,\n    var(--glow) 22%,\n    var(--card) 30%,\n    var(--chart-2) 50%,\n    var(--foreground) 62%,\n    var(--highlight) 84%,\n    var(--accent) 94%,\n    transparent\n  );\n}\n\n.growthbook-rail[data-fixed] .growthbook-rail-bar {\n  height: 100%;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .growthbook-rail:not([data-fixed]) .growthbook-rail-bar {\n      animation: growthbook-rail-travel linear both;\n      animation-timeline: --growthbook-rail;\n      animation-range: cover 15% cover 85%;\n    }\n  }\n}\n\n@keyframes growthbook-rail-travel {\n  from {\n    top: 0;\n  }\n  to {\n    top: calc(100% - min(25rem, 70%));\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-rail.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./growthbook-rail.css\";\n\nexport interface GrowthbookRailProps {\n  /** which edge of the positioned parent it rides */\n  side?: \"left\" | \"right\";\n  /** fixed: the gradient fills the whole edge and stays still (the card-edge variant) */\n  fixed?: boolean;\n  /** bar width in px-ish Tailwind classes, e.g. \"w-[3px]\" (default) */\n  className?: string;\n}\n\n/** Decorative only (aria-hidden). Put it in a `relative` box. */\nexport function GrowthbookRail({ side = \"left\", fixed, className }: GrowthbookRailProps) {\n  return (\n    <span\n      aria-hidden\n      data-fixed={fixed ? \"\" : undefined}\n      className={cn(\n        \"growthbook-rail pointer-events-none absolute inset-y-0 w-[3px] overflow-clip\",\n        side === \"left\" ? \"-left-px\" : \"-right-px\",\n        className,\n      )}\n    >\n      <span className=\"growthbook-rail-bar absolute inset-x-0 top-0 block\" />\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "side",
+      "type": "enum",
+      "required": false,
+      "default": "left",
+      "description": "which edge of the positioned parent it rides"
+    },
+    {
+      "name": "fixed",
+      "type": "boolean",
+      "required": false,
+      "description": "fixed: the gradient fills the whole edge and stays still (the card-edge variant)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "bar width in px-ish Tailwind classes, e.g. \"w-[3px]\" (default)"
+    }
+  ],
+  "hash": "58f3a80b4bb1f1bce1a3a0a78aea7f4cc7e750f4abf8b730409e63538db330e7"
+}

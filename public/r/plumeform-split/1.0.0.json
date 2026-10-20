@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform alternating feature rows",
+  "description": "Feature rows on warm paper: eyebrow, tight bold title and slate copy (optionally a dotted list) in one half, a translucent glass panel floating over blurred mint, sky and peach clouds in the other, sides alternating, with very generous gaps between rows. Copy and panels rise in with a soft blur; the clouds float and drift as you scroll.",
+  "category": "features",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "split",
+    "alternating",
+    "light",
+    "glass",
+    "clouds",
+    "reveal",
+    "parallax"
+  ],
+  "notes": [
+    "each panel is a media slot: the original's live mini-demos are not rebuilt",
+    "an optional centred intro line sits above the rows (the original uses it under the hero)",
+    "CSS only"
+  ],
+  "entry": "plumeform-split.tsx",
+  "source": "foundry",
+  "name": "plumeform-split",
+  "files": [
+    {
+      "path": "plumeform-split.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformLink } from \"@foundry/plumeform-link\";\nimport { PlumeformPanel, type PlumeformPanelClouds } from \"@foundry/plumeform-panel\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformSplitRow {\n  /** small capitals above the title */\n  eyebrow?: string;\n  title: ReactNode;\n  /** a paragraph, or several as your own <p>s; <code> renders as a dark chip */\n  body?: ReactNode;\n  /** a short list under the body: bold lead-in, then the rest */\n  bullets?: { title: string; text: string }[];\n  /** the panel's demo, picture or video; empty shows a placeholder of `aspect` */\n  media?: ReactNode;\n  /** the placeholder's width / height inside the panel, e.g. \"390/400\" */\n  aspect?: string;\n  /** cloud arrangement behind the panel */\n  clouds?: PlumeformPanelClouds;\n  /** which side the panel sits on at desktop widths */\n  panelSide?: \"start\" | \"end\";\n}\n\nexport interface PlumeformSplitProps {\n  /** a centred line (and link) above the rows, e.g. right under the hero */\n  intro?: { text: ReactNode; link?: { label: string; href: string } };\n  /** the feature rows, one under another */\n  rows: PlumeformSplitRow[];\n  id?: string;\n  className?: string;\n}\n\n/**\n * Feature rows on paper: copy in one half, a glass panel over drifting colour clouds in the\n * other, alternating sides, with very generous space between rows. Stacks on phones.\n */\nexport function PlumeformSplit({ intro, rows, id, className }: PlumeformSplitProps) {\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        {intro && (\n          <PlumeformReveal className=\"mx-auto mb-32 max-w-xl pt-6 text-center lg:mb-52 lg:pt-10\">\n            <p className=\"text-sm text-muted-foreground\">{intro.text}</p>\n            {intro.link && <PlumeformLink href={intro.link.href} className=\"mt-5 text-sm\">{intro.link.label}</PlumeformLink>}\n          </PlumeformReveal>\n        )}\n\n        <div className=\"space-y-32 lg:space-y-60\">\n          {rows.map((row, i) => {\n            const panelFirst = row.panelSide === \"start\";\n            return (\n              <div key={i} className=\"grid items-start gap-14 lg:grid-cols-2 lg:gap-x-16\">\n                <PlumeformHeading\n                  eyebrow={row.eyebrow}\n                  title={row.title}\n                  className={cn(\n                    \"max-w-md [&_code]:rounded-md [&_code]:bg-primary [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.8125rem] [&_code]:font-bold [&_code]:text-primary-foreground\",\n                    panelFirst && \"lg:order-2 lg:justify-self-end\",\n                  )}\n                >\n                  {row.body}\n                  {row.bullets && (\n                    <ul className=\"mt-8 space-y-3 text-sm leading-5\">\n                      {row.bullets.map((b) => (\n                        <li key={b.title} className=\"relative pl-4 before:absolute before:top-[0.45rem] before:left-0 before:size-1.5 before:rounded-full before:bg-highlight\">\n                          <strong>{b.title}</strong> — {b.text}\n                        </li>\n                      ))}\n                    </ul>\n                  )}\n                </PlumeformHeading>\n                <PlumeformReveal className={cn(\"w-full max-w-[18.75rem] justify-self-center sm:max-w-[28rem] lg:mt-6\", panelFirst && \"lg:order-1\")}>\n                  <PlumeformPanel media={row.media} aspect={row.aspect ?? \"390/400\"} clouds={row.clouds ?? ([\"a\", \"b\", \"c\"] as const)[i % 3]} />\n                </PlumeformReveal>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-heading",
+    "plumeform-link",
+    "plumeform-panel",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "intro",
+      "type": "{ text: ReactNode; link?: { label: string; href: string; }; }",
+      "required": false,
+      "description": "a centred line (and link) above the rows, e.g. right under the hero"
+    },
+    {
+      "name": "rows",
+      "type": "PlumeformSplitRow[]",
+      "required": true,
+      "description": "the feature rows, one under another"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3b3cb8a6246cffa4d49d3357bbfcb087c574ceeee3b2388fe41f3f56e33a02d0"
+}

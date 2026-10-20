@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook SDK picker",
+  "description": "A pale lavender band split down the middle by a thin rule: heading, paragraph and violet + outline buttons on the left; on the right a white panel with the multicolour rail on its edge, a framework dropdown, an icon-and-name row, a dark rounded code block with lime strings and a copy button, and a mono dotted-underline docs link. Picking a framework swaps the snippet.",
+  "category": "features",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "sdk",
+    "code",
+    "developer",
+    "select",
+    "lavender",
+    "split",
+    "mono",
+    "frame-rule",
+    "light"
+  ],
+  "notes": [
+    "the code block forces the dark tokens (class dark) so it stays navy in both modes; quoted strings use chart-4",
+    "the dropdown is a native select; the copy button uses the clipboard API"
+  ],
+  "hydrate": "visible",
+  "entry": "growthbook-sdks.tsx",
+  "source": "foundry",
+  "name": "growthbook-sdks",
+  "files": [
+    {
+      "path": "growthbook-sdks.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown, Copy } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookButton } from \"@foundry/growthbook-button\";\nimport { GrowthbookRail } from \"@foundry/growthbook-rail\";\n\nexport interface GrowthbookSnippet {\n  /** the dropdown option, e.g. \"HTML\" */\n  label: string;\n  /** the name beside the round icon, e.g. \"Script tag\" */\n  name: string;\n  /** small mark inside the navy circle */\n  icon?: ReactNode;\n  /** the code, shown as written (quoted strings are tinted) */\n  code: string;\n}\n\nexport interface GrowthbookSdksProps {\n  /** the heading; each string starts a new line */\n  title: string[];\n  body: string;\n  primary?: { label: string; href: string };\n  secondary?: { label: string; href: string };\n  snippets: GrowthbookSnippet[];\n  /** accessible label of the dropdown */\n  selectLabel: string;\n  /** accessible label of the copy button */\n  copyLabel: string;\n  /** mono link under the code */\n  docs?: { label: string; href: string };\n  className?: string;\n}\n\n/** Tints quoted strings; everything else stays plain. */\nfunction tint(code: string) {\n  return code.split(/(\"[^\"\\n]*\"|'[^'\\n]*')/g).map((part, i) =>\n    i % 2 ? (\n      <span key={i} className=\"text-chart-4\">\n        {part}\n      </span>\n    ) : (\n      part\n    ),\n  );\n}\n\nexport function GrowthbookSdks({ title, body, primary, secondary, snippets, selectLabel, copyLabel, docs, className }: GrowthbookSdksProps) {\n  const [active, setActive] = useState(0);\n  const s = snippets[active];\n\n  return (\n    <section className={cn(\"bg-secondary text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative grid border-x border-border pt-12 pb-12 lg:grid-cols-2 lg:pt-20 lg:pb-20\">\n          <span aria-hidden className=\"absolute inset-y-0 left-1/2 hidden w-px bg-border lg:block\" />\n          <div className=\"px-10 lg:pt-0.5\">\n            <h2 className=\"font-display text-4xl leading-[1.2] font-normal lg:text-[3.5rem]\">\n              {title.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </h2>\n            <p className=\"mt-4 max-w-[30rem] text-base leading-[1.65] text-foreground/85 lg:mt-6\">{body}</p>\n            <div className=\"mt-12 flex flex-col gap-3 md:flex-row lg:mt-[5.5rem]\">\n              {primary && (\n                <GrowthbookButton href={primary.href} arrow blockOnMobile>\n                  {primary.label}\n                </GrowthbookButton>\n              )}\n              {secondary && (\n                <GrowthbookButton href={secondary.href} variant=\"outline\" blockOnMobile>\n                  {secondary.label}\n                </GrowthbookButton>\n              )}\n            </div>\n          </div>\n\n          <div className=\"relative mt-14 bg-card p-4 text-card-foreground lg:mt-0 lg:p-5\">\n            <GrowthbookRail fixed />\n            <label className=\"relative block\">\n              <span className=\"sr-only\">{selectLabel}</span>\n              <select\n                value={active}\n                onChange={(e) => setActive(Number(e.target.value))}\n                className=\"h-14 w-full appearance-none rounded-md border border-input bg-card px-4 text-sm text-card-foreground focus-visible:outline-2 focus-visible:outline-ring\"\n              >\n                {snippets.map((o, i) => (\n                  <option key={o.label} value={i}>\n                    {o.label}\n                  </option>\n                ))}\n              </select>\n              <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-5 size-5 -translate-y-1/2\" strokeWidth={1.75} />\n            </label>\n            <p className=\"mt-16 flex items-center gap-2 text-base\">\n              <span className=\"dark grid size-[3.125rem] place-items-center rounded-full bg-background text-foreground [&_svg]:size-5\">{s.icon}</span>\n              {s.name}\n            </p>\n            <div className=\"dark relative mt-8 rounded-lg bg-background p-8 pr-10 text-foreground\">\n              <button\n                type=\"button\"\n                aria-label={copyLabel}\n                onClick={() => navigator.clipboard?.writeText(s.code)}\n                className=\"absolute top-3.5 right-3.5 grid size-[1.875rem] place-items-center rounded-full border border-foreground/50 transition-colors duration-250 hover:bg-foreground/10 motion-reduce:transition-none\"\n              >\n                <Copy aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n              </button>\n              <pre className=\"font-mono text-sm leading-[2] break-all whitespace-pre-wrap\">\n                <code>{tint(s.code)}</code>\n              </pre>\n            </div>\n            {docs && (\n              <a\n                href={docs.href}\n                className=\"mt-4 inline-block font-mono text-base text-primary underline decoration-dotted underline-offset-4 transition-colors duration-250 hover:text-foreground motion-reduce:transition-none\"\n              >\n                {docs.label}\n              </a>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-button",
+    "growthbook-rail"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading; each string starts a new line"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "snippets",
+      "type": "GrowthbookSnippet[]",
+      "required": true
+    },
+    {
+      "name": "selectLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible label of the dropdown"
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible label of the copy button"
+    },
+    {
+      "name": "docs",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "mono link under the code"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6d7c1e98cdc1a514d5bb18f24a627ebcf2887cfaef9a1915f428974cc5539964"
+}

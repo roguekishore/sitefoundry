@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wiemer scroll reveals and split text",
+  "description": "CSS-only scroll reveals in the Wiemer manner: display headings whose letters rise out of a masked line one after another as they enter the window, a smaller split for sublines (30px rise), paragraphs that rise 24px and fade, plain fades, a fade-out as a block leaves, and a parallax drift for pictures inside their frames.",
+  "category": "text-effect",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "split-text",
+    "letters",
+    "stagger",
+    "scroll",
+    "parallax",
+    "fade",
+    "css"
+  ],
+  "notes": [
+    "uses animation-timeline: view(); browsers without it, and reduced motion, show everything in place",
+    "split text keeps the full text for screen readers and hides the letter spans from them",
+    "drift: put wiemerDriftFrame on an overflow-clip frame and wiemerReveal(\"drift\") on a child that is taller than it"
+  ],
+  "entry": "wiemer-reveal.tsx",
+  "source": "foundry",
+  "name": "wiemer-reveal",
+  "files": [
+    {
+      "path": "wiemer-reveal.css",
+      "content": "/* Wiemer reveals, all CSS. Each one is tied to an element's trip into the window (a view\n   timeline) and ends over a fixed scroll distance after the element's top edge enters, so\n   tall headings finish as quickly as short ones. Without scroll-driven animations, or with\n   reduced motion, nothing moves and everything is in place. */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    /* Split text: the heading carries one named timeline; every letter reads it with its\n       own start, --i letters later. The word around each letter clips it, so letters\n       rise out of their line like type set from below. */\n    .wiemer-split {\n      view-timeline-name: --wiemer-split;\n    }\n    .wiemer-split-char {\n      animation: wiemer-reveal-letter both cubic-bezier(0.22, 1, 0.36, 1);\n      animation-timeline: --wiemer-split;\n      animation-range: entry calc(var(--i, 0) * var(--wiemer-step, 9px)) entry calc(var(--wiemer-run, 260px) + var(--i, 0) * var(--wiemer-step, 9px));\n    }\n\n    .wiemer-reveal-fade,\n    .wiemer-reveal-rise {\n      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);\n      animation-fill-mode: both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--wiemer-delay, 0px)) entry calc(240px + var(--wiemer-delay, 0px));\n    }\n    .wiemer-reveal-fade { animation-name: wiemer-reveal-fade; }\n    .wiemer-reveal-rise { animation-name: wiemer-reveal-rise; }\n\n    /* fade-out: scrubbed as the block leaves through the top of the window */\n    .wiemer-reveal-fadeout {\n      animation: wiemer-reveal-fadeout linear both;\n      animation-timeline: view();\n      animation-range: exit 0% exit 70%;\n    }\n\n    /* drift: the frame names the timeline; the picture inside slides against it */\n    .wiemer-drift-frame {\n      view-timeline-name: --wiemer-drift;\n    }\n    .wiemer-reveal-drift {\n      animation: wiemer-reveal-drift linear both;\n      animation-timeline: --wiemer-drift;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes wiemer-reveal-letter {\n  from { opacity: 0; transform: translateY(var(--wiemer-rise, 105%)); }\n}\n@keyframes wiemer-reveal-fade {\n  from { opacity: 0; }\n}\n@keyframes wiemer-reveal-rise {\n  from { opacity: 0; transform: translateY(24px); }\n}\n@keyframes wiemer-reveal-fadeout {\n  to { opacity: 0; }\n}\n@keyframes wiemer-reveal-drift {\n  from { transform: translateY(calc(-1 * var(--wiemer-drift, 46px))); }\n  to { transform: translateY(var(--wiemer-drift, 46px)); }\n}\n"
+    },
+    {
+      "path": "wiemer-reveal.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-reveal.css\";\n\n/**\n * fade: opacity 0→1 · rise: fade + a 24px lift (paragraphs) · fadeout: opacity 1→0 while\n * leaving through the top · drift: a parallax slide inside a frame named by wiemerDriftFrame\n */\nexport type WiemerRevealEffect = \"fade\" | \"rise\" | \"fadeout\" | \"drift\";\n\n/** The class for an effect, to put straight on an element. */\nexport function wiemerReveal(effect: WiemerRevealEffect) {\n  return `wiemer-reveal-${effect}`;\n}\n\n/** Class for the overflow-clip frame a drifting picture moves inside. */\nexport const wiemerDriftFrame = \"wiemer-drift-frame\";\n\n/** Inline style: start a reveal `delay` px of scrolling later, and/or set a drift distance. */\nexport function wiemerRevealStyle(delay = 0, drift?: number): CSSProperties {\n  return { \"--wiemer-delay\": `${delay}px`, ...(drift !== undefined && { \"--wiemer-drift\": `${drift}px` }) } as CSSProperties;\n}\n\nexport interface WiemerSplitTextProps {\n  /** the text; a line break (\"\\n\") forces a new line */\n  text: string;\n  /** the element to render, e.g. \"h1\", \"h2\", \"p\" */\n  as?: ElementType;\n  /** lg: letters rise a full line out of a mask (display headings) · sm: letters rise 30px, quicker stagger (sublines) */\n  size?: \"lg\" | \"sm\";\n  className?: string;\n}\n\n/**\n * Text whose letters rise into place one after another as it scrolls into view. Static\n * HTML shows the text normally; screen readers get the plain text.\n */\nexport function WiemerSplitText({ text, as: Tag = \"h2\", size = \"lg\", className }: WiemerSplitTextProps) {\n  let i = 0;\n  const vars = (size === \"lg\" ? {} : { \"--wiemer-rise\": \"30px\", \"--wiemer-step\": \"3px\", \"--wiemer-run\": \"200px\" }) as CSSProperties;\n  return (\n    <Tag className={cn(\"wiemer-split\", className)} style={vars}>\n      <span className=\"sr-only\">{text}</span>\n      <span aria-hidden=\"true\">\n        {text.split(\"\\n\").map((line, l) => (\n          <Fragment key={l}>\n            {l > 0 && <br />}\n            {line.split(\" \").map((word, w) => (\n              <Fragment key={w}>\n                {w > 0 && \" \"}\n                <span className=\"-mb-[0.14em] inline-block overflow-clip pb-[0.14em] align-top\">\n                  {Array.from(word).map((char, c) => (\n                    <span key={c} className=\"wiemer-split-char inline-block\" style={{ \"--i\": i++ } as CSSProperties}>\n                      {char}\n                    </span>\n                  ))}\n                </span>\n              </Fragment>\n            ))}\n          </Fragment>\n        ))}\n      </span>\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; a line break (\"\\n\") forces a new line"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render, e.g. \"h1\", \"h2\", \"p\""
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "lg: letters rise a full line out of a mask (display headings) · sm: letters rise 30px, quicker stagger (sublines)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2c5d8da663830ab797984908face0a9bcf4c12d4d0a577852f3fdc2992f01d1f"
+}

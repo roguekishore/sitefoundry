@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook logo marquee",
+  "description": "A one-line caption over a slow, endless marquee of customer wordmarks, clipped at the page frame's edges, with the thin frame rule running down the left.",
+  "category": "logos",
+  "site": "growthbook",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "marquee",
+    "loop",
+    "light",
+    "minimal",
+    "frame-rule"
+  ],
+  "notes": [
+    "CSS-only loop (the list is drawn twice); stops under reduced motion and on hover"
+  ],
+  "entry": "growthbook-logos.tsx",
+  "source": "foundry",
+  "name": "growthbook-logos",
+  "files": [
+    {
+      "path": "growthbook-logos.css",
+      "content": "/* The list is rendered twice side by side; sliding the pair left by half its width loops it. */\n.growthbook-logos-run {\n  animation: growthbook-logos-scroll var(--growthbook-logos-duration, 60s) linear infinite;\n}\n.growthbook-logos-strip:hover .growthbook-logos-run {\n  animation-play-state: paused;\n}\n\n@keyframes growthbook-logos-scroll {\n  from {\n    transform: translateX(0);\n  }\n  to {\n    transform: translateX(-50%);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .growthbook-logos-run {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "growthbook-logos.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./growthbook-logos.css\";\n\nexport interface GrowthbookLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text), about 24–30px tall */\n  logo: ReactNode;\n}\n\nexport interface GrowthbookLogosProps {\n  /** one line above the marquee */\n  caption: string;\n  logos: GrowthbookLogo[];\n  /** seconds for one full loop (default 60) */\n  duration?: number;\n  className?: string;\n}\n\nexport function GrowthbookLogos({ caption, logos, duration = 60, className }: GrowthbookLogosProps) {\n  const run = (copy: number) => (\n    <ul aria-hidden={copy === 1 || undefined} className=\"flex shrink-0 items-center gap-14 pr-14 lg:gap-[4.5rem] lg:pr-[4.5rem]\">\n      {logos.map((l) => (\n        <li key={l.name} role=\"img\" aria-label={copy === 0 ? l.name : undefined} className=\"flex h-10 shrink-0 items-center text-foreground\">\n          {l.logo}\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*4)] px-gutter md:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"border-l border-border pt-12 pb-6 lg:pt-[5.25rem] lg:pb-14\">\n          <p className=\"text-center text-sm lg:text-base\">{caption}</p>\n          <div className=\"growthbook-logos-strip mt-8 overflow-clip lg:mt-14\">\n            <div\n              className=\"growthbook-logos-run flex w-max\"\n              style={{ \"--growthbook-logos-duration\": `${duration}s` } as CSSProperties}\n            >\n              {run(0)}\n              {run(1)}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "one line above the marquee"
+    },
+    {
+      "name": "logos",
+      "type": "GrowthbookLogo[]",
+      "required": true
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "60",
+      "description": "seconds for one full loop (default 60)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9ca0e0c3b2423c7ea6ff74dec5d548400a15fa866115869c041049f2cf882881"
+}

@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform answer-type chooser band",
+  "description": "A near-black green band: bold heading and a long paragraph side by side, then labelled groups of outlined pill chips (one selected in mint) beside a glass demo card with two offset cards stacked behind it, back and next controls and a counter, then the complete list in five columns with tier tags. Rises in as it scrolls; chips brighten on hover.",
+  "category": "features",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chips",
+    "list",
+    "dark",
+    "glass",
+    "stack",
+    "reveal",
+    "hover"
+  ],
+  "notes": [
+    "forces dark colours",
+    "the demo card is a media slot (the original runs a live example per type); the chips and controls are static",
+    "CSS only"
+  ],
+  "entry": "plumeform-types.tsx",
+  "source": "foundry",
+  "name": "plumeform-types",
+  "files": [
+    {
+      "path": "plumeform-types.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowLeft } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformBadge } from \"@foundry/plumeform-badge\";\nimport { PlumeformBand } from \"@foundry/plumeform-band\";\nimport { PlumeformButton } from \"@foundry/plumeform-button\";\nimport { PlumeformGlassCard } from \"@foundry/plumeform-glass-card\";\nimport { PlumeformHeading } from \"@foundry/plumeform-heading\";\nimport { PlumeformLink } from \"@foundry/plumeform-link\";\nimport { PlumeformReveal } from \"@foundry/plumeform-reveal\";\n\nexport interface PlumeformTypeChip {\n  label: string;\n  /** a small line icon before the label */\n  icon?: ReactNode;\n  /** a tier tag after it, e.g. \"Plus\" */\n  badge?: string;\n}\n\nexport interface PlumeformTypesProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** the long paragraph on the right */\n  body: ReactNode;\n  link?: { label: string; href: string };\n  /** chips in labelled groups; the first chip of the first group shows as selected */\n  groups: { label: string; chips: PlumeformTypeChip[] }[];\n  /** the demo card (a working example of the selected type); empty shows a placeholder */\n  media?: ReactNode;\n  /** placeholder size of the demo card, width / height */\n  aspect?: string;\n  /** labels for the controls under the card */\n  controls?: { previousLabel: string; nextLabel: string; counter: string };\n  /** a small note under the controls */\n  note?: ReactNode;\n  /** the complete list, in five columns on desktop */\n  all?: { label: string; items: { label: string; badge?: string }[] };\n  /** a closing line under the list: a bold lead-in, then the rest */\n  extra?: { lead: string; text: string };\n  /** art behind the band (the original's WebGL fluted glass); empty shows a soft glow */\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\n/**\n * A dark band about answer types: heading and long copy side by side, then grouped pill chips\n * beside a stacked demo card with back / next controls, then the full list in five columns.\n */\nexport function PlumeformTypes({ eyebrow, title, body, link, groups, media, aspect = \"510/430\", controls, note, all, extra, backdrop, id, className }: PlumeformTypesProps) {\n  return (\n    <PlumeformBand id={id} backdrop={backdrop} className={cn(\"py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"grid gap-10 lg:grid-cols-2 lg:items-end lg:gap-x-36 lg:pt-6\">\n          <PlumeformHeading eyebrow={eyebrow} title={title} className=\"lg:pb-24\" />\n          <PlumeformReveal step={1} className=\"max-w-[28rem]\">\n            <p className=\"text-base leading-[1.625] text-muted-foreground\">{body}</p>\n            {link && <PlumeformLink href={link.href} className=\"mt-7\">{link.label}</PlumeformLink>}\n          </PlumeformReveal>\n        </div>\n\n        <div className=\"mt-14 grid gap-14 lg:mt-10 lg:grid-cols-[1fr_32rem] lg:gap-x-16\">\n          <PlumeformReveal className=\"space-y-7\">\n            {groups.map((group, g) => (\n              <div key={group.label}>\n                <p className=\"mb-3 text-[0.625rem] font-bold tracking-[0.16em] text-muted-foreground uppercase\">{group.label}</p>\n                <ul className=\"flex flex-wrap gap-2\">\n                  {group.chips.map((chip, c) => {\n                    const active = g === 0 && c === 0;\n                    return (\n                      <li key={chip.label}>\n                        <span\n                          className={cn(\n                            \"inline-flex h-10 cursor-default items-center gap-2 rounded-full border px-4 text-[0.8125rem] transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none [&_svg]:size-3.5 [&_svg]:stroke-[1.75]\",\n                            active\n                              ? \"border-highlight/70 bg-highlight/10 font-bold text-foreground\"\n                              : \"border-border font-medium text-muted-foreground hover:border-foreground/30 hover:text-foreground\",\n                          )}\n                        >\n                          {chip.icon}\n                          {chip.label}\n                          {chip.badge && <PlumeformBadge>{chip.badge}</PlumeformBadge>}\n                        </span>\n                      </li>\n                    );\n                  })}\n                </ul>\n              </div>\n            ))}\n          </PlumeformReveal>\n\n          <PlumeformReveal step={1} className=\"lg:mt-12\">\n            <div className=\"relative mr-4 mb-4\">\n              <PlumeformGlassCard className=\"absolute inset-0 translate-x-4 translate-y-4 opacity-40\" />\n              <PlumeformGlassCard className=\"absolute inset-0 translate-x-2 translate-y-2 opacity-70\" />\n              <PlumeformGlassCard className=\"relative overflow-clip bg-card/80 p-7\">\n                {media ?? <div className=\"w-full rounded-[calc(var(--radius)/2)] bg-muted/60\" style={{ aspectRatio: aspect } as CSSProperties} />}\n              </PlumeformGlassCard>\n            </div>\n            {controls && (\n              <div className=\"mt-8 flex items-center gap-2\">\n                <button\n                  type=\"button\"\n                  aria-label={controls.previousLabel}\n                  className=\"grid size-10 place-items-center rounded-full border border-border text-foreground transition-colors duration-200 hover:border-foreground/30 hover:bg-foreground/5\"\n                >\n                  <ArrowLeft className=\"size-4\" strokeWidth={1.75} />\n                </button>\n                <PlumeformButton type=\"button\" arrow>\n                  {controls.nextLabel}\n                </PlumeformButton>\n                <span className=\"ml-auto text-[0.8125rem] font-semibold text-muted-foreground\">{controls.counter}</span>\n              </div>\n            )}\n            {note && <p className=\"mt-5 text-[0.8125rem] text-muted-foreground\">{note}</p>}\n          </PlumeformReveal>\n        </div>\n\n        {all && (\n          <PlumeformReveal className=\"mt-24 lg:mt-28\">\n            <p className=\"mb-6 text-[0.625rem] font-bold tracking-[0.16em] text-muted-foreground uppercase\">{all.label}</p>\n            <ul className=\"grid grid-cols-2 gap-x-6 gap-y-3.5 text-[0.9375rem] text-muted-foreground sm:grid-cols-3 lg:grid-cols-5\">\n              {all.items.map((item) => (\n                <li key={item.label} className=\"flex items-center gap-1.5\">\n                  {item.label}\n                  {item.badge && <PlumeformBadge>{item.badge}</PlumeformBadge>}\n                </li>\n              ))}\n            </ul>\n            {extra && (\n              <p className=\"mt-10 max-w-3xl text-[0.9375rem] leading-6 text-muted-foreground\">\n                <strong className=\"font-bold text-foreground\">{extra.lead}</strong> {extra.text}\n              </p>\n            )}\n          </PlumeformReveal>\n        )}\n      </div>\n    </PlumeformBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-badge",
+    "plumeform-band",
+    "plumeform-button",
+    "plumeform-glass-card",
+    "plumeform-heading",
+    "plumeform-link",
+    "plumeform-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the long paragraph on the right"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "groups",
+      "type": "{ label: string; chips: PlumeformTypeChip[]; }[]",
+      "required": true,
+      "description": "chips in labelled groups; the first chip of the first group shows as selected"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the demo card (a working example of the selected type); empty shows a placeholder"
+    },
+    {
+      "name": "aspect",
+      "type": "string",
+      "required": false,
+      "default": "510/430",
+      "description": "placeholder size of the demo card, width / height"
+    },
+    {
+      "name": "controls",
+      "type": "{ previousLabel: string; nextLabel: string; counter: string; }",
+      "required": false,
+      "description": "labels for the controls under the card"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small note under the controls"
+    },
+    {
+      "name": "all",
+      "type": "{ label: string; items: { label: string; badge?: string; }[]; }",
+      "required": false,
+      "description": "the complete list, in five columns on desktop"
+    },
+    {
+      "name": "extra",
+      "type": "{ lead: string; text: string; }",
+      "required": false,
+      "description": "a closing line under the list: a bold lead-in, then the rest"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the band (the original's WebGL fluted glass); empty shows a soft glow"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "384aa8a379da9368754e4c877c657575365edea884ed6243c153dc188d253ca8"
+}

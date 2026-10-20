@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform scroll reveal",
+  "description": "CSS-only entrance on scroll: content fades in, rises 22px and sharpens from a soft blur over its first 220px in the window, staggered 40px per list item. Also a 340ms swap-in class for tab and toggle changes.",
+  "category": "text-effect",
+  "site": "plumeform",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "blur",
+    "fade",
+    "stagger",
+    "css"
+  ],
+  "notes": [
+    "uses animation-timeline: view(); browsers without it, and reduced motion, show everything in place",
+    "use the wrapper, or put plumeformReveal() and plumeformRevealStyle(step) on your own element",
+    "plumeformSwapIn replays when the element's React key changes"
+  ],
+  "entry": "plumeform-reveal.tsx",
+  "source": "foundry",
+  "name": "plumeform-reveal",
+  "files": [
+    {
+      "path": "plumeform-reveal.css",
+      "content": "/* Scroll-driven entrances, CSS only. An element fades in, rises 22px and sharpens from a\n   6px blur over its first 220px in the window (animation-timeline: view()). A fixed px\n   range (not a % of the element) means tall cards that start on the first screen are\n   already settled at load. --plumeform-step (0, 1, 2 …) starts an item 40px later, for\n   staggered lists. Browsers without scroll timelines, and reduced motion, show everything\n   in place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-reveal-rise,\n    .plumeform-reveal-fade {\n      animation: plumeform-reveal-rise cubic-bezier(0.2, 0.8, 0.2, 1) both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--plumeform-step, 0) * 40px) entry calc(220px + var(--plumeform-step, 0) * 40px);\n    }\n    .plumeform-reveal-fade {\n      animation-name: plumeform-reveal-fade;\n    }\n  }\n}\n\n@keyframes plumeform-reveal-rise {\n  from {\n    opacity: 0;\n    transform: translateY(22px);\n    filter: blur(6px);\n  }\n}\n@keyframes plumeform-reveal-fade {\n  from { opacity: 0; }\n}\n\n/* Content swapped by a click (a tab, a billing toggle) comes in quickly: give the new\n   content a fresh React key to replay it. */\n.plumeform-swap-in {\n  animation: plumeform-reveal-swap 340ms cubic-bezier(0.2, 0.8, 0.2, 1) both;\n}\n@keyframes plumeform-reveal-swap {\n  from { opacity: 0; transform: translateY(6px); }\n}\n@media (prefers-reduced-motion: reduce) {\n  .plumeform-swap-in { animation: none; }\n}\n"
+    },
+    {
+      "path": "plumeform-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-reveal.css\";\n\n/** rise: fade + 22px lift + blur to sharp · fade: opacity only */\nexport type PlumeformRevealEffect = \"rise\" | \"fade\";\n\n/** The class for an effect, to put straight on your own element. */\nexport function plumeformReveal(effect: PlumeformRevealEffect = \"rise\") {\n  return `plumeform-reveal-${effect}`;\n}\n\n/** Inline style for a staggered item: each step starts 40px of scroll later. */\nexport function plumeformRevealStyle(step = 0): CSSProperties {\n  return { \"--plumeform-step\": step } as CSSProperties;\n}\n\n/** Class for content that should replay a short 340ms swap-in when its React key changes. */\nexport const plumeformSwapIn = \"plumeform-swap-in\";\n\nexport interface PlumeformRevealProps {\n  /** what happens as it enters the window */\n  effect?: PlumeformRevealEffect;\n  /** stagger position in a list (0, 1, 2 …) */\n  step?: number;\n  /** the element to render */\n  as?: \"div\" | \"li\" | \"p\" | \"span\" | \"section\";\n  children?: ReactNode;\n  className?: string;\n}\n\n/** Wraps content in a CSS scroll-driven entrance. Static HTML and old browsers show it in place. */\nexport function PlumeformReveal({ effect = \"rise\", step = 0, as: Tag = \"div\", children, className }: PlumeformRevealProps) {\n  return (\n    <Tag className={cn(plumeformReveal(effect), className)} style={plumeformRevealStyle(step)}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "effect",
+      "type": "enum",
+      "required": false,
+      "default": "rise",
+      "description": "what happens as it enters the window"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position in a list (0, 1, 2 …)"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "72977b1f7da44254bc2369e3d6bdf22b31ef4d93a61625141dcfb09b5749bb02"
+}

@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher FAQ",
+  "description": "Questions on cream in two halves. Left, a big numbered list of question groups (the chosen one at full strength, the others at 15%) that stays in view while you scroll; right, the chosen group's questions between thin rules, each with a 40px outlined square plus button that fills dark on hover and opens the answer with a smooth height change. Phones stack the group list on top.",
+  "category": "faq",
+  "site": "hhhusher",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "tabs",
+    "light",
+    "cream",
+    "large-type",
+    "sticky",
+    "minimal"
+  ],
+  "notes": [
+    "switching groups and opening answers need JavaScript (hydrate: visible)"
+  ],
+  "entry": "hhhusher-faq.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-faq",
+  "files": [
+    {
+      "path": "hhhusher-faq.tsx",
+      "content": "import { useState } from \"react\";\nimport { Minus, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { hhhusherEase } from \"@foundry/hhhusher-button\";\n\nexport interface HhhusherFaqItem {\n  question: string;\n  answer: string;\n}\n\nexport interface HhhusherFaqGroup {\n  /** the big number, e.g. \"01\" */\n  index: string;\n  /** the group's name */\n  label: string;\n  items: HhhusherFaqItem[];\n}\n\nexport interface HhhusherFaqProps {\n  /** two or more groups of questions; the big list on the left switches between them */\n  groups: HhhusherFaqGroup[];\n  /** the id other links jump to */\n  id?: string;\n  className?: string;\n}\n\n/**\n * Questions on cream in two halves. Left, a big numbered list of groups (the chosen one full\n * strength, the others at 15%) that stays in view while you scroll; right, the chosen group's\n * questions between thin rules, each with a square plus button that fills dark on hover and\n * opens the answer below. Phones put the group list on top.\n */\nexport function HhhusherFaq({ groups, id, className }: HhhusherFaqProps) {\n  const [group, setGroup] = useState(0);\n  const [open, setOpen] = useState<number | null>(null);\n  const items = groups[group]?.items ?? [];\n\n  return (\n    <section id={id} className={cn(\"bg-background pt-section pb-[7rem] text-foreground lg:pb-[10rem]\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-8 px-gutter lg:grid-cols-2 lg:gap-10\">\n        <ul className=\"flex flex-col gap-1 self-start lg:sticky lg:top-30 lg:max-w-[30.3rem]\">\n          {groups.map((g, i) => (\n            <li key={i}>\n              <button\n                type=\"button\"\n                aria-pressed={i === group}\n                onClick={() => {\n                  setGroup(i);\n                  setOpen(null);\n                }}\n                className={cn(\n                  \"flex w-full items-baseline justify-between font-display text-[1.82rem] leading-[1.2] font-medium tracking-[-0.01em] transition-opacity duration-400 lg:text-[2.6875rem] lg:leading-[1.45]\",\n                  hhhusherEase,\n                  i === group ? \"opacity-100\" : \"opacity-15 hover:opacity-40\",\n                )}\n              >\n                <span>{g.index}</span>\n                <span>{g.label}</span>\n              </button>\n            </li>\n          ))}\n        </ul>\n\n        <ul className=\"border-b-2 border-border lg:border-b-0\">\n          {items.map((item, i) => {\n            const isOpen = open === i;\n            return (\n              <li key={`${group}-${i}`} className=\"border-t-2 border-border\">\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  onClick={() => setOpen(isOpen ? null : i)}\n                  className=\"group flex w-full items-center justify-between gap-6 py-[1.3rem] text-left lg:py-5\"\n                >\n                  <span className=\"font-display text-[1.04rem] leading-[1.3] font-medium tracking-[-0.01em] lg:text-2xl lg:leading-[1.3]\">{item.question}</span>\n                  <span\n                    aria-hidden\n                    className={cn(\n                      \"flex size-[2.6rem] shrink-0 items-center justify-center rounded-lg border-2 border-foreground transition-colors duration-300 group-hover:bg-foreground group-hover:text-background lg:size-10\",\n                      hhhusherEase,\n                    )}\n                  >\n                    {isOpen ? <Minus className=\"size-5\" strokeWidth={1.75} /> : <Plus className=\"size-5\" strokeWidth={1.75} />}\n                  </span>\n                </button>\n                <div className={cn(\"grid transition-[grid-template-rows] duration-400 motion-reduce:transition-none\", hhhusherEase, isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}>\n                  <div className=\"overflow-hidden\">\n                    <p className=\"max-w-[36rem] pb-6 text-[1.04rem] leading-[1.3] font-medium text-muted-foreground lg:text-base\">{item.answer}</p>\n                  </div>\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-button"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "HhhusherFaqGroup[]",
+      "required": true,
+      "description": "two or more groups of questions; the big list on the left switches between them"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the id other links jump to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1ad497563488410f84af8b7a10852bb580abe3a900b295218cf18636e5386e8f"
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wiemer dot field",
+  "description": "A perforated-plate backdrop: a 12×9 grid of pale round dots behind centred content (a form card). Each dot turns dark grey the moment the pointer touches it and fades back over 0.8s, so the pointer leaves a short trail. Dots show from large screens up.",
+  "category": "background",
+  "site": "wiemer",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "dots",
+    "grid",
+    "pattern",
+    "hover",
+    "trail",
+    "minimal",
+    "css"
+  ],
+  "notes": [
+    "CSS only; the trail is a plain transition with no delay on and a slow fade off",
+    "below lg the content sits in normal flow without dots"
+  ],
+  "entry": "wiemer-dot-field.tsx",
+  "source": "foundry",
+  "name": "wiemer-dot-field",
+  "files": [
+    {
+      "path": "wiemer-dot-field.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerDotFieldProps {\n  /** what sits in the middle of the field, e.g. a form card */\n  children?: ReactNode;\n  /** dots across (default 12) */\n  cols?: number;\n  /** rows of dots (default 9); the field is cols:rows in proportion */\n  rows?: number;\n  className?: string;\n}\n\n/** A grid of pale dots that darken under the pointer, with content centred over it. */\nexport function WiemerDotField({ children, cols = 12, rows = 9, className }: WiemerDotFieldProps) {\n  return (\n    <div className={cn(\"relative lg:grid lg:place-items-center\", className)}>\n      <div\n        aria-hidden=\"true\"\n        className=\"absolute inset-0 hidden lg:grid\"\n        style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }}\n      >\n        {Array.from({ length: cols * rows }, (_, i) => (\n          <span key={i} className=\"grid place-items-center\">\n            <span className=\"aspect-square w-[32%] rounded-full bg-foreground/5 transition-colors duration-[800ms] ease-out hover:bg-foreground/50 hover:duration-0 motion-reduce:transition-none\" />\n          </span>\n        ))}\n      </div>\n      {/* the field keeps the dots round: its height follows its width */}\n      <div className=\"hidden lg:block\" style={{ gridArea: \"1 / 1\", width: \"100%\", aspectRatio: `${cols} / ${rows}` }} />\n      <div className=\"pointer-events-none relative w-full lg:[grid-area:1/1] [&>*]:pointer-events-auto\">{children}</div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what sits in the middle of the field, e.g. a form card"
+    },
+    {
+      "name": "cols",
+      "type": "number",
+      "required": false,
+      "default": "12",
+      "description": "dots across (default 12)"
+    },
+    {
+      "name": "rows",
+      "type": "number",
+      "required": false,
+      "default": "9",
+      "description": "rows of dots (default 9); the field is cols:rows in proportion"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8fec4dc6dc0f52a67144b1aa8a21aa88d4a0c335aa8540634e6fdba2e2a268de"
+}
