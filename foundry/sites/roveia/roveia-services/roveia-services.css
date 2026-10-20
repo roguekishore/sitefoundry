@@ -1,0 +1,68 @@
+/* Desktop, with scroll-driven animations: the section becomes a 380svh track whose content is
+   pinned; the row slides left until its last card meets the right padding, and card i is "in
+   focus" (pale blue tint, illustration in colour) around step i of the run. Without support
+   or with reduced motion the row simply scrolls sideways. --steps = cards − 1, --i = index. */
+@media (min-width: 64rem) {
+  .roveia-services-viewport {
+    overflow-x: auto;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .roveia-services-fade {
+      animation: roveia-services-fade linear both;
+      animation-timeline: view();
+      animation-range: entry 0px entry 260px;
+    }
+  }
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .roveia-services-track {
+      height: 380svh;
+      view-timeline-name: --roveia-services;
+    }
+    .roveia-services-viewport {
+      overflow: clip;
+    }
+    .roveia-services-row,
+    .roveia-services-card,
+    .roveia-services-media {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --roveia-services;
+    }
+    .roveia-services-row {
+      animation-name: roveia-services-slide;
+      animation-range: contain 0% contain 100%;
+    }
+    .roveia-services-card,
+    .roveia-services-media {
+      animation-range:
+        contain calc((var(--i) - 1) * 100% / var(--steps))
+        contain calc((var(--i) + 1) * 100% / var(--steps));
+    }
+    .roveia-services-card {
+      animation-name: roveia-services-focus;
+    }
+    .roveia-services-media {
+      animation-name: roveia-services-colour;
+    }
+  }
+}
+
+@keyframes roveia-services-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% + 100vw)); }
+}
+@keyframes roveia-services-focus {
+  0%, 15%, 85%, 100% { background-color: var(--muted); }
+  40%, 60% { background-color: var(--accent); }
+}
+@keyframes roveia-services-colour {
+  0%, 15%, 85%, 100% { filter: grayscale(1); }
+  40%, 60% { filter: grayscale(0); }
+}
+@keyframes roveia-services-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
