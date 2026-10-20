@@ -1,0 +1,44 @@
+/* Scroll-driven reveals, all CSS. Each element animates on its own trip into the window
+   (animation-timeline: view()), with the site's easing. Without support, or with reduced
+   motion, everything simply shows.
+   --hh-step (0, 1, 2 …) starts an item a little later, for staggered lists.
+   --hh-rise sets how far "rise" travels (default 40px); --hh-drift the parallax (72px). */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hhhusher-v2-reveal-word,
+    .hhhusher-v2-reveal-fade,
+    .hhhusher-v2-reveal-rise {
+      animation-timing-function: cubic-bezier(0.32, 0.94, 0.6, 1);
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--hh-step, 0) * 8%) entry calc(100% + var(--hh-step, 0) * 8%);
+    }
+    /* a word: the whole line it sits on rises with it, since they share a position */
+    .hhhusher-v2-reveal-word {
+      animation-name: hhhusher-v2-reveal-rise;
+      --hh-rise: 0.9em;
+      animation-range: entry 10% entry 100%;
+    }
+    .hhhusher-v2-reveal-fade { animation-name: hhhusher-v2-reveal-fade; }
+    .hhhusher-v2-reveal-rise { animation-name: hhhusher-v2-reveal-rise; }
+
+    /* drift is scrubbed for the whole trip: the picture slides inside its frame */
+    .hhhusher-v2-reveal-drift {
+      animation: hhhusher-v2-reveal-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes hhhusher-v2-reveal-fade {
+  from { opacity: 0; }
+}
+@keyframes hhhusher-v2-reveal-rise {
+  from { opacity: 0; transform: translateY(var(--hh-rise, 40px)); }
+}
+@keyframes hhhusher-v2-reveal-drift {
+  from { transform: translateY(calc(-1 * var(--hh-drift, 72px))); }
+  to { transform: translateY(var(--hh-drift, 72px)); }
+}
