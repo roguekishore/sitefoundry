@@ -43,19 +43,13 @@ resource "aws_instance" "preview" {
 # It is running when created (step D provisions it then).
 resource "aws_instance" "run" {
   ami                                  = data.aws_ssm_parameter.al2023_arm64.value
-  instance_type                        = "t4g.large"
+  instance_type                        = "m7g.large"
   subnet_id                            = aws_subnet.public.id
   private_ip                           = var.run_ip
   associate_public_ip_address          = true
   vpc_security_group_ids               = [aws_security_group.run.id]
   iam_instance_profile                 = aws_iam_instance_profile.run.name
   instance_initiated_shutdown_behavior = "stop"
-
-  # Standard, not unlimited: when CPU credits run out it slows down instead of billing
-  # the surplus.
-  credit_specification {
-    cpu_credits = "standard"
-  }
 
   metadata_options {
     http_tokens = "required"
@@ -71,7 +65,9 @@ resource "aws_instance" "run" {
   tags = { Name = "foundry-run" }
 
   lifecycle {
-    ignore_changes = [ami, user_data]
+    # The public IP is released while the instance is stopped, so Terraform would read
+    # it as false and want to replace the instance.
+    ignore_changes = [ami, user_data, associate_public_ip_address]
   }
 }
 

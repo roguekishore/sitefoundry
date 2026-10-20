@@ -7,7 +7,7 @@ and the reasons are in [`docs/phase-7-cloud.md`](../docs/phase-7-cloud.md).
 |---|---|
 | `network.tf` | VPC `10.20.0.0/16`, one public subnet in `ap-south-1a`, internet gateway, no NAT, no peering; the two security groups |
 | `iam.tf` | `FoundryPreview` (SSM + `FoundryRunSwitch`: start/stop the run instance only) and `FoundryRun` (SSM only) |
-| `instances.tf` | preview: t4g.small, `10.20.0.10`, Elastic IP, 20 GB · run: t4g.large, `10.20.0.20`, auto-assigned public IP, 40 GB, standard credits, shutdown = stop |
+| `instances.tf` | preview: t4g.small, `10.20.0.10`, Elastic IP, 20 GB · run: m7g.large, `10.20.0.20`, auto-assigned public IP, 40 GB, shutdown = stop |
 | `outputs.tf` | the Elastic IP, the DNS records, instance IDs, private IPs |
 | `aws.sh` | `aws` as jk with the root-key CSV, never a profile |
 | `ssm.sh` | runs scripts on an instance over SSM and prints their output |

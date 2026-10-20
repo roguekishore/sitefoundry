@@ -1,4 +1,4 @@
-# The run instance (t4g.large, 10.20.0.20): the runner, the Gemini CLI, Claude Code,
+# The run instance (m7g.large, 10.20.0.20): the runner, the Gemini CLI, Claude Code,
 # Chromium. After common.sh. First run: makes the deploy key, prints it, stops. Add the key
 # (with write access), run it again.
 REPO_DIR=/home/runner/sitefoundry
