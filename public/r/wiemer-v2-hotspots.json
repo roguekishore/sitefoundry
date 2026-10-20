@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer photo hotspots (v2)",
+  "description": "A full-bleed photo band (115% of the window tall on desktop, 2:3 on phones) with small white round “+” buttons pinned to details. Each grows and turns 45° on hover and opens a small card with a close-up and a few words; the photo drifts slowly as you scroll. Without hotspots it is a plain parallax photo band.",
+  "category": "gallery",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "photo",
+    "full-bleed",
+    "hotspots",
+    "popover",
+    "parallax",
+    "hover",
+    "minimal",
+    "window-height"
+  ],
+  "notes": [
+    "hotspot cards use the native popover attribute: no JavaScript, light-dismiss and Esc built in",
+    "place hotspots in % of the photo; on phones the 2:3 crop moves things, so check positions there",
+    "height \"photo\" gives a 3:2 band (the contact page uses it without hotspots)"
+  ],
+  "entry": "wiemer-v2-hotspots.tsx",
+  "source": "foundry",
+  "name": "wiemer-v2-hotspots",
+  "files": [
+    {
+      "path": "wiemer-v2-hotspots.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { Plus, X } from \"lucide-react\";\nimport { wiemerV2Reveal, wiemerV2RevealStyle } from \"@foundry/wiemer-v2-reveal\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerV2Hotspot {\n  /** where the button sits, in % of the photo's width from the left */\n  x: number;\n  /** where the button sits, in % of the photo's height from the top */\n  y: number;\n  /** the detail's title (also the button's label for screen readers) */\n  title: string;\n  /** a sentence or two about this detail */\n  text: string;\n  /** a close-up picture for the detail card (4:3, an <img>); grey when empty */\n  media?: ReactNode;\n}\n\nexport interface WiemerV2HotspotsProps {\n  /** the full-bleed photo (an <img>), cropped to fill; a soft placeholder when empty */\n  media?: ReactNode;\n  /** for screen readers: what the photo shows */\n  label: string;\n  /** the round \"+\" buttons on the photo; leave empty for a plain photo band */\n  hotspots?: WiemerV2Hotspot[];\n  /** how tall it is from lg: \"window\" = 115% of the window, \"photo\" = a 3:2 frame (phones are 2:3) */\n  height?: \"window\" | \"photo\";\n  /** let the photo drift inside the band as you scroll (default on) */\n  drift?: boolean;\n  /** screen-reader label for the detail card's close button */\n  closeLabel?: string;\n  className?: string;\n}\n\n/**\n * A full-bleed photo band with small white round \"+\" buttons pinned to details in the picture.\n * A button grows and turns 45° on hover; a click opens a small card with a close-up and a few\n * words (a native popover, no JavaScript). The photo drifts slowly as you scroll.\n */\nexport function WiemerV2Hotspots({ media, label, hotspots = [], height = \"window\", drift = true, closeLabel, className }: WiemerV2HotspotsProps) {\n  const id = useId().replace(/:/g, \"\");\n  return (\n    <section aria-label={label} className={cn(\"relative aspect-[2/3] w-full overflow-clip bg-muted\", height === \"window\" ? \"lg:aspect-auto lg:h-[115svh]\" : \"lg:aspect-[3/2]\", className)}>\n      <div\n        className={cn(drift && wiemerV2Reveal(\"drift\"), \"absolute inset-x-0\", drift ? \"-top-[8%] h-[116%]\" : \"inset-y-0\", \"[&>img]:size-full [&>img]:object-cover\")}\n        style={drift ? wiemerV2RevealStyle(0, [-80, 40]) : undefined}\n      >\n        {media ?? <div className=\"size-full bg-[radial-gradient(ellipse_at_45%_55%,color-mix(in_oklab,var(--glow)_35%,transparent),transparent_70%)]\" />}\n      </div>\n\n      {hotspots.map((h, i) => (\n        <div key={i} className=\"absolute\" style={{ left: `${h.x}%`, top: `${h.y}%` }}>\n          <button\n            type=\"button\"\n            popoverTarget={`${id}-spot-${i}`}\n            aria-label={h.title}\n            className=\"-translate-x-1/2 -translate-y-1/2 grid size-8 place-items-center rounded-full bg-card text-card-foreground transition-transform duration-300 ease-[cubic-bezier(0.38,0.005,0.215,1)] hover:scale-110 hover:rotate-45 motion-reduce:transition-none lg:size-12\"\n          >\n            <Plus aria-hidden=\"true\" strokeWidth={1.5} className=\"size-3.5 lg:size-4\" />\n          </button>\n          <div\n            id={`${id}-spot-${i}`}\n            popover=\"auto\"\n            className=\"fixed inset-0 m-auto h-fit w-[min(28rem,calc(100vw-2rem))] rounded-xl bg-background p-3 text-foreground backdrop:bg-foreground/30\"\n          >\n            <div className=\"aspect-[4/3] overflow-clip rounded-md bg-muted [&>img]:size-full [&>img]:object-cover\">{h.media}</div>\n            <div className=\"flex items-start justify-between gap-4 px-1 pt-4 pb-1\">\n              <div>\n                <p className=\"text-xl leading-[1.2] font-medium tracking-[-0.02em]\">{h.title}</p>\n                <p className=\"mt-2 text-[0.9375rem] leading-[1.35]\">{h.text}</p>\n              </div>\n              <button type=\"button\" popoverTarget={`${id}-spot-${i}`} popoverTargetAction=\"hide\" aria-label={closeLabel} className=\"grid size-8 shrink-0 place-items-center rounded-full border border-border transition-colors hover:bg-muted\">\n                <X aria-hidden=\"true\" strokeWidth={1.5} className=\"size-4\" />\n              </button>\n            </div>\n          </div>\n        </div>\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed photo (an <img>), cropped to fill; a soft placeholder when empty"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "for screen readers: what the photo shows"
+    },
+    {
+      "name": "hotspots",
+      "type": "WiemerV2Hotspot[]",
+      "required": false,
+      "default": "[]",
+      "description": "the round \"+\" buttons on the photo; leave empty for a plain photo band"
+    },
+    {
+      "name": "height",
+      "type": "enum",
+      "required": false,
+      "default": "window",
+      "description": "how tall it is from lg: \"window\" = 115% of the window, \"photo\" = a 3:2 frame (phones are 2:3)"
+    },
+    {
+      "name": "drift",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "let the photo drift inside the band as you scroll (default on)"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the detail card's close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "92e787e392cbcc5f5774c510f71ee51c6931be9767116d2c9c1ac89d6ce9417d"
+}

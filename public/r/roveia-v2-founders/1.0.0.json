@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia flying testimonials (v2)",
+  "description": "A centred 70px heading with a blue second line, pinned while white quote cards (blue quote mark, 16px quote, grey name, small video slot, a soft coloured glow in one corner, a soft shadow) fly across from right to left one after another, turning from +10° to −10° on a gentle arc. On phones the cards stack under the heading and rise in.",
+  "category": "testimonials",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "cards",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "horizontal",
+    "rotate",
+    "light",
+    "shadow"
+  ],
+  "notes": [
+    "desktop (≥1024px): a window-tall stage pinned inside a 680svh wrapper; CSS scroll-driven, no JavaScript",
+    "without scroll-driven animation support the cards simply stack under the heading",
+    "corner glow per card: highlight (peach), primary or muted"
+  ],
+  "entry": "roveia-v2-founders.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-founders",
+  "files": [
+    {
+      "path": "roveia-v2-founders.css",
+      "content": "/* ≥1024px: a window-tall stage pins inside a tall wrapper; the quote cards fly across it from\n   off the right edge to off the left one, turning from +10° to −10° on a slight arc, one after\n   another (each card's range is set inline from its index).\n   Phones: the cards stack and rise in. */\n@supports (animation-timeline: view()) {\n  @media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-founders-card {\n      animation: roveia-v2-founders-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 5% cover 25%;\n    }\n  }\n  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-founders {\n      height: 680svh;\n      view-timeline: --roveia-v2-founders block;\n    }\n    .roveia-v2-founders-stage {\n      position: sticky;\n      top: 0;\n      height: 100svh;\n      min-height: 44rem;\n      overflow: clip;\n      padding: 0;\n    }\n    .roveia-v2-founders-heading {\n      position: absolute;\n      inset-inline: 0;\n      top: calc(50% - 9.5rem);\n    }\n    .roveia-v2-founders-track {\n      position: absolute;\n      inset: 0;\n      display: block;\n      max-width: none;\n      margin: 0;\n    }\n    .roveia-v2-founders-card {\n      position: absolute;\n      width: 21rem;\n      top: 50%;\n      left: 50%;\n      margin: -14rem 0 0 -10.5rem;\n      animation: roveia-v2-founders-fly linear both;\n      animation-timeline: --roveia-v2-founders;\n      animation-range: var(--roveia-v2-founders-range);\n    }\n  }\n}\n@keyframes roveia-v2-founders-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes roveia-v2-founders-fly {\n  from { transform: translateX(calc(50vw + 12rem)) translateY(-4rem) rotate(10deg); }\n  50% { transform: translateX(0) translateY(-1rem) rotate(0deg); }\n  to { transform: translateX(calc(-50vw - 12rem)) translateY(-4rem) rotate(-10deg); }\n}\n"
+    },
+    {
+      "path": "roveia-v2-founders.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { Quote } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-founders.css\";\n\nexport interface RoveiaV2Quote {\n  /** what they said */\n  quote: string;\n  /** who said it, e.g. \"Mara, founder of Brisa\" */\n  author: string;\n  /** the colour of the soft glow in the card's corner */\n  tint?: \"highlight\" | \"primary\" | \"muted\";\n  /** a short video or picture of them; a placeholder shows when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaV2FoundersProps {\n  /** the ink line of the heading */\n  heading: string;\n  /** the blue line under it */\n  accent?: string;\n  /** the quote cards, in the order they fly past */\n  quotes: RoveiaV2Quote[];\n  className?: string;\n}\n\nconst glows = {\n  highlight: \"var(--highlight)\",\n  primary: \"var(--primary)\",\n  muted: \"var(--muted-foreground)\",\n};\n\n/** Card i flies across during its own slice of the pinned range; slices overlap. */\nfunction range(i: number, n: number): CSSProperties {\n  const span = 45;\n  const step = n > 1 ? (100 - span) / (n - 1) : 0;\n  return { \"--roveia-v2-founders-range\": `contain ${step * i}% contain ${step * i + span}%` } as CSSProperties;\n}\n\nexport function RoveiaV2Founders({ heading, accent, quotes, className }: RoveiaV2FoundersProps) {\n  return (\n    <section className={cn(\"roveia-v2-founders relative bg-background text-foreground\", className)}>\n      <div className=\"roveia-v2-founders-stage px-gutter pt-14 pb-16 lg:pt-[7.5rem] lg:pb-[7.5rem]\">\n        <RoveiaV2Heading size=\"statement\" accent={accent} accentAt=\"below\" className=\"roveia-v2-founders-heading text-center\">\n          {heading}\n        </RoveiaV2Heading>\n\n        <ul className=\"roveia-v2-founders-track mt-10 space-y-10 lg:mx-auto lg:mt-16 lg:grid lg:max-w-page lg:grid-cols-3 lg:gap-6 lg:space-y-0\">\n          {quotes.map((q, i) => (\n            <li\n              key={q.author}\n              className=\"roveia-v2-founders-card rounded-lg bg-card p-6 text-card-foreground shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\"\n              style={{\n                ...range(i, quotes.length),\n                backgroundImage: `radial-gradient(circle at 100% 100%, color-mix(in oklab, ${glows[q.tint ?? \"highlight\"]} 16%, transparent), transparent 56%)`,\n              }}\n            >\n              <Quote aria-hidden className=\"size-7 rotate-180 fill-primary text-primary\" strokeWidth={0} />\n              <blockquote className=\"mt-4 text-base leading-6 tracking-[-0.03em]\">{q.quote}</blockquote>\n              <p className=\"mt-4 text-sm leading-6 text-muted-foreground\">— {q.author}</p>\n              <div className=\"mt-6 aspect-[1.78] overflow-clip rounded-[calc(var(--radius)/3)] lg:aspect-[1.49] [&>*]:size-full [&>*]:object-cover\">\n                {q.media ?? <div className=\"bg-muted\" />}\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the ink line of the heading"
+    },
+    {
+      "name": "accent",
+      "type": "string",
+      "required": false,
+      "description": "the blue line under it"
+    },
+    {
+      "name": "quotes",
+      "type": "RoveiaV2Quote[]",
+      "required": true,
+      "description": "the quote cards, in the order they fly past"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fbb4464d30eece4000605f1bb7a5d1e88864e84ec350502ee03bbb6fa2b18097"
+}

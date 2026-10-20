@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wiemer form card (v2)",
+  "description": "A calm off-white form card: optional heading and intro slot, labelled white inputs with hairline borders and accent asterisks, a consent checkbox, and a full-width accent button that presses in slightly.",
+  "category": "contact",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "form",
+    "card",
+    "contact",
+    "waitlist",
+    "minimal",
+    "flat",
+    "light"
+  ],
+  "notes": [
+    "posts to `action`; wire validation and sending in your app",
+    "made to sit on a muted band"
+  ],
+  "entry": "wiemer-v2-form-card.tsx",
+  "source": "foundry",
+  "name": "wiemer-v2-form-card",
+  "files": [
+    {
+      "path": "wiemer-v2-form-card.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerV2FormField {\n  /** the field's name in the submitted form */\n  name: string;\n  /** the label above the field */\n  label: string;\n  /** text, email or a multi-line message */\n  type?: \"text\" | \"email\" | \"textarea\";\n  /** grey hint text inside the empty field */\n  placeholder?: string;\n  /** marks the label with an accent asterisk */\n  required?: boolean;\n}\n\nexport interface WiemerV2FormCardProps {\n  /** optional heading at the top of the card */\n  title?: string;\n  /** anything between the heading and the fields (a price box, say) */\n  intro?: ReactNode;\n  /** the fields, top to bottom */\n  fields: WiemerV2FormField[];\n  /** the consent line next to the checkbox (may hold a link) */\n  consent?: ReactNode;\n  /** the button's text */\n  submitLabel: string;\n  /** where the form posts to */\n  action?: string;\n  className?: string;\n}\n\n/**\n * An off-white form card with 14px corners: optional heading and intro, labelled white\n * fields with hairline borders, a consent checkbox and a full-width accent button.\n */\nexport function WiemerV2FormCard({ title, intro, fields, consent, submitLabel, action, className }: WiemerV2FormCardProps) {\n  const field = \"w-full rounded-sm border border-input bg-card px-4 text-base text-card-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none\";\n  return (\n    <form action={action} method=\"post\" className={cn(\"rounded-lg bg-background p-6 text-foreground lg:rounded-xl lg:p-8\", className)}>\n      {title && <h3 className=\"text-xl leading-[1.2] font-medium tracking-[-0.01em] lg:text-[max(1.25rem,1.6vw)]\">{title}</h3>}\n      {intro && <div className=\"mt-5\">{intro}</div>}\n      <div className={cn(\"space-y-8\", (title || intro) && \"mt-8\")}>\n        {fields.map((f) => (\n          <label key={f.name} className=\"block\">\n            <span className=\"block text-[0.9375rem]\">\n              {f.label}\n              {f.required && <span className=\"text-primary\"> *</span>}\n            </span>\n            {f.type === \"textarea\" ? (\n              <textarea name={f.name} required={f.required} placeholder={f.placeholder} rows={5} className={cn(field, \"mt-2 block min-h-36 py-3\")} />\n            ) : (\n              <input name={f.name} type={f.type ?? \"text\"} required={f.required} placeholder={f.placeholder} className={cn(field, \"mt-2 block h-[3.125rem]\")} />\n            )}\n          </label>\n        ))}\n      </div>\n      {consent && (\n        <label className=\"mt-8 flex items-start gap-2.5 text-sm leading-[1.2]\">\n          <input type=\"checkbox\" required className=\"mt-px size-[1.125rem] shrink-0 appearance-none rounded-[3px] border border-foreground bg-card checked:bg-foreground\" />\n          <span className=\"[&_a]:underline [&_a]:underline-offset-2\">\n            {consent}\n            <span className=\"text-primary\">*</span>\n          </span>\n        </label>\n      )}\n      <button\n        type=\"submit\"\n        className=\"mt-8 h-11 w-full rounded-sm bg-primary text-[0.9375rem] font-medium text-primary-foreground transition-all duration-200 ease-out hover:bg-primary/90 active:scale-[0.98] motion-reduce:transition-none\"\n      >\n        {submitLabel}\n      </button>\n    </form>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "optional heading at the top of the card"
+    },
+    {
+      "name": "intro",
+      "type": "ReactNode",
+      "required": false,
+      "description": "anything between the heading and the fields (a price box, say)"
+    },
+    {
+      "name": "fields",
+      "type": "WiemerV2FormField[]",
+      "required": true,
+      "description": "the fields, top to bottom"
+    },
+    {
+      "name": "consent",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the consent line next to the checkbox (may hold a link)"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button's text"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "172233cae4654ecd1f5ad0c0c7e78926f5ddd14a59cda1f92c33dd3fdee582b7"
+}

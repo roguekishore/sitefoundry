@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher bento (v2)",
+  "description": "Three dark 5px-cornered media cards on a bronze-tan band: one tall card filling the left 60%, two shorter ones stacked on the right (all stacked on phones). Each has a title, a short paragraph and a yellow caps read-more link at the top left over a full-bleed film; the text fades in as the card comes up the window.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "dark",
+    "tan",
+    "video",
+    "reveal",
+    "grid"
+  ],
+  "notes": [
+    "the band is the secondary colour; the cards force dark",
+    "one media slot per card (video or picture), cropped like cover",
+    "follows the overview slider on the same band (no top padding of its own by default)"
+  ],
+  "entry": "hhhusher-v2-bento.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-bento",
+  "files": [
+    {
+      "path": "hhhusher-v2-bento.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button } from \"@foundry/hhhusher-v2-button\";\nimport { hhhusherV2Reveal } from \"@foundry/hhhusher-v2-reveal\";\n\nexport interface HhhusherV2BentoCard {\n  title: string;\n  text: string;\n  /** the yellow read-more link under the text */\n  link?: { label: string; href: string };\n  /** the card's film or picture, full-bleed behind the text; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface HhhusherV2BentoProps {\n  /** three cards: the first is the tall one on the left */\n  cards: HhhusherV2BentoCard[];\n  /** top padding, for when it doesn't follow the overview slider */\n  padTop?: boolean;\n  id?: string;\n  className?: string;\n}\n\n// desktop: the tall card spans both rows; the two right cards are 485 and 420px tall\nconst place = [\"lg:row-span-2 min-h-[25rem]\", \"min-h-[26rem] lg:min-h-0\", \"min-h-[22.5rem] lg:min-h-0\"];\n\nexport function HhhusherV2Bento({ cards, padTop = false, id, className }: HhhusherV2BentoProps) {\n  return (\n    <section id={id} className={cn(\"bg-secondary pt-4 pb-[calc(var(--section-y)*0.9)] text-secondary-foreground lg:pt-10 lg:pb-[calc(var(--section-y)*1.55)]\", padTop && \"pt-section lg:pt-section\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-4 px-gutter lg:grid-cols-[61.4fr_35.7fr] lg:grid-rows-[30.3rem_26.25rem] lg:gap-10\">\n        {cards.slice(0, 3).map((card, i) => (\n          <article key={card.title} className={cn(\"dark relative isolate overflow-clip rounded-lg bg-muted p-5 text-foreground lg:p-10\", place[i])}>\n            <div className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n              {card.media ?? <div className=\"size-full bg-linear-to-b from-foreground/5 to-transparent\" />}\n            </div>\n            <div className={cn(hhhusherV2Reveal(\"fade\"), \"max-w-[20rem] lg:max-w-[20.5rem]\")}>\n              <h3 className=\"font-display text-[1.56rem] leading-[1.1] font-[570] tracking-[-0.02em] lg:text-[2rem]\">{card.title}</h3>\n              <p className=\"mt-3 font-display text-[1.04rem] leading-[1.32] font-[570] tracking-[-0.02em] lg:mt-6 lg:text-base lg:leading-[1.3]\">{card.text}</p>\n              {card.link && (\n                <HhhusherV2Button variant=\"link\" href={card.link.href} className=\"mt-3 text-[0.55rem] text-primary lg:mt-6 lg:text-[0.75rem]\">\n                  {card.link.label}\n                </HhhusherV2Button>\n              )}\n            </div>\n          </article>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "cards",
+      "type": "HhhusherV2BentoCard[]",
+      "required": true,
+      "description": "three cards: the first is the tall one on the left"
+    },
+    {
+      "name": "padTop",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "top padding, for when it doesn't follow the overview slider"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "188d878ae5041c0b63a4198348134f0c79230df3f83f230652bb14b4aa6143ba"
+}

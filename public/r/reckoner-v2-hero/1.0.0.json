@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reckoner hero (v2)",
+  "description": "A full-window merlot screen with one huge, regular-weight linen headline set about a third of the way down (110px on desktop, 48px on phones), two square buttons under it, a small news link and a 'scroll' cue at the bottom whose little arrows stream downwards on a loop, and a faint vertical label at the right edge. A full-bleed artwork slot sits behind everything.",
+  "category": "hero",
+  "site": "reckoner-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-screen",
+    "dark-surface",
+    "warm",
+    "editorial",
+    "finance",
+    "minimal",
+    "loop",
+    "large-type"
+  ],
+  "notes": [
+    "uses the primary colour as its surface: pair it with reckoner-v2-header, which floats over it",
+    "100svh tall; the background slot is cropped to it like object-fit: cover (empty: a soft highlight wash, a placeholder)",
+    "the scroll cue's loop is CSS only and stops under reduced motion"
+  ],
+  "entry": "reckoner-v2-hero.tsx",
+  "source": "foundry",
+  "name": "reckoner-v2-hero",
+  "files": [
+    {
+      "path": "reckoner-v2-hero.css",
+      "content": "/* The scroll cue: two small arrows stacked in a short window, both sliding down one step and\n   fading as they go, so they seem to stream downwards. Hover pauses them and pulls them\n   together. */\n.reckoner-v2-hero-cue-arrow {\n  animation: reckoner-v2-hero-cue 0.5s linear infinite;\n}\n\n@keyframes reckoner-v2-hero-cue {\n  from {\n    translate: 0 -100%;\n    opacity: 1;\n  }\n  to {\n    translate: 0 0;\n    opacity: 0.25;\n  }\n}\n\n.group:hover .reckoner-v2-hero-cue-arrow {\n  animation-play-state: paused;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .reckoner-v2-hero-cue-arrow {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "reckoner-v2-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowDown, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReckonerV2Button } from \"@foundry/reckoner-v2-button\";\nimport \"./reckoner-v2-hero.css\";\n\nexport interface ReckonerV2HeroProps {\n  /** the headline; wraps by itself (about two lines on desktop, three on phones) */\n  title: string;\n  /** square buttons under the headline: an outline one and a tinted one, usually */\n  actions?: { label: string; href: string; variant?: \"outline\" | \"tint\" }[];\n  /** a short news link at the bottom left, with an arrow */\n  news?: { label: string; href: string };\n  /** the cue at the bottom right that points down the page */\n  scrollCue?: { label: string; href: string };\n  /** a faint label written down the right edge on desktop (e.g. the parent company) */\n  aside?: string;\n  /** full-bleed artwork behind everything (an <img>, <video> or <canvas>); cropped to the screen */\n  background?: ReactNode;\n  className?: string;\n}\n\nexport function ReckonerV2Hero({ title, actions = [], news, scrollCue, aside, background, className }: ReckonerV2HeroProps) {\n  return (\n    <section className={cn(\"relative isolate flex min-h-svh flex-col overflow-clip bg-primary text-primary-foreground\", className)}>\n      {/* artwork slot: fills the screen like object-fit: cover */}\n      <div aria-hidden={!background} className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n        {background ?? (\n          <div className=\"bg-[radial-gradient(ellipse_70%_60%_at_72%_30%,color-mix(in_oklab,var(--highlight)_16%,transparent),transparent_70%)]\" />\n        )}\n      </div>\n\n      <div className=\"mx-auto flex w-full max-w-page flex-1 flex-col px-gutter pt-[46svh] pb-8 lg:pt-[33svh] lg:pb-12\">\n        <h1 className=\"max-w-[18ch] font-display text-[3rem] leading-none font-normal tracking-[-0.02em] text-balance lg:max-w-[56rem] lg:text-[6.875rem]\">\n          {title}\n        </h1>\n\n        {actions.length > 0 && (\n          <div className=\"mt-8 flex flex-wrap gap-3 lg:mt-12\">\n            {actions.map((a) => (\n              <ReckonerV2Button key={a.href} href={a.href} variant={a.variant ?? \"outline\"}>\n                {a.label}\n              </ReckonerV2Button>\n            ))}\n          </div>\n        )}\n\n        {(news || scrollCue) && (\n          <div className=\"mt-auto flex items-end justify-between gap-6 pt-10\">\n            {news ? (\n              <a\n                href={news.href}\n                className=\"group/news max-w-[22rem] text-sm leading-[1.4] text-primary-foreground/70 transition-colors duration-500 hover:text-primary-foreground motion-reduce:transition-none\"\n              >\n                {news.label}\n                <ArrowRight\n                  aria-hidden\n                  className=\"ml-2 inline size-[1em] align-[-0.125em] transition-[translate] duration-500 group-hover/news:translate-x-[0.125em] motion-reduce:transition-none\"\n                  strokeWidth={1.75}\n                />\n              </a>\n            ) : (\n              <span />\n            )}\n            {scrollCue && (\n              <a href={scrollCue.href} className=\"group flex shrink-0 items-center gap-3 text-xs tracking-[0.02em] uppercase\">\n                {scrollCue.label}\n                <span\n                  aria-hidden\n                  className=\"flex h-8 w-8 flex-col items-center justify-center gap-[0.25em] overflow-clip border border-primary-foreground/15 transition-[gap] duration-500 group-hover:gap-[0.0625em] motion-reduce:transition-none\"\n                >\n                  <ArrowDown className=\"reckoner-v2-hero-cue-arrow size-3\" strokeWidth={1.75} />\n                  <ArrowDown className=\"reckoner-v2-hero-cue-arrow size-3\" strokeWidth={1.75} />\n                </span>\n              </a>\n            )}\n          </div>\n        )}\n      </div>\n\n      {aside && (\n        <p className=\"absolute top-[38%] right-gutter hidden text-xs text-primary-foreground/20 [writing-mode:vertical-rl] lg:block\">{aside}</p>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reckoner-v2-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; wraps by itself (about two lines on desktop, three on phones)"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; variant?: \"outline\" | \"tint\"; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "square buttons under the headline: an outline one and a tinted one, usually"
+    },
+    {
+      "name": "news",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a short news link at the bottom left, with an arrow"
+    },
+    {
+      "name": "scrollCue",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the cue at the bottom right that points down the page"
+    },
+    {
+      "name": "aside",
+      "type": "string",
+      "required": false,
+      "description": "a faint label written down the right edge on desktop (e.g. the parent company)"
+    },
+    {
+      "name": "background",
+      "type": "ReactNode",
+      "required": false,
+      "description": "full-bleed artwork behind everything (an <img>, <video> or <canvas>); cropped to the screen"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c8ee36306b9509180bf240549a7743009135892c45cff3dcb457069cf7a8a203"
+}

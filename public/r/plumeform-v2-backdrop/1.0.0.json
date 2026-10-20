@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform band backdrop (v2)",
+  "description": "The full-bleed layer behind a dark band: a slot for a background video, WebGL scene or image (cropped like object-fit: cover), with an optional dark veil for legible text. Empty, it is a plain dark surface with a soft teal glow wash. It fades in on load or as it scrolls into view.",
+  "category": "background",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "dark",
+    "glow",
+    "placeholder",
+    "fade",
+    "reveal",
+    "media"
+  ],
+  "notes": [
+    "place it inside a relative, isolated parent; it sits at z-index -10 and fills it",
+    "the empty state is a placeholder for the original's fluted-glass canvas"
+  ],
+  "entry": "plumeform-v2-backdrop.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-backdrop",
+  "files": [
+    {
+      "path": "plumeform-v2-backdrop.css",
+      "content": "/* load: the hero's slow aurora fade. view: a quick fade as the band scrolls in. */\n@media (prefers-reduced-motion: no-preference) {\n  .plumeform-v2-backdrop-load {\n    animation: plumeform-v2-backdrop-aurora 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-v2-backdrop-view {\n      animation: plumeform-v2-backdrop-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 25%;\n    }\n  }\n}\n\n@keyframes plumeform-v2-backdrop-aurora {\n  from { opacity: 0; transform: scale(1.04); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes plumeform-v2-backdrop-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "plumeform-v2-backdrop.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-v2-backdrop.css\";\n\nexport interface PlumeformV2BackdropProps {\n  /** a video, canvas or image filling the band; empty shows the placeholder */\n  media?: ReactNode;\n  /** fade in once on page load (hero) or as the band scrolls into view */\n  entrance?: \"load\" | \"view\" | \"none\";\n  /** darken the middle and the edges so text on top stays readable */\n  veil?: boolean;\n  className?: string;\n}\n\nexport function PlumeformV2Backdrop({ media, entrance = \"view\", veil = false, className }: PlumeformV2BackdropProps) {\n  return (\n    <div aria-hidden className={cn(\"pointer-events-none absolute inset-0 -z-10 overflow-clip bg-background\", className)}>\n      <div\n        className={cn(\n          \"absolute inset-0 [&>*]:size-full [&>*]:object-cover\",\n          entrance === \"load\" && \"plumeform-v2-backdrop-load\",\n          entrance === \"view\" && \"plumeform-v2-backdrop-view\",\n        )}\n      >\n        {media ?? (\n          <div className=\"bg-[radial-gradient(45%_60%_at_25%_30%,color-mix(in_oklab,var(--glow)_32%,transparent),transparent_75%),radial-gradient(40%_55%_at_75%_65%,color-mix(in_oklab,var(--glow)_22%,transparent),transparent_75%)]\" />\n        )}\n      </div>\n      {veil && (\n        <div className=\"absolute inset-0 bg-[radial-gradient(62%_64%_at_50%_42%,color-mix(in_oklab,var(--background)_72%,transparent),transparent_78%),linear-gradient(color-mix(in_oklab,var(--background)_55%,transparent),transparent_24%,transparent_62%,var(--background))]\" />\n      )}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a video, canvas or image filling the band; empty shows the placeholder"
+    },
+    {
+      "name": "entrance",
+      "type": "enum",
+      "required": false,
+      "default": "view",
+      "description": "fade in once on page load (hero) or as the band scrolls into view"
+    },
+    {
+      "name": "veil",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "darken the middle and the edges so text on top stays readable"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "504a026ab137585615e34fa8352fb5235cab28661607ebe035305ac189422cd0"
+}

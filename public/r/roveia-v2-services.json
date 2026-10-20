@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia sideways service track (v2)",
+  "description": "A 32px label over a row of pale grey 500px service cards (illustration slot, 32px title, small translucent chips, a one-line promise). On desktop the section pins and the row slides left with the scroll; the card passing the middle takes a soft blue tint and its picture turns from grey to colour. On phones the cards stack and rise in.",
+  "category": "features",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "services",
+    "cards",
+    "horizontal-scroll",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "light",
+    "chips",
+    "reveal"
+  ],
+  "notes": [
+    "desktop (≥1024px): a window-tall stage (h-svh) pinned inside a 380svh wrapper; CSS scroll-driven, no JavaScript",
+    "the media slot takes an illustration (object-fit: contain); empty it is a faint tile"
+  ],
+  "entry": "roveia-v2-services.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-services",
+  "files": [
+    {
+      "path": "roveia-v2-services.css",
+      "content": "/* ≥1024px: a window-tall stage pins inside a wrapper almost four windows tall, and the row of\n   cards slides left until its last card is in view. The card passing the middle takes a pale\n   blue tint and its picture loses its grey filter; ranges are set inline from each index.\n   Phones: the heading fades in and the cards rise in as they enter. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-services-fade {\n      animation: roveia-v2-services-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 35%;\n    }\n  }\n  @media (max-width: 1023.98px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-services-card {\n      animation: roveia-v2-services-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 5% cover 25%;\n    }\n  }\n  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-services {\n      height: 380svh;\n      view-timeline: --roveia-v2-services block;\n    }\n    .roveia-v2-services-stage {\n      position: sticky;\n      top: 0;\n      display: flex;\n      flex-direction: column;\n      height: 100svh;\n      min-height: 44rem;\n      overflow: clip;\n      padding-bottom: 0;\n    }\n    .roveia-v2-services-track {\n      width: max-content;\n      overflow: visible;\n      animation: roveia-v2-services-slide linear both;\n      animation-timeline: --roveia-v2-services;\n      animation-range: contain 0% contain 100%;\n    }\n    .roveia-v2-services-card {\n      animation: roveia-v2-services-focus linear both;\n      animation-timeline: --roveia-v2-services;\n      animation-range: var(--roveia-v2-services-range);\n    }\n    .roveia-v2-services-media {\n      animation: roveia-v2-services-colour linear both;\n      animation-timeline: --roveia-v2-services;\n      animation-range: var(--roveia-v2-services-range);\n    }\n  }\n}\n@keyframes roveia-v2-services-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes roveia-v2-services-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes roveia-v2-services-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(calc(-100% + 100vw)); }\n}\n@keyframes roveia-v2-services-focus {\n  0%, 15%, 85%, 100% { background-color: var(--muted); }\n  40%, 60% { background-color: color-mix(in oklab, var(--primary) 7%, var(--muted)); }\n}\n@keyframes roveia-v2-services-colour {\n  0%, 15%, 85%, 100% { filter: grayscale(1); }\n  40%, 60% { filter: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-services.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Heading } from \"@foundry/roveia-v2-heading\";\nimport \"./roveia-v2-services.css\";\n\nexport interface RoveiaV2Service {\n  /** the service's name */\n  title: string;\n  /** small chips: channels, formats, methods */\n  chips?: string[];\n  /** a one-line promise under the chips */\n  line?: string;\n  /** the illustration at the top; a placeholder tile shows when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaV2ServicesProps {\n  /** the label above the row */\n  heading: string;\n  /** the service cards, in order */\n  services: RoveiaV2Service[];\n  className?: string;\n}\n\n/** Card i's moment in the pinned range: spread one card either side. */\nfunction range(i: number, n: number): CSSProperties {\n  const step = n > 1 ? 100 / (n - 1) : 0;\n  const at = step * i;\n  return { \"--roveia-v2-services-range\": `contain ${at - step}% contain ${at + step}%` } as CSSProperties;\n}\n\nexport function RoveiaV2Services({ heading, services, className }: RoveiaV2ServicesProps) {\n  const n = services.length;\n  return (\n    <section className={cn(\"roveia-v2-services relative bg-background text-foreground\", className)}>\n      <div className=\"roveia-v2-services-stage pt-14 pb-10 lg:pt-28 lg:pb-28\">\n        <div className=\"mx-auto w-full max-w-page px-gutter\">\n          <RoveiaV2Heading size=\"label\" className=\"roveia-v2-services-fade\">\n            {heading}\n          </RoveiaV2Heading>\n        </div>\n\n        <ul className=\"roveia-v2-services-track mt-14 space-y-5 px-gutter lg:mt-[3.75rem] lg:flex lg:gap-5 lg:overflow-x-auto lg:space-y-0 lg:px-[max(var(--page-gutter),calc((100vw_-_var(--page-width))/2_+_var(--page-gutter)))]\">\n          {services.map((s, i) => (\n            <li\n              key={s.title}\n              className=\"roveia-v2-services-card rounded-lg bg-muted p-6 lg:flex lg:h-[31.5rem] lg:w-[31.25rem] lg:shrink-0 lg:flex-col lg:p-10 lg:pt-6\"\n              style={range(i, n)}\n            >\n              <div className=\"roveia-v2-services-media mx-auto aspect-[1.27] w-full max-w-[20.25rem] overflow-clip rounded-lg [&>*]:size-full [&>*]:object-contain\">\n                {s.media ?? <div className=\"bg-foreground/5\" />}\n              </div>\n              <h3 className=\"mt-8 text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:mt-2\">{s.title}</h3>\n              {s.chips && s.chips.length > 0 && (\n                <ul className=\"mt-6 flex flex-wrap gap-1\">\n                  {s.chips.map((chip) => (\n                    <li key={chip} className=\"rounded-[calc(var(--radius)/3)] border border-border bg-foreground/5 px-2 py-1 text-base tracking-[-0.02em]\">\n                      {chip}\n                    </li>\n                  ))}\n                </ul>\n              )}\n              {s.line && <p className=\"mt-5 text-base leading-6 tracking-[-0.02em] lg:min-h-12\">{s.line}</p>}\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the label above the row"
+    },
+    {
+      "name": "services",
+      "type": "RoveiaV2Service[]",
+      "required": true,
+      "description": "the service cards, in order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7a74d6cd7ffbd06356679829604066e1d41e6acc3a09c490f3b6d1dd827ebeb2"
+}

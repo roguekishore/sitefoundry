@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform template gallery (v2)",
+  "description": "On paper: a heavy two-line heading whose second line is slate, a wrap of small filter pills (the first one solid), then a three-column grid of near-white glass cards, each with a small capital category, a bold name and a quiet detail line, and an arrow that slides in at the corner. Cards lift 2px with a firmer border on hover and rise into view in turn; an underlined link follows.",
+  "category": "gallery",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "templates",
+    "cards",
+    "filters",
+    "pills",
+    "glass",
+    "hover",
+    "lift",
+    "reveal",
+    "light"
+  ],
+  "notes": [
+    "the filter pills are links (point them at filtered pages); the first is shown as current"
+  ],
+  "entry": "plumeform-v2-templates.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-templates",
+  "files": [
+    {
+      "path": "plumeform-v2-templates.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2Template {\n  /** small capitals above the name */\n  category: string;\n  name: string;\n  /** a quiet line, e.g. \"9 questions · 2 min\" */\n  detail: string;\n  href: string;\n}\n\nexport interface PlumeformV2TemplatesProps {\n  /** the first heading line */\n  title: string;\n  /** the second heading line, in slate */\n  subtitle?: string;\n  body?: ReactNode;\n  /** filter pills; the first is shown as current */\n  filters?: { label: string; href: string }[];\n  templates: PlumeformV2Template[];\n  link?: { label: string; href: string };\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2Templates({ title, subtitle, body, filters, templates, link, id, className }: PlumeformV2TemplatesProps) {\n  return (\n    <section id={id} className={cn(\"bg-background px-gutter pt-[calc(var(--section-y)*0.75)] pb-12 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <PlumeformV2Reveal className=\"max-w-2xl\">\n          <h2 className=\"font-display text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-balance lg:text-5xl\">\n            {title}\n            {subtitle && <span className=\"block text-muted-foreground\">{subtitle}</span>}\n          </h2>\n          {body && <div className=\"mt-6 text-base leading-[1.65] text-muted-foreground lg:text-[1.0625rem]\">{body}</div>}\n        </PlumeformV2Reveal>\n        {filters && (\n          <PlumeformV2Reveal step={1} className=\"mt-9 flex flex-wrap gap-2\">\n            {filters.map((f, i) => (\n              <a\n                key={f.href}\n                href={f.href}\n                aria-current={i === 0 ? \"page\" : undefined}\n                className={cn(\n                  \"flex h-9 items-center rounded-full px-4 text-[0.8125rem] font-semibold transition-colors duration-150\",\n                  i === 0 ? \"bg-foreground text-background\" : \"border border-border bg-card/70 text-muted-foreground hover:border-primary/40 hover:text-foreground\",\n                )}\n              >\n                {f.label}\n              </a>\n            ))}\n          </PlumeformV2Reveal>\n        )}\n        <ul className=\"mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3\">\n          {templates.map((t, i) => (\n            <PlumeformV2Reveal as=\"li\" key={t.href} step={i % 3}>\n              <a\n                href={t.href}\n                className=\"group relative flex min-h-[9.5rem] flex-col rounded-lg border border-border bg-card/75 p-6 shadow-[inset_1px_1px_0_color-mix(in_oklab,var(--card)_85%,transparent),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent)] backdrop-blur-xl transition-[transform,border-color,box-shadow] duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)] motion-reduce:transition-none motion-reduce:hover:translate-y-0\"\n              >\n                <span className=\"text-[0.625rem] font-bold tracking-[0.2em] text-primary uppercase\">{t.category}</span>\n                <span className=\"mt-3 text-[1.0625rem] font-bold tracking-[-0.01em]\">{t.name}</span>\n                <span className=\"mt-auto pt-6 text-xs text-muted-foreground\">{t.detail}</span>\n                <ArrowUpRight\n                  aria-hidden\n                  className=\"absolute top-6 right-6 size-4 text-primary opacity-0 transition-[opacity,transform] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 motion-reduce:transition-none\"\n                  strokeWidth={2}\n                />\n              </a>\n            </PlumeformV2Reveal>\n          ))}\n        </ul>\n        {link && (\n          <PlumeformV2Reveal className=\"mt-10\">\n            <PlumeformV2Button variant=\"link\" href={link.href} arrow>\n              {link.label}\n            </PlumeformV2Button>\n          </PlumeformV2Reveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the first heading line"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "the second heading line, in slate"
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "filters",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "description": "filter pills; the first is shown as current"
+    },
+    {
+      "name": "templates",
+      "type": "PlumeformV2Template[]",
+      "required": true
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f7b48579646215848f04ec504edb05e88b71e81fdf4d57801539381a456666f0"
+}

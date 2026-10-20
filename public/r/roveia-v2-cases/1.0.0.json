@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia stacked case studies (v2)",
+  "description": "Window-tall rounded video cards that stick near the top one after another, each new card sliding up over the last while it grows from 90% to full size. A dark wash deepens towards the foot, where a 40px client name and a short story sit; over a card a blue pill with an arrow follows the cursor.",
+  "category": "gallery",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "case-studies",
+    "cards",
+    "stack",
+    "sticky",
+    "pinned",
+    "scale",
+    "scrubbed",
+    "dark",
+    "video",
+    "cursor"
+  ],
+  "notes": [
+    "desktop cards are sized by the window (calc(100svh − 2rem)); phones get 400px cards that stack the same way",
+    "cards wrap themselves in .dark; the media slot takes a video or picture (object-fit: cover)",
+    "the cursor-following pill needs JavaScript (hydrate: visible); without it the pill sits in the centre on hover"
+  ],
+  "entry": "roveia-v2-cases.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "roveia-v2-cases",
+  "files": [
+    {
+      "path": "roveia-v2-cases.css",
+      "content": "/* Each card sticks near the top and the next one slides up over it. While a card rises into\n   the window it grows from 90% to full size (scrubbed with the scroll). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-cases-card {\n      transform-origin: 50% 0;\n      animation: roveia-v2-cases-grow linear both;\n      animation-timeline: view();\n      animation-range: entry 0% contain 0%;\n    }\n  }\n}\n@keyframes roveia-v2-cases-grow {\n  from { transform: scale(0.9); }\n  to { transform: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-cases.tsx",
+      "content": "import type { MouseEvent, ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./roveia-v2-cases.css\";\n\nexport interface RoveiaV2Case {\n  /** the client's name */\n  title: string;\n  /** what was done and what came of it */\n  description: string;\n  /** where the full story lives */\n  href?: string;\n  /** the video or picture filling the card; a placeholder shows when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaV2CasesProps {\n  /** the stories, stacked in order */\n  cases: RoveiaV2Case[];\n  /** the blue pill that follows the cursor over a card */\n  pillLabel?: string;\n  className?: string;\n}\n\n// the pill follows the pointer: its position is kept in two CSS variables on the card\nfunction follow(e: MouseEvent<HTMLAnchorElement>) {\n  const box = e.currentTarget.getBoundingClientRect();\n  e.currentTarget.style.setProperty(\"--roveia-v2-cases-x\", `${e.clientX - box.left}px`);\n  e.currentTarget.style.setProperty(\"--roveia-v2-cases-y\", `${e.clientY - box.top}px`);\n}\n\nexport function RoveiaV2Cases({ cases, pillLabel, className }: RoveiaV2CasesProps) {\n  return (\n    <section className={cn(\"relative bg-background px-5 pt-5 pb-10 lg:px-9 lg:pt-0 lg:pb-0\", className)}>\n      {cases.map((c, i) => (\n        <a\n          key={c.title}\n          href={c.href ?? \"#\"}\n          onMouseMove={follow}\n          className={cn(\n            \"roveia-v2-cases-card group dark sticky top-20 mb-8 flex h-[25rem] flex-col justify-end overflow-clip rounded-lg bg-background text-foreground\",\n            \"lg:top-4 lg:mb-8 lg:h-[calc(100svh-2rem)] lg:min-h-[36rem] lg:rounded-2xl\",\n            i === cases.length - 1 && \"lg:mb-0\",\n          )}\n        >\n          <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">\n            {c.media ?? <div className=\"bg-muted bg-[radial-gradient(ellipse_at_70%_30%,color-mix(in_oklab,var(--glow)_22%,transparent),transparent_60%)]\" />}\n          </div>\n          {/* the original's wash: 40% black all over, deepening to 90% at the foot */}\n          <div aria-hidden className=\"absolute inset-0 bg-[linear-gradient(to_bottom,transparent_54%,color-mix(in_oklab,var(--background)_50%,transparent)),linear-gradient(color-mix(in_oklab,var(--background)_40%,transparent),color-mix(in_oklab,var(--background)_40%,transparent))]\" />\n\n          <div className=\"relative px-6 pb-6 lg:max-w-[44rem] lg:px-[6.25rem] lg:pb-20\">\n            <h3 className=\"text-[2rem] leading-[1.2] font-normal tracking-[-0.03em] lg:text-[2.5rem]\">{c.title}</h3>\n            <p className=\"mt-2 text-sm leading-5 tracking-[-0.03em] text-foreground/75 lg:mt-6 lg:text-base lg:leading-6\">{c.description}</p>\n          </div>\n\n          {pillLabel && (\n            <span\n              aria-hidden\n              className=\"pointer-events-none absolute top-[var(--roveia-v2-cases-y,50%)] left-[var(--roveia-v2-cases-x,50%)] hidden -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-base tracking-[-0.03em] text-primary-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none lg:flex\"\n            >\n              {pillLabel}\n              <ArrowUpRight className=\"size-3.5\" strokeWidth={2} />\n            </span>\n          )}\n        </a>\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "cases",
+      "type": "RoveiaV2Case[]",
+      "required": true,
+      "description": "the stories, stacked in order"
+    },
+    {
+      "name": "pillLabel",
+      "type": "string",
+      "required": false,
+      "description": "the blue pill that follows the cursor over a card"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6c5ca352e2db58512716703d118bb273c728c2fc506f8777af28655c3828eae8"
+}

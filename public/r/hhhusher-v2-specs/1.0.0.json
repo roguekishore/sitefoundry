@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher spec sheet (v2)",
+  "description": "A near-black specification band: a huge two-line heading, a short note with a yellow button on the left, and on the right a three-column table in bold mono caps (group name, measurement, value pushed right), groups divided by a cream rule and rows by faint hairlines. On phones each group name gets its own row and the note follows the table. Groups fade in as they arrive.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "specs",
+    "table",
+    "dark",
+    "mono",
+    "uppercase",
+    "product",
+    "reveal",
+    "technical"
+  ],
+  "notes": [
+    "always dark (forces the dark class)",
+    "CSS-only reveals"
+  ],
+  "entry": "hhhusher-v2-specs.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-specs",
+  "files": [
+    {
+      "path": "hhhusher-v2-specs.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button } from \"@foundry/hhhusher-v2-button\";\nimport { HhhusherV2RevealText, hhhusherV2Reveal } from \"@foundry/hhhusher-v2-reveal\";\n\nexport interface HhhusherV2SpecGroup {\n  /** the group's name, in the first column */\n  name: string;\n  /** measurement → value rows */\n  rows: { label: string; value: string }[];\n}\n\nexport interface HhhusherV2SpecsProps {\n  /** the heading; use \\n to break it */\n  heading: string;\n  /** the short note beside (desktop) or under (phone) the table */\n  note?: string;\n  /** the yellow button under the note */\n  action?: { label: string; href: string };\n  groups: HhhusherV2SpecGroup[];\n  id?: string;\n  className?: string;\n}\n\nexport function HhhusherV2Specs({ heading, note, action, groups, id, className }: HhhusherV2SpecsProps) {\n  return (\n    <section id={id} className={cn(\"dark bg-background pt-[calc(var(--section-y)*1.1)] pb-[calc(var(--section-y)*1.1)] text-foreground lg:pt-[calc(var(--section-y)*1.08)] lg:pb-[calc(var(--section-y)*1.15)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        {heading.split(\"\\n\").map((line) => (\n          <HhhusherV2RevealText key={line} as=\"h2\" text={line} className=\"font-display text-[2.6rem] leading-[1] font-[570] tracking-[-0.02em] lg:text-[4.75rem] lg:leading-[1.03]\" />\n        ))}\n\n        <div className=\"mt-12 flex flex-col gap-16 lg:mt-20 lg:grid lg:grid-cols-[25.7%_minmax(0,1fr)] lg:gap-0\">\n          {(note || action) && (\n            <div className=\"order-2 lg:order-1\">\n              {note && <p className=\"max-w-[22rem] font-display text-[1.04rem] leading-[1.3] font-[570] tracking-[-0.01em] lg:max-w-[16.5rem] lg:text-base\">{note}</p>}\n              {action && (\n                <HhhusherV2Button href={action.href} className=\"mt-6 w-[3.9rem] lg:w-[5.25rem]\">\n                  {action.label}\n                </HhhusherV2Button>\n              )}\n            </div>\n          )}\n\n          <div className=\"order-1 font-mono text-[0.78rem] font-bold uppercase lg:order-2 lg:text-[0.875rem]\">\n            {groups.map((group) => (\n              <div key={group.name} className={cn(hhhusherV2Reveal(\"fade\"), \"grid border-t-2 border-foreground lg:grid-cols-[34.6%_minmax(0,1fr)]\")}>\n                <p className=\"border-b border-border py-5 lg:border-0 lg:py-[1.3rem]\">{group.name}</p>\n                <dl>\n                  {group.rows.map((row, i) => (\n                    <div key={row.label} className={cn(\"flex justify-between gap-6 py-5 lg:py-[1.3rem]\", i < group.rows.length - 1 && \"border-b border-border\")}>\n                      <dt>{row.label}</dt>\n                      <dd className=\"text-right\">{row.value}</dd>\n                    </div>\n                  ))}\n                </dl>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading; use \\n to break it"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the short note beside (desktop) or under (phone) the table"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the yellow button under the note"
+    },
+    {
+      "name": "groups",
+      "type": "HhhusherV2SpecGroup[]",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c233c69a2a743d25cf4e00af492555ddbe234ea45b6d771875b488ec69eded7"
+}

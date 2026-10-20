@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook footer (v2)",
+  "description": "A navy footer: wordmark, a short description, a row of pale social icons and two round outline compliance badges on the left; five tidy link columns on the right (with an optional small violet 'new' tag); a mono copyright and legal links along the bottom. Phones fold the columns into a two-up grid.",
+  "category": "footer",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "navy",
+    "links",
+    "columns",
+    "mono",
+    "badges"
+  ],
+  "notes": [
+    "always uses the theme's dark colours (dark class)",
+    "social icons come in as props (lucide 1.x has no brand icons)"
+  ],
+  "entry": "growthbook-v2-footer.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-footer",
+  "files": [
+    {
+      "path": "growthbook-v2-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GrowthbookV2FooterLink {\n  label: string;\n  href: string;\n  /** a small violet tag after the label, e.g. \"New\" */\n  badge?: string;\n}\n\nexport interface GrowthbookV2FooterProps {\n  /** the wordmark, drawn larger than in the header */\n  brand: ReactNode;\n  /** one or two sentences under it */\n  blurb: string;\n  /** icon links (YouTube, code host…) */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** round outline badges, e.g. compliance marks; each line is a line of text */\n  badges?: { label: string; lines: string[] }[];\n  /** up to five columns */\n  columns: { title: string; links: GrowthbookV2FooterLink[] }[];\n  /** the mono line at the bottom left */\n  copyright: string;\n  /** the mono links at the bottom right */\n  legal: { label: string; href: string }[];\n  className?: string;\n}\n\nexport function GrowthbookV2Footer({ brand, blurb, socials, badges = [], columns, copyright, legal, className }: GrowthbookV2FooterProps) {\n  const link = \"transition-colors duration-250 hover:text-accent-foreground motion-reduce:transition-none\";\n  const brandBlock = (\n    <div className=\"lg:max-w-[25rem]\">\n      <div className=\"[&_svg]:size-9 lg:[&_svg]:size-10\">{brand}</div>\n      <p className=\"mt-6 text-sm/[1.8]\">{blurb}</p>\n    </div>\n  );\n  const extras = (\n    <div>\n      <ul className=\"flex gap-8 lg:gap-11\">\n        {socials.map((s) => (\n          <li key={s.label}>\n            <a href={s.href} aria-label={s.label} className={cn(\"flex size-11 items-center justify-center text-muted-foreground [&_svg]:size-7\", link)}>\n              {s.icon}\n            </a>\n          </li>\n        ))}\n      </ul>\n      {badges.length > 0 && (\n        <ul className=\"mt-8 flex gap-2\">\n          {badges.map((b) => (\n            <li\n              key={b.label}\n              aria-label={b.label}\n              className=\"flex size-[4.5rem] flex-col items-center justify-center rounded-full border border-border text-center font-mono text-xs/[1.35] text-foreground/85 lg:size-24 lg:font-sans lg:text-base/[1.2]\"\n            >\n              {b.lines.map((l) => (\n                <span key={l}>{l}</span>\n              ))}\n            </li>\n          ))}\n        </ul>\n      )}\n    </div>\n  );\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter pt-12 pb-10 lg:pt-16 lg:pb-16\">\n        <div className=\"lg:flex lg:justify-between lg:gap-16\">\n          <div className=\"lg:flex lg:max-w-[25rem] lg:shrink lg:flex-col lg:gap-12\">\n            {brandBlock}\n            <div className=\"hidden lg:block\">{extras}</div>\n          </div>\n          <nav className=\"mt-16 grid grid-cols-2 gap-x-6 gap-y-14 lg:mt-0 lg:min-w-0 lg:flex-1 lg:grid-cols-[repeat(5,minmax(0,10.625rem))] lg:justify-end lg:gap-x-0 lg:gap-y-0\">\n            {columns.map((c) => (\n              <div key={c.title} className=\"lg:pr-4\">\n                <p className=\"text-sm lg:text-base\">{c.title}</p>\n                <ul className=\"mt-6 flex flex-col gap-3.5 text-sm lg:mt-5\">\n                  {c.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className={cn(\"inline-flex items-center gap-2\", link)}>\n                        {l.label}\n                        {l.badge && (\n                          <span className=\"rounded-sm bg-primary px-1.5 py-0.5 text-[0.6875rem]/none font-bold tracking-[0.1em] text-primary-foreground uppercase\">\n                            {l.badge}\n                          </span>\n                        )}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </nav>\n          <div className=\"mt-16 lg:hidden\">{extras}</div>\n        </div>\n        <div className=\"mt-12 grid grid-cols-3 gap-4 font-mono text-xs/[1.7] lg:mt-52 lg:flex lg:items-center lg:justify-between\">\n          <p>{copyright}</p>\n          <ul className=\"contents lg:flex lg:gap-8\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={link}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark, drawn larger than in the header"
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": true,
+      "description": "one or two sentences under it"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "icon links (YouTube, code host…)"
+    },
+    {
+      "name": "badges",
+      "type": "{ label: string; lines: string[]; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "round outline badges, e.g. compliance marks; each line is a line of text"
+    },
+    {
+      "name": "columns",
+      "type": "{ title: string; links: GrowthbookV2FooterLink[]; }[]",
+      "required": true,
+      "description": "up to five columns"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the mono line at the bottom left"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the mono links at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "407b4095f000a47ce262e190012c1a282b4e9610b5599cd0bf7309bdda7ae101"
+}

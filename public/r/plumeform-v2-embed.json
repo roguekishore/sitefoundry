@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform embed showcase (v2)",
+  "description": "On paper: an eyebrow and heavy heading at the left, the explanation, a bold one-liner and an underlined link at the right, both resting on the same baseline. Below, two glass panels side by side with a thin arrow between them (it turns downward on phones): one framed like a browser tab with three dots, an address and a label, the other like an app header with a status dot. A small centred caption closes it. Everything reveals on scroll; the fog drifts.",
+  "category": "features",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "embed",
+    "split",
+    "glass",
+    "pastel",
+    "browser",
+    "flow",
+    "reveal",
+    "light"
+  ],
+  "notes": [
+    "each panel's body is a slot (a screenshot or a live demo); empty, both are placeholders of panelHeight"
+  ],
+  "entry": "plumeform-v2-embed.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-embed",
+  "files": [
+    {
+      "path": "plumeform-v2-embed.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Panel } from \"@foundry/plumeform-v2-panel\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2EmbedPanel {\n  /** the label at the left of the panel's top strip (an address, an app name) */\n  label: string;\n  /** the label at the right of the strip */\n  note?: string;\n  /** browser: three dots before the label and capitals at the right; app: a status dot before the note */\n  chrome?: \"browser\" | \"app\";\n  /** the panel's body; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface PlumeformV2EmbedProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** the explanation at the right */\n  body: ReactNode;\n  /** a bold line under the explanation */\n  emphasis?: string;\n  link?: { label: string; href: string };\n  /** the two panels, left then right */\n  panels: [PlumeformV2EmbedPanel, PlumeformV2EmbedPanel];\n  /** height of the empty panel placeholders (CSS length) */\n  panelHeight?: string;\n  /** a small centred line under the panels */\n  caption?: string;\n  id?: string;\n  className?: string;\n}\n\nfunction Strip({ panel }: { panel: PlumeformV2EmbedPanel }) {\n  const browser = panel.chrome !== \"app\";\n  return (\n    <div className=\"flex items-center justify-between gap-3 border-b border-foreground/8 px-4 py-3.5 text-[0.6875rem] sm:px-6\">\n      <span className={cn(\"flex min-w-0 items-center gap-3\", browser ? \"text-muted-foreground\" : \"text-sm font-bold text-foreground\")}>\n        {browser && (\n          <span aria-hidden className=\"flex gap-1\">\n            {[0, 1, 2].map((d) => (\n              <span key={d} className=\"size-1.5 rounded-full bg-foreground/20\" />\n            ))}\n          </span>\n        )}\n        <span className=\"truncate\">{panel.label}</span>\n      </span>\n      {panel.note && (\n        <span className={cn(\"flex shrink-0 items-center gap-1.5\", browser ? \"font-semibold tracking-[0.14em] text-muted-foreground uppercase\" : \"text-primary\")}>\n          {!browser && <span aria-hidden className=\"size-1.5 rounded-full bg-primary\" />}\n          {panel.note}\n        </span>\n      )}\n    </div>\n  );\n}\n\nexport function PlumeformV2Embed({ eyebrow, title, body, emphasis, link, panels, panelHeight = \"33rem\", caption, id, className }: PlumeformV2EmbedProps) {\n  return (\n    <section id={id} className={cn(\"overflow-x-clip bg-background px-gutter py-[calc(var(--section-y)*0.8)] text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <div className=\"grid gap-8 lg:grid-cols-2 lg:items-end lg:gap-x-16\">\n          <PlumeformV2Heading eyebrow={eyebrow} title={title} className=\"max-w-xl\" />\n          <PlumeformV2Reveal step={1} className=\"max-w-md text-base leading-[1.65] text-muted-foreground lg:text-[1.0625rem]\">\n            <div>{body}</div>\n            {emphasis && <p className=\"mt-4 text-[0.9375rem] font-semibold text-foreground\">{emphasis}</p>}\n            {link && (\n              <PlumeformV2Button variant=\"link\" href={link.href} arrow className=\"mt-8\">\n                {link.label}\n              </PlumeformV2Button>\n            )}\n          </PlumeformV2Reveal>\n        </div>\n\n        <div className=\"mt-20 grid items-center gap-6 lg:mt-24 lg:grid-cols-[1fr_auto_1fr] lg:gap-2 lg:px-8\">\n          {panels.map((panel, i) => (\n            <PlumeformV2Reveal key={panel.label} step={i} className={cn(i === 1 && \"lg:order-3\")}>\n              <PlumeformV2Panel header={<Strip panel={panel} />} placeholderHeight={panelHeight} fog={i === 0 ? \"cool\" : \"warm\"} padding=\"md\">\n                {panel.media}\n              </PlumeformV2Panel>\n            </PlumeformV2Reveal>\n          ))}\n          <span aria-hidden className=\"flex justify-center text-primary lg:order-2 lg:px-1\">\n            <span className=\"h-px w-0 bg-primary/50 lg:w-10\" />\n            <ArrowRight className=\"-ml-1 size-4 rotate-90 lg:rotate-0\" strokeWidth={1.75} />\n          </span>\n        </div>\n\n        {caption && (\n          <PlumeformV2Reveal className=\"mt-14 text-center text-xs text-muted-foreground\">\n            <p>{caption}</p>\n          </PlumeformV2Reveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button",
+    "plumeform-v2-heading",
+    "plumeform-v2-panel",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the explanation at the right"
+    },
+    {
+      "name": "emphasis",
+      "type": "string",
+      "required": false,
+      "description": "a bold line under the explanation"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "panels",
+      "type": "[PlumeformV2EmbedPanel, PlumeformV2EmbedPanel]",
+      "required": true,
+      "description": "the two panels, left then right"
+    },
+    {
+      "name": "panelHeight",
+      "type": "string",
+      "required": false,
+      "default": "33rem",
+      "description": "height of the empty panel placeholders (CSS length)"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "a small centred line under the panels"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0c0c197d3e837ce0ad6fba3b2c15e606d5841c2551738627dc612052552193fa"
+}

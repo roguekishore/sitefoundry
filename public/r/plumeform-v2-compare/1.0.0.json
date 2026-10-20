@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform comparison table (v2)",
+  "description": "A calm comparison table on paper: an eyebrow (and optionally a heavy heading), then a 28px near-white card with a pale header row of small spaced capitals, hairline rows, bold first column, and one row inverted to solid ink with a mint marker beside its name. A small footnote and an optional line of underlined links follow. It scrolls sideways inside its card on narrow screens.",
+  "category": "pricing",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "table",
+    "comparison",
+    "minimal",
+    "hairline",
+    "light",
+    "reveal"
+  ],
+  "notes": [
+    "mark your own row with highlight: true; its tag shows next to the name"
+  ],
+  "entry": "plumeform-v2-compare.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-compare",
+  "files": [
+    {
+      "path": "plumeform-v2-compare.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Eyebrow, PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2CompareRow {\n  /** one cell per column; the first is the name */\n  cells: string[];\n  /** invert the row to solid ink (your own product) */\n  highlight?: boolean;\n  /** a small mint marker beside the name in the highlighted row */\n  tag?: string;\n}\n\nexport interface PlumeformV2CompareProps {\n  eyebrow?: string;\n  /** a heading above the table (optional: the landing page shows only the eyebrow) */\n  title?: ReactNode;\n  columns: string[];\n  rows: PlumeformV2CompareRow[];\n  /** small print under the table */\n  footnote?: ReactNode;\n  /** a line of underlined links under the footnote */\n  links?: { lead: string; items: { label: string; href: string }[] };\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2Compare({ eyebrow, title, columns, rows, footnote, links, id, className }: PlumeformV2CompareProps) {\n  return (\n    <section id={id} className={cn(\"bg-background px-gutter pt-16 pb-[calc(var(--section-y)*0.85)] text-foreground lg:pb-section\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        {title ? (\n          <PlumeformV2Heading eyebrow={eyebrow} title={title} className=\"max-w-3xl\" />\n        ) : (\n          eyebrow && <PlumeformV2Eyebrow className=\"text-[0.6875rem]\">{eyebrow}</PlumeformV2Eyebrow>\n        )}\n        <PlumeformV2Reveal className={cn(\"rounded-2xl border border-border bg-card shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent)]\", title ? \"mt-10\" : \"mt-6\")}>\n          <div className=\"overflow-x-auto rounded-2xl\">\n            <table className=\"w-full min-w-[40rem] text-left text-[0.9375rem]\">\n              <thead>\n                <tr className=\"bg-muted/70 text-[0.625rem] font-bold tracking-[0.2em] text-muted-foreground uppercase\">\n                  {columns.map((c) => (\n                    <th key={c} scope=\"col\" className=\"px-3 py-3.5 font-bold first:pl-3 lg:first:w-[24%]\">\n                      {c}\n                    </th>\n                  ))}\n                </tr>\n              </thead>\n              <tbody>\n                {rows.map((row) => (\n                  <tr key={row.cells[0]} className={cn(row.highlight ? \"bg-foreground font-bold text-background\" : \"border-t border-border text-muted-foreground\")}>\n                    {row.cells.map((cell, i) =>\n                      i === 0 ? (\n                        <th key={i} scope=\"row\" className={cn(\"px-3 py-4 font-bold\", !row.highlight && \"text-foreground\")}>\n                          {cell}\n                          {row.highlight && row.tag && <span className=\"ml-2 text-xs font-semibold text-highlight italic\">{row.tag}</span>}\n                        </th>\n                      ) : (\n                        <td key={i} className=\"px-3 py-4\">\n                          {cell}\n                        </td>\n                      ),\n                    )}\n                  </tr>\n                ))}\n              </tbody>\n            </table>\n          </div>\n        </PlumeformV2Reveal>\n        {footnote && <p className=\"mt-5 text-xs leading-relaxed text-muted-foreground\">{footnote}</p>}\n        {links && (\n          <p className=\"mt-8 text-sm text-muted-foreground\">\n            {links.lead}{\" \"}\n            {links.items.map((l, i) => (\n              <span key={l.href}>\n                {i > 0 && <span aria-hidden> · </span>}\n                <a href={l.href} className=\"border-b-2 border-primary font-bold text-foreground transition-colors hover:text-primary\">\n                  {l.label}\n                </a>\n              </span>\n            ))}\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-heading",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a heading above the table (optional: the landing page shows only the eyebrow)"
+    },
+    {
+      "name": "columns",
+      "type": "string[]",
+      "required": true
+    },
+    {
+      "name": "rows",
+      "type": "PlumeformV2CompareRow[]",
+      "required": true
+    },
+    {
+      "name": "footnote",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small print under the table"
+    },
+    {
+      "name": "links",
+      "type": "{ lead: string; items: { label: string; href: string; }[]; }",
+      "required": false,
+      "description": "a line of underlined links under the footnote"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5f23145559e8139c4614e0653e891388dd9b134e0216c8b1ba008e26379e3a85"
+}

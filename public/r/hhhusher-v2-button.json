@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "HHHusher button (v2)",
+  "description": "Small, square-shouldered buttons in bold monospaced caps with 5px corners: a signal-yellow buy button that empties to a yellow outline on hover, cream-glass buttons for dark backdrops, an outlined button, and a plain 'discover more →' text link that dims on hover.",
+  "category": "button",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "mono",
+    "uppercase",
+    "glass",
+    "yellow",
+    "minimal"
+  ],
+  "notes": [
+    "glass and outline are foreground-coloured: put them on dark bands (the dark class) for the original look",
+    "hover timing is the original's: 0.3s cubic-bezier(0.32, 0.94, 0.6, 1)"
+  ],
+  "entry": "hhhusher-v2-button.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-button",
+  "files": [
+    {
+      "path": "hhhusher-v2-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HhhusherV2ButtonProps {\n  children?: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: yellow, empties to a yellow outline on hover · glass: cream at 15% (for dark\n   * backdrops), outlined on hover · soft: cream at 20%, a little brighter on hover (the play\n   * button) · outline: 2px foreground border · link: bare caps text with an arrow, dims on hover\n   */\n  variant?: \"primary\" | \"glass\" | \"soft\" | \"outline\" | \"link\";\n  /** md: 43px tall (the original's buy buttons) · sm: 36px · icon: a 43px square */\n  size?: \"sm\" | \"md\" | \"icon\";\n  /** for the link variant: the arrow after the label (default on) */\n  arrow?: boolean;\n  /** stretch to the container's width */\n  block?: boolean;\n  /** for an icon-only button: what a screen reader says */\n  label?: string;\n  type?: \"button\" | \"submit\";\n  onClick?: () => void;\n  className?: string;\n}\n\n// The site's one easing for every hover, 0.3s.\nexport const hhhusherV2Ease = \"duration-300 ease-[cubic-bezier(0.32,0.94,0.6,1)] motion-reduce:transition-none\";\n\nconst sizes = {\n  sm: \"h-9 px-4\",\n  md: \"h-[2.6875rem] px-5\",\n  icon: \"size-[2.6875rem]\",\n};\n\nconst variants = {\n  primary: \"border-2 border-primary bg-primary text-primary-foreground hover:bg-transparent hover:text-primary\",\n  glass: \"border-2 border-transparent bg-foreground/15 text-foreground hover:border-foreground hover:bg-transparent\",\n  soft: \"border-2 border-transparent bg-foreground/20 text-primary hover:bg-foreground/40\",\n  outline: \"border-2 border-foreground/80 text-foreground hover:bg-foreground hover:text-background\",\n};\n\n/** Buttons and the \"discover more →\" link, in the site's bold monospaced caps. */\nexport function HhhusherV2Button({ children, href, variant = \"primary\", size = \"md\", arrow = true, block, label, type = \"button\", onClick, className }: HhhusherV2ButtonProps) {\n  const isLink = variant === \"link\";\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center gap-1.5 font-mono text-[0.75rem] leading-none font-bold tracking-normal whitespace-nowrap uppercase transition-[background-color,color,border-color,opacity]\",\n    hhhusherV2Ease,\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    isLink ? \"h-auto px-0 text-current hover:opacity-70\" : cn(\"rounded-lg\", sizes[size], variants[variant]),\n    block && \"w-full\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {isLink && arrow && (\n        <svg aria-hidden viewBox=\"0 0 10 10\" className=\"size-[0.6rem] shrink-0 fill-none stroke-current stroke-[1.6]\">\n          <path d=\"M1 5h7.5M5.5 2 8.5 5l-3 3\" />\n        </svg>\n      )}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick} aria-label={label}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes} onClick={onClick} aria-label={label}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: yellow, empties to a yellow outline on hover · glass: cream at 15% (for dark\nbackdrops), outlined on hover · soft: cream at 20%, a little brighter on hover (the play\nbutton) · outline: 2px foreground border · link: bare caps text with an arrow, dims on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: 43px tall (the original's buy buttons) · sm: 36px · icon: a 43px square"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "for the link variant: the arrow after the label (default on)"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the container's width"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "for an icon-only button: what a screen reader says"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "994b39fddbd0ef7989bc9a799bbeaeb74b6b8d34abee065f1a3e3f0b313af8ca"
+}

@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform button (v2)",
+  "description": "Pill buttons and an underlined link. Solid is foreground-coloured (ink on paper, paper on the dark bands) and turns plume teal (mint on dark) on hover with a 1px lift; soft is a quiet bordered pill; link is bold text with a 2px teal underline and a separately underlined arrow.",
+  "category": "button",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "link",
+    "underline",
+    "hover",
+    "lift"
+  ],
+  "notes": [
+    "solid follows the foreground colour, so it flips between ink and paper with the dark class"
+  ],
+  "entry": "plumeform-v2-button.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-button",
+  "files": [
+    {
+      "path": "plumeform-v2-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PlumeformV2ButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** where it goes; without it the button is a <button> */\n  href?: string;\n  /** solid pill (foreground colour), soft bordered pill, or an underlined text link */\n  variant?: \"solid\" | \"soft\" | \"link\";\n  /** sm: 32px tall (header), md: 40px, lg: 48px */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** show an arrow after the label */\n  arrow?: boolean;\n  /** stretch to the width of its container */\n  block?: boolean;\n  /** for a <button>: the form button type */\n  type?: \"button\" | \"submit\";\n  /** marks a toggle as selected (aria-pressed) */\n  pressed?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-8 px-4 text-[0.8125rem]\",\n  md: \"h-10 px-5 text-sm\",\n  lg: \"h-12 px-8 text-[0.9375rem]\",\n};\n\nexport function PlumeformV2Button({\n  children,\n  href,\n  variant = \"solid\",\n  size = \"md\",\n  arrow = false,\n  block = false,\n  type = \"button\",\n  pressed,\n  onClick,\n  className,\n}: PlumeformV2ButtonProps) {\n  const classes =\n    variant === \"link\"\n      ? cn(\n          \"group/btn inline-flex items-center gap-2 text-sm font-bold text-foreground transition-colors duration-200\",\n          className,\n        )\n      : cn(\n          \"inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full font-bold whitespace-nowrap\",\n          \"transition-[background-color,color,transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-px motion-reduce:transition-none motion-reduce:hover:translate-y-0\",\n          variant === \"solid\" &&\n            \"bg-foreground text-background shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_8px_24px_-12px_color-mix(in_oklab,var(--foreground)_25%,transparent)] hover:bg-primary hover:text-primary-foreground\",\n          variant === \"soft\" && \"border border-border bg-secondary text-secondary-foreground hover:border-primary/40 hover:bg-accent\",\n          sizes[size],\n          block && \"w-full\",\n          className,\n        );\n\n  const inner =\n    variant === \"link\" ? (\n      <>\n        <span className=\"border-b-2 border-primary pb-0.5\">{children}</span>\n        {arrow && (\n          <span className=\"border-b-2 border-primary pb-0.5 transition-transform duration-200 group-hover/btn:translate-x-0.5 motion-reduce:transition-none\">\n            <ArrowRight className=\"size-4\" strokeWidth={2.25} aria-hidden />\n          </span>\n        )}\n      </>\n    ) : (\n      <>\n        {children}\n        {arrow && <ArrowRight className=\"size-4\" strokeWidth={2.25} aria-hidden />}\n      </>\n    );\n\n  if (href) {\n    return (\n      <a href={href} className={classes} onClick={onClick}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={classes} onClick={onClick} aria-pressed={pressed}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it goes; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid pill (foreground colour), soft bordered pill, or an underlined text link"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 32px tall (header), md: 40px, lg: 48px"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "show an arrow after the label"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "stretch to the width of its container"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: the form button type"
+    },
+    {
+      "name": "pressed",
+      "type": "boolean",
+      "required": false,
+      "description": "marks a toggle as selected (aria-pressed)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3531045e331499f7aabfd3befda6c7b85a9a94515410fe1abdba18121af66374"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform glass panel (v2)",
+  "description": "A near-white glass panel (20px corners, white inner edge, faint long shadow) floating in a pastel fog of sky, peach, butter and mint blobs that drift with the scroll and slowly breathe. Holds a product demo, screenshot or form; empty, it shows a plain placeholder of the given height.",
+  "category": "card",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "panel",
+    "glass",
+    "pastel",
+    "fog",
+    "blur",
+    "parallax",
+    "loop",
+    "light"
+  ],
+  "notes": [
+    "the fog uses chart-3, chart-4, chart-5 and glow; it spills about 3rem past the panel, so leave room around it",
+    "best on light themes; on dark themes it becomes a dark glass panel"
+  ],
+  "entry": "plumeform-v2-panel.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-panel",
+  "files": [
+    {
+      "path": "plumeform-v2-panel.css",
+      "content": "/* The fog blobs: each drifts with the scroll (outer span) and breathes slowly (inner span). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-v2-panel-drift {\n      animation: plumeform-v2-panel-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .plumeform-v2-panel-float {\n    animation: plumeform-v2-panel-float 12s ease-in-out infinite alternate;\n  }\n}\n\n@keyframes plumeform-v2-panel-drift {\n  from { transform: translate(14px, -50px) scale(1.1); }\n  to { transform: translate(2px, -10px) scale(1.02); }\n}\n\n@keyframes plumeform-v2-panel-float {\n  from { transform: translate(0, 0) scale(1); }\n  to { transform: translate(18px, -14px) scale(1.08); }\n}\n"
+    },
+    {
+      "path": "plumeform-v2-panel.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-v2-panel.css\";\n\nexport interface PlumeformV2PanelProps {\n  /** the panel's content (a demo, screenshot or form); empty shows a placeholder */\n  children?: ReactNode;\n  /** a strip across the top, above the padding (e.g. a browser bar) */\n  header?: ReactNode;\n  /** height of the empty placeholder, as a CSS length */\n  placeholderHeight?: string;\n  /** which colours lead the fog */\n  fog?: \"cool\" | \"warm\" | \"mint\";\n  /** padding inside the panel */\n  padding?: \"none\" | \"md\" | \"lg\";\n  className?: string;\n}\n\n// position and size, then colour token, of the three blobs for each fog\nconst fogs: Record<\"cool\" | \"warm\" | \"mint\", [string, string][]> = {\n  cool: [\n    [\"left-[2%] top-[30%] size-[65%]\", \"chart-3\"],\n    [\"right-[-4%] bottom-[0%] size-[60%]\", \"chart-4\"],\n    [\"right-[10%] top-[-5%] size-[55%]\", \"glow\"],\n  ],\n  warm: [\n    [\"left-[-4%] top-[15%] size-[65%]\", \"chart-5\"],\n    [\"right-[0%] top-[-5%] size-[55%]\", \"chart-4\"],\n    [\"right-[5%] bottom-[-5%] size-[55%]\", \"glow\"],\n  ],\n  mint: [\n    [\"left-[0%] top-[5%] size-[65%]\", \"glow\"],\n    [\"right-[-4%] top-[35%] size-[60%]\", \"chart-3\"],\n    [\"left-[25%] bottom-[-5%] size-[50%]\", \"glow\"],\n  ],\n};\n\nconst paddings = { none: \"\", md: \"p-5 sm:p-7\", lg: \"p-6 sm:p-8\" };\n\nexport function PlumeformV2Panel({\n  children,\n  header,\n  placeholderHeight = \"20rem\",\n  fog = \"cool\",\n  padding = \"md\",\n  className,\n}: PlumeformV2PanelProps) {\n  return (\n    <div className={cn(\"relative isolate\", className)}>\n      <div aria-hidden className=\"pointer-events-none absolute -inset-12 -z-10\">\n        {fogs[fog].map(([place, colour], i) => (\n          <span key={i} className={cn(\"plumeform-v2-panel-drift absolute\", place)}>\n            <span\n              className=\"plumeform-v2-panel-float block size-full bg-[radial-gradient(closest-side,var(--plumeform-v2-fog),transparent)] opacity-90\"\n              style={{ \"--plumeform-v2-fog\": `var(--${colour})`, animationDelay: `${i * -4}s` } as CSSProperties}\n            />\n          </span>\n        ))}\n      </div>\n      <div\n        className={cn(\n          \"relative overflow-clip rounded-lg border border-card/70 bg-card/75\",\n          \"shadow-[inset_1px_1px_0_color-mix(in_oklab,var(--card)_85%,transparent),0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_20px_46px_-30px_color-mix(in_oklab,var(--foreground)_45%,transparent)]\",\n        )}\n      >\n        {header}\n        <div className={paddings[padding]}>\n          {children ?? (\n            <div className=\"rounded-[calc(var(--radius)/2)] bg-muted/60\" style={{ height: placeholderHeight }} />\n          )}\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the panel's content (a demo, screenshot or form); empty shows a placeholder"
+    },
+    {
+      "name": "header",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a strip across the top, above the padding (e.g. a browser bar)"
+    },
+    {
+      "name": "placeholderHeight",
+      "type": "string",
+      "required": false,
+      "default": "20rem",
+      "description": "height of the empty placeholder, as a CSS length"
+    },
+    {
+      "name": "fog",
+      "type": "enum",
+      "required": false,
+      "default": "cool",
+      "description": "which colours lead the fog"
+    },
+    {
+      "name": "padding",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "padding inside the panel"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d8676635c99118cd9a2ca8dc918fbf49b451a95232231e2301a0605f2e8670c9"
+}

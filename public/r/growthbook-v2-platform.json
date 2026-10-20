@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook platform rows (v2)",
+  "description": "A big regular-weight intro line, then alternating-free feature rows: a mono eyebrow with a violet line icon, a 56px heading, a short paragraph and a violet button on the left, a large square gradient frame holding a product shot on the right. A hairline rail runs down the left edge with a gradient accent that sticks to the top of the window. Phones stack each row and widen the button.",
+  "category": "features",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "split",
+    "rail",
+    "sticky",
+    "gradient",
+    "light",
+    "saas",
+    "screenshot"
+  ],
+  "notes": [
+    "each row takes its own media; empty, a card-coloured shot placeholder sits on the gradient frame"
+  ],
+  "entry": "growthbook-v2-platform.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-platform",
+  "files": [
+    {
+      "path": "growthbook-v2-platform.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Eyebrow } from \"@foundry/growthbook-v2-eyebrow\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2Panel } from \"@foundry/growthbook-v2-panel\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\n\nexport interface GrowthbookV2PlatformRow {\n  /** the mono label above the heading */\n  eyebrow: string;\n  /** a small line icon for the eyebrow */\n  icon?: ReactNode;\n  /** the row's heading; \\n for a line break */\n  title: string;\n  body: string;\n  /** the violet button under the text (gets an arrow) */\n  action: { label: string; href: string };\n  /** the gradient frame's wash */\n  tone?: \"violet\" | \"mint\" | \"sky\";\n  /** the shot's shape when empty: a wide card in the middle, or a tall dark window cropped at the bottom */\n  shot?: \"card\" | \"window\";\n  /** a real image or video for the whole square; empty = gradient frame + shot placeholder */\n  media?: ReactNode;\n}\n\nexport interface GrowthbookV2PlatformProps {\n  /** the large line before the rows; \\n for a line break */\n  intro: string;\n  rows: GrowthbookV2PlatformRow[];\n  className?: string;\n}\n\nconst shots = {\n  card: \"inset-x-[6.5%] top-[22%] h-[55%] rounded-md bg-card shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_12%,transparent)]\",\n  window: \"inset-x-[16%] top-[11.5%] -bottom-2 rounded-t-lg bg-foreground\",\n};\n\nexport function GrowthbookV2Platform({ intro, rows, className }: GrowthbookV2PlatformProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative border-l border-border pt-12 pb-[calc(var(--section-y)*0.6)] lg:pt-[calc(var(--section-y)*0.7)] lg:pb-section\">\n          <GrowthbookV2RailAccent />\n          <GrowthbookV2Heading size=\"hero\" className=\"pl-4 whitespace-pre-line max-md:text-[2.5rem]/[1.2] lg:pl-10 lg:text-pretty\">\n            {intro}\n          </GrowthbookV2Heading>\n          <div className=\"mt-24 flex flex-col gap-24 lg:mt-40 lg:gap-40\">\n            {rows.map((r) => (\n              <article key={r.title} className=\"grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,36.125rem)] lg:gap-16\">\n                <div className=\"pl-4 lg:pt-1 lg:pl-9\">\n                  <GrowthbookV2Eyebrow icon={r.icon}>{r.eyebrow}</GrowthbookV2Eyebrow>\n                  <GrowthbookV2Heading as=\"h3\" className=\"mt-8 whitespace-pre-line lg:mt-9\">\n                    {r.title}\n                  </GrowthbookV2Heading>\n                  <p className=\"mt-8 max-w-[34rem] text-sm/[1.65] text-foreground/85 lg:mt-10 lg:text-base/[1.65]\">{r.body}</p>\n                  <GrowthbookV2Button href={r.action.href} arrow fullOnMobile className=\"mt-10 lg:mt-12\">\n                    {r.action.label}\n                  </GrowthbookV2Button>\n                </div>\n                <GrowthbookV2Panel tone={r.tone ?? \"violet\"} grid media={r.media} className=\"aspect-square rounded-2xl lg:rounded-xl\">\n                  {!r.media && <div aria-hidden className={cn(\"absolute\", shots[r.shot ?? \"card\"])} />}\n                </GrowthbookV2Panel>\n              </article>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-eyebrow",
+    "growthbook-v2-heading",
+    "growthbook-v2-panel",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the large line before the rows; \\n for a line break"
+    },
+    {
+      "name": "rows",
+      "type": "GrowthbookV2PlatformRow[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9549a0a0f00e349ed553ab0abf0d66eb2cb7dbe652bfc7a82db35a3e3611bbf7"
+}

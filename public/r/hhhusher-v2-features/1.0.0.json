@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher pinned features (v2)",
+  "description": "A long cream section with the product pinned in the middle of the window (a sticky, window-tall stage) while four text panels scroll past it, about a window apart: the first in the left third (a big two-line heading up top, a small paragraph and buttons lower down), the rest in a narrow right-hand column. Headings rise in line by line, paragraphs fade in, and the stage fades up as the section arrives.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "sticky",
+    "pinned",
+    "scroll",
+    "cream",
+    "text-reveal",
+    "light",
+    "editorial"
+  ],
+  "notes": [
+    "the stage takes the 3D scene, a video or a cut-out picture; empty, it shows a soft placeholder panel where the object floats",
+    "about four windows tall: one panel per window",
+    "CSS only (sticky + scroll-driven reveals)"
+  ],
+  "entry": "hhhusher-v2-features.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-features",
+  "files": [
+    {
+      "path": "hhhusher-v2-features.css",
+      "content": "/* The stage fades up from 20% as the section comes in, then stays pinned. */\n.hhhusher-v2-features {\n  view-timeline: --hhhusher-v2-features block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-v2-features-stage {\n      animation: hhhusher-v2-features-stage linear both;\n      animation-timeline: --hhhusher-v2-features;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-v2-features-stage {\n  from { opacity: 0.2; transform: scale(0.94); }\n}\n"
+    },
+    {
+      "path": "hhhusher-v2-features.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button } from \"@foundry/hhhusher-v2-button\";\nimport { HhhusherV2RevealText, hhhusherV2Reveal } from \"@foundry/hhhusher-v2-reveal\";\nimport \"./hhhusher-v2-features.css\";\n\nexport interface HhhusherV2FeaturePanel {\n  heading: string;\n  text: string;\n  /** the yellow button */\n  buy?: { label: string; href: string };\n  /** the caps read-more link beside it */\n  link?: { label: string; href: string };\n}\n\nexport interface HhhusherV2FeaturesProps {\n  /** the panels, about a window apart: the first is the section's big intro (left third), the rest sit in the right column */\n  panels: HhhusherV2FeaturePanel[];\n  /** what stays pinned in the window: the 3D scene, a video or a cut-out picture */\n  media?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\nfunction Actions({ buy, link }: Pick<HhhusherV2FeaturePanel, \"buy\" | \"link\">) {\n  if (!buy && !link) return null;\n  return (\n    <div className=\"mt-6 flex items-center gap-7\">\n      {buy && <HhhusherV2Button href={buy.href}>{buy.label}</HhhusherV2Button>}\n      {link && (\n        <HhhusherV2Button variant=\"link\" href={link.href}>\n          {link.label}\n        </HhhusherV2Button>\n      )}\n    </div>\n  );\n}\n\nexport function HhhusherV2Features({ panels, media, id, className }: HhhusherV2FeaturesProps) {\n  const [intro, ...rest] = panels;\n  return (\n    <section id={id} className={cn(\"hhhusher-v2-features relative bg-background text-foreground\", className)}>\n      {/* the pinned stage: as tall as the window, stuck for the whole section */}\n      <div className=\"sticky top-0 -mb-[100svh] h-svh overflow-clip\">\n        {media ? (\n          <div className=\"hhhusher-v2-features-stage absolute inset-0 [&>*]:size-full [&>*]:object-contain\">{media}</div>\n        ) : (\n          <div className=\"hhhusher-v2-features-stage absolute top-[24%] right-[-6%] left-[22%] h-[34%] rounded-2xl bg-muted lg:top-[5%] lg:right-[30%] lg:left-[24%] lg:h-[92%]\" />\n        )}\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter\">\n        {intro && (\n          <div className=\"flex min-h-[110svh] flex-col pt-[20rem] lg:min-h-[112svh] lg:pt-[10.3rem]\">\n            <HhhusherV2RevealText\n              as=\"h2\"\n              text={intro.heading}\n              className=\"max-w-[36rem] font-display text-[2.08rem] leading-[1.1] font-[570] tracking-[-0.02em] lg:text-[4.25rem] lg:leading-[1.1]\"\n            />\n            <div className={cn(hhhusherV2Reveal(\"fade\"), \"mt-[6.5rem] max-w-[22rem] lg:mt-[17rem] lg:max-w-[19.5rem]\")}>\n              <p className=\"font-display text-[1.04rem] leading-[1.3] font-[570] tracking-[-0.02em] lg:text-base lg:leading-[1.3]\">{intro.text}</p>\n              <Actions buy={intro.buy} link={intro.link} />\n            </div>\n          </div>\n        )}\n        {rest.map((panel, i) => (\n          <div key={panel.heading} className={cn(\"flex flex-col lg:ml-[63.5%]\", i === rest.length - 1 ? \"min-h-[80svh] lg:min-h-[70svh]\" : \"min-h-[110svh] lg:min-h-[105svh]\")}>\n            <HhhusherV2RevealText\n              as=\"h3\"\n              text={panel.heading}\n              className=\"font-display text-[2.08rem] leading-[1.05] font-[570] tracking-[-0.02em] lg:text-[3.5625rem] lg:leading-[1.05]\"\n            />\n            <div className={cn(hhhusherV2Reveal(\"fade\"), \"mt-6 lg:mt-8\")}>\n              <p className=\"font-display text-[1.3rem] leading-[1.3] font-[570] tracking-[-0.02em] lg:text-[1.25rem] lg:leading-[1.3]\">{panel.text}</p>\n              <Actions buy={panel.buy} link={panel.link} />\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "panels",
+      "type": "HhhusherV2FeaturePanel[]",
+      "required": true,
+      "description": "the panels, about a window apart: the first is the section's big intro (left third), the rest sit in the right column"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what stays pinned in the window: the 3D scene, a video or a cut-out picture"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bcc1398b50440da4d7aa6fd4ed17d781edeb55d1c4c52e6184019120296c0003"
+}

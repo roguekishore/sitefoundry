@@ -1,0 +1,147 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform question types (v2)",
+  "description": "A dark band: heading at the left and a long explanation with an underlined link at the right; under the heading, labelled groups of outlined pill chips with small icons and mint PLUS badges (one chip picked out with a mint rim); beside them a stack of frosted cards (two peeking out behind) with a round back button, a paper 'next' pill and a counter. Underneath, the whole catalogue as a quiet five-column list. Chips brighten on hover; everything rises and un-blurs into view.",
+  "category": "features",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "catalogue",
+    "chips",
+    "pills",
+    "cards",
+    "stack",
+    "dark",
+    "glass",
+    "reveal",
+    "hover"
+  ],
+  "notes": [
+    "dark by itself (dark class); the card's body is a slot (a live example or a screenshot), a placeholder when empty",
+    "the back / next buttons are links you point at your own pages",
+    "phones show only the first chip group, as one row that scrolls sideways"
+  ],
+  "entry": "plumeform-v2-question-types.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-question-types",
+  "files": [
+    {
+      "path": "plumeform-v2-question-types.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowLeft } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Backdrop } from \"@foundry/plumeform-v2-backdrop\";\nimport { PlumeformV2Badge } from \"@foundry/plumeform-v2-badge\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2GlassCard } from \"@foundry/plumeform-v2-glass-card\";\nimport { PlumeformV2Eyebrow, PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2QuestionChip {\n  label: string;\n  /** a small line icon before the label */\n  icon?: ReactNode;\n  /** a badge after the label (e.g. a plan name) */\n  badge?: string;\n  href?: string;\n}\n\nexport interface PlumeformV2QuestionTypesProps {\n  eyebrow?: string;\n  title: ReactNode;\n  /** the long explanation at the right */\n  body: ReactNode;\n  link?: { label: string; href: string };\n  /** labelled groups of chips under the heading */\n  groups: { label: string; chips: PlumeformV2QuestionChip[] }[];\n  /** the chip shown as picked */\n  selected?: string;\n  /** the example in the card; empty shows a placeholder */\n  example?: ReactNode;\n  /** height of the empty example placeholder (CSS length) */\n  exampleHeight?: string;\n  /** the round back button (its label is for screen readers) */\n  previous?: { label: string; href: string };\n  next?: { label: string; href: string };\n  /** e.g. \"1 of 24\" */\n  counter?: string;\n  /** a small line under the card */\n  note?: string;\n  /** the full list under everything */\n  catalogue?: { label: string; items: { label: string; badge?: string }[] };\n  /** a closing line under the list; strong text is brightened */\n  footnote?: ReactNode;\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2QuestionTypes({\n  eyebrow,\n  title,\n  body,\n  link,\n  groups,\n  selected,\n  example,\n  exampleHeight = \"28rem\",\n  previous,\n  next,\n  counter,\n  note,\n  catalogue,\n  footnote,\n  backdrop,\n  id,\n  className,\n}: PlumeformV2QuestionTypesProps) {\n  return (\n    <section id={id} className={cn(\"dark relative isolate overflow-clip px-gutter py-[calc(var(--section-y)*0.85)] text-foreground lg:py-section\", className)}>\n      <PlumeformV2Backdrop media={backdrop} />\n      <div className=\"mx-auto grid max-w-[calc(var(--page-width)-2*var(--page-gutter))] gap-y-12 lg:grid-cols-2 lg:gap-x-24\">\n        <PlumeformV2Heading eyebrow={eyebrow} title={title} className=\"max-w-xl lg:self-end\" />\n        <PlumeformV2Reveal step={1} className=\"max-w-[28rem] text-base leading-[1.65] text-muted-foreground lg:text-[1.0625rem]\">\n          <div>{body}</div>\n          {link && (\n            <PlumeformV2Button variant=\"link\" href={link.href} arrow className=\"mt-8\">\n              {link.label}\n            </PlumeformV2Button>\n          )}\n        </PlumeformV2Reveal>\n\n        <PlumeformV2Reveal className=\"space-y-7\">\n          {groups.map((group, g) => (\n            <div key={group.label} className={cn(g > 0 && \"hidden lg:block\")}>\n              <PlumeformV2Eyebrow className=\"mb-3.5 text-[0.625rem] font-bold tracking-[0.2em]\">{group.label}</PlumeformV2Eyebrow>\n              {/* phones: one row that scrolls sideways to the window's edge */}\n              <ul className=\"-mr-gutter flex gap-2 overflow-x-auto pr-gutter pb-1 [scrollbar-width:none] lg:mr-0 lg:flex-wrap lg:overflow-visible lg:pr-0 lg:pb-0\">\n                {group.chips.map((chip) => {\n                  const on = chip.label === selected;\n                  return (\n                    <li key={chip.label}>\n                      <a\n                        href={chip.href ?? \"#\"}\n                        aria-current={on ? \"true\" : undefined}\n                        className={cn(\n                          \"flex h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 whitespace-nowrap text-[0.8125rem] transition-colors duration-200 [&_svg]:size-3.5 [&_svg]:opacity-80\",\n                          on\n                            ? \"border-highlight bg-foreground/5 font-bold text-foreground\"\n                            : \"border-foreground/12 text-muted-foreground hover:border-foreground/30 hover:text-foreground\",\n                        )}\n                      >\n                        {chip.icon}\n                        {chip.label}\n                        {chip.badge && <PlumeformV2Badge>{chip.badge}</PlumeformV2Badge>}\n                      </a>\n                    </li>\n                  );\n                })}\n              </ul>\n            </div>\n          ))}\n        </PlumeformV2Reveal>\n\n        <div className=\"lg:-ml-6 lg:pt-12\">\n          <div className=\"relative mr-4 mb-4\">\n            {/* two cards peeking out behind the front one */}\n            <span aria-hidden className=\"absolute inset-0 translate-x-4 translate-y-4 rounded-2xl border border-foreground/8 bg-foreground/3\" />\n            <span aria-hidden className=\"absolute inset-0 translate-x-2 translate-y-2 rounded-2xl border border-foreground/10 bg-foreground/4\" />\n            <PlumeformV2GlassCard step={1} className=\"bg-card/80 p-6 lg:p-7\">\n              {example ?? <div className=\"rounded-[calc(var(--radius)/2)] bg-foreground/6\" style={{ height: exampleHeight }} />}\n            </PlumeformV2GlassCard>\n          </div>\n          {(previous || next || counter) && (\n            <div className=\"mt-8 flex items-center gap-2\">\n              {previous && (\n                <a\n                  href={previous.href}\n                  aria-label={previous.label}\n                  className=\"flex size-10 items-center justify-center rounded-full border border-foreground/20 transition-colors hover:bg-foreground/8\"\n                >\n                  <ArrowLeft className=\"size-4\" strokeWidth={2} aria-hidden />\n                </a>\n              )}\n              {next && (\n                <PlumeformV2Button href={next.href} arrow>\n                  {next.label}\n                </PlumeformV2Button>\n              )}\n              {counter && <span className=\"ml-auto text-[0.8125rem] font-semibold text-muted-foreground\">{counter}</span>}\n            </div>\n          )}\n          {note && <p className=\"mt-4 text-[0.8125rem] text-muted-foreground\">{note}</p>}\n        </div>\n\n        {catalogue && (\n          <PlumeformV2Reveal className=\"mt-12 lg:col-span-2 lg:mt-16\">\n            <PlumeformV2Eyebrow className=\"text-[0.625rem] font-bold tracking-[0.2em]\">{catalogue.label}</PlumeformV2Eyebrow>\n            <ul className=\"mt-6 grid grid-cols-2 gap-x-6 gap-y-3.5 text-[0.9375rem] text-muted-foreground lg:grid-cols-5 lg:gap-y-4\">\n              {catalogue.items.map((item) => (\n                <li key={item.label} className=\"flex flex-wrap items-center gap-x-2 gap-y-1\">\n                  {item.label}\n                  {item.badge && <PlumeformV2Badge>{item.badge}</PlumeformV2Badge>}\n                </li>\n              ))}\n            </ul>\n            {footnote && (\n              <p className=\"mt-10 max-w-3xl text-[0.9375rem] leading-relaxed text-muted-foreground [&_strong]:font-bold [&_strong]:text-foreground\">{footnote}</p>\n            )}\n          </PlumeformV2Reveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-backdrop",
+    "plumeform-v2-badge",
+    "plumeform-v2-button",
+    "plumeform-v2-glass-card",
+    "plumeform-v2-heading",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the long explanation at the right"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "groups",
+      "type": "{ label: string; chips: PlumeformV2QuestionChip[]; }[]",
+      "required": true,
+      "description": "labelled groups of chips under the heading"
+    },
+    {
+      "name": "selected",
+      "type": "string",
+      "required": false,
+      "description": "the chip shown as picked"
+    },
+    {
+      "name": "example",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the example in the card; empty shows a placeholder"
+    },
+    {
+      "name": "exampleHeight",
+      "type": "string",
+      "required": false,
+      "default": "28rem",
+      "description": "height of the empty example placeholder (CSS length)"
+    },
+    {
+      "name": "previous",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the round back button (its label is for screen readers)"
+    },
+    {
+      "name": "next",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "counter",
+      "type": "string",
+      "required": false,
+      "description": "e.g. \"1 of 24\""
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "a small line under the card"
+    },
+    {
+      "name": "catalogue",
+      "type": "{ label: string; items: { label: string; badge?: string; }[]; }",
+      "required": false,
+      "description": "the full list under everything"
+    },
+    {
+      "name": "footnote",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a closing line under the list; strong text is brightened"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1e0681adbab3f42c3e144cee023c2d8cfeb67e29cfbf1fbccb6db21b6f9e2065"
+}

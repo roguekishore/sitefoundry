@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform pricing plans (v2)",
+  "description": "Two plan cards side by side on paper. The free plan is a near-white 28px card: name and a big price on one line, a short line, a list with teal ticks and a solid pill at its foot. The paid plan glows deep teal with paper text: a paper monthly/yearly pill toggle beside the price, a line, a paper pill CTA, a small note, paper ticks and a footnote. Above them an eyebrow and heavy heading (a page title or a section title with a link at the right). Cards rise and un-blur into view.",
+  "category": "pricing",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "toggle",
+    "cards",
+    "teal",
+    "gradient",
+    "checklist",
+    "reveal",
+    "light",
+    "interactive"
+  ],
+  "notes": [
+    "the featured card is dark by itself (dark class) and uses the theme's glow colour",
+    "needs JavaScript for the monthly/yearly toggle (hydrate: visible); without it monthly shows"
+  ],
+  "entry": "plumeform-v2-pricing.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "plumeform-v2-pricing",
+  "files": [
+    {
+      "path": "plumeform-v2-pricing.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2Eyebrow, PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2PlanPrice {\n  /** the figure, e.g. \"$12\" */\n  value: string;\n  /** small text after the figure, e.g. \"/mo\" */\n  suffix?: string;\n  /** the line under the price */\n  description: string;\n}\n\nexport interface PlumeformV2Plan {\n  name: string;\n  /** the monthly price (or the only price) */\n  price: PlumeformV2PlanPrice;\n  /** the yearly price; plans that have one show the toggle */\n  yearly?: PlumeformV2PlanPrice;\n  features: string[];\n  cta: { label: string; href: string };\n  /** a small line under the button */\n  ctaNote?: string;\n  /** a small line at the foot of the card */\n  footnote?: ReactNode;\n  /** the deep teal card */\n  featured?: boolean;\n}\n\nexport interface PlumeformV2PricingProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body?: ReactNode;\n  /** page: a 72px page title; section: a 48px section title */\n  size?: \"page\" | \"section\";\n  /** an underlined link at the right of the heading */\n  link?: { label: string; href: string };\n  /** small capitals above the cards */\n  plansLabel?: string;\n  plans: PlumeformV2Plan[];\n  /** the toggle's two labels */\n  periods?: { monthly: string; yearly: string };\n  id?: string;\n  className?: string;\n}\n\nfunction Price({ price, featured }: { price: PlumeformV2PlanPrice; featured?: boolean }) {\n  return (\n    <p className=\"shrink-0 font-display text-[2rem] leading-none font-extrabold tracking-[-0.03em]\">\n      {price.value}\n      {price.suffix && <span className={cn(\"ml-0.5 text-sm font-semibold tracking-normal\", !featured && \"text-muted-foreground\")}>{price.suffix}</span>}\n    </p>\n  );\n}\n\nfunction PlanCard({ plan, periods, step }: { plan: PlumeformV2Plan; periods?: { monthly: string; yearly: string }; step: number }) {\n  const [yearly, setYearly] = useState(false);\n  const price = yearly && plan.yearly ? plan.yearly : plan.price;\n  const toggle = plan.yearly && periods;\n  return (\n    <PlumeformV2Reveal\n      step={step}\n      className={cn(\n        \"flex flex-col rounded-2xl p-7 sm:p-8\",\n        plan.featured\n          ? \"dark bg-[linear-gradient(170deg,var(--glow),color-mix(in_oklab,var(--glow)_50%,var(--background)))] text-foreground shadow-[0_32px_64px_-24px_color-mix(in_oklab,var(--background)_60%,transparent)]\"\n          : \"border border-border bg-card text-card-foreground shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_8px_24px_-12px_color-mix(in_oklab,var(--foreground)_12%,transparent)]\",\n      )}\n    >\n      <div className=\"flex items-start justify-between gap-4\">\n        <h3 className=\"pt-1 text-xl font-bold tracking-[-0.02em]\">{plan.name}</h3>\n        {!toggle && <Price price={price} featured={plan.featured} />}\n      </div>\n      {toggle && (\n        <div className=\"mt-5 flex items-center justify-between gap-4\">\n          <div className=\"flex rounded-full bg-foreground p-1 text-[0.8125rem] font-bold text-background\">\n            {[false, true].map((y) => (\n              <button\n                key={String(y)}\n                type=\"button\"\n                aria-pressed={yearly === y}\n                onClick={() => setYearly(y)}\n                className={cn(\"h-9 rounded-full px-4 transition-colors duration-200\", yearly === y ? \"bg-background text-foreground\" : \"hover:bg-background/10\")}\n              >\n                {y ? periods.yearly : periods.monthly}\n              </button>\n            ))}\n          </div>\n          <Price price={price} featured={plan.featured} />\n        </div>\n      )}\n      <p className={cn(\"mt-3 text-sm\", plan.featured ? \"text-foreground/90\" : \"text-muted-foreground\")}>{price.description}</p>\n\n      {plan.featured && (\n        <div className=\"mt-8\">\n          <PlumeformV2Button href={plan.cta.href} arrow>\n            {plan.cta.label}\n          </PlumeformV2Button>\n          {plan.ctaNote && <p className=\"mt-4 text-xs text-foreground/80\">{plan.ctaNote}</p>}\n        </div>\n      )}\n\n      <ul className={cn(\"space-y-3 text-[0.9375rem]\", plan.featured ? \"mt-8\" : \"mt-7 text-muted-foreground\")}>\n        {plan.features.map((f) => (\n          <li key={f} className=\"flex gap-3\">\n            <Check className={cn(\"mt-0.5 size-4 shrink-0\", plan.featured ? \"text-foreground\" : \"text-primary\")} strokeWidth={2.5} aria-hidden />\n            {f}\n          </li>\n        ))}\n      </ul>\n\n      {plan.footnote && <p className=\"mt-8 text-xs leading-relaxed text-foreground/85 [&_a]:font-bold [&_a]:underline\">{plan.footnote}</p>}\n\n      {!plan.featured && (\n        <div className=\"mt-auto pt-12\">\n          <PlumeformV2Button href={plan.cta.href} arrow size=\"lg\" className=\"px-6\">\n            {plan.cta.label}\n          </PlumeformV2Button>\n          {plan.ctaNote && <p className=\"mt-4 text-xs text-muted-foreground\">{plan.ctaNote}</p>}\n        </div>\n      )}\n    </PlumeformV2Reveal>\n  );\n}\n\nexport function PlumeformV2Pricing({\n  eyebrow,\n  title,\n  body,\n  size = \"section\",\n  link,\n  plansLabel,\n  plans,\n  periods,\n  id,\n  className,\n}: PlumeformV2PricingProps) {\n  return (\n    <section\n      id={id}\n      className={cn(\n        \"bg-background px-gutter text-foreground\",\n        size === \"page\" ? \"pt-[calc(var(--section-y)*0.85+3.75rem)] pb-16 lg:pt-[8.5rem]\" : \"pt-[calc(var(--section-y)*0.85)] pb-16 lg:pt-section\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <div className=\"flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between\">\n          <PlumeformV2Heading eyebrow={eyebrow} title={title} body={body} size={size} className={size === \"page\" ? \"max-w-[42rem]\" : \"max-w-[40rem]\"} />\n          {link && (\n            <PlumeformV2Reveal step={1} className=\"lg:pb-3\">\n              <PlumeformV2Button variant=\"link\" href={link.href}>\n                {link.label}\n              </PlumeformV2Button>\n            </PlumeformV2Reveal>\n          )}\n        </div>\n        {plansLabel && <PlumeformV2Eyebrow className=\"mt-16 text-[0.6875rem]\">{plansLabel}</PlumeformV2Eyebrow>}\n        <div className={cn(\"grid gap-4 lg:grid-cols-2\", plansLabel ? \"mt-6\" : \"mt-16\")}>\n          {plans.map((plan, i) => (\n            <PlanCard key={plan.name} plan={plan} periods={periods} step={i} />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button",
+    "plumeform-v2-heading",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "page: a 72px page title; section: a 48px section title"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an underlined link at the right of the heading"
+    },
+    {
+      "name": "plansLabel",
+      "type": "string",
+      "required": false,
+      "description": "small capitals above the cards"
+    },
+    {
+      "name": "plans",
+      "type": "PlumeformV2Plan[]",
+      "required": true
+    },
+    {
+      "name": "periods",
+      "type": "{ monthly: string; yearly: string; }",
+      "required": false,
+      "description": "the toggle's two labels"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c4ffa81a914a47002975f994a9b6ee8701c256a878147e684b4deeb46f1ba1d5"
+}

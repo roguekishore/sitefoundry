@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Roveia button (v2)",
+  "description": "A soft pill button with a small arrow: brand blue that brightens to a lighter blue on hover, or ink black that turns blue on hover (0.5s ease). Three heights: 40px (nav), 52px (sections) and a full-width phone version.",
+  "category": "button",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "blue",
+    "arrow",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "the ink variant uses foreground/background, so on a dark theme it is a light pill"
+  ],
+  "entry": "roveia-v2-button.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-button",
+  "files": [
+    {
+      "path": "roveia-v2-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RoveiaV2ButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary: brand-blue pill · ink: black pill that turns blue on hover */\n  variant?: \"primary\" | \"ink\";\n  /** sm: 40px tall (nav) · md: 52px tall (sections) */\n  size?: \"sm\" | \"md\";\n  /** show the small arrow after the label (on by default) */\n  arrow?: boolean;\n  /** stretch to the container's width (phones) */\n  block?: boolean;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-10 gap-3 pl-3 pr-3.5 text-base tracking-[-0.03em]\",\n  md: \"h-[3.25rem] gap-4 px-10 text-base tracking-[-0.02em]\",\n};\n\nconst variants = {\n  // the original: background-color all 0.3s ease, blue → a lighter blue\n  primary: \"bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary)_82%,var(--background))] duration-300\",\n  // the original: 0.5s ease, ink → brand blue\n  ink: \"bg-foreground text-background hover:bg-primary hover:text-primary-foreground duration-500\",\n};\n\nexport function RoveiaV2Button({ children, href, variant = \"primary\", size = \"md\", arrow = true, block, className }: RoveiaV2ButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center rounded-full font-medium whitespace-nowrap\",\n    \"transition-colors ease-[ease] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    block && \"w-full\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {arrow && <ArrowRight aria-hidden className=\"size-4\" strokeWidth={2} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: brand-blue pill · ink: black pill that turns blue on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 40px tall (nav) · md: 52px tall (sections)"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the small arrow after the label (on by default)"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the container's width (phones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2e53e4caf840113faa52ef9f07e47a72a57136c4b409fd5cbab37acee6638b8d"
+}

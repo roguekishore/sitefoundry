@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook hero (v2)",
+  "description": "A centred, regular-weight 68px headline on a near-white page, a short muted line and an outline + violet button pair, over a wide violet-to-mint gradient frame. A dark pill tab group sits on the frame and switches the product shot below it, which the frame's bottom edge crops. Phones stack the buttons full width and run the frame edge to edge.",
+  "category": "hero",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "centered",
+    "light",
+    "gradient",
+    "tabs",
+    "violet",
+    "saas",
+    "screenshot"
+  ],
+  "notes": [
+    "needs JavaScript for the tabs (hydrate: load)",
+    "each tab takes its own media; empty, the shot is a plain card-coloured placeholder"
+  ],
+  "entry": "growthbook-v2-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "growthbook-v2-hero",
+  "files": [
+    {
+      "path": "growthbook-v2-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Button } from \"@foundry/growthbook-v2-button\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2Panel } from \"@foundry/growthbook-v2-panel\";\n\nexport interface GrowthbookV2HeroTab {\n  label: string;\n  /** a small line icon before the label */\n  icon?: ReactNode;\n  /** the product shot shown while this tab is active (image or video); empty = placeholder */\n  media?: ReactNode;\n}\n\nexport interface GrowthbookV2HeroProps {\n  /** the headline; use \\n for the line breaks you want on desktop */\n  title: string;\n  /** one or two sentences under it */\n  subtitle: string;\n  /** usually two: outline first, then the primary one (gets an arrow) */\n  actions: { label: string; href: string; variant?: \"primary\" | \"outline\" }[];\n  /** the pill tabs on the frame; at least one */\n  tabs: GrowthbookV2HeroTab[];\n  /** a real image or video for the frame's backdrop; empty = the violet gradient */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nexport function GrowthbookV2Hero({ title, subtitle, actions, tabs, backdrop, className }: GrowthbookV2HeroProps) {\n  const [active, setActive] = useState(0);\n  const shot = tabs[active]?.media;\n  return (\n    <section className={cn(\"bg-background pt-20 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"mx-auto max-w-[62rem] text-center\">\n          <GrowthbookV2Heading as=\"h1\" size=\"hero\" className=\"whitespace-pre-line lg:text-pretty\">\n            {title}\n          </GrowthbookV2Heading>\n          <p className=\"mx-auto mt-4 max-w-[30rem] text-sm/[1.65] text-foreground/85 lg:mt-6 lg:text-lg/[1.5]\">{subtitle}</p>\n          <div className=\"mt-12 flex flex-col gap-3 sm:flex-row sm:justify-center\">\n            {actions.map((a) => (\n              <GrowthbookV2Button\n                key={a.label}\n                href={a.href}\n                variant={a.variant ?? \"primary\"}\n                size=\"lg\"\n                arrow={(a.variant ?? \"primary\") === \"primary\"}\n                className=\"w-full sm:w-44\"\n              >\n                {a.label}\n              </GrowthbookV2Button>\n            ))}\n          </div>\n        </div>\n\n        <GrowthbookV2Panel\n          tone=\"violet\"\n          media={backdrop}\n          className=\"-mx-gutter mt-10 h-[21.125rem] rounded-none md:mx-0 md:h-[28rem] md:rounded-xl lg:mt-16 lg:h-[37.1875rem]\"\n        >\n          {tabs.length > 1 && (\n            <div\n              role=\"tablist\"\n              className=\"absolute top-12 left-1/2 hidden -translate-x-1/2 gap-1 rounded-full border-2 border-foreground bg-foreground/85 p-0.5 md:flex dark:border-card dark:bg-card/85\"\n            >\n              {tabs.map((t, i) => (\n                <button\n                  key={t.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === active}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"flex h-12 items-center gap-2.5 rounded-full px-5 text-sm whitespace-nowrap transition-colors duration-300 motion-reduce:transition-none [&_svg]:size-5 [&_svg]:stroke-[1.5]\",\n                    i === active ? \"bg-card text-card-foreground\" : \"bg-background/10 text-background hover:bg-foreground/20 dark:text-foreground\",\n                  )}\n                >\n                  {t.icon}\n                  {t.label}\n                </button>\n              ))}\n            </div>\n          )}\n          <div\n            className={cn(\n              \"absolute top-7 left-[4%] h-[120%] w-[118%] overflow-clip rounded-t-xl md:top-28 md:left-1/2 md:w-[80%] md:-translate-x-1/2 lg:top-[9.5rem] lg:w-[67%]\",\n              !shot && \"bg-card shadow-[0_4px_20px_color-mix(in_oklab,var(--foreground)_15%,transparent)]\",\n            )}\n          >\n            {shot && <div className=\"size-full [&>*]:size-full [&>img]:object-cover [&>img]:object-top\">{shot}</div>}\n          </div>\n        </GrowthbookV2Panel>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-button",
+    "growthbook-v2-heading",
+    "growthbook-v2-panel"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; use \\n for the line breaks you want on desktop"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": true,
+      "description": "one or two sentences under it"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; variant?: \"primary\" | \"outline\" | undefined; }[]",
+      "required": true,
+      "description": "usually two: outline first, then the primary one (gets an arrow)"
+    },
+    {
+      "name": "tabs",
+      "type": "GrowthbookV2HeroTab[]",
+      "required": true,
+      "description": "the pill tabs on the frame; at least one"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video for the frame's backdrop; empty = the violet gradient"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "59424221ba417b159545b7b0eb18b88669252a21228d567c876d7dddec839c5b"
+}

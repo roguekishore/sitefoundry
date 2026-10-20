@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform footer (v2)",
+  "description": "A deep footer panel inset 16px from the window's sides with 32px top corners, lit teal at the top and sinking to green-black. A wordmark and short line at the left, a text link and a paper pill at the right; five columns of small-capital headings over quiet links; a hairline row that opens a wider library of links; and a legal row with copyright, centred links and an email address. Links brighten and underline on hover.",
+  "category": "footer",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "teal",
+    "gradient",
+    "columns",
+    "links",
+    "details",
+    "rounded"
+  ],
+  "notes": [
+    "dark by itself (dark class); its gradient runs from the theme's glow colour to the background"
+  ],
+  "entry": "plumeform-v2-footer.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-footer",
+  "files": [
+    {
+      "path": "plumeform-v2-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\n\nexport interface PlumeformV2FooterColumn {\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface PlumeformV2FooterProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** logo (an icon plus a wordmark) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** a short line under the logo */\n  tagline?: string;\n  /** a text link at the right of the top row */\n  secondary?: { label: string; href: string };\n  /** the pill at the right of the top row */\n  cta?: { label: string; href: string };\n  columns: PlumeformV2FooterColumn[];\n  /** a row that opens to more links */\n  library?: { title: string; text: string; links: { label: string; href: string }[] };\n  /** e.g. \"© 2026 Murmur\" */\n  copyright: string;\n  legal?: { label: string; href: string }[];\n  email?: string;\n  className?: string;\n}\n\nconst link = \"text-foreground/85 underline-offset-4 transition-colors duration-200 hover:text-foreground hover:underline\";\n\nexport function PlumeformV2Footer({\n  brand,\n  logo,\n  homeHref = \"/\",\n  tagline,\n  secondary,\n  cta,\n  columns,\n  library,\n  copyright,\n  legal,\n  email,\n  className,\n}: PlumeformV2FooterProps) {\n  return (\n    <footer className={cn(\"bg-background px-2 pt-6 sm:px-4\", className)}>\n      <div className=\"dark rounded-t-[2rem] bg-[linear-gradient(to_bottom,var(--glow),var(--background)_88%)] px-gutter pt-20 pb-10 text-foreground lg:pt-[5.5rem]\">\n        <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n          <div className=\"flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between\">\n            <div>\n              <a href={homeHref} aria-label={brand} className=\"inline-flex\">\n                {logo}\n              </a>\n              {tagline && <p className=\"mt-6 max-w-sm text-[0.9375rem] leading-relaxed text-foreground/80\">{tagline}</p>}\n            </div>\n            {(secondary || cta) && (\n              <div className=\"flex items-center gap-6\">\n                {secondary && (\n                  <a href={secondary.href} className={cn(link, \"text-[0.9375rem] font-bold\")}>\n                    {secondary.label}\n                  </a>\n                )}\n                {cta && (\n                  <PlumeformV2Button href={cta.href} size=\"sm\" arrow className=\"h-9 px-4\">\n                    {cta.label}\n                  </PlumeformV2Button>\n                )}\n              </div>\n            )}\n          </div>\n\n          <div className=\"mt-14 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-5\">\n            {columns.map((col) => (\n              <nav key={col.title} aria-label={col.title}>\n                <p className=\"text-[0.625rem] font-bold tracking-[0.2em] text-foreground/70 uppercase\">{col.title}</p>\n                <ul className=\"mt-6 space-y-[1.125rem] text-sm\">\n                  {col.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className={link}>\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </nav>\n            ))}\n          </div>\n\n          {library && (\n            <details className=\"group mt-14 border-y border-foreground/15\">\n              <summary className=\"flex cursor-pointer list-none items-center justify-between gap-6 py-5 [&::-webkit-details-marker]:hidden\">\n                <span>\n                  <span className=\"block text-[0.9375rem] font-bold\">{library.title}</span>\n                  <span className=\"mt-1 block text-xs text-foreground/70\">{library.text}</span>\n                </span>\n                <Plus className=\"size-4 shrink-0 transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none\" strokeWidth={2} aria-hidden />\n              </summary>\n              <ul className=\"grid grid-cols-2 gap-x-6 gap-y-3 pb-6 text-sm sm:grid-cols-3 lg:grid-cols-5\">\n                {library.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={link}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </details>\n          )}\n\n          <div className=\"mt-10 flex flex-col gap-5 text-xs text-foreground/75 lg:flex-row lg:items-center lg:justify-between\">\n            <p>{copyright}</p>\n            {legal && (\n              <ul className=\"flex flex-wrap gap-x-5 gap-y-2\">\n                {legal.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={link}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {email && (\n              <a href={`mailto:${email}`} className={link}>\n                {email}\n              </a>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "logo (an icon plus a wordmark)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": false,
+      "description": "a short line under the logo"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a text link at the right of the top row"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the pill at the right of the top row"
+    },
+    {
+      "name": "columns",
+      "type": "PlumeformV2FooterColumn[]",
+      "required": true
+    },
+    {
+      "name": "library",
+      "type": "{ title: string; text: string; links: { label: string; href: string; }[]; }",
+      "required": false,
+      "description": "a row that opens to more links"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "e.g. \"© 2026 Murmur\""
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": false
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fe7b2fe46d93cb20ff803aaa5158b0ae92d10b97d03befd5bd0e9e4f53d2025d"
+}

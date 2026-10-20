@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher FAQ (v2)",
+  "description": "A cream FAQ split in two: on the left a pinned index of question groups (big numbers on the left, names pushed right; the group you're reading at full strength, the others faded to 15%), on the right the questions between 2px faint rules, each with an outlined plus square that fills dark on hover and opens the answer.",
+  "category": "faq",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "sticky",
+    "scroll",
+    "cream",
+    "light",
+    "minimal",
+    "index"
+  ],
+  "notes": [
+    "CSS only: native details for the answers, sticky index, and named scroll timelines that light the current group (timeline-scope); without support every group shows at full strength",
+    "the index sits above the list on phones"
+  ],
+  "entry": "hhhusher-v2-faq.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-faq",
+  "files": [
+    {
+      "path": "hhhusher-v2-faq.css",
+      "content": "/* Each group of questions gets its own view timeline (named in a variable set inline); the\n   index entry for that group is at full strength while the group crosses the middle of the\n   window, and at 15% the rest of the time. */\n.hhhusher-v2-faq {\n  timeline-scope: var(--hh-faq-scope);\n}\n.hhhusher-v2-faq-group {\n  view-timeline-name: var(--hh-faq-name);\n}\n\n@supports (timeline-scope: none) and (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-v2-faq-entry {\n      opacity: 0.15;\n      transition: opacity 0.4s cubic-bezier(0.32, 0.94, 0.6, 1);\n      animation: hhhusher-v2-faq-entry linear;\n      animation-timeline: var(--hh-faq-name);\n      animation-range: cover 50vh cover calc(100% - 50vh);\n    }\n    /* groups touch (padding, no gap), so one hands over to the next at mid-window; the first\n       is current from the start, the last until the end */\n    .hhhusher-v2-faq-entry:first-child {\n      animation-range: cover 0% cover calc(100% - 50vh);\n    }\n    .hhhusher-v2-faq-entry:last-child {\n      animation-range: cover 50vh cover 100%;\n    }\n    .hhhusher-v2-faq-entry:only-child {\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-v2-faq-entry {\n  from, to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "hhhusher-v2-faq.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\nimport \"./hhhusher-v2-faq.css\";\n\nexport interface HhhusherV2Question {\n  question: string;\n  answer: string;\n}\n\nexport interface HhhusherV2FaqGroup {\n  /** the group's name in the index (e.g. \"Product\") */\n  name: string;\n  questions: HhhusherV2Question[];\n}\n\nexport interface HhhusherV2FaqProps {\n  /** one or more groups; the index lists them with numbers */\n  groups: HhhusherV2FaqGroup[];\n  id?: string;\n  className?: string;\n}\n\nconst pad = (n: number) => String(n + 1).padStart(2, \"0\");\nconst timeline = (i: number) => `--hhhusher-v2-faq-${i}`;\n\nexport function HhhusherV2Faq({ groups, id, className }: HhhusherV2FaqProps) {\n  const scope = { \"--hh-faq-scope\": groups.map((_, i) => timeline(i)).join(\", \") } as CSSProperties;\n  return (\n    <section id={id} className={cn(\"hhhusher-v2-faq bg-background py-section text-foreground\", className)} style={scope}>\n      <div className=\"mx-auto grid max-w-page gap-10 px-gutter lg:grid-cols-[minmax(0,35.7%)_minmax(0,1fr)] lg:gap-[15.6%]\">\n        {/* the index: pinned on desktop */}\n        <div>\n          <ol className=\"font-display text-[1.82rem] leading-[1.25] font-[570] tracking-[-0.02em] lg:sticky lg:top-[7.5rem] lg:text-[2.6875rem] lg:leading-[1.47]\">\n            {groups.map((group, i) => (\n              <li key={group.name} className=\"hhhusher-v2-faq-entry flex justify-between\" style={{ \"--hh-faq-name\": timeline(i) } as CSSProperties}>\n                <a href={`#${id ?? \"faq\"}-${i + 1}`}>{pad(i)}</a>\n                <a href={`#${id ?? \"faq\"}-${i + 1}`}>{group.name}</a>\n              </li>\n            ))}\n          </ol>\n        </div>\n\n        <div className=\"flex flex-col\">\n          {groups.map((group, i) => (\n            <div key={group.name} id={`${id ?? \"faq\"}-${i + 1}`} className=\"hhhusher-v2-faq-group scroll-mt-28 pb-16 last:pb-0 lg:pb-24\" style={{ \"--hh-faq-name\": timeline(i) } as CSSProperties}>\n              {group.questions.map((q) => (\n                <details key={q.question} className=\"group border-t-2 border-border\">\n                  <summary className=\"flex cursor-pointer list-none items-center justify-between gap-6 py-5 lg:py-5 [&::-webkit-details-marker]:hidden\">\n                    <span className=\"font-display text-[1.04rem] leading-[1.3] font-[570] tracking-[-0.02em] lg:text-[1.5rem] lg:leading-[1.3]\">{q.question}</span>\n                    <span\n                      className={cn(\n                        \"flex size-[2.55rem] shrink-0 items-center justify-center rounded-lg border-2 border-foreground transition-colors group-hover:bg-foreground group-hover:text-background lg:size-10\",\n                        hhhusherV2Ease,\n                      )}\n                    >\n                      <Plus className=\"size-6 transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none\" strokeWidth={1.5} />\n                    </span>\n                  </summary>\n                  <p className=\"max-w-[36rem] pb-7 font-display text-[1rem] leading-[1.4] font-[570] text-foreground/75 lg:text-[1.125rem]\">{q.answer}</p>\n                </details>\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "HhhusherV2FaqGroup[]",
+      "required": true,
+      "description": "one or more groups; the index lists them with numbers"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e1d9fda7c15de9cf210b7cb2e6907a4255cb4f57f59044150d188f204e74be3a"
+}

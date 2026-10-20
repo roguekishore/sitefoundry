@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "GrowthBook why-us cards (v2)",
+  "description": "A big heading, then a narrow tab list (a white active tab with a gradient edge, small mono 'For' prefixes) beside a row of tall gradient cards (navy, violet, teal) with a short white title and an art slot at the bottom. The row slides sideways as you scroll; the tabs switch the set of cards. On phones the tabs become a sideways strip with a violet underline.",
+  "category": "features",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "cards",
+    "gradient",
+    "carousel",
+    "scrubbed",
+    "scroll",
+    "violet",
+    "teal",
+    "rail"
+  ],
+  "notes": [
+    "needs JavaScript for the tabs (hydrate: visible)",
+    "the sideways slide is CSS; without scroll timelines or with reduced motion the row is a plain swipe row"
+  ],
+  "entry": "growthbook-v2-why.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "growthbook-v2-why",
+  "files": [
+    {
+      "path": "growthbook-v2-why.css",
+      "content": ".growthbook-v2-why-viewport {\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n  scrollbar-width: none;\n}\n.growthbook-v2-why-viewport > ul > li {\n  scroll-snap-align: start;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .growthbook-v2-why-viewport {\n      overflow-x: clip;\n    }\n    .growthbook-v2-why-track {\n      animation: growthbook-v2-why-slide linear both;\n      animation-timeline: view();\n      animation-range: cover 20% cover 80%;\n    }\n  }\n}\n\n@keyframes growthbook-v2-why-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(min(0px, calc(100cqw - 100%))); }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-why.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GrowthbookV2Heading } from \"@foundry/growthbook-v2-heading\";\nimport { GrowthbookV2Panel } from \"@foundry/growthbook-v2-panel\";\nimport { GrowthbookV2RailAccent } from \"@foundry/growthbook-v2-rail-accent\";\nimport \"./growthbook-v2-why.css\";\n\nexport interface GrowthbookV2WhyCard {\n  /** the short white title at the top */\n  title: string;\n  /** the card's wash */\n  tone?: \"navy\" | \"violet\" | \"teal\";\n  /** the art at the bottom (image); empty = a soft placeholder */\n  media?: ReactNode;\n}\n\nexport interface GrowthbookV2WhyTab {\n  /** the tab's label */\n  label: string;\n  /** a tiny mono word before it, e.g. \"For\" */\n  prefix?: string;\n  /** the first tab of the original carries an arrow */\n  arrow?: boolean;\n  cards: GrowthbookV2WhyCard[];\n}\n\nexport interface GrowthbookV2WhyProps {\n  /** the heading; \\n for line breaks */\n  title: string;\n  tabs: GrowthbookV2WhyTab[];\n  className?: string;\n}\n\nexport function GrowthbookV2Why({ title, tabs, className }: GrowthbookV2WhyProps) {\n  const [active, setActive] = useState(0);\n  const cards = tabs[active]?.cards ?? [];\n  return (\n    <section className={cn(\"overflow-x-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <div className=\"relative border-l border-border pt-12 lg:pt-20\">\n          <GrowthbookV2RailAccent />\n          <GrowthbookV2Heading className=\"pl-10 lg:whitespace-pre-line\">{title}</GrowthbookV2Heading>\n          <div className=\"mt-10 lg:mt-28 lg:grid lg:grid-cols-[15.375rem_minmax(0,1fr)] lg:gap-8\">\n            <div role=\"tablist\" className=\"-mr-gutter flex overflow-x-auto pl-10 [scrollbar-width:none] lg:mr-0 lg:flex-col lg:overflow-visible\">\n              {tabs.map((t, i) => (\n                <button\n                  key={t.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === active}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"relative flex h-[3.75rem] shrink-0 items-center gap-2 px-5 text-left text-base whitespace-nowrap transition-colors duration-300 motion-reduce:transition-none lg:h-[4.25rem] lg:border-b lg:border-border lg:px-2\",\n                    i === active\n                      ? \"border-b-4 border-b-primary bg-card lg:border-b lg:border-b-border lg:px-5\"\n                      : \"hover:text-primary\",\n                    i === 0 && \"lg:border-t\",\n                  )}\n                >\n                  {i === active && <GrowthbookV2RailAccent className=\"left-0 hidden lg:block\" barClassName=\"h-full lg:h-full\" />}\n                  {t.prefix && <sup className=\"font-mono text-[0.625rem]\">{t.prefix}</sup>}\n                  {t.label}\n                  {t.arrow && <ArrowRight aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n                </button>\n              ))}\n            </div>\n            <div className=\"growthbook-v2-why-viewport @container mt-12 -mr-gutter lg:mt-0 lg:-mr-[max(var(--page-gutter),calc((100vw-var(--page-width))/2))]\">\n              <ul key={active} className=\"growthbook-v2-why-track flex w-max gap-5 pr-gutter\">\n                {cards.map((c) => (\n                  <li key={c.title} className=\"w-[16.125rem] shrink-0 lg:w-[19.8125rem]\">\n                    <GrowthbookV2Panel tone={c.tone ?? \"navy\"} className=\"flex h-[24.75rem] flex-col rounded-lg p-6\">\n                      <span aria-hidden className=\"absolute inset-x-6 bottom-6 h-px bg-card/10\" />\n                      <span aria-hidden className=\"absolute top-6 bottom-6 left-6 w-px bg-card/10\" />\n                      <p className=\"relative max-w-[12rem] text-lg/[1.5] text-primary-foreground\">{c.title}</p>\n                      <div className=\"relative mt-auto mb-8 ml-4 h-32 w-40 [&>*]:size-full [&>img]:object-contain\">\n                        {c.media ?? <div aria-hidden className=\"size-full rounded-xl bg-linear-to-br from-card/45 to-card/0\" />}\n                      </div>\n                    </GrowthbookV2Panel>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "growthbook-v2-heading",
+    "growthbook-v2-panel",
+    "growthbook-v2-rail-accent"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n for line breaks"
+    },
+    {
+      "name": "tabs",
+      "type": "GrowthbookV2WhyTab[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "886286c91fe1f13b9704c64bdf6d100739a36f1bd91941b64c5317a28224ebdc"
+}

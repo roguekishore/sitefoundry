@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "TypeSomething hero (v2)",
+  "description": "A centred hero on warm paper with a soft pink glow top-left and a lime glow top-right: a small announcement pill, a huge light-weight two-line headline with very tight tracking, a typewriter line (a bold verb, then phrases that type and erase behind a blinking underscore), a paragraph and two pill buttons. A white feature strip with three icon cells and a long soft shadow closes it.",
+  "category": "hero",
+  "site": "typesomething-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "warm",
+    "centred",
+    "glow",
+    "typewriter",
+    "cursor",
+    "blink",
+    "loop",
+    "pill",
+    "feature-strip"
+  ],
+  "notes": [
+    "needs JavaScript for the typewriter (hydrate: load); static HTML shows the first phrase",
+    "with reduced motion the first phrase stays and the cursor holds still",
+    "best on light themes: the glows are the highlight and primary colours"
+  ],
+  "entry": "typesomething-v2-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "typesomething-v2-hero",
+  "files": [
+    {
+      "path": "typesomething-v2-hero.css",
+      "content": "/* The typewriter's underscore blinks on a 640ms beat, like the original. */\n.typesomething-v2-hero-cursor {\n  animation: typesomething-v2-hero-blink 640ms steps(1, end) infinite;\n}\n\n@keyframes typesomething-v2-hero-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .typesomething-v2-hero-cursor { animation: none; }\n}\n"
+    },
+    {
+      "path": "typesomething-v2-hero.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { TypesomethingV2Button } from \"@foundry/typesomething-v2-button\";\nimport \"./typesomething-v2-hero.css\";\n\nexport interface TypesomethingV2HeroFeature {\n  /** a small icon in a pink dot (lucide works well) */\n  icon: ReactNode;\n  title: string;\n  text: string;\n}\n\nexport interface TypesomethingV2HeroProps {\n  /** the small pill above the headline */\n  badge?: { label: string; href: string };\n  /** the headline, one string per line */\n  title: string[];\n  /** the bold word that starts the typewriter line, e.g. \"Ask\" */\n  typeLead: string;\n  /** phrases typed after it, one after another; the first is shown without JavaScript */\n  phrases: string[];\n  /** the paragraph under the typewriter line */\n  description: string;\n  /** one or two buttons: the first lime, the rest outlined */\n  actions: { label: string; href: string }[];\n  /** the white strip of three features at the bottom */\n  features: TypesomethingV2HeroFeature[];\n  className?: string;\n}\n\n/** Types and erases each phrase in turn. Returns the visible part of the current phrase. */\nfunction useTypewriter(phrases: string[]) {\n  const [text, setText] = useState(phrases[0] ?? \"\");\n  useEffect(() => {\n    if (phrases.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let index = 0;\n    let shown = phrases[0].length;\n    let erasing = true;\n    let timer = window.setTimeout(tick, 1800);\n    function tick() {\n      const phrase = phrases[index];\n      if (erasing) {\n        shown -= 1;\n        if (shown <= 0) {\n          erasing = false;\n          index = (index + 1) % phrases.length;\n        }\n        setText(phrase.slice(0, Math.max(shown, 0)));\n        timer = window.setTimeout(tick, shown <= 0 ? 320 : 38);\n      } else {\n        const next = phrases[index];\n        shown += 1;\n        setText(next.slice(0, shown));\n        if (shown >= next.length) {\n          erasing = true;\n          timer = window.setTimeout(tick, 1800);\n        } else {\n          timer = window.setTimeout(tick, 72);\n        }\n      }\n    }\n    return () => window.clearTimeout(timer);\n  }, [phrases]);\n  return text;\n}\n\nexport function TypesomethingV2Hero({ badge, title, typeLead, phrases, description, actions, features, className }: TypesomethingV2HeroProps) {\n  const typed = useTypewriter(phrases);\n  return (\n    <section className={cn(\"relative overflow-clip bg-muted text-foreground\", className)}>\n      {/* the two soft glows behind the headline */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-0\">\n        <div className=\"absolute -top-24 -left-40 size-[26rem] rounded-full bg-highlight opacity-80 blur-[90px] dark:opacity-30 lg:-top-40 lg:-left-24 lg:size-[34rem] lg:blur-[110px]\" />\n        <div className=\"absolute -top-16 -right-48 size-[26rem] rounded-full bg-glow opacity-55 blur-[90px] dark:opacity-25 lg:-top-32 lg:-right-20 lg:size-[38rem] lg:blur-[110px]\" />\n      </div>\n\n      <div className=\"relative mx-auto flex max-w-page flex-col items-center px-gutter pt-[4.7rem] pb-14 text-center lg:pt-[8.75rem] lg:pb-24\">\n        {badge && (\n          <a\n            href={badge.href}\n            className=\"inline-flex h-7 items-center gap-2 rounded-full border border-border bg-background/60 pr-2 pl-3 text-[0.72rem] font-semibold transition-[border-color] duration-[180ms] ease-[ease] hover:border-foreground motion-reduce:transition-none\"\n          >\n            <span aria-hidden className=\"size-2 rounded-full bg-primary\" />\n            {badge.label}\n            <ChevronRight aria-hidden className=\"size-3.5 opacity-60\" strokeWidth={2} />\n          </a>\n        )}\n\n        <h1 className=\"mt-7 font-display text-[2.4375rem] leading-[1.05] font-normal tracking-[-0.055em] lg:mt-8 lg:text-[5.5rem]\">\n          {title.map((line) => (\n            <span key={line} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </h1>\n\n        <p className=\"mt-6 flex min-h-[1.25em] items-baseline justify-center gap-[0.3em] text-[min(2.2rem,8.5vw)] leading-[1.25] tracking-[-0.03em] whitespace-nowrap lg:mt-5 lg:text-[4rem]\">\n          <span className=\"font-bold\">{typeLead}</span>\n          <span className=\"font-light text-muted-foreground\">\n            {typed}\n            <span aria-hidden className=\"typesomething-v2-hero-cursor font-light text-foreground\">\n              _\n            </span>\n          </span>\n        </p>\n\n        <p className=\"mt-6 max-w-[40rem] text-[1.05rem] leading-[1.5] text-muted-foreground text-pretty lg:mt-6 lg:text-[1.15rem]\">{description}</p>\n\n        {actions.length > 0 && (\n          <div className=\"mt-8 flex flex-wrap items-center justify-center gap-3\">\n            {actions.map((action, i) => (\n              <TypesomethingV2Button key={action.href + action.label} href={action.href} variant={i === 0 ? \"primary\" : \"outline\"} className=\"max-sm:h-11 max-sm:px-4 max-sm:text-[0.92rem]\">\n                {action.label}\n              </TypesomethingV2Button>\n            ))}\n          </div>\n        )}\n\n        {features.length > 0 && (\n          <ul className=\"mt-14 grid w-full max-w-[71.75rem] divide-y divide-border rounded-lg border border-border bg-card text-left shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:mt-11 lg:grid-cols-3 lg:divide-x lg:divide-y-0\">\n            {features.map((feature) => (\n              <li key={feature.title} className=\"flex gap-3 px-5 py-5 lg:px-6\">\n                <span className=\"grid size-7 shrink-0 place-items-center rounded-full bg-highlight text-highlight-foreground [&_svg]:size-3.5\">{feature.icon}</span>\n                <div>\n                  <h3 className=\"text-[0.95rem] leading-7 font-bold\">{feature.title}</h3>\n                  <p className=\"mt-0.5 text-[0.78rem] leading-[1.55] text-muted-foreground\">{feature.text}</p>\n                </div>\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "typesomething-v2-button"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the small pill above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the headline, one string per line"
+    },
+    {
+      "name": "typeLead",
+      "type": "string",
+      "required": true,
+      "description": "the bold word that starts the typewriter line, e.g. \"Ask\""
+    },
+    {
+      "name": "phrases",
+      "type": "string[]",
+      "required": true,
+      "description": "phrases typed after it, one after another; the first is shown without JavaScript"
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the typewriter line"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "one or two buttons: the first lime, the rest outlined"
+    },
+    {
+      "name": "features",
+      "type": "TypesomethingV2HeroFeature[]",
+      "required": true,
+      "description": "the white strip of three features at the bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a20ec4c9cd4508596d0c167c8d768e03d7af948d806849835b17d0e5c9f4f0ee"
+}

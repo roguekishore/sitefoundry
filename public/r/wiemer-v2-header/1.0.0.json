@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wiemer header (v2)",
+  "description": "A slim 72px bar with a plain wordmark left and a circle-arrow link right. Over a hero it is an accent-coloured bar on phones and fully transparent with light text on desktop, turning solid off-white once you pass the hero; it slides away while scrolling down and returns on scroll up.",
+  "category": "header",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "minimal",
+    "transparent",
+    "overlay",
+    "hide-on-scroll",
+    "sticky",
+    "light"
+  ],
+  "notes": [
+    "overlay variant is fixed and takes no space: put it over a full-window hero (wiemer-v2-hero)",
+    "solid variant is sticky and sits in the flow, for inner pages",
+    "the transparent desktop state uses the background colour for its text, so it wants a dark photo in light mode"
+  ],
+  "entry": "wiemer-v2-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "wiemer-v2-header",
+  "files": [
+    {
+      "path": "wiemer-v2-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { WiemerV2ArrowLink } from \"@foundry/wiemer-v2-arrow-link\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WiemerV2HeaderProps {\n  /** the wordmark: the brand's name, an optional icon before it, and where it links */\n  brand: { name: string; icon?: ReactNode; href: string };\n  /** the one call to action on the right */\n  cta: { label: string; href: string };\n  /**\n   * overlay: floats over a full-window hero (an accent bar on phones; from lg transparent with\n   * light text, turning solid once the page passes `solidAfter`) · solid: a plain bar in the flow\n   */\n  variant?: \"overlay\" | \"solid\";\n  /** overlay only: how far down (in window heights) the bar turns solid, default 1.5 */\n  solidAfter?: number;\n  className?: string;\n}\n\n/**\n * A slim 72px bar: wordmark on the left, a circle-arrow link on the right. It slides away\n * while you scroll down and comes back as soon as you scroll up.\n */\nexport function WiemerV2Header({ brand, cta, variant = \"overlay\", solidAfter = 1.5, className }: WiemerV2HeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [past, setPast] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      setHidden(y > 96 && y > last);\n      setPast(y > window.innerHeight * solidAfter - 72);\n      last = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [solidAfter]);\n\n  const overlay = variant === \"overlay\";\n  const clear = overlay && !past; // transparent over the hero (from lg)\n\n  return (\n    <header\n      className={cn(\n        \"inset-x-0 top-0 z-50 transition-[translate,background-color,color] duration-500 ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\",\n        overlay ? \"fixed\" : \"sticky\",\n        hidden && \"-translate-y-full\",\n        overlay ? \"bg-highlight text-highlight-foreground\" : \"border-b border-border bg-background text-foreground\",\n        overlay && (clear ? \"lg:bg-transparent lg:text-background\" : \"lg:border-b lg:border-border lg:bg-background lg:text-foreground\"),\n        className,\n      )}\n    >\n      <div className=\"flex h-18 items-center justify-between gap-4 px-gutter lg:px-8\">\n        <a href={brand.href} className=\"flex items-center gap-2 text-[1.75rem] leading-none font-medium tracking-[-0.03em] [&_svg]:size-6\">\n          {brand.icon}\n          <span>{brand.name}</span>\n        </a>\n        <WiemerV2ArrowLink href={cta.href} tone={clear ? \"inverse\" : \"ink\"} className={cn(clear && \"max-lg:text-highlight-foreground max-lg:[&>span:last-child]:border-highlight-foreground\")}>\n          {cta.label}\n        </WiemerV2ArrowLink>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wiemer-v2-arrow-link"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; icon?: ReactNode; href: string; }",
+      "required": true,
+      "description": "the wordmark: the brand's name, an optional icon before it, and where it links"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the one call to action on the right"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "overlay",
+      "description": "overlay: floats over a full-window hero (an accent bar on phones; from lg transparent with\nlight text, turning solid once the page passes `solidAfter`) · solid: a plain bar in the flow"
+    },
+    {
+      "name": "solidAfter",
+      "type": "number",
+      "required": false,
+      "default": "1.5",
+      "description": "overlay only: how far down (in window heights) the bar turns solid, default 1.5"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "68c1f2c0570f625fa91ed24e9f3dcb7a702e5dbceb2ac9828d61d422088ed760"
+}

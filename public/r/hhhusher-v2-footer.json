@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher footer (v2)",
+  "description": "A near-black footer: a small newsletter (title, cream-glass email field, outlined subscribe that wakes up once the consent box is ticked) on the left, two columns of bold mono caps links on the right, and a giant black-weight wordmark across the bottom whose letters slide in from the left through their own masks, the far ones from farther away. With reveal on, the page lifts off it like a curtain.",
+  "category": "footer",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "newsletter",
+    "wordmark",
+    "big-type",
+    "curtain",
+    "reveal",
+    "mono",
+    "sticky"
+  ],
+  "notes": [
+    "always dark (forces the dark class)",
+    "reveal: the footer becomes sticky to the window bottom behind the page; wrap everything above it in one element with relative z-10 (and opaque backgrounds) so the page covers it until the end",
+    "the wordmark scales with the window (24vw), so keep it short (about six letters)",
+    "CSS only; reduced motion shows the wordmark in place"
+  ],
+  "entry": "hhhusher-v2-footer.tsx",
+  "source": "foundry",
+  "name": "hhhusher-v2-footer",
+  "files": [
+    {
+      "path": "hhhusher-v2-footer.css",
+      "content": "/* The wordmark's letters slide in from the left, each inside its own mask; letter n starts\n   farther away than letter n-1 (--hh-far). In curtain mode the footer is stuck behind the\n   page, so the slide follows the last stretch of the page's scroll instead of the footer's\n   own trip into view. */\n.hhhusher-v2-footer {\n  view-timeline: --hhhusher-v2-footer block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hhhusher-v2-footer-letter {\n      animation: hhhusher-v2-footer-letter cubic-bezier(0.32, 0.94, 0.6, 1) both;\n      animation-timeline: --hhhusher-v2-footer;\n      animation-range: entry 0% entry 100%;\n    }\n    .hhhusher-v2-footer[data-reveal] .hhhusher-v2-footer-letter {\n      animation-timeline: scroll(root);\n      animation-range: calc(100% - 70svh) 100%;\n    }\n  }\n}\n\n@keyframes hhhusher-v2-footer-letter {\n  from { transform: translateX(calc(-1 * var(--hh-far, 60%))); }\n}\n"
+    },
+    {
+      "path": "hhhusher-v2-footer.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\nimport \"./hhhusher-v2-footer.css\";\n\nexport interface HhhusherV2FooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface HhhusherV2FooterProps {\n  /** the newsletter title */\n  title: string;\n  /** placeholder of the email field */\n  emailPlaceholder: string;\n  /** label of the email field, for screen readers */\n  emailLabel?: string;\n  /** the subscribe button */\n  submitLabel: string;\n  /** the consent line next to the checkbox; subscribe lights up once it's ticked */\n  consent: string;\n  /** where the form posts */\n  action?: string;\n  /** links, laid out in two columns */\n  links: HhhusherV2FooterLink[];\n  /** the giant wordmark across the bottom, set at 24% of the window width: keep it to about six capitals */\n  wordmark: string;\n  /** curtain mode: sticks to the window bottom behind the page, which lifts off it at the end */\n  reveal?: boolean;\n  className?: string;\n}\n\nexport function HhhusherV2Footer({ title, emailPlaceholder, emailLabel, submitLabel, consent, action, links, wordmark, reveal = false, className }: HhhusherV2FooterProps) {\n  const letters = Array.from(wordmark);\n  return (\n    <footer\n      data-reveal={reveal || undefined}\n      className={cn(\"hhhusher-v2-footer dark bg-background text-foreground\", reveal && \"sticky bottom-0 z-0\", className)}\n    >\n      <div className=\"mx-auto max-w-page px-gutter pt-20 lg:pt-7\">\n        <div className=\"grid gap-14 lg:grid-cols-2 lg:gap-0\">\n          <form action={action} className=\"group max-w-[30rem]\">\n            <p className=\"font-display text-[1.3rem] leading-[1.3] font-[570] tracking-[-0.02em] lg:text-[1.5rem]\">{title}</p>\n            <div className=\"mt-9 flex gap-2.5 lg:mt-5\">\n              <label className=\"min-w-0 flex-1 lg:max-w-[21.25rem]\">\n                <span className=\"sr-only\">{emailLabel ?? emailPlaceholder}</span>\n                <input\n                  type=\"email\"\n                  name=\"email\"\n                  required\n                  placeholder={emailPlaceholder}\n                  className=\"h-[2.8rem] w-full rounded-lg bg-foreground/20 px-4 font-mono text-base font-bold text-foreground uppercase placeholder:text-foreground/60 focus:outline-2 focus:outline-ring lg:h-[2.6875rem] lg:text-[0.75rem]\"\n                />\n              </label>\n              <button\n                type=\"submit\"\n                className={cn(\n                  \"h-[2.8rem] w-[8.4rem] shrink-0 rounded-lg border border-foreground/20 bg-foreground/15 font-mono text-[0.75rem] font-bold text-foreground/50 uppercase transition-colors lg:h-[2.6875rem] lg:w-[8.125rem]\",\n                  \"group-has-[input[type=checkbox]:checked]:border-primary group-has-[input[type=checkbox]:checked]:bg-primary group-has-[input[type=checkbox]:checked]:text-primary-foreground\",\n                  hhhusherV2Ease,\n                )}\n              >\n                {submitLabel}\n              </button>\n            </div>\n            <label className=\"mt-6 flex cursor-pointer items-start gap-3 lg:mt-7\">\n              <input type=\"checkbox\" name=\"consent\" required className=\"mt-0.5 size-[1.15rem] shrink-0 cursor-pointer appearance-none rounded-sm border border-foreground bg-transparent checked:border-primary checked:bg-primary\" />\n              <span className=\"font-display text-[0.92rem] leading-[1.4] font-semibold lg:text-[0.875rem] lg:leading-[1.45]\">{consent}</span>\n            </label>\n          </form>\n\n          <ul className=\"grid grid-cols-2 gap-x-4 gap-y-6 self-start lg:pt-1\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className={cn(\"font-mono text-[0.75rem] font-bold uppercase transition-colors hover:text-primary\", hhhusherV2Ease)}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        {/* the giant wordmark: each letter slides in through its own mask */}\n        <p\n          aria-label={wordmark}\n          className=\"mt-16 pb-12 font-display text-[24vw] leading-[0.8] font-black tracking-[-0.025em] whitespace-nowrap lg:mt-[4.6rem] lg:pb-[7rem] lg:text-[min(24vw,21.6rem)]\"\n        >\n          {letters.map((letter, i) => (\n            <span key={i} aria-hidden className=\"inline-block overflow-x-clip\">\n              <span className=\"hhhusher-v2-footer-letter inline-block\" style={{ \"--hh-far\": `${45 + i * 12}%` } as CSSProperties}>\n                {letter}\n              </span>\n            </span>\n          ))}\n        </p>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the newsletter title"
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": true,
+      "description": "placeholder of the email field"
+    },
+    {
+      "name": "emailLabel",
+      "type": "string",
+      "required": false,
+      "description": "label of the email field, for screen readers"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the subscribe button"
+    },
+    {
+      "name": "consent",
+      "type": "string",
+      "required": true,
+      "description": "the consent line next to the checkbox; subscribe lights up once it's ticked"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "links",
+      "type": "HhhusherV2FooterLink[]",
+      "required": true,
+      "description": "links, laid out in two columns"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant wordmark across the bottom, set at 24% of the window width: keep it to about six capitals"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "curtain mode: sticks to the window bottom behind the page, which lifts off it at the end"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c607762cf58463b2dc7ab3c8044a176e2dae0c4f41851b8560354f0e09ff6dda"
+}

@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plumeform reveal (v2)",
+  "description": "A wrapper that fades its content in as it scrolls into view: opacity 0 to 1, a 22px rise and a 6px blur clearing, driven by the scroll itself (CSS view timeline). Give list items a step number to stagger them.",
+  "category": "animation",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "blur",
+    "rise",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: browsers without scroll-driven animations, and reduced motion, show the content in place",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "plumeform-v2-reveal.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-reveal",
+  "files": [
+    {
+      "path": "plumeform-v2-reveal.css",
+      "content": "/* Fade, rise and un-blur over the first 220px of scroll after the element's top enters the\n   window (a fixed distance, so tall cards in the first screen are already clear at load). The\n   step number shifts the range by 40px so items in a row arrive one after another. Only where\n   the browser supports view timelines and the visitor allows motion; otherwise everything is\n   simply there. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-v2-reveal {\n      animation: plumeform-v2-reveal-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--plumeform-v2-reveal-step, 0) * 40px) entry calc(220px + var(--plumeform-v2-reveal-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes plumeform-v2-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(22px);\n    filter: blur(6px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n    filter: none;\n  }\n}\n"
+    },
+    {
+      "path": "plumeform-v2-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./plumeform-v2-reveal.css\";\n\nexport interface PlumeformV2RevealProps {\n  children?: ReactNode;\n  /** the element to render (div by default; li inside lists) */\n  as?: ElementType;\n  /** position in a staggered row: 0, 1, 2… each arrives a little later */\n  step?: number;\n  className?: string;\n}\n\nexport function PlumeformV2Reveal({ children, as: Tag = \"div\", step = 0, className }: PlumeformV2RevealProps) {\n  return (\n    <Tag className={cn(\"plumeform-v2-reveal\", className)} style={{ \"--plumeform-v2-reveal-step\": step } as CSSProperties}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default; li inside lists)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered row: 0, 1, 2… each arrives a little later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c7c97db163d3ec77c53be45b0ab92cd8d25907fb76e25aeb4db72c1595eaef3c"
+}

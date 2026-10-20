@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform at a glance (v2)",
+  "description": "A dark band with a heavy left-aligned heading over a bento of frosted glass stat cards: a tall card whose huge paper-to-mint numeral sits at its foot, two compact cards with the label above the figure and a note below, and a wide card along the bottom. Cards rise and un-blur into view one after another.",
+  "category": "stats",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "bento",
+    "glass",
+    "dark",
+    "gradient-text",
+    "reveal",
+    "stagger",
+    "band"
+  ],
+  "notes": [
+    "dark by itself (dark class); the backdrop is a placeholder until given a video or WebGL scene",
+    "made for four stats: the first is tall, the last is wide; other counts fall back to a plain grid"
+  ],
+  "entry": "plumeform-v2-glance.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-glance",
+  "files": [
+    {
+      "path": "plumeform-v2-glance.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Backdrop } from \"@foundry/plumeform-v2-backdrop\";\nimport { PlumeformV2GlassCard } from \"@foundry/plumeform-v2-glass-card\";\nimport { PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\n\nexport interface PlumeformV2Stat {\n  /** the line above the figure */\n  label: string;\n  /** the figure, e.g. \"150\" or \"$12\" */\n  value: string;\n  /** a line under the figure */\n  note?: string;\n}\n\nexport interface PlumeformV2GlanceProps {\n  eyebrow?: string;\n  title: ReactNode;\n  stats: PlumeformV2Stat[];\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\nconst figure =\n  \"bg-[linear-gradient(135deg,var(--foreground),var(--primary)_45%,var(--highlight))] bg-clip-text font-display leading-none font-extrabold tracking-[-0.05em] text-transparent\";\n\nexport function PlumeformV2Glance({ eyebrow, title, stats, backdrop, id, className }: PlumeformV2GlanceProps) {\n  const bento = stats.length === 4;\n  return (\n    <section id={id} className={cn(\"dark relative isolate overflow-clip px-gutter py-[calc(var(--section-y)*0.85)] text-foreground lg:py-section\", className)}>\n      <PlumeformV2Backdrop media={backdrop} />\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <PlumeformV2Heading eyebrow={eyebrow} title={title} className=\"max-w-[41rem]\" />\n        <ul className={cn(\"mt-12 grid gap-4 lg:mt-14\", bento ? \"md:grid-cols-2 lg:grid-cols-3\" : \"md:grid-cols-3\")}>\n          {stats.map((s, i) => {\n            const tall = bento && i === 0;\n            const wide = bento && i === 3;\n            return (\n              <PlumeformV2GlassCard\n                as=\"li\"\n                key={s.label}\n                step={i}\n                className={cn(\"flex flex-col p-8\", tall && \"md:row-span-2 md:min-h-[29rem]\", wide && \"md:col-span-2 lg:col-start-2\")}\n              >\n                <p className=\"text-sm font-semibold text-foreground/80\">{s.label}</p>\n                <p className={cn(figure, tall ? \"mt-7 text-[4.5rem] md:mt-auto md:pt-16 md:text-[6.5rem] lg:text-[8rem]\" : \"mt-7 text-[4rem] lg:text-[4.5rem]\")}>{s.value}</p>\n                {s.note && <p className=\"mt-6 text-sm text-muted-foreground\">{s.note}</p>}\n              </PlumeformV2GlassCard>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-backdrop",
+    "plumeform-v2-glass-card",
+    "plumeform-v2-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "stats",
+      "type": "PlumeformV2Stat[]",
+      "required": true
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f2f1a2252be564dba615264f709bcb71397b984222567c80a1aa8cfcde777a6e"
+}

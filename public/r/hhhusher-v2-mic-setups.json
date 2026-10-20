@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "HHHusher setup picker (v2)",
+  "description": "A full-bleed dark photo band with a picker on the left: a two-line heading, a numbered list of setups (small grey number squares and grey mono caps; the chosen one turns yellow), the chosen setup's paragraph and a yellow buy button. Picking another setup crossfades the photo; the list fades in item by item as it comes up the window.",
+  "category": "features",
+  "site": "hhhusher-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "picker",
+    "tabs",
+    "dark",
+    "photo",
+    "fullscreen",
+    "mono",
+    "yellow",
+    "reveal"
+  ],
+  "notes": [
+    "always dark (forces the dark class); one photo slot per setup, cropped like cover",
+    "sized by the window on phones (100svh), by its content on desktop, like the original",
+    "needs JavaScript to switch setups (hydrate: visible); without it the first setup shows"
+  ],
+  "entry": "hhhusher-v2-mic-setups.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hhhusher-v2-mic-setups",
+  "files": [
+    {
+      "path": "hhhusher-v2-mic-setups.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HhhusherV2Button, hhhusherV2Ease } from \"@foundry/hhhusher-v2-button\";\nimport { HhhusherV2RevealText, hhhusherV2Reveal, hhhusherV2RevealStyle } from \"@foundry/hhhusher-v2-reveal\";\n\nexport interface HhhusherV2Setup {\n  /** the list label, in mono caps */\n  label: string;\n  /** the paragraph shown while it's chosen */\n  text: string;\n  /** the setup's photo, full-bleed behind; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface HhhusherV2MicSetupsProps {\n  heading: string;\n  /** the setups; the first starts chosen */\n  setups: HhhusherV2Setup[];\n  /** the yellow button under the paragraph */\n  buy?: { label: string; href: string };\n  id?: string;\n  className?: string;\n}\n\nconst pad = (n: number) => String(n + 1).padStart(2, \"0\");\n\nexport function HhhusherV2MicSetups({ heading, setups, buy, id, className }: HhhusherV2MicSetupsProps) {\n  const [active, setActive] = useState(0);\n  const current = setups[active] ?? setups[0];\n  return (\n    <section id={id} className={cn(\"dark relative isolate flex min-h-svh flex-col justify-center overflow-clip bg-card text-foreground lg:min-h-0\", className)}>\n      {setups.map((setup, i) => (\n        <div\n          key={setup.label}\n          aria-hidden\n          className={cn(\"absolute inset-0 -z-20 transition-opacity duration-700 ease-[cubic-bezier(0.32,0.94,0.6,1)] motion-reduce:transition-none [&>*]:size-full [&>*]:object-cover\", i === active ? \"opacity-100\" : \"opacity-0\")}\n        >\n          {setup.media ?? <div className=\"size-full bg-muted\" />}\n        </div>\n      ))}\n      {/* a wash on the text side so it reads over any photo */}\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-r from-card/70 via-card/30 to-transparent\" />\n\n      <div className=\"mx-auto w-full max-w-page px-gutter py-16 lg:pt-[13.9rem] lg:pb-[13.5rem]\">\n        <HhhusherV2RevealText as=\"h2\" text={heading} className=\"max-w-[12rem] font-display text-[2.08rem] leading-[1.03] font-[570] tracking-[-0.02em] lg:max-w-[11rem] lg:text-[2rem] lg:leading-[1.07]\" />\n\n        <ul className=\"mt-3 flex flex-col gap-3 lg:mt-10 lg:gap-2.5\">\n          {setups.map((setup, i) => (\n            <li key={setup.label} className={hhhusherV2Reveal(\"rise\")} style={hhhusherV2RevealStyle(i * 0.6, 14)}>\n              <button type=\"button\" onClick={() => setActive(i)} aria-pressed={i === active} className=\"group flex items-center gap-3.5 text-left font-mono text-[0.78rem] font-bold uppercase lg:text-[0.75rem]\">\n                <span\n                  className={cn(\n                    \"flex size-[1.95rem] shrink-0 items-center justify-center rounded-md border transition-colors lg:size-[1.875rem]\",\n                    hhhusherV2Ease,\n                    i === active ? \"border-primary bg-primary text-primary-foreground\" : \"border-transparent bg-muted-foreground/80 text-background group-hover:bg-primary\",\n                  )}\n                >\n                  {pad(i)}\n                </span>\n                <span className={cn(\"transition-colors\", hhhusherV2Ease, i === active ? \"text-primary\" : \"text-muted-foreground group-hover:text-primary\")}>{setup.label}</span>\n              </button>\n            </li>\n          ))}\n        </ul>\n\n        <p key={active} className=\"mt-10 max-w-[45rem] font-display text-[0.875rem] leading-[1.45] font-[570] lg:mt-14 lg:text-base lg:leading-[1.3]\">\n          {current.text}\n        </p>\n        {buy && (\n          <HhhusherV2Button href={buy.href} className=\"mt-12 lg:mt-14\">\n            {buy.label}\n          </HhhusherV2Button>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hhhusher-v2-button",
+    "hhhusher-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "setups",
+      "type": "HhhusherV2Setup[]",
+      "required": true,
+      "description": "the setups; the first starts chosen"
+    },
+    {
+      "name": "buy",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the yellow button under the paragraph"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "678b1c2231bb4eef9e687991c645c580b95c801494f3c9b894f99ebfb7edcb63"
+}

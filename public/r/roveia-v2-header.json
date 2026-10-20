@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia floating nav (v2)",
+  "description": "A white pill nav floating 24px from the top of the window with a soft shadow: plain wordmark left, five links centre (dropdowns open a small white card on hover or focus), and an ink pill button with an arrow that turns blue on hover. On phones a narrower pill with a two-line burger that opens a white card of links.",
+  "category": "header",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "floating",
+    "pill",
+    "fixed",
+    "light",
+    "minimal",
+    "dropdown"
+  ],
+  "notes": [
+    "position: fixed, so it floats over the page; put it first on the page",
+    "dropdowns and the phone menu are CSS / <details>, no JavaScript needed"
+  ],
+  "entry": "roveia-v2-header.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-header",
+  "files": [
+    {
+      "path": "roveia-v2-header.tsx",
+      "content": "import { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Button } from \"@foundry/roveia-v2-button\";\n\nexport interface RoveiaV2NavLink {\n  /** the link text */\n  label: string;\n  /** where it goes (ignored when the item has children) */\n  href?: string;\n  /** a dropdown of further links */\n  children?: { label: string; href: string }[];\n}\n\nexport interface RoveiaV2HeaderProps {\n  /** the company name, set as a plain wordmark */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the centre links */\n  links: RoveiaV2NavLink[];\n  /** the pill button on the right */\n  cta: { label: string; href: string };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  className?: string;\n}\n\nexport function RoveiaV2Header({ brand, brandHref = \"#\", links, cta, menuLabel = \"Menu\", className }: RoveiaV2HeaderProps) {\n  return (\n    <header className={cn(\"fixed inset-x-0 top-4 z-50 px-8 text-foreground lg:top-6 lg:px-gutter\", className)}>\n      <div className=\"relative mx-auto flex h-12 max-w-[62.25rem] items-center justify-between rounded-full bg-card pr-4 pl-6 shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:h-14 lg:pr-2 lg:pl-[1.625rem]\">\n        <a href={brandHref} className=\"text-[1.0625rem] font-medium tracking-[0.01em] lg:text-lg\">\n          {brand}\n        </a>\n\n        <nav className=\"hidden items-center gap-8 lg:flex\">\n          {links.map((link) =>\n            link.children ? (\n              <div key={link.label} className=\"group relative\">\n                <button type=\"button\" className=\"flex items-center gap-1 text-base tracking-[-0.02em] transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none\">\n                  {link.label}\n                  <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.75} />\n                </button>\n                <div className=\"invisible absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 transition-opacity duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\">\n                  <ul className=\"min-w-48 rounded-lg bg-popover p-2 text-popover-foreground shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n                    {link.children.map((child) => (\n                      <li key={child.label}>\n                        <a href={child.href} className=\"block rounded-sm px-3 py-2 text-[0.9375rem] transition-colors duration-300 hover:bg-accent hover:text-primary\">\n                          {child.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              </div>\n            ) : (\n              <a key={link.label} href={link.href} className=\"text-base tracking-[-0.02em] transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none\">\n                {link.label}\n              </a>\n            ),\n          )}\n        </nav>\n\n        <RoveiaV2Button href={cta.href} variant=\"ink\" size=\"sm\" className=\"hidden lg:inline-flex\">\n          {cta.label}\n        </RoveiaV2Button>\n\n        {/* phones: a two-line burger that opens a white card of links */}\n        <details className=\"group/menu lg:hidden\">\n          <summary aria-label={menuLabel} className=\"flex h-10 w-12 cursor-pointer list-none flex-col items-end justify-center gap-2 [&::-webkit-details-marker]:hidden\">\n            <span className=\"h-0.5 w-12 rounded-full bg-foreground transition-transform duration-300 group-open/menu:translate-y-[5px] group-open/menu:rotate-6 motion-reduce:transition-none\" />\n            <span className=\"h-0.5 w-12 rounded-full bg-foreground transition-transform duration-300 group-open/menu:-translate-y-[5px] group-open/menu:-rotate-6 motion-reduce:transition-none\" />\n          </summary>\n          <div className=\"absolute inset-x-0 top-full mt-3 rounded-lg bg-popover p-6 text-popover-foreground shadow-[0_8px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n            <ul className=\"space-y-1\">\n              {links.map((link) => (\n                <li key={link.label}>\n                  {link.children ? (\n                    <>\n                      <p className=\"pt-2 pb-1 text-sm text-muted-foreground\">{link.label}</p>\n                      <ul>\n                        {link.children.map((child) => (\n                          <li key={child.label}>\n                            <a href={child.href} className=\"block py-1.5 text-lg tracking-[-0.02em]\">\n                              {child.label}\n                            </a>\n                          </li>\n                        ))}\n                      </ul>\n                    </>\n                  ) : (\n                    <a href={link.href} className=\"block py-1.5 text-lg tracking-[-0.02em]\">\n                      {link.label}\n                    </a>\n                  )}\n                </li>\n              ))}\n            </ul>\n            <RoveiaV2Button href={cta.href} block className=\"mt-6\">\n              {cta.label}\n            </RoveiaV2Button>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a plain wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "RoveiaV2NavLink[]",
+      "required": true,
+      "description": "the centre links"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the pill button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "01fd1ab8511e600b5e1f19272b88e3d77c4a69c2f08d3271688ba32fc9c4a9f4"
+}

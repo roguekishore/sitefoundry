@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia pinned client list (v2)",
+  "description": "A dark, window-sized rounded panel that pins for four screens of scrolling: on the left a column of 70px client names slides up row by row, the current one bright and the others fading away (1, .5, .25, .1, .05); on the right a heading over the current client's wordmark, tags and paragraph, cross-fading with a full-panel background picture. On phones: a centred line over a two-column grid of wordmarks.",
+  "category": "logos",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "clients",
+    "dark",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "crossfade",
+    "large-type",
+    "social-proof"
+  ],
+  "notes": [
+    "desktop (≥1024px): sized by the window (calc(100svh − 2rem)) inside a 500svh wrapper; CSS scroll-driven, no JavaScript",
+    "the panel wraps itself in .dark; each brand's background slot takes a picture (object-fit: cover), empty it is a tinted placeholder",
+    "without scroll-driven animation support only the first brand's details show"
+  ],
+  "entry": "roveia-v2-brands.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-brands",
+  "files": [
+    {
+      "path": "roveia-v2-brands.css",
+      "content": "/* ≥1024px: a dark, window-sized panel pins inside a wrapper five windows tall. While pinned,\n   the list of names slides up one row per brand; each name's opacity follows its distance\n   from the middle row (1, .5, .25, .1, .05); the matching background and detail cross-fade.\n   Each item's animation-range is set inline from its index (see the .tsx).\n   Phones: a plain grid of wordmarks that fades in. */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .roveia-v2-brands-grid {\n      animation: roveia-v2-brands-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 35%;\n    }\n  }\n  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-brands {\n      height: 500svh;\n      view-timeline: --roveia-v2-brands block;\n    }\n    .roveia-v2-brands-list {\n      animation: roveia-v2-brands-slide linear both;\n      animation-timeline: --roveia-v2-brands;\n      animation-range: contain 5% contain 95%;\n    }\n    .roveia-v2-brands-name {\n      animation: roveia-v2-brands-name linear both;\n      animation-timeline: --roveia-v2-brands;\n      animation-range: var(--roveia-v2-brands-range);\n    }\n    .roveia-v2-brands-name[data-edge=\"first\"] { animation-name: roveia-v2-brands-name-first; }\n    .roveia-v2-brands-name[data-edge=\"last\"] { animation-name: roveia-v2-brands-name-last; }\n    .roveia-v2-brands-swap {\n      animation: roveia-v2-brands-swap linear both;\n      animation-timeline: --roveia-v2-brands;\n      animation-range: var(--roveia-v2-brands-range);\n    }\n    .roveia-v2-brands-swap[data-edge=\"first\"] { animation-name: roveia-v2-brands-swap-first; }\n    .roveia-v2-brands-swap[data-edge=\"last\"] { animation-name: roveia-v2-brands-swap-last; }\n  }\n}\n\n/* without scroll-driven animations (or with reduced motion) only the first brand shows */\n.roveia-v2-brands-swap:not([data-edge=\"first\"]) { opacity: 0; }\n\n@keyframes roveia-v2-brands-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes roveia-v2-brands-slide {\n  from { transform: translateY(0); }\n  to { transform: translateY(var(--roveia-v2-brands-shift)); }\n}\n/* the range spans four rows either side of a name's own moment */\n@keyframes roveia-v2-brands-name {\n  0%, 100% { opacity: 0.05; }\n  12.5%, 87.5% { opacity: 0.1; }\n  25%, 75% { opacity: 0.25; }\n  37.5%, 62.5% { opacity: 0.5; }\n  50% { opacity: 1; }\n}\n@keyframes roveia-v2-brands-name-first {\n  0%, 50% { opacity: 1; }\n  62.5% { opacity: 0.5; }\n  75% { opacity: 0.25; }\n  87.5% { opacity: 0.1; }\n  100% { opacity: 0.05; }\n}\n@keyframes roveia-v2-brands-name-last {\n  0% { opacity: 0.05; }\n  12.5% { opacity: 0.1; }\n  25% { opacity: 0.25; }\n  37.5% { opacity: 0.5; }\n  50%, 100% { opacity: 1; }\n}\n/* the range spans one row either side */\n@keyframes roveia-v2-brands-swap {\n  0%, 25%, 75%, 100% { opacity: 0; }\n  40%, 60% { opacity: 1; }\n}\n@keyframes roveia-v2-brands-swap-first {\n  0%, 60% { opacity: 1; }\n  75%, 100% { opacity: 0; }\n}\n@keyframes roveia-v2-brands-swap-last {\n  0%, 25% { opacity: 0; }\n  40%, 100% { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-brands.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./roveia-v2-brands.css\";\n\nexport interface RoveiaV2Brand {\n  /** the client's name, as listed on the left */\n  name: string;\n  /** its wordmark (styled text, svg or img); the name in medium weight when empty */\n  wordmark?: ReactNode;\n  /** a short line of categories, e.g. \"Virtual care · Sleep\" */\n  tags?: string;\n  /** one or two sentences about the client */\n  description?: string;\n  /** the full-panel background picture; a tinted placeholder shows when empty */\n  media?: ReactNode;\n}\n\nexport interface RoveiaV2BrandsProps {\n  /** the line above the details (and above the grid on phones) */\n  heading: string;\n  /** the clients, in list order */\n  brands: RoveiaV2Brand[];\n  className?: string;\n}\n\n// placeholder tints, one per brand in turn\nconst tints = [\"var(--chart-1)\", \"var(--chart-3)\", \"var(--chart-4)\", \"var(--chart-5)\", \"var(--chart-2)\"];\n\n/** Where item i's scroll moment sits (in % of the pinned range) and its animation-range. */\nfunction range(i: number, n: number, spread: number): CSSProperties {\n  const step = n > 1 ? 90 / (n - 1) : 0;\n  const at = 5 + step * i;\n  return { \"--roveia-v2-brands-range\": `contain ${at - spread * step}% contain ${at + spread * step}%` } as CSSProperties;\n}\nconst edge = (i: number, n: number) => (i === 0 ? \"first\" : i === n - 1 ? \"last\" : undefined);\n\nexport function RoveiaV2Brands({ heading, brands, className }: RoveiaV2BrandsProps) {\n  const n = brands.length;\n  return (\n    <section className={cn(\"roveia-v2-brands relative bg-background text-foreground\", className)}>\n      {/* phones: a centred line over a two-column grid of wordmarks */}\n      <div className=\"roveia-v2-brands-grid px-gutter pt-10 pb-12 lg:hidden\">\n        <p className=\"text-center text-base\">{heading}</p>\n        <ul className=\"mt-10 grid grid-cols-2 gap-x-6 gap-y-8 text-center text-[1.25rem] text-foreground/75\">\n          {brands.map((b) => (\n            <li key={b.name}>{b.wordmark ?? <span className=\"font-medium\">{b.name}</span>}</li>\n          ))}\n        </ul>\n      </div>\n\n      {/* desktop: the pinned dark panel */}\n      <div className=\"hidden px-5 lg:sticky lg:top-4 lg:block\">\n        <div className=\"dark relative h-[calc(100svh-2rem)] min-h-[40rem] overflow-clip rounded-[2.5rem] bg-background text-foreground\">\n          {brands.map((b, i) => (\n            <div\n              key={b.name}\n              data-edge={edge(i, n)}\n              className=\"roveia-v2-brands-swap absolute inset-0 [&>*]:size-full [&>*]:object-cover\"\n              style={range(i, n, 1)}\n            >\n              {b.media ?? (\n                <div\n                  className=\"bg-muted\"\n                  style={{ backgroundImage: `radial-gradient(ellipse at 75% 40%, color-mix(in oklab, ${tints[i % tints.length]} 45%, transparent), transparent 65%)` }}\n                />\n              )}\n            </div>\n          ))}\n          <div aria-hidden className=\"absolute inset-0 bg-background/50\" />\n\n          {/* left: the names, sliding up one row per brand */}\n          <ul\n            className=\"roveia-v2-brands-list absolute top-[calc(50%-5.5rem)] left-[12.625rem]\"\n            style={{ \"--roveia-v2-brands-shift\": `${-(n - 1) * 6.25}rem` } as CSSProperties}\n          >\n            {brands.map((b, i) => (\n              <li\n                key={b.name}\n                data-edge={edge(i, n)}\n                className=\"roveia-v2-brands-name h-[6.25rem] text-[4.375rem] leading-[6.25rem] font-normal tracking-[-0.02em] whitespace-nowrap\"\n                style={range(i, n, 4)}\n              >\n                {b.name}\n              </li>\n            ))}\n          </ul>\n\n          {/* right: the heading and the current brand's details */}\n          <div className=\"absolute top-[calc(50%-6rem)] left-1/2 w-[28.5rem]\">\n            <p className=\"text-2xl tracking-[-0.03em]\">{heading}</p>\n            <div className=\"mt-[9.5rem] grid\">\n              {brands.map((b, i) => (\n                <div key={b.name} data-edge={edge(i, n)} className=\"roveia-v2-brands-swap [grid-area:1/1]\" style={range(i, n, 1)}>\n                  <div className=\"flex items-center gap-10\">\n                    <span className=\"text-[2rem] leading-none\">{b.wordmark ?? <span className=\"font-medium\">{b.name}</span>}</span>\n                    {b.tags && <span className=\"text-base text-muted-foreground\">{b.tags}</span>}\n                  </div>\n                  {b.description && <p className=\"mt-12 text-base leading-6 tracking-[-0.02em] text-foreground/75\">{b.description}</p>}\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the line above the details (and above the grid on phones)"
+    },
+    {
+      "name": "brands",
+      "type": "RoveiaV2Brand[]",
+      "required": true,
+      "description": "the clients, in list order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "72fdc62f7e0bcc573baf6491c06b7f6f0a6f4c480c63dbdfaa18edfccba9aeff"
+}

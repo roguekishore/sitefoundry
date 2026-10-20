@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wiemer split heading (v2)",
+  "description": "A heading split into letters that rise 1.2em from under their line and fade in one after another, left to right, as it scrolls into view. Words stay whole, so it wraps like normal text.",
+  "category": "text-effect",
+  "site": "wiemer-v2",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "split-text",
+    "reveal",
+    "scroll",
+    "stagger",
+    "css",
+    "minimal"
+  ],
+  "notes": [
+    "CSS scroll-driven (a named view timeline); static HTML, old browsers and reduced motion show the plain heading",
+    "screen readers get the whole text through aria-label",
+    "set size, weight and colour with className"
+  ],
+  "entry": "wiemer-v2-split-heading.tsx",
+  "source": "foundry",
+  "name": "wiemer-v2-split-heading",
+  "files": [
+    {
+      "path": "wiemer-v2-split-heading.css",
+      "content": "/* Letters rising into place, one after another, as the heading comes into view.\n   The heading is a named view timeline (bottom 15 % of the window ignored); each letter\n   plays over a slice of the heading's entry, shifted later by its place in the text\n   (--wiemer-v2-p, 0 → 1). Every word clips its letters, so they come up from under a line. */\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wiemer-v2-split-heading {\n      view-timeline: --wiemer-v2-split block;\n      view-timeline-inset: 0% 15%;\n    }\n    .wiemer-v2-split-heading-char {\n      animation: wiemer-v2-split-heading-rise cubic-bezier(0.215, 0.61, 0.355, 1) both;\n      animation-timeline: --wiemer-v2-split;\n      animation-range: entry calc(var(--wiemer-v2-p, 0) * 45%) entry calc(55% + var(--wiemer-v2-p, 0) * 45%);\n    }\n  }\n}\n\n@keyframes wiemer-v2-split-heading-rise {\n  from {\n    opacity: 0;\n    transform: translateY(1.2em);\n  }\n}\n"
+    },
+    {
+      "path": "wiemer-v2-split-heading.tsx",
+      "content": "import { Fragment, type CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wiemer-v2-split-heading.css\";\n\nexport interface WiemerV2SplitHeadingProps {\n  /** the heading's text; a line break (\"\\n\") forces a new line */\n  text: string;\n  /** which element to render */\n  as?: \"h1\" | \"h2\" | \"h3\" | \"p\";\n  /** sizes and colour come from here (the component only sets the motion) */\n  className?: string;\n}\n\n/**\n * A heading whose letters rise 1.2em from under their line and fade in, one after another\n * from left to right, as it scrolls into view. CSS only: the static HTML is the plain text.\n */\nexport function WiemerV2SplitHeading({ text, as: Tag = \"h2\", className }: WiemerV2SplitHeadingProps) {\n  const total = Math.max(1, text.replace(/\\s/g, \"\").length - 1);\n  let n = 0;\n  return (\n    <Tag aria-label={text.replace(/\\n/g, \" \")} className={cn(\"wiemer-v2-split-heading\", className)}>\n      <span aria-hidden=\"true\">\n        {text.split(\"\\n\").map((line, l) => (\n          <Fragment key={l}>\n            {l > 0 && <br />}\n            {line.split(\" \").map((word, w) => (\n              <Fragment key={w}>\n                {w > 0 && \" \"}\n                <span className=\"inline-block overflow-clip whitespace-nowrap [overflow-clip-margin:0.2em]\">\n                  {[...word].map((char, c) => (\n                    <span key={c} className=\"wiemer-v2-split-heading-char inline-block\" style={{ \"--wiemer-v2-p\": n++ / total } as CSSProperties}>\n                      {char}\n                    </span>\n                  ))}\n                </span>\n              </Fragment>\n            ))}\n          </Fragment>\n        ))}\n      </span>\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the heading's text; a line break (\"\\n\") forces a new line"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "which element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "sizes and colour come from here (the component only sets the motion)"
+    }
+  ],
+  "hash": "0cb27a11ce1abca78e1043ecbdd5533716ef2da1389329acf5746980f10009db"
+}

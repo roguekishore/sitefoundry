@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform hero (v2)",
+  "description": "A dark band lit by a backdrop slot, with a centred heavy headline, a slate lead and a single pill CTA, then a large rounded frame (tall and phone-shaped on mobile, wide on desktop) whose border is a spinning mint-and-butter halo. The frame overhangs the band onto the paper below and grows to full size as you scroll (from 88% on desktop, 78% on phones). Headline and lead settle in on load, the CTA and frame rise in after them, and the backdrop fades in like an aurora.",
+  "category": "hero",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "glow",
+    "halo",
+    "frame",
+    "embed",
+    "load-in",
+    "scroll",
+    "scale",
+    "loop",
+    "centered"
+  ],
+  "notes": [
+    "the band is dark by itself (dark class); the frame stays in the page's own colours",
+    "media fills the frame (an iframe, video or screenshot); backdrop fills the band (a video or WebGL scene); both are placeholders when empty",
+    "place it right after plumeform-v2-header: its top padding leaves room for the floating bar"
+  ],
+  "entry": "plumeform-v2-hero.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-hero",
+  "files": [
+    {
+      "path": "plumeform-v2-hero.css",
+      "content": "/* Load-in: the headline and lead settle up into place (no fade, so they paint at once);\n   the CTA and the frame rise and fade in just after. The halo spins round the frame for good,\n   and the frame grows to full size while it scrolls up the window. */\n@media (prefers-reduced-motion: no-preference) {\n  .plumeform-v2-hero-settle {\n    animation: plumeform-v2-hero-settle 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n  .plumeform-v2-hero-rise {\n    animation: plumeform-v2-hero-rise 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n  .plumeform-v2-hero-halo {\n    animation: plumeform-v2-hero-halo 3s linear infinite;\n  }\n}\n\n/* phones: the tall frame starts at 78% and grows from its centre; desktop: 88%, from the top */\n.plumeform-v2-hero-grow {\n  --plumeform-v2-hero-from: 0.78;\n  transform-origin: 50% 50%;\n}\n@media (min-width: 64rem) {\n  .plumeform-v2-hero-grow {\n    --plumeform-v2-hero-from: 0.88;\n    transform-origin: 50% 0;\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .plumeform-v2-hero-grow {\n      animation: plumeform-v2-hero-grow linear both;\n      animation-timeline: view();\n      animation-range: entry 50% cover 50%;\n    }\n    .plumeform-v2-hero-glow {\n      animation: plumeform-v2-hero-glow linear both;\n      animation-timeline: view();\n      animation-range: entry 50% cover 50%;\n    }\n  }\n}\n\n@keyframes plumeform-v2-hero-settle {\n  from { transform: translateY(16px); }\n  to { transform: none; }\n}\n\n@keyframes plumeform-v2-hero-rise {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes plumeform-v2-hero-halo {\n  to { transform: rotate(360deg); }\n}\n\n@keyframes plumeform-v2-hero-grow {\n  from { transform: scale(var(--plumeform-v2-hero-from)); }\n  to { transform: scale(1); }\n}\n\n@keyframes plumeform-v2-hero-glow {\n  from { opacity: 0.18; }\n  to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "plumeform-v2-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Backdrop } from \"@foundry/plumeform-v2-backdrop\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport \"./plumeform-v2-hero.css\";\n\nexport interface PlumeformV2HeroProps {\n  /** the headline */\n  title: ReactNode;\n  /** the lead paragraph */\n  lead: ReactNode;\n  /** the pill button */\n  cta: { label: string; href: string };\n  /** the small labels in the frame's top strip: left and right */\n  frameLabel?: string;\n  frameNote?: string;\n  /** what fills the frame (an embedded form, a video, a screenshot); empty shows a placeholder */\n  media?: ReactNode;\n  /** what fills the dark band (a video or WebGL scene); empty shows a placeholder */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nexport function PlumeformV2Hero({ title, lead, cta, frameLabel, frameNote, media, backdrop, className }: PlumeformV2HeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-x-clip bg-background pb-12 lg:pb-0\", className)}>\n      {/* the dark band; on desktop it stops above the frame's foot so the frame overhangs it */}\n      <div className=\"dark absolute inset-x-0 top-0 bottom-0 -z-10 lg:bottom-[4.75rem]\">\n        <PlumeformV2Backdrop media={backdrop} entrance=\"load\" veil />\n      </div>\n\n      <div className=\"dark px-gutter pt-[6.75rem] text-center text-foreground lg:pt-[8.5rem]\">\n        <h1 className=\"plumeform-v2-hero-settle mx-auto max-w-5xl font-display text-5xl leading-[1.04] font-extrabold tracking-[-0.035em] text-balance sm:text-6xl lg:text-[4.5rem] lg:leading-[1.08]\">\n          {title}\n        </h1>\n        <p className=\"plumeform-v2-hero-settle mx-auto mt-7 max-w-3xl text-lg leading-[1.65] text-foreground/75 lg:mt-6 lg:text-xl\">{lead}</p>\n        <div className=\"plumeform-v2-hero-rise mt-9 flex justify-center lg:mt-10\" style={{ animationDelay: \"120ms\" }}>\n          <PlumeformV2Button href={cta.href} arrow className=\"px-6\">\n            {cta.label}\n          </PlumeformV2Button>\n        </div>\n      </div>\n\n      <div className=\"relative mt-2 px-gutter lg:mt-10\">\n        <div className=\"plumeform-v2-hero-grow relative mx-auto w-full max-w-[64rem]\">\n          {/* a soft light behind the frame that fades as it grows */}\n          <span aria-hidden className=\"plumeform-v2-hero-glow absolute -inset-8 -z-10 rounded-[3rem] bg-glow opacity-0 blur-3xl\" />\n          <div\n            className=\"plumeform-v2-hero-rise relative aspect-[342/680] overflow-clip rounded-[1.75rem] p-[3px] shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--foreground)_55%,transparent)] sm:aspect-[4/3] lg:aspect-[1026/670]\"\n            style={{ animationDelay: \"220ms\" }}\n          >\n            {/* the halo: a conic gradient spinning behind the 3px rim */}\n            <span aria-hidden className=\"absolute inset-0 overflow-clip rounded-[inherit]\">\n              <span className=\"plumeform-v2-hero-halo absolute -inset-full bg-[conic-gradient(from_0deg,var(--glow),var(--chart-5),var(--glow),var(--chart-3),var(--glow))]\" />\n            </span>\n            <div className=\"relative flex h-full flex-col overflow-clip rounded-[calc(1.75rem-3px)] bg-card text-card-foreground\">\n              {(frameLabel || frameNote) && (\n                <div className=\"flex items-center justify-between gap-4 px-4 pt-3 text-[0.625rem] lg:px-6 lg:text-[0.6875rem]\">\n                  <span className=\"font-semibold\">{frameLabel}</span>\n                  <span className=\"text-muted-foreground\">{frameNote}</span>\n                </div>\n              )}\n              <div className=\"relative m-2 flex-1 overflow-clip rounded-[1.25rem] lg:m-3 [&>*]:size-full\">\n                {media ?? <div className=\"bg-muted/70\" />}\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-backdrop",
+    "plumeform-v2-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lead paragraph"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the pill button"
+    },
+    {
+      "name": "frameLabel",
+      "type": "string",
+      "required": false,
+      "description": "the small labels in the frame's top strip: left and right"
+    },
+    {
+      "name": "frameNote",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what fills the frame (an embedded form, a video, a screenshot); empty shows a placeholder"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what fills the dark band (a video or WebGL scene); empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "13d18520800f56fdc4d741656054014d650b001ed6ad996f2c5e5c890ab1e0c9"
+}

@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plumeform card grid (v2)",
+  "description": "A dark band over a backdrop slot: an eyebrow and heavy heading (centred or left), a slate lead, an optional pill CTA with a short note beside it, then a three-column grid of frosted glass cards, each with a mint line icon or mint eyebrow, a bold title with an optional PLUS badge, and a short paragraph. The backdrop fades in as the band arrives; heading and cards rise and un-blur into view one after another.",
+  "category": "features",
+  "site": "plumeform-v2",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "grid",
+    "cards",
+    "glass",
+    "dark",
+    "icons",
+    "reveal",
+    "stagger",
+    "band"
+  ],
+  "notes": [
+    "dark by itself (dark class); the backdrop is a placeholder until given a video or WebGL scene",
+    "three columns on desktop, one on phones"
+  ],
+  "entry": "plumeform-v2-card-grid.tsx",
+  "source": "foundry",
+  "name": "plumeform-v2-card-grid",
+  "files": [
+    {
+      "path": "plumeform-v2-card-grid.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlumeformV2Backdrop } from \"@foundry/plumeform-v2-backdrop\";\nimport { PlumeformV2Badge } from \"@foundry/plumeform-v2-badge\";\nimport { PlumeformV2Button } from \"@foundry/plumeform-v2-button\";\nimport { PlumeformV2GlassCard } from \"@foundry/plumeform-v2-glass-card\";\nimport { PlumeformV2Heading } from \"@foundry/plumeform-v2-heading\";\nimport { PlumeformV2Reveal } from \"@foundry/plumeform-v2-reveal\";\n\nexport interface PlumeformV2GridCard {\n  /** a line icon (e.g. from lucide-react), drawn in mint */\n  icon?: ReactNode;\n  /** small mint capitals above the title */\n  eyebrow?: string;\n  title: string;\n  /** a badge after the title (e.g. a plan name) */\n  badge?: string;\n  body: string;\n}\n\nexport interface PlumeformV2CardGridProps {\n  eyebrow?: string;\n  title: ReactNode;\n  body?: ReactNode;\n  /** heading alignment */\n  align?: \"left\" | \"center\";\n  /** a pill button under the heading */\n  cta?: { label: string; href: string };\n  /** a short line beside the button */\n  note?: ReactNode;\n  cards: PlumeformV2GridCard[];\n  /** what fills the band (a video or WebGL scene); empty shows a placeholder */\n  backdrop?: ReactNode;\n  id?: string;\n  className?: string;\n}\n\nexport function PlumeformV2CardGrid({\n  eyebrow,\n  title,\n  body,\n  align = \"center\",\n  cta,\n  note,\n  cards,\n  backdrop,\n  id,\n  className,\n}: PlumeformV2CardGridProps) {\n  const centred = align === \"center\";\n  return (\n    <section id={id} className={cn(\"dark relative isolate overflow-clip px-gutter py-[calc(var(--section-y)*0.85)] text-foreground lg:py-section\", className)}>\n      <PlumeformV2Backdrop media={backdrop} />\n      <div className=\"mx-auto max-w-[calc(var(--page-width)-2*var(--page-gutter))]\">\n        <PlumeformV2Heading\n          eyebrow={eyebrow}\n          title={title}\n          body={body}\n          align={align}\n          className={cn(centred ? \"mx-auto max-w-3xl [&_h2]:mx-auto [&_h2]:max-w-2xl\" : \"max-w-2xl\")}\n        />\n        {(cta || note) && (\n          <PlumeformV2Reveal\n            step={1}\n            className={cn(\"mt-9 flex flex-col gap-5 sm:flex-row sm:items-center\", centred && \"items-center justify-center text-center sm:text-left\")}\n          >\n            {cta && (\n              <PlumeformV2Button href={cta.href} arrow className=\"px-6\">\n                {cta.label}\n              </PlumeformV2Button>\n            )}\n            {note && <p className=\"text-sm text-muted-foreground [&_strong]:font-bold [&_strong]:text-foreground\">{note}</p>}\n          </PlumeformV2Reveal>\n        )}\n        <ul className=\"mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-3\">\n          {cards.map((card, i) => (\n            <PlumeformV2GlassCard as=\"li\" key={card.title} step={i % 3} className=\"p-7 lg:p-8\">\n              {card.icon && <span className=\"block text-highlight [&_svg]:size-7 [&_svg]:stroke-[1.5]\">{card.icon}</span>}\n              {card.eyebrow && (\n                <p className=\"text-[0.625rem] font-bold tracking-[0.2em] text-highlight uppercase\">{card.eyebrow}</p>\n              )}\n              <h3 className={cn(\"flex flex-wrap items-center gap-2 text-lg font-bold tracking-[-0.02em] lg:text-[1.1875rem]\", card.icon ? \"mt-6\" : \"mt-4 text-xl lg:text-[1.375rem]\")}>\n                {card.title}\n                {card.badge && <PlumeformV2Badge>{card.badge}</PlumeformV2Badge>}\n              </h3>\n              <p className=\"mt-2 text-sm leading-[1.65] text-muted-foreground\">{card.body}</p>\n            </PlumeformV2GlassCard>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plumeform-v2-backdrop",
+    "plumeform-v2-badge",
+    "plumeform-v2-button",
+    "plumeform-v2-glass-card",
+    "plumeform-v2-heading",
+    "plumeform-v2-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "heading alignment"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a pill button under the heading"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a short line beside the button"
+    },
+    {
+      "name": "cards",
+      "type": "PlumeformV2GridCard[]",
+      "required": true
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what fills the band (a video or WebGL scene); empty shows a placeholder"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "86119cea803591e72679b6a1af977d2a1fff88140453c417751bc6e1c87b53b8"
+}

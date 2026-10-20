@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Roveia pinned hero (v2)",
+  "description": "A window-tall rounded panel washed from white to sky blue: a centred 70px headline with a blue middle, then a row of a big stat, a 16:9 media slot and a short line with a blue pill, and a row of partner chips. On desktop the panel pins while the media grows to fill it under a darkening wash and the text turns white; on phones everything stacks and rises in.",
+  "category": "hero",
+  "site": "roveia-v2",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "gradient",
+    "sky",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "expand",
+    "media",
+    "stat",
+    "reveal"
+  ],
+  "notes": [
+    "desktop (≥1024px): sized by the window (calc(100svh − 1rem)) inside a 210svh wrapper; CSS scroll-driven, no JavaScript",
+    "the header floats over it: put roveia-v2-header before it",
+    "the media slot takes a video or image (object-fit: cover); empty, it is a muted placeholder"
+  ],
+  "entry": "roveia-v2-hero.tsx",
+  "source": "foundry",
+  "name": "roveia-v2-hero",
+  "files": [
+    {
+      "path": "roveia-v2-hero.css",
+      "content": "/* Phones: one rounded sky panel, everything in the flow, a soft rise-in on load.\n   ≥1024px: the panel is window-sized and sticks inside a wrapper about two windows tall;\n   while it is pinned the media grows from its 580×326 slot to (almost) the whole panel, a\n   black wash fades up to 75% and the text turns white. */\n\n.roveia-v2-hero-rise {\n  animation: roveia-v2-hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;\n}\n@keyframes roveia-v2-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (min-width: 1024px) {\n  /* the media starts in the middle of the row, which sits 5.5rem below the panel's centre */\n  .roveia-v2-hero-media {\n    position: absolute;\n    inset: calc(50% + 5.5rem - 163px) calc(50% - 290px) calc(50% - 5.5rem - 163px);\n    border-radius: var(--radius);\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {\n    .roveia-v2-hero {\n      height: 210svh;\n      view-timeline: --roveia-v2-hero block;\n    }\n    .roveia-v2-hero-media {\n      animation: roveia-v2-hero-grow linear both;\n      animation-timeline: --roveia-v2-hero;\n      animation-range: contain 0% contain 85%;\n    }\n    .roveia-v2-hero-wash {\n      animation: roveia-v2-hero-wash linear both;\n      animation-timeline: --roveia-v2-hero;\n      animation-range: contain 8% contain 90%;\n    }\n    .roveia-v2-hero-ink {\n      animation: roveia-v2-hero-ink linear both;\n      animation-timeline: --roveia-v2-hero;\n      animation-range: contain 10% contain 60%;\n    }\n  }\n}\n@keyframes roveia-v2-hero-grow {\n  to { inset: 0.625rem; border-radius: calc(var(--radius) + 0.5rem); }\n}\n@keyframes roveia-v2-hero-wash {\n  from { opacity: 0; }\n  to { opacity: 0.75; }\n}\n@keyframes roveia-v2-hero-ink {\n  from { color: var(--foreground); }\n  to { color: var(--primary-foreground); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .roveia-v2-hero-rise { animation: none; }\n}\n"
+    },
+    {
+      "path": "roveia-v2-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { TrendingDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RoveiaV2Button } from \"@foundry/roveia-v2-button\";\nimport \"./roveia-v2-hero.css\";\n\nexport interface RoveiaV2Partner {\n  /** the platform's name */\n  name: string;\n  /** a small icon shown in a white circle */\n  icon?: ReactNode;\n}\n\nexport interface RoveiaV2HeroProps {\n  /** the headline: an ink start, a blue middle and an ink end */\n  headline: { before?: string; accent: string; after?: string };\n  /** the short line beside (desktop) or under (phones) the headline */\n  lead: string;\n  /** the blue pill button */\n  cta: { label: string; href: string };\n  /** the big number on the left (desktop only) */\n  stat?: { value: string; label: string; note?: string; icon?: ReactNode };\n  /** the label before the partner chips */\n  partnersLabel?: string;\n  /** the partner chips along the bottom */\n  partners?: RoveiaV2Partner[];\n  /** the video or picture; a placeholder of the same size shows when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\nfunction Partners({ label, partners, className }: { label?: string; partners: RoveiaV2Partner[]; className?: string }) {\n  return (\n    <div className={cn(\"roveia-v2-hero-rise [animation-delay:0.35s]\", className)}>\n      {label && <p className=\"text-center text-base lg:shrink-0 lg:text-left\">{label}</p>}\n      <ul className=\"mt-6 grid grid-cols-2 gap-x-4 gap-y-6 px-2 lg:mt-0 lg:flex lg:flex-1 lg:justify-between lg:gap-4 lg:pl-10\">\n        {partners.map((p) => (\n          <li key={p.name} className=\"flex items-center gap-2 text-base\">\n            <span className=\"flex size-6 shrink-0 items-center justify-center rounded-full bg-card text-primary [&_svg]:size-3.5\">{p.icon}</span>\n            {p.name}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport function RoveiaV2Hero({ headline, lead, cta, stat, partnersLabel, partners = [], media, className }: RoveiaV2HeroProps) {\n  return (\n    <section className={cn(\"roveia-v2-hero relative bg-background text-foreground\", className)}>\n      <div className=\"px-2 lg:sticky lg:top-0 lg:px-5\">\n        <div className=\"relative overflow-clip rounded-b-[2rem] flex flex-col bg-[linear-gradient(to_bottom,var(--background),color-mix(in_oklab,var(--glow)_30%,var(--background)))] px-6 pt-[8.5rem] pb-20 lg:h-[calc(100svh-1rem)] lg:min-h-[42rem] lg:block lg:rounded-[2.5rem] lg:p-0\">\n          {/* the media slot: in the flow on phones; on desktop it grows over the panel */}\n          <div className=\"roveia-v2-hero-media relative order-3 mt-10 aspect-video overflow-clip rounded-lg lg:mt-0 lg:aspect-auto\">\n            <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">\n              {media ?? <div className=\"size-full bg-muted bg-[radial-gradient(circle_at_30%_20%,color-mix(in_oklab,var(--glow)_35%,transparent),transparent_60%)]\" />}\n            </div>\n            <div aria-hidden className=\"roveia-v2-hero-wash dark absolute inset-0 bg-background opacity-0\" />\n          </div>\n\n          <div className=\"roveia-v2-hero-ink contents lg:absolute lg:inset-0 lg:block\">\n            <h1 className=\"roveia-v2-hero-rise order-1 text-center font-display text-[2rem] leading-[1.2] font-normal tracking-[-0.06em] text-balance lg:absolute lg:inset-x-0 lg:top-[9.5rem] lg:mx-auto lg:max-w-[66rem] lg:text-[4.375rem] lg:leading-[1.1] lg:tracking-[-0.03em]\">\n              {headline.before && <>{headline.before} </>}\n              <span className=\"text-primary\">{headline.accent}</span>\n              {headline.after && <> {headline.after}</>}\n            </h1>\n\n            {/* phones: lead and a full-width button under the headline */}\n            <div className=\"roveia-v2-hero-rise order-2 [animation-delay:0.15s] lg:hidden\">\n              <p className=\"mx-auto mt-8 max-w-[18rem] text-center text-base leading-6 opacity-60\">{lead}</p>\n              <RoveiaV2Button href={cta.href} block className=\"mt-10\">\n                {cta.label}\n              </RoveiaV2Button>\n            </div>\n\n            {/* desktop: stat · (media) · lead and button, centred 5.5rem below the middle */}\n            <div className=\"roveia-v2-hero-rise hidden [animation-delay:0.15s] lg:absolute lg:inset-x-0 lg:top-[calc(50%+5.5rem)] lg:grid lg:-translate-y-1/2 lg:grid-cols-[1fr_36.25rem_1fr] lg:items-center lg:px-[8.25rem]\">\n              <div className=\"justify-self-start\">\n                {stat && (\n                  <>\n                    <span className=\"block text-primary [&_svg]:size-11\">{stat.icon ?? <TrendingDown aria-hidden strokeWidth={1.25} />}</span>\n                    <p className=\"mt-4 text-[4rem] leading-none font-light tracking-[-0.03em]\">{stat.value}</p>\n                    <p className=\"mt-4 text-base\">{stat.label}</p>\n                    {stat.note && <p className=\"mt-10 text-base opacity-60\">{stat.note}</p>}\n                  </>\n                )}\n              </div>\n              <div aria-hidden className=\"h-[20.375rem]\" />\n              <div className=\"w-[12.5rem] justify-self-end\">\n                <p className=\"text-base leading-6 opacity-60\">{lead}</p>\n                <RoveiaV2Button href={cta.href} block className=\"mt-10\">\n                  {cta.label}\n                </RoveiaV2Button>\n              </div>\n            </div>\n\n            {partners.length > 0 && (\n              <Partners label={partnersLabel} partners={partners} className=\"order-4 mt-10 lg:absolute lg:inset-x-0 lg:bottom-[5.5rem] lg:mt-0 lg:flex lg:items-center lg:px-[8.25rem]\" />\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "roveia-v2-button"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "{ before?: string | undefined; accent: string; after?: string | undefined; }",
+      "required": true,
+      "description": "the headline: an ink start, a blue middle and an ink end"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the short line beside (desktop) or under (phones) the headline"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the blue pill button"
+    },
+    {
+      "name": "stat",
+      "type": "{ value: string; label: string; note?: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "the big number on the left (desktop only)"
+    },
+    {
+      "name": "partnersLabel",
+      "type": "string",
+      "required": false,
+      "description": "the label before the partner chips"
+    },
+    {
+      "name": "partners",
+      "type": "RoveiaV2Partner[]",
+      "required": false,
+      "default": "[]",
+      "description": "the partner chips along the bottom"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the video or picture; a placeholder of the same size shows when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4fd49a76eda7cc04505072abe7cb134a4db7bdb42dea5696813f408cfdf13dcf"
+}

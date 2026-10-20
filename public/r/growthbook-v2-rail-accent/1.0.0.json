@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "GrowthBook rail accent (v2)",
+  "description": "A 4px gradient bar (navy → violet → white → blue → navy → green → mint) laid over a section's left hairline rail. It grows down as it enters the window, then sticks to the top while its section scrolls past.",
+  "category": "background",
+  "site": "growthbook-v2",
+  "license": "proprietary",
+  "tags": [
+    "accent",
+    "gradient",
+    "rail",
+    "hairline",
+    "sticky",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "place inside a relative box whose left edge is the rail line",
+    "CSS only; the grow-in is off under reduced motion and in browsers without scroll timelines"
+  ],
+  "entry": "growthbook-v2-rail-accent.tsx",
+  "source": "foundry",
+  "name": "growthbook-v2-rail-accent",
+  "files": [
+    {
+      "path": "growthbook-v2-rail-accent.css",
+      "content": "/* The gradient stops follow the original's rail bar; every colour is a token. */\n.growthbook-v2-rail-accent {\n  background: linear-gradient(\n    to bottom,\n    var(--foreground),\n    var(--primary) 9%,\n    var(--glow) 16%,\n    var(--card) 25%,\n    var(--chart-5) 38%,\n    var(--chart-2) 53%,\n    var(--foreground) 63%,\n    var(--chart-3) 83%,\n    var(--chart-4) 92%,\n    transparent\n  );\n  transform-origin: top;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .growthbook-v2-rail-accent {\n      animation: growthbook-v2-rail-accent-grow linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes growthbook-v2-rail-accent-grow {\n  from { transform: scaleY(0); }\n  to { transform: scaleY(1); }\n}\n"
+    },
+    {
+      "path": "growthbook-v2-rail-accent.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./growthbook-v2-rail-accent.css\";\n\nexport interface GrowthbookV2RailAccentProps {\n  /** classes for the outer column (positioning; defaults to the parent's full height on its left edge) */\n  className?: string;\n  /** classes for the bar itself, e.g. its height (default 12rem on phones, 28rem from 1024px) */\n  barClassName?: string;\n}\n\n/**\n * The gradient accent on the left rail. Its column fills the parent's height, so the bar can\n * stick to the top of the window until the parent ends.\n */\nexport function GrowthbookV2RailAccent({ className, barClassName }: GrowthbookV2RailAccentProps) {\n  return (\n    <div aria-hidden className={cn(\"pointer-events-none absolute inset-y-0 -left-px w-1\", className)}>\n      <div className={cn(\"growthbook-v2-rail-accent sticky top-0 h-48 w-1 lg:h-[28rem]\", barClassName)} />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "classes for the outer column (positioning; defaults to the parent's full height on its left edge)"
+    },
+    {
+      "name": "barClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the bar itself, e.g. its height (default 12rem on phones, 28rem from 1024px)"
+    }
+  ],
+  "hash": "9144c08fcaaab8697b3b212341e0f8191e48cc0da7eacc01175c33b6e2ae4a32"
+}
