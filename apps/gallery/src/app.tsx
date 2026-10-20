@@ -7,6 +7,7 @@ import { byName, items } from "./catalog";
 import { library, pageLabel, pagesOf, SOURCE_COLOUR, SOURCE_LABEL, SOURCES, siteColour, siteLabel, siteList, sourceOf, TYPE_LABEL } from "./library";
 import { openOverlay, setSettings, useDarkChrome, useRoute, type Route } from "./state";
 import { Browse, browseTitle, readBrowse } from "./views/browse";
+import { DevicesPage } from "./views/devices";
 import { ItemPage } from "./views/item";
 import { Overview, Sites } from "./views/overview";
 import { PasskeysPage } from "./views/passkeys";
@@ -37,6 +38,7 @@ export function App() {
   else if (head === "browse") view = <Browse route={route} />;
   else if (head === "sites") view = <Sites />;
   else if (head === "runs") view = <RunsPage route={route} />;
+  else if (head === "devices") view = <DevicesPage />;
   else if (head === "passkeys") view = <PasskeysPage />;
   else view = <Overview />;
 
@@ -100,6 +102,7 @@ function Sidebar({ route }: { route: Route }) {
         {typeLink("component", Box)}
         {typeLink("theme", Palette)}
         {link("#/runs", <Play className="i" />, "Runs", null, head === "runs")}
+        {link("#/devices", <KeyRound className="i" />, "Devices", null, head === "devices")}
         {link("#/passkeys", <KeyRound className="i" />, "Passkeys", null, head === "passkeys")}
       </nav>
       <nav className="nav-group">
@@ -129,6 +132,7 @@ function Crumbs({ route }: { route: Route }) {
   let list: [string, string?][] = [["Overview"]];
   if (head === "sites") list = [["Overview", "#/"], ["Sites"]];
   if (head === "runs") list = a ? [["Overview", "#/"], ["Runs", "#/runs"], [a === "new" ? "New run" : `Run #${a}`]] : [["Overview", "#/"], ["Runs"]];
+  if (head === "devices") list = [["Overview", "#/"], ["Devices"]];
   if (head === "passkeys") list = [["Overview", "#/"], ["Passkeys"]];
   if (head === "browse") list = [["Overview", "#/"], [browseTitle(readBrowse(route.q))]];
   if (head === "item") {

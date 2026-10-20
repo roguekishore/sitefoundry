@@ -4,7 +4,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { NO_USAGE, type Call, type Passkey, type Run, type RunEvent, type RunState, type ThumbsJob, type ThumbsState, type Usage } from "./shared.ts";
+import { NO_USAGE, type Call, type Device, type Passkey, type Run, type RunEvent, type RunState, type ThumbsJob, type ThumbsState, type Usage } from "./shared.ts";
 
 /** A passkey as stored: `Passkey` plus what checking a login needs. */
 export type StoredPasskey = Passkey & { publicKey: Uint8Array<ArrayBuffer>; counter: number; transports: string[] };
@@ -63,6 +63,14 @@ CREATE TABLE IF NOT EXISTS sessions (
   hash TEXT PRIMARY KEY,
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS devices (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  token_hash TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT,
+  revoked_at TEXT
 );
 CREATE TABLE IF NOT EXISTS passkeys (
   id TEXT PRIMARY KEY,
@@ -222,6 +230,31 @@ export class Db {
   }
   dropSession(hash: string) {
     this.sql.prepare("DELETE FROM sessions WHERE hash = ? OR expires_at <= ?").run(hash, now());
+  }
+
+  // ---------- devices (the MCP's tokens; only their SHA-256 is kept, like sessions) ----------
+
+  addDevice(name: string, tokenHash: string): Device {
+    const { lastInsertRowid } = this.sql.prepare("INSERT INTO devices (name, token_hash, created_at) VALUES (?, ?, ?)").run(name, tokenHash, now());
+    return this.devices().find((d) => d.id === Number(lastInsertRowid))!;
+  }
+  /** Newest first, revoked ones too (they show when the token was cut off). */
+  devices(): Device[] {
+    return (this.sql.prepare("SELECT * FROM devices ORDER BY id DESC").all() as Row[]).map((r) => ({
+      id: Number(r.id),
+      name: String(r.name),
+      createdAt: String(r.created_at),
+      lastUsedAt: (r.last_used_at as string) ?? null,
+      revokedAt: (r.revoked_at as string) ?? null,
+    }));
+  }
+  /** The device a token belongs to, if it isn't revoked; marks it used. */
+  useDevice(tokenHash: string): number | undefined {
+    const row = this.sql.prepare("UPDATE devices SET last_used_at = ? WHERE token_hash = ? AND revoked_at IS NULL RETURNING id").get(now(), tokenHash) as Row | undefined;
+    return row ? Number(row.id) : undefined;
+  }
+  revokeDevice(id: number): boolean {
+    return this.sql.prepare("UPDATE devices SET revoked_at = ? WHERE id = ? AND revoked_at IS NULL").run(now(), id).changes > 0;
   }
 
   // ---------- passkeys (the login) ----------

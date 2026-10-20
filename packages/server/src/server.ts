@@ -1,6 +1,7 @@
 // The foundry server. On the laptop it is the gallery plus the run page, with the runner as a
 // child process; in the cloud it runs on the preview instance behind Caddy and switches the run
-// instance on when there is work.
+// instance on when there is work. It also answers the foundry MCP's read-only tools at /mcp for
+// other machines, each with a device token from the Devices page (#/devices).
 //
 //   node packages/server/dist/server.mjs                 serve (settings from FOUNDRY_* below)
 //   node packages/server/dist/server.mjs setup-login     passphrase on stdin → the two login lines
@@ -31,10 +32,11 @@ import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
-import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
+import { createRemoteMcp } from "@foundry/mcp/http";
+import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret, sha256 } from "./auth.ts";
 import { Db } from "./db.ts";
 import { Ec2Machine, LocalMachine, type Machine } from "./machine.ts";
-import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState, type ThumbsInfo, type ThumbsReport, type ThumbsWork } from "./shared.ts";
+import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type NewDevice, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState, type ThumbsInfo, type ThumbsReport, type ThumbsWork } from "./shared.ts";
 import { writeWardenRuns } from "./warden.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -99,6 +101,21 @@ const machine: Machine =
         log,
       );
 const LIVE_URL = env.FOUNDRY_LIVE_URL ?? (machine.kind === "local" ? `http://localhost:${LOCAL_GALLERY_PORT}/` : null);
+
+// The MCP's screenshots come from this server's own gallery, opened by a headless browser that
+// is let past the login by a pass made up at each start (GET requests outside /api only).
+const SELF_PASS = randomBytes(24).toString("base64url");
+const SELF_HOST = HOST === "0.0.0.0" || HOST === "::" ? "127.0.0.1" : HOST;
+const remoteMcp = createRemoteMcp({
+  registryDir: join(REPO, "public/r"),
+  previews: {
+    gallery: async () => `http://${SELF_HOST}:${PORT}/`,
+    headers: { "x-foundry-pass": SELF_PASS },
+    cacheDir: join(DATA, "shots"),
+    // Chromium takes a few hundred MB, which the 2 GB preview instance needs back
+    idleCloseMs: 5 * 60e3,
+  },
+});
 
 function required(name: string): string {
   const v = env[name];
@@ -431,6 +448,11 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     return proxy(req, res);
   }
 
+  // The MCP for other machines: a device token, never the login.
+  if (path === "/mcp") return mcp(req, res, method);
+  // MCP clients look for an OAuth server here after a refused token; there is none.
+  if (path.startsWith("/.well-known/")) return send(res, 404, { error: "not found" });
+
   // The runner: a bearer token, never the login.
   if (path.startsWith("/api/runner/")) {
     if (req.headers.authorization !== `Bearer ${RUNNER_TOKEN}`) return send(res, 401, { error: "bad runner token" });
@@ -479,7 +501,8 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     return res.writeHead(303, { location: "/login" }).end();
   }
 
-  if (!auth.loggedIn(req)) {
+  const self = method === "GET" && !path.startsWith("/api/") && req.headers["x-foundry-pass"] === SELF_PASS;
+  if (!self && !auth.loggedIn(req)) {
     if (path.startsWith("/api/")) return send(res, 401, { error: "log in" });
     return res.writeHead(303, { location: "/login" }).end();
   }
@@ -600,7 +623,37 @@ async function api(req: IncomingMessage, res: ServerResponse, method: string, pa
       return send(res, 200, db.run(id));
     }
   }
+  if (path === "/api/devices") {
+    if (method === "POST") {
+      const name = String((await readJson<{ name?: string }>(req)).name ?? "").trim();
+      if (!name || name.length > 60) throw new HttpError(400, "Give the device a name of up to 60 characters, like work laptop.");
+      const token = `fdy_${randomBytes(32).toString("base64url")}`;
+      const added: NewDevice = { device: db.addDevice(name, sha256(token)), token };
+      log(`device #${added.device.id} added: ${name}`);
+      return send(res, 201, added);
+    }
+    return send(res, 200, db.devices());
+  }
+  const d = path.match(/^\/api\/devices\/(\d+)\/revoke$/);
+  if (method === "POST" && d) {
+    if (!db.revokeDevice(Number(d[1]))) throw new HttpError(404, "No such device, or it's revoked already.");
+    log(`device #${d[1]} revoked`);
+    return send(res, 200, db.devices());
+  }
   send(res, 404, { error: "not found" });
+}
+
+// ---------- the MCP (other machines, read-only tools) ----------
+
+async function mcp(req: IncomingMessage, res: ServerResponse, method: string) {
+  const token = /^Bearer (\S+)$/.exec(req.headers.authorization ?? "")?.[1];
+  if (!token || db.useDevice(sha256(token)) === undefined) {
+    res.writeHead(401, { "content-type": "application/json; charset=utf-8", "www-authenticate": 'Bearer realm="foundry"' });
+    return res.end(JSON.stringify({ error: "This needs a device token: make one on the Devices page (#/devices)." }));
+  }
+  // Stateless: no event stream to open (GET) and no session to end (DELETE).
+  if (method !== "POST") return res.writeHead(405, { allow: "POST", "content-type": "text/plain" }).end("POST only.");
+  await remoteMcp.handle(req, res, await readJson(req));
 }
 
 // ---------- the live gallery proxy (cloud) ----------
@@ -659,6 +712,7 @@ if (WARDEN_DIR) setInterval(wardenSoon, 60e3);
 const shutdown = async () => {
   log("stopping");
   if (machine.kind === "local") await machine.stop();
+  await remoteMcp.close().catch(() => {});
   process.exit(0);
 };
 process.on("SIGINT", shutdown);
