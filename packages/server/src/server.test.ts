@@ -105,3 +105,21 @@ test("Claude: a call's tokens come from the stream's message_delta, not the assi
   assert.deepEqual(stream.end(), { session: "s-1", held: undefined });
   assert.ok(events.includes("Claude finished (success): 2 turns in 11 s, Claude Code's own figure $0.02."));
 });
+
+test("passkeys: the public key comes back byte for byte, the counter and last use update", () => {
+  const dir = mkdtempSync(join(tmpdir(), "foundry-db-"));
+  const db = new Db(join(dir, "test.db"));
+  const publicKey = new Uint8Array([165, 1, 2, 3, 38, 0, 255]);
+  db.addPasskey({ id: "abc_-1", publicKey, counter: 0, transports: ["internal", "hybrid"], name: "Phone" });
+  const p = db.passkey("abc_-1")!;
+  assert.deepEqual([...p.publicKey], [...publicKey]);
+  assert.deepEqual(p.transports, ["internal", "hybrid"]);
+  assert.equal(p.lastUsedAt, null);
+  db.passkeyUsed(p.id, 7);
+  assert.equal(db.passkey(p.id)?.counter, 7);
+  assert.ok(db.passkey(p.id)?.lastUsedAt);
+  assert.equal(db.dropPasskey(p.id), true);
+  assert.equal(db.passkeys().length, 0);
+  db.sql.close();
+  rmSync(dir, { recursive: true, force: true });
+});

@@ -10,7 +10,7 @@ import { navigate, type Route } from "../state";
 
 // ---------- talking to the server ----------
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
@@ -19,7 +19,7 @@ class ApiError extends Error {
   }
 }
 
-async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+export async function api<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
   let res: Response;
   try {
     res = await fetch(`/api/${path}`, {
@@ -40,7 +40,7 @@ async function api<T>(path: string, init?: { method?: string; body?: unknown }):
 }
 
 /** Fetches `path` now and every `everyMs` while `live` is true. */
-function usePoll<T>(path: string | null, everyMs: number, live = true): { data?: T; error?: ApiError; reload: () => void } {
+export function usePoll<T>(path: string | null, everyMs: number, live = true): { data?: T; error?: ApiError; reload: () => void } {
   const [data, setData] = useState<T>();
   const [error, setError] = useState<ApiError>();
   const [tick, setTick] = useState(0);
@@ -65,7 +65,7 @@ function usePoll<T>(path: string | null, everyMs: number, live = true): { data?:
 
 const usd = (n: number) => (n >= 100 ? `$${n.toFixed(0)}` : `$${n.toFixed(2)}`);
 const tokens = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(n));
-function ago(iso: string | null): string {
+export function ago(iso: string | null): string {
   if (!iso) return "";
   const s = (Date.now() - Date.parse(iso)) / 1000;
   if (s < 60) return "just now";
@@ -87,7 +87,7 @@ export function StateBadge({ state, stopping }: { state: Run["state"]; stopping?
   return <span className={`badge run-${state}`}>{stopping ? "Stopping…" : STATE_LABEL[state]}</span>;
 }
 
-function Problem({ error }: { error: ApiError }) {
+export function Problem({ error }: { error: ApiError }) {
   return (
     <div className="panel run-problem">
       <b>{error.message}</b>
@@ -318,7 +318,7 @@ function NewRun() {
 
 /** A form field. `group` is for controls other than one input (the agent's buttons): a <label>
  * around buttons would make the label's whole text the first button's name. */
-function Field({ label, hint, group, children }: { label: string; hint?: string; group?: boolean; children: ReactNode }) {
+export function Field({ label, hint, group, children }: { label: string; hint?: string; group?: boolean; children: ReactNode }) {
   const id = useId();
   const inner = (
     <>
