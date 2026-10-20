@@ -6,60 +6,93 @@ Status markers as in [`phase-7-cloud.md`](phase-7-cloud.md): **DONE**, **BUILT**
 
 ## What the user asked for (their decisions, don't reopen them)
 
-- The foundry MCP from other machines, **without registering anything in any Claude account**
-  (the user works from several accounts and wants nothing visible in them). So: no claude.ai
-  custom connector, no OAuth. Claude Code reads a config file per session
-  (`claude --mcp-config <file>`); the claude.ai web and phone apps are out.
-- **Read-only for now:** `search`, `get`, `preview`. Nothing that writes (`init`, `add`,
-  `theme`) and nothing that reads a project on disk (`status`, `diff`).
-- **No starting runs** from the MCP.
-- **Tokens per device, made on the foundry site's Devices page** (`#/devices`), behind the login.
+- The foundry MCP from **any machine**, set up like other hosted MCPs: one entry in Claude
+  Code's config, then a login. **Nothing registered in any Claude account** (the user works
+  from several): Claude Code keeps the login on the machine, in `~/.claude/.credentials.json`
+  (`mcpOAuth`, apart from the Claude account's own login; checked 2026-10-20).
+- **The login is OAuth, asking for the passphrase only** (no authenticator code). It opens the
+  read-only MCP, never the site, which keeps its passphrase + code or passkey.
+- **Hand-made device tokens are dropped** (the first version of this branch had them; final
+  decision 2026-10-20). The Devices page lists the logged-in machines and revokes them.
+- **Read-only:** `search`, `get`, `preview`. Nothing that writes (`init`, `add`, `theme`) and
+  nothing that reads a project on disk (`status`, `diff`). **No starting runs** from the MCP.
+
+## Using it
+
+```bash
+claude mcp add --transport http foundry https://foundry.themaverick.tech/mcp -s user
+```
+
+then `/mcp` → `foundry` → Authenticate in Claude Code, or `claude mcp login foundry` (add
+`--no-browser` over SSH). The browser shows the foundry's MCP login: a name for the machine,
+the passphrase, Allow. Every session after that has the tools; Claude Code renews the token
+itself. `claude mcp logout foundry` logs the machine out (the server revokes it too).
 
 ## How it works: **BUILT**, verified on the laptop
 
 - `packages/mcp/src/tools.ts` holds every tool; `registerTools(server, { readOnly })`.
   `index.ts` (stdio, all 8 tools) and `http.ts` (`createRemoteMcp`, the 3 read-only ones)
-  both use it. `preview.ts` became `createPreviewer({ gallery, headers, cacheDir, idleCloseMs })`.
+  both use it. `preview.ts` is `createPreviewer({ gallery, headers, cacheDir, idleCloseMs })`.
 - The foundry server answers `POST /mcp` (MCP's Streamable HTTP transport, **stateless**: a
-  fresh MCP server per request, JSON replies, no event stream; GET/DELETE get 405). It needs
-  `Authorization: Bearer fdy_…`, a device token; the login cookie doesn't count, and the login
-  doesn't open `/mcp` either. `/.well-known/*` is a plain 404 (MCP clients look for OAuth there
-  after a refused token).
-- **Device tokens**: `fdy_` + 32 random bytes, shown once; the `devices` table keeps only the
-  SHA-256 (like sessions), the name, created, last used, revoked. API behind the login:
-  `GET/POST /api/devices`, `POST /api/devices/<id>/revoke`. A revoked token is refused at once.
+  fresh MCP server per request, JSON replies; GET/DELETE get 405). It needs an OAuth access
+  token; the site's login cookie doesn't count, and the site's login doesn't open `/mcp`.
+- **The login** (`packages/server/src/oauth.ts`), OAuth 2.1 as the MCP spec has it:
+  - `/mcp`'s 401 carries `WWW-Authenticate: Bearer resource_metadata="…/.well-known/oauth-protected-resource/mcp"`;
+    that (RFC 9728) names this server as the login, whose endpoints are at
+    `/.well-known/oauth-authorization-server` (RFC 8414). Other `/.well-known/*` are 404.
+  - `POST /oauth/register` (RFC 7591): anyone may register, but **only redirects to the same
+    machine** (`http://localhost|127.0.0.1|[::1]:<port>/…`), so a code can never reach a
+    website. Registrations no device logged in through go after a day; at most 200.
+  - `GET /oauth/authorize`: the page (the login page's look, never framed). **PKCE S256 is
+    required**; `resource`, when sent, must be this server's `/mcp`. `POST` checks the
+    passphrase (`Auth.checkPassphrase`, the same lockout as the site's login: five misses a
+    minute) and sends the browser back with a one-time code (5 minutes, in memory). Cancel
+    sends back `access_denied`. The loopback port may differ from the registered one (RFC 8252).
+  - `POST /oauth/token`: the code + PKCE verifier make a **device** (named on the page) and a
+    pair of tokens: access (1 hour) and refresh (90 days). A refresh gives a new pair; the old
+    refresh token keeps working 10 more minutes (two sessions on one machine may both refresh).
+  - `POST /oauth/revoke` (RFC 7009): either token logs the whole device out.
+  - Tables `mcp_clients`, `mcp_devices`, `mcp_tokens` (SHA-256 only, like sessions). The first
+    version's `devices` table is dropped at start.
+- **Devices page** (`#/devices`): the setup (the `claude mcp add` line and a `.mcp.json`
+  entry, with the page's own address) and the machines: name, app, logged in, last used,
+  Revoke (`GET /api/devices`, `POST /api/devices/<id>/revoke`, behind the site's login).
 - **Screenshots in the cloud** come from the server's own built gallery: Playwright opens
   `http://127.0.0.1:<port>/preview.html`, let past the login by `x-foundry-pass`, a secret
   made up at each start and accepted only on GET outside `/api/`. Cached in `<data>/shots`;
   Chromium is closed after 5 idle minutes (the preview instance has 2 GB).
-- The Devices page shows the config to save (`mcpServers.foundry`, type `http`, the URL from
-  the page's own address, the bearer header) and the `claude --mcp-config` command.
 
-Verified on 2026-10-20 with a test server on port 4501 **with the login on**: no token, a
-made-up token and a revoked token → 401; `/api/devices` without login → 401; a wrong
-`x-foundry-pass` → the login redirect; device made through the API after logging in;
-`packages/mcp/smoke.mjs` (a scripted MCP client): 3 tools, the instructions, `search`,
-`get`, and `preview` (an 82 KB PNG in 1.6 s, rendered right); the local stdio MCP still lists
-all 8 tools and searches; the Devices page at 390 px light and 1440 px dark (no sideways
-scroll); `pnpm --filter @foundry/server test` 6/6 (a new devices test).
+Verified on 2026-10-20, a test server on port 4502 **with the login on**:
+- `pnpm --filter @foundry/server test` 8/8 (two new: redirects and PKCE against RFC 7636's
+  vector; the whole flow, wrong passphrase, used code, refresh, revoke).
+- `packages/mcp/smoke.mjs` through the MCP SDK's own OAuth client: discovery, registration,
+  PKCE, the page, tokens, the 3 tools, `preview` (82 KB PNG in 1.9 s), refresh, logout, the
+  token refused after. A wrong passphrase fails it. Website redirects refused at registration;
+  the site's cookie alone refused at `/mcp`; `POST /api/devices` gone.
+- **The real Claude Code (2.1.286)**: `claude mcp add` + `claude mcp login --no-browser` (in a
+  pseudo-terminal, the page filled in by a script): "Authenticated", `claude mcp get` →
+  ✔ Connected, a `claude -p` session called `search` and got items back; the Devices list
+  showed it as "Claude Code (<server name>)"; `claude mcp logout` revoked it on the server.
+- The page and the Devices page at 390 px light and 1440 px dark (no sideways scroll); the
+  local stdio MCP still lists all 8 tools.
 
 ## To go live: **TODO** (the operator's steps, after merging)
 
-1. Merge `phase-8/remote-mcp` into main once phase 7's work in main allows; push when the
-   user says.
+1. Merge `phase-8/remote-mcp` into main; push when the user says.
 2. `./ssm.sh preview provision/common.sh provision/preview.sh` once: it installs Chromium's
    libraries and Playwright's Chromium on the preview instance and checks it launches
    (`deploy-preview.sh` alone only fetches Chromium, not the libraries). Then `./deploy.sh`.
    `run.sh` now takes the same steps from `common.sh` (`chromium_libs`, `chromium_check`);
    unchanged in effect.
-3. On `https://foundry.themaverick.tech/#/devices` add a device, save the config on that
-   machine, and check it: `FOUNDRY_MCP_TOKEN=fdy_… node packages/mcp/smoke.mjs
-   https://foundry.themaverick.tech/mcp` (from a clone), or a Claude Code session with
-   `--mcp-config`. Not verified yet: through Caddy, Chromium's memory on the t4g.small.
+3. From any clone: `node packages/mcp/smoke.mjs https://foundry.themaverick.tech/mcp` (asks
+   for the passphrase), then on a machine: the `claude mcp add` line and `/mcp` → Authenticate.
+   Not verified yet: through Caddy (the server takes `https` from `X-Forwarded-Proto` and the
+   host from `Host`, which Caddy passes), and Chromium's memory on the t4g.small.
 
 ## Not done (suggestions, not asked for)
 
 - Installing on a machine without a clone: core's registry reader already sends
-  `FOUNDRY_TOKEN` as a bearer token, so letting a device token read `/r/` would make
-  `foundry add` work against `https://foundry.themaverick.tech/r` (two lines in the server).
+  `FOUNDRY_TOKEN` as a bearer token, so `/r/` could accept the MCP's tokens and `foundry add`
+  would work against `https://foundry.themaverick.tech/r`. The CLI would then need a login of
+  its own (the access token lasts an hour).
 - Thumbnails are still missing in the cloud gallery; `preview` doesn't need them.

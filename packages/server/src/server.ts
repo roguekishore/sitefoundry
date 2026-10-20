@@ -1,7 +1,8 @@
 // The foundry server. On the laptop it is the gallery plus the run page, with the runner as a
 // child process; in the cloud it runs on the preview instance behind Caddy and switches the run
 // instance on when there is work. It also answers the foundry MCP's read-only tools at /mcp for
-// other machines, each with a device token from the Devices page (#/devices).
+// Claude Code on other machines, which log in by themselves with OAuth (oauth.ts): the browser
+// asks for the passphrase once per machine; the Devices page (#/devices) lists and revokes them.
 //
 //   node packages/server/dist/server.mjs                 serve (settings from FOUNDRY_* below)
 //   node packages/server/dist/server.mjs setup-login     passphrase on stdin → the two login lines
@@ -33,10 +34,11 @@ import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 import { createRemoteMcp } from "@foundry/mcp/http";
-import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret, sha256 } from "./auth.ts";
+import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
 import { Db } from "./db.ts";
 import { Ec2Machine, LocalMachine, type Machine } from "./machine.ts";
-import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type NewDevice, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState, type ThumbsInfo, type ThumbsReport, type ThumbsWork } from "./shared.ts";
+import { baseUrl, OAuth, OAuthError } from "./oauth.ts";
+import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState, type ThumbsInfo, type ThumbsReport, type ThumbsWork } from "./shared.ts";
 import { writeWardenRuns } from "./warden.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -85,6 +87,7 @@ const auth = new Auth(
     ? { passphraseHash: env.FOUNDRY_PASSPHRASE_HASH, totpSecret: env.FOUNDRY_TOTP_SECRET, cookieDomain: env.FOUNDRY_COOKIE_DOMAIN ?? null }
     : null,
 );
+const oauth = new OAuth(db, auth, log);
 if (!auth.enabled && HOST !== "127.0.0.1" && HOST !== "localhost") {
   console.error("Refusing to listen beyond this computer without a login: set FOUNDRY_PASSPHRASE_HASH and FOUNDRY_TOTP_SECRET (setup-login).");
   process.exit(1);
@@ -448,10 +451,9 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     return proxy(req, res);
   }
 
-  // The MCP for other machines: a device token, never the login.
+  // The MCP for other machines: its own login's access token, never the site's cookie.
   if (path === "/mcp") return mcp(req, res, method);
-  // MCP clients look for an OAuth server here after a refused token; there is none.
-  if (path.startsWith("/.well-known/")) return send(res, 404, { error: "not found" });
+  if (path.startsWith("/.well-known/") || path.startsWith("/oauth/")) return oauthRoute(req, res, method, path, q);
 
   // The runner: a bearer token, never the login.
   if (path.startsWith("/api/runner/")) {
@@ -623,37 +625,70 @@ async function api(req: IncomingMessage, res: ServerResponse, method: string, pa
       return send(res, 200, db.run(id));
     }
   }
-  if (path === "/api/devices") {
-    if (method === "POST") {
-      const name = String((await readJson<{ name?: string }>(req)).name ?? "").trim();
-      if (!name || name.length > 60) throw new HttpError(400, "Give the device a name of up to 60 characters, like work laptop.");
-      const token = `fdy_${randomBytes(32).toString("base64url")}`;
-      const added: NewDevice = { device: db.addDevice(name, sha256(token)), token };
-      log(`device #${added.device.id} added: ${name}`);
-      return send(res, 201, added);
-    }
-    return send(res, 200, db.devices());
-  }
+  // The machines logged in to the MCP (they log in themselves, see oauth.ts); revoking cuts one off.
+  if (method === "GET" && path === "/api/devices") return send(res, 200, db.devices());
   const d = path.match(/^\/api\/devices\/(\d+)\/revoke$/);
   if (method === "POST" && d) {
     if (!db.revokeDevice(Number(d[1]))) throw new HttpError(404, "No such device, or it's revoked already.");
-    log(`device #${d[1]} revoked`);
+    log(`MCP device #${d[1]} revoked`);
     return send(res, 200, db.devices());
   }
   send(res, 404, { error: "not found" });
 }
 
-// ---------- the MCP (other machines, read-only tools) ----------
+// ---------- the MCP (other machines, read-only tools) and its login ----------
 
 async function mcp(req: IncomingMessage, res: ServerResponse, method: string) {
   const token = /^Bearer (\S+)$/.exec(req.headers.authorization ?? "")?.[1];
-  if (!token || db.useDevice(sha256(token)) === undefined) {
-    res.writeHead(401, { "content-type": "application/json; charset=utf-8", "www-authenticate": 'Bearer realm="foundry"' });
-    return res.end(JSON.stringify({ error: "This needs a device token: make one on the Devices page (#/devices)." }));
+  if (!token || oauth.deviceFor(token) === undefined) {
+    res.writeHead(401, { "content-type": "application/json; charset=utf-8", "www-authenticate": oauth.challenge(baseUrl(req), Boolean(token)) });
+    return res.end(JSON.stringify({ error: "Log in first: in Claude Code, /mcp → foundry → Authenticate." }));
   }
   // Stateless: no event stream to open (GET) and no session to end (DELETE).
   if (method !== "POST") return res.writeHead(405, { allow: "POST", "content-type": "text/plain" }).end("POST only.");
   await remoteMcp.handle(req, res, await readJson(req));
+}
+
+/** /.well-known/* and /oauth/*: how Claude Code finds the MCP's login, registers and logs in (oauth.ts). */
+async function oauthRoute(req: IncomingMessage, res: ServerResponse, method: string, path: string, q: URLSearchParams) {
+  const base = baseUrl(req);
+  const form = async () => {
+    const text = (await readBody(req, 16384)).toString("utf8");
+    if (!String(req.headers["content-type"] ?? "").includes("json")) return new URLSearchParams(text);
+    try {
+      return new URLSearchParams(JSON.parse(text || "{}") as Record<string, string>);
+    } catch {
+      throw new OAuthError(400, "invalid_request", "not JSON");
+    }
+  };
+  try {
+    if (method === "GET" && (path === "/.well-known/oauth-protected-resource" || path === "/.well-known/oauth-protected-resource/mcp")) return send(res, 200, oauth.resourceMetadata(base));
+    if (method === "GET" && path === "/.well-known/oauth-authorization-server") return send(res, 200, oauth.serverMetadata(base));
+    if (method === "POST" && path === "/oauth/register") return send(res, 201, oauth.register(await readJson(req)));
+    if (path === "/oauth/authorize" && (method === "GET" || method === "POST")) {
+      const reply = method === "POST" ? oauth.approve(await form(), base) : oauth.ask(q, base);
+      if ("redirect" in reply) return res.writeHead(method === "POST" ? 303 : 302, { location: reply.redirect, "cache-control": "no-store" }).end();
+      return res
+        .writeHead(reply.status, {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store",
+          // never inside another site's frame, where Allow could be clicked unseen
+          "x-frame-options": "DENY",
+          "content-security-policy": "frame-ancestors 'none'",
+          "referrer-policy": "no-referrer",
+        })
+        .end(reply.page);
+    }
+    if (method === "POST" && path === "/oauth/token") return send(res, 200, oauth.token(await form()));
+    if (method === "POST" && path === "/oauth/revoke") {
+      oauth.revoke(await form());
+      return send(res, 200, {});
+    }
+  } catch (e) {
+    if (e instanceof OAuthError) return send(res, e.status, e.body);
+    throw e;
+  }
+  send(res, 404, { error: "not found" });
 }
 
 // ---------- the live gallery proxy (cloud) ----------

@@ -1,5 +1,5 @@
 // The read-only foundry tools over MCP's HTTP transport, for the foundry server to answer at
-// /mcp (packages/server checks the device token first). Stateless: every request gets a fresh
+// /mcp (packages/server checks the OAuth access token first). Stateless: every request gets a fresh
 // MCP server, so nothing is kept between calls and a restart loses nothing.
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
