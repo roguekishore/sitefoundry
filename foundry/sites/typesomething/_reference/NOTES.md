@@ -106,3 +106,42 @@ radial lights (warm grey top-left, acid bottom-right, 288px).
   stays CSS-only for that part; the typing wordmark is the one bit that needs JavaScript,
   so header, hero and footer carry `"hydrate"`.
 - Mobile menu: a native `<details>` panel (works without JavaScript).
+
+## Comparison rounds
+
+The original's captures are blurred behind its consent dialog for the header and hero, so
+those two are compared on layout, size and colour only.
+
+### Round 1 (first capture of ours)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | pill 16→374, 60px tall, acid round menu button: matches | pill 64→1376, centred nav with acid "Home" pill, EN, acid CTA: matches | sticky ✓; tucks to the top and narrows to 180→1260 on scroll, same as the original's scrolled frames ✓; wordmark types ✓ | — |
+| hero | H1 wrapped to 3 lines (our headline was longer); typing line overflowed | H1 line 890px wide vs 615 (longer copy); strip ~45px lower; badge too high (no room for the overlaid header) | typing + 640ms blink ✓ | yes: shorter headline and words (same length as theirs), header overlays the hero and the hero pads under it, tighter gaps above the strip |
+| steps | no top padding (page passed pt-0) | 511 vs 627 tall, same cause | none | yes: page keeps its padding (623 now) |
+| chat | window content 1278 wide inside the gutter | same (1278 vs 1312) | rise 12px + fade on entering view ✓ (scroll frames); the full-page crop shows the window empty, because a full-page screenshot never scrolls the messages into view | gutter fixed in every block (padding outside, page width inside); crop artefact noted, not a defect |
+| features | cards 81→1359 instead of 64→1376 | same | none | yes (gutter) |
+| reasons | ok | cards narrower (gutter) | none | yes (gutter) |
+| CTA | no top padding | card started at the top of its band; heavy shadow the original doesn't show | hover lift ✓ | yes: padding back, shadow removed; the static "." after the wordmark no longer blinks |
+| footer | 854 vs 761 tall; wordmark pushed right by a wide tagline | 488 vs 442; plain-text badge | hover underline / fill ✓ | yes: tighter gaps, shorter tagline, badge with icon + two lines |
+
+### Round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | matches | matches | matches | — |
+| hero | 1019 vs 1039 tall; strip items one line of text where theirs wrap to two (copy length) | 1028 vs 1007; the rotating word re-centred the line while typing (theirs keeps the bold word still) | ✓ | yes: the typing line reserves the longest word's width, text-left inside it; strip copy shortened |
+| steps | 1100 vs 1124 | 623 vs 627 | — | — |
+| chat | 793 vs 906 (our conversation is shorter) | 779 vs 837 (same) | ✓ | left: content length |
+| features | 1796 vs 1979 (shorter copy) | 924 vs 968 | — | left: content length |
+| reasons | 1053 vs 1195 | 585 vs 639 (shorter copy) | — | left: content length |
+| CTA | 537 vs 536 | 801 vs 774 (heading wraps after "website", brand on line 2 as theirs) | ✓ | — |
+| footer | 818 vs 761 | 464 vs 442 | ✓ | — |
+
+Overflow: fits at 360, 768 and 1024 in both rounds. "Sized by the window": the capture
+marks only the header (10% at a short window, the pill's tuck) in theirs and in ours.
+
+Re-theme check: `typesomething-steps` and `typesomething-cta` under `sample-ember` take its
+cream bands, serif headings and orange primary, and the CTA stays a dark card (it forces
+`.dark`). Dark mode of our own theme: ink page, charcoal cards; the hero glows are toned
+down under `.dark` (they were too loud on ink).

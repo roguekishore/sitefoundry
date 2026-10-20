@@ -23,8 +23,8 @@ export interface TypesomethingStepsProps {
 /** "How it works" band on paper-grey: a centred heading and numbered white cards in a row. */
 export function TypesomethingSteps({ title, subtitle, steps, id, className }: TypesomethingStepsProps) {
   return (
-    <section id={id} className={cn("bg-muted py-section text-foreground lg:py-28", className)}>
-      <div className="mx-auto max-w-page px-gutter">
+    <section id={id} className={cn("bg-muted px-gutter py-section text-foreground lg:py-28", className)}>
+      <div className="mx-auto max-w-page">
         <TypesomethingSectionHeading title={title} subtitle={subtitle} />
         <ol className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-3">
           {steps.map((s) => (

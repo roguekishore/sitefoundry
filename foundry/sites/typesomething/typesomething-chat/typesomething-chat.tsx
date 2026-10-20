@@ -38,8 +38,8 @@ function Avatar({ children }: { children?: ReactNode }) {
  */
 export function TypesomethingChat({ messages, assistantAvatar, userAvatar, label, className }: TypesomethingChatProps) {
   return (
-    <section aria-label={label} className={cn("bg-muted py-section text-foreground lg:py-28", className)}>
-      <div className="mx-auto max-w-page px-gutter">
+    <section aria-label={label} className={cn("bg-muted px-gutter py-section text-foreground lg:py-28", className)}>
+      <div className="mx-auto max-w-page">
         <div className="overflow-clip rounded-lg border border-foreground/14 bg-card shadow-[0_28px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)]">
           <div aria-hidden className="flex h-[2.3rem] items-center gap-1.5 border-b border-foreground/14 bg-muted px-4">
             <span className="size-2.5 rounded-full bg-primary" />

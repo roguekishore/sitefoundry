@@ -23,8 +23,8 @@ export interface TypesomethingReasonsProps {
 /** "Why we did it" band on paper-grey: white cards, each an acid number tile beside a bold title and its story. */
 export function TypesomethingReasons({ title, subtitle, reasons, id, className }: TypesomethingReasonsProps) {
   return (
-    <section id={id} className={cn("bg-muted py-section text-foreground lg:py-28", className)}>
-      <div className="mx-auto max-w-page px-gutter">
+    <section id={id} className={cn("bg-muted px-gutter py-section text-foreground lg:py-28", className)}>
+      <div className="mx-auto max-w-page">
         <TypesomethingSectionHeading title={title} subtitle={subtitle} className="lg:max-w-[48rem]" />
         <ol className="mt-14 grid gap-5 lg:mt-14 lg:grid-cols-3">
           {reasons.map((r) => (

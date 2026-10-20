@@ -24,8 +24,8 @@ export interface TypesomethingFeaturesProps {
 /** Feature grid on white: a centred heading and hairline cards, three per row, each with a glyph tile. */
 export function TypesomethingFeatures({ title, subtitle, features, id, className }: TypesomethingFeaturesProps) {
   return (
-    <section id={id} className={cn("bg-background py-section text-foreground lg:py-28", className)}>
-      <div className="mx-auto max-w-page px-gutter">
+    <section id={id} className={cn("bg-background px-gutter py-section text-foreground lg:py-28", className)}>
+      <div className="mx-auto max-w-page">
         <TypesomethingSectionHeading title={title} subtitle={subtitle} />
         <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3">
           {features.map((f) => (

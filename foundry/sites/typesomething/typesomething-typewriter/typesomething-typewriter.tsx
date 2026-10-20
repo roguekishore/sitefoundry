@@ -82,7 +82,7 @@ export function TypesomethingTypewriter({
     <span className={cn("relative inline-flex items-baseline whitespace-nowrap", className)}>
       {/* screen readers hear every word once, never the typing */}
       <span className="sr-only">{words.join(", ")}</span>
-      <span aria-hidden className={cn(reserve && "inline-grid")}>
+      <span aria-hidden className={cn(reserve && "inline-grid text-left")}>
         {reserve && <span className="invisible [grid-area:1/1]">{longest}{cursor}</span>}
         <span className={cn(reserve && "[grid-area:1/1]")}>
           {text}
