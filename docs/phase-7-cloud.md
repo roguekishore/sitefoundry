@@ -165,8 +165,9 @@ the agent run them, unattended): `https://foundry.themaverick.tech/` answers wit
 the runner token and the Vertex key, **no Claude token** (skipped, so Claude runs fail on the run
 instance until `secrets.sh` adds one); `provision/run.sh` reran clean (deploy key, Gemini CLI
 0.64.0, Claude Code 2.1.303, headless Chromium 156 launches, runner up and polling the server).
-**Still open:** the `live.foundry.themaverick.tech` A record is not in Netlify (the name does
-not resolve); neither instance has warden's outpost yet. **Found:** starting the run instance
+The `live.foundry.themaverick.tech` A record was added later that day; Caddy had backed off
+after failing without it, so it was restarted and got the certificate (`live.` answers 401
+without a session, as it should). **Still open:** neither instance has warden's outpost yet. **Found:** starting the run instance
 failed three times with `InsufficientInstanceCapacity` (t4g.large, `ap-south-1a`) before it
 started a minute later.
 
@@ -232,7 +233,7 @@ systemd unit for `node packages/server/dist/runner.mjs`. The user then logs in t
 
 Both: install warden's outpost from warden's UI (button on the instance).
 
-## Step E — deploying: **BUILT** (2026-10-20, not run yet)
+## Step E — deploying: **DONE** (2026-10-20)
 
 - `infra/deploy.sh` (operator, with `!`): refuses unless the laptop's `main` equals GitHub's
   (the instances pull from GitHub, so an unpushed main would deploy an older commit), then sends
@@ -246,6 +247,11 @@ Both: install warden's outpost from warden's UI (button on the instance).
   Takes effect once `provision/run.sh` has been run again (it is safe to rerun).
 - `./deploy.sh run` updates the runner now (restarts the service); refused while a `claude` or
   `gemini` process is running there.
+- Run four times on 2026-10-20 (preview now at the newest main). Found and fixed on the way:
+  **`ssm.sh` wrote every command to the same `/tmp/foundry-ssm.sh`**; a second command sent
+  while a deploy ran overwrote it, and bash (which reads a script as it goes) ended the deploy
+  after the build with exit 0, so the gallery wasn't swapped and the server not restarted. Each
+  command now gets its own `mktemp` file.
 
 Thumbnails: `public/thumbs/` is git-ignored, so the cloud
 gallery shows placeholders until something builds them (the run instance could run
@@ -268,7 +274,16 @@ outposts updated first; check its `docs/STATE.md`.
 
 ## Known gaps and risks
 
-- Not verified yet: `Ec2Machine`, the `live.` proxy and its WebSocket pass-through, Claude's
+- **t4g.large capacity in `ap-south-1a`.** On 2026-10-20 AWS refused to start the run instance
+  (`InsufficientInstanceCapacity`) for about a minute at 03:18, then from 03:33 for 25+ minutes
+  on end. The server retries every 15 s and the run says so once (`warn`), but a run can wait
+  indefinitely. Not decided (the instance type is the user's decision): falling back to another
+  Graviton type on a refused start (`ModifyInstanceAttribute` while stopped, e.g. m7g.large or
+  t4g.xlarge; a small IAM change), or a second subnet in another AZ (a new run instance).
+- `Ec2Machine.stop` is verified (the server switched the idle run instance off at exactly 10
+  minutes, 2026-10-20); `Ec2Machine.start` is called and AWS answers it (the capacity errors).
+- Not verified yet: a full run in the cloud (smoke run #1, queued 2026-10-20, never started for
+  lack of capacity and was cancelled at the user's request), the `live.` proxy and its WebSocket pass-through, Claude's
   usage-limit detection (a regex on its error text → state `held`), the warden files against a
   real outpost.
 - The login lockout is one counter for everyone: someone hammering the login page from the
