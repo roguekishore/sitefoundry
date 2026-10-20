@@ -4,8 +4,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { hashPassphrase, sha256, totp } from "./auth.ts";
+import { Auth, hashPassphrase, totp } from "./auth.ts";
 import { Db } from "./db.ts";
+import { isLoopback, OAuth, pkceMatches, redirectMatches } from "./oauth.ts";
 import { costOf } from "./prices.ts";
 import { claudeStream } from "./runner/claude.ts";
 import type { Call } from "./shared.ts";
@@ -60,23 +61,81 @@ test("runs: claim takes the oldest queued run once, totals add up from calls", (
   rmSync(dir, { recursive: true, force: true });
 });
 
-test("devices: a token works until revoked; only its hash is stored", () => {
+test("MCP login: only same-machine redirects, PKCE S256", () => {
+  assert.equal(isLoopback("http://localhost:53682/callback"), true);
+  assert.equal(isLoopback("http://127.0.0.1:9/cb"), true);
+  assert.equal(isLoopback("http://[::1]:9/cb"), true);
+  assert.equal(isLoopback("https://evil.example/cb"), false);
+  assert.equal(isLoopback("http://localhost.evil.example/cb"), false);
+  assert.equal(isLoopback("http://localhost:9/cb#x"), false);
+  // the port may change between logins; host and path may not
+  assert.equal(redirectMatches("http://localhost:4000/callback", ["http://localhost:53682/callback"]), true);
+  assert.equal(redirectMatches("http://localhost:4000/other", ["http://localhost:53682/callback"]), false);
+  assert.equal(redirectMatches("http://127.0.0.1:4000/callback", ["http://localhost:53682/callback"]), false);
+  // RFC 7636 appendix B
+  assert.equal(pkceMatches("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk", "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"), true);
+  assert.equal(pkceMatches("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXX", "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"), false);
+});
+
+test("MCP login: passphrase → code → tokens; refresh rotates; revoking cuts the device off", () => {
   const dir = mkdtempSync(join(tmpdir(), "foundry-db-"));
   const db = new Db(join(dir, "test.db"));
-  const laptop = db.addDevice("work laptop", sha256("fdy_one"));
-  const pc = db.addDevice("home pc", sha256("fdy_two"));
-  assert.deepEqual(db.devices().map((d) => d.name), ["home pc", "work laptop"]);
-  assert.equal(db.devices()[0].lastUsedAt, null);
+  const auth = new Auth(db, { passphraseHash: hashPassphrase("correct horse battery"), totpSecret: "GEZDGNBVGY3TQOJQ", cookieDomain: null });
+  const oauth = new OAuth(db, auth, () => {});
+  const base = "https://foundry.example";
+  const verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
 
-  assert.equal(db.useDevice(sha256("fdy_one")), laptop.id);
-  assert.notEqual(db.devices().find((d) => d.id === laptop.id)?.lastUsedAt, null);
-  assert.equal(db.useDevice(sha256("fdy_nope")), undefined);
-  assert.equal(db.sql.prepare("SELECT COUNT(*) AS n FROM devices WHERE token_hash LIKE 'fdy_%'").get()?.n, 0);
+  assert.throws(() => oauth.register({ redirect_uris: ["https://evil.example/cb"] }), /same machine/);
+  const client = oauth.register({ client_name: "Claude Code (foundry)", redirect_uris: ["http://localhost:53682/callback"] });
+  const ask = new URLSearchParams({
+    client_id: client.client_id,
+    redirect_uri: "http://localhost:53682/callback",
+    response_type: "code",
+    code_challenge: "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+    code_challenge_method: "S256",
+    state: "s1",
+    resource: `${base}/mcp`,
+  });
+  const page = oauth.ask(ask, base);
+  assert.ok("page" in page && page.page.includes("Claude Code (foundry)") && page.page.includes('name="passphrase"'));
+  // a wrong passphrase gets the page again, never a code
+  const wrong = oauth.approve(new URLSearchParams({ ...Object.fromEntries(ask), passphrase: "nope" }), base);
+  assert.ok("page" in wrong && wrong.status === 401);
+  // no PKCE: sent back with an error, not asked for the passphrase
+  const noPkce = oauth.ask(new URLSearchParams({ ...Object.fromEntries(ask), code_challenge_method: "plain" }), base);
+  assert.ok("redirect" in noPkce && noPkce.redirect.includes("error=invalid_request"));
 
-  assert.equal(db.revokeDevice(pc.id), true);
-  assert.equal(db.revokeDevice(pc.id), false);
-  assert.equal(db.useDevice(sha256("fdy_two")), undefined);
-  assert.equal(db.useDevice(sha256("fdy_one")), laptop.id);
+  const ok = oauth.approve(new URLSearchParams({ ...Object.fromEntries(ask), passphrase: "correct horse battery", name: "work laptop" }), base);
+  assert.ok("redirect" in ok);
+  const back = new URL(ok.redirect);
+  assert.equal(back.searchParams.get("state"), "s1");
+  const code = back.searchParams.get("code")!;
+
+  const swap = (extra: Record<string, string>) => oauth.token(new URLSearchParams({ grant_type: "authorization_code", client_id: client.client_id, code, redirect_uri: "http://localhost:53682/callback", ...extra }));
+  assert.throws(() => swap({ code_verifier: "x".repeat(43) }), /PKCE/);
+  // a refused swap used the code up
+  assert.throws(() => swap({ code_verifier: verifier }), /used or expired/);
+
+  const again = oauth.approve(new URLSearchParams({ ...Object.fromEntries(ask), passphrase: "correct horse battery", name: "work laptop" }), base);
+  const code2 = new URL((again as { redirect: string }).redirect).searchParams.get("code")!;
+  const tokens = oauth.token(new URLSearchParams({ grant_type: "authorization_code", client_id: client.client_id, code: code2, redirect_uri: "http://localhost:53682/callback", code_verifier: verifier }));
+  const device = oauth.deviceFor(tokens.access_token);
+  assert.ok(device !== undefined);
+  assert.equal(db.devices()[0].name, "work laptop");
+  assert.equal(db.devices()[0].app, "Claude Code (foundry)");
+  assert.equal(db.sql.prepare("SELECT COUNT(*) AS n FROM mcp_tokens WHERE hash LIKE 'fdy_%'").get()?.n, 0);
+
+  const refresh = (token: string, clientId = client.client_id) => oauth.token(new URLSearchParams({ grant_type: "refresh_token", client_id: clientId, refresh_token: token }));
+  assert.throws(() => refresh(tokens.refresh_token, "another-app"), /refresh token/);
+  const renewed = refresh(tokens.refresh_token);
+  assert.equal(oauth.deviceFor(renewed.access_token), device);
+  // the old access token runs out on its own; the old refresh token gets a short grace
+  assert.equal(oauth.deviceFor(tokens.access_token), device);
+  assert.ok(refresh(tokens.refresh_token).access_token);
+
+  assert.equal(db.revokeDevice(device), true);
+  assert.equal(oauth.deviceFor(renewed.access_token), undefined);
+  assert.throws(() => refresh(renewed.refresh_token), /refresh token/);
   db.sql.close();
   rmSync(dir, { recursive: true, force: true });
 });

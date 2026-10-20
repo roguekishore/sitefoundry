@@ -63,11 +63,18 @@ Tools: `search`, `get` (props + code), `preview` (screenshot in any theme/width/
 quietly.
 
 **From another machine** (no clone needed): the foundry server answers the read-only tools
-(`search`, `get`, `preview`) at `https://foundry.themaverick.tech/mcp`. Add the machine on
-the **Devices** page (`#/devices`); it shows a token once, in a config file to save on that
-machine, used per session with `claude --mcp-config ~/.foundry/mcp.json`. Nothing is
-registered in a Claude account. Check an address and token with
-`FOUNDRY_MCP_TOKEN=fdy_… node packages/mcp/smoke.mjs <url>/mcp`.
+(`search`, `get`, `preview`) at `https://foundry.themaverick.tech/mcp`. Add it once:
+
+```bash
+claude mcp add --transport http foundry https://foundry.themaverick.tech/mcp -s user
+```
+
+then in Claude Code `/mcp` → `foundry` → Authenticate (or `claude mcp login foundry`): the
+browser opens the foundry's MCP login, which asks for a name for the machine and the
+passphrase only. Claude Code keeps the login on that machine and renews it; nothing is
+registered in a Claude account. The **Devices** page (`#/devices`) lists the machines and
+revokes them. Check an address with `node packages/mcp/smoke.mjs <url>/mcp` (it logs in
+with OAuth too, asking for the passphrase, then logs out).
 
 ## Adding blocks
 

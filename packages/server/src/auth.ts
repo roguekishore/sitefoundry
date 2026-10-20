@@ -138,6 +138,16 @@ export class Auth {
     return "ok";
   }
 
+  /** The passphrase alone, for the MCP's login page (oauth.ts): it lets a machine use the
+   * read-only MCP, never the site, so no code is asked for. Same lockout as the login. */
+  checkPassphrase(passphrase: string): "ok" | "wrong" | "locked" {
+    if (!this.settings) return "ok";
+    if (this.locked()) return "locked";
+    if (passphraseMatches(passphrase, this.settings.passphraseHash)) return "ok";
+    this.failures.push(Date.now());
+    return "wrong";
+  }
+
   /** Five failed passphrase or code checks in the last minute. (Passkey logins neither count nor
    * are locked out: a signature can't be guessed, and the owner can still get in with one.) */
   private locked(): boolean {
@@ -275,14 +285,8 @@ export class Auth {
   }
 }
 
-/** The login page, light and dark. Plain HTML; with `passkeys`, a button and a small script
- * for "Log in with a passkey" too (hidden where the browser has no passkeys). */
-export function loginPage(message = "", passkeys = false): string {
-  return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SITEFOUNDRY · Log in</title>
-<style>
-:root{--bg:#fff;--fg:#09090b;--muted:#71717a;--border:#e4e4e7;--primary:#18181b;--primary-fg:#fafafa;--bad:#b91c1c;color-scheme:light}
+/** The login page's look, light and dark (the MCP's login page in oauth.ts shares it). */
+export const PAGE_CSS = `:root{--bg:#fff;--fg:#09090b;--muted:#71717a;--border:#e4e4e7;--primary:#18181b;--primary-fg:#fafafa;--bad:#b91c1c;color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#09090b;--fg:#fafafa;--muted:#a1a1aa;--border:#27272a;--primary:#fafafa;--primary-fg:#18181b;--bad:#f87171;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;background:var(--bg);color:var(--fg);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px}
 main,form{width:100%;max-width:340px;display:grid;gap:14px}h1{font-size:18px;margin:0 0 4px}p{margin:0;color:var(--muted);font-size:13.5px}
@@ -291,7 +295,16 @@ input:focus{outline:2px solid var(--muted);outline-offset:1px}button{font:inheri
 button.quiet{background:transparent;color:var(--fg);border:1px solid var(--border)}button:disabled{opacity:.55;cursor:default}
 .or{display:flex;align-items:center;gap:10px;font-size:12.5px}.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--border)}
 #pk{display:grid;gap:14px}#pk[hidden]{display:none}.bad{color:var(--bad)}
-</style></head><body>
+`;
+
+/** The login page, light and dark. Plain HTML; with `passkeys`, a button and a small script
+ * for "Log in with a passkey" too (hidden where the browser has no passkeys). */
+export function loginPage(message = "", passkeys = false): string {
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SITEFOUNDRY · Log in</title>
+<style>
+${PAGE_CSS}</style></head><body>
 <main>
 <div><h1>SITEFOUNDRY</h1><p>Log in to see the gallery and start runs.</p></div>
 <p id="msg" class="bad" role="alert"${message ? "" : " hidden"}>${message}</p>

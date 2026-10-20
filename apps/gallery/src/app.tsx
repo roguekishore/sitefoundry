@@ -2,7 +2,7 @@
 // and the current view. Sites open the site viewer; items (blocks, components, themes) open an
 // item page. Layout follows docs/mockups/gallery-redesign.html.
 import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { Box, House, KeyRound, LayoutTemplate, Menu, Moon, Palette, Play, Search, Sun } from "lucide-react";
+import { Box, House, KeyRound, Laptop, LayoutTemplate, Menu, Moon, Palette, Play, Search, Sun } from "lucide-react";
 import { byName, items } from "./catalog";
 import { library, pageLabel, pagesOf, SOURCE_COLOUR, SOURCE_LABEL, SOURCES, siteColour, siteLabel, siteList, sourceOf, TYPE_LABEL } from "./library";
 import { openOverlay, setSettings, useDarkChrome, useRoute, type Route } from "./state";
@@ -102,7 +102,7 @@ function Sidebar({ route }: { route: Route }) {
         {typeLink("component", Box)}
         {typeLink("theme", Palette)}
         {link("#/runs", <Play className="i" />, "Runs", null, head === "runs")}
-        {link("#/devices", <KeyRound className="i" />, "Devices", null, head === "devices")}
+        {link("#/devices", <Laptop className="i" />, "Devices", null, head === "devices")}
         {link("#/passkeys", <KeyRound className="i" />, "Passkeys", null, head === "passkeys")}
       </nav>
       <nav className="nav-group">

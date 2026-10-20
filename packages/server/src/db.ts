@@ -9,6 +9,14 @@ import { NO_USAGE, type Call, type Device, type Passkey, type Run, type RunEvent
 /** A passkey as stored: `Passkey` plus what checking a login needs. */
 export type StoredPasskey = Passkey & { publicKey: Uint8Array<ArrayBuffer>; counter: number; transports: string[] };
 
+/** An app registered for the MCP's login (Claude Code registers itself, RFC 7591). */
+export interface McpClient {
+  id: string;
+  name: string;
+  redirectUris: string[];
+}
+export type TokenKind = "access" | "refresh";
+
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS runs (
   id INTEGER PRIMARY KEY,
@@ -64,14 +72,30 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL
 );
-CREATE TABLE IF NOT EXISTS devices (
+-- The MCP's OAuth login: the apps that registered (Claude Code does, once per machine), the
+-- devices logged in through them, and their tokens (only the SHA-256, like sessions).
+CREATE TABLE IF NOT EXISTS mcp_clients (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  redirect_uris TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS mcp_devices (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  token_hash TEXT NOT NULL UNIQUE,
+  client_id TEXT NOT NULL,
   created_at TEXT NOT NULL,
   last_used_at TEXT,
   revoked_at TEXT
 );
+CREATE TABLE IF NOT EXISTS mcp_tokens (
+  hash TEXT PRIMARY KEY,
+  device_id INTEGER NOT NULL REFERENCES mcp_devices(id),
+  kind TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+-- The hand-made device tokens this replaced (never deployed).
+DROP TABLE IF EXISTS devices;
 CREATE TABLE IF NOT EXISTS passkeys (
   id TEXT PRIMARY KEY,
   public_key BLOB NOT NULL,
@@ -232,29 +256,67 @@ export class Db {
     this.sql.prepare("DELETE FROM sessions WHERE hash = ? OR expires_at <= ?").run(hash, now());
   }
 
-  // ---------- devices (the MCP's tokens; only their SHA-256 is kept, like sessions) ----------
+  // ---------- the MCP's login (OAuth clients, devices, tokens; see oauth.ts) ----------
 
-  addDevice(name: string, tokenHash: string): Device {
-    const { lastInsertRowid } = this.sql.prepare("INSERT INTO devices (name, token_hash, created_at) VALUES (?, ?, ?)").run(name, tokenHash, now());
+  addMcpClient(id: string, name: string, redirectUris: string[]) {
+    this.sql.prepare("INSERT INTO mcp_clients (id, name, redirect_uris, created_at) VALUES (?, ?, ?, ?)").run(id, name, JSON.stringify(redirectUris), now());
+  }
+  mcpClient(id: string): McpClient | undefined {
+    const row = this.sql.prepare("SELECT * FROM mcp_clients WHERE id = ?").get(id) as Row | undefined;
+    return row && { id: String(row.id), name: String(row.name), redirectUris: JSON.parse(String(row.redirect_uris)) as string[] };
+  }
+  /** Anyone may register, so registrations no device logged in through go after a day. Returns how many are left. */
+  pruneMcpClients(): number {
+    const dayAgo = new Date(Date.now() - 864e5).toISOString();
+    this.sql.prepare("DELETE FROM mcp_clients WHERE created_at < ? AND id NOT IN (SELECT client_id FROM mcp_devices)").run(dayAgo);
+    return Number((this.sql.prepare("SELECT COUNT(*) AS n FROM mcp_clients").get() as Row).n);
+  }
+
+  addDevice(name: string, clientId: string): Device {
+    const { lastInsertRowid } = this.sql.prepare("INSERT INTO mcp_devices (name, client_id, created_at) VALUES (?, ?, ?)").run(name, clientId, now());
     return this.devices().find((d) => d.id === Number(lastInsertRowid))!;
   }
-  /** Newest first, revoked ones too (they show when the token was cut off). */
+  /** Newest first, revoked ones too (they show when the device was cut off). */
   devices(): Device[] {
-    return (this.sql.prepare("SELECT * FROM devices ORDER BY id DESC").all() as Row[]).map((r) => ({
+    return (this.sql.prepare("SELECT d.*, c.name AS app FROM mcp_devices d LEFT JOIN mcp_clients c ON c.id = d.client_id ORDER BY d.id DESC").all() as Row[]).map((r) => ({
       id: Number(r.id),
       name: String(r.name),
+      app: (r.app as string) ?? "",
       createdAt: String(r.created_at),
       lastUsedAt: (r.last_used_at as string) ?? null,
       revokedAt: (r.revoked_at as string) ?? null,
     }));
   }
-  /** The device a token belongs to, if it isn't revoked; marks it used. */
-  useDevice(tokenHash: string): number | undefined {
-    const row = this.sql.prepare("UPDATE devices SET last_used_at = ? WHERE token_hash = ? AND revoked_at IS NULL RETURNING id").get(now(), tokenHash) as Row | undefined;
-    return row ? Number(row.id) : undefined;
+  deviceClient(id: number): string | undefined {
+    return (this.sql.prepare("SELECT client_id FROM mcp_devices WHERE id = ?").get(id) as Row | undefined)?.client_id as string | undefined;
   }
+  /** Cuts a device off: its tokens are deleted and it shows as revoked. */
   revokeDevice(id: number): boolean {
-    return this.sql.prepare("UPDATE devices SET revoked_at = ? WHERE id = ? AND revoked_at IS NULL").run(now(), id).changes > 0;
+    this.sql.prepare("DELETE FROM mcp_tokens WHERE device_id = ?").run(id);
+    return this.sql.prepare("UPDATE mcp_devices SET revoked_at = ? WHERE id = ? AND revoked_at IS NULL").run(now(), id).changes > 0;
+  }
+
+  addToken(hash: string, deviceId: number, kind: TokenKind, expiresAt: string) {
+    this.sql.prepare("DELETE FROM mcp_tokens WHERE expires_at <= ?").run(now());
+    this.sql.prepare("INSERT INTO mcp_tokens (hash, device_id, kind, expires_at) VALUES (?, ?, ?, ?)").run(hash, deviceId, kind, expiresAt);
+  }
+  /** The device a token of `kind` belongs to, if the token hasn't expired and the device isn't revoked. An access token marks it used. */
+  tokenDevice(hash: string, kind: TokenKind): number | undefined {
+    const row = this.sql
+      .prepare("SELECT t.device_id FROM mcp_tokens t JOIN mcp_devices d ON d.id = t.device_id WHERE t.hash = ? AND t.kind = ? AND t.expires_at > ? AND d.revoked_at IS NULL")
+      .get(hash, kind, now()) as Row | undefined;
+    if (!row) return undefined;
+    if (kind === "access") this.sql.prepare("UPDATE mcp_devices SET last_used_at = ? WHERE id = ?").run(now(), row.device_id);
+    return Number(row.device_id);
+  }
+  /** Makes a token expire at `at` at the latest (a refresh token that was just swapped for a new one). */
+  expireToken(hash: string, at: string) {
+    this.sql.prepare("UPDATE mcp_tokens SET expires_at = min(expires_at, ?) WHERE hash = ?").run(at, hash);
+  }
+  /** The device a token (of either kind) belongs to, expired or not. */
+  tokenOwner(hash: string): number | undefined {
+    const row = this.sql.prepare("SELECT device_id FROM mcp_tokens WHERE hash = ?").get(hash) as Row | undefined;
+    return row ? Number(row.device_id) : undefined;
   }
 
   // ---------- passkeys (the login) ----------

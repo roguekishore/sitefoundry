@@ -1,39 +1,18 @@
-// #/devices: the machines allowed to use the foundry MCP at <this address>/mcp. Each gets a
-// token of its own, shown once, that goes into a config file on that machine; Claude Code
-// reads it with --mcp-config, so nothing is registered in any Claude account.
-import { useState, type FormEvent } from "react";
-import { Check, Copy, KeyRound, Plus } from "lucide-react";
-import type { Device, NewDevice } from "../../../../packages/server/src/shared";
+// #/devices: the machines logged in to the foundry MCP at <this address>/mcp. A machine logs
+// itself in: Claude Code opens the browser at this server's MCP login page, which asks for the
+// passphrase (see packages/server/src/oauth.ts). Revoking one cuts that machine off at once.
+import { Check, Copy, Laptop } from "lucide-react";
+import type { Device } from "../../../../packages/server/src/shared";
 import { useCopy } from "../ui";
 import { ago, api, Problem, usePoll } from "./runs";
 
 export function DevicesPage() {
   const devices = usePoll<Device[]>("devices", 0, false);
-  const [name, setName] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string>();
-  const [made, setMade] = useState<NewDevice>();
-
-  const add = async (e: FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    setError(undefined);
-    try {
-      setMade(await api<NewDevice>("devices", { method: "POST", body: { name } }));
-      setName("");
-      devices.reload();
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setSending(false);
-    }
-  };
 
   const revoke = async (d: Device) => {
-    if (!confirm(`Revoke "${d.name}"? Its token stops working at once.`)) return;
+    if (!confirm(`Revoke "${d.name}"? It is logged out at once and has to log in again to use the MCP.`)) return;
     try {
       await api(`devices/${d.id}/revoke`, { method: "POST" });
-      if (made?.device.id === d.id) setMade(undefined);
       devices.reload();
     } catch (err) {
       alert((err as Error).message);
@@ -45,24 +24,12 @@ export function DevicesPage() {
       <div className="page-head">
         <h1>Devices</h1>
         <p>
-          Machines that may use the foundry from Claude Code: search, read items and see screenshots, nothing that writes. Each has a token of its own; revoke one to cut that
-          machine off. The token lives in a file on the machine, so nothing is registered in any Claude account.
+          Machines logged in to the foundry from Claude Code: search, read items and see screenshots, nothing that writes. Each logs in once with the passphrase; revoke one to cut that
+          machine off. Nothing is registered in any Claude account.
         </p>
       </div>
 
-      <form className="device-add" onSubmit={add}>
-        <label className="run-field">
-          <span className="lbl">New device</span>
-          <input className="field" required maxLength={60} placeholder="work laptop" value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
-        <button className="btn primary big" disabled={sending}>
-          <Plus className="i" />
-          {sending ? "Adding…" : "Add"}
-        </button>
-      </form>
-      {error && <p className="run-bad">{error}</p>}
-
-      {made && <Setup made={made} />}
+      <Setup />
 
       {devices.error && <Problem error={devices.error} />}
       {devices.data && !devices.data.length && <div className="empty">No devices yet.</div>}
@@ -70,11 +37,11 @@ export function DevicesPage() {
         <div className="run-list device-list">
           {devices.data.map((d) => (
             <div key={d.id} className={`device-row${d.revokedAt ? " revoked" : ""}`}>
-              <KeyRound className="i muted" />
+              <Laptop className="i muted" />
               <span className="run-what">
                 <b>{d.name}</b>
                 <small className="muted">
-                  added {ago(d.createdAt)} · {d.lastUsedAt ? `last used ${ago(d.lastUsedAt)}` : "never used"}
+                  {d.app && d.app !== d.name ? `${d.app} · ` : ""}logged in {ago(d.createdAt)} · {d.lastUsedAt ? `last used ${ago(d.lastUsedAt)}` : "not used yet"}
                 </small>
               </span>
               {d.revokedAt ? (
@@ -92,27 +59,23 @@ export function DevicesPage() {
   );
 }
 
-/** What to do with a new token, shown once. */
-function Setup({ made }: { made: NewDevice }) {
-  const config = JSON.stringify(
-    { mcpServers: { foundry: { type: "http", url: `${location.origin}/mcp`, headers: { Authorization: `Bearer ${made.token}` } } } },
-    null,
-    2,
-  );
-  const command = "claude --mcp-config ~/.foundry/mcp.json";
+/** How a machine gets the MCP: add it once, then log in from Claude Code. */
+function Setup() {
+  const command = `claude mcp add --transport http foundry ${location.origin}/mcp -s user`;
+  const config = JSON.stringify({ mcpServers: { foundry: { type: "http", url: `${location.origin}/mcp` } } }, null, 2);
   return (
     <div className="panel device-setup">
-      <b>Set up {made.device.name}</b>
-      <p className="muted">This is the only time the token is shown. If it's lost, revoke the device and add it again.</p>
+      <b>Add a machine</b>
       <ol>
         <li>
-          On that machine, save this as <code>~/.foundry/mcp.json</code> (or anywhere private: the file is the token).
+          Add the foundry to Claude Code on that machine, once:
+          <CopyBlock text={command} />
+          or put this in a project's <code>.mcp.json</code>:
           <CopyBlock text={config} />
         </li>
         <li>
-          Start Claude Code with it:
-          <CopyBlock text={command} />
-          The foundry's tools then show up as <code>foundry</code> in that session only.
+          In Claude Code type <code>/mcp</code>, pick <code>foundry</code> and choose Authenticate. The browser opens this site's MCP login: name the machine, type the passphrase,
+          Allow. Claude Code keeps the login on that machine and renews it by itself.
         </li>
       </ol>
     </div>
