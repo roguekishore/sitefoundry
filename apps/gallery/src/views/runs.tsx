@@ -4,8 +4,8 @@
 //   #/runs/new      the form
 //   #/runs/<id>     one run: its log, its calls with tokens and cost, its details
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { ExternalLink, Play, Plus, Power, RotateCcw, Square } from "lucide-react";
-import type { Backend, Call, MachineInfo, Options, Run, RunEvent, RunRequest, Usage } from "../../../../packages/server/src/shared";
+import { ExternalLink, Image as ImageIcon, Play, Plus, Power, RotateCcw, Square } from "lucide-react";
+import type { Backend, Call, MachineInfo, Options, Run, RunEvent, RunRequest, ThumbsInfo, Usage } from "../../../../packages/server/src/shared";
 import { navigate, type Route } from "../state";
 
 // ---------- talking to the server ----------
@@ -124,6 +124,7 @@ function RunList() {
         </a>
       </div>
       <MachineSwitch />
+      <ThumbsPanel />
       {runs.error && <Problem error={runs.error} />}
       {runs.data && !runs.data.length && <div className="empty">No runs yet.</div>}
       {runs.data && runs.data.length > 0 && (
@@ -190,6 +191,70 @@ function MachineSwitch() {
         <Power className="i" />
         {on ? "Switch off" : "Switch on"}
       </button>
+    </div>
+  );
+}
+
+// The gallery's thumbnails in the cloud: the run instance shoots main and sends them here.
+function ThumbsPanel() {
+  const [live, setLive] = useState(false);
+  const thumbs = usePoll<ThumbsInfo>("thumbs", 4000, live);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string>();
+  const t = thumbs.data;
+  const job = t?.latest;
+  const going = job?.state === "queued" || job?.state === "running";
+  useEffect(() => setLive(going), [going]);
+  if (!t) return null;
+
+  const act = async (path: string) => {
+    setBusy(true);
+    setError(undefined);
+    try {
+      await api(path, { method: "POST" });
+      thumbs.reload();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const lastLine = job?.log.split("\n").filter(Boolean).at(-1);
+  const status = !job
+    ? "never shot here"
+    : going
+      ? job.state === "queued"
+        ? `queued (${job.reason})`
+        : `shooting${job.commit ? ` ${job.commit.slice(0, 7)}` : ""}…`
+      : `${job.state === "done" ? "shot" : job.state}${job.commit ? ` ${job.commit.slice(0, 7)}` : ""} ${ago(job.endedAt)}${job.error ? `: ${job.error}` : ""}`;
+  return (
+    <div className="panel machine thumbs-panel">
+      <ImageIcon className="i thumbs-icon" />
+      <div>
+        <b>Thumbnails: {status}</b>
+        <small className="muted">
+          {t.receivedAt ? `the gallery's stills, received ${ago(t.receivedAt)}` : "none here yet: the gallery shows placeholders"}
+          {going && lastLine ? ` · ${lastLine}` : job?.summary && !going ? ` · ${job.summary}` : ""}
+        </small>
+        {error && <small className="run-bad">{error}</small>}
+      </div>
+      {going ? (
+        <button className="btn sm" disabled={busy || job?.stopRequested} onClick={() => act("thumbs/stop")}>
+          <Square className="i" />
+          {job?.stopRequested ? "Stopping…" : "Stop"}
+        </button>
+      ) : (
+        <button className="btn sm" disabled={busy} onClick={() => act("thumbs")}>
+          <ImageIcon className="i" />
+          Shoot now
+        </button>
+      )}
+      {job?.log && (
+        <details className="thumbs-log">
+          <summary className="muted">Output</summary>
+          <pre className="run-log mono short">{job.log}</pre>
+        </details>
+      )}
     </div>
   );
 }
