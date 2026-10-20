@@ -1,0 +1,64 @@
+/* Wiemer reveals, all CSS. Each one is tied to an element's trip into the window (a view
+   timeline) and ends over a fixed scroll distance after the element's top edge enters, so
+   tall headings finish as quickly as short ones. Without scroll-driven animations, or with
+   reduced motion, nothing moves and everything is in place. */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Split text: the heading carries one named timeline; every letter reads it with its
+       own start, --i letters later. The word around each letter clips it, so letters
+       rise out of their line like type set from below. */
+    .wiemer-split {
+      view-timeline-name: --wiemer-split;
+    }
+    .wiemer-split-char {
+      animation: wiemer-reveal-letter both cubic-bezier(0.22, 1, 0.36, 1);
+      animation-timeline: --wiemer-split;
+      animation-range: entry calc(var(--i, 0) * var(--wiemer-step, 9px)) entry calc(var(--wiemer-run, 260px) + var(--i, 0) * var(--wiemer-step, 9px));
+    }
+
+    .wiemer-reveal-fade,
+    .wiemer-reveal-rise {
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--wiemer-delay, 0px)) entry calc(240px + var(--wiemer-delay, 0px));
+    }
+    .wiemer-reveal-fade { animation-name: wiemer-reveal-fade; }
+    .wiemer-reveal-rise { animation-name: wiemer-reveal-rise; }
+
+    /* fade-out: scrubbed as the block leaves through the top of the window */
+    .wiemer-reveal-fadeout {
+      animation: wiemer-reveal-fadeout linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 70%;
+    }
+
+    /* drift: the frame names the timeline; the picture inside slides against it */
+    .wiemer-drift-frame {
+      view-timeline-name: --wiemer-drift;
+    }
+    .wiemer-reveal-drift {
+      animation: wiemer-reveal-drift linear both;
+      animation-timeline: --wiemer-drift;
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes wiemer-reveal-letter {
+  from { opacity: 0; transform: translateY(var(--wiemer-rise, 105%)); }
+}
+@keyframes wiemer-reveal-fade {
+  from { opacity: 0; }
+}
+@keyframes wiemer-reveal-rise {
+  from { opacity: 0; transform: translateY(24px); }
+}
+@keyframes wiemer-reveal-fadeout {
+  to { opacity: 0; }
+}
+@keyframes wiemer-reveal-drift {
+  from { transform: translateY(calc(-1 * var(--wiemer-drift, 46px))); }
+  to { transform: translateY(var(--wiemer-drift, 46px)); }
+}
