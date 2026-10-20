@@ -26,10 +26,10 @@ import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
-import { Auth, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
+import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
 import { Db } from "./db.ts";
 import { Ec2Machine, LocalMachine, type Machine } from "./machine.ts";
-import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Report, type ReportReply, type RunRequest, type RunState } from "./shared.ts";
+import { ACTIVE_STATES, BACKENDS, type Job, type MachineInfo, type Options, type Passkey, type Report, type ReportReply, type RunRequest, type RunState } from "./shared.ts";
 import { writeWardenRuns } from "./warden.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -383,9 +383,15 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
       const result = auth.login(req, res, form.get("passphrase") ?? "", form.get("code") ?? "");
       if (result === "ok") return res.writeHead(303, { location: "/" }).end();
       const msg = result === "locked" ? "Too many tries. Wait a minute." : "That didn't match. Check both and try again.";
-      return res.writeHead(401, { "content-type": "text/html; charset=utf-8" }).end(loginPage(msg));
+      return res.writeHead(401, { "content-type": "text/html; charset=utf-8" }).end(loginPage(msg, auth.hasPasskeys));
     }
-    return res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }).end(loginPage());
+    return res.writeHead(200, { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" }).end(loginPage("", auth.hasPasskeys));
+  }
+  // A passkey login: a challenge, then the device's signature over it (the login page's script).
+  if (method === "POST" && path === "/login/passkey/options") return send(res, 200, await auth.passkeyLoginOptions(req));
+  if (method === "POST" && path === "/login/passkey") {
+    await auth.passkeyLogin(req, res, await readJson(req));
+    return send(res, 200, { ok: true });
   }
   if (path === "/logout" && method === "POST") {
     auth.logout(req, res);
@@ -433,6 +439,23 @@ async function api(req: IncomingMessage, res: ServerResponse, method: string, pa
     }
     const info: MachineInfo = { state: await machine.state(), kind: machine.kind, runnerSeen, idleMinutes: IDLE_MINUTES };
     return send(res, 200, info);
+  }
+  if (path === "/api/passkeys") {
+    if (method === "POST") {
+      const body = await readJson<{ name?: string; response?: unknown }>(req);
+      await auth.addPasskey(req, body.name ?? "", body.response as Parameters<Auth["addPasskey"]>[2]);
+    }
+    const list: Passkey[] = db.passkeys().map(({ id, name, createdAt, lastUsedAt }) => ({ id, name, createdAt, lastUsedAt }));
+    return send(res, 200, list);
+  }
+  if (method === "POST" && path === "/api/passkeys/options") {
+    const body = await readJson<{ code?: string }>(req);
+    return send(res, 200, await auth.passkeyAddOptions(req, String(body.code ?? "")));
+  }
+  const pk = path.match(/^\/api\/passkeys\/([A-Za-z0-9_-]+)$/);
+  if (method === "DELETE" && pk) {
+    if (!db.dropPasskey(pk[1])) throw new HttpError(404, "No such passkey.");
+    return send(res, 200, { ok: true });
   }
   if (path === "/api/runs") {
     if (method === "POST") {
@@ -499,7 +522,7 @@ function proxy(req: IncomingMessage, res: ServerResponse) {
 
 const server = http.createServer((req, res) => {
   handle(req, res).catch((e) => {
-    const status = e instanceof HttpError ? e.status : 500;
+    const status = e instanceof HttpError || e instanceof AuthError ? e.status : 500;
     if (status === 500) log(`error on ${req.method} ${req.url}: ${e.stack ?? e}`);
     if (!res.headersSent) send(res, status, { error: status === 500 ? "Something broke on the server; its log has the details." : e.message });
     else res.end();

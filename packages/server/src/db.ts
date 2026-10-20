@@ -4,7 +4,10 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { DatabaseSync } from "node:sqlite";
-import { NO_USAGE, type Call, type Run, type RunEvent, type RunState, type Usage } from "./shared.ts";
+import { NO_USAGE, type Call, type Passkey, type Run, type RunEvent, type RunState, type Usage } from "./shared.ts";
+
+/** A passkey as stored: `Passkey` plus what checking a login needs. */
+export type StoredPasskey = Passkey & { publicKey: Uint8Array<ArrayBuffer>; counter: number; transports: string[] };
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS runs (
@@ -60,6 +63,15 @@ CREATE TABLE IF NOT EXISTS sessions (
   hash TEXT PRIMARY KEY,
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS passkeys (
+  id TEXT PRIMARY KEY,
+  public_key BLOB NOT NULL,
+  counter INTEGER NOT NULL,
+  transports TEXT NOT NULL DEFAULT '',
+  name TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT
 );
 `;
 
@@ -198,7 +210,40 @@ export class Db {
     this.sql.prepare("DELETE FROM sessions WHERE hash = ? OR expires_at <= ?").run(hash, now());
   }
 
+  // ---------- passkeys (the login) ----------
+
+  addPasskey(p: { id: string; publicKey: Uint8Array; counter: number; transports: string[]; name: string }) {
+    this.sql.prepare("INSERT INTO passkeys (id, public_key, counter, transports, name, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(p.id, p.publicKey, p.counter, p.transports.join(" "), p.name, now());
+  }
+  /** Newest first. */
+  passkeys(): StoredPasskey[] {
+    return (this.sql.prepare("SELECT * FROM passkeys ORDER BY created_at DESC").all() as Row[]).map((r) => this.toPasskey(r));
+  }
+  passkey(id: string): StoredPasskey | undefined {
+    const row = this.sql.prepare("SELECT * FROM passkeys WHERE id = ?").get(id) as Row | undefined;
+    return row && this.toPasskey(row);
+  }
+  passkeyUsed(id: string, counter: number) {
+    this.sql.prepare("UPDATE passkeys SET counter = ?, last_used_at = ? WHERE id = ?").run(counter, now(), id);
+  }
+  dropPasskey(id: string): boolean {
+    return this.sql.prepare("DELETE FROM passkeys WHERE id = ?").run(id).changes > 0;
+  }
+
   // ---------- rows → objects ----------
+
+  private toPasskey(r: Row): StoredPasskey {
+    return {
+      id: String(r.id),
+      publicKey: new Uint8Array(r.public_key as unknown as Uint8Array),
+      counter: Number(r.counter),
+      transports: String(r.transports).split(" ").filter(Boolean),
+      name: String(r.name),
+      createdAt: String(r.created_at),
+      lastUsedAt: (r.last_used_at as string) ?? null,
+    };
+  }
+
 
   private toRun(r: Row): Run {
     const byModel = this.usageByModel(Number(r.id));

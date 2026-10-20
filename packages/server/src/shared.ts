@@ -133,6 +133,15 @@ export interface Options {
   auth: boolean;
 }
 
+/** A passkey that can log in, as the passkeys page lists it. */
+export interface Passkey {
+  /** the credential id (base64url) */
+  id: string;
+  name: string;
+  createdAt: string;
+  lastUsedAt: string | null;
+}
+
 export const BACKENDS: Options["backends"] = {
   gemini: { label: "Gemini CLI (Vertex, Standard tier)", models: ["gemini-4-argon", "gemini-3.8-flash"], efforts: [] },
   claude: {

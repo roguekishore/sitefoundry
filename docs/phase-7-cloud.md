@@ -61,7 +61,7 @@ Code:
 |---|---|
 | `packages/server/src/server.ts` | HTTP server: login, gallery, previews, API, queue, on/off, live proxy, warden files. Settings are listed at the top of the file. |
 | `packages/server/src/db.ts` | SQLite (`node:sqlite`): runs, calls, events, sessions. Totals are summed from calls. |
-| `packages/server/src/auth.ts` | Passphrase (scrypt) + TOTP, sessions stored hashed, 5 failures/min lockout, login page. |
+| `packages/server/src/auth.ts` | Passphrase (scrypt) + TOTP, passkeys (WebAuthn, `@simplewebauthn/server`), sessions stored hashed, 5 failures/min lockout, login page. |
 | `packages/server/src/machine.ts` | The run instance's switch: `LocalMachine` (child process) and `Ec2Machine`. |
 | `packages/server/src/warden.ts` | Warden run files. |
 | `packages/server/src/prices.ts` | Prices per 1M tokens (Gemini Standard; Claude API list prices, cache writes 1.25×/2×). |
@@ -72,7 +72,7 @@ Code:
 
 Commands: `pnpm build:server`, `pnpm --filter gallery build`, `pnpm serve` (http://127.0.0.1:4401,
 no login, local runner). In dev, `pnpm gallery` passes `/api` and `/p/` to port 4401.
-`pnpm --filter @foundry/server test` (5 tests: TOTP RFC vector, costs, claim/totals, Claude call usage).
+`pnpm --filter @foundry/server test` (6 tests: TOTP RFC vector, costs, claim/totals, Claude call usage, passkey rows).
 
 Verified on 2026-10-19: API probes; one Claude run end to end (Haiku, own prompt, run #1 in a
 temporary database): worktree, install, the run's gallery, Claude, 3 calls logged with the
@@ -274,6 +274,34 @@ ran `./w ship` at the user's request; `/healthz` reports `warden-20261020T043204
 `foundry-preview` already has warden's outpost (its frames arrive), but runs reach warden only
 from outpost `a59d83e79def`: press **Update outpost** on it in warden, then add the App widget
 where wanted.
+
+## Passkeys: **DEPLOYED** (2026-10-20, preview at `f0ec3bf`); no real passkey added yet
+
+Asked by the user ("add passkeys to the foundry"). A passkey is a second way in; the passphrase
+and code stay, and are the only way to add the first passkey.
+
+- `#/passkeys` in the gallery lists them (name, added, last used), adds one on the device in hand
+  and removes them. **Adding asks for the authenticator code again**, so a stolen session cookie
+  alone can't plant a passkey that outlives the session.
+- The login page shows "Log in with a passkey" only once one exists (and only where the browser
+  has WebAuthn). Discoverable passkeys with user verification required (fingerprint, face or
+  PIN), so no user name, and still two factors: the device and you. The device refuses a second
+  passkey where it already holds one (`excludeCredentials`).
+- Passkey logins don't count towards the lockout and aren't locked out by it (a signature can't
+  be guessed), so they also get the owner past someone hammering the login page.
+- The relying party is `FOUNDRY_COOKIE_DOMAIN` (`foundry.themaverick.tech`), so passkeys work
+  only on the main address, not `live.`; with no cookie domain, the request's host (`localhost`
+  works for testing, `127.0.0.1` doesn't). Challenges are kept in memory, single use, 5 minutes:
+  a server restart in the middle of a login just means pressing the button again.
+- Routes: `POST /login/passkey/options`, `POST /login/passkey` (no session); `GET /api/passkeys`,
+  `POST /api/passkeys/options` (`{code}`), `POST /api/passkeys` (`{name, response}`),
+  `DELETE /api/passkeys/<id>`. Table `passkeys` (the public key, counter, transports, name).
+- Verified on 2026-10-20 with Chromium's virtual authenticator at 390 px, light and dark: no
+  button before a passkey exists, wrong code refused, add and list, the same device refused,
+  passkey login gives a working session, a removed passkey is refused (401).
+- Deployed 2026-10-20: the live login asks for challenges with rpId `foundry.themaverick.tech`,
+  `/api/passkeys` answers 401 without a session. **Next (the user)**: add a passkey on the phone at
+  `https://foundry.themaverick.tech/#/passkeys`.
 
 ## Known gaps and risks
 
