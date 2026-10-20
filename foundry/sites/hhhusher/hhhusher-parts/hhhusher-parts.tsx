@@ -39,7 +39,7 @@ export function HhhusherParts({ parts, id, className }: HhhusherPartsProps) {
   };
 
   return (
-    <section id={id} className={cn("bg-secondary py-section text-secondary-foreground", className)}>
+    <section id={id} className={cn("overflow-clip bg-secondary py-section text-secondary-foreground", className)}>
       <div ref={box} className="relative mx-auto max-w-page px-gutter">
         <ul className="border-b border-foreground/25" onPointerMove={onMove} onPointerEnter={(e) => e.pointerType === "mouse" && setOver(true)} onPointerLeave={() => setOver(false)}>
           {parts.map((part, i) => (

@@ -73,7 +73,7 @@ export function HhhusherOverview({ tabs, cards, className }: HhhusherOverviewPro
             </div>
           ))}
           <div className="relative p-[1.3rem] lg:p-10">
-            <h3 className="font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[1.8125rem]">{current.title}</h3>
+            <h3 className="font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[2rem]">{current.title}</h3>
             <p className="mt-3 text-[1.04rem] font-medium lg:mt-5 lg:text-base">{current.subtitle}</p>
           </div>
 
@@ -127,7 +127,7 @@ export function HhhusherOverview({ tabs, cards, className }: HhhusherOverviewPro
             >
               <MediaSlot media={card.media} />
               <div className="relative flex flex-col items-start p-[1.3rem] lg:max-w-[23rem] lg:p-10">
-                <h3 className="font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[1.8125rem]">{card.title}</h3>
+                <h3 className="font-display text-[1.6rem] leading-[1.1] font-medium tracking-[-0.01em] lg:text-[2rem]">{card.title}</h3>
                 <p className="mt-2 text-[1.04rem] leading-[1.3] font-medium lg:mt-6 lg:text-base lg:leading-[1.3]">{card.text}</p>
                 {card.link && (
                   <HhhusherButton href={card.link.href} variant="link" className="mt-4 text-primary lg:mt-6">
