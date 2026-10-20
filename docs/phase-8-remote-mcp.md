@@ -76,18 +76,22 @@ Verified on 2026-10-20, a test server on port 4502 **with the login on**:
 - The page and the Devices page at 390 px light and 1440 px dark (no sideways scroll); the
   local stdio MCP still lists all 8 tools.
 
-## To go live: **TODO** (the operator's steps, after merging)
+## Live: **DONE** (2026-10-20)
 
-1. Merge `phase-8/remote-mcp` into main; push when the user says.
-2. `./ssm.sh preview provision/common.sh provision/preview.sh` once: it installs Chromium's
-   libraries and Playwright's Chromium on the preview instance and checks it launches
-   (`deploy-preview.sh` alone only fetches Chromium, not the libraries). Then `./deploy.sh`.
-   `run.sh` now takes the same steps from `common.sh` (`chromium_libs`, `chromium_check`);
-   unchanged in effect.
-3. From any clone: `node packages/mcp/smoke.mjs https://foundry.themaverick.tech/mcp` (asks
-   for the passphrase), then on a machine: the `claude mcp add` line and `/mcp` → Authenticate.
-   Not verified yet: through Caddy (the server takes `https` from `X-Forwarded-Proto` and the
-   host from `Host`, which Caddy passes), and Chromium's memory on the t4g.small.
+1. Merged into main (fast-forward) and pushed.
+2. `./ssm.sh preview provision/common.sh provision/preview.sh` run once: Chromium's libraries
+   and Playwright's Chromium (156) on the preview instance, launch checked; it also pulled
+   main and rebuilt, so no `./deploy.sh` was needed that time. (`deploy-preview.sh` alone only
+   fetches Chromium, not the libraries.) `run.sh` takes the same steps from `common.sh`
+   (`chromium_libs`, `chromium_check`); unchanged in effect.
+3. Checked from the laptop: the discovery documents name `https://foundry.themaverick.tech`
+   (so `X-Forwarded-Proto` and `Host` come through Caddy right), `/mcp`'s 401 points at them,
+   and the user's run of `node packages/mcp/smoke.mjs https://foundry.themaverick.tech/mcp`
+   passed: login, the 3 tools, `preview` on the t4g.small, refresh, logout.
+
+`smoke.mjs` asks for the passphrase before connecting (the SDK's 60 s request timeout would
+otherwise run while it's typed), reads it with echo off, and refuses at once without a
+terminal: run it in a terminal of your own, not with `!` in Claude Code.
 
 ## Not done (suggestions, not asked for)
 
