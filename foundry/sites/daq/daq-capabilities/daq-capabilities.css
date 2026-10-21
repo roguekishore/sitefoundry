@@ -1,0 +1,87 @@
+/* Desktop: the section is a named view timeline; its "contain" range is the pinned stretch.
+   Over it the track slides left until its last card's right edge is at 64% of the window, the progress
+   lines grow, and each card reads its own slice (inline variables) to fill its title and
+   light its tab and border. Phones: each card's title fills as the card scrolls in.
+   Without scroll-driven animations everything shows filled and still. */
+.daq-capabilities {
+  view-timeline: --daq-capabilities block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .daq-capabilities-fill {
+      animation: daq-capabilities-fill linear both;
+      animation-timeline: view();
+      animation-range: entry 80px entry 380px;
+    }
+
+    @media (min-width: 64rem) {
+      .daq-capabilities-track {
+        animation: daq-capabilities-slide linear both;
+        animation-timeline: --daq-capabilities;
+        animation-range: contain 0% contain 100%;
+      }
+      .daq-capabilities-progress {
+        animation: daq-capabilities-grow linear both;
+        animation-timeline: --daq-capabilities;
+        animation-range: contain 0% contain 100%;
+      }
+      .daq-capabilities-fill {
+        animation-timeline: --daq-capabilities;
+        animation-range: contain var(--daq-cap-fill-from) contain var(--daq-cap-fill-to);
+      }
+      .daq-capabilities-tab {
+        animation: daq-capabilities-on linear;
+        animation-timeline: --daq-capabilities;
+        animation-range: contain var(--daq-cap-on-from) contain var(--daq-cap-on-to);
+      }
+      .daq-capabilities-card {
+        animation: daq-capabilities-edge linear;
+        animation-timeline: --daq-capabilities;
+        animation-range: contain var(--daq-cap-on-from) contain var(--daq-cap-on-to);
+      }
+      /* hovering a card shows the hover border, not the scroll-lit one */
+      .daq-capabilities-card:hover {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes daq-capabilities-slide {
+  to {
+    transform: translateX(calc(-100% + 64vw));
+  }
+}
+
+@keyframes daq-capabilities-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes daq-capabilities-fill {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes daq-capabilities-on {
+  from,
+  to {
+    color: var(--foreground);
+  }
+}
+
+@keyframes daq-capabilities-edge {
+  from,
+  to {
+    border-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+  }
+}
