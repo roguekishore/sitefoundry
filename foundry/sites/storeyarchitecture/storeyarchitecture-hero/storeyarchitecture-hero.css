@@ -1,0 +1,60 @@
+/* Load: the first slide eases in from 110% scale (fill backwards only, so afterwards the
+   slideshow's own classes decide its opacity); the copy rises 28px and fades in, the
+   button a little later. Leaving: the slides sink 20% and dim to 60% as the hero scrolls
+   out (the hero's own view timeline, exit range). */
+.storeyarchitecture-hero {
+  view-timeline-name: --storeyarchitecture-hero;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .storeyarchitecture-hero-first {
+    animation: storeyarchitecture-hero-settle 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  }
+  .storeyarchitecture-hero-copy {
+    animation: storeyarchitecture-hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(0.35s + var(--storeyarchitecture-hero-step, 0) * 0.12s);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .storeyarchitecture-hero-media {
+      animation: storeyarchitecture-hero-sink linear both;
+      animation-timeline: --storeyarchitecture-hero;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+@keyframes storeyarchitecture-hero-settle {
+  from {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes storeyarchitecture-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes storeyarchitecture-hero-sink {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0.6;
+    transform: translateY(20%);
+  }
+}

@@ -1,0 +1,48 @@
+/* The media is 116% of the frame's height and starts 16% above it; over the frame's whole
+   pass through the window it drifts down by that 16%, so it always covers the frame.
+   The veil fades out over the first 300px after the frame enters. Both read the frame's
+   own view timeline (the frame is overflow: clip, never its own scroller). */
+.storeyarchitecture-frame {
+  view-timeline-name: --storeyarchitecture-frame;
+}
+
+.storeyarchitecture-frame-veil {
+  opacity: 0;
+}
+
+.storeyarchitecture-frame-label {
+  transform: translate(var(--storeyarchitecture-frame-x, 1.4vw), var(--storeyarchitecture-frame-y, 1.4vw));
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .storeyarchitecture-frame-media {
+      animation: storeyarchitecture-frame-drift linear both;
+      animation-timeline: --storeyarchitecture-frame;
+      animation-range: cover 0% cover 100%;
+    }
+    .storeyarchitecture-frame-veil {
+      animation: storeyarchitecture-frame-uncover linear both;
+      animation-timeline: --storeyarchitecture-frame;
+      animation-range: entry 0px entry 300px;
+    }
+  }
+}
+
+@keyframes storeyarchitecture-frame-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(13.8%);
+  }
+}
+
+@keyframes storeyarchitecture-frame-uncover {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
