@@ -1,0 +1,61 @@
+/* Each word sits in an inline-block mask that crops it (overflow: clip is not a scroll
+   container, so the view timeline still works). The padding plus an equal negative margin
+   leaves room for ascenders and descenders without changing the line height. Each letter
+   starts --d below its place: the first barely, later ones further, so a line reads as a
+   wave settling from left to right. */
+.lunchline-letter-rise-mask {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-block: 0.1em 0.2em;
+  margin-block: -0.1em -0.2em;
+}
+
+.lunchline-letter-rise-ch {
+  display: inline-block;
+}
+
+/* scroll mode: the heading itself is the timeline, so all its letters share it */
+.lunchline-letter-rise[data-mode="scroll"] {
+  view-timeline-name: --lunchline-letter-rise;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lunchline-letter-rise[data-mode="scroll"] .lunchline-letter-rise-ch {
+      animation: lunchline-letter-rise-up linear both;
+      animation-timeline: --lunchline-letter-rise;
+      animation-range: entry 0% cover 45%;
+    }
+  }
+}
+
+/* load mode: once, on the original's ease-out cubic, 22ms apart */
+@media (prefers-reduced-motion: no-preference) {
+  .lunchline-letter-rise[data-mode="load"] {
+    animation: lunchline-letter-rise-fade 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+    animation-delay: var(--lunchline-letter-rise-delay, 0ms);
+  }
+  .lunchline-letter-rise[data-mode="load"] .lunchline-letter-rise-ch {
+    animation: lunchline-letter-rise-up 1s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+    animation-delay: calc(var(--lunchline-letter-rise-delay, 0ms) + var(--i, 0) * 22ms);
+  }
+}
+
+@keyframes lunchline-letter-rise-up {
+  from {
+    transform: translateY(var(--d, 0.5em));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes lunchline-letter-rise-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
