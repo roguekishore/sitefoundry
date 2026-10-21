@@ -6,6 +6,7 @@
 //   pnpm build:thumbs --only newhalo,aurora names containing any of these words
 //   pnpm build:thumbs --url http://localhost:4400   use a gallery that is already running
 //   pnpm build:thumbs --concurrency 6 --settle 1500 --no-sites --no-items
+//   pnpm build:thumbs:vault                 the vault repo's items, from the vault gallery (into its public/thumbs)
 //
 // Out: public/thumbs/items/<name>/<variant>.jpg, public/thumbs/sites/<site>/<page>/<variant>.jpg
 // and public/thumbs/manifest.json. Variants: desktop-light, desktop-dark, phone-light, phone-dark.
@@ -19,11 +20,12 @@ import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promise
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium, type Browser, type BrowserContext } from "playwright";
-import { ROOT, scan, type ScannedItem } from "./lib/scan.ts";
+import { ROOT, scan, targetFromArgs, type ScannedItem } from "./lib/scan.ts";
 
 /** Bump when the way shots are taken changes: everything is shot again. */
 const SHOT_VERSION = 1;
-const OUT = join(ROOT, "public", "thumbs");
+const TARGET = targetFromArgs(process.argv.slice(2));
+const OUT = TARGET.thumbsDir;
 const MANIFEST = join(OUT, "manifest.json");
 const GALLERY = join(ROOT, "apps", "gallery");
 
@@ -52,7 +54,8 @@ const opts = {
   /** ms to wait after rendering, for entrance animations to finish */
   settle: Number(option("settle") ?? 1200),
   items: !flag("no-items"),
-  sites: !flag("no-sites"),
+  // the vault has no sites
+  sites: !flag("no-sites") && TARGET.kind === "foundry",
 };
 
 // ---------- what to shoot ----------
@@ -114,7 +117,7 @@ async function buildJobs(items: ScannedItem[]): Promise<Job[]> {
   const baseHash = sha(String(SHOT_VERSION), ...(await Promise.all(baseFiles.map(readText))), ...baseItems.map((i) => itemOwnHash(i, "")));
 
   const demoText = new Map<string, string>();
-  for (const i of items) if (i.demo) demoText.set(i.name, await readText(join(ROOT, i.demo)));
+  for (const i of items) if (i.demo) demoText.set(i.name, await readText(join(TARGET.root, i.demo)));
 
   function itemOwnHash(i: ScannedItem, demo: string) {
     return sha(JSON.stringify(i.meta), ...i.files.map((f) => `${f.path}:${f.content}`), demo);
@@ -138,7 +141,8 @@ async function buildJobs(items: ScannedItem[]): Promise<Job[]> {
 
   const jobs: Job[] = [];
   if (opts.items) {
-    for (const i of items) {
+    // borrowed items (the vault's view of our base and themes) are shot in their own gallery
+    for (const i of items.filter((i) => !i.borrowed)) {
       const isTheme = i.meta.type === "theme";
       if (!isTheme && !i.demo) continue;
       const theme = ownTheme(i);
@@ -198,11 +202,13 @@ async function startGallery(): Promise<{ url: string; close: () => Promise<void>
   // vite lives in the gallery's own node_modules, not the root's
   const vite: ViteApi = await import(pathToFileURL(require.resolve("vite")).href);
   const configFile = join(GALLERY, "vite.config.ts");
+  // the vault gallery is the same app, built with --mode vault (it serves at /vault/)
+  const mode = TARGET.kind === "vault" ? "vault" : "production";
   log("building the gallery (once per run)…");
   const started = Date.now();
-  await vite.build({ configFile, logLevel: "error" });
+  await vite.build({ configFile, mode, logLevel: "error" });
   log(`built in ${seconds(Date.now() - started)}`);
-  const server = await vite.preview({ configFile, logLevel: "error", preview: { port: 4410, strictPort: false, open: false } });
+  const server = await vite.preview({ configFile, mode, logLevel: "error", preview: { port: 4410, strictPort: false, open: false } });
   const url = (server.resolvedUrls?.local[0] ?? "http://localhost:4410/").replace(/\/$/, "");
   return { url, close: () => new Promise<void>((resolve) => server.httpServer.close(() => resolve())) };
 }
@@ -300,12 +306,12 @@ function saveManifest(m: Manifest) {
 async function main() {
   const startedAt = Date.now();
   await mkdir(OUT, { recursive: true });
-  const items = await scan();
+  const items = await scan(TARGET);
   const jobs = await buildJobs(items);
   const manifest = await loadManifest();
 
   // forget things that no longer exist (only on a full run, so --only doesn't drop the rest)
-  if (!opts.only && opts.items && opts.sites) {
+  if (!opts.only && opts.items && (opts.sites || TARGET.kind === "vault")) {
     const keys = new Set(jobs.map((j) => j.key));
     for (const key of Object.keys(manifest.entries)) {
       if (keys.has(key)) continue;

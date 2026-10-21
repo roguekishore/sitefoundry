@@ -1,6 +1,6 @@
 # CONTRACT — how to write a foundry item
 
-Everything in `foundry/` and `vault/` follows this. `pnpm check` enforces it; an item with
+Everything in `foundry/` and in the vault repo's `vault/` follows this. `pnpm check` enforces it; an item with
 errors can't enter the registry. Format version: **1**.
 
 ## An item is a folder with `meta.json`
@@ -40,7 +40,7 @@ foundry/sites/huly/huly-header/
 |---|---|
 | `type` | `block` (a page section) · `component` (a smaller shared piece, e.g. a button) · `theme` · `lib` (code helpers) · `asset` (images, fonts, art) · `base` (foundry-base only) |
 | `category` | required for blocks: `header`, `hero`, `features`, `logos`, `testimonials`, `pricing`, `faq`, `cta`, `footer`, `gallery`, `stats`, `contact`, `text-effect`, `background`, `button`, `card`… |
-| `source` | `foundry` for ours (default); the vault uses `shadcn`, `reactbits`, … |
+| `source` | `foundry` for ours (default); the vault uses the library's name: `shadcn`, `reactbits`, `aceternity`, `magicui`, … |
 | `license` | ours: `proprietary`. Vault: the upstream licence (`MIT`, `MIT + Commons Clause`…) |
 | `notes` | what a picker should know: "best on dark themes", "needs a display font", "heavy: three.js" |
 

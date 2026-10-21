@@ -1,78 +1,57 @@
-// Everything the gallery knows, discovered from the repo's folders at build time.
-// New items appear without touching gallery code: drop a folder with meta.json into foundry/ or vault/.
+// Everything the gallery knows, found in the item folders when it is built (vite.config.ts's
+// virtual:foundry-catalog). New items appear without touching gallery code: drop a folder with
+// meta.json into foundry/ (the sites gallery) or the vault repo's vault/ (the vault gallery).
 import type { ComponentType } from "react";
 import type { IndexEntry, ItemMeta } from "@foundry/core";
+import { demos, metas, otherPages, sitePages, themeCss } from "virtual:foundry-catalog";
 import { BASE } from "./base";
 
-const metaFiles = import.meta.glob<ItemMeta>(
-  ["../../../foundry/**/meta.json", "../../../vault/**/meta.json", "!**/_*/**", "!**/node_modules/**"],
-  { eager: true, import: "default" },
-);
-const demoFiles = import.meta.glob<{ default: ComponentType }>(
-  ["../../../foundry/**/*.demo.tsx", "../../../vault/**/*.demo.tsx", "../../../vault/**/*.demo.jsx", "!**/_*/**", "!**/node_modules/**"],
-);
-const themeFiles = import.meta.glob<string>(
-  ["../../../foundry/**/theme.css", "../../../vault/**/theme.css", "!**/_*/**", "!**/node_modules/**"],
-  { query: "?inline", import: "default" },
-);
-// A site's landing page is page.tsx; any other pages it has are pages/<name>.tsx.
-const sitePages = import.meta.glob<{ default: ComponentType }>("../../../foundry/sites/*/page.tsx");
-const otherPages = import.meta.glob<{ default: ComponentType }>("../../../foundry/sites/*/pages/*.tsx");
+export { gallery } from "virtual:foundry-catalog";
 
 export interface Item {
   name: string;
-  /** repo-relative folder, e.g. foundry/sites/huly/huly-header */
+  /** folder relative to its repo, e.g. foundry/sites/huly/huly-header or vault/magicui/magicui-marquee */
   dir: string;
   meta: ItemMeta;
   hasDemo: boolean;
 }
 
-const dirOf = (key: string) => key.replace(/^(\.\.\/)+/, "").replace(/\/[^/]+$/, "");
-
-const demoByDir = new Map(Object.entries(demoFiles).map(([key, load]) => [dirOf(key), load]));
-const themeByDir = new Map(Object.entries(themeFiles).map(([key, load]) => [dirOf(key), load]));
-
 /** What you came to pick comes first; plumbing last. */
 const TYPE_ORDER = ["block", "component", "theme", "asset", "lib", "base"];
 
-export const items: Item[] = Object.entries(metaFiles)
-  .map(([key, meta]) => {
-    const dir = dirOf(key);
-    return { name: dir.split("/").pop()!, dir, meta, hasDemo: demoByDir.has(dir) };
-  })
+export const items: Item[] = Object.entries(metas)
+  .map(([dir, meta]) => ({ name: dir.split("/").pop()!, dir, meta, hasDemo: dir in demos }))
   .sort((a, b) => TYPE_ORDER.indexOf(a.meta.type) - TYPE_ORDER.indexOf(b.meta.type) || a.name.localeCompare(b.name));
 
 export const byName = new Map(items.map((i) => [i.name, i]));
 export const themes = items.filter((i) => i.meta.type === "theme");
 
-export const sites = Object.keys(sitePages)
-  .map((key) => key.match(/sites\/([^/]+)\/page\.tsx$/)?.[1])
-  .filter((s): s is string => !!s)
-  .sort();
+/** The recreated sites (none in the vault gallery). */
+export const sites = Object.keys(sitePages).sort();
 
 export async function loadDemo(name: string): Promise<ComponentType | undefined> {
   const item = byName.get(name);
-  const load = item && demoByDir.get(item.dir);
+  const load = item && demos[item.dir];
   return load ? (await load()).default : undefined;
 }
 
 /** The pages a site has besides its landing page, e.g. ["about", "pricing"]. */
 export function sitePageNames(site: string): string[] {
   return Object.keys(otherPages)
-    .map((key) => key.match(new RegExp(`sites/${site}/pages/([^/]+)\\.tsx$`))?.[1])
-    .filter((p): p is string => !!p)
+    .filter((key) => key.startsWith(`${site}/`))
+    .map((key) => key.slice(site.length + 1))
     .sort();
 }
 
 /** The landing page, or with `page` one of the site's other pages. */
 export async function loadSitePage(site: string, page?: string | null): Promise<ComponentType | undefined> {
-  const load = page ? otherPages[`../../../foundry/sites/${site}/pages/${page}.tsx`] : sitePages[`../../../foundry/sites/${site}/page.tsx`];
+  const load = page ? otherPages[`${site}/${page}`] : sitePages[site];
   return load ? (await load()).default : undefined;
 }
 
 export async function loadThemeCss(name: string): Promise<string | undefined> {
   const item = byName.get(name);
-  const load = item && themeByDir.get(item.dir);
+  const load = item && themeCss[item.dir];
   return load ? await load() : undefined;
 }
 

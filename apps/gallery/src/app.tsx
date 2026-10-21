@@ -2,9 +2,9 @@
 // and the current view. Sites open the site viewer; items (blocks, components, themes) open an
 // item page. Layout follows docs/mockups/gallery-redesign.html.
 import { Fragment, useEffect, useState, type ReactNode } from "react";
-import { Box, House, KeyRound, Laptop, LayoutTemplate, Menu, Moon, Palette, Play, Search, Sun } from "lucide-react";
-import { byName, items } from "./catalog";
-import { library, pageLabel, pagesOf, SOURCE_COLOUR, SOURCE_LABEL, SOURCES, siteColour, siteLabel, siteList, sourceOf, TYPE_LABEL } from "./library";
+import { ArrowUpRight, Box, House, KeyRound, Laptop, LayoutTemplate, Menu, Moon, Palette, Play, Search, Sun } from "lucide-react";
+import { byName, gallery, items } from "./catalog";
+import { GALLERY_LABEL, library, OTHER_GALLERY, pageLabel, pagesOf, SOURCE_COLOUR, SOURCE_LABEL, SOURCES, siteColour, siteLabel, siteList, sourceOf, TYPE_LABEL } from "./library";
 import { openOverlay, setSettings, useDarkChrome, useRoute, type Route } from "./state";
 import { Browse, browseTitle, readBrowse } from "./views/browse";
 import { DevicesPage } from "./views/devices";
@@ -93,7 +93,7 @@ function Sidebar({ route }: { route: Route }) {
         <span className="brand-mark">SF</span>
         <div>
           SITEFOUNDRY
-          <small>local gallery</small>
+          <small>{GALLERY_LABEL}</small>
         </div>
       </a>
       <nav className="nav-group">
@@ -101,9 +101,10 @@ function Sidebar({ route }: { route: Route }) {
         {typeLink("block", LayoutTemplate)}
         {typeLink("component", Box)}
         {typeLink("theme", Palette)}
-        {link("#/runs", <Play className="i" />, "Runs", null, head === "runs")}
-        {link("#/devices", <Laptop className="i" />, "Devices", null, head === "devices")}
-        {link("#/passkeys", <KeyRound className="i" />, "Passkeys", null, head === "passkeys")}
+        {gallery === "sites" && link("#/runs", <Play className="i" />, "Runs", null, head === "runs")}
+        {gallery === "sites" && link("#/devices", <Laptop className="i" />, "Devices", null, head === "devices")}
+        {gallery === "sites" && link("#/passkeys", <KeyRound className="i" />, "Passkeys", null, head === "passkeys")}
+        {link(OTHER_GALLERY.href, <ArrowUpRight className="i" />, OTHER_GALLERY.label, null, false)}
       </nav>
       <nav className="nav-group">
         <h6>Sources</h6>
@@ -111,13 +112,15 @@ function Sidebar({ route }: { route: Route }) {
           link(`#/browse?source=${s}`, <span className="dot" style={{ background: SOURCE_COLOUR[s] }} />, SOURCE_LABEL[s], count((i) => sourceOf(i) === s), browsing && q.get("source") === s && !q.get("type")),
         )}
       </nav>
-      <nav className="nav-group">
-        <h6>Recreated sites</h6>
-        {siteList.map((s) => {
-          const n = pagesOf(s).length;
-          return link(`#/site/${s}`, <span className="dot" style={{ background: siteColour(s) }} />, siteLabel(s), n > 1 ? `${n} pages` : "1 page", (head === "site" || head === "full") && route.parts[1] === s);
-        })}
-      </nav>
+      {siteList.length > 0 && (
+        <nav className="nav-group">
+          <h6>Recreated sites</h6>
+          {siteList.map((s) => {
+            const n = pagesOf(s).length;
+            return link(`#/site/${s}`, <span className="dot" style={{ background: siteColour(s) }} />, siteLabel(s), n > 1 ? `${n} pages` : "1 page", (head === "site" || head === "full") && route.parts[1] === s);
+          })}
+        </nav>
+      )}
       <div className="sidebar-foot">
         {items.length} items in the catalog
         <br />

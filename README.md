@@ -1,8 +1,14 @@
 # SITEFOUNDRY
 
 A private registry of website blocks: recreations of inspiration sites (one folder per
-site), plus a mirrored vault (shadcn, React Bits…). Every block is plain React + Tailwind,
-reads its look from shared tokens, and installs into any project with one command.
+site). Every block is plain React + Tailwind, reads its look from shared tokens, and installs
+into any project with one command.
+
+The mirrored libraries (shadcn, React Bits, Aceternity, Magic UI and more) are the **vault**,
+a repo of its own next to this one: `D:/PROJECTS/SITEFOUNDRY-VAULT` (found as
+`<this folder>-VAULT`, or wherever `FOUNDRY_VAULT` points). This repo holds the tools for
+both; the vault holds only items, its mirror and its built registry. Everything works without
+the vault, just without its items.
 
 ## Setup (once, and after pulling changes)
 
@@ -11,6 +17,10 @@ pnpm install
 pnpm build:registry      # public/r/ — what the CLI and MCP read
 pnpm build:cli           # packages/cli/dist/foundry.mjs
 pnpm build:mcp           # packages/mcp/dist/mcp.mjs
+
+# the vault, next to this repo
+(cd ../SITEFOUNDRY-VAULT && pnpm install)
+pnpm build:registry:vault   # ../SITEFOUNDRY-VAULT/public/r/
 ```
 
 Optional, to type `foundry` anywhere instead of `node D:/PROJECTS/SITEFOUNDRY/packages/cli/dist/foundry.mjs`:
@@ -19,8 +29,13 @@ Optional, to type `foundry` anywhere instead of `node D:/PROJECTS/SITEFOUNDRY/pa
 ## Browse
 
 ```bash
-pnpm gallery             # http://localhost:4400
+pnpm gallery             # the recreated sites: http://localhost:4400
+pnpm gallery:vault       # the vault:           http://localhost:4402/vault/
 ```
+
+Two apps from one gallery codebase (`apps/gallery`, the vault one is `--mode vault`), built
+apart so a new site never rebuilds the vault. Each links to the other. On the foundry server
+they are `/` and `/vault/`.
 
 Two kinds of thing, two entry points (layout: `docs/mockups/gallery-redesign.html`):
 
@@ -34,15 +49,15 @@ Two kinds of thing, two entry points (layout: `docs/mockups/gallery-redesign.htm
   preview (device, theme, light/dark), its props, code and details, and where it's used.
 
 Ctrl K (or `/`) jumps to any site, page or item. Lists show still thumbnails, not live
-previews: `pnpm build:thumbs` makes them (only the ones missing; `--force` redoes all), and anything not shot yet
-shows a placeholder.
+previews: `pnpm build:thumbs` makes them (only the ones missing; `--force` redoes all;
+`pnpm build:thumbs:vault` for the vault's), and anything not shot yet shows a placeholder.
 
 ## Use blocks in a customer project
 
 The project needs React and Tailwind v4 (Vite, Astro with `@astrojs/react`, or Next.js).
 
 ```bash
-foundry init                       # foundry.json, base tokens, CSS imports
+foundry init                       # foundry.json (both registries: ours, then the vault's), base tokens, CSS imports
 foundry theme sample-ember         # the project's colours, fonts, radius, spacing
 foundry add sample-header          # copies source to src/components/foundry/, installs npm packages
 foundry list header                # find things   ·   foundry info <name>   details and props
@@ -59,8 +74,9 @@ claude mcp add foundry -s user -- node D:/PROJECTS/SITEFOUNDRY/packages/mcp/dist
 ```
 
 Tools: `search`, `get` (props + code), `preview` (screenshot in any theme/width/mode),
-`init`, `add`, `theme`, `status`, `diff`. Previews use the running gallery, or start one
-quietly.
+`init`, `add`, `theme`, `status`, `diff`. It reads both registries (ours, then the vault's;
+`FOUNDRY_REGISTRY` takes a comma-separated list instead). Previews use the running galleries
+(the vault's for vault items), or start them quietly.
 
 **From another machine** (no clone needed): the foundry server answers the read-only tools
 (`search`, `get`, `preview`) at `https://foundry.themaverick.tech/mcp`. Add it once:
@@ -85,6 +101,10 @@ Read [CONTRACT.md](CONTRACT.md) (the rules) and [foundry/tokens.md](foundry/toke
 pnpm check [name…]       # must report 0 errors
 pnpm build:registry      # refuses changed files without a version bump
 ```
+
+The vault the same way: `pnpm check:vault [name…]`, `pnpm build:registry:vault` (or
+`pnpm check` and `pnpm build:registry` from inside the vault repo). Its items come from its
+mirror: see its README.
 
 ## Recreating sites in a batch
 
@@ -127,9 +147,9 @@ runs. Logs and each site's report go to `tools/claude-batch/runs/`.
 | Path | |
 |---|---|
 | `foundry/` | ours: `base/`, `themes/`, `sites/<site>/` (blocks + `page.tsx`, the full recreation) |
-| `vault/` | mirrored third-party items, same format |
+| `../SITEFOUNDRY-VAULT` | the vault: mirrored third-party items, same format, its own repo and registry |
 | `public/r/` | the built registry (committed) |
 | `packages/core` | item format, registry reader, installer (shared by CLI and MCP) |
 | `packages/cli`, `packages/mcp` | `foundry` command, MCP server |
-| `apps/gallery` | the picker |
-| `tools/` | `check`, `build-registry`, `claude-batch` (batch recreation) |
+| `apps/gallery` | the picker: the sites gallery, and the vault gallery (`--mode vault`) |
+| `tools/` | `check`, `build-registry`, `build-thumbs` (each with `--vault`), `claude-batch` (batch recreation) |

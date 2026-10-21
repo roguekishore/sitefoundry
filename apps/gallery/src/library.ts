@@ -2,34 +2,44 @@
 // site page uses, each theme's colours, thumbnails, and when items were added. The preview iframe
 // doesn't need any of this, so it lives apart from catalog.ts.
 import added from "virtual:foundry-added";
+// page sources, and the design notes a recreation keeps (their first lines name the original)
+import { gallery, pageSources, siteNotes, sources, themeSources } from "virtual:foundry-catalog";
 import { BASE } from "./base";
 import { byName, items, ownTheme, sitePageNames, sites, themes, type Item } from "./catalog";
 
-const pageSources = import.meta.glob<string>(["../../../foundry/sites/*/page.tsx", "../../../foundry/sites/*/pages/*.tsx"], {
-  query: "?raw",
-  import: "default",
-  eager: true,
-});
-// The design notes a recreation keeps; their first lines name the original.
-const siteNotes = import.meta.glob<string>("../../../foundry/sites/*/_reference/NOTES.md", { query: "?raw", import: "default", eager: true });
-const themeSources = import.meta.glob<string>(
-  ["../../../foundry/**/theme.css", "../../../vault/**/theme.css", "../../../foundry/base/foundry-base/foundry.css", "!**/_*/**", "!**/node_modules/**"],
-  { query: "?raw", import: "default", eager: true },
-);
+// ---------- the two galleries ----------
+
+/** This gallery's name in the sidebar, and where the other one is (same server: / and /vault/). */
+export const GALLERY_LABEL = gallery === "vault" ? "Vault" : "Recreated sites";
+export const OTHER_GALLERY =
+  gallery === "vault"
+    ? { label: "Recreated sites", href: location.port === "4402" ? `${location.protocol}//${location.hostname}:4400/` : "/" }
+    : { label: "Vault", href: location.port === "4400" ? `${location.protocol}//${location.hostname}:4402/vault/` : "/vault/" };
 
 // ---------- what you browse ----------
 
 /** Plumbing (lib, base) is installed along with what needs it; nobody picks it from a list. */
 export const library: Item[] = items.filter((i) => !["lib", "base"].includes(i.meta.type));
 
-export type Source = "foundry" | "shadcn" | "reactbits";
-export const SOURCES: Source[] = ["foundry", "shadcn", "reactbits"];
-export const SOURCE_LABEL: Record<string, string> = { foundry: "Recreations", shadcn: "shadcn", reactbits: "React Bits" };
-export const SOURCE_COLOUR: Record<string, string> = { foundry: "#f2602a", shadcn: "#71717a", reactbits: "#8b5cf6" };
+export const titleCase = (s: string) => s.replace(/(^|-)(\w)/g, (_, dash: string, c: string) => (dash ? " " : "") + c.toUpperCase());
 export const sourceOf = (i: Item): string => i.meta.source ?? "foundry";
 
+// in the vault gallery, our items are only the site themes it borrows (to preview vault items in a site's colours)
+const KNOWN_LABEL: Record<string, string> = { foundry: gallery === "vault" ? "Site themes" : "Recreations", shadcn: "shadcn", reactbits: "React Bits" };
+const KNOWN_COLOUR: Record<string, string> = { foundry: "#f2602a", shadcn: "#71717a", reactbits: "#8b5cf6" };
+/** A steady colour for a library without one of its own: a hue from its name. */
+const hueOf = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+
+/** The sources this gallery has items from: ours first, then shadcn and React Bits, then the libraries by name. */
+export const SOURCES: string[] = [...new Set(library.map(sourceOf))].sort(
+  (a, b) => (["foundry", "shadcn", "reactbits"].indexOf(a) + 1 || 9) - (["foundry", "shadcn", "reactbits"].indexOf(b) + 1 || 9) || a.localeCompare(b),
+);
+export const SOURCE_LABEL: Record<string, string> = Object.fromEntries(SOURCES.map((s) => [s, KNOWN_LABEL[s] ?? sources[s]?.label ?? titleCase(s)]));
+export const SOURCE_COLOUR: Record<string, string> = { ...Object.fromEntries(SOURCES.map((s) => [s, `hsl(${hueOf(s)} 62% 52%)`])), ...KNOWN_COLOUR };
+/** A vault library's home page, when the mirror knows it. */
+export const sourceHome = (s: string): string | undefined => sources[s]?.homepage;
+
 export const TYPE_LABEL: Record<string, string> = { block: "Blocks", component: "Components", theme: "Themes", asset: "Assets" };
-export const titleCase = (s: string) => s.replace(/(^|-)(\w)/g, (_, dash: string, c: string) => (dash ? " " : "") + c.toUpperCase());
 
 export const addedAt = (name: string): number => added[name] ?? Date.now();
 
@@ -39,11 +49,12 @@ export const LANDING = "landing";
 
 /** "landing" first, then the site's other pages. */
 export const pagesOf = (site: string): string[] => [LANDING, ...sitePageNames(site)];
-const SPELLED = { faq: "FAQ" } as Record<string, string>;
+const SPELLED = { faq: "FAQ", cta: "CTA", ui: "UI" } as Record<string, string>;
 export const pageLabel = (page: string) => (page === LANDING ? "Landing" : (SPELLED[page] ?? titleCase(page)));
+/** A category in running text: "text effect", "CTA". */
+export const categoryLabel = (category: string) => SPELLED[category] ?? titleCase(category).toLowerCase();
 
-const sourceOfPage = (site: string, page: string) =>
-  pageSources[page === LANDING ? `../../../foundry/sites/${site}/page.tsx` : `../../../foundry/sites/${site}/pages/${page}.tsx`] ?? "";
+const sourceOfPage = (site: string, page: string) => pageSources[`${site}/${page}`] ?? "";
 
 /**
  * The items a page imports, in the order it imports them. The preview reports the order they
@@ -57,7 +68,7 @@ export function pageItems(site: string, page: string): string[] {
 /** The original a site recreates ("huly.io"), from its notes or its landing page. */
 export function siteOrigin(site: string): string | undefined {
   const domain = /\b((?:[a-z0-9-]+\.)+(?:com|io|app|dev|co|ai|net|org))\b/i;
-  const notes = (siteNotes[`../../../foundry/sites/${site}/_reference/NOTES.md`] ?? "").split("\n").slice(0, 12).join("\n");
+  const notes = (siteNotes[site] ?? "").split("\n").slice(0, 12).join("\n");
   return notes.match(domain)?.[1] ?? sourceOfPage(site, LANDING).match(domain)?.[1];
 }
 
@@ -103,7 +114,7 @@ function parseSwatches(css: string): { light?: Swatch; dark?: Swatch } {
   return { light: read(/:root\s*\{([^}]*)\}/), dark: read(/\.dark\s*\{([^}]*)\}/) };
 }
 
-const swatchesByDir = new Map(Object.entries(themeSources).map(([key, css]) => [key.replace(/^(\.\.\/)+/, "").replace(/\/[^/]+$/, ""), parseSwatches(css)]));
+const swatchesByDir = new Map(Object.entries(themeSources).map(([dir, css]) => [dir, parseSwatches(css)]));
 
 function themeGroup(t: Item): string {
   if (t.meta.source && t.meta.source !== "foundry") return SOURCE_LABEL[t.meta.source] ?? t.meta.source;

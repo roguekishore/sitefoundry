@@ -7,8 +7,9 @@ is the point of this directory.
 
 - Every component of a recreated site is **exportable** on its own and becomes a building
   block for later custom sites. All blocks are viewable in the gallery for picking.
-- The same directory mirrors **React Bits and shadcn** (+ shadcn's directory registries)
-  into `vault/`. 21st.dev skipped for now.
+- The **vault** mirrors React Bits, shadcn and chosen libraries from shadcn's directory
+  registries (Aceternity, Magic UI…), in its own repo next to this one:
+  `..\SITEFOUNDRY-VAULT` (split 2026-10-21; see PLAN.md). 21st.dev skipped for now.
 - **Independent of MaverickCloud.** Nothing in `..\MAVERICKCLOUD\` constrains this repo.
 - **Private.** Remote `roguekishore/sitefoundry` (private); push only when the user says.
   The cloud (a login-gated preview instance and an on-demand run instance) is phase 7 of

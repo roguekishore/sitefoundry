@@ -5,8 +5,10 @@
 //  2. pnpm install there, then `pnpm build:thumbs` (it builds the gallery and screenshots every
 //     item and site page in headless Chromium), its output sent to the server as it goes.
 //  3. public/thumbs/ packed and sent to the server, which serves it at /thumbs/.
+//  4. With the vault repo on this machine (FOUNDRY_VAULT, or next to the repo): the same for the
+//     vault gallery (`pnpm build:thumbs:vault`), sent too and served at /vault/thumbs/.
 import { createReadStream, existsSync, mkdirSync, rmSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import type { ReportReply, ThumbsJob, ThumbsReport } from "../shared.ts";
 import type { RunnerSettings } from "./job.ts";
 import { eachLine, exited, git, killTree, run as runToEnd, start, stripAnsi } from "./proc.ts";
@@ -52,49 +54,75 @@ export async function runThumbs(job: ThumbsJob, s: RunnerSettings): Promise<void
     report.set({ commit });
     say(`shooting main at ${commit.slice(0, 7)} in ${worktree}`);
 
-    // ---------- 2. install and shoot ----------
+    // ---------- 2. install ----------
     say("installing packages");
     const install = await runToEnd("pnpm", ["install", "--frozen-lockfile", "--prefer-offline"], worktree);
     if (install.code !== 0) return await fail(`pnpm install failed:\n${install.out.slice(-2000)}`);
     if (stopped) return await end(report, "stopped");
 
-    shooting = start("pnpm", ["build:thumbs"], { cwd: worktree });
-    let summary = "";
-    const onLine = (l: string) => {
-      const line = stripAnsi(l).trimEnd();
-      if (!line) return;
-      if (line.startsWith("done in ") || / to shoot \(/.test(line)) summary = line;
-      say(line);
-    };
-    eachLine(shooting.stdout!, onLine);
-    eachLine(shooting.stderr!, onLine);
-    const code = await exited(shooting);
-    shooting = null;
-    if (summary) report.set({ summary });
-    if (stopped) return await end(report, "stopped");
-    if (code !== 0) return await fail(`build:thumbs exited with code ${code}`);
+    /** Shoots one gallery (`pnpm <script>` in the worktree) and sends its thumbnails: an error message, or null. */
+    const shootAndSend = async (script: string, out: string, gallery: "sites" | "vault", shot: string, env?: NodeJS.ProcessEnv): Promise<string | null> => {
+      shooting = start("pnpm", [script], { cwd: worktree, env: env ?? process.env });
+      let summary = "";
+      const onLine = (l: string) => {
+        const line = stripAnsi(l).trimEnd();
+        if (!line) return;
+        if (line.startsWith("done in ") || / to shoot \(/.test(line)) summary = line;
+        say(line);
+      };
+      eachLine(shooting.stdout!, onLine);
+      eachLine(shooting.stderr!, onLine);
+      const code = await exited(shooting);
+      shooting = null;
+      if (summary) report.set({ summary });
+      if (stopped) return null;
+      if (code !== 0) return `${script} exited with code ${code}`;
 
-    // ---------- 3. send them ----------
-    const out = join(worktree, "public", "thumbs");
-    if (!existsSync(join(out, "manifest.json"))) return await fail("build:thumbs made no public/thumbs/manifest.json");
-    const tarName = ".thumbs.tar.gz";
-    const tar = join(s.worktrees, tarName);
-    // Relative paths and cwd: GNU tar on Windows reads "C:" as a remote host.
-    const packed = await runToEnd("tar", ["-czf", tarName, "-C", "thumbs/public/thumbs", "."], s.worktrees);
-    if (packed.code !== 0) return await fail(`couldn't pack the thumbnails: ${packed.out.slice(-500)}`);
-    try {
-      say(`sending ${(statSync(tar).size / 1e6).toFixed(1)} MB to the server`);
-      const res = await fetch(`${s.serverUrl}/api/runner/thumbs/${job.id}/upload`, {
-        method: "PUT",
-        headers: { authorization: `Bearer ${s.token}`, "content-type": "application/gzip", "content-length": String(statSync(tar).size) },
-        body: createReadStream(tar) as unknown as BodyInit,
-        duplex: "half",
-      } as RequestInit);
-      if (!res.ok) throw new Error(`server answered ${res.status}`);
-    } catch (e) {
-      return await fail(`couldn't send the thumbnails: ${(e as Error).message}`);
-    } finally {
-      rmSync(tar, { force: true });
+      // ---------- 3. send them ----------
+      if (!existsSync(join(out, "manifest.json"))) return `${script} made no thumbs/manifest.json`;
+      const tarName = `.thumbs-${gallery}.tar.gz`;
+      const tar = join(s.worktrees, tarName);
+      // Relative paths and cwd: GNU tar on Windows reads "C:" as a remote host.
+      const packed = await runToEnd("tar", ["-czf", tarName, "-C", relative(s.worktrees, out).replace(/\\/g, "/"), "."], s.worktrees);
+      if (packed.code !== 0) return `couldn't pack the thumbnails: ${packed.out.slice(-500)}`;
+      try {
+        say(`sending the ${gallery} gallery's ${(statSync(tar).size / 1e6).toFixed(1)} MB to the server`);
+        const res = await fetch(`${s.serverUrl}/api/runner/thumbs/${job.id}/upload?gallery=${gallery}&commit=${shot}`, {
+          method: "PUT",
+          headers: { authorization: `Bearer ${s.token}`, "content-type": "application/gzip", "content-length": String(statSync(tar).size) },
+          body: createReadStream(tar) as unknown as BodyInit,
+          duplex: "half",
+        } as RequestInit);
+        if (!res.ok) throw new Error(`server answered ${res.status}`);
+      } catch (e) {
+        return `couldn't send the thumbnails: ${(e as Error).message}`;
+      } finally {
+        rmSync(tar, { force: true });
+      }
+      return null;
+    };
+
+    const mainError = await shootAndSend("build:thumbs", join(worktree, "public", "thumbs"), "sites", commit);
+    if (stopped) return await end(report, "stopped");
+    if (mainError) return await fail(mainError);
+
+    // ---------- 4. the vault's, the same way, when this machine has the vault repo ----------
+    if (s.vault) {
+      if (s.fetch) {
+        say("fetching the vault's origin");
+        const fetched = git(s.vault, "fetch", "--quiet", "origin", "main");
+        if (fetched.status !== 0) return await fail(`git fetch (vault) failed: ${fetched.stderr.trim()}`);
+        const moved = git(s.vault, "checkout", "--quiet", "--detach", "origin/main");
+        if (moved.status !== 0) return await fail(`git checkout (vault) failed: ${moved.stderr.trim()}`);
+      }
+      const vaultCommit = git(s.vault, "rev-parse", "HEAD").stdout.trim();
+      say(`shooting the vault at ${vaultCommit.slice(0, 7)} in ${s.vault}`);
+      const vaultInstall = await runToEnd("pnpm", ["install", "--frozen-lockfile", "--prefer-offline"], s.vault);
+      if (vaultInstall.code !== 0) return await fail(`pnpm install (vault) failed:\n${vaultInstall.out.slice(-2000)}`);
+      if (stopped) return await end(report, "stopped");
+      const vaultError = await shootAndSend("build:thumbs:vault", join(s.vault, "public", "thumbs"), "vault", vaultCommit, { ...process.env, FOUNDRY_VAULT: s.vault });
+      if (stopped) return await end(report, "stopped");
+      if (vaultError) return await fail(vaultError);
     }
     await end(report, "done");
   } catch (e) {

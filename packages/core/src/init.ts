@@ -1,13 +1,14 @@
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, posix } from "node:path";
-import { add, type AddOptions, type AddResult } from "./install.ts";
+import { add, registryList, type AddOptions, type AddResult } from "./install.ts";
 import { CONFIG_FILE, THEME_PLACEHOLDER, loadLock, saveConfig } from "./project.ts";
 import { toPosix } from "./rewrite.ts";
 import { SCHEMA, type FoundryConfig } from "./types.ts";
 
 export interface InitOptions extends AddOptions {
-  registry: string;
+  /** one registry, or several: a list, or comma-separated (the foundry's and the vault's) */
+  registry: string | string[];
   blocksDir?: string;
   publicDir?: string;
   themeFile?: string;
@@ -35,7 +36,7 @@ export async function init(projectDir: string, opts: InitOptions): Promise<{ con
   const cssFile = opts.cssFile ?? (await findTailwindCss(projectDir));
   const config: FoundryConfig = {
     schema: SCHEMA,
-    registry: opts.registry,
+    registry: registryList(opts.registry).length > 1 ? registryList(opts.registry) : registryList(opts.registry)[0],
     blocksDir: opts.blocksDir ?? `${src}components/foundry`,
     publicDir: opts.publicDir ?? "public",
     themeFile: opts.themeFile ?? `${src}styles/foundry-theme.css`,

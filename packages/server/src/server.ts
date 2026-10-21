@@ -10,7 +10,10 @@
 // Settings (environment):
 //   FOUNDRY_HOST, FOUNDRY_PORT          where to listen (127.0.0.1:4401)
 //   FOUNDRY_DATA                        database and previews (<repo>/.foundry)
-//   FOUNDRY_GALLERY_DIST                the built gallery (<repo>/apps/gallery/dist)
+//   FOUNDRY_GALLERY_DIST                the built sites gallery, served at / (<repo>/apps/gallery/dist)
+//   FOUNDRY_VAULT_GALLERY_DIST          the built vault gallery, served at /vault/ (<repo>/apps/gallery/dist-vault)
+//   FOUNDRY_VAULT                       the vault repo (default: <repo>-vault next to the repo); its
+//                                       registry is the MCP's too, and its new commits get thumbnails
 //   FOUNDRY_PASSPHRASE_HASH, FOUNDRY_TOTP_SECRET, FOUNDRY_COOKIE_DOMAIN
 //                                       the login; without the first two there is none (laptop)
 //   FOUNDRY_RUNNER_TOKEN                what the runner must send (made up per start on the laptop)
@@ -25,14 +28,16 @@
 // Thumbnails: the gallery's stills (pnpm build:thumbs) are git-ignored, so the cloud gets them
 // from the run instance: a thumbnails job shoots main there and sends public/thumbs/, kept in
 // <FOUNDRY_DATA>/thumbs and served at /thumbs/ ahead of the built gallery's own (the laptop's).
-// In the cloud a job is queued at start when the deployed commit changed what the gallery shows.
+// The vault gallery's go the same way into <FOUNDRY_DATA>/thumbs-vault, served at /vault/thumbs/.
+// In the cloud a job is queued at start when the deployed commit changed what a gallery shows.
 import { spawn, spawnSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { createReadStream, createWriteStream, existsSync, mkdirSync, renameSync, rmSync, statSync, utimesSync } from "node:fs";
+import { createReadStream, createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import { dirname, extname, join, normalize, resolve, sep } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
+import { findVault, registryDirOf } from "@foundry/core";
 import { createRemoteMcp } from "@foundry/mcp/http";
 import { Auth, AuthError, hashPassphrase, loginPage, newTotpSecret } from "./auth.ts";
 import { Db } from "./db.ts";
@@ -68,8 +73,13 @@ const HOST = env.FOUNDRY_HOST ?? "127.0.0.1";
 const PORT = Number(env.FOUNDRY_PORT ?? 4401);
 const DATA = resolve(env.FOUNDRY_DATA ?? join(REPO, ".foundry"));
 const GALLERY = resolve(env.FOUNDRY_GALLERY_DIST ?? join(REPO, "apps/gallery/dist"));
+const VAULT = findVault(REPO);
+const VAULT_GALLERY = resolve(env.FOUNDRY_VAULT_GALLERY_DIST ?? join(REPO, "apps/gallery/dist-vault"));
 const PREVIEWS = join(DATA, "previews");
 const THUMBS = join(DATA, "thumbs");
+const VAULT_THUMBS = join(DATA, "thumbs-vault");
+/** The vault commit its thumbnails were shot at (written when they arrive). */
+const VAULT_THUMBS_COMMIT = join(DATA, "thumbs-vault.commit");
 const IDLE_MINUTES = Number(env.FOUNDRY_IDLE_MINUTES ?? 10);
 const RUNNER_TOKEN = env.FOUNDRY_RUNNER_TOKEN ?? randomBytes(24).toString("base64url");
 const LIVE_TARGET = env.FOUNDRY_LIVE_TARGET ? new URL(env.FOUNDRY_LIVE_TARGET) : null;
@@ -110,9 +120,9 @@ const LIVE_URL = env.FOUNDRY_LIVE_URL ?? (machine.kind === "local" ? `http://loc
 const SELF_PASS = randomBytes(24).toString("base64url");
 const SELF_HOST = HOST === "0.0.0.0" || HOST === "::" ? "127.0.0.1" : HOST;
 const remoteMcp = createRemoteMcp({
-  registryDir: join(REPO, "public/r"),
+  registryDir: [registryDirOf(REPO), ...(VAULT ? [registryDirOf(VAULT)] : [])],
   previews: {
-    gallery: async () => `http://${SELF_HOST}:${PORT}/`,
+    gallery: async (which) => `http://${SELF_HOST}:${PORT}/${which === "vault" ? "vault/" : ""}`,
     headers: { "x-foundry-pass": SELF_PASS },
     cacheDir: join(DATA, "shots"),
     // Chromium takes a few hundred MB, which the 2 GB preview instance needs back
@@ -318,14 +328,18 @@ function thumbsAfterDeploy() {
   if (machine.kind !== "ec2" || db.activeThumbs()) return;
   const head = spawnSync("git", ["-C", REPO, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim();
   if (!head) return log("thumbnails: no git commit here, not queueing any");
+  // a job shoots both galleries; the vault's are due when its repo moved since they were shot
+  const vaultHead = VAULT ? spawnSync("git", ["-C", VAULT, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim() : undefined;
+  const vaultShot = existsSync(VAULT_THUMBS_COMMIT) ? readFileSync(VAULT_THUMBS_COMMIT, "utf8").trim() : undefined;
+  const vaultDue = !!vaultHead && vaultHead !== vaultShot;
   const last = db.latestThumbs("done")?.commit;
-  if (last && thumbsReceivedAt()) {
+  if (last && thumbsReceivedAt() && !vaultDue) {
     if (last === head) return;
-    const diff = spawnSync("git", ["-C", REPO, "diff", "--quiet", last, head, "--", "foundry", "vault", "apps/gallery", "public/r", "tools/build-thumbs.ts"]);
+    const diff = spawnSync("git", ["-C", REPO, "diff", "--quiet", last, head, "--", "foundry", "apps/gallery", "public/r", "tools/build-thumbs.ts"]);
     if (diff.status === 0) return log(`thumbnails: nothing the gallery shows changed since ${last.slice(0, 7)}`);
   }
-  db.addThumbs(`deployed ${head.slice(0, 7)}`);
-  log(`thumbnails queued for ${head.slice(0, 7)}`);
+  db.addThumbs(vaultDue && last === head ? `vault at ${vaultHead!.slice(0, 7)}` : `deployed ${head.slice(0, 7)}`);
+  log(`thumbnails queued for ${head.slice(0, 7)}${vaultDue ? ` and the vault at ${vaultHead!.slice(0, 7)}` : ""}`);
 }
 
 function report(id: number, r: Report): ReportReply {
@@ -469,9 +483,12 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     m = path.match(/^\/api\/runner\/thumbs\/(\d+)\/upload$/);
     if (method === "PUT" && m) {
       if (!db.thumbs(Number(m[1]))) throw new HttpError(404, "no such thumbnails job");
-      await receiveTar(req, THUMBS);
-      utimesSync(THUMBS, new Date(), new Date()); // tar gave the folder the runner's time
-      db.addThumbsLog(Number(m[1]), ["The server has the thumbnails."]);
+      const vault = q.get("gallery") === "vault";
+      const dest = vault ? VAULT_THUMBS : THUMBS;
+      await receiveTar(req, dest);
+      utimesSync(dest, new Date(), new Date()); // tar gave the folder the runner's time
+      if (vault && /^[0-9a-f]{40}$/.test(q.get("commit") ?? "")) writeFileSync(VAULT_THUMBS_COMMIT, q.get("commit")!);
+      db.addThumbsLog(Number(m[1]), [vault ? "The server has the vault gallery's thumbnails." : "The server has the thumbnails."]);
       return send(res, 200, { ok: true });
     }
     m = path.match(/^\/api\/runner\/runs\/(\d+)\/preview$/);
@@ -519,6 +536,18 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
     // A preview has no thumbnails of its own: main's show for what it shares with main.
     if (p[2].startsWith("/thumbs/") && serveFile(res, THUMBS, p[2].slice("/thumbs".length))) return;
     return res.writeHead(404, { "content-type": "text/plain" }).end("No preview for that run (yet).");
+  }
+
+  // The vault gallery: the same app built from the vault repo (`build --mode vault`), at /vault/.
+  if (path === "/vault") return res.writeHead(301, { location: "/vault/" }).end();
+  if (path.startsWith("/vault/")) {
+    const rest = path.slice("/vault".length);
+    if (rest.startsWith("/thumbs/") && serveFile(res, VAULT_THUMBS, rest.slice("/thumbs".length))) return;
+    if (serveFile(res, VAULT_GALLERY, rest)) return;
+    if (!existsSync(join(VAULT_GALLERY, "index.html"))) {
+      return res.writeHead(503, { "content-type": "text/plain; charset=utf-8" }).end(`The vault gallery isn't built yet: pnpm --filter gallery build:vault (looked in ${VAULT_GALLERY}).`);
+    }
+    return res.writeHead(404, { "content-type": "text/plain" }).end("Not found.");
   }
 
   if (path.startsWith("/thumbs/") && serveFile(res, THUMBS, path.slice("/thumbs".length))) return;

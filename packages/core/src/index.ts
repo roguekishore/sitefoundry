@@ -6,3 +6,4 @@ export * from "./project.ts";
 export * from "./rewrite.ts";
 export * from "./install.ts";
 export * from "./init.ts";
+export * from "./roots.ts";

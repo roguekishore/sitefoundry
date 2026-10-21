@@ -313,7 +313,11 @@ function packageManager(projectDir: string): "pnpm" | "yarn" | "bun" | "npm" {
   }
 }
 
-/** A relative registry folder in foundry.json is relative to the project. */
-export function resolveRegistry(projectDir: string, registry: string): string {
-  return /^https?:\/\//i.test(registry) ? registry : resolve(projectDir, registry);
+/** The registries in foundry.json (one, or several), relative folders made relative to the project. */
+export function resolveRegistry(projectDir: string, registry: string | string[]): string[] {
+  return registryList(registry).map((r) => (/^https?:\/\//i.test(r) ? r : resolve(projectDir, r)));
 }
+
+/** One registry, a list, or a comma-separated string, as a list. */
+export const registryList = (registry: string | string[]): string[] =>
+  (Array.isArray(registry) ? registry : registry.split(",")).map((r) => r.trim()).filter(Boolean);

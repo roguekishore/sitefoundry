@@ -2,6 +2,7 @@
 # The gallery is built into a side folder and swapped in, so the site never serves a
 # half-built gallery; the server restarts at the end (the runner retries meanwhile).
 REPO_DIR=/home/foundry/sitefoundry
+VAULT_DIR=/home/foundry/sitefoundry-vault
 export PATH=/opt/node/bin:$PATH
 
 [[ -d $REPO_DIR/.git ]] || { echo "no repository at $REPO_DIR: run provision/preview.sh first"; exit 1; }
@@ -20,6 +21,16 @@ quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm bu
 quiet as foundry "cd $REPO_DIR && pnpm exec playwright install chromium"
 quiet as foundry "cd $REPO_DIR/apps/gallery && rm -rf dist.next && NODE_OPTIONS=--max-old-space-size=1536 pnpm exec vite build --outDir dist.next --emptyOutDir"
 as foundry "cd $REPO_DIR/apps/gallery && rm -rf dist.old && { [[ ! -d dist ]] || mv dist dist.old; } && mv dist.next dist && rm -rf dist.old"
+
+# The vault: pulled, and its gallery rebuilt only when the vault or the gallery code moved.
+if [[ -n "$VAULT_REPO_URL" ]]; then
+  say "vault"
+  vault_key foundry "foundry-preview vault (read only)"
+  V_BEFORE=$( [[ -d $VAULT_DIR/.git ]] && as foundry "git -C $VAULT_DIR rev-parse --short HEAD" || echo none)
+  clone_or_pull foundry "$VAULT_DIR" "$VAULT_REPO_URL"
+  echo "vault $V_BEFORE -> $(as foundry "git -C $VAULT_DIR rev-parse --short HEAD")"
+  vault_gallery "$REPO_DIR" "$VAULT_DIR"
+fi
 
 say "restart"
 systemctl restart foundry

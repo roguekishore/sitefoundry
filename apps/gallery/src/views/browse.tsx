@@ -110,7 +110,7 @@ export function Browse({ route }: { route: Route }) {
     <div className="page">
       <div className="page-head">
         <h1>{title}</h1>
-        <p>{plain ? "Every block, component and theme, from the recreations and the vault." : `${results.length} shown with the current filters.`}</p>
+        <p>{plain ? `Every block, component and theme in this gallery (${results.length}).` : `${results.length} shown with the current filters.`}</p>
       </div>
       <div className="filters">
         <div className="filters-row">
