@@ -334,7 +334,7 @@ The user chose "the run instance shoots them" over the laptop uploading its own 
   time), and whether it runs out of CPU credits on the way (the instance uses standard credits,
   which slow it to its baseline when spent).
 
-## The vault in the cloud: **BUILT** (2026-10-21), waiting for the vault repo on GitHub
+## The vault in the cloud: **DONE** (2026-10-21), live; its thumbnails not shot yet
 
 The vault is its own repo since 2026-10-21 (PLAN.md, "The vault split"). In the cloud:
 
@@ -348,13 +348,20 @@ The vault is its own repo since 2026-10-21 (PLAN.md, "The vault split"). In the 
   each; the server keeps the vault's in `<FOUNDRY_DATA>/thumbs-vault` (served at
   `/vault/thumbs/`) and the vault commit they show in `thumbs-vault.commit`. At start, a job is
   queued when the vault moved since then.
-- **Off until the remote exists:** `VAULT_REPO_URL` in `infra/provision/common.sh` is empty, so
-  every vault step is skipped. Set it (`git@github-vault:<owner>/<repo>.git`), run
-  `provision/preview.sh` and `provision/run.sh` once each (they print the vault key to add with
-  `gh repo deploy-key add`), then deploy. `deploy.sh` refuses when the vault's main isn't pushed.
-- **Not tried yet:** building the vault gallery on the 2 GB preview instance (several thousand
-  items; it has 2 GB of swap and the build gets 1.5 GB of heap). If it runs out of memory, build
-  it on the run instance or the laptop and send it, like the thumbnails.
+- **The remote:** `roguekishore/sitefoundry-vault` (private), `VAULT_REPO_URL=git@github-vault:
+  roguekishore/sitefoundry-vault.git` in `infra/provision/common.sh`. One read-only deploy key
+  per instance (`foundry-preview vault`, `foundry-run vault`). `deploy.sh` refuses when the
+  vault's main isn't pushed.
+- **Live 2026-10-21:** `provision/preview.sh` and `provision/run.sh` rerun (each stopped once for
+  its vault key). The vault gallery **built on the 2 GB preview instance** without running out
+  of memory; `/vault/` answers behind the login; the runner restarted at `89965d9`.
+- **Found:** both instances' clones still held main from before its history was rewritten
+  (2026-10-21), and every pull is `--ff-only`, so provisioning (and the runner's update at
+  each start) refused to move. Fixed once by hand: fetch, check that HEAD is inside a value
+  `origin/main` had there (nothing of the instance's own), `reset --hard origin/main`. Any
+  future rewrite of main needs the same on both instances.
+- **Not seen yet:** the first thumbnails job with the vault (press **Shoot now** on the Runs
+  page): how long the vault's several thousand items take on the run instance.
 
 ## Known gaps and risks
 

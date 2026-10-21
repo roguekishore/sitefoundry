@@ -61,8 +61,9 @@ this repo stays about the recreated sites, and building a new site never rebuild
   Registries over 900 items, icon packs, loaders and app-only kits are left out. The list and
   each library's licence: the vault's `tools/mirror/sources/registry.ts`.
 - **Cloud:** the preview instance pulls the vault and builds its gallery when it moved; the
-  run instance shoots its thumbnails in the same job as ours. Both wait for the vault's GitHub
-  remote (`VAULT_REPO_URL` in `infra/provision/common.sh`, its own deploy key).
+  run instance shoots its thumbnails in the same job as ours. Live since 2026-10-21 from
+  `roguekishore/sitefoundry-vault` (private; `VAULT_REPO_URL` in `infra/provision/common.sh`,
+  a read-only deploy key per instance).
 
 ## Built in from day one
 
