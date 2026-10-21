@@ -2,6 +2,7 @@
 # Chromium. After common.sh. First run: makes the deploy key, prints it, stops. Add the key
 # (with write access), run it again.
 REPO_DIR=/home/runner/sitefoundry
+VAULT_DIR=/home/runner/sitefoundry-vault
 WORKTREES=/home/runner/sitefoundry-runs
 SERVER_URL=http://10.20.0.10:4401
 
@@ -10,6 +11,7 @@ base_packages
 say "user and deploy key"
 make_user runner
 deploy_key runner "foundry-run (write)" rw
+vault_key runner "foundry-run vault (read only)"
 
 install_node
 
@@ -38,6 +40,8 @@ say "the repository and git identity"
 clone_or_pull runner "$REPO_DIR"
 as runner "git config --global user.name '$GIT_NAME' && git config --global user.email '$GIT_EMAIL'"
 install -d -o runner -g runner "$WORKTREES"
+# the vault: its gallery gets thumbnails here too (the thumbnails job fetches it each time)
+[[ -z "$VAULT_REPO_URL" ]] || clone_or_pull runner "$VAULT_DIR" "$VAULT_REPO_URL"
 
 say "install, build, Chromium (a few minutes the first time)"
 quiet as runner "cd $REPO_DIR && pnpm install --frozen-lockfile"
@@ -86,6 +90,7 @@ Environment=PATH=/opt/node/bin:/home/runner/.local/bin:/usr/local/bin:/usr/bin
 Environment=FOUNDRY_SERVER_URL=$SERVER_URL
 Environment=FOUNDRY_REPO=$REPO_DIR
 Environment=FOUNDRY_WORKTREES=$WORKTREES
+Environment=FOUNDRY_VAULT=$VAULT_DIR
 Environment=FOUNDRY_GALLERY_HOST=0.0.0.0
 Environment=FOUNDRY_FETCH=1
 Environment=FOUNDRY_PUSH=1

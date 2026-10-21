@@ -20,5 +20,16 @@ if [[ "$LOCAL" != "$REMOTE" ]]; then
   echo "main here is ${LOCAL:0:7}, GitHub's is ${REMOTE:0:7}: push main first (git push origin main)." >&2
   exit 1
 fi
+# The vault repo next to this one: once it has a GitHub remote, its main must be pushed too
+# (the preview instance pulls it and builds the vault gallery from it).
+VAULT_DIR="$(cd .. && pwd)-VAULT"
+if [[ -d "$VAULT_DIR/.git" ]] && git -C "$VAULT_DIR" remote get-url origin >/dev/null 2>&1; then
+  V_LOCAL="$(git -C "$VAULT_DIR" rev-parse main)"
+  V_REMOTE="$(git -C "$VAULT_DIR" ls-remote origin refs/heads/main | cut -f1)"
+  if [[ "$V_LOCAL" != "$V_REMOTE" ]]; then
+    echo "the vault's main here is ${V_LOCAL:0:7}, GitHub's is ${V_REMOTE:0:7}: push it first (git -C $VAULT_DIR push origin main)." >&2
+    exit 1
+  fi
+fi
 echo "deploying main ${LOCAL:0:7} to $TARGET"
 exec ./ssm.sh "$TARGET" provision/common.sh "provision/deploy-$TARGET.sh"

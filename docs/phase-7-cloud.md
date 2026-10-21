@@ -334,6 +334,28 @@ The user chose "the run instance shoots them" over the laptop uploading its own 
   time), and whether it runs out of CPU credits on the way (the instance uses standard credits,
   which slow it to its baseline when spent).
 
+## The vault in the cloud: **BUILT** (2026-10-21), waiting for the vault repo on GitHub
+
+The vault is its own repo since 2026-10-21 (PLAN.md, "The vault split"). In the cloud:
+
+- **Preview instance:** clones it to `/home/foundry/sitefoundry-vault` (a second, read-only
+  deploy key: GitHub takes a key on one repo only; ssh host name `github-vault`). Each deploy
+  pulls it and rebuilds the vault gallery (`apps/gallery/dist-vault`, `vite build --mode
+  vault`) only when the vault or the gallery code moved (`dist-vault/.built-from`). The server
+  serves it at `/vault/`; the remote MCP reads both registries and previews vault items there.
+- **Run instance:** clones it to `/home/runner/sitefoundry-vault`. A thumbnails job shoots our
+  gallery, then the vault's (`pnpm build:thumbs:vault`, after fetching the vault), and sends
+  each; the server keeps the vault's in `<FOUNDRY_DATA>/thumbs-vault` (served at
+  `/vault/thumbs/`) and the vault commit they show in `thumbs-vault.commit`. At start, a job is
+  queued when the vault moved since then.
+- **Off until the remote exists:** `VAULT_REPO_URL` in `infra/provision/common.sh` is empty, so
+  every vault step is skipped. Set it (`git@github-vault:<owner>/<repo>.git`), run
+  `provision/preview.sh` and `provision/run.sh` once each (they print the vault key to add with
+  `gh repo deploy-key add`), then deploy. `deploy.sh` refuses when the vault's main isn't pushed.
+- **Not tried yet:** building the vault gallery on the 2 GB preview instance (several thousand
+  items; it has 2 GB of swap and the build gets 1.5 GB of heap). If it runs out of memory, build
+  it on the run instance or the laptop and send it, like the thumbnails.
+
 ## Known gaps and risks
 
 - **t4g.large capacity in `ap-south-1a`.** On 2026-10-20 AWS refused to start the run instance

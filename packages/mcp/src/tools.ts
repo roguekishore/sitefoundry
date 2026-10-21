@@ -8,8 +8,8 @@ import type { Previewer } from "./preview.ts";
 
 export interface ToolOptions {
   registry: Registry;
-  /** what `init` writes into foundry.json by default */
-  registryLocation: string;
+  /** what `init` writes into foundry.json by default (the foundry's registry and the vault's) */
+  registryLocation: string | string[];
   previews: Previewer;
   /** only search, get and preview */
   readOnly?: boolean;
@@ -61,14 +61,14 @@ export function registerTools(server: McpServer, { registry, registryLocation, p
     {
       title: "Search the foundry",
       description:
-        "Find blocks (page sections), components, themes and assets in the private foundry registry: our recreated sites' blocks plus the vault (shadcn, React Bits…). " +
+        "Find blocks (page sections), components, themes and assets in the private foundry registry: our recreated sites' blocks plus the vault (shadcn, React Bits, Aceternity, Magic UI and other libraries)." +
         "Every word of `query` must match the name, title, tags, description or notes. Combine with filters. Returns one line per item; use `get` for props and code, `preview` to see it.",
       inputSchema: {
         query: z.string().optional().describe("words, e.g. 'dark header glow' or 'pricing'"),
         type: z.enum(["block", "component", "theme", "lib", "asset", "base"]).optional(),
         category: z.string().optional().describe("header, hero, features, pricing, footer, text-effect, background…"),
         site: z.string().optional().describe("a recreated site, e.g. 'huly'"),
-        source: z.string().optional().describe("'foundry' for ours, or a vault source: 'shadcn', 'reactbits'…"),
+        source: z.string().optional().describe("'foundry' for ours, or a vault library: 'shadcn', 'reactbits', 'aceternity', 'magicui'…"),
         license: z.string().optional(),
         tag: z.string().optional(),
         limit: z.number().int().min(1).max(200).optional().describe("default 30"),
@@ -155,6 +155,8 @@ export function registerTools(server: McpServer, { registry, registryLocation, p
         let target: { item?: string; site?: string; specimen?: string };
         let key: string;
         let chosen = theme;
+        // vault items are shown by the vault gallery, ours by the sites gallery
+        let gallery: "sites" | "vault" = "sites";
         if (site) {
           target = { site };
           key = `site-${site}`;
@@ -165,10 +167,11 @@ export function registerTools(server: McpServer, { registry, registryLocation, p
           if (["lib", "base"].includes(item.type)) throw new Error(`${name} is a ${item.type}; there's nothing to look at`);
           target = item.type === "theme" ? { specimen: item.name } : { item: item.name };
           key = `${item.name}@${item.version}`;
+          if ((item.source ?? "foundry") !== "foundry") gallery = "vault";
           chosen ??= ownTheme(items, item)?.name ?? "none";
         }
         const themeItem = items.find((t) => t.name === chosen);
-        const png = await previews.screenshot({ target, key, theme: chosen!, mode, width, fresh: fresh || !!site });
+        const png = await previews.screenshot({ target, key, theme: chosen!, mode, width, gallery, fresh: fresh || !!site });
         return {
           content: [
             { type: "image" as const, data: png.toString("base64"), mimeType: "image/png" },
@@ -196,7 +199,7 @@ export function registerTools(server: McpServer, { registry, registryLocation, p
       try {
         const { log, lines } = collector();
         const { config, css, result } = await init(project_dir, { registry: reg ?? registryLocation, log, packageOutput: "capture" });
-        return text([`foundry.json written (registry ${config.registry})`, report(result), css, ...lines].join("\n"));
+        return text([`foundry.json written (registry ${[config.registry].flat().join(", ")})`, report(result), css, ...lines].join("\n"));
       } catch (e) {
         return fail(e);
       }

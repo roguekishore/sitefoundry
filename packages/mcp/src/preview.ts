@@ -1,6 +1,7 @@
 // Screenshots of items, taken from the gallery's preview page. Results are cached per version.
-// On this computer it uses a running gallery (pnpm gallery, port 4400) or starts its own quietly;
-// on the foundry server it uses the server's own built gallery (http.ts).
+// Our items come from the sites gallery, vault items from the vault gallery. On this computer it
+// uses a running one (pnpm gallery on 4400, pnpm gallery:vault on 4402) or starts its own quietly;
+// on the foundry server it uses the server's own built galleries, at / and /vault/ (http.ts).
 import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
@@ -17,6 +18,8 @@ export interface Shot {
   theme: string;
   mode: "light" | "dark";
   width: number;
+  /** which gallery shows it: ours (default) or the vault's */
+  gallery?: "sites" | "vault";
   fresh?: boolean;
 }
 
@@ -26,8 +29,8 @@ export interface Previewer {
 }
 
 export interface PreviewerOptions {
-  /** the gallery's address, ending in "/"; default: the local one */
-  gallery?: () => Promise<string>;
+  /** a gallery's address, ending in "/"; default: the local ones */
+  gallery?: (which: "sites" | "vault") => Promise<string>;
   /** sent with every request the browser makes (the server's own pass for its login) */
   headers?: Record<string, string>;
   /** default <repo>/.cache/shots */
@@ -45,24 +48,27 @@ async function isGallery(url: string): Promise<boolean> {
   }
 }
 
-let localGallery: Promise<string> | undefined;
-function local(): Promise<string> {
-  localGallery ??= (async () => {
-    if (await isGallery("http://localhost:4400/")) return "http://localhost:4400/";
+const localGallery: Partial<Record<"sites" | "vault", Promise<string>>> = {};
+function local(which: "sites" | "vault"): Promise<string> {
+  localGallery[which] ??= (async () => {
+    const running = which === "vault" ? "http://localhost:4402/vault/" : "http://localhost:4400/";
+    if (await isGallery(running)) return running;
     // Nothing may reach stdout: it carries the MCP protocol.
     const { createServer } = await import("vite");
     const server = await createServer({
       configFile: join(ROOT, "apps/gallery/vite.config.ts"),
+      // the vault gallery is the same app in vault mode
+      mode: which === "vault" ? "vault" : "development",
       logLevel: "silent",
       clearScreen: false,
-      server: { port: 4401, strictPort: false, open: false },
+      server: { port: which === "vault" ? 4403 : 4401, strictPort: false, open: false },
     });
     await server.listen();
     const url = server.resolvedUrls?.local[0];
-    if (!url) throw new Error("could not start the gallery for previews");
+    if (!url) throw new Error(`could not start the ${which} gallery for previews`);
     return url.endsWith("/") ? url : url + "/";
   })();
-  return localGallery;
+  return localGallery[which]!;
 }
 
 export function createPreviewer({ gallery = local, headers, cacheDir = join(ROOT, ".cache", "shots"), idleCloseMs }: PreviewerOptions = {}): Previewer {
@@ -80,7 +86,7 @@ export function createPreviewer({ gallery = local, headers, cacheDir = join(ROOT
     const file = join(cacheDir, `${shot.key}-${shot.theme}-${shot.mode}-${shot.width}.png`.replace(/[^a-z0-9@._-]/gi, "_"));
     if (!shot.fresh && existsSync(file)) return readFile(file);
 
-    const base = await gallery();
+    const base = await gallery(shot.gallery ?? "sites");
     clearTimeout(idleTimer);
     busy++;
     try {

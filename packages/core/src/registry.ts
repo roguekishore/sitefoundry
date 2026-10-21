@@ -13,7 +13,42 @@ export interface Registry {
 
 class NotFound extends Error {}
 
-export function openRegistry(location: string): Registry {
+/**
+ * One registry, or several read as one (the foundry's and the vault's): the index lists every
+ * item (the first registry wins a name both have), and an item is looked up in each in turn.
+ * A comma-separated string is a list too (for --registry and FOUNDRY_REGISTRY).
+ */
+export function openRegistry(location: string | string[]): Registry {
+  const list = (Array.isArray(location) ? location : location.split(",")).map((l) => l.trim()).filter(Boolean);
+  if (list.length === 1) return openOne(list[0]);
+  const parts = list.map(openOne);
+  return {
+    location: parts.map((p) => p.location).join(","),
+    async index() {
+      const indexes = await Promise.all(parts.map((p) => p.index().catch((e: Error) => (e instanceof NotFound ? undefined : Promise.reject(e)))));
+      const seen = new Set<string>();
+      const items = indexes.flatMap((ix) => ix?.items ?? []).filter((i) => !seen.has(i.name) && seen.add(i.name));
+      return { ...(indexes.find(Boolean) ?? { schema: SCHEMA }), items } as RegistryIndex;
+    },
+    async item(name, version) {
+      let last: unknown;
+      for (const p of parts) {
+        try {
+          return await p.item(name, version);
+        } catch (e) {
+          last = e;
+          if (!(e instanceof MissingItem)) throw e;
+        }
+      }
+      throw last;
+    },
+  };
+}
+
+/** An item (or version) a registry doesn't have; the next one in a list is asked. */
+class MissingItem extends Error {}
+
+function openOne(location: string): Registry {
   const remote = /^https?:\/\//i.test(location);
   const base = location.replace(/[\\/]+$/, "");
 
@@ -52,7 +87,7 @@ export function openRegistry(location: string): Registry {
         return checkSchema((await read(rel)) as RegistryItem, name);
       } catch (e) {
         if (e instanceof NotFound) {
-          throw new Error(version ? `no version ${version} of "${name}" in the registry` : `no item "${name}" in the registry`);
+          throw new MissingItem(version ? `no version ${version} of "${name}" in the registry` : `no item "${name}" in the registry`);
         }
         throw e;
       }

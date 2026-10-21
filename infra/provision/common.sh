@@ -4,6 +4,10 @@ set -euo pipefail
 
 LOG=/var/log/foundry-provision.log
 REPO_URL=git@github.com:roguekishore/sitefoundry.git
+# The vault repo (mirrored libraries; served at /vault/). Empty = not on GitHub yet: every vault
+# step is skipped. "github-vault" is an ssh host name for its own deploy key (GitHub accepts a
+# deploy key on one repo only), set up by vault_key.
+VAULT_REPO_URL=
 NODE_VERSION=24.21.0          # the laptop's
 PNPM_VERSION=12.14.0          # the laptop's
 REGION=ap-south-1
@@ -106,13 +110,49 @@ CONF
   exit 3
 }
 
-# clone_or_pull <user> <dir>: the repo at origin/main, as that user.
+# vault_key <user> <title>: like deploy_key, for the vault repo: a second key (~/.ssh/id_ed25519_vault)
+# behind the ssh host name github-vault, read-only. Run it after deploy_key (which rewrites the
+# ssh config). Nothing to do while VAULT_REPO_URL is empty.
+vault_key() {
+  local user=$1 title=$2 home
+  [[ -n "$VAULT_REPO_URL" ]] || { say "no vault repo on GitHub yet (VAULT_REPO_URL): skipping the vault"; return 0; }
+  home=$(getent passwd "$user" | cut -d: -f6)
+  [[ -f "$home/.ssh/id_ed25519_vault" ]] || as "$user" "ssh-keygen -q -t ed25519 -N '' -C '$title' -f ~/.ssh/id_ed25519_vault"
+  grep -q '^Host github-vault' "$home/.ssh/config" || cat >> "$home/.ssh/config" <<CONF
+
+Host github-vault
+  HostName github.com
+  IdentityFile ~/.ssh/id_ed25519_vault
+  IdentitiesOnly yes
+  StrictHostKeyChecking accept-new
+CONF
+  local why repo
+  if why=$(as "$user" "git ls-remote $VAULT_REPO_URL HEAD" 2>&1); then
+    say "vault deploy key accepted by GitHub (ro)"
+    return 0
+  fi
+  repo=$(echo "$VAULT_REPO_URL" | sed -E 's#^[^:]+:##; s#\.git$##')
+  echo
+  echo "GitHub did not let this machine into the vault repo. git said:"
+  echo "$why" | tail -n 5
+  echo
+  echo "Its public key for the vault:"
+  echo
+  cat "$home/.ssh/id_ed25519_vault.pub"
+  echo
+  echo "On the laptop, save that line to a file (say vault-key.pub) and run:"
+  echo "  gh repo deploy-key add vault-key.pub --repo $repo --title '$title'"
+  echo "then run this script again."
+  exit 3
+}
+
+# clone_or_pull <user> <dir> [url]: the repo (default: the foundry's) at origin/main, as that user.
 clone_or_pull() {
-  local user=$1 dir=$2
+  local user=$1 dir=$2 url=${3:-$REPO_URL}
   if [[ -d "$dir/.git" ]]; then
     as "$user" "cd '$dir' && git fetch -q origin && git checkout -q main && git merge -q --ff-only origin/main"
   else
-    as "$user" "git clone -q $REPO_URL '$dir'"
+    as "$user" "git clone -q $url '$dir'"
   fi
 }
 
@@ -158,6 +198,23 @@ chown $owner:$owner "\$out"
 mv "\$out" /run/foundry/secrets.env
 SCRIPT
   chmod 755 /usr/local/bin/foundry-env
+}
+
+# vault_gallery <repo dir> <vault dir>: builds the vault gallery (apps/gallery/dist-vault, served at
+# /vault/) when the vault or the gallery's code moved since the last build: a marker in the folder
+# says what it was built from. Built into a side folder and swapped in, like the sites gallery.
+vault_gallery() {
+  local repo=$1 vault=$2 from
+  [[ -d "$vault/.git" ]] || return 0
+  from="$(as foundry "git -C $vault rev-parse HEAD"):$(as foundry "git -C $repo rev-parse HEAD:apps/gallery")"
+  if [[ -f "$repo/apps/gallery/dist-vault/.built-from" && "$(cat "$repo/apps/gallery/dist-vault/.built-from")" == "$from" ]]; then
+    say "vault gallery up to date"
+    return 0
+  fi
+  say "vault: install and build its gallery (a while: thousands of items)"
+  quiet as foundry "cd $vault && pnpm install --frozen-lockfile"
+  quiet as foundry "cd $repo/apps/gallery && rm -rf dist-vault.next && FOUNDRY_VAULT=$vault NODE_OPTIONS=--max-old-space-size=1536 pnpm exec vite build --mode vault --outDir dist-vault.next --emptyOutDir"
+  as foundry "cd $repo/apps/gallery && echo '$from' > dist-vault.next/.built-from && rm -rf dist-vault.old && { [[ ! -d dist-vault ]] || mv dist-vault dist-vault.old; } && mv dist-vault.next dist-vault && rm -rf dist-vault.old"
 }
 
 # Waits for a URL to answer, for the checks at the end of a script.

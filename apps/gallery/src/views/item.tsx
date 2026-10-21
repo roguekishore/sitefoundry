@@ -5,7 +5,7 @@ import { ExternalLink, RotateCw } from "lucide-react";
 import type { IndexEntry, RegistryItem } from "@foundry/core";
 import { byName, installCommand, registryIndex } from "../catalog";
 import { MiniItem } from "../cards";
-import { library, pageLabel, themeFor, titleCase, usedOn } from "../library";
+import { categoryLabel, library, pageLabel, themeFor, titleCase, usedOn } from "../library";
 import { BASE } from "../base";
 import { useSettings } from "../state";
 import { Badges, CmdBox, DeviceSeg, ItemStage, ThemeButton } from "../ui";
@@ -145,7 +145,7 @@ export function ItemPage({ name }: { name: string }) {
           )}
           {related.length > 0 && (
             <div className="panel">
-              <h6>More {isTheme ? "themes" : titleCase(item.meta.category ?? "items").toLowerCase()}</h6>
+              <h6>More {isTheme ? "themes" : categoryLabel(item.meta.category ?? "items")}</h6>
               {related.map((x) => (
                 <MiniItem key={x.name} item={x} />
               ))}

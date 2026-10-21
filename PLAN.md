@@ -18,7 +18,7 @@ packages/cli/        `foundry` command
 packages/mcp/        MCP server (local, stdio)
 apps/gallery/        the picker (Vite)
 foundry/             OUR content: base/, themes/, sites/<site>/
-vault/               mirrored third-party items (shadcn, directory registries, React Bits)
+../SITEFOUNDRY-VAULT the vault, its own repo: mirrored third-party items, the mirror, its registry
 tools/               build-registry, check
 public/r/            the built registry (generated, committed)
 ```
@@ -32,14 +32,37 @@ public/r/            the built registry (generated, committed)
 | 2 | CLI: init / list / add / theme / diff / update, `foundry.lock` | this agent | **done** (Vite + npm, Astro + pnpm) |
 | 3 | Gallery: browse, device widths, theme + light/dark switch, copy command | this agent | **done** |
 | 4 | Huly recreation | another agent, **ready to start** | faithful at 390 px and desktop; every block standalone |
-| 5 | Vault mirror (shadcn + directory registries + React Bits) | another agent, **ready to start** | vault items live in the gallery and install with `foundry add` |
+| 5 | Vault mirror (shadcn + directory registries + React Bits) | **done**; split into its own repo 2026-10-21 (below) | vault items live in the gallery and install with `foundry add` |
 | 6 | MCP (local): search / get / preview / add / theme | this agent | **done** (scripted MCP client) |
 | 7 | Cloud: preview instance, run instance, run page, warden widget (below) | A–F **done** (warden's outpost on the preview still to update); see [`docs/phase-7-cloud.md`](docs/phase-7-cloud.md) | a run started from the phone lands as a branch you can browse |
 | 8 | Remote MCP (read-only), OAuth login per machine (passphrase only) | **done**, live 2026-10-20; see [`docs/phase-8-remote-mcp.md`](docs/phase-8-remote-mcp.md) | Claude Code on another machine searches, reads and previews items with nothing registered in a Claude account |
 
-Folders per agent: Huly → `foundry/sites/huly/`, `foundry/themes/huly/`. Vault →
-`vault/`, `tools/mirror/`, plus its npm packages in the root `package.json`. The gallery
+Folders per agent: Huly → `foundry/sites/huly/`, `foundry/themes/huly/`. Vault → the vault
+repo (`vault/`, `tools/mirror/`, its npm packages in its own `package.json`). The gallery
 picks up both automatically; nobody else edits gallery code.
+
+## The vault split (agreed with the user 2026-10-21)
+
+The mirrored libraries moved to their own private repo, `SITEFOUNDRY-VAULT`, next to this one:
+this repo stays about the recreated sites, and building a new site never rebuilds the vault.
+
+- **What's where.** Vault repo: `vault/<library>/<item>/`, `vault/sources.json`, the mirror
+  (`pnpm mirror`), its built registry `public/r/`, its own `package.json`. This repo: every
+  tool, run with `--vault` (`pnpm check:vault`, `build:registry:vault`, `build:thumbs:vault`,
+  `gallery:vault`).
+- **Two galleries, one codebase.** The sites gallery at `/`, the vault gallery at `/vault/`
+  (`vite --mode vault`), built and deployed apart; each links to the other.
+- **CLI and MCP read both registries** as one list (ours first). Projects get both in
+  `foundry.json`.
+- **What the vault mirrors:** shadcn, React Bits, and from shadcn's directory the effect
+  libraries (Aceternity, Magic UI, Cult UI, Motion Primitives, Skiper, Kokonut, SmoothUI,
+  Eldora, Animate UI, UI Layouts, ncdai, Kibo) whole, minus copies of shadcn's basics; and
+  only whole blocks and pages from the block libraries (shadcnui-blocks, 7ovr, flx, uiception…).
+  Registries over 900 items, icon packs, loaders and app-only kits are left out. The list and
+  each library's licence: the vault's `tools/mirror/sources/registry.ts`.
+- **Cloud:** the preview instance pulls the vault and builds its gallery when it moved; the
+  run instance shoots its thumbnails in the same job as ours. Both wait for the vault's GitHub
+  remote (`VAULT_REPO_URL` in `infra/provision/common.sh`, its own deploy key).
 
 ## Built in from day one
 

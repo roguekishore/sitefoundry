@@ -23,6 +23,8 @@ export interface RunnerSettings {
   token: string;
   /** the repository the worktrees are made from */
   repo: string;
+  /** the vault repo (its gallery gets thumbnails too), if this machine has it */
+  vault?: string;
   worktrees: string;
   galleryPort: number;
   /** 0.0.0.0 in the cloud, so the preview instance can show the live gallery */

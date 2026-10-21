@@ -7,6 +7,7 @@
 //   FOUNDRY_SERVER_URL, FOUNDRY_RUNNER_TOKEN   the server and its runner token
 //   FOUNDRY_REPO                 the repository (this one)
 //   FOUNDRY_WORKTREES            where run worktrees go (../SITEFOUNDRY-runs)
+//   FOUNDRY_VAULT                the vault repo, for its thumbnails (default: <repo>-vault next to the repo)
 //   FOUNDRY_GALLERY_PORT, FOUNDRY_GALLERY_HOST the run's gallery (4410, localhost)
 //   FOUNDRY_FETCH=1, FOUNDRY_PUSH=1            work from origin/main and push the branch (cloud)
 //   FOUNDRY_VERTEX_PROJECT, FOUNDRY_VERTEX_KEY Gemini's Vertex project, and its key (cloud)
@@ -17,6 +18,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Job, ThumbsWork } from "../shared.ts";
 import { runJob, type RunnerSettings } from "./job.ts";
+import { findVault } from "@foundry/core";
 import { runThumbs } from "./thumbs.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -27,6 +29,7 @@ const settings: RunnerSettings = {
   serverUrl: env.FOUNDRY_SERVER_URL ?? "http://127.0.0.1:4401",
   token: env.FOUNDRY_RUNNER_TOKEN ?? "",
   repo,
+  vault: findVault(repo),
   worktrees: resolve(env.FOUNDRY_WORKTREES ?? resolve(repo, "..", "SITEFOUNDRY-runs")),
   galleryPort: Number(env.FOUNDRY_GALLERY_PORT ?? 4410),
   galleryHost: env.FOUNDRY_GALLERY_HOST ?? "localhost",

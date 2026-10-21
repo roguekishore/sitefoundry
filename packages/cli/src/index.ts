@@ -4,10 +4,12 @@ import { parseArgs } from "node:util";
 import {
   add,
   diff,
+  findVault,
   init,
   loadConfig,
   loadLock,
   openRegistry,
+  registryDirOf,
   resolveRegistry,
   search,
   update,
@@ -18,7 +20,7 @@ import {
 
 const HELP = `foundry — add blocks from the foundry registry to a project
 
-  foundry init [--registry <folder|url>]   set this project up (foundry.json, base, CSS imports)
+  foundry init [--registry <folder|url>[,…]]  set this project up (foundry.json, base, CSS imports)
   foundry list [words…] [filters]          find items
         --type block|component|theme|lib|asset  --category header  --site huly
         --source shadcn  --license MIT  --tag dark
@@ -35,8 +37,10 @@ const HELP = `foundry — add blocks from the foundry registry to a project
   --cwd <dir>    the project folder (default: current folder)
   --json         machine-readable output (list, info, status)`;
 
-/** The registry built in this repo, used by `init` when no --registry is given. */
-const LOCAL_REGISTRY = resolve(dirname(fileURLToPath(import.meta.url)), "../../../public/r");
+/** The registries built here, used by `init` when no --registry is given: this repo's, then the vault repo's next to it. */
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const VAULT = findVault(REPO);
+const LOCAL_REGISTRY = [registryDirOf(REPO), ...(VAULT ? [registryDirOf(VAULT)] : [])];
 
 const log: Logger = {
   info: (m) => console.log(m),
@@ -70,7 +74,7 @@ async function main(argv: string[]) {
   switch (command) {
     case "init": {
       const { config, css, result } = await init(cwd, { registry: o.registry ?? LOCAL_REGISTRY, ...addOpts });
-      console.log(`foundry.json written (registry: ${config.registry})`);
+      console.log(`foundry.json written (registry: ${[config.registry].flat().join(", ")})`);
       report(result, !!o["dry-run"]);
       console.log(css);
       console.log(`next: foundry theme <name>, then foundry add <block>. Browse with \`foundry list\`.`);

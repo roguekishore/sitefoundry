@@ -77,8 +77,8 @@ export interface RegistryIndex {
 /** `foundry.json` in a customer project. Paths are relative to the project. */
 export interface FoundryConfig {
   schema: number;
-  /** a folder path or an http(s) URL of the built registry (`…/r`) */
-  registry: string;
+  /** a folder path or an http(s) URL of the built registry (`…/r`), or several (the foundry's and the vault's) */
+  registry: string | string[];
   blocksDir: string;
   publicDir: string;
   themeFile: string;

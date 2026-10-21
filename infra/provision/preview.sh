@@ -2,6 +2,7 @@
 # First run: makes the deploy key, prints it, stops. Add the key (read-only), run it again.
 RUN_INSTANCE_ID=i-0ab154c93b3356c22
 REPO_DIR=/home/foundry/sitefoundry
+VAULT_DIR=/home/foundry/sitefoundry-vault
 DATA_DIR=/var/lib/foundry
 
 base_packages
@@ -9,6 +10,7 @@ base_packages
 say "user and deploy key"
 make_user foundry
 deploy_key foundry "foundry-preview (read only)" ro
+vault_key foundry "foundry-preview vault (read only)"
 
 install_node
 chromium_libs
@@ -28,6 +30,12 @@ say "install and build (a few minutes the first time)"
 quiet as foundry "cd $REPO_DIR && pnpm install --frozen-lockfile"
 quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm build:server"
 quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm --filter gallery build"
+
+if [[ -n "$VAULT_REPO_URL" ]]; then
+  say "the vault repository and its gallery"
+  clone_or_pull foundry "$VAULT_DIR" "$VAULT_REPO_URL"
+  vault_gallery "$REPO_DIR" "$VAULT_DIR"
+fi
 
 say "Chromium for the MCP's screenshots (the server closes it after 5 idle minutes)"
 quiet as foundry "cd $REPO_DIR && pnpm exec playwright install chromium"
@@ -50,6 +58,7 @@ WorkingDirectory=$REPO_DIR
 Environment=PATH=/opt/node/bin:/usr/local/bin:/usr/bin
 Environment=FOUNDRY_HOST=0.0.0.0
 Environment=FOUNDRY_DATA=$DATA_DIR
+Environment=FOUNDRY_VAULT=$VAULT_DIR
 Environment=FOUNDRY_COOKIE_DOMAIN=$DOMAIN
 Environment=FOUNDRY_MACHINE=ec2
 Environment=FOUNDRY_RUN_INSTANCE_ID=$RUN_INSTANCE_ID

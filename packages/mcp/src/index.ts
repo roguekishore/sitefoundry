@@ -1,14 +1,15 @@
 // The foundry as MCP tools, over stdio. Same core as the `foundry` CLI.
 //   claude mcp add foundry -s user -- node D:/PROJECTS/SITEFOUNDRY/packages/mcp/dist/mcp.mjs
 // The foundry server offers the read-only tools over HTTP too, for other machines (http.ts).
-import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { openRegistry } from "@foundry/core";
+import { findVault, openRegistry, registryDirOf } from "@foundry/core";
 import { ROOT, createPreviewer } from "./preview.ts";
 import { registerTools } from "./tools.ts";
 
-const REGISTRY = process.env.FOUNDRY_REGISTRY ?? join(ROOT, "public", "r");
+// this repo's registry, then the vault repo's next to it (FOUNDRY_REGISTRY: a comma-separated list instead)
+const VAULT = findVault(ROOT);
+const REGISTRY = process.env.FOUNDRY_REGISTRY?.split(",") ?? [registryDirOf(ROOT), ...(VAULT ? [registryDirOf(VAULT)] : [])];
 const previews = createPreviewer();
 
 const server = new McpServer({ name: "foundry", version: "1.0.0" });

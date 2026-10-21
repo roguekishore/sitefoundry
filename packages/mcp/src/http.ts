@@ -9,9 +9,9 @@ import { createPreviewer, type PreviewerOptions } from "./preview.ts";
 import { registerTools } from "./tools.ts";
 
 export interface RemoteMcpOptions {
-  /** the built registry folder (public/r) */
-  registryDir: string;
-  /** how screenshots reach the server's own gallery */
+  /** the built registry folders (public/r): the foundry's, and the vault's */
+  registryDir: string | string[];
+  /** how screenshots reach the server's own galleries */
   previews: PreviewerOptions;
 }
 

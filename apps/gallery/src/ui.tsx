@@ -81,7 +81,8 @@ export function Thumb({ thumbKey, prefer = "desktop", aspect = 16 / 10, label }:
 export function Badges({ item, extra = false }: { item: Item; extra?: boolean }) {
   const { meta } = item;
   const where = sourceOf(item) === "foundry" ? (meta.site ? siteLabel(meta.site) : "Foundry") : SOURCE_LABEL[sourceOf(item)] ?? sourceOf(item);
-  const tags = extra ? (meta.tags ?? []).filter((t) => t !== meta.category && t !== meta.site).slice(0, 4) : [];
+  // not the ones the first two badges already say (a vault item's tags start with its library's name)
+  const tags = extra ? (meta.tags ?? []).filter((t) => t !== meta.category && t !== meta.site && t !== meta.source).slice(0, 4) : [];
   return (
     <>
       <span className="badge">{meta.type === "theme" ? "theme" : (meta.category ?? meta.type)}</span>
