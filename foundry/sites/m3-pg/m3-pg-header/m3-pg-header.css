@@ -1,0 +1,42 @@
+/* Over the first 120px of page scroll the full wordmark fades out, the short mark fades in,
+   and the desktop bar gives up its extra top padding (96px -> 80px). Without scroll-driven
+   animations (or with reduced motion) the wordmark simply stays. */
+.m3-pg-header-mark {
+  opacity: 0;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .m3-pg-header-full,
+    .m3-pg-header-mark,
+    .m3-pg-header-bar {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 120px;
+    }
+    .m3-pg-header-full {
+      animation-name: m3-pg-header-out;
+    }
+    .m3-pg-header-mark {
+      animation-name: m3-pg-header-in;
+    }
+    .m3-pg-header-bar {
+      animation-name: m3-pg-header-settle;
+    }
+  }
+}
+
+@keyframes m3-pg-header-out {
+  0%, 40% { opacity: 1; }
+  70%, 100% { opacity: 0; visibility: hidden; }
+}
+
+@keyframes m3-pg-header-in {
+  0%, 40% { opacity: 0; }
+  70%, 100% { opacity: 1; }
+}
+
+@keyframes m3-pg-header-settle {
+  to { padding-top: 0; }
+}
