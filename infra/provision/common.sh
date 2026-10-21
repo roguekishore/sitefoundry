@@ -7,7 +7,7 @@ REPO_URL=git@github.com:roguekishore/sitefoundry.git
 # The vault repo (mirrored libraries; served at /vault/). Empty = not on GitHub yet: every vault
 # step is skipped. "github-vault" is an ssh host name for its own deploy key (GitHub accepts a
 # deploy key on one repo only), set up by vault_key.
-VAULT_REPO_URL=
+VAULT_REPO_URL=git@github-vault:roguekishore/sitefoundry-vault.git
 NODE_VERSION=24.21.0          # the laptop's
 PNPM_VERSION=12.14.0          # the laptop's
 REGION=ap-south-1
