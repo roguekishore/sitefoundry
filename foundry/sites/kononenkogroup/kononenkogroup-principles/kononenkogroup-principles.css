@@ -1,0 +1,135 @@
+/* A pinned star: the section is two windows tall and its stage sticks for the length of one.
+   Eight hairline rays with numbered tips turn half a turn with the scroll (the numbers stay
+   upright), the first heading slides up out of its masks while the second rises in, and a
+   dark copy of the stage fades over the light one, so the page turns black on the way into
+   the dark sections that follow. */
+
+@property --kononenkogroup-principles-turn {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.kononenkogroup-principles {
+  view-timeline-name: --kononenkogroup-principles;
+  --kononenkogroup-principles-r: min(42.5svh, 44vw);
+}
+
+.kononenkogroup-principles-star {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--kononenkogroup-principles-turn));
+}
+
+.kononenkogroup-principles-ray {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--kononenkogroup-principles-angle));
+}
+
+.kononenkogroup-principles-line {
+  position: absolute;
+  left: -0.5px;
+  width: 1px;
+  bottom: calc(var(--kononenkogroup-principles-r) * 0.3);
+  height: calc(var(--kononenkogroup-principles-r) * 0.64);
+  background: linear-gradient(to top, transparent, color-mix(in oklab, var(--foreground) 30%, transparent));
+}
+
+.kononenkogroup-principles-label {
+  position: absolute;
+  left: 0;
+  top: calc(var(--kononenkogroup-principles-r) * -1);
+  transform: translate(-50%, -50%)
+    rotate(calc(-1 * (var(--kononenkogroup-principles-angle) + var(--kononenkogroup-principles-turn))));
+}
+
+.kononenkogroup-principles-mask {
+  display: block;
+  overflow: clip;
+  padding-block: 0.12em 0.2em;
+  margin-block: -0.12em -0.2em;
+}
+
+.kononenkogroup-principles-word {
+  display: block;
+}
+
+/* the dark copy only exists where it can be animated */
+.kononenkogroup-principles-night {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .kononenkogroup-principles-stage {
+      animation: kononenkogroup-principles-spin linear both;
+      animation-timeline: --kononenkogroup-principles;
+      animation-range: cover 0% cover 100%;
+    }
+
+    /* the two headings share one place; without animation they simply stack */
+    .kononenkogroup-principles-second {
+      position: absolute;
+      inset: 0;
+    }
+
+    .kononenkogroup-principles-first .kononenkogroup-principles-word {
+      animation: kononenkogroup-principles-out linear both;
+      animation-timeline: --kononenkogroup-principles;
+      animation-range: contain 12% contain 42%;
+    }
+
+    .kononenkogroup-principles-second .kononenkogroup-principles-word {
+      animation: kononenkogroup-principles-in cubic-bezier(0.17, 0.84, 0.44, 1) both;
+      animation-timeline: --kononenkogroup-principles;
+      animation-range: contain 48% contain 78%;
+    }
+
+    .kononenkogroup-principles-night {
+      display: block;
+      animation: kononenkogroup-principles-dusk linear both;
+      animation-timeline: --kononenkogroup-principles;
+      animation-range: contain 18% contain 40%;
+    }
+  }
+}
+
+@keyframes kononenkogroup-principles-spin {
+  from {
+    --kononenkogroup-principles-turn: 0deg;
+  }
+  to {
+    --kononenkogroup-principles-turn: -180deg;
+  }
+}
+
+@keyframes kononenkogroup-principles-out {
+  from {
+    transform: none;
+  }
+  to {
+    transform: translateY(calc(-100% - 0.5em));
+  }
+}
+
+@keyframes kononenkogroup-principles-in {
+  from {
+    transform: translateY(calc(100% + 0.5em));
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes kononenkogroup-principles-dusk {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

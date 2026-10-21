@@ -1,0 +1,62 @@
+/* An oval ring of client circles around the heading. Every circle's place on the ring is an
+   angle; its position comes from cos/sin of that angle, and so do its size and strength: near
+   the bottom of the oval a circle is full size and bright, near the top it shrinks to 0.7 and
+   fades to a tenth, as if the ring were tilted towards you. As the section crosses the window
+   the ring fades in and turns into place. */
+
+@property --kononenkogroup-clients-turn {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.kononenkogroup-clients {
+  view-timeline-name: --kononenkogroup-clients;
+}
+
+/* only on wide screens, and only where CSS trigonometry exists */
+.kononenkogroup-clients-ring {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  @supports (translate: calc(cos(0deg) * 1px) 0) {
+    .kononenkogroup-clients-ring {
+      display: block;
+    }
+  }
+}
+
+.kononenkogroup-clients-mark {
+  --kononenkogroup-clients-a: calc(var(--kononenkogroup-clients-turn) + var(--kononenkogroup-clients-at));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8.75vw;
+  aspect-ratio: 1;
+  margin: -4.375vw 0 0 -4.375vw;
+  translate: calc(cos(var(--kononenkogroup-clients-a)) * 35vw) calc(sin(var(--kononenkogroup-clients-a)) * 26.7vw);
+  scale: calc(0.85 + 0.15 * sin(var(--kononenkogroup-clients-a)));
+  opacity: calc(0.55 + 0.45 * sin(var(--kononenkogroup-clients-a)));
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .kononenkogroup-clients-ring {
+      animation: kononenkogroup-clients-arrive linear both;
+      animation-timeline: --kononenkogroup-clients;
+      animation-range: cover 0% cover 75%;
+    }
+  }
+}
+
+@keyframes kononenkogroup-clients-arrive {
+  from {
+    --kononenkogroup-clients-turn: 40deg;
+    opacity: 0;
+  }
+  to {
+    --kononenkogroup-clients-turn: 0deg;
+    opacity: 1;
+  }
+}
