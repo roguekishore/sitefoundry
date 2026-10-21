@@ -1,0 +1,75 @@
+/* The section is the scroll timeline. On phones (one window tall) the words fly apart while
+   the hero scrolls away; on desktop, with `data-pinned`, the section is three windows tall,
+   the stage is sticky, and they fly apart while it stays pinned. The media sinks at half
+   speed as the section leaves, so the next section slides over it. */
+.rioproperty-hero {
+  view-timeline: --rioproperty-hero block;
+}
+
+.rioproperty-hero-curtain {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rioproperty-hero-fly,
+    .rioproperty-hero-scrim {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --rioproperty-hero;
+      animation-range: exit 35% exit 72%;
+    }
+    .rioproperty-hero-fly {
+      animation-name: rioproperty-hero-fly;
+    }
+    .rioproperty-hero-scrim {
+      animation-name: rioproperty-hero-clear;
+    }
+    .rioproperty-hero-media {
+      animation: rioproperty-hero-sink linear both;
+      animation-timeline: --rioproperty-hero;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .rioproperty-hero[data-pinned] .rioproperty-hero-fly,
+    .rioproperty-hero[data-pinned] .rioproperty-hero-scrim {
+      animation-range: contain 18% exit 60%;
+    }
+  }
+}
+
+/* The load-in: a violet curtain lifts off the first screen. */
+@media (prefers-reduced-motion: no-preference) {
+  .rioproperty-hero-curtain {
+    display: block;
+    animation: rioproperty-hero-lift 0.9s cubic-bezier(0.625, 0.05, 0, 1) 0.2s both;
+  }
+}
+
+@keyframes rioproperty-hero-fly {
+  to {
+    translate: calc(var(--rioproperty-hero-drift, 0) * 1vw) 0;
+  }
+}
+
+@keyframes rioproperty-hero-clear {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rioproperty-hero-sink {
+  to {
+    translate: 0 50svh;
+  }
+}
+
+@keyframes rioproperty-hero-lift {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 0 -100%;
+  }
+}
