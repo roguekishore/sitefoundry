@@ -1,0 +1,42 @@
+/* The project column moves with the page's scroll while the section passes: on phones the
+   track slides left until its last card is in view; at desktop the list slides up through a
+   window 900px tall. The section names the view timeline. Without view timelines (or with
+   reduced motion) phones get a sideways-scrolling row and desktop the full list. */
+.structureengineering-work {
+  view-timeline: --structureengineering-work block;
+}
+.structureengineering-work-window {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+@media (min-width: 64rem) {
+  .structureengineering-work-window { overflow: visible; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .structureengineering-work-window { overflow: clip; }
+    .structureengineering-work-track {
+      animation: structureengineering-work-across linear both;
+      animation-timeline: --structureengineering-work;
+      animation-range: entry 100% exit 100%;
+    }
+    @media (min-width: 64rem) {
+      .structureengineering-work-window { height: 56.25rem; }
+      .structureengineering-work-track {
+        animation-name: structureengineering-work-up;
+        animation-range: cover 0% cover 100%;
+      }
+    }
+  }
+}
+
+@keyframes structureengineering-work-across {
+  from { transform: none; }
+  to { transform: translateX(calc(-100% + 100vw - 2 * var(--page-gutter))); }
+}
+
+@keyframes structureengineering-work-up {
+  from { transform: none; }
+  to { transform: translateY(calc(-100% + 56.25rem)); }
+}
