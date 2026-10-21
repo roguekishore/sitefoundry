@@ -1,0 +1,57 @@
+/* The section is a named view timeline. Its "contain" range is the pinned stretch (the
+   sticky panel holds still from contain 0% to 100%). Each key word and tag reads its own
+   slice of that range from inline variables: hollow outline → solid, tag 25% → full.
+   Then, as the section leaves (exit 0–50%), the whole block dims to 15% and lifts 40px. */
+.daq-manifesto {
+  view-timeline: --daq-manifesto block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .daq-manifesto-key,
+    .daq-manifesto-tag {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --daq-manifesto;
+      animation-range: contain var(--daq-manifesto-from) contain var(--daq-manifesto-to);
+    }
+    .daq-manifesto-key {
+      animation-name: daq-manifesto-fill;
+    }
+    .daq-manifesto-tag {
+      animation-name: daq-manifesto-light;
+    }
+    .daq-manifesto-body {
+      animation: daq-manifesto-leave linear both;
+      animation-timeline: --daq-manifesto;
+      animation-range: exit 0% exit 50%;
+    }
+  }
+}
+
+@keyframes daq-manifesto-fill {
+  from {
+    color: transparent;
+    -webkit-text-stroke: 1px color-mix(in oklab, var(--foreground) 45%, transparent);
+  }
+  to {
+    color: var(--foreground);
+    -webkit-text-stroke: 1px transparent;
+  }
+}
+
+@keyframes daq-manifesto-light {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes daq-manifesto-leave {
+  to {
+    opacity: 0.15;
+    transform: translateY(-40px);
+  }
+}
