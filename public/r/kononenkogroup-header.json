@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup header",
+  "description": "A fixed, transparent header: a three-line wordmark top left whose last line is serif, and a comma-separated row of small links top right with an underline that draws in on hover. It inverts what is under it (blend: difference), so it is white on photos and black sections and black on paper. At the end of the page its lines rise out of their masks.",
+  "category": "header",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "transparent",
+    "blend",
+    "difference",
+    "minimal",
+    "underline",
+    "hover",
+    "monochrome"
+  ],
+  "notes": [
+    "the difference blend is exact on a white background theme; on tinted backgrounds the inverted colours tint too",
+    "in dark mode it uses plain foreground text instead of the blend",
+    "the rise-out at the page end is CSS scroll-driven (scroll(root)) and simply doesn't happen without support"
+  ],
+  "entry": "kononenkogroup-header.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-header",
+  "files": [
+    {
+      "path": "kononenkogroup-header.css",
+      "content": "/* As the page reaches its end (the footer's screen), the wordmark and the links rise out of\n   their masks, so the footer's own wordmark takes over. Scrubbed on the page's scroll. */\n.kononenkogroup-header-mask {\n  display: block;\n  overflow: clip;\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-header-line {\n      animation: kononenkogroup-header-leave linear both;\n      animation-timeline: scroll(root);\n      animation-range: calc(100% - 60svh) calc(100% - 20svh);\n    }\n  }\n}\n\n@keyframes kononenkogroup-header-leave {\n  from {\n    transform: none;\n  }\n  to {\n    transform: translateY(calc(-100% - 0.3em));\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-header.tsx",
+      "content": "import { KononenkogroupLink } from \"@foundry/kononenkogroup-link\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-header.css\";\n\nexport interface KononenkogroupHeaderLink {\n  label: string;\n  href: string;\n  /** the current page: underlined */\n  active?: boolean;\n  /** shown from 1024px only (the original drops \"Index\" on phones) */\n  desktopOnly?: boolean;\n}\n\nexport interface KononenkogroupHeaderProps {\n  /** the wordmark, one line each; the last line is set in the serif */\n  wordmark: string[];\n  homeHref?: string;\n  /** the links, written as one comma-separated line */\n  links: KononenkogroupHeaderLink[];\n  /** what follows every link but the last */\n  separator?: string;\n  className?: string;\n}\n\n/**\n * A fixed, transparent header: a three-line wordmark top left (the last line in serif) and a\n * comma-separated row of links top right. It inverts whatever is under it (blend: difference),\n * so it reads white on photos and black sections and black on white paper.\n */\nexport function KononenkogroupHeader({ wordmark, homeHref = \"/\", links, separator = \",\", className }: KononenkogroupHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between px-gutter pt-4 lg:pt-[1.2vw]\",\n        \"text-background mix-blend-difference dark:text-foreground dark:mix-blend-normal\",\n        \"font-sans text-[3.733vw] leading-none tracking-[-0.02em] lg:text-[max(10px,0.99vw)]\",\n        className,\n      )}\n    >\n      <a href={homeHref} className=\"pointer-events-auto block\">\n        {wordmark.map((line, i) => (\n          <span key={i} className=\"kononenkogroup-header-mask\">\n            <span className={cn(\"kononenkogroup-header-line block\", i === wordmark.length - 1 && \"font-display tracking-[-0.03em]\")}>\n              {line}\n            </span>\n          </span>\n        ))}\n      </a>\n      <nav className=\"kononenkogroup-header-mask pointer-events-auto\">\n        <ul className=\"kononenkogroup-header-line flex gap-[0.4em]\">\n          {links.map((link, i) => (\n            <li key={link.href} className={cn(link.desktopOnly && \"hidden lg:block\")}>\n              <KononenkogroupLink href={link.href} active={link.active}>\n                {link.label}\n              </KononenkogroupLink>\n              {i < links.length - 1 && separator}\n            </li>\n          ))}\n        </ul>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-link"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string[]",
+      "required": true,
+      "description": "the wordmark, one line each; the last line is set in the serif"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "KononenkogroupHeaderLink[]",
+      "required": true,
+      "description": "the links, written as one comma-separated line"
+    },
+    {
+      "name": "separator",
+      "type": "string",
+      "required": false,
+      "default": ",",
+      "description": "what follows every link but the last"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d03983eec9b8592e8b0d656bc27c20b7c2a5f1de78abf162ab53d0a56e7277b5"
+}

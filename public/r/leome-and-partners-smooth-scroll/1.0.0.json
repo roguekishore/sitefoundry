@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Leome and Partners smooth scroll",
+  "description": "Invisible helper that makes wheel scrolling glide with an exponential ease-out (Lenis), as the original does. Put it once on a page.",
+  "category": "background",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "smooth-scroll",
+    "lenis",
+    "motion",
+    "scroll"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: load)",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-smooth-scroll.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "leome-and-partners-smooth-scroll",
+  "files": [
+    {
+      "path": "leome-and-partners-smooth-scroll.tsx",
+      "content": "import { useEffect } from \"react\";\nimport Lenis from \"lenis\";\n\nexport interface LeomeAndPartnersSmoothScrollProps {\n  /** how long one wheel step glides, in seconds */\n  duration?: number;\n}\n\n/**\n * Turns on eased, gliding wheel scrolling for the whole page (Lenis), as the original does.\n * Renders nothing; place it once on a page. Off when the visitor prefers reduced motion.\n */\nexport function LeomeAndPartnersSmoothScroll({ duration = 1.1 }: LeomeAndPartnersSmoothScrollProps) {\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const lenis = new Lenis({ duration, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });\n    let frame = requestAnimationFrame(function raf(time) {\n      lenis.raf(time);\n      frame = requestAnimationFrame(raf);\n    });\n    return () => {\n      cancelAnimationFrame(frame);\n      lenis.destroy();\n    };\n  }, [duration]);\n  return null;\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lenis": "^1.3.27",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [],
+  "props": [
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "1.1",
+      "description": "how long one wheel step glides, in seconds"
+    }
+  ],
+  "hash": "e97a8fa06f11f99e642c2b9361a06b7f456c9020dc6dd5cb7ee1faad613b2f79"
+}

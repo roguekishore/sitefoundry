@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wild AG card slider",
+  "description": "On phones a swipeable row of cards, one 86%-wide card at a time with the next one peeking in, and two round paper arrow buttons (espresso on hover; the unused one faded) above it at the right. From 1024px the same cards stand in a plain grid and the arrows go away.",
+  "category": "gallery",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "slider",
+    "carousel",
+    "scroll-snap",
+    "arrows",
+    "grid",
+    "responsive",
+    "hover"
+  ],
+  "notes": [
+    "native scroll-snap: it swipes without JavaScript; the arrows need it",
+    "title sits at the left of the arrow row on phones and above the grid from 1024px",
+    "columns sets the desktop grid (2, 3 or 4)"
+  ],
+  "entry": "wild-ag-carousel.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "wild-ag-carousel",
+  "files": [
+    {
+      "path": "wild-ag-carousel.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WildAgCarouselProps {\n  /** the cards, in order */\n  items: ReactNode[];\n  /** a title, shown left of the arrows on phones and above the grid on desktop */\n  title?: ReactNode;\n  /** screen-reader labels of the arrow buttons */\n  prevLabel: string;\n  nextLabel: string;\n  /** columns of the desktop grid */\n  columns?: 2 | 3 | 4;\n  className?: string;\n}\n\nconst cols = { 2: \"lg:grid-cols-2\", 3: \"lg:grid-cols-3\", 4: \"lg:grid-cols-4\" };\n\nconst arrow =\n  \"flex size-[3.4rem] items-center justify-center rounded-full bg-background text-primary transition-colors duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] enabled:hover:bg-foreground enabled:hover:text-background disabled:opacity-50 motion-reduce:transition-none\";\n\nexport function WildAgCarousel({ items, title, prevLabel, nextLabel, columns = 4, className }: WildAgCarouselProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [edge, setEdge] = useState({ start: true, end: false });\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    const check = () => setEdge({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth > el.scrollWidth - 8 });\n    check();\n    el.addEventListener(\"scroll\", check, { passive: true });\n    window.addEventListener(\"resize\", check);\n    return () => {\n      el.removeEventListener(\"scroll\", check);\n      window.removeEventListener(\"resize\", check);\n    };\n  }, []);\n\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.firstElementChild as HTMLElement | null;\n    if (!el || !card) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.offsetWidth + 16), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <div className={className}>\n      <div className=\"mb-7 flex items-end justify-between gap-4 lg:mb-9\">\n        <div>{title}</div>\n        <div className=\"flex shrink-0 gap-3 lg:hidden\">\n          <button type=\"button\" aria-label={prevLabel} disabled={edge.start} onClick={() => step(-1)} className={arrow}>\n            <ArrowLeft className=\"size-5\" strokeWidth={1.5} aria-hidden />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} disabled={edge.end} onClick={() => step(1)} className={arrow}>\n            <ArrowRight className=\"size-5\" strokeWidth={1.5} aria-hidden />\n          </button>\n        </div>\n      </div>\n      <ul\n        ref={track}\n        className={cn(\n          \"-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-4 overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden\",\n          \"lg:mx-0 lg:grid lg:overflow-visible lg:px-0\",\n          cols[columns],\n        )}\n      >\n        {items.map((item, i) => (\n          <li key={i} className=\"w-[86%] shrink-0 snap-start sm:w-[45%] lg:w-auto\">\n            {item}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a title, shown left of the arrows on phones and above the grid on desktop"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "columns",
+      "type": "enum",
+      "required": false,
+      "default": "4",
+      "description": "columns of the desktop grid"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e0b2b15cc9d97952d50db052ffe19829eeafe7702e0468f7b833166903275d7d"
+}

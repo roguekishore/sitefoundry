@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG header",
+  "description": "A bare header over full-bleed footage: a thin, widely tracked paper wordmark at the left and a two-bar burger at the right (its lower bar halves on hover). Past the first screen a compact pair drops in at the top right: a gradient 'Contact' pill and a round paper burger disc. The burger opens a full-window paper menu of large uppercase links that turn to the brand gradient on hover.",
+  "category": "header",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "overlay",
+    "burger",
+    "fullscreen-menu",
+    "sticky",
+    "gradient",
+    "minimal"
+  ],
+  "notes": [
+    "it overlays the top of the page (absolute) with paper-coloured marks: the first section should be dark footage or a gradient band",
+    "the compact pair appears after the page scrolls past `threshold` (a fraction of the window height)",
+    "desktop layout inferred: on the original the intro curtain hid the header in every desktop frame"
+  ],
+  "entry": "wild-ag-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "wild-ag-header",
+  "files": [
+    {
+      "path": "wild-ag-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgButton } from \"@foundry/wild-ag-button\";\nimport { WildAgWordmark } from \"@foundry/wild-ag-wordmark\";\n\nexport interface WildAgHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface WildAgHeaderProps {\n  /** the brand name, set as a thin wordmark */\n  brand: string;\n  homeHref?: string;\n  /** screen-reader labels of the burger and the menu's close button */\n  menuLabel: string;\n  closeLabel: string;\n  /** the menu's links */\n  links: WildAgHeaderLink[];\n  /** the pill in the compact bar and at the foot of the menu */\n  contact: WildAgHeaderLink;\n  /** how far the page scrolls, as a fraction of the window height, before the compact bar drops in */\n  threshold?: number;\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] motion-reduce:transition-none\";\n\n/** Two bars; on hover the lower one shrinks to half, from the right. */\nfunction Burger({ tone }: { tone: \"light\" | \"ink\" }) {\n  const bar = cn(\"block h-[2px] rounded-full\", tone === \"light\" ? \"bg-primary-foreground\" : \"bg-primary\");\n  return (\n    <span aria-hidden className=\"flex w-10 flex-col items-end gap-2\">\n      <span className={cn(bar, \"w-full\")} />\n      <span className={cn(bar, \"w-full transition-[width] group-hover/burger:w-1/2\", ease)} />\n    </span>\n  );\n}\n\nexport function WildAgHeader({\n  brand,\n  homeHref = \"/\",\n  menuLabel,\n  closeLabel,\n  links,\n  contact,\n  threshold = 0.9,\n  className,\n}: WildAgHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [past, setPast] = useState(false);\n\n  useEffect(() => {\n    const check = () => setPast(window.scrollY > window.innerHeight * threshold);\n    check();\n    window.addEventListener(\"scroll\", check, { passive: true });\n    window.addEventListener(\"resize\", check);\n    return () => {\n      window.removeEventListener(\"scroll\", check);\n      window.removeEventListener(\"resize\", check);\n    };\n  }, [threshold]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={cn(\"relative z-40\", className)}>\n      {/* the bare row over the footage */}\n      <div className=\"absolute inset-x-0 top-0 px-gutter\">\n        <div className=\"mx-auto flex max-w-page items-center justify-between pt-[1.4rem] lg:pt-10\">\n          <a href={homeHref} className=\"text-[1.5rem] lg:text-[1.75rem]\">\n            <WildAgWordmark text={brand} tone=\"light\" />\n          </a>\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen(true)}\n            className=\"group/burger -m-2 p-2\"\n          >\n            <Burger tone=\"light\" />\n          </button>\n        </div>\n      </div>\n\n      {/* the compact pair that drops in after the first screen */}\n      <div\n        className={cn(\n          \"fixed top-4 right-[max(var(--page-gutter),calc((100vw_-_var(--page-width))/2))] flex items-center gap-3 transition-[translate,opacity] lg:top-6\",\n          ease,\n          past && !open ? \"translate-y-0 opacity-100\" : \"pointer-events-none -translate-y-[150%] opacity-0\",\n        )}\n      >\n        <WildAgButton href={contact.href} variant=\"gradient\" size=\"sm\" className=\"hidden sm:inline-flex\">\n          {contact.label}\n        </WildAgButton>\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen(true)}\n          className={cn(\n            \"group/burger flex size-[3.4rem] items-center justify-center rounded-full bg-background shadow-[0_6px_30px_color-mix(in_oklab,var(--foreground)_8%,transparent)]\",\n          )}\n        >\n          <span className=\"scale-[0.65]\">\n            <Burger tone=\"ink\" />\n          </span>\n        </button>\n      </div>\n\n      {/* the full-window menu */}\n      {open && (\n        <div className=\"fixed inset-0 z-50 flex flex-col overflow-y-auto bg-background\">\n          <div className=\"mx-auto flex w-full max-w-[calc(var(--page-width)+2*var(--page-gutter))] items-center justify-between px-gutter pt-[1.4rem] lg:pt-10\">\n            <a href={homeHref} className=\"text-[1.5rem] lg:text-[1.75rem]\">\n              <WildAgWordmark text={brand} />\n            </a>\n            <button\n              type=\"button\"\n              aria-label={closeLabel}\n              onClick={() => setOpen(false)}\n              className={cn(\n                \"flex size-[3.4rem] items-center justify-center rounded-full bg-muted text-primary transition-colors hover:bg-accent hover:text-accent-foreground\",\n                ease,\n              )}\n            >\n              <X className=\"size-5\" strokeWidth={1.5} aria-hidden />\n            </button>\n          </div>\n          <nav className=\"mx-auto flex w-full max-w-[calc(var(--page-width)+2*var(--page-gutter))] flex-1 flex-col justify-center gap-10 px-gutter py-12\">\n            <ul className=\"grid gap-1 lg:gap-2\">\n              {links.map((link) => (\n                <li key={link.href}>\n                  <a\n                    href={link.href}\n                    onClick={() => setOpen(false)}\n                    className=\"group/link relative inline-block font-sans text-[2.25rem] leading-[1.15] font-medium tracking-[-0.01em] text-foreground uppercase lg:text-[3.5rem]\"\n                  >\n                    {link.label}\n                    {/* the same word in the brand gradient fades in on top */}\n                    <span\n                      aria-hidden\n                      className={cn(\n                        \"absolute inset-0 bg-linear-15 from-primary to-highlight bg-clip-text text-transparent opacity-0 transition-opacity group-hover/link:opacity-100\",\n                        ease,\n                      )}\n                    >\n                      {link.label}\n                    </span>\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <div>\n              <WildAgButton href={contact.href} variant=\"gradient\">\n                {contact.label}\n              </WildAgButton>\n            </div>\n          </nav>\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-button",
+    "wild-ag-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand name, set as a thin wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the burger and the menu's close button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "links",
+      "type": "WildAgHeaderLink[]",
+      "required": true,
+      "description": "the menu's links"
+    },
+    {
+      "name": "contact",
+      "type": "WildAgHeaderLink",
+      "required": true,
+      "description": "the pill in the compact bar and at the foot of the menu"
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "required": false,
+      "default": "0.9",
+      "description": "how far the page scrolls, as a fraction of the window height, before the compact bar drops in"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8bc0b2bdd9a870a0480758ba1fbcb9ad3e26df1198227c3005b10fd36c98126a"
+}

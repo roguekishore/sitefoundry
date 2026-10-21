@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mr C Residences header",
+  "description": "On phones a fixed 62px brick-red bar with a light wordmark lockup at the left and 'MENU' plus a three-line burger at the right, which slides a full-height red menu of uppercase links in from the right. On desktop it lies over the top of the hero: the lockup top-left and a right-aligned column of ten small SemiBold uppercase links closed by a thin vertical rule, each link drawing an underline in from the left on hover.",
+  "category": "header",
+  "site": "mrcresidencesbocaraton",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "overlay",
+    "vertical-nav",
+    "side-menu",
+    "uppercase",
+    "underline",
+    "hover",
+    "red"
+  ],
+  "notes": [
+    "phones: fixed bar (62px); the first section should leave 62px for it (mrcresidencesbocaraton-hero does)",
+    "desktop: absolute over the first section, white text, so that section should be dark media",
+    "the mark slot takes a small logo; empty, a lucide glass icon stands in"
+  ],
+  "entry": "mrcresidencesbocaraton-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "mrcresidencesbocaraton-header",
+  "files": [
+    {
+      "path": "mrcresidencesbocaraton-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Menu, Wine, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MrcresidencesbocaratonUnderlineLink } from \"@foundry/mrcresidencesbocaraton-underline-link\";\n\nexport interface MrcresidencesbocaratonHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface MrcresidencesbocaratonHeaderProps {\n  /** the big light word of the lockup (the brand) */\n  name: string;\n  /** the word stacked to its right, e.g. \"Residences\" */\n  title: string;\n  /** the tiny line under the title, e.g. the city */\n  place: string;\n  homeHref?: string;\n  /** a small mark in front of the lockup; empty: a thin lucide glass icon */\n  mark?: ReactNode;\n  /** the nav links (a column at the right on desktop; the side menu on phones) */\n  links: MrcresidencesbocaratonHeaderLink[];\n  /** label of the phone menu button */\n  menuLabel: string;\n  /** screen-reader label of the side menu's close button */\n  closeLabel: string;\n  className?: string;\n}\n\nfunction Lockup({ name, title, place, mark }: Pick<MrcresidencesbocaratonHeaderProps, \"name\" | \"title\" | \"place\" | \"mark\">) {\n  return (\n    <span className=\"flex items-center gap-2 lg:gap-3\">\n      <span className=\"flex h-5 w-3 items-center justify-center [&>svg]:size-5 lg:h-8 lg:w-5 lg:[&>svg]:size-8\">\n        {mark ?? <Wine aria-hidden strokeWidth={1.25} />}\n      </span>\n      <span className=\"text-[27px] leading-none font-light tracking-[-0.01em] lg:text-[40px]\">{name}</span>\n      <span className=\"flex flex-col pt-0.5\">\n        <span className=\"text-[17px] leading-[0.95] font-light tracking-[0.01em] uppercase lg:text-[23px]\">{title}</span>\n        <span className=\"text-[7px] leading-[1.2] tracking-[0.08em] uppercase lg:text-[11px]\">{place}</span>\n      </span>\n    </span>\n  );\n}\n\nexport function MrcresidencesbocaratonHeader({\n  name,\n  title,\n  place,\n  homeHref = \"/\",\n  mark,\n  links,\n  menuLabel,\n  closeLabel,\n  className,\n}: MrcresidencesbocaratonHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 text-primary-foreground lg:absolute\", className)}>\n      <div className=\"flex h-[62px] items-center justify-between bg-primary px-[25px] lg:h-auto lg:items-start lg:bg-transparent lg:px-10 lg:pt-10\">\n        <a href={homeHref} aria-label={`${name} ${title}`}>\n          <Lockup name={name} title={title} place={place} mark={mark} />\n        </a>\n\n        {/* phones: MENU + burger */}\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          onClick={() => setOpen(true)}\n          className=\"flex items-center gap-4 text-[12px] font-semibold uppercase lg:hidden\"\n        >\n          {menuLabel}\n          <Menu aria-hidden className=\"size-7\" strokeWidth={1.25} />\n        </button>\n\n        {/* desktop: a right-aligned column closed by a thin rule */}\n        <nav className=\"hidden lg:block\">\n          <ul className=\"flex flex-col items-end gap-2 border-r border-current pt-2 pb-3 pr-[15px]\">\n            {links.map((link) => (\n              <li key={link.href + link.label} className=\"leading-4\">\n                <MrcresidencesbocaratonUnderlineLink\n                  href={link.href}\n                  behaviour=\"grow\"\n                  duration={300}\n                  lineClassName=\"-bottom-0.5\"\n                  className=\"text-[14px] leading-4 font-semibold uppercase\"\n                >\n                  {link.label}\n                </MrcresidencesbocaratonUnderlineLink>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n\n      {/* phones: the side menu */}\n      <div\n        aria-hidden={!open}\n        className={cn(\n          \"fixed inset-0 z-50 flex flex-col bg-primary px-[25px] transition-[translate,visibility] duration-500 ease-in-out motion-reduce:transition-none lg:hidden\",\n          open ? \"visible translate-x-0\" : \"invisible translate-x-full\",\n        )}\n      >\n        <div className=\"flex h-[62px] shrink-0 items-center justify-between\">\n          <Lockup name={name} title={title} place={place} mark={mark} />\n          <button type=\"button\" aria-label={closeLabel} onClick={() => setOpen(false)}>\n            <X aria-hidden className=\"size-7\" strokeWidth={1.25} />\n          </button>\n        </div>\n        <ul className=\"mt-6 flex flex-col\">\n          {links.map((link) => (\n            <li key={link.href + link.label}>\n              <a\n                href={link.href}\n                onClick={() => setOpen(false)}\n                className=\"block text-[16px] leading-[47px] font-semibold uppercase transition-opacity duration-300 hover:opacity-70\"\n              >\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mrcresidencesbocaraton-underline-link"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the big light word of the lockup (the brand)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the word stacked to its right, e.g. \"Residences\""
+    },
+    {
+      "name": "place",
+      "type": "string",
+      "required": true,
+      "description": "the tiny line under the title, e.g. the city"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark in front of the lockup; empty: a thin lucide glass icon"
+    },
+    {
+      "name": "links",
+      "type": "MrcresidencesbocaratonHeaderLink[]",
+      "required": true,
+      "description": "the nav links (a column at the right on desktop; the side menu on phones)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the phone menu button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the side menu's close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "08e87f418490d0741149a2a38ebf41c120a30279c91e60d17959c6ca352bd00d"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty deals",
+  "description": "A big capital heading and a small arrow link over a sideways-scrolling track of tall photo cards at loose, uneven heights, running off the right edge; each card has its type and status in grey capitals under the photo. The track drifts up as you scroll. On hover the photo turns grey under a dark veil, a paper corner tab with an arrow folds in at the top right, and the details rise from below: district and size, the name in big wide capitals, and a violet bar with the type and status in yellow.",
+  "category": "gallery",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "portfolio",
+    "deals",
+    "case-studies",
+    "carousel",
+    "horizontal-scroll",
+    "snap",
+    "photo",
+    "hover",
+    "grayscale",
+    "parallax",
+    "scrubbed",
+    "uppercase",
+    "light"
+  ],
+  "notes": [
+    "each media slot fills its card like object-fit cover; empty, it is a bg-muted placeholder",
+    "the track is a native sideways scroller with snap (swipe, trackpad or shift-wheel)",
+    "the hover bar uses primary with highlight text"
+  ],
+  "entry": "rioproperty-deals.tsx",
+  "source": "foundry",
+  "name": "rioproperty-deals",
+  "files": [
+    {
+      "path": "rioproperty-deals.css",
+      "content": "/* Cards sit at uneven heights, a loose stagger that repeats every four cards. */\n.rioproperty-deals-card {\n  margin-top: 0;\n}\n.rioproperty-deals-card:nth-child(4n + 2) {\n  margin-top: 5rem;\n}\n.rioproperty-deals-card:nth-child(4n + 3) {\n  margin-top: 1rem;\n}\n.rioproperty-deals-card:nth-child(4n + 4) {\n  margin-top: 4rem;\n}\n@media (min-width: 64rem) {\n  .rioproperty-deals-card:nth-child(4n + 1) {\n    margin-top: 4.375rem;\n  }\n  .rioproperty-deals-card:nth-child(4n + 2) {\n    margin-top: 0;\n  }\n  .rioproperty-deals-card:nth-child(4n + 3) {\n    margin-top: 4.25rem;\n  }\n  .rioproperty-deals-card:nth-child(4n + 4) {\n    margin-top: 6.5rem;\n  }\n}\n\n/* No scrollbar under the track: it is dragged or swiped sideways. */\n.rioproperty-deals-track {\n  scrollbar-width: none;\n}\n.rioproperty-deals-track::-webkit-scrollbar {\n  display: none;\n}\n\n/* The track drifts from 80px below its place to 80px above while it crosses the window. The\n   drift sits on the wrapper: the track is a sideways scroller, so a vertical view timeline\n   inside it would follow the track instead of the page. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-deals-drift {\n      animation: rioproperty-deals-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes rioproperty-deals-drift {\n  from {\n    translate: 0 80px;\n  }\n  to {\n    translate: 0 -80px;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-deals.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RiopropertyArrowLink } from \"@foundry/rioproperty-arrow-link\";\nimport { RiopropertyRiseText } from \"@foundry/rioproperty-rise-text\";\nimport \"./rioproperty-deals.css\";\n\nexport interface RiopropertyDeal {\n  /** the street or building, shown big on hover */\n  name: string;\n  /** the district */\n  area: string;\n  /** the size, e.g. \"640 m²\" */\n  size: string;\n  /** what kind of property: under the photo, and in the violet bar on hover */\n  type: string;\n  /** what happened: sold, leased… */\n  status: string;\n  href: string;\n  /** a photo; fills the card like object-fit cover. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface RiopropertyDealsProps {\n  /** the big capital heading */\n  heading: string;\n  /** a small arrow link under the heading */\n  link?: { label: string; href: string };\n  /** the cards of the sideways track */\n  deals: RiopropertyDeal[];\n  className?: string;\n}\n\n// The original's hover timing: 0.75s on a long, snappy ease.\nconst ease = \"duration-[750ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\nexport function RiopropertyDeals({ heading, link, deals, className }: RiopropertyDealsProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background pt-section pb-section text-foreground lg:pb-14\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RiopropertyRiseText\n          text={heading}\n          className=\"max-w-[18rem] font-display text-[clamp(2.19rem,1.8rem+1.61vw,3.25rem)] leading-[0.966] font-semibold uppercase sm:max-w-none lg:max-w-[38rem]\"\n        />\n        {link && (\n          <div className=\"mt-8 hidden lg:block\">\n            <RiopropertyArrowLink href={link.href} reveal>\n              {link.label}\n            </RiopropertyArrowLink>\n          </div>\n        )}\n      </div>\n\n      {/* the whole track drifts up as it crosses the window; the track itself scrolls sideways */}\n      <div className=\"rioproperty-deals-drift mx-auto mt-14 max-w-page lg:mt-12\">\n        <ul className=\"rioproperty-deals-track flex snap-x snap-mandatory scroll-px-gutter gap-4 overflow-x-auto px-gutter pb-4\">\n          {deals.map((deal) => (\n            <li key={deal.name} className=\"rioproperty-deals-card shrink-0 snap-start\">\n              <a href={deal.href} className=\"group/deal block w-[85.6vw] sm:w-[22rem] lg:w-[min(29.5vw,32rem)]\">\n                <div className=\"relative isolate aspect-[425/497] overflow-clip bg-muted\">\n                  <div className={cn(\"absolute inset-0 -z-10 transition-[filter] group-hover/deal:grayscale\", ease)}>{deal.media}</div>\n                  <div aria-hidden className={cn(\"absolute inset-0 -z-10 bg-secondary/55 opacity-0 transition-opacity group-hover/deal:opacity-100\", ease)} />\n\n                  {/* the corner tab with the arrow */}\n                  <span\n                    aria-hidden\n                    className={cn(\n                      \"absolute top-0 right-0 flex size-14 origin-top-right scale-0 items-center justify-center bg-background text-primary transition-[scale] group-hover/deal:scale-100 lg:size-16\",\n                      ease,\n                    )}\n                  >\n                    <ArrowUpRight strokeWidth={1.25} className={cn(\"size-9 transition-[translate] group-hover/deal:translate-x-px group-hover/deal:-translate-y-px\", ease)} />\n                  </span>\n\n                  {/* the details rise in from below on hover */}\n                  <div className={cn(\"absolute inset-x-0 bottom-0 translate-y-full transition-[translate] group-hover/deal:translate-y-0\", ease)}>\n                    <div className=\"px-6 pb-5 text-background dark:text-foreground\">\n                      <p className=\"flex gap-6 text-sm leading-normal uppercase lg:text-base\">\n                        <span className=\"w-1/2\">{deal.area}</span>\n                        <span>{deal.size}</span>\n                      </p>\n                      <p className=\"mt-3 font-display text-[1.6875rem] leading-[1.17] font-semibold uppercase lg:text-[2.25rem]\">{deal.name}</p>\n                    </div>\n                    <p className=\"flex justify-between bg-primary px-2 py-2 text-sm leading-normal font-medium text-highlight uppercase lg:text-base\">\n                      <span>{deal.type}</span>\n                      <span>{deal.status}</span>\n                    </p>\n                  </div>\n                </div>\n                {/* the caption under the photo slides up out of sight on hover */}\n                <div className=\"overflow-clip\">\n                  <p\n                    className={cn(\n                      \"flex justify-between px-2 pt-2 text-sm leading-normal text-muted-foreground uppercase transition-[translate] group-hover/deal:-translate-y-full lg:text-base\",\n                      ease,\n                    )}\n                  >\n                    <span>{deal.type}</span>\n                    <span>{deal.status}</span>\n                  </p>\n                </div>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rioproperty-arrow-link",
+    "rioproperty-rise-text"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big capital heading"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a small arrow link under the heading"
+    },
+    {
+      "name": "deals",
+      "type": "RiopropertyDeal[]",
+      "required": true,
+      "description": "the cards of the sideways track"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c80ee370b1b6c73ac1c684ed7c3d61e7825dee93a60157bf642b03ce108fbeb"
+}

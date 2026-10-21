@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers stats",
+  "description": "A tall ruled band of three columns with very large orange figures (or three words) set as a staircase: top of the first column, middle of the second, near the bottom of the third. Each pins under the header while its column scrolls by; the figures' words rise in and captions fade up. On phones they stack.",
+  "category": "stats",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "big-type",
+    "staircase",
+    "ruled",
+    "hairline",
+    "sticky",
+    "pinned",
+    "orange",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "without captions the items stack tightly on phones, for a three-word section title",
+    "the sticky offset assumes the 64px rollers header",
+    "the figures read the rollers theme's --typeface-grotesk and fall back to the body face"
+  ],
+  "entry": "rollers-stats.tsx",
+  "source": "foundry",
+  "name": "rollers-stats",
+  "files": [
+    {
+      "path": "rollers-stats.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { RollersRise } from \"@foundry/rollers-rise\";\nimport { RollersRule } from \"@foundry/rollers-rule\";\nimport { RollersWords } from \"@foundry/rollers-words\";\n\nexport interface RollersStatsItem {\n  /** the big orange figure or word (\"Since 1987\", \"450+\") */\n  value: string;\n  /** the small line under it; leave all captions out for a three-word title (FROM / THE / YARD) */\n  caption?: string;\n}\n\nexport interface RollersStatsProps {\n  /** three figures (or three words), set down the page as a staircase on wide screens */\n  items: RollersStatsItem[];\n  /** an in-page anchor */\n  id?: string;\n  className?: string;\n}\n\nconst align = [\"md:justify-start\", \"md:justify-center\", \"md:justify-end\"];\n\n/** A tall ruled band of three columns with very large orange figures in a staircase: the first\n    at the top of its column, the second in the middle, the third near the bottom. Each figure\n    pins (sticky) under the header while its column scrolls past. On phones they stack. */\nexport function RollersStats({ items, id, className }: RollersStatsProps) {\n  const titleOnly = items.every((item) => !item.caption);\n  return (\n    <section\n      id={id}\n      className={cn(\n        \"relative flex flex-col bg-background px-gutter pt-8 pb-8 text-foreground md:grid md:min-h-[67.5rem] md:grid-cols-3 md:px-0 md:py-0\",\n        titleOnly ? \"gap-0\" : \"gap-11\",\n        className,\n      )}\n    >\n      <RollersRule className=\"inset-x-0 top-0\" />\n      <RollersRule orientation=\"vertical\" className=\"inset-y-0 left-1/3 hidden md:block\" />\n      <RollersRule orientation=\"vertical\" className=\"inset-y-0 left-2/3 hidden md:block\" />\n\n      {items.map((item, i) => (\n        <div\n          key={item.value}\n          className={cn(\n            \"flex flex-col md:pt-section md:pb-[8.25rem]\",\n            i === 0 ? \"md:pl-gutter\" : \"md:pl-7\",\n            align[i] ?? \"md:justify-start\",\n          )}\n        >\n          <div className=\"md:sticky md:top-[calc(4rem+2.5rem)]\">\n            <RollersWords\n              as=\"p\"\n              segments={[{ text: item.value }]}\n              className=\"font-[family-name:var(--typeface-grotesk,var(--typeface-body))] text-[2.5rem] leading-[1.1] tracking-[-0.01em] text-primary uppercase md:text-[3rem] lg:text-[4.5rem] xl:text-[5.625rem]\"\n            />\n            {item.caption ? (\n              <RollersRise as=\"p\" className=\"mt-1.5 font-display text-[0.875rem] leading-[1.5] md:mt-2 lg:text-[1.125rem]\">\n                {item.caption}\n              </RollersRise>\n            ) : null}\n          </div>\n        </div>\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-rise",
+    "rollers-rule",
+    "rollers-words"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "RollersStatsItem[]",
+      "required": true,
+      "description": "three figures (or three words), set down the page as a staircase on wide screens"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an in-page anchor"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "54141b8ad473ad37d727d3368da645ce06f2dc6c2f13bbcba08f754abbd40757"
+}

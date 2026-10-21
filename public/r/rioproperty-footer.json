@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty footer",
+  "description": "A deep indigo footer band: a big yellow capital e-mail address with an arrow across the right two thirds, under it lavender capital columns (phone and address, page links, a social link with a square badge), and at the bottom left a very wide-tracked white wordmark with a capital tagline. It is revealed from under the page: the content settles down 158px and brightens as the footer scrolls in. On hover the e-mail rolls up to an identical copy and the arrow flies out up-right as a twin comes in.",
+  "category": "footer",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "indigo",
+    "yellow",
+    "contact",
+    "links",
+    "wordmark",
+    "reveal",
+    "scrubbed",
+    "text-roll",
+    "hover",
+    "uppercase"
+  ],
+  "notes": [
+    "uses secondary as the band, accent for the links and highlight for the e-mail: best where secondary is dark",
+    "the wordmark is plain text in the display face, letter-spaced 0.35em"
+  ],
+  "entry": "rioproperty-footer.tsx",
+  "source": "foundry",
+  "name": "rioproperty-footer",
+  "files": [
+    {
+      "path": "rioproperty-footer.css",
+      "content": "/* The footer is revealed from under the page: its content starts 158px higher and faint, and\n   settles into place as the footer comes into view (entry range: reachable as the last block). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-footer-inner {\n      animation: rioproperty-footer-settle linear both;\n      animation-timeline: --rioproperty-footer;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n.rioproperty-footer {\n  view-timeline: --rioproperty-footer block;\n}\n\n@keyframes rioproperty-footer-settle {\n  from {\n    opacity: 0.25;\n    translate: 0 -158px;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-footer.tsx",
+      "content": "import { ArrowUpRight, SquareArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rioproperty-footer.css\";\n\nexport interface RiopropertyFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface RiopropertyFooterProps {\n  /** the big yellow address at the top, e.g. a mailto link */\n  email: RiopropertyFooterLink;\n  /** the phone number line */\n  phone: RiopropertyFooterLink;\n  /** the street address, one entry per line */\n  address: string[];\n  /** the page links in the middle column */\n  links: RiopropertyFooterLink[];\n  /** social links at the right, each with a small square arrow badge */\n  socials: RiopropertyFooterLink[];\n  /** the wordmark at the bottom, in very wide-tracked capitals */\n  brand: string;\n  /** the capital line under the wordmark */\n  tagline: string;\n  className?: string;\n}\n\n// The original's hover timing: 0.75s on a long, snappy ease.\nconst ease = \"duration-[750ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\nconst linkHover = \"transition-colors duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] hover:text-secondary-foreground\";\n\nexport function RiopropertyFooter({ email, phone, address, links, socials, brand, tagline, className }: RiopropertyFooterProps) {\n  return (\n    <footer className={cn(\"rioproperty-footer overflow-clip bg-secondary text-accent\", className)}>\n      <div className=\"rioproperty-footer-inner mx-auto flex max-w-page flex-col px-gutter pt-24 pb-10 lg:pt-36 lg:pb-9\">\n        <div className=\"lg:pl-[37%]\">\n          {/* the address rolls up to an identical copy on hover, and the arrow is swapped */}\n          <a\n            href={email.href}\n            className=\"group/mail flex items-center justify-between gap-3 font-display text-[clamp(1.4rem,0.6rem+3.3vw,3.25rem)] leading-none font-semibold text-highlight uppercase\"\n          >\n            <span className=\"relative block overflow-clip py-[0.08em]\">\n              <span className={cn(\"block transition-[translate] group-hover/mail:-translate-y-[120%]\", ease)}>{email.label}</span>\n              <span aria-hidden className={cn(\"absolute inset-x-0 top-full block py-[0.08em] transition-[translate] group-hover/mail:-translate-y-full\", ease)}>\n                {email.label}\n              </span>\n            </span>\n            <span aria-hidden className=\"relative size-[0.8em] shrink-0 overflow-clip\">\n              <ArrowUpRight\n                strokeWidth={1.25}\n                className={cn(\"absolute inset-0 size-full transition-[translate] group-hover/mail:translate-x-full group-hover/mail:-translate-y-full\", ease)}\n              />\n              <ArrowUpRight\n                strokeWidth={1.25}\n                className={cn(\"absolute inset-0 size-full -translate-x-full translate-y-full transition-[translate] group-hover/mail:translate-0\", ease)}\n              />\n            </span>\n          </a>\n\n          <div className=\"mt-14 grid grid-cols-[1fr_auto] gap-x-6 gap-y-16 uppercase lg:mt-12 lg:grid-cols-[51.5%_1fr_auto]\">\n            <div>\n              <a href={phone.href} className={cn(\"block\", linkHover)}>\n                {phone.label}\n              </a>\n              <address className=\"mt-2 not-italic\">\n                {address.map((line) => (\n                  <span key={line} className=\"block\">\n                    {line}\n                  </span>\n                ))}\n              </address>\n            </div>\n            <ul className=\"flex flex-col gap-1.5\">\n              {links.map((link) => (\n                <li key={link.href}>\n                  <a href={link.href} className={linkHover}>\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <ul className=\"col-span-2 flex flex-col items-end gap-2 lg:col-span-1\">\n              {socials.map((social) => (\n                <li key={social.href}>\n                  <a href={social.href} className={cn(\"group/social flex items-center gap-3\", linkHover)}>\n                    {social.label}\n                    <SquareArrowUpRight aria-hidden strokeWidth={1.5} className=\"size-5\" />\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n\n        <div className=\"mt-16 lg:mt-32\">\n          <p aria-label={brand} className=\"font-display text-[1.75rem] leading-none font-semibold tracking-[0.35em] whitespace-nowrap text-secondary-foreground uppercase lg:text-[1.875rem]\">\n            {brand}\n          </p>\n          <p className=\"mt-5 max-w-[18rem] text-[1.0625rem] leading-normal text-secondary-foreground uppercase lg:mt-6 lg:max-w-[22rem] lg:text-base\">{tagline}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "email",
+      "type": "RiopropertyFooterLink",
+      "required": true,
+      "description": "the big yellow address at the top, e.g. a mailto link"
+    },
+    {
+      "name": "phone",
+      "type": "RiopropertyFooterLink",
+      "required": true,
+      "description": "the phone number line"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "the street address, one entry per line"
+    },
+    {
+      "name": "links",
+      "type": "RiopropertyFooterLink[]",
+      "required": true,
+      "description": "the page links in the middle column"
+    },
+    {
+      "name": "socials",
+      "type": "RiopropertyFooterLink[]",
+      "required": true,
+      "description": "social links at the right, each with a small square arrow badge"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark at the bottom, in very wide-tracked capitals"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "the capital line under the wordmark"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d465a144d6a873ab6c9b1896df372af9f5cd3fa2183ae5a17e8cf21f215566c5"
+}

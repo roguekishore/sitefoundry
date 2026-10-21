@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke header",
+  "description": "A transparent bar over the top of the page on the 12-column grid: the company name, a tagline at column 4, a stacked list of tiny capital links at column 9 (the current page marked by a small square that also scales in on hover) and a two-line menu icon. Two small dark chips (CONTACT and the menu) stay fixed at the top right: on phones always, on desktop they fade in after the first half screen; they lift away when the footer arrives. The menu opens a black full-screen list of the same links.",
+  "category": "header",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "transparent",
+    "minimal",
+    "uppercase",
+    "fixed",
+    "chips",
+    "menu",
+    "overlay",
+    "monochrome",
+    "scroll-driven"
+  ],
+  "notes": [
+    "it scrolls away with the page (absolute); place it first, above a hero",
+    "tone=\"dark\" for a dark hero (white text), tone=\"light\" on paper",
+    "the chip fade-in and lift-away are CSS scroll-driven (scroll(root)); without support the chips are simply shown",
+    "needs JavaScript for the menu (hydrate: load)"
+  ],
+  "entry": "esrbespoke-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "esrbespoke-header",
+  "files": [
+    {
+      "path": "esrbespoke-header.css",
+      "content": "/* The fixed chips: on desktop they fade in over the first half screen of scrolling; everywhere\n   they lift 120px out of the way over the last quarter screen, when the footer arrives. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .esrbespoke-header-chips {\n      animation: esrbespoke-header-chips-away linear both;\n      animation-timeline: scroll(root);\n      animation-range: calc(100% - 25svh) 100%;\n    }\n    @media (min-width: 64rem) {\n      .esrbespoke-header-chips {\n        animation: esrbespoke-header-chips-in linear both, esrbespoke-header-chips-away linear both;\n        animation-timeline: scroll(root), scroll(root);\n        animation-range: 30svh 50svh, calc(100% - 25svh) 100%;\n      }\n    }\n  }\n}\n\n@keyframes esrbespoke-header-chips-in {\n  from { opacity: 0; visibility: hidden; }\n  to { opacity: 1; visibility: visible; }\n}\n@keyframes esrbespoke-header-chips-away {\n  from { transform: translateY(0); }\n  to { transform: translateY(-120px); }\n}\n"
+    },
+    {
+      "path": "esrbespoke-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { Equal, X } from \"lucide-react\";\nimport { EsrbespokeLabel } from \"@foundry/esrbespoke-label\";\nimport { toneClass, type EsrbespokeTone } from \"@foundry/esrbespoke-tone\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./esrbespoke-header.css\";\n\nexport interface EsrbespokeHeaderLink {\n  label: string;\n  href: string;\n  /** the current page: marked with a small square */\n  active?: boolean;\n}\n\nexport interface EsrbespokeHeaderProps {\n  /** the company name, top left on desktop */\n  brand: string;\n  /** the short wordmark shown top left on phones (set plainly in the label face, wide and bold) */\n  mark: string;\n  /** a short line at column 4 on desktop */\n  tagline: string;\n  /** the page links, stacked at column 9 */\n  links: EsrbespokeHeaderLink[];\n  /** the fixed contact chip */\n  contact: { label: string; href: string };\n  /** accessible names for the menu button and the close button */\n  menuLabel?: string;\n  closeLabel?: string;\n  homeHref?: string;\n  /** what the bar sits on: \"dark\" for a dark hero (white text), \"light\"/\"charcoal\" otherwise */\n  tone?: EsrbespokeTone;\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.19,1,0.22,1)]\";\n\n/** The site's top bar, its fixed CONTACT + menu chips and the full-screen menu. */\nexport function EsrbespokeHeader({\n  brand,\n  mark,\n  tagline,\n  links,\n  contact,\n  menuLabel = \"Menu\",\n  closeLabel = \"Close\",\n  homeHref = \"/\",\n  tone = \"light\",\n  className,\n}: EsrbespokeHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <>\n      <header className={cn(\"absolute inset-x-0 top-0 z-40\", tone !== \"light\" && \"dark\", \"text-foreground\", className)}>\n        <div className=\"grid grid-cols-2 gap-x-4 px-gutter pt-5 lg:grid-cols-12 lg:pt-7\">\n          <a href={homeHref} className={cn(\"self-start transition-opacity hover:opacity-50 lg:col-span-3\", ease)}>\n            <span className=\"block font-mono text-[1.75rem] leading-none font-bold tracking-[0.02em] uppercase font-stretch-[125%] lg:hidden\">\n              {mark}\n            </span>\n            <EsrbespokeLabel className=\"hidden lg:block\">{brand}</EsrbespokeLabel>\n          </a>\n          <EsrbespokeLabel className=\"hidden lg:col-span-4 lg:col-start-4 lg:block\">{tagline}</EsrbespokeLabel>\n          <nav className=\"hidden lg:col-span-3 lg:col-start-9 lg:block\">\n            <ul className=\"-mt-px\">\n              {links.map((link) => (\n                <li key={link.href}>\n                  <a\n                    href={link.href}\n                    aria-current={link.active ? \"page\" : undefined}\n                    className={cn(\n                      \"group relative block w-fit font-mono text-[0.875rem] leading-[1.25] tracking-[0.09em] uppercase font-stretch-[88%] transition-opacity hover:opacity-50\",\n                      ease,\n                    )}\n                  >\n                    <span\n                      aria-hidden\n                      className={cn(\n                        \"absolute top-1/2 -left-4 size-1.5 -translate-y-1/2 bg-current transition-transform\",\n                        ease,\n                        link.active ? \"scale-100\" : \"scale-0 group-hover:scale-100\",\n                      )}\n                    />\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n          <button\n            type=\"button\"\n            onClick={() => setOpen(true)}\n            aria-label={menuLabel}\n            className={cn(\"hidden self-start justify-self-end transition-opacity hover:opacity-50 lg:col-start-12 lg:block\", ease)}\n          >\n            <Equal className=\"size-6\" strokeWidth={1} />\n          </button>\n        </div>\n      </header>\n\n      <div className=\"esrbespoke-header-chips dark fixed top-5 right-gutter z-50 flex gap-1 lg:top-6\">\n        <a\n          href={contact.href}\n          className={cn(\"flex h-6 items-center rounded-lg bg-muted px-2 font-mono text-[0.8125rem] leading-none font-semibold tracking-[0.08em] text-foreground uppercase font-stretch-[88%] transition-opacity hover:opacity-70\", ease)}\n        >\n          {contact.label}\n        </a>\n        <button\n          type=\"button\"\n          onClick={() => setOpen(true)}\n          aria-label={menuLabel}\n          aria-expanded={open}\n          className={cn(\"flex size-6 items-center justify-center rounded-lg bg-muted text-foreground transition-opacity hover:opacity-70\", ease)}\n        >\n          <Equal className=\"size-5\" strokeWidth={1} />\n        </button>\n      </div>\n\n      <div\n        role=\"dialog\"\n        aria-modal=\"true\"\n        aria-label={menuLabel}\n        className={cn(\n          toneClass(\"dark\"),\n          \"fixed inset-0 z-[60] flex flex-col px-gutter pt-5 pb-8 transition-[opacity,visibility] duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] lg:pt-7\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n      >\n        <div className=\"flex items-start justify-between\">\n          <EsrbespokeLabel>{brand}</EsrbespokeLabel>\n          <button\n            type=\"button\"\n            onClick={() => setOpen(false)}\n            aria-label={closeLabel}\n            className={cn(\"flex size-6 items-center justify-center rounded-lg bg-muted transition-opacity hover:opacity-70\", ease)}\n          >\n            <X className=\"size-4\" strokeWidth={1.25} />\n          </button>\n        </div>\n        <nav className=\"mt-auto grid grid-cols-2 gap-x-4 lg:grid-cols-12\">\n          <ul className=\"col-span-2 lg:col-span-4 lg:col-start-9\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a\n                  href={link.href}\n                  onClick={() => setOpen(false)}\n                  className={cn(\n                    \"block font-display text-[2.5rem] leading-none font-medium tracking-[-0.01em] font-stretch-[106%] transition-opacity hover:opacity-50 lg:text-[3.875rem]\",\n                    ease,\n                    link.active && \"opacity-50\",\n                  )}\n                >\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "esrbespoke-label",
+    "esrbespoke-tone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, top left on desktop"
+    },
+    {
+      "name": "mark",
+      "type": "string",
+      "required": true,
+      "description": "the short wordmark shown top left on phones (set plainly in the label face, wide and bold)"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "a short line at column 4 on desktop"
+    },
+    {
+      "name": "links",
+      "type": "EsrbespokeHeaderLink[]",
+      "required": true,
+      "description": "the page links, stacked at column 9"
+    },
+    {
+      "name": "contact",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the fixed contact chip"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "accessible names for the menu button and the close button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "light",
+      "description": "what the bar sits on: \"dark\" for a dark hero (white text), \"light\"/\"charcoal\" otherwise"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1360f163065c52df1bba0c16bf2f7e91c651f62f30cad2a9d028faa17d48a8fb"
+}

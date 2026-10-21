@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "AAT Architecten hero",
+  "description": "A quiet white opening: one statement in a 24–40px grotesk, a small 'scroll' cue at the bottom-left, and a single tall portrait photo. On phones the photo sits right of centre under the text; from 1024px the block fills the window and the photo stands at the right edge, nearly the window's full height. The photo wipes up into view on load, and on phones it is cropped away from the top as it scrolls off.",
+  "category": "hero",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "minimal",
+    "white",
+    "architecture",
+    "editorial",
+    "portrait",
+    "clip",
+    "reveal",
+    "scrubbed",
+    "window-height",
+    "load"
+  ],
+  "notes": [
+    "from 1024px it is exactly the window's height and leaves room at the top for an overlaid header (aat-architecten-header)",
+    "the load wipe starts after 0.9s, timed to follow aat-architecten-loader; pass revealDelay={0} without it",
+    "the photo slot is a muted placeholder until you pass media (an <img> with object-cover fills it)"
+  ],
+  "entry": "aat-architecten-hero.tsx",
+  "source": "foundry",
+  "name": "aat-architecten-hero",
+  "files": [
+    {
+      "path": "aat-architecten-hero.css",
+      "content": "/* Load: the photo frame opens from the bottom edge upwards. */\n.aat-architecten-hero-frame {\n  animation: aat-architecten-hero-wipe 1.5s cubic-bezier(0.16, 1, 0.3, 1) both;\n  animation-delay: var(--aat-hero-delay, 0.9s);\n}\n@keyframes aat-architecten-hero-wipe {\n  from { clip-path: inset(100% 0 0 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n\n/* Phones and tablets: while the photo scrolls off the top, it is eaten away from its top edge. */\n@supports (animation-timeline: view()) {\n  @media (max-width: 63.99rem) {\n    .aat-architecten-hero-crop {\n      animation: aat-architecten-hero-crop linear both;\n      animation-timeline: view();\n      animation-range: exit 0% exit 100%;\n    }\n  }\n}\n@keyframes aat-architecten-hero-crop {\n  from { clip-path: inset(0 0 0 0); }\n  to { clip-path: inset(70% 0 0 0); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aat-architecten-hero-frame,\n  .aat-architecten-hero-crop {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "aat-architecten-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./aat-architecten-hero.css\";\n\nexport interface AatArchitectenHeroProps {\n  /** the one statement, a sentence or two */\n  statement: string;\n  /** the small cue at the bottom-left (e.g. \"scroll\") */\n  scrollLabel?: string;\n  /** the photo (an <img> with object-cover fills the frame); empty: a muted placeholder */\n  media?: ReactNode;\n  /** seconds before the photo wipes in on load (0.9 follows aat-architecten-loader) */\n  revealDelay?: number;\n  className?: string;\n}\n\nexport function AatArchitectenHero({ statement, scrollLabel, media, revealDelay = 0.9, className }: AatArchitectenHeroProps) {\n  return (\n    <section className={cn(\"bg-background pb-section text-foreground\", className)}>\n      <div className=\"relative mx-auto max-w-page px-gutter pt-10 pb-10 lg:h-svh lg:pt-[10.5rem] lg:pb-0\">\n        <h1 className=\"max-w-[40rem] text-[clamp(24px,1.8vw+1rem,40px)] leading-[1.25] font-normal lg:max-w-[calc(61vw-2*var(--page-gutter)-2.5rem)]\">\n          {statement}\n        </h1>\n\n        <div className=\"relative mt-[4.75rem] lg:static lg:mt-0\">\n          {/* the photo: right of centre on phones; from 1024px flush with the window's right edge and\n              almost window-tall (below the header at 1024–1279px, where the links would reach it) */}\n          <div\n            style={{ \"--aat-hero-delay\": `${revealDelay}s` } as CSSProperties}\n            className=\"aat-architecten-hero-frame ml-[16.7%] w-[78.6%] lg:absolute lg:top-[6.875rem] lg:right-0 lg:ml-0 lg:h-[calc(100svh-9.375rem)] lg:w-[39vw] lg:max-w-[35rem] xl:top-0 xl:h-[calc(100svh-2.5rem)]\"\n          >\n            <div className=\"aat-architecten-hero-crop aspect-[269/342] overflow-clip bg-muted lg:aspect-auto lg:h-full [&>img]:size-full [&>img]:object-cover\">\n              {media}\n            </div>\n          </div>\n          {scrollLabel && (\n            <span className=\"absolute bottom-0 left-0 text-base leading-none lg:bottom-10 lg:left-gutter\">{scrollLabel}</span>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the one statement, a sentence or two"
+    },
+    {
+      "name": "scrollLabel",
+      "type": "string",
+      "required": false,
+      "description": "the small cue at the bottom-left (e.g. \"scroll\")"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo (an <img> with object-cover fills the frame); empty: a muted placeholder"
+    },
+    {
+      "name": "revealDelay",
+      "type": "number",
+      "required": false,
+      "default": "0.9",
+      "description": "seconds before the photo wipes in on load (0.9 follows aat-architecten-loader)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8a77574c10c8f4d2577c76b1cf4f6047152f2142ab5a3e9cedab8d503bd9ae9f"
+}

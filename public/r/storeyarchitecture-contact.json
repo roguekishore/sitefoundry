@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture contact",
+  "description": "A huge five-line invitation at the left, partly covered by a large off-white paper form pinned with a paperclip: a mono 'brief' title and the wordmark at the top, numbered fields drawn as single underlines, a two-by-two row of square checkboxes, a three-line message area, a grey Submit button and a mono footer row under a hairline. A short paragraph sits under the heading. On desktop the paper drifts down slowly as you scroll.",
+  "category": "contact",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "brief",
+    "paper",
+    "mono",
+    "numbered",
+    "underline",
+    "overlap",
+    "parallax",
+    "light",
+    "vw"
+  ],
+  "notes": [
+    "the form posts to `action` with ordinary field names; no JavaScript needed",
+    "the paper uses --card and --card-foreground; Submit is the secondary (form grey) button",
+    "on phones the paragraph moves under the form (the original hides it behind the paper)"
+  ],
+  "entry": "storeyarchitecture-contact.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-contact",
+  "files": [
+    {
+      "path": "storeyarchitecture-contact.css",
+      "content": "/* Desktop: the paper form drifts down 10vw over the section's pass through the window. */\n.storeyarchitecture-contact {\n  view-timeline-name: --storeyarchitecture-contact;\n}\n\n@supports (animation-timeline: view()) {\n  @media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-contact-paper {\n      animation: storeyarchitecture-contact-drift linear both;\n      animation-timeline: --storeyarchitecture-contact;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-contact-drift {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(10vw);\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-contact.tsx",
+      "content": "import { Paperclip } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureButton } from \"@foundry/storeyarchitecture-button\";\nimport { StoreyarchitectureRise } from \"@foundry/storeyarchitecture-rise\";\nimport \"./storeyarchitecture-contact.css\";\n\nexport interface StoreyarchitectureContactField {\n  /** the label above the line */\n  label: string;\n  /** the form field name */\n  name: string;\n  /** text / email: one underline · message: three ruled lines · choice: square checkboxes */\n  kind: \"text\" | \"email\" | \"message\" | \"choice\";\n  /** for choice: the options, laid out two per row */\n  options?: string[];\n}\n\nexport interface StoreyarchitectureContactProps {\n  /** the huge invitation at the left */\n  heading: string;\n  /** the short paragraph under it */\n  intro: string;\n  /** the paper's mono title, one string per line */\n  formTitle: string[];\n  /** the small mono mark at the paper's top-left */\n  formMark: string;\n  /** the wordmark at the paper's top-right */\n  brand: string;\n  /** the numbered fields, in order */\n  fields: StoreyarchitectureContactField[];\n  /** the Submit button label */\n  submitLabel: string;\n  /** the mono labels along the paper's foot */\n  footer: string[];\n  /** where the form posts */\n  action?: string;\n  className?: string;\n}\n\nconst line = \"w-full border-b border-input bg-transparent text-[4.3vw] leading-none outline-none focus:border-card-foreground sm:text-[1.1vw]\";\n\nexport function StoreyarchitectureContact({\n  heading,\n  intro,\n  formTitle,\n  formMark,\n  brand,\n  fields,\n  submitLabel,\n  footer,\n  action,\n  className,\n}: StoreyarchitectureContactProps) {\n  return (\n    <section\n      className={cn(\n        \"storeyarchitecture-contact grid grid-cols-6 font-[450] gap-x-gutter bg-background px-gutter pt-section pb-[4vw] text-foreground tracking-[-0.02em] sm:grid-cols-12 sm:pb-[1.4vw]\",\n        className,\n      )}\n    >\n      <StoreyarchitectureRise as=\"h2\" className=\"col-span-6 col-start-1 row-start-1 text-[12vw] leading-none sm:col-span-5 sm:col-start-1 sm:text-[7vw]\">\n        {heading}\n      </StoreyarchitectureRise>\n      <StoreyarchitectureRise\n        step={1}\n        className=\"col-span-6 col-start-1 row-start-2 mt-[10vw] text-[4.3vw] leading-[1.2] sm:col-span-3 sm:col-start-1 sm:row-start-1 sm:mt-[44vw] sm:text-[1.6vw]\"\n      >\n        <p>{intro}</p>\n      </StoreyarchitectureRise>\n\n      <form\n        action={action}\n        className=\"storeyarchitecture-contact-paper relative col-span-6 col-start-1 row-start-1 mt-[16vw] bg-card text-card-foreground sm:col-span-9 sm:col-start-4 sm:mt-[14.8vw]\"\n      >\n        <Paperclip\n          aria-hidden\n          strokeWidth={1}\n          className=\"absolute top-[-9vw] left-[5vw] size-[23vw] -rotate-[42deg] text-foreground/60 sm:top-[-3.5vw] sm:left-[7vw] sm:size-[8.5vw]\"\n        />\n        <div className=\"px-[4vw] pt-[12vw] sm:px-[8.2vw] sm:pt-[5.4vw]\">\n          <div className=\"grid grid-cols-[15vw_1fr] items-start sm:grid-cols-[8.2vw_1fr_auto]\">\n            <span className=\"pt-[0.6vw] font-mono text-[3.6vw] leading-none tracking-[-0.06em] sm:text-[1vw]\">{formMark}</span>\n            <h3 className=\"font-mono text-[8vw] leading-none tracking-[-0.06em] uppercase sm:text-[2.2vw]\">\n              {formTitle.map((t) => (\n                <span key={t} className=\"block\">\n                  {t}\n                </span>\n              ))}\n            </h3>\n            <span className=\"-mr-[2.3vw] hidden text-[2.2vw] leading-none sm:block\">{brand}</span>\n          </div>\n\n          <div className=\"mt-[12vw] flex flex-col gap-[12vw] sm:mt-[7.5vw] sm:gap-[5.5vw]\">\n            {fields.map((field, i) => (\n              <div key={field.name} className=\"grid grid-cols-[15vw_1fr] items-start sm:grid-cols-[8.2vw_1fr]\">\n                <span className=\"font-mono text-[4.3vw] leading-none tracking-[-0.06em] sm:text-[1.1vw]\">{`${String(i + 1).padStart(2, \"0\")})`}</span>\n                {field.kind === \"choice\" ? (\n                  <fieldset>\n                    <legend className=\"text-[4.3vw] leading-none sm:text-[1.1vw]\">{field.label}</legend>\n                    <div className=\"mt-[4vw] grid grid-cols-2 gap-y-[3vw] sm:mt-[1.6vw] sm:gap-y-[1.2vw]\">\n                      {field.options?.map((option) => (\n                        <label key={option} className=\"flex items-center gap-[3vw] text-[4.3vw] leading-none sm:gap-[2.4vw] sm:text-[1.1vw]\">\n                          <input\n                            type=\"checkbox\"\n                            name={field.name}\n                            value={option}\n                            className=\"size-[3.6vw] shrink-0 appearance-none bg-card-foreground/45 transition-colors duration-200 checked:bg-card-foreground sm:size-[1vw]\"\n                          />\n                          {option}\n                        </label>\n                      ))}\n                    </div>\n                  </fieldset>\n                ) : (\n                  <label className=\"flex flex-col\">\n                    <span className=\"text-[4.3vw] leading-none sm:text-[1.1vw]\">{field.label}</span>\n                    {field.kind === \"message\" ? (\n                      <textarea\n                        name={field.name}\n                        rows={3}\n                        className={cn(\n                          line,\n                          \"mt-[3vw] resize-none border-b-0 bg-[linear-gradient(to_bottom,transparent_calc(100%-1px),var(--input)_0)] bg-size-[100%_8vw] leading-[8vw] sm:mt-[0.8vw] sm:bg-size-[100%_2.5vw] sm:leading-[2.5vw]\",\n                        )}\n                      />\n                    ) : (\n                      <input type={field.kind} name={field.name} className={cn(line, \"h-[9vw] sm:h-[2.4vw]\")} />\n                    )}\n                  </label>\n                )}\n              </div>\n            ))}\n          </div>\n\n          <div className=\"mt-[8vw] grid grid-cols-[15vw_1fr] sm:mt-[4vw] sm:grid-cols-[8.2vw_1fr]\">\n            <StoreyarchitectureButton type=\"submit\" size=\"sm\" variant=\"grey\" className=\"col-start-2 justify-self-start\">\n              {submitLabel}\n            </StoreyarchitectureButton>\n          </div>\n        </div>\n\n        <div className=\"mx-[4vw] mt-[8vw] flex flex-wrap gap-x-[8vw] gap-y-[4vw] border-t border-card-foreground px-[3vw] pt-[8vw] pb-[10vw] font-mono text-[4.3vw] leading-none tracking-[-0.06em] uppercase sm:mx-0 sm:mt-[2vw] sm:justify-between sm:px-[5.2vw] sm:pt-[2.6vw] sm:pb-[4vw] sm:text-[1.1vw]\">\n          {footer.map((label) => (\n            <span key={label}>{label}</span>\n          ))}\n        </div>\n      </form>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-button",
+    "storeyarchitecture-rise"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the huge invitation at the left"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the short paragraph under it"
+    },
+    {
+      "name": "formTitle",
+      "type": "string[]",
+      "required": true,
+      "description": "the paper's mono title, one string per line"
+    },
+    {
+      "name": "formMark",
+      "type": "string",
+      "required": true,
+      "description": "the small mono mark at the paper's top-left"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark at the paper's top-right"
+    },
+    {
+      "name": "fields",
+      "type": "StoreyarchitectureContactField[]",
+      "required": true,
+      "description": "the numbered fields, in order"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the Submit button label"
+    },
+    {
+      "name": "footer",
+      "type": "string[]",
+      "required": true,
+      "description": "the mono labels along the paper's foot"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c00ed3ee92277705c74d2a3254f55aec02833f84688c695503cdc227f7dd7b99"
+}

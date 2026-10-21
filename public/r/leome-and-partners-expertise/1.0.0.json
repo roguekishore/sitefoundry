@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Leome and Partners expertise",
+  "description": "Practice areas as square hairline cards with a small index, a filled arrow tile and the name. Stacked on phones; from 1024px scattered over three columns beside the heading, drifting at three speeds as you scroll. Entering, a primary panel covering each card shrinks into its top-right corner and the name brightens; on hover the arrow flies out and a copy flies in.",
+  "category": "features",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "services",
+    "cards",
+    "square",
+    "grid",
+    "staggered",
+    "parallax",
+    "reveal",
+    "scroll-driven",
+    "hover",
+    "arrow",
+    "outline",
+    "dark",
+    "minimal"
+  ],
+  "notes": [
+    "the staggered desktop layout is made for four areas; more follow in rows",
+    "motion is CSS scroll-driven; without support the cards sit still and uncovered",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-expertise.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-expertise",
+  "files": [
+    {
+      "path": "leome-and-partners-expertise.css",
+      "content": "/* Each card's slot (the grid item, which never moves) carries a view timeline.\n   - Entering: the primary cover shrinks from full size into the card's top-right corner and\n     the name brightens from 35%; from early in the slot's entry until it has risen another\n     quarter of the free space above it, so the cover is still shrinking while the whole card\n     is in view, as on the original.\n   - From 1024px the card itself drifts up through the window at its own speed (--lp-from to\n     --lp-to of its height), the original's staggered parallax. */\n.leome-and-partners-expertise-slot {\n  view-timeline-name: --leome-and-partners-expertise-slot;\n}\n\n.leome-and-partners-expertise-cover {\n  transform: scale(0);\n  transform-origin: top right;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .leome-and-partners-expertise-cover {\n      animation: leome-and-partners-expertise-uncover linear both;\n      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);\n      animation-timeline: --leome-and-partners-expertise-slot;\n      animation-range: entry 10% contain 25%;\n    }\n\n    .leome-and-partners-expertise-name {\n      animation: leome-and-partners-expertise-brighten linear both;\n      animation-timeline: --leome-and-partners-expertise-slot;\n      animation-range: entry 30% contain 25%;\n    }\n  }\n\n  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {\n    .leome-and-partners-expertise-card {\n      animation: leome-and-partners-expertise-drift linear both;\n      animation-timeline: --leome-and-partners-expertise-slot;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes leome-and-partners-expertise-uncover {\n  from {\n    transform: scale(1);\n  }\n  to {\n    transform: scale(0);\n  }\n}\n\n@keyframes leome-and-partners-expertise-brighten {\n  from {\n    opacity: 0.35;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes leome-and-partners-expertise-drift {\n  from {\n    translate: 0 var(--lp-from, 0);\n  }\n  to {\n    translate: 0 var(--lp-to, 0);\n  }\n}\n"
+    },
+    {
+      "path": "leome-and-partners-expertise.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { LeomeAndPartnersCornerMarks } from \"@foundry/leome-and-partners-corner-marks\";\nimport { LeomeAndPartnersLineLink } from \"@foundry/leome-and-partners-line-link\";\nimport { LeomeAndPartnersWordReveal } from \"@foundry/leome-and-partners-word-reveal\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./leome-and-partners-expertise.css\";\n\nexport interface LeomeAndPartnersExpertiseArea {\n  /** the small index at the card's top-left (\"01\") */\n  number: string;\n  /** the area's name at the card's bottom-left */\n  title: string;\n  href: string;\n}\n\nexport interface LeomeAndPartnersExpertiseProps {\n  /** the heading, one entry per line at desktop */\n  title: string[];\n  /** the link beside the heading: top-right at desktop, after the first card on phones */\n  link?: { label: string; href: string };\n  /** the areas as square cards; the first four take the staggered desktop pattern, more follow in rows */\n  areas: LeomeAndPartnersExpertiseArea[];\n  /** the two small squares near the bottom corners */\n  marks?: boolean;\n  className?: string;\n}\n\n// Where the first four cards rest at 1024px and up (three columns): column, row and how far\n// down (as a share of the column width), plus their parallax drift (share of the card's\n// height). Each card enters lower than it rests and leaves higher, so they spread apart.\nconst slots = [\n  { place: \"lg:col-start-2 lg:row-start-1\", from: \"20%\", to: \"-10%\" },\n  { place: \"lg:col-start-1 lg:row-start-2 lg:mt-[7%]\", from: \"30%\", to: \"-10%\" },\n  { place: \"lg:col-start-3 lg:row-start-2 lg:mt-[7%]\", from: \"40%\", to: \"-15%\" },\n  { place: \"lg:col-start-2 lg:row-start-2 lg:mt-[115%]\", from: \"20%\", to: \"-10%\" },\n];\n\nconst ease = \"ease-[cubic-bezier(0.625,0.05,0,1)]\";\n\n/**\n * Practice areas as square hairline cards with an index, a filled arrow tile and the name.\n * Phones stack them full width; from 1024px they scatter over three columns and drift at\n * three different speeds. As each card enters, a primary panel covering it shrinks into its\n * top-right corner and the name brightens; on hover the arrow flies out and a copy flies in.\n */\nexport function LeomeAndPartnersExpertise({ title, link, areas, marks = true, className }: LeomeAndPartnersExpertiseProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-background px-gutter py-section font-sans text-foreground\", className)}>\n      <div className=\"grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-0\">\n        <h2 className=\"font-display text-[2.75rem] leading-[1.05] font-medium tracking-[-0.02em] lg:col-start-1 lg:row-start-1 lg:text-[4rem]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"block\">\n              <LeomeAndPartnersWordReveal text={line} />\n            </span>\n          ))}\n        </h2>\n\n        {areas.map((area, i) => {\n          const slot = slots[i];\n          return [\n            <div\n              key={area.href + i}\n              className={cn(\"leome-and-partners-expertise-slot\", slot?.place)}\n              style={slot ? ({ \"--lp-from\": slot.from, \"--lp-to\": slot.to } as CSSProperties) : undefined}\n            >\n              <a\n                href={area.href}\n                className={cn(\n                  \"leome-and-partners-expertise-card group relative block aspect-square overflow-clip border border-border p-6 transition-colors duration-[600ms] hover:border-input motion-reduce:transition-none\",\n                  ease,\n                )}\n              >\n                <span aria-hidden className=\"leome-and-partners-expertise-cover absolute inset-0 bg-primary\" />\n                <span className=\"relative block text-xs leading-none font-medium\">{area.number}</span>\n                <span aria-hidden className=\"absolute top-6 right-6 size-12 overflow-clip bg-primary text-primary-foreground\">\n                  <ArrowUpRight\n                    strokeWidth={1.75}\n                    className={cn(\"absolute top-1/2 left-1/2 -mt-[2.125rem] -ml-[2.125rem] size-[4.25rem] transition-[translate] duration-[600ms] group-hover:translate-x-[150%] group-hover:-translate-y-[150%] motion-reduce:transition-none\", ease)}\n                  />\n                  <ArrowUpRight\n                    strokeWidth={1.75}\n                    className={cn(\"absolute top-1/2 left-1/2 -mt-[2.125rem] -ml-[2.125rem] size-[4.25rem] -translate-x-[150%] translate-y-[150%] transition-[translate] duration-[600ms] group-hover:translate-0 motion-reduce:transition-none\", ease)}\n                  />\n                </span>\n                <span className=\"leome-and-partners-expertise-name absolute right-6 bottom-6 left-6 text-2xl leading-[1.1] font-medium tracking-[-0.01em] lg:text-[2rem]\">\n                  {area.title}\n                </span>\n              </a>\n            </div>,\n            i === 0 && link && (\n              <div key=\"link\" className=\"lg:col-start-3 lg:row-start-1 lg:justify-self-end\">\n                <LeomeAndPartnersLineLink label={link.label} href={link.href} />\n              </div>\n            ),\n          ];\n        })}\n      </div>\n      {marks && <LeomeAndPartnersCornerMarks edge=\"bottom\" />}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "leome-and-partners-corner-marks",
+    "leome-and-partners-line-link",
+    "leome-and-partners-word-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading, one entry per line at desktop"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the link beside the heading: top-right at desktop, after the first card on phones"
+    },
+    {
+      "name": "areas",
+      "type": "LeomeAndPartnersExpertiseArea[]",
+      "required": true,
+      "description": "the areas as square cards; the first four take the staggered desktop pattern, more follow in rows"
+    },
+    {
+      "name": "marks",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "the two small squares near the bottom corners"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7d10cbfdb718573bc0e2d9a16813ff6ab349f06d3363e361821ece4f770a0f06"
+}

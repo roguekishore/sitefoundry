@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG intro curtain",
+  "description": "A full-window intro curtain: a paper card with big round corners inset on the taupe-to-sand gradient, the gradient wordmark at its centre. On load the wordmark wipes in from the left, holds, and then the whole curtain lifts up out of the window, revealing the page (5.9s in all).",
+  "category": "background",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "loader",
+    "intro",
+    "curtain",
+    "load-in",
+    "wipe",
+    "gradient",
+    "fixed",
+    "overlay",
+    "css-only"
+  ],
+  "notes": [
+    "fixed over everything (z-index 100) and click-through; it hides itself when done",
+    "CSS only; under reduced motion it isn't shown at all",
+    "duration (seconds) sets the whole sequence; the original takes 5.9s"
+  ],
+  "entry": "wild-ag-loader.tsx",
+  "source": "foundry",
+  "name": "wild-ag-loader",
+  "files": [
+    {
+      "path": "wild-ag-loader.css",
+      "content": "/* The sequence: the wordmark wipes in from the left (8%–30% of the run), holds, then the\n   curtain lifts up out of the window (72%–100%) and is hidden. Fill-mode both keeps the end\n   state. Under reduced motion the curtain isn't shown. */\n.wild-ag-loader {\n  animation: wild-ag-loader-lift var(--wild-ag-loader-duration, 5.9s) cubic-bezier(0.65, 0, 0.35, 1) both;\n}\n\n.wild-ag-loader-mark {\n  animation: wild-ag-loader-wipe var(--wild-ag-loader-duration, 5.9s) cubic-bezier(0.25, 0.46, 0.45, 0.94) both;\n}\n\n@keyframes wild-ag-loader-lift {\n  0%,\n  72% {\n    transform: none;\n    visibility: visible;\n  }\n  99.9% {\n    transform: translateY(-100%);\n    visibility: visible;\n  }\n  100% {\n    transform: translateY(-100%);\n    visibility: hidden;\n  }\n}\n\n@keyframes wild-ag-loader-wipe {\n  0%,\n  8% {\n    opacity: 0;\n    clip-path: inset(0 100% 0 0);\n  }\n  30%,\n  100% {\n    opacity: 1;\n    clip-path: inset(0 0 0 0);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .wild-ag-loader {\n    display: none;\n  }\n}\n"
+    },
+    {
+      "path": "wild-ag-loader.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgWordmark } from \"@foundry/wild-ag-wordmark\";\nimport \"./wild-ag-loader.css\";\n\nexport interface WildAgLoaderProps {\n  /** the brand name shown on the curtain */\n  wordmark: string;\n  /** seconds for the whole sequence (wipe in, hold, lift away) */\n  duration?: number;\n  className?: string;\n}\n\nexport function WildAgLoader({ wordmark, duration = 5.9, className }: WildAgLoaderProps) {\n  return (\n    <div\n      aria-hidden\n      className={cn(\"wild-ag-loader pointer-events-none fixed inset-0 z-[100] bg-linear-15 from-primary to-highlight\", className)}\n      style={{ \"--wild-ag-loader-duration\": `${duration}s` } as CSSProperties}\n    >\n      <div className=\"wild-ag-loader-card absolute inset-x-0 inset-y-6 flex items-center justify-center rounded-[calc(var(--radius)*3.4)] bg-background lg:inset-y-9 lg:rounded-[calc(var(--radius)*4.5)]\">\n        <WildAgWordmark text={wordmark} className=\"wild-ag-loader-mark text-[2.4rem] lg:text-[3.6rem]\" />\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-wordmark"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the brand name shown on the curtain"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "5.9",
+      "description": "seconds for the whole sequence (wipe in, hold, lift away)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d5e4a7b80650f43390d798f0fdf71a0647dcf5135fb90a9bb40ab1113d9d9c5d"
+}

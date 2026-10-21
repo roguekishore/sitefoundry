@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup principles",
+  "description": "A pinned interlude two windows tall: a star of eight hairline rays, fading towards the middle, with tiny numbers at their tips around a centred two-line grotesk heading. While pinned, the star turns half a turn with the scroll (numbers stay upright), the heading slides up out of its masks as a second heading rises into its place, and the stage fades from white to black.",
+  "category": "features",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "rotate",
+    "star",
+    "rays",
+    "heading-swap",
+    "dark-transition",
+    "minimal",
+    "monochrome",
+    "scroll"
+  ],
+  "notes": [
+    "hidden below 1024px by default (desktopOnly), as on the original; pass desktopOnly={false} to show it everywhere",
+    "fades to the theme's dark tokens: place it before dark sections",
+    "CSS only: without scroll-driven animations the star stands still and the two headings stack"
+  ],
+  "entry": "kononenkogroup-principles.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-principles",
+  "files": [
+    {
+      "path": "kononenkogroup-principles.css",
+      "content": "/* A pinned star: the section is two windows tall and its stage sticks for the length of one.\n   Eight hairline rays with numbered tips turn half a turn with the scroll (the numbers stay\n   upright), the first heading slides up out of its masks while the second rises in, and a\n   dark copy of the stage fades over the light one, so the page turns black on the way into\n   the dark sections that follow. */\n\n@property --kononenkogroup-principles-turn {\n  syntax: \"<angle>\";\n  inherits: true;\n  initial-value: 0deg;\n}\n\n.kononenkogroup-principles {\n  view-timeline-name: --kononenkogroup-principles;\n  --kononenkogroup-principles-r: min(42.5svh, 44vw);\n}\n\n.kononenkogroup-principles-star {\n  position: absolute;\n  inset: 0;\n  transform: rotate(var(--kononenkogroup-principles-turn));\n}\n\n.kononenkogroup-principles-ray {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  width: 0;\n  height: 0;\n  transform: rotate(var(--kononenkogroup-principles-angle));\n}\n\n.kononenkogroup-principles-line {\n  position: absolute;\n  left: -0.5px;\n  width: 1px;\n  bottom: calc(var(--kononenkogroup-principles-r) * 0.3);\n  height: calc(var(--kononenkogroup-principles-r) * 0.64);\n  background: linear-gradient(to top, transparent, color-mix(in oklab, var(--foreground) 30%, transparent));\n}\n\n.kononenkogroup-principles-label {\n  position: absolute;\n  left: 0;\n  top: calc(var(--kononenkogroup-principles-r) * -1);\n  transform: translate(-50%, -50%)\n    rotate(calc(-1 * (var(--kononenkogroup-principles-angle) + var(--kononenkogroup-principles-turn))));\n}\n\n.kononenkogroup-principles-mask {\n  display: block;\n  overflow: clip;\n  padding-block: 0.12em 0.2em;\n  margin-block: -0.12em -0.2em;\n}\n\n.kononenkogroup-principles-word {\n  display: block;\n}\n\n/* the dark copy only exists where it can be animated */\n.kononenkogroup-principles-night {\n  display: none;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-principles-stage {\n      animation: kononenkogroup-principles-spin linear both;\n      animation-timeline: --kononenkogroup-principles;\n      animation-range: cover 0% cover 100%;\n    }\n\n    /* the two headings share one place; without animation they simply stack */\n    .kononenkogroup-principles-second {\n      position: absolute;\n      inset: 0;\n    }\n\n    .kononenkogroup-principles-first .kononenkogroup-principles-word {\n      animation: kononenkogroup-principles-out linear both;\n      animation-timeline: --kononenkogroup-principles;\n      animation-range: contain 12% contain 42%;\n    }\n\n    .kononenkogroup-principles-second .kononenkogroup-principles-word {\n      animation: kononenkogroup-principles-in cubic-bezier(0.17, 0.84, 0.44, 1) both;\n      animation-timeline: --kononenkogroup-principles;\n      animation-range: contain 48% contain 78%;\n    }\n\n    .kononenkogroup-principles-night {\n      display: block;\n      animation: kononenkogroup-principles-dusk linear both;\n      animation-timeline: --kononenkogroup-principles;\n      animation-range: contain 18% contain 40%;\n    }\n  }\n}\n\n@keyframes kononenkogroup-principles-spin {\n  from {\n    --kononenkogroup-principles-turn: 0deg;\n  }\n  to {\n    --kononenkogroup-principles-turn: -180deg;\n  }\n}\n\n@keyframes kononenkogroup-principles-out {\n  from {\n    transform: none;\n  }\n  to {\n    transform: translateY(calc(-100% - 0.5em));\n  }\n}\n\n@keyframes kononenkogroup-principles-in {\n  from {\n    transform: translateY(calc(100% + 0.5em));\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes kononenkogroup-principles-dusk {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-principles.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-principles.css\";\n\nexport interface KononenkogroupPrinciplesProps {\n  /** the labels at the tips of the rays, clockwise from the top (eight on the original) */\n  rays: string[];\n  /** the heading shown first, one item per line */\n  first: string[];\n  /** the heading that replaces it halfway through, one item per line */\n  second: string[];\n  /** hide the whole section below 1024px, as the original does */\n  desktopOnly?: boolean;\n  className?: string;\n}\n\nfunction Heading({ lines, which }: { lines: string[]; which: \"first\" | \"second\" }) {\n  return (\n    <span className={cn(`kononenkogroup-principles-${which}`, \"flex flex-col justify-center\")}>\n      {lines.map((line, i) => (\n        <span key={i} className=\"kononenkogroup-principles-mask\">\n          <span className=\"kononenkogroup-principles-word\">{line}</span>\n        </span>\n      ))}\n    </span>\n  );\n}\n\nfunction Stage({ rays, first, second, copy }: Omit<KononenkogroupPrinciplesProps, \"desktopOnly\" | \"className\"> & { copy?: boolean }) {\n  const Tag = copy ? \"p\" : \"h2\";\n  return (\n    <div className=\"kononenkogroup-principles-stage absolute inset-0\">\n      <div className=\"kononenkogroup-principles-star\" aria-hidden>\n        {rays.map((ray, i) => (\n          <span\n            key={i}\n            className=\"kononenkogroup-principles-ray\"\n            style={{ \"--kononenkogroup-principles-angle\": `${(360 / rays.length) * i}deg` } as CSSProperties}\n          >\n            <span className=\"kononenkogroup-principles-line\" />\n            <span className=\"kononenkogroup-principles-label font-sans text-[2.4vw] leading-none lg:text-[max(9px,0.625vw)]\">{ray}</span>\n          </span>\n        ))}\n      </div>\n      <div className=\"absolute inset-0 flex items-center justify-center\">\n        <Tag className=\"relative text-center font-sans text-[10.67vw] leading-[0.85] tracking-[-0.045em] lg:text-[4.17vw] lg:leading-[0.875]\">\n          <Heading lines={first} which=\"first\" />\n          <Heading lines={second} which=\"second\" />\n        </Tag>\n      </div>\n    </div>\n  );\n}\n\n/**\n * A pinned interlude two windows tall: a star of eight hairline rays with numbered tips around\n * a centred two-line heading. While it is pinned the star turns half a turn, the heading slides\n * up and out as a second one rises into its place, and the stage fades to black, leading into\n * dark sections. Desktop only by default, like the original.\n */\nexport function KononenkogroupPrinciples({ rays, first, second, desktopOnly = true, className }: KononenkogroupPrinciplesProps) {\n  return (\n    <section className={cn(\"kononenkogroup-principles relative h-[200svh]\", desktopOnly && \"hidden lg:block\", className)}>\n      <div className=\"sticky top-0 h-svh overflow-clip bg-background text-foreground\">\n        <Stage rays={rays} first={first} second={second} />\n        <div aria-hidden className=\"kononenkogroup-principles-night dark absolute inset-0 bg-background text-foreground\">\n          <Stage rays={rays} first={first} second={second} copy />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "rays",
+      "type": "string[]",
+      "required": true,
+      "description": "the labels at the tips of the rays, clockwise from the top (eight on the original)"
+    },
+    {
+      "name": "first",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading shown first, one item per line"
+    },
+    {
+      "name": "second",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading that replaces it halfway through, one item per line"
+    },
+    {
+      "name": "desktopOnly",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "hide the whole section below 1024px, as the original does"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "90e9bbc0e5ebfe7c091f97edb2994aaf7c9ba905aa669612c2cafaf1e008095c"
+}

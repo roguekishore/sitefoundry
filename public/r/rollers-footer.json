@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers footer",
+  "description": "A charcoal footer with a faint sawtooth texture: a big orange mark over a bold white wordmark, a spaced uppercase sign-off on the right with every other word in orange, then hairline-ruled rows of link columns and depot addresses under orange uppercase headings, and the legal line. Links turn orange on hover; the rules draw in.",
+  "category": "footer",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "charcoal",
+    "pattern",
+    "ruled",
+    "links",
+    "addresses",
+    "orange",
+    "industrial"
+  ],
+  "notes": [
+    "dark in both modes: it uses the theme's .dark palette on itself"
+  ],
+  "entry": "rollers-footer.tsx",
+  "source": "foundry",
+  "name": "rollers-footer",
+  "files": [
+    {
+      "path": "rollers-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Cylinder } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RollersBand } from \"@foundry/rollers-band\";\nimport { RollersRule } from \"@foundry/rollers-rule\";\n\nexport interface RollersFooterLink {\n  label: string;\n  href: string;\n  /** the page you are on: set in orange */\n  current?: boolean;\n}\n\nexport interface RollersFooterGroup {\n  /** the orange uppercase heading over its hairline */\n  title: string;\n  links: RollersFooterLink[];\n}\n\nexport interface RollersFooterDepot {\n  /** the town, set as an orange uppercase heading */\n  town: string;\n  /** address and phone lines, one paragraph each (a \"\\n\" breaks a paragraph without a gap) */\n  lines: string[];\n}\n\nexport interface RollersFooterProps {\n  /** the wordmark under the mark */\n  brand: string;\n  homeHref?: string;\n  /** the large mark above the wordmark; an orange roller-drum icon by default */\n  mark?: ReactNode;\n  /** the sign-off on the right, word by word; every other word is orange */\n  tagline: string[];\n  /** link columns (four on wide screens, two on phones) */\n  groups: RollersFooterGroup[];\n  /** depot addresses (five on wide screens, two on phones) */\n  depots: RollersFooterDepot[];\n  /** the copyright line */\n  legal: string;\n  /** a link on the right of the bottom row (privacy, credits) */\n  credit?: RollersFooterLink;\n  className?: string;\n}\n\nconst heading = \"border-b border-border/60 pb-2.5 font-display text-[0.875rem] leading-none text-primary uppercase md:text-[1.125rem]\";\nconst link = \"transition-colors duration-200 ease-linear hover:text-primary motion-reduce:transition-none\";\n\n/** The charcoal footer: a big orange mark over a bold wordmark with a spaced two-tone sign-off\n    on the right, then hairline-ruled rows of link columns, depot addresses and the legal line.\n    Links turn orange on hover. */\nexport function RollersFooter({ brand, homeHref = \"/\", mark, tagline, groups, depots, legal, credit, className }: RollersFooterProps) {\n  return (\n    <RollersBand as=\"footer\" className={cn(\"font-display\", className)}>\n      <div className=\"relative flex flex-col gap-2 px-gutter pt-7.5 pb-7.5 md:flex-row md:items-end md:justify-between md:pt-20 md:pb-9\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        <a href={homeHref} className=\"flex flex-col items-start\">\n          <span aria-hidden className=\"ml-6 flex size-16 items-center justify-center text-primary\">\n            {mark ?? <Cylinder className=\"size-16\" strokeWidth={2.5} />}\n          </span>\n          <span className=\"mt-2 text-[2.05rem] leading-none font-bold tracking-[-0.02em]\">{brand}</span>\n        </a>\n        <p className=\"text-[1.35rem] leading-none font-bold tracking-[0.06em] uppercase md:text-[1.75rem]\">\n          {tagline.map((word, i) => (\n            <span key={i} className={i % 2 === 0 ? \"text-primary\" : undefined}>\n              {i > 0 ? \" \" : null}\n              {word}\n            </span>\n          ))}\n        </p>\n      </div>\n\n      <div className=\"relative grid grid-cols-2 gap-x-3.5 gap-y-10 px-gutter pt-10 pb-10 md:grid-cols-4 md:gap-x-13.5 md:pt-13 md:pb-13\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        {groups.map((group) => (\n          <div key={group.title}>\n            <h2 className={heading}>{group.title}</h2>\n            <ul className=\"mt-4 flex flex-col gap-1 text-[0.875rem] leading-[1.45] md:mt-5 md:gap-1.5 md:text-[1.125rem]\">\n              {group.links.map((item) => (\n                <li key={item.label}>\n                  <a href={item.href} aria-current={item.current ? \"page\" : undefined} className={cn(link, item.current && \"text-primary\")}>\n                    {item.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        ))}\n      </div>\n\n      <div className=\"relative grid grid-cols-2 gap-x-10 gap-y-10 px-gutter pt-10 pb-15 md:grid-cols-5 md:pt-13 md:pb-13\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        {depots.map((depot) => (\n          <div key={depot.town}>\n            <h2 className={cn(heading, \"pb-4 md:pb-3.5\")}>{depot.town}</h2>\n            <div className=\"mt-4 flex flex-col gap-2.5 text-[0.875rem] leading-[1.5] whitespace-pre-line md:text-[1.125rem]\">\n              {depot.lines.map((line, i) => (\n                <p key={i}>{line}</p>\n              ))}\n            </div>\n          </div>\n        ))}\n      </div>\n\n      <div className=\"flex flex-col gap-3 border-t border-border/60 px-gutter pt-6 pb-8 text-[0.875rem] md:flex-row md:justify-between md:pt-7 md:pb-6 md:text-[1.125rem]\">\n        <p>{legal}</p>\n        {credit ? (\n          <a href={credit.href} className={link}>\n            {credit.label}\n          </a>\n        ) : null}\n      </div>\n    </RollersBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-band",
+    "rollers-rule"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark under the mark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large mark above the wordmark; an orange roller-drum icon by default"
+    },
+    {
+      "name": "tagline",
+      "type": "string[]",
+      "required": true,
+      "description": "the sign-off on the right, word by word; every other word is orange"
+    },
+    {
+      "name": "groups",
+      "type": "RollersFooterGroup[]",
+      "required": true,
+      "description": "link columns (four on wide screens, two on phones)"
+    },
+    {
+      "name": "depots",
+      "type": "RollersFooterDepot[]",
+      "required": true,
+      "description": "depot addresses (five on wide screens, two on phones)"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "credit",
+      "type": "RollersFooterLink",
+      "required": false,
+      "description": "a link on the right of the bottom row (privacy, credits)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e837d4e2bbef44e15701220c96b288fb7e60bd21e4e974eaef4cf2851ad557f9"
+}

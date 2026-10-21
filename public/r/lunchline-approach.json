@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline approach",
+  "description": "Two halves: a tracked eyebrow, large light heading and lead paragraph on cream, beside a deep evergreen board with a typed title and a handwritten sum (a pale aside, a hooked arrow, terms and signs, a circled note, a double-underlined result). The heading's letters rise in, the board's lines wipe in from left to right one after another as you scroll, and the top hairline draws itself out.",
+  "category": "features",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "approach",
+    "split",
+    "chalkboard",
+    "handwritten",
+    "formula",
+    "evergreen",
+    "dark-panel",
+    "editorial",
+    "scrubbed",
+    "wipe",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "the board uses primary / primary-foreground and highlight for the pale aside, arrow and underline",
+    "the handwriting uses the theme's --typeface-hand when it has one (lunchline-theme: Reenie Beanie); with a wider display face, keep lines short",
+    "the wipe finishes while the board's lines sit in the lower half of the window, so leave something below it on the page"
+  ],
+  "entry": "lunchline-approach.tsx",
+  "source": "foundry",
+  "name": "lunchline-approach",
+  "files": [
+    {
+      "path": "lunchline-approach.css",
+      "content": "/* The board's lines wipe in from left to right as if written, one after another, scrubbed\n   with the scroll while the board crosses the lower half of the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-approach-line {\n      animation: lunchline-approach-write linear both;\n      animation-timeline: view();\n      animation-range: cover calc(8% + var(--lunchline-approach-i, 0) * 5%) cover calc(24% + var(--lunchline-approach-i, 0) * 5%);\n    }\n  }\n}\n\n@keyframes lunchline-approach-write {\n  from {\n    clip-path: inset(-80% 100% -40% 0);\n  }\n  to {\n    clip-path: inset(-80% -40% -40% 0);\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-approach.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { CornerDownRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineLetterRise } from \"@foundry/lunchline-letter-rise\";\nimport { LunchlineDrawRule } from \"@foundry/lunchline-draw-rule\";\nimport { LunchlineScribble } from \"@foundry/lunchline-scribble-link\";\nimport \"./lunchline-approach.css\";\n\nexport interface LunchlineFormulaLine {\n  /** the handwritten words */\n  text: string;\n  /** \"aside\": smaller, pale and left-aligned (a remark above the sum); \"term\": a large\n      centred line; \"sign\": a large centred + or = */\n  kind?: \"aside\" | \"term\" | \"sign\";\n  /** draw a hooked arrow into this line from the left */\n  arrow?: boolean;\n  /** a tiny note in a loose circle, pinned to the line's top-right */\n  note?: string;\n  /** underline the line with a double marker stroke (the result) */\n  underline?: boolean;\n}\n\nexport interface LunchlineApproachProps {\n  /** the small tracked label above the heading */\n  eyebrow: string;\n  /** the light heading; its letters rise in as it scrolls into view */\n  heading: string;\n  /** the lead paragraph under it */\n  body: string;\n  /** the evergreen board: its typed title, then the handwritten lines that wipe in */\n  board: { title: string; lines: LunchlineFormulaLine[] };\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst hand = \"font-[family-name:var(--typeface-hand,var(--typeface-display))]\";\n\nexport function LunchlineApproach({ eyebrow, heading, body, board, id, className }: LunchlineApproachProps) {\n  return (\n    <section id={id} className={cn(\"relative grid bg-background text-foreground lg:grid-cols-2\", className)}>\n      <LunchlineDrawRule className=\"z-10\" />\n      <div className=\"px-gutter pt-section pb-12 lg:pt-[4.75rem] lg:pb-[5.5rem] lg:pl-[max(var(--page-gutter),calc((100vw_-_var(--page-width))/2_+_var(--page-gutter)))]\">\n        <p className=\"text-sm leading-none font-bold tracking-[0.08em] uppercase lg:text-base\">{eyebrow}</p>\n        <LunchlineLetterRise\n          text={heading}\n          className=\"mt-[1.1rem] max-w-[22rem] font-display text-[2.375rem] leading-[1.2] font-light tracking-[-0.01em] lg:mt-5 lg:max-w-[31rem] lg:text-[3.5rem]\"\n        />\n        <p className=\"mt-8 max-w-[33rem] text-xl leading-[1.2] font-light lg:mt-12 lg:text-[1.75rem] lg:leading-[1.3]\">{body}</p>\n      </div>\n\n      <div className=\"overflow-x-clip bg-primary px-gutter pt-11 pb-14 text-primary-foreground lg:px-[3.8rem] lg:pt-[4.1rem] lg:pb-16\">\n        <p className=\"text-[2rem] leading-[1.2] font-light tracking-[-0.01em] lg:text-[2.5rem]\">{board.title}</p>\n        <div className={cn(hand, \"mt-1 flex max-w-[34rem] flex-col lg:max-w-[36rem]\")}>\n          {board.lines.map((line, i) => {\n            const kind = line.kind ?? \"term\";\n            return (\n              <div\n                key={i}\n                className={cn(\n                  \"lunchline-approach-line relative\",\n                  kind === \"aside\" ? \"text-[2rem] leading-[1] text-highlight lg:text-[2.9rem]\" : \"text-center text-[3.5rem] leading-[0.95] tracking-[-0.05em] lg:text-[4.1rem]\",\n                  kind === \"sign\" && \"py-1\",\n                  line.arrow && \"pt-6 pl-10\",\n                )}\n                style={{ \"--lunchline-approach-i\": i } as CSSProperties}\n              >\n                {line.arrow && <CornerDownRight aria-hidden className=\"absolute top-0 left-3 size-12 text-highlight\" strokeWidth={1.25} />}\n                <span className=\"relative inline-block\">\n                  {line.text}\n                  {line.note && (\n                    <span className=\"absolute -top-9 -right-3 -rotate-6 rounded-[50%] border border-current px-3 py-1.5 text-[1.35rem] leading-[0.8] tracking-normal whitespace-pre lg:-top-8 lg:-right-20 lg:text-[1.6rem]\">\n                      {line.note}\n                    </span>\n                  )}\n                  {line.underline && <LunchlineScribble className=\"mt-1 h-3 text-highlight\" />}\n                </span>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-draw-rule",
+    "lunchline-letter-rise",
+    "lunchline-scribble-link"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small tracked label above the heading"
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light heading; its letters rise in as it scrolls into view"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the lead paragraph under it"
+    },
+    {
+      "name": "board",
+      "type": "{ title: string; lines: LunchlineFormulaLine[]; }",
+      "required": true,
+      "description": "the evergreen board: its typed title, then the handwritten lines that wipe in"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dbe7a7a116db3203ec5c04b28415d2a9dccbd1236c4082d9b6c38ebf8fd047b2"
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Ledup reveal",
+  "description": "A wrapper that fades its content in and lifts it into place (24px by default, any distance, or none for a plain fade) over the first stretch of scroll after it enters the window. Steps stagger cards in a row.",
+  "category": "animation",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "rise",
+    "fade",
+    "scroll",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only (view timeline): browsers without scroll-driven animations, and reduced motion, show the content in place",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "ledup-reveal.tsx",
+  "source": "foundry",
+  "name": "ledup-reveal",
+  "files": [
+    {
+      "path": "ledup-reveal.css",
+      "content": "/* Fade in and rise by --ledup-reveal-y over the first 220px of scroll after the element's top\n   enters the window (a fixed distance, so whatever is in the first screen is already in place).\n   Each step starts 60px of scroll later. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ledup-reveal {\n      animation: ledup-reveal-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--ledup-reveal-step, 0) * 60px) entry calc(220px + var(--ledup-reveal-step, 0) * 60px);\n    }\n  }\n}\n\n@keyframes ledup-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(var(--ledup-reveal-y, 24px));\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "ledup-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ledup-reveal.css\";\n\nexport interface LedupRevealProps {\n  children?: ReactNode;\n  /** the element to render (div by default) */\n  as?: ElementType;\n  /** how far it rises, in px (0 = fade only) */\n  distance?: number;\n  /** position in a staggered row: 0, 1, 2… each arrives 60px of scroll later */\n  step?: number;\n  className?: string;\n}\n\n/** Fades and lifts its content into place as it scrolls into view (CSS only). */\nexport function LedupReveal({ children, as: Tag = \"div\", distance = 24, step = 0, className }: LedupRevealProps) {\n  return (\n    <Tag\n      className={cn(\"ledup-reveal\", className)}\n      style={{ \"--ledup-reveal-y\": `${distance}px`, \"--ledup-reveal-step\": step } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default)"
+    },
+    {
+      "name": "distance",
+      "type": "number",
+      "required": false,
+      "default": "24",
+      "description": "how far it rises, in px (0 = fade only)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered row: 0, 1, 2… each arrives 60px of scroll later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c00146e7cdaf2fe128dfe3b86670f09e6816f533517fbe2085d44f990d7fbd42"
+}

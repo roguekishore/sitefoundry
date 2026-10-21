@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Leome and Partners roll text",
+  "description": "A link label whose characters roll up one after another on hover (10ms apart, 0.6s soft ease-out), each replaced by an identical copy rising from below.",
+  "category": "text-effect",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "hover",
+    "roll",
+    "stagger",
+    "link",
+    "button",
+    "css"
+  ],
+  "notes": [
+    "the hover target is the nearest ancestor with the class group/roll",
+    "the copy is a text shadow in currentColor, so it works on any colour",
+    "no movement under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-roll-text.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-roll-text",
+  "files": [
+    {
+      "path": "leome-and-partners-roll-text.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\nexport interface LeomeAndPartnersRollTextProps {\n  /** the label; every character rolls up to an identical copy on hover */\n  text: string;\n  className?: string;\n}\n\n// The original's hover timing: 0.6s on a long, soft ease-out, 10ms between characters.\nconst roll =\n  \"inline-block [text-shadow:0_1.3em_currentColor] transition-[translate] duration-[600ms] ease-[cubic-bezier(0.625,0.05,0,1)] \" +\n  \"group-hover/roll:-translate-y-[1.3em] group-focus-visible/roll:-translate-y-[1.3em] \" +\n  \"motion-reduce:transition-none motion-reduce:group-hover/roll:translate-y-0 motion-reduce:group-focus-visible/roll:translate-y-0\";\n\n/**\n * A label whose characters roll up one after another on hover, each replaced by a copy rising\n * from below (a text shadow 1.3em down). The hover target is the nearest ancestor with the\n * class `group/roll` (a link or button). Screen readers get the plain text.\n */\nexport function LeomeAndPartnersRollText({ text, className }: LeomeAndPartnersRollTextProps) {\n  return (\n    <span className={cn(\"relative inline-block overflow-clip align-top leading-[1.2]\", className)}>\n      <span className=\"sr-only\">{text}</span>\n      <span aria-hidden className=\"inline-block whitespace-pre\">\n        {Array.from(text).map((char, i) => (\n          <span key={i} className={roll} style={{ transitionDelay: `${(i * 0.01).toFixed(2)}s` }}>\n            {char}\n          </span>\n        ))}\n      </span>\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the label; every character rolls up to an identical copy on hover"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4c7d7ea26de251850317f554d48d1e9163c7b6cbcb2eb69437a0b335039992cd"
+}

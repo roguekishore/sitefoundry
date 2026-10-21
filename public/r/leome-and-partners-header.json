@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Leome and Partners header",
+  "description": "A fixed, transparent header: a mark and a two-line wordmark at the left, a small filled Menu button at the right whose label rolls letter by letter, fill insets and outer bars shorten on hover. It opens a full-screen menu that wipes down with a clip-path, with huge links that dim the others when one is hovered.",
+  "category": "header",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "transparent",
+    "menu",
+    "fullscreen-menu",
+    "hamburger",
+    "hover",
+    "roll",
+    "minimal",
+    "dark"
+  ],
+  "notes": [
+    "the open menu is inferred (the capture shows it closed): bg-card panel, 58px links, clip-path wipe of 1s",
+    "Escape closes the menu",
+    "fixed: in a page, the first section should leave room at the top (about 7rem)"
+  ],
+  "entry": "leome-and-partners-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "leome-and-partners-header",
+  "files": [
+    {
+      "path": "leome-and-partners-header.tsx",
+      "content": "import { useEffect, useId, useState, type ReactNode } from \"react\";\nimport { LeomeAndPartnersRollText } from \"@foundry/leome-and-partners-roll-text\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LeomeAndPartnersHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface LeomeAndPartnersHeaderProps {\n  /** the firm's name beside the mark, one entry per line (two short lines read best) */\n  wordmark: string[];\n  /** the brand mark left of the wordmark, e.g. a lucide icon; it is sized to 4rem */\n  mark?: ReactNode;\n  homeHref?: string;\n  /** the menu button's label */\n  menuLabel: string;\n  /** the button's label while the menu is open */\n  closeLabel: string;\n  /** the links of the full-screen menu */\n  links: LeomeAndPartnersHeaderLink[];\n  /** short lines along the foot of the open menu (address, phone, email…) */\n  menuFootnote?: string[];\n  className?: string;\n}\n\n// The original's hover and menu timings.\nconst ease = \"ease-[cubic-bezier(0.625,0.05,0,1)]\";\nconst bar = cn(\"absolute inset-x-0 top-1/2 h-px bg-current transition-[translate,rotate,scale,opacity] duration-[600ms] motion-reduce:transition-none\", ease);\n\n/**\n * A fixed, transparent header: a mark with a two-line wordmark at the left and a small filled\n * \"Menu\" button at the right whose label rolls, fill insets and outer bars shorten on hover.\n * The button opens a full-screen menu that wipes down (clip-path); hovering one of its large\n * links dims the others.\n */\nexport function LeomeAndPartnersHeader({\n  wordmark,\n  mark,\n  homeHref = \"/\",\n  menuLabel,\n  closeLabel,\n  links,\n  menuFootnote,\n  className,\n}: LeomeAndPartnersHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const menuId = useId();\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (event: KeyboardEvent) => {\n      if (event.key === \"Escape\") setOpen(false);\n    };\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 font-sans text-foreground\", className)}>\n      <div className=\"relative z-10 flex items-center justify-between px-10 pt-[1.5625rem]\">\n        <a href={homeHref} className=\"flex items-center gap-3\">\n          {mark && (\n            <span aria-hidden className=\"block size-16 [&_svg]:size-full\">\n              {mark}\n            </span>\n          )}\n          <span className=\"text-2xl leading-none font-medium tracking-[-0.02em]\">\n            {wordmark.map((line, i) => (\n              <span key={i} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </span>\n        </a>\n\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          aria-controls={menuId}\n          onClick={() => setOpen((value) => !value)}\n          className=\"group/roll relative flex h-[2.125rem] items-center gap-3 px-3.5 text-[0.85rem] font-medium text-primary-foreground\"\n        >\n          <span\n            aria-hidden\n            className={cn(\"absolute inset-0 bg-primary transition-[inset] duration-[600ms] group-hover/roll:inset-[0.125em] motion-reduce:transition-none\", ease)}\n          />\n          <LeomeAndPartnersRollText text={open ? closeLabel : menuLabel} className=\"relative\" />\n          <span aria-hidden className=\"relative block h-[1em] w-6\">\n            <span\n              className={cn(\n                bar,\n                open\n                  ? \"translate-y-0 rotate-45 scale-x-70\"\n                  : \"-translate-y-[0.35em] group-hover/roll:-translate-y-[0.5em] group-hover/roll:scale-x-50\",\n              )}\n            />\n            <span className={cn(bar, open && \"opacity-0\")} />\n            <span\n              className={cn(\n                bar,\n                open\n                  ? \"translate-y-0 -rotate-45 scale-x-70\"\n                  : \"translate-y-[0.35em] group-hover/roll:translate-y-[0.5em] group-hover/roll:scale-x-50\",\n              )}\n            />\n          </span>\n        </button>\n      </div>\n\n      <div\n        id={menuId}\n        inert={!open}\n        className={cn(\n          \"fixed inset-0 flex flex-col justify-end gap-12 bg-card px-10 pt-32 pb-10 text-card-foreground transition-[clip-path] duration-1000 ease-[cubic-bezier(0.9,0,0.1,1)] motion-reduce:transition-none\",\n          open ? \"[clip-path:inset(0_0_0_0)]\" : \"pointer-events-none [clip-path:inset(0_0_100%_0)]\",\n        )}\n      >\n        <nav>\n          <ul className=\"[&:has(>li:hover)>li:not(:hover)]:opacity-15\">\n            {links.map((link) => (\n              <li key={link.href} className=\"transition-opacity duration-500 motion-reduce:transition-none\">\n                <a\n                  href={link.href}\n                  onClick={() => setOpen(false)}\n                  className=\"group/roll block text-[2.75rem] font-medium tracking-[-0.048em] lg:text-[3.65rem]\"\n                >\n                  <LeomeAndPartnersRollText text={link.label} />\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n        {menuFootnote && menuFootnote.length > 0 && (\n          <ul className=\"flex flex-wrap gap-x-8 gap-y-2 text-xs font-medium uppercase\">\n            {menuFootnote.map((line) => (\n              <li key={line}>{line}</li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "leome-and-partners-roll-text"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string[]",
+      "required": true,
+      "description": "the firm's name beside the mark, one entry per line (two short lines read best)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the brand mark left of the wordmark, e.g. a lucide icon; it is sized to 4rem"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the menu button's label"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button's label while the menu is open"
+    },
+    {
+      "name": "links",
+      "type": "LeomeAndPartnersHeaderLink[]",
+      "required": true,
+      "description": "the links of the full-screen menu"
+    },
+    {
+      "name": "menuFootnote",
+      "type": "string[]",
+      "required": false,
+      "description": "short lines along the foot of the open menu (address, phone, email…)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "51d2fd5cc192371312ff8154a61f9c93f088b8100ee5253b68b0f04d0fa4a2ec"
+}

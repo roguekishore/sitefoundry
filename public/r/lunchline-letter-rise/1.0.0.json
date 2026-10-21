@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Lunchline letter rise",
+  "description": "A heading split into letters that rise into place through their word's mask: the first letter starts just below its place, each next one further down, so a line settles like a wave from left to right. Scrubbed with the scroll as the heading enters (scroll mode), or once on load (load mode, 22ms apart, with a fade).",
+  "category": "text-effect",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "heading",
+    "reveal",
+    "split",
+    "letters",
+    "stagger",
+    "mask",
+    "scrubbed",
+    "scroll",
+    "load",
+    "css-only"
+  ],
+  "notes": [
+    "takes plain text (it splits on spaces, then into letters); screen readers get the whole text from aria-label",
+    "CSS only: without scroll-driven animations, or with reduced motion, the text simply stands",
+    "use load mode only for a heading in the first screen"
+  ],
+  "entry": "lunchline-letter-rise.tsx",
+  "source": "foundry",
+  "name": "lunchline-letter-rise",
+  "files": [
+    {
+      "path": "lunchline-letter-rise.css",
+      "content": "/* Each word sits in an inline-block mask that crops it (overflow: clip is not a scroll\n   container, so the view timeline still works). The padding plus an equal negative margin\n   leaves room for ascenders and descenders without changing the line height. Each letter\n   starts --d below its place: the first barely, later ones further, so a line reads as a\n   wave settling from left to right. */\n.lunchline-letter-rise-mask {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: top;\n  padding-block: 0.1em 0.2em;\n  margin-block: -0.1em -0.2em;\n}\n\n.lunchline-letter-rise-ch {\n  display: inline-block;\n}\n\n/* scroll mode: the heading itself is the timeline, so all its letters share it */\n.lunchline-letter-rise[data-mode=\"scroll\"] {\n  view-timeline-name: --lunchline-letter-rise;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-letter-rise[data-mode=\"scroll\"] .lunchline-letter-rise-ch {\n      animation: lunchline-letter-rise-up linear both;\n      animation-timeline: --lunchline-letter-rise;\n      animation-range: entry 0% cover 45%;\n    }\n  }\n}\n\n/* load mode: once, on the original's ease-out cubic, 22ms apart */\n@media (prefers-reduced-motion: no-preference) {\n  .lunchline-letter-rise[data-mode=\"load\"] {\n    animation: lunchline-letter-rise-fade 0.6s cubic-bezier(0.215, 0.61, 0.355, 1) both;\n    animation-delay: var(--lunchline-letter-rise-delay, 0ms);\n  }\n  .lunchline-letter-rise[data-mode=\"load\"] .lunchline-letter-rise-ch {\n    animation: lunchline-letter-rise-up 1s cubic-bezier(0.215, 0.61, 0.355, 1) both;\n    animation-delay: calc(var(--lunchline-letter-rise-delay, 0ms) + var(--i, 0) * 22ms);\n  }\n}\n\n@keyframes lunchline-letter-rise-up {\n  from {\n    transform: translateY(var(--d, 0.5em));\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes lunchline-letter-rise-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-letter-rise.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./lunchline-letter-rise.css\";\n\nexport interface LunchlineLetterRiseProps {\n  /** the text; split into words (each its own mask) and letters */\n  text: string;\n  /** the element to render: h2 by default */\n  as?: ElementType;\n  /** \"scroll\": the letters rise as the heading scrolls into view, scrubbed with the scroll;\n      \"load\": they rise once when the page loads (for the first screen) */\n  mode?: \"scroll\" | \"load\";\n  /** load mode only: wait this long (ms) before the first letter moves */\n  delay?: number;\n  /** how far the first letter starts below its place, in em; each next letter starts 15%\n      further down, up to `maxDrop` */\n  drop?: number;\n  /** the furthest any letter starts below its place, in em (about one line hides it fully) */\n  maxDrop?: number;\n  /** size, leading, weight and colour go here */\n  className?: string;\n}\n\nexport function LunchlineLetterRise({\n  text,\n  as: Tag = \"h2\",\n  mode = \"scroll\",\n  delay = 0,\n  drop = 0.11,\n  maxDrop = 1.05,\n  className,\n}: LunchlineLetterRiseProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  let index = 0;\n  return (\n    <Tag\n      aria-label={text}\n      data-mode={mode}\n      className={cn(\"lunchline-letter-rise\", className)}\n      style={{ \"--lunchline-letter-rise-delay\": `${delay}ms` } as CSSProperties}\n    >\n      {words.map((word, w) => (\n        <Fragment key={w}>\n          <span aria-hidden className=\"lunchline-letter-rise-mask\">\n            {Array.from(word).map((letter, l) => {\n              const i = index++;\n              const d = Math.min(drop * Math.pow(1.15, i), maxDrop);\n              return (\n                <span key={l} className=\"lunchline-letter-rise-ch\" style={{ \"--i\": i, \"--d\": `${d.toFixed(3)}em` } as CSSProperties}>\n                  {letter}\n                </span>\n              );\n            })}\n          </span>\n          {w < words.length - 1 && \" \"}\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; split into words (each its own mask) and letters"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render: h2 by default"
+    },
+    {
+      "name": "mode",
+      "type": "enum",
+      "required": false,
+      "default": "scroll",
+      "description": "\"scroll\": the letters rise as the heading scrolls into view, scrubbed with the scroll;\n\"load\": they rise once when the page loads (for the first screen)"
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "load mode only: wait this long (ms) before the first letter moves"
+    },
+    {
+      "name": "drop",
+      "type": "number",
+      "required": false,
+      "default": "0.11",
+      "description": "how far the first letter starts below its place, in em; each next letter starts 15%\nfurther down, up to `maxDrop`"
+    },
+    {
+      "name": "maxDrop",
+      "type": "number",
+      "required": false,
+      "default": "1.05",
+      "description": "the furthest any letter starts below its place, in em (about one line hides it fully)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, leading, weight and colour go here"
+    }
+  ],
+  "hash": "7d177ac10c68025c9583b366a812a7f7422951c3da39bb55c7c2c27431dde81e"
+}

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "AAT Architecten projects",
+  "description": "A white project index: a grey section head with an underlined 'all work' link, then large square-cornered photos with a two-line caption (ink title, grey category). Stacked full-width on phones; from 1024px a 12-column grid where portraits take 4 columns and landscapes 8, so a row lines up at one height. Each card fades in from blank as it scrolls into view, and its photo slowly swells on hover.",
+  "category": "gallery",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "portfolio",
+    "gallery",
+    "grid",
+    "minimal",
+    "white",
+    "architecture",
+    "editorial",
+    "scrubbed",
+    "fade",
+    "hover"
+  ],
+  "notes": [
+    "cards flow in order through the 12-column grid: mix portraits (4 columns) and landscapes (8) so rows fill to 12",
+    "the scroll fade needs CSS scroll-driven animations; elsewhere the cards simply show",
+    "photo slots are muted placeholders until you pass media (an <img> with object-cover fills them)"
+  ],
+  "entry": "aat-architecten-projects.tsx",
+  "source": "foundry",
+  "name": "aat-architecten-projects",
+  "files": [
+    {
+      "path": "aat-architecten-projects.css",
+      "content": "/* Each card goes from blank to fully shown while it enters the window, tied to the scroll. */\n@supports (animation-timeline: view()) {\n  .aat-architecten-projects-card {\n    animation: aat-architecten-projects-fade linear both;\n    animation-timeline: view();\n    animation-range: entry 0% entry 100%;\n  }\n}\n@keyframes aat-architecten-projects-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aat-architecten-projects-card { animation: none; }\n}\n"
+    },
+    {
+      "path": "aat-architecten-projects.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AatArchitectenLineLink } from \"@foundry/aat-architecten-line-link\";\nimport \"./aat-architecten-projects.css\";\n\nexport interface AatArchitectenProject {\n  /** the project's name (ink) */\n  title: string;\n  /** its kind or sector (grey, under the title) */\n  category: string;\n  href: string;\n  /** portrait: 4 of 12 columns from 1024px; landscape: 8 columns, the same height */\n  shape: \"portrait\" | \"landscape\";\n  /** the photo (an <img> with object-cover fills it); empty: a muted placeholder */\n  media?: ReactNode;\n}\n\nexport interface AatArchitectenProjectsProps {\n  /** the grey section head */\n  heading: string;\n  /** label of the link to every project */\n  allLabel: string;\n  allHref: string;\n  projects: AatArchitectenProject[];\n  id?: string;\n  className?: string;\n}\n\nexport function AatArchitectenProjects({ heading, allLabel, allHref, projects, id, className }: AatArchitectenProjectsProps) {\n  return (\n    <section id={id} className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 px-gutter lg:grid-cols-12 lg:gap-x-10\">\n        <h2 className=\"text-[clamp(20px,1.3vw+0.8rem,32px)] leading-[1.25] font-normal text-muted-foreground lg:col-span-6 lg:row-start-1\">\n          {heading}\n        </h2>\n\n        <ul className=\"mt-10 grid grid-cols-1 gap-y-[3.75rem] lg:col-span-12 lg:row-start-2 lg:mt-32 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-40\">\n          {projects.map((project) => (\n            <li\n              key={project.href + project.title}\n              className={cn(\"aat-architecten-projects-card\", project.shape === \"landscape\" ? \"lg:col-span-8\" : \"lg:col-span-4\")}\n            >\n              <a href={project.href} className=\"group block\">\n                <div className=\"overflow-clip bg-muted\">\n                  {/* the photo swells slowly on hover, inside its fixed frame */}\n                  <div\n                    className={cn(\n                      \"transition-[scale] duration-[1500ms] ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-[1.04] motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover\",\n                      project.shape === \"landscape\" ? \"aspect-[1.585]\" : \"aspect-[0.76]\",\n                    )}\n                  >\n                    {project.media}\n                  </div>\n                </div>\n                <p className=\"mt-5 text-xl leading-[1.375]\">{project.title}</p>\n                <p className=\"text-xl leading-[1.375] text-muted-foreground\">{project.category}</p>\n              </a>\n            </li>\n          ))}\n        </ul>\n\n        <AatArchitectenLineLink href={allHref} className=\"mt-[5.5rem] lg:col-span-4 lg:col-start-9 lg:row-start-1 lg:mt-0 lg:self-start lg:justify-self-end\">\n          {allLabel}\n        </AatArchitectenLineLink>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "aat-architecten-line-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the grey section head"
+    },
+    {
+      "name": "allLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the link to every project"
+    },
+    {
+      "name": "allHref",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "projects",
+      "type": "AatArchitectenProject[]",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f7fb77d5f956c07a140303c6c121b8f0e394a1563c13bbb57497d24b2c692376"
+}

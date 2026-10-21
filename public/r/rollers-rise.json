@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rollers rise",
+  "description": "A wrapper that fades its content in while lifting it 40px (or sliding it 60px in from the right) over the first stretch of scroll after it enters the window. Steps stagger items set side by side. CSS view timeline.",
+  "category": "animation",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "fade-up",
+    "fade-right",
+    "scroll",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: without support, and under reduced motion, the content shows in place",
+    "sliding in from the right can push past the page edge while it runs: give the section overflow-x-clip",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "rollers-rise.tsx",
+  "source": "foundry",
+  "name": "rollers-rise",
+  "files": [
+    {
+      "path": "rollers-rise.css",
+      "content": "/* fadeInUp / fadeInRight, tied to scroll: over the first 220px after the element's top enters\n   the window (a fixed distance, so anything in the first screen is in place at load).\n   Each step starts 40px later. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rollers-rise {\n      animation: rollers-rise-up linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--rollers-rise-step, 0) * 40px) entry calc(220px + var(--rollers-rise-step, 0) * 40px);\n    }\n    .rollers-rise.rollers-rise-right {\n      animation-name: rollers-rise-left;\n    }\n  }\n}\n\n@keyframes rollers-rise-up {\n  from {\n    opacity: 0;\n    transform: translateY(40px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes rollers-rise-left {\n  from {\n    opacity: 0;\n    transform: translateX(60px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "rollers-rise.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rollers-rise.css\";\n\nexport interface RollersRiseProps {\n  children?: ReactNode;\n  /** the element to render (div by default) */\n  as?: ElementType;\n  /** below: rise 40px into place (the original's fadeInUp) · right: slide in 60px from the right (fadeInRight) */\n  from?: \"below\" | \"right\";\n  /** position in a staggered row: 0, 1, 2… each arrives 40px of scroll later */\n  step?: number;\n  className?: string;\n}\n\n/** A wrapper that fades its content in and moves it into place over the first 220px of scroll\n    after it enters the window (CSS view timeline). */\nexport function RollersRise({ children, as: Tag = \"div\", from = \"below\", step = 0, className }: RollersRiseProps) {\n  return (\n    <Tag\n      className={cn(\"rollers-rise\", from === \"right\" && \"rollers-rise-right\", className)}\n      style={{ \"--rollers-rise-step\": step } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default)"
+    },
+    {
+      "name": "from",
+      "type": "enum",
+      "required": false,
+      "default": "below",
+      "description": "below: rise 40px into place (the original's fadeInUp) · right: slide in 60px from the right (fadeInRight)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered row: 0, 1, 2… each arrives 40px of scroll later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f8c792577304dc1383cecc851bacd8d5c4bcaf0793d77c34e6e2c87767f179a9"
+}

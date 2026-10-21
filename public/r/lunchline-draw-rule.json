@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Lunchline draw rule",
+  "description": "A 1px hairline along the top or bottom edge of a band that draws itself out from the middle (86% to full width) as it scrolls into view. CSS only.",
+  "category": "divider",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "divider",
+    "hairline",
+    "line",
+    "draw",
+    "reveal",
+    "scroll",
+    "minimal",
+    "css-only"
+  ],
+  "notes": [
+    "absolutely positioned: give the parent `relative`",
+    "the line ends its draw a third of the way up the window, so on a page's very last band it can stop just short of full width"
+  ],
+  "entry": "lunchline-draw-rule.tsx",
+  "source": "foundry",
+  "name": "lunchline-draw-rule",
+  "files": [
+    {
+      "path": "lunchline-draw-rule.css",
+      "content": "/* The original's drawBorder: scaleX 0.86 -> 1 from the middle while the line enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-draw-rule {\n      animation: lunchline-draw-rule-draw linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 35%;\n    }\n  }\n}\n\n@keyframes lunchline-draw-rule-draw {\n  from {\n    transform: scaleX(0.86);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-draw-rule.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./lunchline-draw-rule.css\";\n\nexport interface LunchlineDrawRuleProps {\n  /** where the line sits in its (relative) parent: along the top edge or the bottom edge */\n  edge?: \"top\" | \"bottom\";\n  /** colour and thickness overrides (bg-border h-px by default) */\n  className?: string;\n}\n\n/** A 1px hairline along the top (or bottom) of its parent that draws itself out from the\n    middle, from 86% to the full width, as it scrolls into view. The parent needs `relative`. */\nexport function LunchlineDrawRule({ edge = \"top\", className }: LunchlineDrawRuleProps) {\n  return (\n    <span\n      aria-hidden\n      className={cn(\n        \"lunchline-draw-rule pointer-events-none absolute inset-x-0 h-px bg-border\",\n        edge === \"top\" ? \"top-0\" : \"bottom-0\",\n        className,\n      )}\n    />\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "edge",
+      "type": "enum",
+      "required": false,
+      "default": "top",
+      "description": "where the line sits in its (relative) parent: along the top edge or the bottom edge"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "colour and thickness overrides (bg-border h-px by default)"
+    }
+  ],
+  "hash": "8414cc8ece724c70933b20c72c94f4f872c5ca2537ebd6d6ca5599120b5c6295"
+}

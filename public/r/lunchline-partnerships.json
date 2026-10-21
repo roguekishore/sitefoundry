@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline partnerships",
+  "description": "A portfolio table: a tiny tracked eyebrow, then a grid of hairline-bordered cells (one column on phones, two on wide screens, an odd last cell left on its own), each with a logo, a large light company name and a short description, and an optional handwritten badge in a loose ellipse beside the logo. Linked cells tint white on hover and show a small 'visit' tag; the section's top hairline draws itself out.",
+  "category": "logos",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "portfolio",
+    "logos",
+    "grid",
+    "table",
+    "bordered",
+    "hairline",
+    "cards",
+    "handwritten",
+    "badge",
+    "minimal",
+    "editorial",
+    "hover"
+  ],
+  "notes": [
+    "logos sit left-aligned and contained in a 10:3 slot (240×72 on phones, 333×100 on wide screens)",
+    "the badge uses the theme's --typeface-hand when it has one (lunchline-theme: Reenie Beanie)",
+    "the hover tag sits in the cell's corner; the original's follows the cursor"
+  ],
+  "entry": "lunchline-partnerships.tsx",
+  "source": "foundry",
+  "name": "lunchline-partnerships",
+  "files": [
+    {
+      "path": "lunchline-partnerships.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineDrawRule } from \"@foundry/lunchline-draw-rule\";\n\nexport interface LunchlinePortfolioItem {\n  /** the company's name, set large and light */\n  name: string;\n  /** one or two sentences on what it does */\n  description: string;\n  /** the company's logo (about 10:3). Empty: a placeholder of that size. */\n  logo?: ReactNode;\n  /** its website: the whole cell becomes a link that tints on hover */\n  href?: string;\n  /** a handwritten word in a loose ellipse beside the logo, e.g. \"sold\" */\n  badge?: string;\n}\n\nexport interface LunchlinePartnershipsProps {\n  /** the small tracked label above the table (left on phones, centred on wide screens) */\n  eyebrow: string;\n  items: LunchlinePortfolioItem[];\n  /** the small tag that appears on a linked cell while hovered */\n  visitLabel?: string;\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst hand = \"font-[family-name:var(--typeface-hand,var(--typeface-display))]\";\n\nexport function LunchlinePartnerships({ eyebrow, items, visitLabel, id, className }: LunchlinePartnershipsProps) {\n  return (\n    <section id={id} className={cn(\"relative bg-background pt-section pb-16 text-foreground lg:pt-[6.4rem] lg:pb-24\", className)}>\n      <LunchlineDrawRule />\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <p className=\"text-sm leading-none font-bold tracking-[0.08em] uppercase lg:text-center lg:text-base\">{eyebrow}</p>\n        <ul className=\"mt-[3.6rem] grid border-t border-l border-border lg:mt-[3.4rem] lg:grid-cols-2\">\n          {items.map((item) => {\n            const Cell = item.href ? \"a\" : \"div\";\n            return (\n              <li key={item.name} className=\"border-r border-b border-border\">\n                <Cell\n                  {...(item.href ? { href: item.href, target: \"_blank\", rel: \"noreferrer\" } : {})}\n                  className={cn(\n                    \"group relative block h-full px-[1.1rem] pt-[1.9rem] pb-[1.6rem] lg:px-12 lg:pt-[4.1rem] lg:pb-[3.4rem]\",\n                    item.href && \"transition-colors duration-150 ease-[cubic-bezier(0.215,0.61,0.355,1)] hover:bg-card/50 motion-reduce:transition-none\",\n                  )}\n                >\n                  <div className=\"h-[4.5rem] w-60 overflow-clip lg:h-[6.25rem] lg:w-[20.8rem] [&>img]:size-full [&>img]:object-contain [&>img]:object-left\">\n                    {item.logo ?? <div className=\"size-full bg-muted/70\" />}\n                  </div>\n                  {item.badge && (\n                    <span\n                      className={cn(\n                        hand,\n                        \"absolute top-[2rem] right-[1.6rem] -rotate-[4deg] rounded-[50%] border border-foreground/60 bg-background/80 px-5 pt-1.5 pb-1 text-[1.9rem] leading-none lg:top-[3.2rem] lg:right-auto lg:left-[21.75rem] lg:text-[2.1rem]\",\n                      )}\n                    >\n                      {item.badge}\n                    </span>\n                  )}\n                  <h3 className=\"mt-3 font-display text-[2rem] leading-[1.2] font-light tracking-[-0.01em] lg:mt-2 lg:text-[2.5rem]\">{item.name}</h3>\n                  <p className=\"mt-2 max-w-[35rem] text-lg leading-[1.3] lg:mt-3 lg:text-[1.3125rem] lg:leading-[1.4]\">{item.description}</p>\n                  {item.href && visitLabel && (\n                    <span className=\"absolute right-4 bottom-4 bg-foreground px-2.5 py-1.5 text-xs leading-none font-bold tracking-[0.08em] text-background uppercase opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none\">\n                      {visitLabel}\n                    </span>\n                  )}\n                </Cell>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-draw-rule"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small tracked label above the table (left on phones, centred on wide screens)"
+    },
+    {
+      "name": "items",
+      "type": "LunchlinePortfolioItem[]",
+      "required": true
+    },
+    {
+      "name": "visitLabel",
+      "type": "string",
+      "required": false,
+      "description": "the small tag that appears on a linked cell while hovered"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3fe7c6ee7021d3255a49c6502111f73381a6db4ae3c1d5b95bd62b778f69c56a"
+}

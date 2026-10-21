@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rioproperty rise text",
+  "description": "Heading text whose words rise out of their own masks as it scrolls into view, rippling left to right, scrubbed with the scroll; or, for paragraphs, the whole block fades and rises 30px. CSS only.",
+  "category": "text-effect",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "heading",
+    "reveal",
+    "mask",
+    "split",
+    "words",
+    "ripple",
+    "scrubbed",
+    "scroll",
+    "css-only"
+  ],
+  "notes": [
+    "takes plain text (it splits on spaces)",
+    "CSS only: without scroll-driven animations, or with reduced motion, the text simply stands",
+    "the masks leave room for ascenders and descenders; leading under ~0.9 may clip accents"
+  ],
+  "entry": "rioproperty-rise-text.tsx",
+  "source": "foundry",
+  "name": "rioproperty-rise-text",
+  "files": [
+    {
+      "path": "rioproperty-rise-text.css",
+      "content": "/* Each word sits in an inline-block mask that crops it (overflow: clip is not a scroll\n   container, so the view timeline still follows the page). Padding plus an equal negative\n   margin leaves room for accents and descenders without changing the line height. The mask is\n   the timeline; each word starts 14px of scroll after the one before it, so a line ripples up\n   from left to right, scrubbed with the scroll. */\n.rioproperty-rise-text-mask {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: top;\n  padding-block: 0.1em 0.14em;\n  margin-block: -0.1em -0.14em;\n  view-timeline-name: --rioproperty-rise-text;\n}\n\n.rioproperty-rise-text-word {\n  display: inline-block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-rise-text-word {\n      animation: rioproperty-rise-text-up linear both;\n      animation-timeline: --rioproperty-rise-text;\n      animation-range:\n        entry calc(var(--rioproperty-rise-text-i, 0) * 14px)\n        entry calc(var(--rioproperty-rise-text-distance, 360px) + var(--rioproperty-rise-text-i, 0) * 14px);\n    }\n    .rioproperty-rise-text-block {\n      animation: rioproperty-rise-text-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry var(--rioproperty-rise-text-distance, 360px);\n    }\n  }\n}\n\n@keyframes rioproperty-rise-text-up {\n  from {\n    transform: translateY(110%);\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes rioproperty-rise-text-fade {\n  from {\n    opacity: 0;\n    transform: translateY(30px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-rise-text.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rioproperty-rise-text.css\";\n\nexport interface RiopropertyRiseTextProps {\n  /** the text; with split \"words\" every word rises from its own mask */\n  text: string;\n  /** the element to render: h2 by default */\n  as?: ElementType;\n  /** \"words\": each word rises out of a mask, a ripple from left to right (headings);\n      \"block\": the whole text fades and rises 30px (paragraphs) */\n  split?: \"words\" | \"block\";\n  /** how many px of scroll, after the text enters the window, the rise takes */\n  distance?: number;\n  className?: string;\n}\n\nexport function RiopropertyRiseText({ text, as: Tag = \"h2\", split = \"words\", distance = 360, className }: RiopropertyRiseTextProps) {\n  const style = { \"--rioproperty-rise-text-distance\": `${distance}px` } as CSSProperties;\n  if (split === \"block\") {\n    return (\n      <Tag className={cn(\"rioproperty-rise-text-block\", className)} style={style}>\n        {text}\n      </Tag>\n    );\n  }\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <Tag className={className} style={style}>\n      {words.map((word, i) => (\n        <Fragment key={i}>\n          <span className=\"rioproperty-rise-text-mask\">\n            <span className=\"rioproperty-rise-text-word\" style={{ \"--rioproperty-rise-text-i\": i } as CSSProperties}>\n              {word}\n            </span>\n          </span>\n          {i < words.length - 1 && \" \"}\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; with split \"words\" every word rises from its own mask"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render: h2 by default"
+    },
+    {
+      "name": "split",
+      "type": "enum",
+      "required": false,
+      "default": "words",
+      "description": "\"words\": each word rises out of a mask, a ripple from left to right (headings);\n\"block\": the whole text fades and rises 30px (paragraphs)"
+    },
+    {
+      "name": "distance",
+      "type": "number",
+      "required": false,
+      "default": "360",
+      "description": "how many px of scroll, after the text enters the window, the rise takes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "720965338739d26ee98e2e2830f930d348a427a5572c549334bc66f2e6653cd4"
+}

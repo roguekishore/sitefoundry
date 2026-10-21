@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG projects",
+  "description": "Two project cards on the light surface, which ends in a 73px rounded bottom: each card a wide photo over a taupe-to-sand panel with a bold paper title, a few facts each led by a thin arrow, and an outline pill that fills with paper on hover. On phones the cards become a swipeable slider with round paper arrows; the title fades up on entering view.",
+  "category": "gallery",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "portfolio",
+    "cards",
+    "gradient",
+    "slider",
+    "carousel",
+    "rounded",
+    "real-estate",
+    "reveal",
+    "hover"
+  ],
+  "notes": [
+    "photo slots empty: plain sand placeholders, top corners rounded, 1.85 on desktop and 1.26 on phones",
+    "sits above the next section (z-10) so a following block with tuck shows around its rounded corners",
+    "the arrows need JavaScript; the slider still swipes without it"
+  ],
+  "entry": "wild-ag-projects.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "wild-ag-projects",
+  "files": [
+    {
+      "path": "wild-ag-projects.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgButton } from \"@foundry/wild-ag-button\";\nimport { WildAgCarousel } from \"@foundry/wild-ag-carousel\";\nimport { WildAgHeading } from \"@foundry/wild-ag-heading\";\nimport { WildAgMedia } from \"@foundry/wild-ag-media\";\n\nexport interface WildAgProject {\n  /** place and name */\n  title: string;\n  /** short facts, each led by an arrow */\n  facts: string[];\n  /** the outline pill */\n  cta: { label: string; href: string };\n  /** photo or rendering. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface WildAgProjectsProps {\n  /** an id for in-page links */\n  id?: string;\n  title: string;\n  projects: WildAgProject[];\n  /** screen-reader labels of the slider arrows */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nexport function WildAgProjects({ id, title, projects, prevLabel, nextLabel, className }: WildAgProjectsProps) {\n  return (\n    <section\n      id={id}\n      className={cn(\n        \"relative z-10 rounded-b-[calc(var(--radius)*3.4)] bg-muted px-gutter pt-[4.4rem] pb-[5.4rem] lg:rounded-b-[calc(var(--radius)*4.5)] lg:py-section\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page\">\n        <WildAgCarousel\n          title={<WildAgHeading>{title}</WildAgHeading>}\n          prevLabel={prevLabel}\n          nextLabel={nextLabel}\n          columns={2}\n          items={projects.map((p) => (\n            <article key={p.title} className=\"flex h-full flex-col overflow-clip rounded-lg\">\n              <WildAgMedia media={p.media} className=\"aspect-[1.26] w-full lg:aspect-[1.85]\" />\n              <div className=\"flex-1 bg-linear-15 from-primary to-highlight px-9 pt-9 pb-9 text-primary-foreground lg:px-10 lg:pt-8 lg:pb-10\">\n                <h3 className=\"text-[1.9rem] leading-[1.2] font-semibold tracking-[-0.01em]\">{p.title}</h3>\n                <ul className=\"mt-3 flex flex-col gap-1.5 text-[1.0625rem] leading-[1.4] font-medium tracking-[-0.01em] text-primary-foreground/85 lg:flex-row lg:flex-wrap lg:gap-x-4 lg:gap-y-1.5\">\n                  {p.facts.map((f) => (\n                    <li key={f} className=\"flex items-center gap-3\">\n                      <ArrowRight aria-hidden strokeWidth={1.5} className=\"size-[1.15rem] shrink-0\" />\n                      {f}\n                    </li>\n                  ))}\n                </ul>\n                <WildAgButton href={p.cta.href} variant=\"outline\" size=\"sm\" className=\"mt-6 w-full lg:w-auto\">\n                  {p.cta.label}\n                </WildAgButton>\n              </div>\n            </article>\n          ))}\n        />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-button",
+    "wild-ag-carousel",
+    "wild-ag-heading",
+    "wild-ag-media"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "projects",
+      "type": "WildAgProject[]",
+      "required": true
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the slider arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c11f248cdd7f5824df273927eebf7687d651644a41cff026a16694eb67715b80"
+}

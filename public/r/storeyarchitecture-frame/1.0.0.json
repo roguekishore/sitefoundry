@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Storey Architecture media frame",
+  "description": "A square-cornered image frame at a given aspect ratio. As it enters the window a black veil over it fades away; while it crosses the window the (oversized) media inside drifts down, a slow parallax. On hover a small white label follows the pointer.",
+  "category": "card",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "image",
+    "frame",
+    "parallax",
+    "reveal",
+    "uncover",
+    "hover",
+    "cursor-follow",
+    "scroll"
+  ],
+  "notes": [
+    "the veil is drawn with bg-foreground, so on dark themes it reads as a pale wash",
+    "empty media shows a bg-muted placeholder; pass an <img> with object-cover to fill it",
+    "the label follows the pointer once hydrated; without JavaScript it appears at the top-left on hover"
+  ],
+  "entry": "storeyarchitecture-frame.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "storeyarchitecture-frame",
+  "files": [
+    {
+      "path": "storeyarchitecture-frame.css",
+      "content": "/* The media is 116% of the frame's height and starts 16% above it; over the frame's whole\n   pass through the window it drifts down by that 16%, so it always covers the frame.\n   The veil fades out over the first 300px after the frame enters. Both read the frame's\n   own view timeline (the frame is overflow: clip, never its own scroller). */\n.storeyarchitecture-frame {\n  view-timeline-name: --storeyarchitecture-frame;\n}\n\n.storeyarchitecture-frame-veil {\n  opacity: 0;\n}\n\n.storeyarchitecture-frame-label {\n  transform: translate(var(--storeyarchitecture-frame-x, 1.4vw), var(--storeyarchitecture-frame-y, 1.4vw));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-frame-media {\n      animation: storeyarchitecture-frame-drift linear both;\n      animation-timeline: --storeyarchitecture-frame;\n      animation-range: cover 0% cover 100%;\n    }\n    .storeyarchitecture-frame-veil {\n      animation: storeyarchitecture-frame-uncover linear both;\n      animation-timeline: --storeyarchitecture-frame;\n      animation-range: entry 0px entry 300px;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-frame-drift {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(13.8%);\n  }\n}\n\n@keyframes storeyarchitecture-frame-uncover {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-frame.tsx",
+      "content": "import type { CSSProperties, PointerEvent, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./storeyarchitecture-frame.css\";\n\nexport interface StoreyarchitectureFrameProps {\n  /** the image or video; empty shows a placeholder surface */\n  media?: ReactNode;\n  /** width / height as a CSS aspect-ratio, e.g. \"4 / 3\" */\n  ratio: string;\n  /** the ratio from 640px up, when the desktop frame has another shape */\n  ratioWide?: string;\n  /** the small label that follows the pointer on hover (\"Explore project\") */\n  label?: string;\n  /** makes the whole frame a link */\n  href?: string;\n  className?: string;\n}\n\n// Keep the label's top-left a little below-right of the pointer.\nfunction follow(event: PointerEvent<HTMLElement>) {\n  const box = event.currentTarget.getBoundingClientRect();\n  event.currentTarget.style.setProperty(\"--storeyarchitecture-frame-x\", `${event.clientX - box.left + 12}px`);\n  event.currentTarget.style.setProperty(\"--storeyarchitecture-frame-y\", `${event.clientY - box.top + 12}px`);\n}\n\nexport function StoreyarchitectureFrame({ media, ratio, ratioWide, label, href, className }: StoreyarchitectureFrameProps) {\n  const Tag = href ? \"a\" : \"div\";\n  return (\n    <Tag\n      href={href}\n      onPointerMove={label ? follow : undefined}\n      className={cn(\n        \"storeyarchitecture-frame group/frame relative block aspect-(--storeyarchitecture-frame-ratio) overflow-clip sm:aspect-(--storeyarchitecture-frame-ratio-wide)\",\n        className,\n      )}\n      style={{ \"--storeyarchitecture-frame-ratio\": ratio, \"--storeyarchitecture-frame-ratio-wide\": ratioWide ?? ratio } as CSSProperties}\n    >\n      <div className=\"storeyarchitecture-frame-media absolute inset-x-0 top-[-16%] h-[116%] bg-muted [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n        {media}\n      </div>\n      <div aria-hidden className=\"storeyarchitecture-frame-veil pointer-events-none absolute inset-0 bg-foreground\" />\n      {label && (\n        <span\n          aria-hidden\n          className=\"storeyarchitecture-frame-label pointer-events-none absolute top-0 left-0 bg-background px-[2vw] py-[1.4vw] text-[3.6vw] leading-none tracking-[-0.02em] whitespace-nowrap text-foreground opacity-0 transition-opacity duration-200 group-hover/frame:opacity-100 sm:px-[0.7vw] sm:py-[0.5vw] sm:text-[1.1vw]\"\n        >\n          {label}\n        </span>\n      )}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the image or video; empty shows a placeholder surface"
+    },
+    {
+      "name": "ratio",
+      "type": "string",
+      "required": true,
+      "description": "width / height as a CSS aspect-ratio, e.g. \"4 / 3\""
+    },
+    {
+      "name": "ratioWide",
+      "type": "string",
+      "required": false,
+      "description": "the ratio from 640px up, when the desktop frame has another shape"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the small label that follows the pointer on hover (\"Explore project\")"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "makes the whole frame a link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ba27da84160d84008c8a67d097523125cf03a26a10bbb43a33efc05455a0ade8"
+}

@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers fleet",
+  "description": "A ruled two-column grid of large square-cornered photo cards with orange arrow tiles, the right column set lower than the left; on wide screens the columns drift against each other as you scroll (left down, right up, 100px each). Under it a ruled row with one orange button that slides in from the right.",
+  "category": "gallery",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "grid",
+    "staggered",
+    "parallax",
+    "scrubbed",
+    "ruled",
+    "hairline",
+    "orange",
+    "arrow",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "made for four cards (two per column); any even number works",
+    "the drift is a CSS view timeline on each column; phones stack the cards without it",
+    "media is a placeholder until you pass an <img> with object-cover and full size"
+  ],
+  "entry": "rollers-fleet.tsx",
+  "source": "foundry",
+  "name": "rollers-fleet",
+  "files": [
+    {
+      "path": "rollers-fleet.css",
+      "content": "/* Wide screens: the two columns drift against each other while the grid crosses the window,\n   the left one from -50px to 50px, the right one from 50px to -50px. */\n@supports (animation-timeline: view()) {\n  @media (min-width: 48rem) and (prefers-reduced-motion: no-preference) {\n    .rollers-fleet-down,\n    .rollers-fleet-up {\n      animation: rollers-fleet-drift-down linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n    .rollers-fleet-up {\n      animation-name: rollers-fleet-drift-up;\n    }\n  }\n}\n\n@keyframes rollers-fleet-drift-down {\n  from {\n    transform: translateY(-50px);\n  }\n  to {\n    transform: translateY(50px);\n  }\n}\n\n@keyframes rollers-fleet-drift-up {\n  from {\n    transform: translateY(50px);\n  }\n  to {\n    transform: translateY(-50px);\n  }\n}\n"
+    },
+    {
+      "path": "rollers-fleet.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RollersArrowCard } from \"@foundry/rollers-arrow-card\";\nimport { RollersButton } from \"@foundry/rollers-button\";\nimport { RollersRise } from \"@foundry/rollers-rise\";\nimport { RollersRule } from \"@foundry/rollers-rule\";\nimport \"./rollers-fleet.css\";\n\nexport interface RollersFleetItem {\n  /** the machine family */\n  title: string;\n  href: string;\n  /** the photo (aspect 1.45); a placeholder when empty */\n  media?: ReactNode;\n  /** screen-reader label of the arrow tile */\n  arrowLabel: string;\n}\n\nexport interface RollersFleetProps {\n  /** the cards, filled into the left column first, then the right (two each) */\n  items: RollersFleetItem[];\n  /** the orange button in the ruled row under the grid */\n  action: { label: string; href: string };\n  /** an in-page anchor */\n  id?: string;\n  className?: string;\n}\n\n/** A ruled two-column grid of large photo cards, the right column set lower than the left.\n    On wide screens the columns drift against each other as you scroll (left down, right up).\n    Under it, a ruled row with one orange button that slides in from the right. */\nexport function RollersFleet({ items, action, id, className }: RollersFleetProps) {\n  const half = Math.ceil(items.length / 2);\n  const columns = [items.slice(0, half), items.slice(half)];\n  return (\n    <section id={id} className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"relative grid overflow-clip md:grid-cols-2\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        <RollersRule orientation=\"vertical\" className=\"inset-y-0 left-1/2 hidden md:block\" />\n        {columns.map((column, c) => (\n          <div key={c} className={cn(\"flex flex-col\", c === 0 ? \"rollers-fleet-down\" : \"rollers-fleet-up\")}>\n            {column.map((item, i) => (\n              <div\n                key={item.title}\n                className={cn(\n                  \"relative px-gutter py-7.5 md:pt-[6.875rem] md:pr-10 md:pb-15 md:pl-7.5\",\n                  c === 1 && i === 0 && \"md:pt-[18.75rem] md:pb-40\",\n                  c === 0 && i === 1 && \"md:pt-40\",\n                  i === column.length - 1 && \"md:flex-1\",\n                )}\n              >\n                {/* a hairline above every card on phones; between the cards of a column on wide screens */}\n                <RollersRule className={cn(\"inset-x-0 top-0\", i === 0 && \"md:hidden\", c === 0 && i === 0 && \"hidden\")} />\n                <RollersRise>\n                  <RollersArrowCard title={item.title} href={item.href} media={item.media} arrowLabel={item.arrowLabel} />\n                </RollersRise>\n              </div>\n            ))}\n          </div>\n        ))}\n      </div>\n\n      <div className=\"relative overflow-x-clip px-gutter pt-7.5 pb-7.5 md:pt-10 md:pb-[6.875rem]\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        <RollersRise from=\"right\" className=\"inline-block\">\n          <RollersButton href={action.href}>{action.label}</RollersButton>\n        </RollersRise>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-arrow-card",
+    "rollers-button",
+    "rollers-rise",
+    "rollers-rule"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "RollersFleetItem[]",
+      "required": true,
+      "description": "the cards, filled into the left column first, then the right (two each)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the orange button in the ruled row under the grid"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an in-page anchor"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47d7780e28c8536c9b04d410b8bf2d662b484115c477545a5225a347e4f9b7e3"
+}

@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "AAT Architecten header",
+  "description": "A bare white header: wordmark with a hairline and descriptor at the left and, from 1024px, a few grey links spaced wide apart (the last with a small arrow) that darken to ink over 0.6s on hover. It lies over the hero on desktop. On phones the links fold into a grey 'Menu' word that stays fixed at the top-right while the page scrolls and opens a full-window white menu of large grey links.",
+  "category": "header",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "minimal",
+    "white",
+    "monochrome",
+    "fixed",
+    "overlay",
+    "menu",
+    "hover",
+    "architecture"
+  ],
+  "notes": [
+    "from 1024px it is absolutely positioned over the first section (the hero leaves room for it); below 1024px it takes its own 104px row",
+    "the phone 'Menu' trigger is position: fixed, so it floats over every section in muted grey",
+    "the links share the footer's column rhythm: they start 27% into the content width"
+  ],
+  "entry": "aat-architecten-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "aat-architecten-header",
+  "files": [
+    {
+      "path": "aat-architecten-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AatArchitectenWordmark } from \"@foundry/aat-architecten-wordmark\";\n\nexport interface AatArchitectenHeaderLink {\n  label: string;\n  href: string;\n  /** show a small arrow after the label (the original marks its contact link this way) */\n  arrow?: boolean;\n}\n\nexport interface AatArchitectenHeaderProps {\n  /** the studio name in the wordmark */\n  brand: string;\n  /** the small word after the wordmark's hairline */\n  descriptor?: string;\n  homeHref?: string;\n  /** the navigation links */\n  links: AatArchitectenHeaderLink[];\n  /** the phone menu trigger's label while closed */\n  menuLabel: string;\n  /** the phone menu trigger's label while open */\n  closeLabel: string;\n  className?: string;\n}\n\n// The original's colour transition on every link.\nconst fade = \"transition-colors duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\";\n\nexport function AatArchitectenHeader({ brand, descriptor, homeHref = \"/\", links, menuLabel, closeLabel, className }: AatArchitectenHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  // Escape closes the phone menu; the page behind doesn't scroll while it is open.\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    document.addEventListener(\"keydown\", onKey);\n    const overflow = document.documentElement.style.overflow;\n    document.documentElement.style.overflow = \"hidden\";\n    return () => {\n      document.removeEventListener(\"keydown\", onKey);\n      document.documentElement.style.overflow = overflow;\n    };\n  }, [open]);\n\n  return (\n    <header className={cn(\"relative z-50 bg-background lg:absolute lg:inset-x-0 lg:top-0 lg:bg-transparent\", className)}>\n      <div className=\"mx-auto flex h-[6.5rem] max-w-page items-center px-gutter lg:grid lg:h-[6.875rem] lg:grid-cols-[27.3fr_72.7fr] lg:items-end lg:pb-10\">\n        <AatArchitectenWordmark name={brand} descriptor={descriptor} href={homeHref} className=\"relative z-10 pt-1 lg:pt-0\" />\n\n        {/* desktop links */}\n        <nav className=\"hidden lg:block\">\n          <ul className=\"flex items-end gap-24\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className={cn(\"inline-flex items-center gap-4 text-xl leading-none text-muted-foreground hover:text-foreground\", fade)}>\n                  {link.label}\n                  {link.arrow && <ArrowRight aria-hidden className=\"size-4\" strokeWidth={1.5} />}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n\n      {/* phone: the trigger stays fixed at the top-right of the window */}\n      <button\n        type=\"button\"\n        aria-expanded={open}\n        aria-controls=\"aat-architecten-menu\"\n        onClick={() => setOpen((o) => !o)}\n        className={cn(\n          \"fixed top-[3.125rem] right-gutter z-[60] text-base leading-none hover:text-foreground lg:hidden\",\n          open ? \"text-foreground\" : \"text-muted-foreground\",\n          fade,\n        )}\n      >\n        {open ? closeLabel : menuLabel}\n      </button>\n\n      {/* phone: the full-window menu */}\n      <nav\n        id=\"aat-architecten-menu\"\n        aria-hidden={!open}\n        className={cn(\n          \"fixed inset-0 z-[55] flex flex-col bg-background px-gutter pt-[9.5rem] lg:hidden\",\n          \"transition-[opacity,visibility] duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n      >\n        <ul className=\"flex flex-col gap-3\">\n          {links.map((link) => (\n            <li key={link.href}>\n              <a\n                href={link.href}\n                tabIndex={open ? 0 : -1}\n                onClick={() => setOpen(false)}\n                className={cn(\"inline-flex items-center gap-4 text-[clamp(24px,1.8vw+1rem,40px)] leading-[1.25] text-muted-foreground hover:text-foreground\", fade)}\n              >\n                {link.label}\n                {link.arrow && <ArrowRight aria-hidden className=\"size-5\" strokeWidth={1.5} />}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "aat-architecten-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the studio name in the wordmark"
+    },
+    {
+      "name": "descriptor",
+      "type": "string",
+      "required": false,
+      "description": "the small word after the wordmark's hairline"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "AatArchitectenHeaderLink[]",
+      "required": true,
+      "description": "the navigation links"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the phone menu trigger's label while closed"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "the phone menu trigger's label while open"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "62c2ad5fe629a5d80927f88d4dcdd489b8272db03c930f59a95fb9ced8f207ca"
+}

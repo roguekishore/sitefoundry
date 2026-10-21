@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wild AG ticker",
+  "description": "An endless horizontal ticker: its content is laid twice side by side and the pair slides left by one copy, linear and forever, so the line never ends. Used for a giant type line and for a row of partner tiles.",
+  "category": "animation",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "ticker",
+    "marquee",
+    "loop",
+    "horizontal",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only; reduced motion stops it in place",
+    "the content should be at least as wide as the window, or repeat it inside before passing it"
+  ],
+  "entry": "wild-ag-ticker.tsx",
+  "source": "foundry",
+  "name": "wild-ag-ticker",
+  "files": [
+    {
+      "path": "wild-ag-ticker.css",
+      "content": "/* The track holds two copies, each with the gap as trailing padding; moving it by half its\n   width brings the second copy exactly where the first began, so the loop has no seam. */\n@media (prefers-reduced-motion: no-preference) {\n  .wild-ag-ticker-track {\n    animation: wild-ag-ticker-run var(--wild-ag-ticker-duration, 30s) linear infinite;\n  }\n  .wild-ag-ticker-right {\n    animation-direction: reverse;\n  }\n}\n\n@keyframes wild-ag-ticker-run {\n  from {\n    transform: translateX(0);\n  }\n  to {\n    transform: translateX(-50%);\n  }\n}\n"
+    },
+    {
+      "path": "wild-ag-ticker.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wild-ag-ticker.css\";\n\nexport interface WildAgTickerProps {\n  /** one copy of the line; it is repeated once to close the loop */\n  children: ReactNode;\n  /** seconds for one copy to pass */\n  duration?: number;\n  /** left (default) or right */\n  direction?: \"left\" | \"right\";\n  /** space between the items and between the two copies, as a CSS length */\n  gap?: string;\n  className?: string;\n}\n\nexport function WildAgTicker({ children, duration = 30, direction = \"left\", gap = \"0px\", className }: WildAgTickerProps) {\n  return (\n    <div className={cn(\"overflow-clip\", className)}>\n      <div\n        className={cn(\"wild-ag-ticker-track flex w-max\", direction === \"right\" && \"wild-ag-ticker-right\")}\n        style={{ \"--wild-ag-ticker-duration\": `${duration}s` } as CSSProperties}\n      >\n        <div className=\"flex shrink-0\" style={{ gap, paddingRight: gap }}>\n          {children}\n        </div>\n        <div aria-hidden className=\"flex shrink-0\" style={{ gap, paddingRight: gap }}>\n          {children}\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one copy of the line; it is repeated once to close the loop"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "30",
+      "description": "seconds for one copy to pass"
+    },
+    {
+      "name": "direction",
+      "type": "enum",
+      "required": false,
+      "default": "left",
+      "description": "left (default) or right"
+    },
+    {
+      "name": "gap",
+      "type": "string",
+      "required": false,
+      "default": "0px",
+      "description": "space between the items and between the two copies, as a CSS length"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e2661e50fa5bc29f4926e5f6a844d404faab259f1d9b84860c4c893820e33313"
+}

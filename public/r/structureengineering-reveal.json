@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Structure engineering reveal",
+  "description": "A wrapper that fades its content in and lifts it 48px as it scrolls into view, with an optional step for staggered rows. Pure CSS scroll-driven animation; static and motion-reduced visitors see it in place.",
+  "category": "motion",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger",
+    "css",
+    "scroll-driven"
+  ],
+  "notes": [
+    "don't put it inside an overflow-hidden box: use overflow-clip, or the timeline freezes"
+  ],
+  "entry": "structureengineering-reveal.tsx",
+  "source": "foundry",
+  "name": "structureengineering-reveal",
+  "files": [
+    {
+      "path": "structureengineering-reveal.css",
+      "content": "/* Fade and rise over the first 320px of scroll after the element's top enters the window (a\n   fixed distance, so things already in the first screen are in place at load). Each step\n   shifts the range by 80px, so a row arrives one after another. Only where view timelines are\n   supported and motion is allowed; otherwise everything is simply there. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .structureengineering-reveal {\n      animation: structureengineering-reveal-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--se-reveal-step, 0) * 80px) entry calc(320px + var(--se-reveal-step, 0) * 80px);\n    }\n  }\n}\n\n@keyframes structureengineering-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(var(--se-reveal-rise, 48px));\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "structureengineering-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./structureengineering-reveal.css\";\n\nexport interface StructureengineeringRevealProps {\n  children?: ReactNode;\n  /** the element to render (div by default; li inside lists, span inside headings) */\n  as?: ElementType;\n  /** position in a staggered group: 0, 1, 2… each arrives a little later */\n  step?: number;\n  /** how far it rises, in px (the original uses 48) */\n  rise?: number;\n  className?: string;\n}\n\n// Fades in and rises as it enters the window, driven by the scroll (CSS only).\nexport function StructureengineeringReveal({ children, as: Tag = \"div\", step = 0, rise = 48, className }: StructureengineeringRevealProps) {\n  return (\n    <Tag\n      className={cn(\"structureengineering-reveal\", className)}\n      style={{ \"--se-reveal-step\": step, \"--se-reveal-rise\": `${rise}px` } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default; li inside lists, span inside headings)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered group: 0, 1, 2… each arrives a little later"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "default": "48",
+      "description": "how far it rises, in px (the original uses 48)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "da6d29679e04486e440189580801313b5fb304b460a9e2b7c7dc9e0d03ccb867"
+}

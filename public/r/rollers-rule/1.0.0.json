@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rollers rule",
+  "description": "A 1px charcoal hairline of a ruled page grid that draws itself in as it scrolls into view: horizontal lines grow from the left edge, vertical ones grow down from the top. CSS view timeline.",
+  "category": "divider",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "divider",
+    "hairline",
+    "grid",
+    "line",
+    "draw",
+    "reveal",
+    "scroll",
+    "css-only"
+  ],
+  "notes": [
+    "absolutely positioned: give the parent `relative` and place it with className (inset-x-0 top-0, inset-y-0 left-1/2…)",
+    "a horizontal line finishes a third of the way up the window, so one in the last 300px of a page stops short: use a plain border there"
+  ],
+  "entry": "rollers-rule.tsx",
+  "source": "foundry",
+  "name": "rollers-rule",
+  "files": [
+    {
+      "path": "rollers-rule.css",
+      "content": "/* The ruled grid draws itself in: horizontals grow from the left while the line travels from\n   the bottom of the window to a third of the way up; verticals grow down over the first 500px\n   of scroll after their top enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rollers-rule {\n      animation: rollers-rule-draw-x linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 35%;\n      transform-origin: left center;\n    }\n    .rollers-rule.rollers-rule-v {\n      animation-name: rollers-rule-draw-y;\n      animation-range: entry 0px entry 500px;\n      transform-origin: center top;\n    }\n  }\n}\n\n@keyframes rollers-rule-draw-x {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes rollers-rule-draw-y {\n  from {\n    transform: scaleY(0);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "rollers-rule.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./rollers-rule.css\";\n\nexport interface RollersRuleProps {\n  /** horizontal: grows from the left edge · vertical: grows down from the top */\n  orientation?: \"horizontal\" | \"vertical\";\n  /** placement inside the (relative) parent, e.g. \"inset-x-0 top-0\" or \"inset-y-0 left-1/2\"; colour overrides */\n  className?: string;\n}\n\n/** A 1px hairline of the ruled grid that draws itself as it scrolls into view: a horizontal one\n    from the left, a vertical one from the top. Absolutely positioned: the parent needs `relative`. */\nexport function RollersRule({ orientation = \"horizontal\", className }: RollersRuleProps) {\n  return (\n    <span\n      aria-hidden\n      className={cn(\n        \"rollers-rule pointer-events-none absolute bg-border\",\n        orientation === \"horizontal\" ? \"rollers-rule-h h-px\" : \"rollers-rule-v w-px\",\n        className,\n      )}\n    />\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "orientation",
+      "type": "enum",
+      "required": false,
+      "default": "horizontal",
+      "description": "horizontal: grows from the left edge · vertical: grows down from the top"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "placement inside the (relative) parent, e.g. \"inset-x-0 top-0\" or \"inset-y-0 left-1/2\"; colour overrides"
+    }
+  ],
+  "hash": "70341f1cbbaf02313c4d9657823b49432ec5c6326f14491aa612be53a82221fe"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG statement window",
+  "description": "A window-tall band: its top three quarters are a window with a rounded bottom onto footage that stays fixed while the page moves, and under it, on the taupe-to-sand gradient, one giant uppercase line mixing light sans and serif-italic words runs as an endless ticker. The band itself ends in a 73px rounded bottom.",
+  "category": "text-effect",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "ticker",
+    "marquee",
+    "loop",
+    "fixed",
+    "window",
+    "video",
+    "gradient",
+    "serif",
+    "italic",
+    "uppercase",
+    "rounded"
+  ],
+  "notes": [
+    "sized by the window (100svh)",
+    "the media slot is fixed to the window; empty, a soft sand placeholder",
+    "CSS only; the ticker stands still under reduced motion"
+  ],
+  "entry": "wild-ag-statement.tsx",
+  "source": "foundry",
+  "name": "wild-ag-statement",
+  "files": [
+    {
+      "path": "wild-ag-statement.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgMedia } from \"@foundry/wild-ag-media\";\nimport { WildAgTicker } from \"@foundry/wild-ag-ticker\";\n\nexport interface WildAgStatementPart {\n  /** words of the line */\n  text: string;\n  /** set in the light serif italic instead of the sans */\n  serif?: boolean;\n}\n\nexport interface WildAgStatementProps {\n  /** the line that runs as a ticker, in parts that switch between sans and serif italic */\n  line: WildAgStatementPart[];\n  /** the mark between repeats of the line */\n  separator?: string;\n  /** footage seen through the window; fixed to the window. Empty: a placeholder */\n  media?: ReactNode;\n  /** seconds for the line to pass once */\n  duration?: number;\n  className?: string;\n}\n\nexport function WildAgStatement({ line, separator = \"—\", media, duration = 30, className }: WildAgStatementProps) {\n  const text = line.map((p) => p.text).join(\" \");\n  return (\n    <section\n      className={cn(\n        \"relative z-10 flex h-svh flex-col overflow-clip rounded-b-[calc(var(--radius)*3.4)] bg-linear-15 from-primary to-highlight text-primary-foreground lg:rounded-b-[calc(var(--radius)*4.5)]\",\n        className,\n      )}\n    >\n      <WildAgMedia media={media} tone=\"soft\" fixed roundBottom className=\"min-h-0 w-full flex-1\" />\n      <h2 className=\"sr-only\">{text}</h2>\n      <WildAgTicker duration={duration} gap=\"0.3em\" className=\"py-[3.3rem] text-[6.125rem] leading-none tracking-[-0.01em] uppercase lg:py-[3.6rem] lg:text-[7.9rem]\">\n        <span aria-hidden className=\"flex shrink-0 gap-[0.3em] whitespace-nowrap\">\n          {line.map((p, i) => (\n            <span key={i} className={p.serif ? \"font-display font-light italic\" : \"font-light\"}>\n              {p.text}\n            </span>\n          ))}\n          <span className=\"font-extralight\">{separator}</span>\n        </span>\n      </WildAgTicker>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-media",
+    "wild-ag-ticker"
+  ],
+  "props": [
+    {
+      "name": "line",
+      "type": "WildAgStatementPart[]",
+      "required": true,
+      "description": "the line that runs as a ticker, in parts that switch between sans and serif italic"
+    },
+    {
+      "name": "separator",
+      "type": "string",
+      "required": false,
+      "default": "—",
+      "description": "the mark between repeats of the line"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "footage seen through the window; fixed to the window. Empty: a placeholder"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "30",
+      "description": "seconds for the line to pass once"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e83687cfe7922041cee8eb4553a2218d2095cc529d911a79e5c8278de9b9e2d4"
+}

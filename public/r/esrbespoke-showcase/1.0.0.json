@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke showcase",
+  "description": "A full-window photo slideshow (4:5 on phones) with a small square tile in the middle showing the next picture under a black NEXT tag. The tile wipes open from the bottom as the section scrolls into view; pressing it crossfades the big picture to the next one.",
+  "category": "gallery",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "slideshow",
+    "full-bleed",
+    "window-height",
+    "dark",
+    "clip-reveal",
+    "crossfade",
+    "scroll-driven",
+    "automotive"
+  ],
+  "notes": [
+    "on the dark scope; empty slides are dark muted placeholders, the tile a lighter one",
+    "the tile's wipe is CSS scroll-driven inside @supports; the crossfade needs JavaScript (hydrate: visible)",
+    "off under reduced motion (the slides still change, without the fade)"
+  ],
+  "entry": "esrbespoke-showcase.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "esrbespoke-showcase",
+  "files": [
+    {
+      "path": "esrbespoke-showcase.css",
+      "content": "/* The NEXT tile wipes open upwards (clip-path) while the section comes into view. */\n.esrbespoke-showcase {\n  view-timeline: --esrbespoke-showcase block;\n}\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .esrbespoke-showcase-tile {\n      animation: esrbespoke-showcase-wipe linear both;\n      animation-timeline: --esrbespoke-showcase;\n      animation-range: entry 35% cover 55%;\n    }\n  }\n}\n@keyframes esrbespoke-showcase-wipe {\n  from { clip-path: inset(100% 0 0 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n"
+    },
+    {
+      "path": "esrbespoke-showcase.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./esrbespoke-showcase.css\";\n\nexport interface EsrbespokeShowcaseSlide {\n  /** the picture (fills like object-fit: cover). Empty: a placeholder */\n  media?: ReactNode;\n  /** what the picture shows, for screen readers */\n  label: string;\n}\n\nexport interface EsrbespokeShowcaseProps {\n  /** the pictures, in order; the tile always shows the one after the current */\n  slides: EsrbespokeShowcaseSlide[];\n  /** the tag on the tile */\n  nextLabel: string;\n  className?: string;\n}\n\nconst ease = \"ease-[cubic-bezier(0.19,1,0.22,1)]\";\n\n/** Full-window slideshow with a NEXT tile in the middle that wipes open on entering view. */\nexport function EsrbespokeShowcase({ slides, nextLabel, className }: EsrbespokeShowcaseProps) {\n  const [current, setCurrent] = useState(0);\n  const next = slides.length ? (current + 1) % slides.length : 0;\n\n  return (\n    <section className={cn(\"esrbespoke-showcase dark relative aspect-[4/5] overflow-clip bg-background text-foreground lg:aspect-auto lg:h-svh\", className)}>\n      {slides.map((slide, i) => (\n        <div\n          key={i}\n          role=\"img\"\n          aria-label={slide.label}\n          aria-hidden={i !== current}\n          className={cn(\n            \"absolute inset-0 transition-opacity duration-800 motion-reduce:transition-none [&>*]:h-full [&>*]:w-full [&>img]:object-cover\",\n            ease,\n            i === current ? \"opacity-100\" : \"opacity-0\",\n          )}\n        >\n          {slide.media ?? <div className=\"h-full w-full bg-muted\" />}\n        </div>\n      ))}\n      {slides.length > 1 && (\n        <button\n          type=\"button\"\n          onClick={() => setCurrent(next)}\n          aria-label={`${nextLabel}: ${slides[next].label}`}\n          className=\"esrbespoke-showcase-tile group absolute top-[40%] right-gutter h-[6rem] w-[5.125rem] overflow-clip lg:top-1/2 lg:right-auto lg:left-1/2 lg:size-[13.375rem]\"\n        >\n          <span className={cn(\"absolute inset-0 transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none [&>*]:h-full [&>*]:w-full [&>img]:object-cover\", ease)}>\n            {slides[next].media ?? <span className=\"block h-full w-full bg-foreground/25\" />}\n          </span>\n          <span className=\"absolute top-4 left-4 hidden h-6 items-center bg-background px-2 font-mono text-[0.8125rem] leading-none font-semibold tracking-[0.08em] text-foreground uppercase font-stretch-[88%] lg:flex\">\n            {nextLabel}\n          </span>\n        </button>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "EsrbespokeShowcaseSlide[]",
+      "required": true,
+      "description": "the pictures, in order; the tile always shows the one after the current"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true,
+      "description": "the tag on the tile"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b3e0f7035e6309508f3f43e897d73ad588dc4200acdef4eb87dc83f0857e3a48"
+}

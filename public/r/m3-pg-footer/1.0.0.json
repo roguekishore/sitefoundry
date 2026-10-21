@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "M3-PG footer",
+  "description": "An ink-dark closing band on the 4-column grid: a big short mark, a quiet grey invitation, and an enquiry form of bare underline fields (two by two, then a full-width message), a consent line and an underlined send link; then address, site links and social links in three columns, the full company name in bold type fitted edge to edge, a hairline and a four-part legal row. Links underline on hover.",
+  "category": "footer",
+  "site": "m3-pg",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "contact",
+    "form",
+    "dark-band",
+    "big-type",
+    "wordmark",
+    "grid",
+    "minimal",
+    "monochrome",
+    "underline"
+  ],
+  "notes": [
+    "the band is the theme's ink (bg-foreground) with paper text: under a dark theme it turns into a light band",
+    "the wordmark is sized in container units; tune wordmarkSize to the name's length so it fills the width",
+    "the form is plain HTML (posts to formAction); wire it up as you like"
+  ],
+  "entry": "m3-pg-footer.tsx",
+  "source": "foundry",
+  "name": "m3-pg-footer",
+  "files": [
+    {
+      "path": "m3-pg-footer.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { M3PgLink } from \"@foundry/m3-pg-link\";\n\nexport interface M3PgFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface M3PgFooterField {\n  /** the field's name in the posted form */\n  name: string;\n  /** the placeholder (also its accessible label) */\n  label: string;\n  type?: \"text\" | \"email\" | \"tel\";\n  required?: boolean;\n  /** true: spans both form columns and is a multi-line message box */\n  message?: boolean;\n}\n\nexport interface M3PgFooterProps {\n  /** the big short mark at the top left */\n  mark: string;\n  /** the grey invitation beside it */\n  intro: string;\n  /** where the form posts */\n  formAction?: string;\n  /** the form fields, in order (two per row on desktop; message fields span the row) */\n  fields: M3PgFooterField[];\n  /** the consent line by the checkbox */\n  consent: string;\n  /** the send link's label */\n  submitLabel: string;\n  /** address and contact lines, one per entry */\n  address: string[];\n  /** the site links */\n  links: M3PgFooterLink[];\n  /** social links */\n  socials: M3PgFooterLink[];\n  /** the full name, set huge across the width */\n  wordmark: string;\n  /** the wordmark's size as a percentage of the content width (e.g. 9.8) */\n  wordmarkSize?: number;\n  /** the copyright line */\n  copyright: string;\n  /** the legal links and credit in the bottom row (three fill it) */\n  legal: M3PgFooterLink[];\n  /** an id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst fieldClass =\n  \"w-full border-b border-background/25 bg-transparent px-0.5 pt-2.5 pb-3 text-lg leading-6 text-background placeholder:text-background/40 focus:border-background focus:outline-none\";\n\nexport function M3PgFooter({\n  mark,\n  intro,\n  formAction,\n  fields,\n  consent,\n  submitLabel,\n  address,\n  links,\n  socials,\n  wordmark,\n  wordmarkSize = 10.5,\n  copyright,\n  legal,\n  id,\n  className,\n}: M3PgFooterProps) {\n  return (\n    <footer id={id} className={cn(\"relative z-10 bg-foreground px-gutter pt-10 pb-8 text-background lg:pt-20\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <div className=\"lg:grid lg:grid-cols-4 lg:gap-x-5\">\n          <p aria-hidden className=\"text-[3.5rem] leading-[0.8] font-semibold tracking-[-0.06em] lg:text-[5.75rem]\">\n            {mark}\n          </p>\n          <p className=\"mt-7 text-base leading-6 tracking-[-0.01em] text-background/40 lg:mt-1 lg:pr-16\">{intro}</p>\n\n          <form action={formAction} method=\"post\" className=\"mt-2 grid gap-x-5 lg:col-span-2 lg:mt-0 lg:grid-cols-2 lg:gap-y-0\">\n            {fields.map((field) =>\n              field.message ? (\n                <textarea\n                  key={field.name}\n                  name={field.name}\n                  aria-label={field.label}\n                  placeholder={field.label}\n                  required={field.required}\n                  rows={1}\n                  className={cn(fieldClass, \"resize-none lg:col-span-2\")}\n                />\n              ) : (\n                <input\n                  key={field.name}\n                  name={field.name}\n                  type={field.type ?? \"text\"}\n                  aria-label={field.label}\n                  placeholder={field.label}\n                  required={field.required}\n                  className={fieldClass}\n                />\n              ),\n            )}\n            <label className=\"mt-6 flex items-start gap-2.5 text-sm leading-5 text-background/40 lg:col-span-2 lg:max-w-[29rem]\">\n              <input type=\"checkbox\" required className=\"mt-0.5 size-3.5 shrink-0 accent-background\" />\n              <span>{consent}</span>\n            </label>\n            <button\n              type=\"submit\"\n              className=\"mt-8 justify-self-start text-lg leading-6 font-semibold text-background/40 underline underline-offset-[0.18em] transition-all duration-300 ease-[ease] hover:text-background hover:no-underline motion-reduce:transition-none lg:mt-9\"\n            >\n              {submitLabel}\n            </button>\n          </form>\n        </div>\n\n        <div className=\"mt-[4.5rem] grid grid-cols-2 gap-x-5 gap-y-8 text-base leading-9 lg:mt-14 lg:grid-cols-4 lg:leading-6\">\n          <address className=\"not-italic lg:col-start-2\">\n            {address.map((line) => (\n              <span key={line} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </address>\n          <ul>\n            {links.map((link) => (\n              <li key={link.href}>\n                <M3PgLink href={link.href} variant=\"nav\">\n                  {link.label}\n                </M3PgLink>\n              </li>\n            ))}\n          </ul>\n          <ul className=\"col-span-2 grid grid-cols-2 gap-x-5 lg:col-span-1 lg:block\">\n            {socials.map((link) => (\n              <li key={link.href}>\n                <M3PgLink href={link.href} variant=\"nav\">\n                  {link.label}\n                </M3PgLink>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        {/* the name, fitted to the width through container units */}\n        <div className=\"@container mt-10 lg:mt-14\">\n          <p\n            className=\"leading-[1.12] font-bold lg:leading-none tracking-[-0.045em] whitespace-nowrap\"\n            style={{ fontSize: `${wordmarkSize}cqi` }}\n          >\n            {wordmark}\n          </p>\n        </div>\n\n        <div className=\"mt-12 grid grid-cols-2 gap-x-5 gap-y-3 text-sm leading-6 lg:mt-9 lg:grid-cols-4 lg:border-t lg:border-background/30 lg:pt-6 lg:text-base\">\n          <p className=\"order-last lg:order-none\">{copyright}</p>\n          {legal.map((link) => (\n            <M3PgLink key={link.href} href={link.href} variant=\"nav\" className=\"justify-self-start\">\n              {link.label}\n            </M3PgLink>\n          ))}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "m3-pg-link"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "string",
+      "required": true,
+      "description": "the big short mark at the top left"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the grey invitation beside it"
+    },
+    {
+      "name": "formAction",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "fields",
+      "type": "M3PgFooterField[]",
+      "required": true,
+      "description": "the form fields, in order (two per row on desktop; message fields span the row)"
+    },
+    {
+      "name": "consent",
+      "type": "string",
+      "required": true,
+      "description": "the consent line by the checkbox"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the send link's label"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "address and contact lines, one per entry"
+    },
+    {
+      "name": "links",
+      "type": "M3PgFooterLink[]",
+      "required": true,
+      "description": "the site links"
+    },
+    {
+      "name": "socials",
+      "type": "M3PgFooterLink[]",
+      "required": true,
+      "description": "social links"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the full name, set huge across the width"
+    },
+    {
+      "name": "wordmarkSize",
+      "type": "number",
+      "required": false,
+      "default": "10.5",
+      "description": "the wordmark's size as a percentage of the content width (e.g. 9.8)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "M3PgFooterLink[]",
+      "required": true,
+      "description": "the legal links and credit in the bottom row (three fill it)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ccb896814d3fc54d9fb7a9f973e68b626ac6ae1463a759013c239278af9f5884"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty laws",
+  "description": "A big capital heading and a violet sub-head over a three-column grid of short rules: each a violet line with a grey follow-up, separated by pale hairlines that draw in (across under each rule, down between the columns) as the grid scrolls through, while the words of every line ripple up out of masks. Phones show the first six in one column with a centred 'more' toggle for the rest.",
+  "category": "features",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "principles",
+    "values",
+    "rules",
+    "list",
+    "grid",
+    "hairlines",
+    "draw",
+    "reveal",
+    "scrubbed",
+    "toggle",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "the phone toggle is a plain checkbox (CSS :has), no JavaScript",
+    "a multiple of three rules fills the desktop grid evenly"
+  ],
+  "entry": "rioproperty-laws.tsx",
+  "source": "foundry",
+  "name": "rioproperty-laws",
+  "files": [
+    {
+      "path": "rioproperty-laws.css",
+      "content": "/* The hairlines draw in while the grid scrolls through: the line under a law grows from the\n   left, the column line grows downwards, each as its cell crosses into the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-laws-hline,\n    .rioproperty-laws-vline {\n      animation: linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 50%;\n    }\n    .rioproperty-laws-hline {\n      transform-origin: left center;\n      animation-name: rioproperty-laws-draw-across;\n    }\n    .rioproperty-laws-vline {\n      transform-origin: center top;\n      animation-name: rioproperty-laws-draw-down;\n    }\n  }\n}\n\n@keyframes rioproperty-laws-draw-across {\n  from {\n    scale: 0 1;\n  }\n  to {\n    scale: 1 1;\n  }\n}\n\n@keyframes rioproperty-laws-draw-down {\n  from {\n    scale: 1 0;\n  }\n  to {\n    scale: 1 1;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-laws.tsx",
+      "content": "import { useId } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RiopropertyRiseText } from \"@foundry/rioproperty-rise-text\";\nimport \"./rioproperty-laws.css\";\n\nexport interface RiopropertyLaw {\n  /** the rule itself, in violet */\n  rule: string;\n  /** the grey follow-up line */\n  aside: string;\n}\n\nexport interface RiopropertyLawsProps {\n  /** the big capital heading */\n  heading: string;\n  /** the violet capital line under it */\n  subhead: string;\n  /** the rules; a multiple of three fills the desktop grid */\n  laws: RiopropertyLaw[];\n  /** phones show this many, then a toggle for the rest */\n  phoneCount?: number;\n  /** the label of the phone toggle */\n  moreLabel: string;\n  className?: string;\n}\n\nexport function RiopropertyLaws({ heading, subhead, laws, phoneCount = 6, moreLabel, className }: RiopropertyLawsProps) {\n  const toggleId = useId();\n  return (\n    <section className={cn(\"group/laws bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RiopropertyRiseText\n          text={heading}\n          className=\"font-display text-[clamp(2.19rem,1.8rem+1.61vw,3.25rem)] leading-[0.966] font-semibold uppercase lg:max-w-[64rem]\"\n        />\n        <RiopropertyRiseText as=\"p\" split=\"block\" text={subhead} className=\"mt-6 text-lg leading-normal text-primary uppercase lg:mt-8 lg:text-2xl\" />\n\n        {/* a plain checkbox drives the phone toggle, so it works without JavaScript */}\n        <input id={toggleId} type=\"checkbox\" className=\"sr-only\" />\n        <ul className=\"mt-16 grid lg:mt-28 lg:grid-cols-3\">\n          {laws.map((law, i) => (\n            <li\n              key={law.rule}\n              className={cn(\"relative px-0 py-7 lg:px-[1.125rem] lg:pt-6 lg:pb-10\", i >= phoneCount && \"hidden group-has-checked/laws:block lg:block\")}\n            >\n              <RiopropertyRiseText as=\"p\" text={law.rule} distance={240} className=\"leading-normal text-primary\" />\n              <RiopropertyRiseText as=\"p\" text={law.aside} distance={240} className=\"mt-4 leading-normal text-muted-foreground\" />\n              {/* hairlines that draw in as the grid scrolls through: under each law, and down\n                  between the desktop columns */}\n              <span aria-hidden className=\"rioproperty-laws-hline absolute right-0 bottom-0 left-0 h-px bg-border lg:right-[1.125rem] lg:left-[1.125rem]\" />\n              {i % 3 !== 0 && <span aria-hidden className=\"rioproperty-laws-vline absolute top-0 bottom-0 left-0 hidden w-px bg-border lg:block\" />}\n            </li>\n          ))}\n        </ul>\n        {laws.length > phoneCount && (\n          <label\n            htmlFor={toggleId}\n            className=\"mt-10 flex cursor-pointer items-center justify-center gap-2 text-foreground uppercase transition-colors duration-500 hover:text-primary group-has-checked/laws:hidden lg:hidden\"\n          >\n            {moreLabel}\n            <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.5} />\n          </label>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rioproperty-rise-text"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big capital heading"
+    },
+    {
+      "name": "subhead",
+      "type": "string",
+      "required": true,
+      "description": "the violet capital line under it"
+    },
+    {
+      "name": "laws",
+      "type": "RiopropertyLaw[]",
+      "required": true,
+      "description": "the rules; a multiple of three fills the desktop grid"
+    },
+    {
+      "name": "phoneCount",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "phones show this many, then a toggle for the rest"
+    },
+    {
+      "name": "moreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label of the phone toggle"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3c44eda061263d109ddec02578c9eb60989be99bd1e7dc660824a528cb130f47"
+}

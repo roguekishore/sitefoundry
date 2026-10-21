@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wild AG media frame",
+  "description": "A media slot that crops an image or video like object-fit cover, with a plain sand placeholder when empty. In 'fixed' mode the footage stays put in the window while its frame scrolls past, so the frame acts as a window onto still footage.",
+  "category": "ui",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video",
+    "fixed",
+    "window",
+    "parallax"
+  ],
+  "notes": [
+    "fixed mode clips a position:fixed layer with clip-path; an ancestor with a transform or filter turns it back into an ordinary frame",
+    "size, radius and position come from className"
+  ],
+  "entry": "wild-ag-media.tsx",
+  "source": "foundry",
+  "name": "wild-ag-media",
+  "files": [
+    {
+      "path": "wild-ag-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WildAgMediaProps {\n  /** an <img> or <video>; it is stretched to cover the frame. Empty: a placeholder */\n  media?: ReactNode;\n  /** placeholder colour: sand (images on paper) or soft (a pale light-to-sand wash for big footage) */\n  tone?: \"sand\" | \"soft\";\n  /** true: the footage is fixed to the window and the frame only shows the part behind it */\n  fixed?: boolean;\n  /** round the bottom corners with the bands' big radius (fixed frames can't use a rounded class) */\n  roundBottom?: boolean;\n  /** sizing, radius and position of the frame */\n  className?: string;\n}\n\nconst cover = \"size-full [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\";\n\nexport function WildAgMedia({ media, tone = \"sand\", fixed = false, roundBottom = false, className }: WildAgMediaProps) {\n  const fill = media ?? (\n    <div\n      aria-hidden\n      className={cn(\"size-full\", tone === \"sand\" ? \"bg-secondary\" : \"bg-linear-15 from-secondary to-muted\")}\n    />\n  );\n  if (fixed) {\n    // clip-path clips even position:fixed children, so the layer below stays still in the\n    // window while this frame moves over it.\n    return (\n      <div\n        className={cn(\n          \"relative\",\n          roundBottom\n            ? \"[clip-path:inset(0_round_0_0_calc(var(--radius)*3.4)_calc(var(--radius)*3.4))] lg:[clip-path:inset(0_round_0_0_calc(var(--radius)*4.5)_calc(var(--radius)*4.5))]\"\n            : \"[clip-path:inset(0)]\",\n          className,\n        )}\n      >\n        <div className={cn(\"fixed inset-x-0 top-0 h-svh\", cover)}>{fill}</div>\n      </div>\n    );\n  }\n  return (\n    <div\n      className={cn(\n        \"relative overflow-clip\",\n        roundBottom && \"rounded-b-[calc(var(--radius)*3.4)] lg:rounded-b-[calc(var(--radius)*4.5)]\",\n        className,\n      )}\n    >\n      <div className={cn(\"absolute inset-0\", cover)}>{fill}</div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an <img> or <video>; it is stretched to cover the frame. Empty: a placeholder"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "sand",
+      "description": "placeholder colour: sand (images on paper) or soft (a pale light-to-sand wash for big footage)"
+    },
+    {
+      "name": "fixed",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "true: the footage is fixed to the window and the frame only shows the part behind it"
+    },
+    {
+      "name": "roundBottom",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "round the bottom corners with the bands' big radius (fixed frames can't use a rounded class)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "sizing, radius and position of the frame"
+    }
+  ],
+  "hash": "a51e98744394c99246c379522c6fd26fb2b9bf21414cd9d481d54f87a415813b"
+}

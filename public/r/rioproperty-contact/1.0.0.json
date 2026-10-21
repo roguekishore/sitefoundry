@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty contact",
+  "description": "A square violet panel in the page margins: a huge yellow capital heading and a lavender sub-head at the left (centred), and at the right an underlined form of capital placeholders, a drop-down with a chevron, a row of tiny yellow-ringed round ticks, a message box and a yellow SEND with an arrow. As it scrolls in the panel settles from a quarter too big (spilling past the edges) into the margins while its content keeps its size; the fields fade in and the tick row and message rise.",
+  "category": "contact",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "enquiry",
+    "panel",
+    "violet",
+    "yellow",
+    "underline-fields",
+    "scale-in",
+    "scrubbed",
+    "reveal",
+    "uppercase",
+    "bold-colour"
+  ],
+  "notes": [
+    "the panel uses primary with highlight (heading, ticks, send) and accent (sub-head): best where primary is a strong, dark colour",
+    "a plain HTML form (action + method post); no JavaScript"
+  ],
+  "entry": "rioproperty-contact.tsx",
+  "source": "foundry",
+  "name": "rioproperty-contact",
+  "files": [
+    {
+      "path": "rioproperty-contact.css",
+      "content": "/* The panel arrives a quarter too big (edge to edge and beyond; the section crops it) and\n   settles into the margins as it comes into view. Its content is counter-scaled on the same\n   timeline (0.8 x 1.25 = 1), so the type keeps its size while the violet closes in. The\n   fields fade in on their own, and the tick row and the message box also rise 12px. */\n.rioproperty-contact-panel {\n  view-timeline: --rioproperty-contact block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-contact-panel {\n      animation: rioproperty-contact-settle linear both;\n      animation-timeline: --rioproperty-contact;\n      animation-range: entry 0% entry 60%;\n    }\n    .rioproperty-contact-inner {\n      animation: rioproperty-contact-counter linear both;\n      animation-timeline: --rioproperty-contact;\n      animation-range: entry 0% entry 60%;\n    }\n    .rioproperty-contact-field {\n      animation: rioproperty-contact-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 280px;\n    }\n    .rioproperty-contact-rise {\n      animation: rioproperty-contact-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 280px;\n    }\n  }\n}\n\n@keyframes rioproperty-contact-settle {\n  from {\n    scale: 1.25;\n  }\n  to {\n    scale: 1;\n  }\n}\n\n@keyframes rioproperty-contact-counter {\n  from {\n    scale: 0.8;\n  }\n  to {\n    scale: 1;\n  }\n}\n\n@keyframes rioproperty-contact-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes rioproperty-contact-rise {\n  from {\n    opacity: 0;\n    translate: 0 12px;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-contact.tsx",
+      "content": "import { useId } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RiopropertyArrowLink } from \"@foundry/rioproperty-arrow-link\";\nimport { RiopropertyRiseText } from \"@foundry/rioproperty-rise-text\";\nimport \"./rioproperty-contact.css\";\n\nexport interface RiopropertyContactField {\n  /** the form field name */\n  name: string;\n  /** the capital placeholder that doubles as its label */\n  label: string;\n  type?: \"text\" | \"email\" | \"tel\";\n}\n\nexport interface RiopropertyContactProps {\n  /** the big yellow capital heading */\n  heading: string;\n  /** the lavender capital line under it */\n  subhead: string;\n  /** where the form posts */\n  action?: string;\n  /** the plain one-line fields (name, e-mail, phone…) */\n  fields: RiopropertyContactField[];\n  /** the drop-down: its label and its choices */\n  select: { name: string; label: string; options: string[] };\n  /** the tick-any-that-apply row */\n  choices: { name: string; legend: string; options: string[] };\n  /** the message box */\n  message: { name: string; label: string };\n  /** the send button's label */\n  submitLabel: string;\n  className?: string;\n}\n\nconst row = \"rioproperty-contact-field block border-b border-primary-foreground/25 transition-colors duration-200 focus-within:border-highlight\";\nconst control =\n  \"w-full bg-transparent pt-10 pb-3 text-primary-foreground uppercase outline-none placeholder:text-primary-foreground/75\";\n\nexport function RiopropertyContact({ heading, subhead, action, fields, select, choices, message, submitLabel, className }: RiopropertyContactProps) {\n  const id = useId();\n  return (\n    <section className={cn(\"overflow-clip bg-background py-8\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"rioproperty-contact-panel bg-primary text-primary-foreground\">\n          <div className=\"rioproperty-contact-inner grid gap-2 px-6 pt-16 pb-8 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-16\">\n            <div className=\"flex flex-col lg:justify-center\">\n              <RiopropertyRiseText\n                text={heading}\n                className=\"font-display text-[clamp(2.9rem,2.4rem+2.4vw,4.625rem)] leading-[0.966] font-semibold text-highlight uppercase\"\n              />\n              <p className=\"mt-6 max-w-[12rem] text-lg leading-normal text-accent uppercase sm:max-w-none lg:mt-10 lg:text-2xl\">{subhead}</p>\n            </div>\n\n            <form action={action} method=\"post\" className=\"flex flex-col\">\n              {fields.map((field) => (\n                <label key={field.name} className={row}>\n                  <input name={field.name} type={field.type ?? \"text\"} placeholder={field.label} aria-label={field.label} className={cn(control, \"pt-8 lg:pt-10\")} />\n                </label>\n              ))}\n\n              <label className={cn(row, \"relative\")}>\n                <select name={select.name} aria-label={select.label} defaultValue=\"\" className={cn(control, \"cursor-pointer appearance-none pr-10\")}>\n                  <option value=\"\" disabled>\n                    {select.label}\n                  </option>\n                  {select.options.map((option) => (\n                    <option key={option} value={option} className=\"bg-primary text-primary-foreground normal-case\">\n                      {option}\n                    </option>\n                  ))}\n                </select>\n                <ChevronDown aria-hidden strokeWidth={2} className=\"pointer-events-none absolute right-6 bottom-4 size-4\" />\n              </label>\n\n              <fieldset className=\"rioproperty-contact-rise pt-10 pb-4\">\n                <legend className=\"float-left w-full text-primary-foreground/85 uppercase\">{choices.legend}</legend>\n                <div className=\"clear-left flex flex-wrap gap-x-8 gap-y-3 pt-5\">\n                  {choices.options.map((option, i) => (\n                    <label key={option} htmlFor={`${id}-${i}`} className=\"group/choice flex cursor-pointer items-center gap-2 text-primary-foreground/85\">\n                      <input\n                        id={`${id}-${i}`}\n                        type=\"checkbox\"\n                        name={choices.name}\n                        value={option}\n                        className=\"size-2.5 cursor-pointer appearance-none rounded-full border border-highlight transition-colors duration-200 checked:bg-highlight\"\n                      />\n                      <span className=\"transition-colors duration-200 group-hover/choice:text-highlight\">{option}</span>\n                    </label>\n                  ))}\n                </div>\n              </fieldset>\n\n              <label className={cn(row, \"rioproperty-contact-rise\")}>\n                <textarea name={message.name} rows={2} placeholder={message.label} aria-label={message.label} className={cn(control, \"resize-none\")} />\n              </label>\n\n              <div className=\"flex justify-end pt-10 pr-1.5\">\n                <RiopropertyArrowLink type=\"submit\" tone=\"highlight\">\n                  {submitLabel}\n                </RiopropertyArrowLink>\n              </div>\n            </form>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rioproperty-arrow-link",
+    "rioproperty-rise-text"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big yellow capital heading"
+    },
+    {
+      "name": "subhead",
+      "type": "string",
+      "required": true,
+      "description": "the lavender capital line under it"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "fields",
+      "type": "RiopropertyContactField[]",
+      "required": true,
+      "description": "the plain one-line fields (name, e-mail, phone…)"
+    },
+    {
+      "name": "select",
+      "type": "{ name: string; label: string; options: string[]; }",
+      "required": true,
+      "description": "the drop-down: its label and its choices"
+    },
+    {
+      "name": "choices",
+      "type": "{ name: string; legend: string; options: string[]; }",
+      "required": true,
+      "description": "the tick-any-that-apply row"
+    },
+    {
+      "name": "message",
+      "type": "{ name: string; label: string; }",
+      "required": true,
+      "description": "the message box"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the send button's label"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "645e45b198b0dcdb434f1ad35e93644d57745f97d7fe723a195c58a4cf7242ab"
+}

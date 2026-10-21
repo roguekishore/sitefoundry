@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Marryandbride announcement bar",
+  "description": "A thin near-black bar across the top of the page (40px on phones, 30px from 1024px) with one short centred uppercase message at a time; every few seconds the message crossfades to the next. A small × at the right closes it.",
+  "category": "banner",
+  "site": "marryandbride",
+  "license": "proprietary",
+  "tags": [
+    "banner",
+    "announcement",
+    "top-bar",
+    "dark",
+    "minimal",
+    "rotating",
+    "crossfade",
+    "loop"
+  ],
+  "notes": [
+    "uses bg-foreground / text-background, so it is always the inverse of the page",
+    "static HTML shows the first message; the rotation and the close button need JavaScript",
+    "under reduced motion the messages still change, without the fade"
+  ],
+  "entry": "marryandbride-announcement.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "marryandbride-announcement",
+  "files": [
+    {
+      "path": "marryandbride-announcement.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface MarryandbrideAnnouncementProps {\n  /** the messages, shown one at a time in turn */\n  messages: string[];\n  /** seconds each message stays */\n  interval?: number;\n  /** screen-reader label of the close button */\n  closeLabel: string;\n  className?: string;\n}\n\n/** A thin dark top bar whose centred uppercase messages crossfade in turn; closable. */\nexport function MarryandbrideAnnouncement({ messages, interval = 4, closeLabel, className }: MarryandbrideAnnouncementProps) {\n  const [current, setCurrent] = useState(0);\n  const [closed, setClosed] = useState(false);\n\n  // step to the next message every `interval` seconds\n  useEffect(() => {\n    if (messages.length < 2) return;\n    const timer = window.setInterval(() => setCurrent((i) => (i + 1) % messages.length), interval * 1000);\n    return () => window.clearInterval(timer);\n  }, [messages.length, interval]);\n\n  if (closed) return null;\n\n  return (\n    <div className={cn(\"relative z-[60] h-10 bg-foreground font-sans text-background lg:h-[1.875rem]\", className)}>\n      <div className=\"relative mx-auto h-full max-w-xl px-10\">\n        {messages.map((message, i) => (\n          <p\n            key={message}\n            aria-hidden={i !== current}\n            className={cn(\n              \"absolute inset-0 flex items-center justify-center text-center text-[0.65rem] leading-none tracking-[0.07em] uppercase transition-opacity duration-500 ease-in-out motion-reduce:transition-none lg:text-[0.7rem]\",\n              i === current ? \"opacity-100\" : \"opacity-0\",\n            )}\n          >\n            {message}\n          </p>\n        ))}\n      </div>\n      <button\n        type=\"button\"\n        aria-label={closeLabel}\n        onClick={() => setClosed(true)}\n        className=\"absolute top-1/2 right-gutter -translate-y-1/2 transition-opacity duration-200 hover:opacity-70\"\n      >\n        <X className=\"size-3.5\" strokeWidth={1.5} />\n      </button>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "messages",
+      "type": "string[]",
+      "required": true,
+      "description": "the messages, shown one at a time in turn"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "4",
+      "description": "seconds each message stays"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d31bd8c0735aa308866d802cebbc43238287f0ca2b8b2199ab09b20f11d8b4fe"
+}

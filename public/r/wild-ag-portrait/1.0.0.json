@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG portrait and values",
+  "description": "A staggered two-column about section on paper: gradient serif-italic title with three paragraphs of warm-grey text and a landscape photo below it on the left; a photo and then a second title with four values (bold title, short text, a short gradient hairline between) on the right. On phones it stacks text, photo, values, photo. The text fades up as it comes into view.",
+  "category": "features",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "values",
+    "two-column",
+    "staggered",
+    "editorial",
+    "serif",
+    "italic",
+    "gradient-text",
+    "reveal",
+    "scroll",
+    "minimal"
+  ],
+  "notes": [
+    "two image slots, 16px corners; empty, plain sand placeholders at the original's 1.14 (desktop) / 1.33 (phone) frame",
+    "the value dividers reach 40px left of the column, as on the original"
+  ],
+  "entry": "wild-ag-portrait.tsx",
+  "source": "foundry",
+  "name": "wild-ag-portrait",
+  "files": [
+    {
+      "path": "wild-ag-portrait.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgHeading } from \"@foundry/wild-ag-heading\";\nimport { WildAgMedia } from \"@foundry/wild-ag-media\";\nimport { WildAgReveal } from \"@foundry/wild-ag-reveal\";\n\nexport interface WildAgPortraitValue {\n  /** short bold title */\n  title: string;\n  /** one or two lines */\n  text: string;\n}\n\nexport interface WildAgPortraitProps {\n  /** an id for in-page links */\n  id?: string;\n  /** the first title */\n  title: string;\n  /** the paragraphs under it */\n  paragraphs: string[];\n  /** the second title, over the values */\n  valuesTitle: string;\n  /** the values */\n  values: WildAgPortraitValue[];\n  /** photo in the right column (second on phones) */\n  mediaA?: ReactNode;\n  /** photo under the text in the left column (last on phones) */\n  mediaB?: ReactNode;\n  className?: string;\n}\n\nconst frame = \"aspect-[1.33] w-full rounded-lg lg:aspect-[1.14]\";\n\nexport function WildAgPortrait({ id, title, paragraphs, valuesTitle, values, mediaA, mediaB, className }: WildAgPortraitProps) {\n  return (\n    <section id={id} className={cn(\"bg-background px-gutter py-section text-muted-foreground\", className)}>\n      {/* phones: one column, ordered text, photo, values, photo. Desktop: two columns that each keep their own pair */}\n      <div className=\"mx-auto flex max-w-page flex-col gap-12 lg:grid lg:grid-cols-2 lg:gap-x-[4.9rem] lg:gap-y-0\">\n        <div className=\"contents lg:flex lg:flex-col\">\n          <div className=\"order-1\">\n            <WildAgHeading>{title}</WildAgHeading>\n            <div className=\"mt-6 space-y-3 text-[1.0625rem] leading-[1.4] font-medium tracking-[-0.01em]\">\n              {paragraphs.map((p, i) => (\n                <WildAgReveal as=\"p\" key={i} step={i + 1}>\n                  {p}\n                </WildAgReveal>\n              ))}\n            </div>\n          </div>\n          <WildAgMedia media={mediaB} className={cn(\"order-4 lg:mt-[7.5rem]\", frame)} />\n        </div>\n\n        <div className=\"contents lg:flex lg:flex-col\">\n          <WildAgMedia media={mediaA} className={cn(\"order-2 lg:mt-[4.8rem]\", frame)} />\n          <div className=\"order-3 lg:mt-[7.4rem]\">\n            <WildAgHeading>{valuesTitle}</WildAgHeading>\n            <ul className=\"mt-6\">\n              {values.map((v, i) => (\n                <WildAgReveal as=\"li\" key={v.title} step={i}>\n                  {i > 0 && (\n                    <span aria-hidden className=\"-ml-gutter my-6 block h-[2px] w-[9.5rem] bg-linear-to-r from-primary/70 to-highlight/60 lg:-ml-10\" />\n                  )}\n                  <h3 className=\"text-[1.4rem] leading-[1.4] font-semibold tracking-[-0.01em] text-foreground\">{v.title}</h3>\n                  <p className=\"mt-2 text-[1.0625rem] leading-[1.4] font-medium tracking-[-0.01em]\">{v.text}</p>\n                </WildAgReveal>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-heading",
+    "wild-ag-media",
+    "wild-ag-reveal"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the first title"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "the paragraphs under it"
+    },
+    {
+      "name": "valuesTitle",
+      "type": "string",
+      "required": true,
+      "description": "the second title, over the values"
+    },
+    {
+      "name": "values",
+      "type": "WildAgPortraitValue[]",
+      "required": true,
+      "description": "the values"
+    },
+    {
+      "name": "mediaA",
+      "type": "ReactNode",
+      "required": false,
+      "description": "photo in the right column (second on phones)"
+    },
+    {
+      "name": "mediaB",
+      "type": "ReactNode",
+      "required": false,
+      "description": "photo under the text in the left column (last on phones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "874fc16961ce75234c7956e172450543695fe5373f1d20a2a5229c6402caa1e8"
+}

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline footer",
+  "description": "A charcoal footer split by a citron hairline: a giant two-line wordmark over the copyright on the left; on the right, a column of section links, a column of legal links, a social icon, and a bottom row with a credit and a back-to-top link. Hovering a link list dims the other links to 32%; the back-to-top arrow lifts 3px; the wordmark fades in as it enters and the top hairline draws itself out.",
+  "category": "footer",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark-band",
+    "wordmark",
+    "split",
+    "hairline",
+    "links",
+    "minimal",
+    "hover",
+    "dim",
+    "reveal"
+  ],
+  "notes": [
+    "uses foreground as its background and background as its text, so it inverts with the theme",
+    "the wordmark is plain text in the display face"
+  ],
+  "entry": "lunchline-footer.tsx",
+  "source": "foundry",
+  "name": "lunchline-footer",
+  "files": [
+    {
+      "path": "lunchline-footer.css",
+      "content": "/* The wordmark fades in as it enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-footer-mark {\n      animation: lunchline-footer-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes lunchline-footer-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineDrawRule } from \"@foundry/lunchline-draw-rule\";\nimport \"./lunchline-footer.css\";\n\nexport interface LunchlineFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface LunchlineFooterProps {\n  /** the giant wordmark, one entry per line */\n  brand: string[];\n  /** the site's sections */\n  links: LunchlineFooterLink[];\n  /** the legal pages, in the second column */\n  legal: LunchlineFooterLink[];\n  /** a social icon link (its icon is required; the label is for screen readers) */\n  social?: { label: string; href: string; icon: ReactNode };\n  /** the copyright line */\n  copyright: string;\n  /** a credit line with a link, e.g. who made the site */\n  credit?: { before: string; label: string; href: string };\n  /** the back-to-top link */\n  backToTop?: { label: string; href: string };\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none\";\n\nfunction LinkList({ items }: { items: LunchlineFooterLink[] }) {\n  return (\n    // hovering the list dims every other link to 32%\n    <ul className=\"group/links flex flex-col gap-[1.2rem] lg:gap-[1.1rem]\">\n      {items.map((link) => (\n        <li key={link.href + link.label}>\n          <a href={link.href} className={cn(\"text-lg leading-[1.3] transition-opacity group-hover/links:opacity-[0.32] hover:opacity-100!\", ease)}>\n            {link.label}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\nexport function LunchlineFooter({ brand, links, legal, social, copyright, credit, backToTop, className }: LunchlineFooterProps) {\n  return (\n    <footer className={cn(\"relative bg-foreground text-background\", className)}>\n      <LunchlineDrawRule className=\"z-10\" />\n      <div className=\"relative mx-auto grid max-w-page px-gutter pt-8 pb-14 lg:min-h-[22.75rem] lg:grid-cols-2 lg:grid-rows-[1fr_auto] lg:pt-10 lg:pb-[2.6rem]\">\n        {/* the centre hairline on wide screens */}\n        <span aria-hidden className=\"absolute inset-y-0 left-1/2 hidden w-px bg-border lg:block\" />\n\n        <p className=\"lunchline-footer-mark font-display text-[3.6rem] leading-[0.8] font-medium tracking-[-0.04em] lg:col-start-1 lg:row-start-1 lg:text-[5.3rem]\">\n          {brand.map((line, i) => (\n            <span key={i} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </p>\n\n        <nav className=\"mt-16 grid grid-cols-2 gap-x-6 lg:col-start-2 lg:row-start-1 lg:mt-3 lg:grid-cols-[1fr_1fr_auto] lg:pl-[3.8rem]\">\n          <LinkList items={links} />\n          <div className=\"flex flex-col justify-between\">\n            <LinkList items={legal} />\n            {social && (\n              <a href={social.href} target=\"_blank\" rel=\"noreferrer\" aria-label={social.label} className={cn(\"mt-8 block size-7 transition-opacity hover:opacity-70 lg:hidden [&>svg]:size-full\", ease)}>\n                {social.icon}\n              </a>\n            )}\n          </div>\n          {social && (\n            <a href={social.href} target=\"_blank\" rel=\"noreferrer\" aria-label={social.label} className={cn(\"hidden size-7 transition-opacity hover:opacity-70 lg:block [&>svg]:size-full\", ease)}>\n              {social.icon}\n            </a>\n          )}\n        </nav>\n\n        <p className=\"mt-10 text-sm leading-none lg:col-start-1 lg:row-start-2 lg:mt-0 lg:self-end\">{copyright}</p>\n\n        <div className=\"mt-9 flex items-center justify-between gap-12 text-sm leading-none lg:col-start-2 lg:row-start-2 lg:mt-0 lg:justify-end lg:self-end lg:pb-2 lg:pl-[3.8rem]\">\n          {credit && (\n            <p>\n              {credit.before}\n              <a href={credit.href} className={cn(\"underline underline-offset-2 transition-opacity hover:opacity-60\", ease)}>\n                {credit.label}\n              </a>\n            </p>\n          )}\n          {backToTop && (\n            <a href={backToTop.href} className=\"group inline-flex items-center gap-1\">\n              {backToTop.label}\n              <ArrowUp aria-hidden className={cn(\"size-3.5 transition-transform group-hover:-translate-y-[3px]\", ease)} strokeWidth={1.5} />\n            </a>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-draw-rule"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string[]",
+      "required": true,
+      "description": "the giant wordmark, one entry per line"
+    },
+    {
+      "name": "links",
+      "type": "LunchlineFooterLink[]",
+      "required": true,
+      "description": "the site's sections"
+    },
+    {
+      "name": "legal",
+      "type": "LunchlineFooterLink[]",
+      "required": true,
+      "description": "the legal pages, in the second column"
+    },
+    {
+      "name": "social",
+      "type": "{ label: string; href: string; icon: ReactNode; }",
+      "required": false,
+      "description": "a social icon link (its icon is required; the label is for screen readers)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "credit",
+      "type": "{ before: string; label: string; href: string; }",
+      "required": false,
+      "description": "a credit line with a link, e.g. who made the site"
+    },
+    {
+      "name": "backToTop",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the back-to-top link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "134bd421b73541609ab6f0b9eba379d8f11f69776b81cf12f38109b695b39562"
+}

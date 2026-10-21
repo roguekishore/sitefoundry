@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup projects",
+  "description": "Selected work on white: a grotesk heading with a small serif count, then project photos scattered across a 15-column grid in three sizes (wide, mid, tall) with staggered tops, each captioned with its name and a serif area; phones get stacked 8:5 cards. Cards rise a long way as they enter; on hover the photo swells to 1.035, the area slides up out of its slot and a 'view' link slides in and underlines itself after 0.3s.",
+  "category": "gallery",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "portfolio",
+    "gallery",
+    "scattered",
+    "asymmetric",
+    "grid",
+    "hover",
+    "reveal",
+    "architecture",
+    "minimal",
+    "editorial",
+    "monochrome"
+  ],
+  "notes": [
+    "the scatter is designed for eight cards and repeats lower down for more",
+    "CSS only: the rise is scroll-driven; hover changes are transitions"
+  ],
+  "entry": "kononenkogroup-projects.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-projects",
+  "files": [
+    {
+      "path": "kononenkogroup-projects.css",
+      "content": "/* Each card rises a long way (about 15vw) as it comes up the window, the original's heavy,\n   late-arriving cards. The list item is the timeline; the card inside moves. */\n.kononenkogroup-projects-item {\n  view-timeline-name: --kononenkogroup-projects-item;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-projects-card {\n      animation: kononenkogroup-projects-rise cubic-bezier(0.17, 0.84, 0.44, 1) both;\n      animation-timeline: --kononenkogroup-projects-item;\n      animation-range: entry 0px entry 420px;\n    }\n  }\n}\n\n@keyframes kononenkogroup-projects-rise {\n  from {\n    transform: translateY(15vw);\n  }\n  to {\n    transform: none;\n  }\n}\n\n/* From 1024px the cards are scattered on the 15-column grid: every card sits in the same grid\n   row, placed by its column and pushed down by its own offset, so they may overlap in height\n   the way the original's do and the section still takes its height from its content. */\n@media (min-width: 64rem) {\n  .kononenkogroup-projects-item {\n    grid-row: 1;\n    grid-column: var(--kononenkogroup-projects-col) / span var(--kononenkogroup-projects-span);\n    align-self: start;\n    margin-top: var(--kononenkogroup-projects-top);\n  }\n  .kononenkogroup-projects-frame {\n    aspect-ratio: var(--kononenkogroup-projects-aspect);\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-projects.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupLink } from \"@foundry/kononenkogroup-link\";\nimport { KononenkogroupMedia } from \"@foundry/kononenkogroup-media\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-projects.css\";\n\nexport interface KononenkogroupProject {\n  /** project name, bottom left of the card */\n  name: string;\n  /** its size, bottom right in serif, e.g. \"540 m²\" */\n  area: string;\n  href: string;\n  /** the project photo (fills the frame) */\n  media?: ReactNode;\n}\n\nexport interface KononenkogroupProjectsProps {\n  /** the heading, one item per line on wide screens (one line on phones) */\n  heading: string[];\n  /** the small serif count after the heading, e.g. \"(8+)\" */\n  count?: string;\n  projects: KononenkogroupProject[];\n  /** the link that replaces the area on hover */\n  visitLabel: string;\n  /** the centred link under the grid */\n  more?: { label: string; href: string };\n  /** how many cards phones show (the original shows six); the rest appear from 1024px */\n  phoneCount?: number;\n  className?: string;\n}\n\n// The original's scatter on the 15-column grid, eight cards long, then repeated lower down:\n// column, width in columns, offset from the top (vw) and the photo's aspect.\nconst scatter = [\n  { col: 1, span: 7, top: 0, aspect: \"643 / 405\" },\n  { col: 9, span: 7, top: 8.9, aspect: \"643 / 405\" },\n  { col: 6, span: 6, top: 49.8, aspect: \"549 / 405\" },\n  { col: 1, span: 4, top: 61.7, aspect: \"361 / 525\" },\n  { col: 8, span: 7, top: 89.9, aspect: \"643 / 405\" },\n  { col: 5, span: 4, top: 131, aspect: \"361 / 525\" },\n  { col: 1, span: 7, top: 187.3, aspect: \"643 / 405\" },\n  { col: 9, span: 7, top: 178.5, aspect: \"643 / 405\" },\n];\nconst cycle = 226; // vw from one run of eight to the next\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\nconst ease = \"duration-[600ms] ease-[cubic-bezier(0.17,0.84,0.44,1)] motion-reduce:transition-none\";\n\n/**\n * Selected work: a grotesk heading with a small serif count, then project photos scattered\n * across a 15-column grid in three sizes (stacked 8:5 cards on phones), each with its name and\n * area underneath. Cards rise a long way as they enter; on hover the photo swells slightly, the\n * area slides up and away and a \"visit\" link slides in and underlines itself.\n */\nexport function KononenkogroupProjects({ heading, count, projects, visitLabel, more, phoneCount = 6, className }: KononenkogroupProjectsProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-section text-foreground\", className)}>\n      <h2 className=\"font-sans text-[8vw] leading-[0.8] tracking-[-0.045em] lg:text-[4.17vw] lg:leading-[0.875]\">\n        {heading.map((line, i) => (\n          <span key={i} className=\"lg:block\">\n            <KononenkogroupLines as=\"span\" text={line} />\n            {i < heading.length - 1 ? \" \" : count && <sup className=\"ml-[0.15em] align-[0.85em] font-display text-[0.45em] tracking-normal\">{count}</sup>}\n          </span>\n        ))}\n      </h2>\n\n      <ul className=\"mt-[8vw] grid gap-[13vw] lg:mt-[3.5vw] lg:grid-cols-15 lg:gap-x-[1.11vw] lg:gap-y-0\">\n        {projects.map((project, i) => {\n          const place = scatter[i % scatter.length];\n          const style = {\n            \"--kononenkogroup-projects-col\": place.col,\n            \"--kononenkogroup-projects-span\": place.span,\n            \"--kononenkogroup-projects-top\": `${place.top + Math.floor(i / scatter.length) * cycle}vw`,\n            \"--kononenkogroup-projects-aspect\": place.aspect,\n          } as CSSProperties;\n          return (\n            <li key={i} className={cn(\"kononenkogroup-projects-item\", i >= phoneCount && \"hidden lg:block\")} style={style}>\n              <a href={project.href} className=\"kononenkogroup-projects-card group/card block\">\n                <div className=\"kononenkogroup-projects-frame aspect-[8/5] overflow-clip\">\n                  <KononenkogroupMedia\n                    media={project.media}\n                    className={cn(\"size-full transition-[scale] group-hover/card:scale-[1.035]\", ease)}\n                  />\n                </div>\n                <div className={cn(small, \"mt-[2.6vw] flex items-start justify-between gap-4 lg:mt-[1vw]\")}>\n                  <span>{project.name}</span>\n                  {/* the area and the visit link share one masked slot and swap on hover */}\n                  <span className=\"relative overflow-clip font-display tracking-[-0.01em]\">\n                    <span className={cn(\"block transition-[translate] group-hover/card:-translate-y-[101%]\", ease)}>{project.area}</span>\n                    <span\n                      className={cn(\n                        \"absolute inset-0 flex translate-y-full justify-end font-sans tracking-[-0.02em] transition-[translate] group-hover/card:translate-y-0\",\n                        ease,\n                      )}\n                    >\n                      <span className=\"relative\">\n                        {visitLabel}\n                        <span\n                          aria-hidden\n                          className={cn(\n                            \"absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-current transition-[scale] group-hover/card:scale-x-100 group-hover/card:delay-300\",\n                            ease,\n                          )}\n                        />\n                      </span>\n                    </span>\n                  </span>\n                </div>\n              </a>\n            </li>\n          );\n        })}\n      </ul>\n\n      {more && (\n        <div className={cn(small, \"mt-[15vw] text-center lg:mt-[7vw] lg:text-[max(10px,0.99vw)]\")}>\n          <KononenkogroupLink href={more.href} underlined>\n            {more.label}\n          </KononenkogroupLink>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-link",
+    "kononenkogroup-media"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading, one item per line on wide screens (one line on phones)"
+    },
+    {
+      "name": "count",
+      "type": "string",
+      "required": false,
+      "description": "the small serif count after the heading, e.g. \"(8+)\""
+    },
+    {
+      "name": "projects",
+      "type": "KononenkogroupProject[]",
+      "required": true
+    },
+    {
+      "name": "visitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link that replaces the area on hover"
+    },
+    {
+      "name": "more",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the centred link under the grid"
+    },
+    {
+      "name": "phoneCount",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "how many cards phones show (the original shows six); the rest appear from 1024px"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1cb626386fa22bd25af5ac4b1115a772ada6265e642d397c1860e5e9ee3e9bce"
+}

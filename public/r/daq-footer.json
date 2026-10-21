@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Daq footer",
+  "description": "A window-tall closing footer: a large two-weight sentence-case call to action at the left, a short line and a long square CTA bar ending in a solid arrow square at the right, then four columns split by hairlines (numbered monospace headings, tracked uppercase links with small arrows, the wordmark with a two-tone tagline, and the small print with a back-to-top link). Links brighten and their arrows nudge on hover.",
+  "category": "footer",
+  "site": "daq",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "cta",
+    "columns",
+    "hairline",
+    "mono",
+    "uppercase",
+    "dark",
+    "fullscreen",
+    "hover"
+  ],
+  "notes": [
+    "transparent: made to sit over daq-backdrop; pass a background in className without it",
+    "100svh tall from 1024px, as on the original; content-sized on phones"
+  ],
+  "entry": "daq-footer.tsx",
+  "source": "foundry",
+  "name": "daq-footer",
+  "files": [
+    {
+      "path": "daq-footer.tsx",
+      "content": "import { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { DaqEyebrow } from \"@foundry/daq-eyebrow\";\nimport { DaqWordmark } from \"@foundry/daq-wordmark\";\n\nexport interface DaqFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface DaqFooterProps {\n  /** the call to action's light first line and heavier second line */\n  lead: string;\n  payoff: string;\n  /** the short line above the CTA bar */\n  blurb: string;\n  /** the long CTA bar */\n  cta: { label: string; href: string };\n  /** two link columns, each with a numbered heading, e.g. \"01 / Practice\" */\n  columns: { heading: string; links: DaqFooterLink[] }[];\n  /** the brand column */\n  brand: { heading: string; name: string; sub?: string; href?: string; tagline: string; taglineStrong?: string; about: string };\n  /** the small-print column */\n  record: { heading: string; items: DaqFooterLink[]; top?: DaqFooterLink };\n  className?: string;\n}\n\nconst link =\n  \"group/link inline-flex items-center gap-2.5 text-xs font-bold tracking-[0.15em] text-foreground/58 uppercase transition-colors duration-300 hover:text-foreground\";\nconst arrow = \"size-3 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 motion-reduce:transition-none\";\nconst small =\n  \"group/link inline-flex items-center gap-2.5 font-mono text-[0.5625rem] font-bold tracking-[0.2em] text-foreground/58 uppercase transition-colors duration-150 hover:text-foreground\";\n\nexport function DaqFooter({ lead, payoff, blurb, cta, columns, brand, record, className }: DaqFooterProps) {\n  return (\n    <footer className={cn(\"relative flex flex-col lg:min-h-svh\", className)}>\n      <div className=\"flex flex-1 flex-col gap-10 px-gutter pt-section pb-24 lg:flex-row lg:items-center lg:justify-between lg:gap-16 lg:py-12\">\n        <h2 className=\"font-display text-[clamp(2.1rem,5.6vw,7rem)] leading-[1.18] tracking-[-0.03em]\">\n          <span className=\"block font-light\">{lead}</span>\n          <span className=\"block font-medium\">{payoff}</span>\n        </h2>\n        <div className=\"lg:w-[21.25rem] lg:shrink-0\">\n          <p className=\"max-w-[21rem] text-sm leading-[1.75] text-foreground/72 lg:text-[0.9375rem]\">{blurb}</p>\n          <a\n            href={cta.href}\n            className=\"group/cta mt-8 flex h-[4.25rem] items-stretch border border-foreground/20 bg-background/60 transition-colors duration-500 hover:border-foreground/60 lg:h-[4.625rem]\"\n          >\n            <span className=\"flex flex-1 items-center px-6 text-base font-medium\">{cta.label}</span>\n            <span className=\"flex aspect-square items-center justify-center bg-primary text-primary-foreground\">\n              <ArrowUpRight aria-hidden strokeWidth={1.25} className=\"size-5 transition-transform duration-500 group-hover/cta:translate-x-0.5 group-hover/cta:-translate-y-0.5\" />\n            </span>\n          </a>\n        </div>\n      </div>\n\n      <div className=\"mx-gutter grid grid-cols-[1.4fr_1fr] border-t border-border lg:grid-cols-[3fr_2fr_4fr_3fr]\">\n        {columns.map((col, c) => (\n          <div key={col.heading} className={cn(\"py-6 lg:py-12\", c > 0 && \"border-l border-border pl-4 lg:pl-8\", c === 0 && \"pr-4 lg:pr-8\")}>\n            <DaqEyebrow label={col.heading} />\n            <ul className=\"mt-6 flex flex-col gap-4 lg:mt-8\">\n              {col.links.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className={link}>\n                    {l.label}\n                    <ArrowUpRight aria-hidden strokeWidth={1.75} className={arrow} />\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        ))}\n\n        <div className=\"col-span-2 border-t border-border py-6 lg:col-span-1 lg:border-t-0 lg:border-l lg:px-8 lg:py-12\">\n          <DaqEyebrow label={brand.heading} />\n          <DaqWordmark name={brand.name} sub={brand.sub} href={brand.href} className=\"mt-6 lg:mt-7\" />\n          <p className=\"mt-5 text-xl tracking-[-0.02em] text-foreground/80 lg:text-2xl\">\n            {brand.tagline}\n            {brand.taglineStrong && <span className=\"font-medium text-foreground\"> {brand.taglineStrong}</span>}\n          </p>\n          <p className=\"mt-5 max-w-[23rem] text-sm leading-relaxed text-foreground/58\">{brand.about}</p>\n        </div>\n\n        <div className=\"col-span-2 border-t border-border py-6 lg:col-span-1 lg:border-t-0 lg:border-l lg:pl-8 lg:py-12\">\n          <DaqEyebrow label={record.heading} />\n          <ul className=\"mt-6 grid grid-cols-2 gap-x-4 gap-y-4 lg:mt-8 lg:grid-cols-1 lg:gap-y-[0.95rem]\">\n            {record.items.map((item) => (\n              <li key={item.label}>\n                <a href={item.href} className={small}>\n                  {item.label}\n                </a>\n              </li>\n            ))}\n            {record.top && (\n              <li>\n                <a href={record.top.href} className={small}>\n                  {record.top.label}\n                  <ArrowUpRight aria-hidden strokeWidth={1.75} className={arrow} />\n                </a>\n              </li>\n            )}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "daq-eyebrow",
+    "daq-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the call to action's light first line and heavier second line"
+    },
+    {
+      "name": "payoff",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": true,
+      "description": "the short line above the CTA bar"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the long CTA bar"
+    },
+    {
+      "name": "columns",
+      "type": "{ heading: string; links: DaqFooterLink[]; }[]",
+      "required": true,
+      "description": "two link columns, each with a numbered heading, e.g. \"01 / Practice\""
+    },
+    {
+      "name": "brand",
+      "type": "{ heading: string; name: string; sub?: string | undefined; href?: string | undefined; tagline: string; taglineStrong?: string | undefined; about: string; }",
+      "required": true,
+      "description": "the brand column"
+    },
+    {
+      "name": "record",
+      "type": "{ heading: string; items: DaqFooterLink[]; top?: DaqFooterLink | undefined; }",
+      "required": true,
+      "description": "the small-print column"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f3acb4dcfda9cc9dfe9741d414d82de48c13a61f1c033341a5774faf79224067"
+}

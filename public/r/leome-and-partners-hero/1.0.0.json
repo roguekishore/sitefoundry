@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Leome and Partners hero",
+  "description": "A window-high centred hero: a big two-line headline split by a 3:2 photo (first line in primary, second in highlight) and small labels spread along the bottom edge. On load an intro panel slides up, the words rise out of masks and the labels lift in; while scrolling the photo slowly zooms and the hero stays pinned under the next sections.",
+  "category": "hero",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "centered",
+    "window-height",
+    "sticky",
+    "pinned",
+    "reveal",
+    "mask",
+    "split-text",
+    "load",
+    "zoom",
+    "scroll-driven",
+    "intro",
+    "preloader",
+    "dark",
+    "minimal"
+  ],
+  "notes": [
+    "pinned (default): it is sticky, so the sections after it need position relative and a z-index to slide over it (wrap them in a relative z-10 div)",
+    "the photo zoom follows the page's scroll from the top (scroll(root)), so it suits a hero at the top of the page",
+    "all motion is CSS; off under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-hero.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-hero",
+  "files": [
+    {
+      "path": "leome-and-partners-hero.css",
+      "content": "/* Load: the intro panel slides up out of the way, the headline words rise (word reveal), the\n   labels lift 12px and fade in after them. Scroll: the photo zooms from 1 to 1.3 over the\n   first window of scrolling (the original reaches 1.5 much later, by when the hero is covered). */\n.leome-and-partners-hero-intro {\n  display: none;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .leome-and-partners-hero-intro {\n    display: block;\n    animation: leome-and-partners-hero-lift 0.9s cubic-bezier(0.625, 0.05, 0, 1) 0.15s both;\n  }\n\n  .leome-and-partners-hero-label {\n    animation: leome-and-partners-hero-label-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;\n  }\n\n  @supports (animation-timeline: scroll()) {\n    .leome-and-partners-hero-media {\n      animation: leome-and-partners-hero-zoom linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 100vh;\n    }\n  }\n}\n\n@keyframes leome-and-partners-hero-lift {\n  from {\n    transform: none;\n  }\n  to {\n    transform: translateY(-100%);\n  }\n}\n\n@keyframes leome-and-partners-hero-label-in {\n  from {\n    opacity: 0;\n    transform: translateY(12px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes leome-and-partners-hero-zoom {\n  from {\n    transform: scale(1);\n  }\n  to {\n    transform: scale(1.3);\n  }\n}\n"
+    },
+    {
+      "path": "leome-and-partners-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { LeomeAndPartnersWordReveal } from \"@foundry/leome-and-partners-word-reveal\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./leome-and-partners-hero.css\";\n\nexport interface LeomeAndPartnersHeroProps {\n  /** the headline's first line, above the photo */\n  titleTop: string;\n  /** the headline's second line, below the photo, in the highlight colour */\n  titleBottom: string;\n  /**\n   * The 3:2 photo between the two lines; give it `className=\"size-full object-cover\"` and\n   * `alt=\"\"` (it sits inside the headline). It zooms in slowly as the page scrolls. A\n   * placeholder when empty.\n   */\n  media?: ReactNode;\n  /** small labels spread along the bottom edge (practice areas, services…) */\n  labels?: string[];\n  /** cover the hero with a panel that slides up on load, like the original's intro */\n  intro?: boolean;\n  /** stay pinned at the top while the following sections slide over it */\n  pinned?: boolean;\n  className?: string;\n}\n\n/**\n * A window-high, centred hero: a large two-line headline split by a 3:2 photo (first line in\n * primary, second in highlight) and a row of small labels along the bottom. On load an intro\n * panel slides up, the words rise out of masks and the labels follow; while scrolling the\n * photo zooms in and the hero stays pinned under the next sections.\n */\nexport function LeomeAndPartnersHero({\n  titleTop,\n  titleBottom,\n  media,\n  labels,\n  intro = true,\n  pinned = true,\n  className,\n}: LeomeAndPartnersHeroProps) {\n  const start = intro ? 0.75 : 0.1;\n  const topWords = titleTop.split(/\\s+/).filter(Boolean).length;\n  return (\n    <section\n      className={cn(\n        \"relative flex h-svh flex-col overflow-clip bg-background px-gutter font-sans text-foreground\",\n        pinned && \"sticky top-0\",\n        className,\n      )}\n    >\n      <div className=\"flex flex-1 flex-col items-center justify-center pt-[4.5rem] lg:pt-[6.5rem]\">\n        <h1 className=\"flex w-full flex-col items-center text-center font-display text-[3.75rem] leading-[1.2] font-medium tracking-[-0.02em] lg:text-[5.5rem]\">\n          <span className=\"block\">\n            <LeomeAndPartnersWordReveal text={titleTop} trigger=\"load\" delay={start} stagger={0.08} />\n          </span>\n          <span className=\"relative my-3 block aspect-[3/2] w-full overflow-clip bg-muted lg:my-4 lg:w-[32rem]\">\n            <span className=\"leome-and-partners-hero-media absolute inset-0 block\">\n              {media ?? <span className=\"block size-full bg-linear-to-br from-muted via-muted to-glow/25\" />}\n            </span>\n          </span>\n          <span className=\"block text-highlight\">\n            <LeomeAndPartnersWordReveal text={titleBottom} trigger=\"load\" delay={start + topWords * 0.08} stagger={0.08} />\n          </span>\n        </h1>\n      </div>\n\n      {labels && labels.length > 0 && (\n        <ul className=\"flex justify-between gap-4 pb-6 text-[0.85rem] leading-tight font-medium\">\n          {labels.map((label, i) => (\n            <li\n              key={label}\n              className=\"leome-and-partners-hero-label\"\n              style={{ animationDelay: `${(start + 0.45 + i * 0.06).toFixed(2)}s` }}\n            >\n              {label}\n            </li>\n          ))}\n        </ul>\n      )}\n\n      {intro && <div aria-hidden className=\"leome-and-partners-hero-intro pointer-events-none absolute inset-0 z-20 bg-card\" />}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "leome-and-partners-word-reveal"
+  ],
+  "props": [
+    {
+      "name": "titleTop",
+      "type": "string",
+      "required": true,
+      "description": "the headline's first line, above the photo"
+    },
+    {
+      "name": "titleBottom",
+      "type": "string",
+      "required": true,
+      "description": "the headline's second line, below the photo, in the highlight colour"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "The 3:2 photo between the two lines; give it `className=\"size-full object-cover\"` and\n`alt=\"\"` (it sits inside the headline). It zooms in slowly as the page scrolls. A\nplaceholder when empty."
+    },
+    {
+      "name": "labels",
+      "type": "string[]",
+      "required": false,
+      "description": "small labels spread along the bottom edge (practice areas, services…)"
+    },
+    {
+      "name": "intro",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "cover the hero with a panel that slides up on load, like the original's intro"
+    },
+    {
+      "name": "pinned",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "stay pinned at the top while the following sections slide over it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "967685030b1ba3c9720355189f39112d258dc7f1de6780c24bbcba3fb3c73fb6"
+}

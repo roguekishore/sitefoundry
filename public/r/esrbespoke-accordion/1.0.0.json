@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke accordion",
+  "description": "A hairline across the full width, a tiny capital label at the left and, from column 7, a stack of 20px rows each closed by a hairline with a small caret at the right. Pressing a row slides its answer open (height eases open, the caret flips).",
+  "category": "faq",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "accordion",
+    "faq",
+    "services",
+    "list",
+    "hairline",
+    "expand",
+    "minimal",
+    "monochrome"
+  ],
+  "notes": [
+    "needs JavaScript to open rows (hydrate: visible)",
+    "the open animation is off under reduced motion"
+  ],
+  "entry": "esrbespoke-accordion.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "esrbespoke-accordion",
+  "files": [
+    {
+      "path": "esrbespoke-accordion.tsx",
+      "content": "import { useId, useState } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { EsrbespokeLabel } from \"@foundry/esrbespoke-label\";\nimport { toneClass, type EsrbespokeTone } from \"@foundry/esrbespoke-tone\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EsrbespokeAccordionItem {\n  /** the row's title */\n  title: string;\n  /** the answer that slides open */\n  body: string;\n}\n\nexport interface EsrbespokeAccordionProps {\n  /** the tiny label at the left */\n  label: string;\n  /** the rows */\n  items: EsrbespokeAccordionItem[];\n  tone?: EsrbespokeTone;\n  id?: string;\n  className?: string;\n}\n\nconst ease = \"ease-[cubic-bezier(0.19,1,0.22,1)]\";\n\n/** Label at the left, hairline rows at column 7 that slide open. */\nexport function EsrbespokeAccordion({ label, items, tone = \"light\", id, className }: EsrbespokeAccordionProps) {\n  const [open, setOpen] = useState<number | null>(null);\n  const base = useId();\n  return (\n    <section id={id} className={cn(toneClass(tone), \"pb-20 lg:pb-32\", className)}>\n      <div className=\"mx-gutter grid grid-cols-2 gap-x-4 border-t border-border lg:grid-cols-12\">\n        <EsrbespokeLabel as=\"h2\" className=\"col-span-2 pt-8 lg:col-span-3\">{label}</EsrbespokeLabel>\n        <ul className=\"col-span-2 mt-[3.75rem] lg:col-span-6 lg:col-start-7 lg:mt-0\">\n          {items.map((item, i) => {\n            const isOpen = open === i;\n            return (\n              <li key={i} className=\"border-b border-border\">\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  aria-controls={`${base}-${i}`}\n                  onClick={() => setOpen(isOpen ? null : i)}\n                  className=\"flex w-full items-center justify-between gap-6 py-5 text-left\"\n                >\n                  <span className=\"font-display text-[1.25rem] leading-[1.2] font-medium tracking-[-0.01em] font-stretch-[106%]\">{item.title}</span>\n                  <ChevronDown className={cn(\"size-3 shrink-0 transition-transform duration-500 motion-reduce:transition-none\", ease, isOpen && \"rotate-180\")} strokeWidth={2.5} />\n                </button>\n                <div\n                  id={`${base}-${i}`}\n                  className={cn(\"grid transition-[grid-template-rows] duration-500 motion-reduce:transition-none\", ease, isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}\n                >\n                  <div className=\"min-h-0 overflow-hidden\">\n                    <p className=\"max-w-[34rem] pb-6 font-display text-[0.9375rem] leading-[1.25] font-medium text-muted-foreground font-stretch-[106%] lg:text-[1.125rem]\">\n                      {item.body}\n                    </p>\n                  </div>\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "esrbespoke-label",
+    "esrbespoke-tone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the tiny label at the left"
+    },
+    {
+      "name": "items",
+      "type": "EsrbespokeAccordionItem[]",
+      "required": true,
+      "description": "the rows"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "light"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b4b5d10c92815336ad53d0df1386f63d2b5ff55a4c236a48da90d445774639ce"
+}

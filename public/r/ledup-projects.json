@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup projects reel",
+  "description": "A white panel with 50px corners holding a swipeable, draggable row of 4:3 project photos. On desktop the label, headline and paragraph sit low at the left beside a slowly spinning ring of text with an arrow (a drag hint), and the reel runs at the right with the next photo peeking; on phones the headline sits on top, the photos peek from the right edge and a short progress bar follows the scroll. The text and reel rise 24px into view.",
+  "category": "gallery",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "carousel",
+    "reel",
+    "horizontal",
+    "drag",
+    "swipe",
+    "projects",
+    "rounded",
+    "panel",
+    "light",
+    "spin",
+    "loop",
+    "reveal",
+    "scroll",
+    "progress"
+  ],
+  "notes": [
+    "the panel is bg-card on a bg-background page (white on near-white, as the original)",
+    "project media fill each 4:3 frame (cover); empty shows a muted placeholder",
+    "touch and trackpads scroll natively; a mouse can drag the reel (needs JavaScript: hydrate visible). The progress bar is a CSS scroll timeline"
+  ],
+  "entry": "ledup-projects.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "ledup-projects",
+  "files": [
+    {
+      "path": "ledup-projects.css",
+      "content": "/* The drag hint: a ring of text that turns slowly, for ever. */\n.ledup-projects-ring {\n  animation: ledup-projects-spin 18s linear infinite;\n}\n\n@keyframes ledup-projects-spin {\n  to {\n    transform: rotate(360deg);\n  }\n}\n\n/* The reel publishes its horizontal scroll as a timeline; the progress thumb under it\n   slides from the left end of its track to the right end as the reel scrolls. */\n.ledup-projects {\n  timeline-scope: --ledup-projects-reel;\n}\n.ledup-projects-reel {\n  scroll-timeline: --ledup-projects-reel x;\n  scrollbar-width: none;\n}\n.ledup-projects-reel::-webkit-scrollbar {\n  display: none;\n}\n\n@supports (animation-timeline: scroll()) {\n  .ledup-projects-thumb {\n    animation: ledup-projects-progress linear both;\n    animation-timeline: --ledup-projects-reel;\n  }\n}\n\n@keyframes ledup-projects-progress {\n  from {\n    transform: translateX(0);\n  }\n  to {\n    transform: translateX(150%);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ledup-projects-ring {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "ledup-projects.tsx",
+      "content": "import { type ReactNode, useEffect, useId, useRef } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LedupHeading } from \"@foundry/ledup-heading\";\nimport { LedupReveal } from \"@foundry/ledup-reveal\";\nimport \"./ledup-projects.css\";\n\nexport interface LedupProject {\n  /** the project's name, for screen readers and as the photo's label */\n  name: string;\n  /** where it links */\n  href?: string;\n  /** the photo; empty shows a muted placeholder */\n  media?: ReactNode;\n}\n\nexport interface LedupProjectsProps {\n  /** the small label above the headline */\n  label?: string;\n  /** the headline */\n  title: ReactNode;\n  /** the paragraph under the headline (desktop only, as on the original) */\n  text?: ReactNode;\n  /** the photos in the reel */\n  projects: LedupProject[];\n  /** the words that run round the spinning drag hint (desktop) */\n  dragHint?: string;\n  className?: string;\n}\n\nexport function LedupProjects({ label, title, text, projects, dragHint, className }: LedupProjectsProps) {\n  const reel = useRef<HTMLDivElement>(null);\n  const ringId = useId().replace(/:/g, \"\");\n\n  // Let a mouse drag the reel sideways (touch and trackpads already scroll it natively).\n  useEffect(() => {\n    const el = reel.current;\n    if (!el) return;\n    let startX = 0;\n    let startLeft = 0;\n    let dragging = false;\n    const down = (e: PointerEvent) => {\n      if (e.pointerType !== \"mouse\") return;\n      dragging = true;\n      startX = e.clientX;\n      startLeft = el.scrollLeft;\n      el.style.scrollSnapType = \"none\";\n      el.style.cursor = \"grabbing\";\n    };\n    const move = (e: PointerEvent) => {\n      if (!dragging) return;\n      e.preventDefault();\n      el.scrollLeft = startLeft - (e.clientX - startX);\n    };\n    const up = () => {\n      if (!dragging) return;\n      dragging = false;\n      el.style.scrollSnapType = \"\";\n      el.style.cursor = \"\";\n    };\n    el.addEventListener(\"pointerdown\", down);\n    window.addEventListener(\"pointermove\", move);\n    window.addEventListener(\"pointerup\", up);\n    return () => {\n      el.removeEventListener(\"pointerdown\", down);\n      window.removeEventListener(\"pointermove\", move);\n      window.removeEventListener(\"pointerup\", up);\n    };\n  }, []);\n\n  return (\n    <section className={cn(\"ledup-projects bg-background font-sans text-foreground\", className)}>\n      <div className=\"overflow-clip rounded-[3.125rem] bg-card pt-section pb-5 text-card-foreground lg:pt-[10.5rem] lg:pb-28\">\n        <div className=\"mx-auto max-w-page lg:grid lg:grid-cols-[minmax(0,1fr)_35rem] lg:px-gutter lg:pr-[calc(var(--page-gutter)+3.75rem)]\">\n          <LedupReveal className=\"relative flex flex-col justify-end px-gutter lg:pr-10 lg:pl-5\">\n            <LedupHeading label={label} title={title} text={text} align=\"left\" size=\"lg\" narrow className=\"lg:-mb-12\" />\n            {dragHint && (\n              <div aria-hidden className=\"absolute -top-10 right-10 hidden size-[9.5rem] text-muted-foreground lg:block\">\n                <svg viewBox=\"0 0 152 152\" className=\"ledup-projects-ring absolute inset-0 size-full\">\n                  <defs>\n                    <path id={ringId} d=\"M76 76 m-62 0 a62 62 0 1 1 124 0 a62 62 0 1 1 -124 0\" />\n                  </defs>\n                  <text fill=\"currentColor\" className=\"text-[0.625rem] tracking-[0.35em] uppercase\">\n                    <textPath href={`#${ringId}`}>{dragHint}</textPath>\n                  </text>\n                </svg>\n                <ArrowRight strokeWidth={0.6} className=\"absolute inset-0 m-auto size-20\" />\n              </div>\n            )}\n          </LedupReveal>\n\n          <LedupReveal className=\"mt-16 min-w-0 lg:mt-0\">\n            <div\n              ref={reel}\n              className=\"ledup-projects-reel flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-6 px-6 select-none lg:scroll-px-0 lg:gap-[3.75rem] lg:px-0\"\n            >\n              {projects.map((p) => {\n                const Tag = p.href ? \"a\" : \"div\";\n                return (\n                  <Tag\n                    key={p.name}\n                    href={p.href}\n                    aria-label={p.name}\n                    draggable={false}\n                    className=\"aspect-[4/3] w-[19.5rem] shrink-0 snap-start overflow-clip rounded-[1rem] bg-muted lg:w-[30rem] [&>*]:pointer-events-none [&>*]:size-full [&>*]:object-cover\"\n                  >\n                    {p.media}\n                  </Tag>\n                );\n              })}\n            </div>\n            <div aria-hidden className=\"mx-auto mt-7 h-[3px] w-[7.5rem] overflow-clip rounded-full bg-muted lg:hidden\">\n              <div className=\"ledup-projects-thumb h-full w-2/5 rounded-full bg-secondary\" />\n            </div>\n          </LedupReveal>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ledup-heading",
+    "ledup-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the small label above the headline"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the paragraph under the headline (desktop only, as on the original)"
+    },
+    {
+      "name": "projects",
+      "type": "LedupProject[]",
+      "required": true,
+      "description": "the photos in the reel"
+    },
+    {
+      "name": "dragHint",
+      "type": "string",
+      "required": false,
+      "description": "the words that run round the spinning drag hint (desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c62f59eebb0149089b50dc4b4c34378544a6f791c7e94e5dfc82709c55ffc27d"
+}

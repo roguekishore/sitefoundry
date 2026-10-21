@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty full image",
+  "description": "A single big photo in the page margins: 2:1 on desktop, a tall 5:6 on phones. It enters a quarter too big, spilling past the margins, and settles into place as it comes fully into view, while the photo drifts slowly inside its square-cornered frame.",
+  "category": "gallery",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "image",
+    "photo",
+    "full-width",
+    "scale-in",
+    "parallax",
+    "scrubbed",
+    "divider",
+    "minimal"
+  ],
+  "notes": [
+    "the media slot fills the frame like object-fit cover and is 40% taller than it for the drift; empty, it is a bg-muted placeholder"
+  ],
+  "entry": "rioproperty-full-image.tsx",
+  "source": "foundry",
+  "name": "rioproperty-full-image",
+  "files": [
+    {
+      "path": "rioproperty-full-image.css",
+      "content": "/* The frame enters a quarter too big, spilling past the margins (the section crops it), and\n   settles to its place in the margins by the time it is fully in view. Inside, the photo drifts\n   down a little slower than the page scrolls. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-full-image-frame {\n      animation: rioproperty-full-image-settle linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n    .rioproperty-full-image-media {\n      animation: rioproperty-full-image-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes rioproperty-full-image-settle {\n  from {\n    scale: 1.25;\n  }\n  to {\n    scale: 1;\n  }\n}\n\n@keyframes rioproperty-full-image-drift {\n  from {\n    translate: 0 -12%;\n  }\n  to {\n    translate: 0 12%;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-full-image.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rioproperty-full-image.css\";\n\nexport interface RiopropertyFullImageProps {\n  /** a photo or video; fills the frame like object-fit cover and drifts inside it. Empty: a\n      placeholder */\n  media?: ReactNode;\n  /** a text alternative for the frame, read when the media is decorative */\n  label?: string;\n  className?: string;\n}\n\nexport function RiopropertyFullImage({ media, label, className }: RiopropertyFullImageProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background py-20\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div role={label ? \"img\" : undefined} aria-label={label} className=\"rioproperty-full-image-frame relative aspect-[353/423] overflow-clip bg-muted sm:aspect-[3/2] lg:aspect-[2/1]\">\n          {/* taller than the frame, so it can drift without showing an edge */}\n          <div className=\"rioproperty-full-image-media absolute inset-x-0 -top-[20%] -bottom-[20%]\">{media}</div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a photo or video; fills the frame like object-fit cover and drifts inside it. Empty: a\nplaceholder"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "a text alternative for the frame, read when the media is decorative"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c6ab623377a0a746f888517741cbc906d58f3a8772f8c790822d6ef5338d26cb"
+}

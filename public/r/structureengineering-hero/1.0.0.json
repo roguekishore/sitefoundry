@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Structure engineering hero",
+  "description": "A full-bleed, darkened photo slideshow a little taller than the window, with a huge tight neo-grotesk statement in white over its lower half and, along the bottom, a ruled 'browse' label over outlined mono tags beside a ruled 'latest' label over three small white project cards (thumbnail, mono sector, name) that invert to ink on hover. Photos settle from 92% scale and the text rises 80px on load; every few seconds the next photo slides in from the right. On phones the cards become a sideways row with the next one peeking.",
+  "category": "hero",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-bleed",
+    "slideshow",
+    "carousel",
+    "dark",
+    "photo",
+    "cards",
+    "tags",
+    "load-in",
+    "rise",
+    "scale",
+    "minimal"
+  ],
+  "notes": [
+    "the text is light over a dark photo: it assumes dark images (placeholders are the theme's glow with a dark veil)",
+    "height follows the window: 100svh + 92px on phones, + 58px at desktop, like the original",
+    "the slideshow advances on a timer (React effect); reduced motion keeps the first slide"
+  ],
+  "entry": "structureengineering-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "structureengineering-hero",
+  "files": [
+    {
+      "path": "structureengineering-hero.css",
+      "content": "/* Load-in: the photos settle from 92% to full size, the statement and the bottom row rise\n   80px and fade in, the row a little later. CSS only, so static HTML shows everything. */\n@media (prefers-reduced-motion: no-preference) {\n  .structureengineering-hero-media {\n    animation: structureengineering-hero-settle 1.4s cubic-bezier(0.22, 1, 0.36, 1) both;\n  }\n  .structureengineering-hero-rise {\n    animation: structureengineering-hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;\n  }\n}\n\n@keyframes structureengineering-hero-settle {\n  from { transform: scale(0.92); }\n  to { transform: none; }\n}\n\n@keyframes structureengineering-hero-rise {\n  from { opacity: 0; transform: translateY(80px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "structureengineering-hero.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StructureengineeringMedia } from \"@foundry/structureengineering-media\";\nimport { StructureengineeringTags, type StructureengineeringTag } from \"@foundry/structureengineering-tags\";\nimport \"./structureengineering-hero.css\";\n\nexport interface StructureengineeringHeroCard {\n  /** the small mono line at the top right (the sector) */\n  category: string;\n  /** the project name at the bottom right */\n  title: string;\n  /** where the card goes */\n  href: string;\n  /** the thumbnail at the left. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface StructureengineeringHeroProps {\n  /** the big statement over the photos */\n  heading: string;\n  /** the small label over the tag row (\"see our work\") */\n  exploreLabel: string;\n  /** the sector tags under it */\n  tags: StructureengineeringTag[];\n  /** the small label over the cards (\"latest work\") */\n  latestLabel: string;\n  /** the project cards along the bottom (three at desktop) */\n  cards: StructureengineeringHeroCard[];\n  /** the full-bleed slideshow images. Empty: placeholders */\n  slides?: ReactNode[];\n  /** how many placeholder slides to show when slides is empty */\n  placeholderSlides?: number;\n  /** seconds each slide stays before the next slides in */\n  interval?: number;\n  className?: string;\n}\n\nconst onMedia = \"text-card dark:text-card-foreground\";\n\n// A full-bleed photo slideshow a little taller than the window, darkened, with a huge white\n// statement over its lower half and, along the bottom, a tag column and a row of small white\n// project cards. On load the photos settle from 92% scale and the text rises 80px; every few\n// seconds the next photo slides in from the right.\nexport function StructureengineeringHero({\n  heading,\n  exploreLabel,\n  tags,\n  latestLabel,\n  cards,\n  slides,\n  placeholderSlides = 3,\n  interval = 5,\n  className,\n}: StructureengineeringHeroProps) {\n  const frames: (ReactNode | undefined)[] = slides && slides.length > 0 ? slides : Array.from({ length: placeholderSlides }, () => undefined);\n  const [active, setActive] = useState(0);\n\n  useEffect(() => {\n    if (frames.length < 2) return;\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setInterval(() => setActive((i) => (i + 1) % frames.length), interval * 1000);\n    return () => window.clearInterval(id);\n  }, [frames.length, interval]);\n\n  return (\n    <section data-tone=\"dark\" className={cn(\"relative isolate flex min-h-[calc(100svh_+_5.75rem)] flex-col overflow-clip lg:min-h-[calc(100svh_+_3.625rem)]\", onMedia, className)}>\n      {/* the slideshow */}\n      <div className=\"structureengineering-hero-media absolute inset-0 -z-10\">\n        <div\n          className=\"flex h-full transition-transform duration-700 ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none\"\n          style={{ transform: `translateX(-${active * 100}%)` }}\n        >\n          {frames.map((slide, i) => (\n            <StructureengineeringMedia key={i} media={slide} tone=\"dark\" veil className={cn(\"h-full w-full shrink-0\", !slide && i % 2 === 1 && \"opacity-90\")} />\n          ))}\n        </div>\n      </div>\n\n      <div className=\"mx-auto flex w-full max-w-page flex-1 flex-col justify-end px-gutter pt-40 pb-6 lg:pb-7\">\n        <h1 className=\"structureengineering-hero-rise max-w-[54rem] font-display text-[3.7rem] leading-none font-medium tracking-[-0.04em] text-balance lg:text-[5.1rem]\">\n          {heading}\n        </h1>\n\n        <div className=\"structureengineering-hero-rise mt-16 grid gap-7 [animation-delay:0.45s] lg:mt-24 lg:grid-cols-[23.5rem_minmax(0,1fr)] lg:gap-4\">\n          <div>\n            <p className=\"border-b border-current pb-1 font-mono text-base leading-tight uppercase\">{exploreLabel}</p>\n            <StructureengineeringTags tags={tags} tone=\"media\" className=\"mt-2.5\" />\n          </div>\n          <div className=\"min-w-0 min-[87.5rem]:-mr-[3.4rem]\">\n            <p className=\"border-b border-current pb-1 font-mono text-base leading-tight uppercase\">{latestLabel}</p>\n            <ul className=\"-mx-gutter mt-3.5 flex snap-x snap-mandatory gap-1.5 overflow-x-auto px-gutter [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-2 lg:overflow-visible lg:px-0\">\n              {cards.map((card) => (\n                <li key={card.title} className=\"w-[80%] shrink-0 snap-start lg:w-auto\">\n                  <a\n                    href={card.href}\n                    className=\"group flex h-[8.9rem] gap-3 rounded-sm bg-card p-1 text-card-foreground transition-colors duration-250 ease-out hover:bg-foreground hover:text-background motion-reduce:transition-none lg:h-[8.5rem]\"\n                  >\n                    <StructureengineeringMedia media={card.media} className=\"aspect-[146/128] h-full shrink-0\" />\n                    <div className=\"flex min-w-0 flex-col justify-between py-2 pr-2\">\n                      <span className=\"font-mono text-[0.9rem] leading-tight uppercase\">{card.category}</span>\n                      <span className=\"text-base leading-tight font-medium tracking-tight\">{card.title}</span>\n                    </div>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "structureengineering-media",
+    "structureengineering-tags"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big statement over the photos"
+    },
+    {
+      "name": "exploreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small label over the tag row (\"see our work\")"
+    },
+    {
+      "name": "tags",
+      "type": "StructureengineeringTag[]",
+      "required": true,
+      "description": "the sector tags under it"
+    },
+    {
+      "name": "latestLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small label over the cards (\"latest work\")"
+    },
+    {
+      "name": "cards",
+      "type": "StructureengineeringHeroCard[]",
+      "required": true,
+      "description": "the project cards along the bottom (three at desktop)"
+    },
+    {
+      "name": "slides",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "the full-bleed slideshow images. Empty: placeholders"
+    },
+    {
+      "name": "placeholderSlides",
+      "type": "number",
+      "required": false,
+      "default": "3",
+      "description": "how many placeholder slides to show when slides is empty"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "5",
+      "description": "seconds each slide stays before the next slides in"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6848b299954b65366982ffcdd075308c22ad316511924902bc480cab5e1db1ef"
+}

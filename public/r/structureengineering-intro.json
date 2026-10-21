@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Structure engineering intro",
+  "description": "A large neo-grotesk statement pinned in the middle of the window for about a screen of scrolling while its words light from pale grey to full ink in reading order, followed by a row of bold uppercase tabs (the chosen one ruled across its top), the chosen tab's mono paragraphs with an outline arrow button at the left, and an image at the lower right. The copy and image rise 48px as they come into view.",
+  "category": "features",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "intro",
+    "about",
+    "statement",
+    "sticky",
+    "pinned",
+    "scrubbed",
+    "word-reveal",
+    "tabs",
+    "mono",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "the statement wrapper is 235svh on phones and 245svh at desktop: the pinned stretch is that minus one window",
+    "word lighting is CSS scroll-driven (a named view timeline); without support the statement is simply full ink",
+    "tabs switch with React state"
+  ],
+  "entry": "structureengineering-intro.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "structureengineering-intro",
+  "files": [
+    {
+      "path": "structureengineering-intro.css",
+      "content": "/* The tall wrapper names a view timeline; while it covers the window (the \"contain\" phase,\n   i.e. while the statement is pinned) each word goes from 20% to full opacity in its own\n   slice of the first 90%, so the light runs through the text in reading order. */\n.structureengineering-intro-pin {\n  view-timeline: --structureengineering-intro block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .structureengineering-intro-word {\n      animation: structureengineering-intro-light linear both;\n      animation-timeline: --structureengineering-intro;\n      animation-range: contain var(--se-from) contain var(--se-to);\n    }\n  }\n}\n\n@keyframes structureengineering-intro-light {\n  from { opacity: 0.2; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "structureengineering-intro.tsx",
+      "content": "import { useId, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StructureengineeringButton } from \"@foundry/structureengineering-button\";\nimport { StructureengineeringMedia } from \"@foundry/structureengineering-media\";\nimport { StructureengineeringReveal } from \"@foundry/structureengineering-reveal\";\nimport \"./structureengineering-intro.css\";\n\nexport interface StructureengineeringIntroTab {\n  /** the tab's label (bold uppercase) */\n  label: string;\n  /** the mono paragraphs shown when it's chosen */\n  paragraphs: string[];\n}\n\nexport interface StructureengineeringIntroProps {\n  /** the large statement that lights up word by word while it's pinned */\n  statement: string;\n  /** two (or more) tabs, each with its own paragraphs */\n  tabs: StructureengineeringIntroTab[];\n  /** the button under the paragraphs */\n  cta: { label: string; href: string };\n  /** the image at the right. Empty: a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n// Two parts on paper. First a large statement, pinned in the middle of the window for about a\n// screen of scrolling while its words go from pale (20%) to full ink in reading order. Then a\n// row of tabs ruled at the top when chosen, the chosen tab's mono paragraphs and an outline\n// button at the left, and an image at the lower right.\nexport function StructureengineeringIntro({ statement, tabs, cta, media, className }: StructureengineeringIntroProps) {\n  const [active, setActive] = useState(0);\n  const id = useId();\n  const words = statement.split(/\\s+/).filter(Boolean);\n  const share = 90 / words.length;\n  const panel = tabs[active] ?? tabs[0];\n\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"structureengineering-intro-pin relative h-[235svh] lg:h-[245svh]\">\n        <div className=\"sticky top-0 flex h-svh items-center\">\n          <div className=\"mx-auto w-full max-w-page px-gutter\">\n            <p className=\"font-display text-[2.1rem] leading-[1.2] font-medium tracking-[-0.03em] lg:text-[2.8rem]\">\n              {words.map((word, i) => (\n                <span\n                  key={i}\n                  className=\"structureengineering-intro-word\"\n                  style={{ \"--se-from\": `${i * share}%`, \"--se-to\": `${(i + 1) * share}%` } as CSSProperties}\n                >\n                  {word}{\" \"}\n                </span>\n              ))}\n            </p>\n          </div>\n        </div>\n      </div>\n\n      <div className=\"mx-auto max-w-page px-gutter pt-8 pb-section lg:pt-12\">\n        <div role=\"tablist\" className=\"flex gap-5 lg:gap-20\">\n          {tabs.map((tab, i) => (\n            <button\n              key={tab.label}\n              type=\"button\"\n              role=\"tab\"\n              id={`${id}-tab-${i}`}\n              aria-selected={i === active}\n              aria-controls={`${id}-panel`}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"border-t pt-4 text-left text-base leading-tight font-bold tracking-tight uppercase transition-colors duration-250 lg:w-[31.25rem]\",\n                i === active ? \"border-foreground\" : \"border-transparent hover:border-border\",\n              )}\n            >\n              {tab.label}\n            </button>\n          ))}\n        </div>\n\n        <div className=\"mt-10 grid gap-10 lg:mt-48 lg:grid-cols-2 lg:gap-6\">\n          <StructureengineeringReveal>\n            <div id={`${id}-panel`} role=\"tabpanel\" aria-labelledby={`${id}-tab-${active}`} className=\"max-w-[23rem] space-y-6 font-mono text-base leading-[1.3]\">\n              {panel?.paragraphs.map((p, i) => (\n                <p key={i}>{p}</p>\n              ))}\n            </div>\n            <StructureengineeringButton href={cta.href} className=\"mt-12 lg:mt-20\">\n              {cta.label}\n            </StructureengineeringButton>\n          </StructureengineeringReveal>\n          <StructureengineeringReveal step={1} className=\"lg:self-end lg:justify-self-end lg:w-full lg:max-w-[38.6rem]\">\n            <StructureengineeringMedia media={media} className=\"aspect-[618/388]\" />\n          </StructureengineeringReveal>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "structureengineering-button",
+    "structureengineering-media",
+    "structureengineering-reveal"
+  ],
+  "props": [
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the large statement that lights up word by word while it's pinned"
+    },
+    {
+      "name": "tabs",
+      "type": "StructureengineeringIntroTab[]",
+      "required": true,
+      "description": "two (or more) tabs, each with its own paragraphs"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button under the paragraphs"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the image at the right. Empty: a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3cd7002a41d8c905c4ecde1ac74c34c1ad924b9bb9c09f0c9cbbb8b87b986d39"
+}

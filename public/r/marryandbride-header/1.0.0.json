@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Marryandbride header",
+  "description": "A boutique header laid over the first screen: two tracked uppercase links at the left, a serif wordmark in the centre, two links and a heart and bag icon with tiny counts at the right (a menu icon on phones). It is transparent with light text over the hero, slides up out of view when you scroll down and slides back, now solid paper, when you scroll up.",
+  "category": "header",
+  "site": "marryandbride",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "transparent",
+    "overlay",
+    "hide-on-scroll",
+    "shop",
+    "minimal",
+    "serif",
+    "fashion"
+  ],
+  "notes": [
+    "it takes no space of its own (negative bottom margin): place it right before a full-bleed hero",
+    "over the hero it uses text-background, so the hero should be dark (in light mode) behind it",
+    "the hide/show on scroll and the phone menu need JavaScript; static HTML shows it in place"
+  ],
+  "entry": "marryandbride-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "marryandbride-header",
+  "files": [
+    {
+      "path": "marryandbride-header.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { Heart, Menu, ShoppingBag, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface MarryandbrideHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface MarryandbrideHeaderCounter {\n  href: string;\n  /** screen-reader label (e.g. \"Wish list\") */\n  label: string;\n  /** the small number at the icon's top right */\n  count: number;\n}\n\nexport interface MarryandbrideHeaderProps {\n  /** the wordmark in the centre */\n  wordmark: string;\n  homeHref?: string;\n  /** links at the left (desktop) */\n  leftLinks: MarryandbrideHeaderLink[];\n  /** links at the right, before the icons (desktop) */\n  rightLinks: MarryandbrideHeaderLink[];\n  /** the heart icon */\n  wishlist: MarryandbrideHeaderCounter;\n  /** the bag icon */\n  bag: MarryandbrideHeaderCounter;\n  /** screen-reader labels of the phone menu buttons */\n  menuLabel: string;\n  closeLabel: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[0.78rem] leading-none tracking-[0.07em] uppercase transition-opacity duration-200 hover:opacity-70 lg:text-[0.863rem]\";\n\nfunction Counter({ counter, icon: Icon }: { counter: MarryandbrideHeaderCounter; icon: typeof Heart }) {\n  return (\n    <a href={counter.href} aria-label={counter.label} className=\"relative block transition-opacity duration-200 hover:opacity-70\">\n      <Icon className=\"size-5 lg:size-[1.35rem]\" strokeWidth={1.1} />\n      <span className=\"absolute -top-1.5 -right-1.5 text-[0.6rem] leading-none font-medium\">{counter.count}</span>\n    </a>\n  );\n}\n\n/**\n * The header: transparent over the hero, hidden while scrolling down, back (solid) on scroll up.\n */\nexport function MarryandbrideHeader({ wordmark, homeHref = \"/\", leftLinks, rightLinks, wishlist, bag, menuLabel, closeLabel, className }: MarryandbrideHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [solid, setSolid] = useState(false);\n  const [open, setOpen] = useState(false);\n  const lastY = useRef(0);\n\n  // hide on scroll down, show on scroll up; solid once the first screen has gone by\n  useEffect(() => {\n    const onScroll = () => {\n      const y = window.scrollY;\n      setHidden(y > lastY.current && y > 120);\n      setSolid(y > window.innerHeight * 0.85);\n      lastY.current = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  return (\n    <>\n      <header\n        className={cn(\n          \"sticky top-0 z-50 -mb-12 h-12 font-sans transition-[transform,background-color,color] duration-[400ms] ease-out motion-reduce:transition-none lg:-mb-[3.625rem] lg:h-[3.625rem]\",\n          hidden && !open && \"-translate-y-full\",\n          solid ? \"bg-background text-foreground\" : \"bg-transparent text-background\",\n          className,\n        )}\n      >\n        <div className=\"grid h-full grid-cols-[1fr_auto_1fr] items-center px-gutter\">\n          <div className=\"flex items-center gap-[2.1rem]\">\n            <button type=\"button\" aria-label={menuLabel} aria-expanded={open} onClick={() => setOpen(true)} className=\"lg:hidden\">\n              <Menu className=\"size-5\" strokeWidth={1.1} />\n            </button>\n            {leftLinks.map((link) => (\n              <a key={link.href} href={link.href} className={cn(linkClass, \"hidden lg:block\")}>\n                {link.label}\n              </a>\n            ))}\n          </div>\n          <a href={homeHref} className=\"font-display text-[1.65rem] leading-none tracking-[-0.01em] lg:text-[2.5rem]\">\n            {wordmark}\n          </a>\n          <div className=\"flex items-center justify-end gap-5 lg:gap-[2.1rem]\">\n            {rightLinks.map((link) => (\n              <a key={link.href} href={link.href} className={cn(linkClass, \"hidden lg:block\")}>\n                {link.label}\n              </a>\n            ))}\n            <Counter counter={wishlist} icon={Heart} />\n            <Counter counter={bag} icon={ShoppingBag} />\n          </div>\n        </div>\n      </header>\n\n      {/* Phone menu: a paper sheet from the left with every link in tracked uppercase. */}\n      <div\n        className={cn(\n          \"fixed inset-0 z-[70] bg-foreground/30 transition-opacity duration-300 motion-reduce:transition-none lg:hidden\",\n          open ? \"opacity-100\" : \"pointer-events-none invisible opacity-0\",\n        )}\n        onClick={() => setOpen(false)}\n      >\n        <nav\n          onClick={(e) => e.stopPropagation()}\n          className={cn(\n            \"h-full w-[85%] max-w-sm bg-background px-gutter pt-4 font-sans text-foreground transition-transform duration-300 ease-out motion-reduce:transition-none\",\n            open ? \"translate-x-0\" : \"-translate-x-full\",\n          )}\n        >\n          <button type=\"button\" aria-label={closeLabel} onClick={() => setOpen(false)} className=\"mb-8\">\n            <X className=\"size-5\" strokeWidth={1.1} />\n          </button>\n          <ul className=\"space-y-5\">\n            {[...leftLinks, ...rightLinks].map((link) => (\n              <li key={link.href}>\n                <a href={link.href} onClick={() => setOpen(false)} className={linkClass}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark in the centre"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "leftLinks",
+      "type": "MarryandbrideHeaderLink[]",
+      "required": true,
+      "description": "links at the left (desktop)"
+    },
+    {
+      "name": "rightLinks",
+      "type": "MarryandbrideHeaderLink[]",
+      "required": true,
+      "description": "links at the right, before the icons (desktop)"
+    },
+    {
+      "name": "wishlist",
+      "type": "MarryandbrideHeaderCounter",
+      "required": true,
+      "description": "the heart icon"
+    },
+    {
+      "name": "bag",
+      "type": "MarryandbrideHeaderCounter",
+      "required": true,
+      "description": "the bag icon"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the phone menu buttons"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "507f35ed7abb4d51cfd0f58edf713a8c204d7e4d59f264749e31ddad0757269a"
+}

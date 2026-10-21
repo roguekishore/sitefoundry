@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Leome and Partners footer",
+  "description": "A footer framed by a backdrop photo: an inset flat panel with a large mark, a column of 24px links and an opening-hours note with a small square, the firm's name set across the full width whose letters rise one after another as it scrolls in, and a row of small uppercase legal links. Links roll letter by letter on hover.",
+  "category": "footer",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "wordmark",
+    "big-type",
+    "frame",
+    "photo",
+    "reveal",
+    "split-text",
+    "stagger",
+    "scroll-driven",
+    "hover",
+    "roll",
+    "dark",
+    "minimal"
+  ],
+  "notes": [
+    "the wordmark is 11vw (10.2vw on phones): about 14–16 characters fill the width",
+    "the frame shows the media; empty, it is a soft glow gradient",
+    "the letter rise is CSS scroll-driven; off under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-footer.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-footer",
+  "files": [
+    {
+      "path": "leome-and-partners-footer.css",
+      "content": "/* The wordmark is one clipping line with a view timeline; its letters rise from 110% below\n   one after another while the line enters the window. Each letter's window is offset by its\n   share of the word (--lp-t, 0 to 1) so the last finishes as the line is fully in view,\n   which is always reachable even at the very end of the page. */\n.leome-and-partners-footer-wordmark {\n  overflow: clip;\n  padding-bottom: 0.12em;\n  view-timeline-name: --leome-and-partners-footer-wordmark;\n}\n\n.leome-and-partners-footer-letter {\n  display: inline-block;\n  white-space: pre;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .leome-and-partners-footer-letter {\n      animation: leome-and-partners-footer-rise linear both;\n      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);\n      animation-timeline: --leome-and-partners-footer-wordmark;\n      animation-range: entry calc(var(--lp-t) * 55%) entry calc(var(--lp-t) * 55% + 45%);\n    }\n  }\n}\n\n@keyframes leome-and-partners-footer-rise {\n  from {\n    transform: translateY(110%);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "leome-and-partners-footer.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { LeomeAndPartnersRollText } from \"@foundry/leome-and-partners-roll-text\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./leome-and-partners-footer.css\";\n\nexport interface LeomeAndPartnersFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface LeomeAndPartnersFooterProps {\n  /** the brand mark shown large at the top-left, e.g. a lucide icon */\n  mark?: ReactNode;\n  /** the main links, in a column */\n  links: LeomeAndPartnersFooterLink[];\n  /** a small block beside the links: a heading line, then its lines (opening hours, address…) */\n  hours?: { title: string; lines: string[] };\n  /** the firm's name, set across the panel; its letters rise one by one as it scrolls in */\n  wordmark: string;\n  /** the small credit at the bottom-left */\n  credit?: string;\n  /** small legal links along the bottom (two read best) */\n  legal?: LeomeAndPartnersFooterLink[];\n  /** the short note at the bottom-right, e.g. the year */\n  note?: string;\n  /**\n   * A backdrop photo filling the whole footer; it shows as a frame around the panel. Give it\n   * `className=\"size-full object-cover\"`. A soft glow gradient when empty.\n   */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A footer framed by a backdrop photo: an inset panel holding a large mark, a column of\n * links and an opening-hours note (with a small square), the firm's name set huge across the\n * panel whose letters rise one after another as it scrolls in, and a row of small uppercase\n * legal links. Links roll on hover.\n */\nexport function LeomeAndPartnersFooter({\n  mark,\n  links,\n  hours,\n  wordmark,\n  credit,\n  legal = [],\n  note,\n  media,\n  className,\n}: LeomeAndPartnersFooterProps) {\n  const letters = Array.from(wordmark);\n  const [first, ...rest] = legal;\n  return (\n    <footer className={cn(\"relative isolate p-4 font-sans text-foreground lg:p-7\", className)}>\n      <div className=\"absolute inset-0 -z-10 overflow-clip [&>*]:size-full\">\n        {media ?? <div className=\"bg-linear-to-tr from-glow via-muted to-highlight/40\" />}\n      </div>\n\n      <div className=\"bg-background px-4 pt-24 pb-7 lg:px-10\">\n        <div className=\"grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-x-8\">\n          <div aria-hidden className=\"col-span-2 h-[10.4rem] w-[12.25rem] [&_svg]:size-full\">\n            {mark}\n          </div>\n          <nav className=\"lg:col-start-3\">\n            <ul className=\"flex flex-col gap-[0.55em] text-2xl leading-[1.15] font-medium tracking-[-0.01em]\">\n              {links.map((link) => (\n                <li key={link.href}>\n                  <a href={link.href} className=\"group/roll inline-block\">\n                    <LeomeAndPartnersRollText text={link.label} />\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n          <div className=\"relative pr-6 text-base leading-normal font-medium\">\n            <span aria-hidden className=\"absolute top-[0.35em] right-0 size-[0.6875rem] bg-primary\" />\n            {hours && (\n              <>\n                <p>{hours.title}</p>\n                <p className=\"mt-6\">\n                  {hours.lines.map((line) => (\n                    <span key={line} className=\"block\">\n                      {line}\n                    </span>\n                  ))}\n                </p>\n              </>\n            )}\n          </div>\n        </div>\n\n        <p\n          className=\"leome-and-partners-footer-wordmark mt-52 font-display text-[10.2vw] leading-none font-medium tracking-[-0.02em] whitespace-nowrap lg:mt-48 lg:text-[11vw]\"\n        >\n          <span className=\"sr-only\">{wordmark}</span>\n          {letters.map((letter, i) => (\n            <span\n              key={i}\n              aria-hidden\n              className=\"leome-and-partners-footer-letter\"\n              style={{ \"--lp-t\": letters.length > 1 ? (i / (letters.length - 1)).toFixed(3) : \"0\" } as CSSProperties}\n            >\n              {letter}\n            </span>\n          ))}\n        </p>\n\n        <div className=\"mt-10 grid grid-cols-2 gap-x-4 gap-y-12 text-xs leading-none font-medium uppercase lg:mt-12 lg:grid-cols-4 lg:gap-x-8\">\n          <p className=\"col-span-2\">{credit}</p>\n          <div>\n            {first && (\n              <a href={first.href} className=\"group/roll inline-block\">\n                <LeomeAndPartnersRollText text={first.label} />\n              </a>\n            )}\n          </div>\n          <div className=\"flex justify-between gap-4\">\n            {rest.map((link) => (\n              <a key={link.href} href={link.href} className=\"group/roll inline-block\">\n                <LeomeAndPartnersRollText text={link.label} />\n              </a>\n            ))}\n            {note && <span className=\"ml-auto\">{note}</span>}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "leome-and-partners-roll-text"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the brand mark shown large at the top-left, e.g. a lucide icon"
+    },
+    {
+      "name": "links",
+      "type": "LeomeAndPartnersFooterLink[]",
+      "required": true,
+      "description": "the main links, in a column"
+    },
+    {
+      "name": "hours",
+      "type": "{ title: string; lines: string[]; }",
+      "required": false,
+      "description": "a small block beside the links: a heading line, then its lines (opening hours, address…)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the firm's name, set across the panel; its letters rise one by one as it scrolls in"
+    },
+    {
+      "name": "credit",
+      "type": "string",
+      "required": false,
+      "description": "the small credit at the bottom-left"
+    },
+    {
+      "name": "legal",
+      "type": "LeomeAndPartnersFooterLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "small legal links along the bottom (two read best)"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the short note at the bottom-right, e.g. the year"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "A backdrop photo filling the whole footer; it shows as a frame around the panel. Give it\n`className=\"size-full object-cover\"`. A soft glow gradient when empty."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "59d17b5d7df380692bea6e8b04c5895b5f26c13787ed8d1d0c0ad27e17ba2bb1"
+}

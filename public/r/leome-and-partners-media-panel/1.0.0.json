@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Leome and Partners media panel",
+  "description": "A full-bleed photo panel, at least the window's height (3:2 on wide screens), with two small corner squares near the top, a scrim darkening the lower half and content at the bottom-left; the photo drifts about 8% against the scroll.",
+  "category": "background",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "full-bleed",
+    "parallax",
+    "scroll-driven",
+    "photo",
+    "dark",
+    "scrim",
+    "window-height"
+  ],
+  "notes": [
+    "the scrim fades to the card colour, so text over it should be light on dark themes",
+    "parallax is CSS scroll-driven; without support the photo stands still",
+    "empty media shows a muted placeholder"
+  ],
+  "entry": "leome-and-partners-media-panel.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-media-panel",
+  "files": [
+    {
+      "path": "leome-and-partners-media-panel.css",
+      "content": "/* The photo layer is 120% of the panel's height and travels from 7% up to 7% down (of its\n   own height, about 8% of the panel) while the panel crosses the window: the original's\n   ±77px drift at 1440. The panel clips with overflow: clip, so the timeline stays live. */\n.leome-and-partners-media-panel {\n  view-timeline-name: --leome-and-partners-media-panel;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .leome-and-partners-media-panel-layer {\n      animation: leome-and-partners-media-panel-drift linear both;\n      animation-timeline: --leome-and-partners-media-panel;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes leome-and-partners-media-panel-drift {\n  from {\n    transform: translateY(-7%);\n  }\n  to {\n    transform: translateY(7%);\n  }\n}\n"
+    },
+    {
+      "path": "leome-and-partners-media-panel.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { LeomeAndPartnersCornerMarks } from \"@foundry/leome-and-partners-corner-marks\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./leome-and-partners-media-panel.css\";\n\nexport interface LeomeAndPartnersMediaPanelProps {\n  /**\n   * A photo or video filling the panel; give it `className=\"size-full object-cover\"`. It sits\n   * in a layer 20% taller than the panel that drifts with the scroll. A placeholder when empty.\n   */\n  media?: ReactNode;\n  /** what sits at the bottom of the panel, over the dark scrim (a statement, a heading and a link…) */\n  children?: ReactNode;\n  /** show the two small corner squares near the top */\n  marks?: boolean;\n  className?: string;\n}\n\n/**\n * A full-bleed photo panel, at least the window's height and otherwise 3:2 (960px tall at\n * 1440), with two corner marks near the top, a scrim darkening the lower half, and content at\n * the bottom-left. The photo drifts against the scroll (parallax) by about 8% each way.\n */\nexport function LeomeAndPartnersMediaPanel({ media, children, marks = true, className }: LeomeAndPartnersMediaPanelProps) {\n  return (\n    <section\n      className={cn(\n        \"leome-and-partners-media-panel relative isolate flex aspect-[3/2] min-h-svh w-full flex-col justify-end overflow-clip bg-card font-sans text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"leome-and-partners-media-panel-layer absolute inset-x-0 -top-[10%] -bottom-[10%] -z-10\">\n        {media ?? <div className=\"size-full bg-linear-to-b from-muted via-muted to-card\" />}\n      </div>\n      <div aria-hidden className=\"absolute inset-x-0 bottom-0 -z-10 h-1/2 bg-linear-to-b from-transparent to-card/80\" />\n      {marks && <LeomeAndPartnersCornerMarks />}\n      <div className=\"px-gutter pb-20\">{children}</div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "leome-and-partners-corner-marks"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "A photo or video filling the panel; give it `className=\"size-full object-cover\"`. It sits\nin a layer 20% taller than the panel that drifts with the scroll. A placeholder when empty."
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what sits at the bottom of the panel, over the dark scrim (a statement, a heading and a link…)"
+    },
+    {
+      "name": "marks",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the two small corner squares near the top"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "80549424e0f13e8396ec1b63ad589682a517b47a60cc26f53898546bd7fd5cb5"
+}

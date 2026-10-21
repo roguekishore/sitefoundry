@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Lunchline scribble link",
+  "description": "A bold, uppercase, tracked link or submit button underlined with a loose hand-drawn marker stroke (two strokes, the second fainter). Fades slightly on hover. Also exports the bare scribble for underlining headings.",
+  "category": "button",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "link",
+    "button",
+    "underline",
+    "scribble",
+    "handwritten",
+    "uppercase",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "the scribble takes currentColor; LunchlineScribble can underline anything (give it a width)"
+  ],
+  "entry": "lunchline-scribble-link.tsx",
+  "source": "foundry",
+  "name": "lunchline-scribble-link",
+  "files": [
+    {
+      "path": "lunchline-scribble-link.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LunchlineScribbleLinkProps {\n  /** the label, set bold, uppercase and tracked */\n  children: ReactNode;\n  /** a link target; without it the component renders a button */\n  href?: string;\n  /** button only: \"submit\" inside a form */\n  type?: \"button\" | \"submit\";\n  /** opens the link in a new tab */\n  external?: boolean;\n  className?: string;\n}\n\n/** The hand-drawn underline: one loose marker stroke, a second fainter one under it. */\nexport function LunchlineScribble({ className }: { className?: string }) {\n  return (\n    <svg aria-hidden viewBox=\"0 0 100 8\" preserveAspectRatio=\"none\" className={cn(\"block h-[0.35em] w-full overflow-visible\", className)}>\n      <path d=\"M1 3.6C18 2.2 37 4.6 55 3.4S86 2.6 99 3.8\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"2.2\" strokeLinecap=\"round\" vectorEffect=\"non-scaling-stroke\" />\n      <path d=\"M4 6.4C26 5.4 52 6.8 96 5.6\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.2\" strokeLinecap=\"round\" opacity=\"0.7\" vectorEffect=\"non-scaling-stroke\" />\n    </svg>\n  );\n}\n\n/** A bold, uppercase, tracked link (or submit button) with a hand-drawn underline. Hover\n    fades it a little, on the original's ease-out cubic. */\nexport function LunchlineScribbleLink({ children, href, type = \"button\", external, className }: LunchlineScribbleLinkProps) {\n  const classes = cn(\n    \"relative inline-block pb-[0.45em] text-left font-sans text-[1.125rem] leading-none font-bold tracking-[0.08em] uppercase transition-opacity duration-300 ease-[cubic-bezier(0.215,0.61,0.355,1)] hover:opacity-70 motion-reduce:transition-none lg:text-[1.3125rem]\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      <LunchlineScribble className=\"absolute inset-x-0 bottom-0\" />\n    </>\n  );\n  if (href) {\n    return (\n      <a href={href} className={classes} {...(external ? { target: \"_blank\", rel: \"noreferrer\" } : {})}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={cn(classes, \"cursor-pointer\")}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label, set bold, uppercase and tracked"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "a link target; without it the component renders a button"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "button only: \"submit\" inside a form"
+    },
+    {
+      "name": "external",
+      "type": "boolean",
+      "required": false,
+      "description": "opens the link in a new tab"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "36792128cba969e09c5752c7e24469739c06449bde43a2aa752b6e1a826ee45d"
+}

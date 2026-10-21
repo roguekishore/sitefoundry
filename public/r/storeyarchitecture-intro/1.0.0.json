@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture intro",
+  "description": "A black band taller than the window (110% on phones, 120% on desktop) with two short white statements set side by side in the right half and a wide empty field below them for a scene. On desktop a small paper card with a dark preview window and an underlined mono link slides up as the band arrives and then sticks to the top-right corner. Statements rise in as they enter.",
+  "category": "features",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "intro",
+    "statement",
+    "dark",
+    "black",
+    "sticky",
+    "paper",
+    "card",
+    "scroll",
+    "reveal",
+    "mono",
+    "vw"
+  ],
+  "notes": [
+    "drawn with bg-foreground: a black band on light themes, a pale one on dark themes",
+    "scene fills the whole band behind the copy (the original runs a WebGL scene there); empty shows a faint surface",
+    "the preview card is desktop only"
+  ],
+  "entry": "storeyarchitecture-intro.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-intro",
+  "files": [
+    {
+      "path": "storeyarchitecture-intro.css",
+      "content": "/* The preview card rides up from 45% of the window below its place while the band's top\n   travels up the window, then stays stuck at the top-right (sticky). It reads the band's\n   timeline, so its own stickiness doesn't move the range. */\n.storeyarchitecture-intro {\n  view-timeline-name: --storeyarchitecture-intro;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-intro-card {\n      animation: storeyarchitecture-intro-ride linear both;\n      animation-timeline: --storeyarchitecture-intro;\n      animation-range: entry 30% entry 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-intro-ride {\n  from {\n    transform: translateY(45svh);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-intro.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureRise } from \"@foundry/storeyarchitecture-rise\";\nimport \"./storeyarchitecture-intro.css\";\n\nexport interface StoreyarchitectureIntroProps {\n  /** two short statements, set side by side in the right half on desktop */\n  statements: string[];\n  /** the scene behind the band (the original's WebGL tiles); empty shows a faint surface */\n  scene?: ReactNode;\n  /** the small paper card at the top-right (desktop) */\n  preview?: {\n    /** the mono link under the window */\n    label: string;\n    href: string;\n    /** what shows in the dark window; empty shows the window alone */\n    media?: ReactNode;\n  };\n  className?: string;\n}\n\nexport function StoreyarchitectureIntro({ statements, scene, preview, className }: StoreyarchitectureIntroProps) {\n  return (\n    <section\n      className={cn(\n        \"storeyarchitecture-intro relative min-h-[110svh] font-[450] bg-foreground px-gutter pt-[12vw] text-background sm:min-h-[120svh] sm:pt-[2vw]\",\n        className,\n      )}\n    >\n      <div aria-hidden={!scene} className=\"absolute inset-0 overflow-clip bg-background/[0.03] [&>*]:size-full\">\n        {scene}\n      </div>\n\n      <div className=\"relative grid grid-cols-6 gap-x-gutter gap-y-[12.5vw] text-[4.3vw] leading-[1.2] tracking-[-0.02em] sm:grid-cols-12 sm:text-[1.6vw]\">\n        {statements.map((text, i) => (\n          <StoreyarchitectureRise key={text} step={i} className={cn(\"col-span-6 sm:col-span-3\", i === 0 ? \"sm:col-start-7\" : \"sm:col-start-10\")}>\n            <p>{text}</p>\n          </StoreyarchitectureRise>\n        ))}\n      </div>\n\n      {preview && (\n        <div className=\"pointer-events-none absolute inset-y-0 right-gutter hidden w-[23.26vw] py-[1.4vw] sm:block\">\n          <a\n            href={preview.href}\n            className=\"storeyarchitecture-intro-card group/card pointer-events-auto sticky top-[1.4vw] block bg-card p-[0.83vw] text-card-foreground\"\n          >\n            <span className=\"block aspect-[311/214] overflow-clip bg-foreground [&>*]:size-full [&>*]:object-cover\">{preview.media}</span>\n            <span className=\"flex justify-center pt-[1.4vw] pb-[1.2vw]\">\n              <span className=\"border-b border-current pb-[0.2vw] font-mono text-[1.1vw] leading-none tracking-[-0.06em] uppercase transition-opacity duration-200 group-hover/card:opacity-60\">\n                {preview.label}\n              </span>\n            </span>\n          </a>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-rise"
+  ],
+  "props": [
+    {
+      "name": "statements",
+      "type": "string[]",
+      "required": true,
+      "description": "two short statements, set side by side in the right half on desktop"
+    },
+    {
+      "name": "scene",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the scene behind the band (the original's WebGL tiles); empty shows a faint surface"
+    },
+    {
+      "name": "preview",
+      "type": "{ label: string; href: string; media?: ReactNode; }",
+      "required": false,
+      "description": "the small paper card at the top-right (desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "23b460bf3b6a6fea25fcd15705febe5f58f585eb671c4f4e381b76c7ceb2e248"
+}

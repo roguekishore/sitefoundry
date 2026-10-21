@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture header",
+  "description": "A fixed, bare header: a plain grotesk wordmark at the left and three small links at the page's halfway line, drawn in white with a difference blend so they turn black over white sections and stay white over photos and black bands; a solid black Contact button with a dashed ring at the right. On phones: wordmark and a large 'Menu' word that opens a full-screen black menu.",
+  "category": "header",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "overlay",
+    "blend",
+    "difference",
+    "minimal",
+    "monochrome",
+    "vw"
+  ],
+  "notes": [
+    "fixed: it overlays the page; the wordmark and links invert against whatever is under them (mix-blend-mode: difference with white ink), so they work on any theme",
+    "the Contact button is not blended: it is bg-primary, and on a band of the same colour it disappears, as on the original",
+    "the phone menu needs JavaScript (hydrate: load)"
+  ],
+  "entry": "storeyarchitecture-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "storeyarchitecture-header",
+  "files": [
+    {
+      "path": "storeyarchitecture-header.css",
+      "content": "/* White ink with a difference blend: white over black, black over white, an inverted\n   colour over photos. White is the one literal the blend needs. */\n.storeyarchitecture-header-ink {\n  color: #fff; /* foundry-allow-colour */\n  mix-blend-mode: difference;\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureButton } from \"@foundry/storeyarchitecture-button\";\nimport \"./storeyarchitecture-header.css\";\n\nexport interface StoreyarchitectureHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface StoreyarchitectureHeaderProps {\n  /** the plain wordmark at the left */\n  brand: string;\n  homeHref?: string;\n  /** the small links at the page's halfway line (desktop) and in the phone menu */\n  links: StoreyarchitectureHeaderLink[];\n  /** the black button at the right (desktop) and the last item of the phone menu */\n  contact: StoreyarchitectureHeaderLink;\n  /** the word that opens the phone menu */\n  menuLabel: string;\n  /** screen-reader label of the close button */\n  closeLabel: string;\n  className?: string;\n}\n\nexport function StoreyarchitectureHeader({ brand, homeHref = \"/\", links, contact, menuLabel, closeLabel, className }: StoreyarchitectureHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  // close the phone menu with Escape\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={className}>\n      {/* The blended layer: its own fixed box, so the blend reaches the page under it. */}\n      <div className=\"storeyarchitecture-header-ink pointer-events-none fixed inset-x-0 top-0 z-50 grid grid-cols-6 gap-x-gutter px-gutter pt-[3vw] text-[8vw] leading-none font-[450] tracking-[-0.02em] sm:grid-cols-12 sm:pt-[1.5vw] sm:text-[2.2vw]\">\n        <a href={homeHref} className=\"pointer-events-auto col-span-3 justify-self-start sm:col-span-6\">\n          {brand}\n        </a>\n        <nav className=\"col-span-4 hidden items-center gap-[0.95vw] text-[1.1vw] sm:flex\">\n          {links.map((link) => (\n            <a key={link.href} href={link.href} className=\"pointer-events-auto transition-opacity duration-200 hover:opacity-60\">\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          onClick={() => setOpen(true)}\n          className=\"pointer-events-auto col-span-3 justify-self-end leading-none sm:hidden\"\n        >\n          {menuLabel}\n        </button>\n      </div>\n\n      {/* Not blended: the solid button keeps its own colour. */}\n      <div className=\"fixed top-[1.5vw] right-gutter z-50 hidden sm:block\">\n        <StoreyarchitectureButton href={contact.href} size=\"sm\">\n          {contact.label}\n        </StoreyarchitectureButton>\n      </div>\n\n      {/* Phone menu: a full-screen black sheet of large links. */}\n      <div\n        className={cn(\n          \"fixed inset-0 z-[60] flex flex-col bg-foreground font-[450] px-gutter pt-[3vw] pb-[10vw] text-background transition-opacity duration-300 sm:hidden motion-reduce:transition-none\",\n          open ? \"opacity-100\" : \"pointer-events-none invisible opacity-0\",\n        )}\n      >\n        <div className=\"flex items-start justify-between text-[8vw] leading-none tracking-[-0.02em]\">\n          <a href={homeHref} onClick={() => setOpen(false)}>\n            {brand}\n          </a>\n          <button type=\"button\" aria-label={closeLabel} onClick={() => setOpen(false)}>\n            <X className=\"size-[8vw]\" strokeWidth={1.25} aria-hidden />\n          </button>\n        </div>\n        <nav className=\"mt-auto flex flex-col gap-[2vw] text-[12vw] leading-none tracking-[-0.02em]\">\n          {[...links, contact].map((link) => (\n            <a key={link.href} href={link.href} onClick={() => setOpen(false)}>\n              {link.label}\n            </a>\n          ))}\n        </nav>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the plain wordmark at the left"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "StoreyarchitectureHeaderLink[]",
+      "required": true,
+      "description": "the small links at the page's halfway line (desktop) and in the phone menu"
+    },
+    {
+      "name": "contact",
+      "type": "StoreyarchitectureHeaderLink",
+      "required": true,
+      "description": "the black button at the right (desktop) and the last item of the phone menu"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word that opens the phone menu"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c874f2f29af149dae67cc330ee170eff3bfc775cc8745b6e5d81be24486c389d"
+}

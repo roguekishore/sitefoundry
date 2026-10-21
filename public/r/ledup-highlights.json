@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup highlights bento",
+  "description": "A centred label, headline and paragraph over a two-row bento of soft 20px cards: photo cards with a dark bottom scrim and a white label, white product cards with a small centred product shot and a faint grey haze, and one warm orange stat card. Every card has a 60px circle arrow at the bottom-right. Cards rise 40px and fade in as they scroll into view, staggered; product cards lift 6px with a deeper shadow on hover. On phones the cards stack, 160px tall.",
+  "category": "features",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "bento",
+    "grid",
+    "cards",
+    "features",
+    "light",
+    "warm",
+    "rounded",
+    "shadow",
+    "hover",
+    "lift",
+    "reveal",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "each row sets its own column widths with a weight per card (the original: 408/299/190/299 then 299/626/299)",
+    "photo-card media fills the card (cover); product media sits in a 100px (phone) / 150px (desktop) square; the stat card's media (a video on the original) fills it, and empty shows a warm highlight-to-glow gradient",
+    "photo-card labels are text-background over a foreground scrim: on dark themes the scrim turns pale and the labels dark",
+    "CSS only: reveals are scroll-driven, hovers are transitions"
+  ],
+  "entry": "ledup-highlights.tsx",
+  "source": "foundry",
+  "name": "ledup-highlights",
+  "files": [
+    {
+      "path": "ledup-highlights.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LedupHeading } from \"@foundry/ledup-heading\";\nimport { LedupReveal } from \"@foundry/ledup-reveal\";\n\nexport interface LedupHighlightCard {\n  /** photo: a photo card with a white label · product: a white card with a product shot · stat: the orange number card */\n  kind: \"photo\" | \"product\" | \"stat\";\n  /** the card's label (for a stat card, the caption under the number) */\n  title: string;\n  /** a second, quieter line under the label (photo cards) */\n  text?: string;\n  /** the big number (stat cards) */\n  value?: string;\n  /** where the card goes; photo and product cards show the circle arrow when set */\n  href?: string;\n  /** the photo, product shot or video; empty shows a placeholder */\n  media?: ReactNode;\n  /** share of the row's width on desktop (the original's widths in px work as-is) */\n  weight?: number;\n}\n\nexport interface LedupHighlightRow {\n  /** the cards in this row, left to right */\n  cards: LedupHighlightCard[];\n  /** desktop height: short is 260px, tall is 300px */\n  height?: \"short\" | \"tall\";\n}\n\nexport interface LedupHighlightsProps {\n  /** the small label above the headline */\n  label?: string;\n  /** the headline */\n  title: ReactNode;\n  /** the paragraph under the headline (desktop only, as on the original) */\n  text?: ReactNode;\n  /** the bento rows; on phones all cards stack in order */\n  rows: LedupHighlightRow[];\n  className?: string;\n}\n\nexport function LedupHighlights({ label, title, text, rows, className }: LedupHighlightsProps) {\n  return (\n    <section className={cn(\"bg-background pt-[4.25rem] pb-4 font-sans text-foreground lg:pt-section lg:pb-[9.25rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <LedupHeading label={label} title={title} text={text} />\n        <div className=\"mt-14 flex flex-col gap-4 lg:mt-24 lg:gap-7\">\n          {rows.map((row, r) => (\n            <div\n              key={r}\n              className=\"grid gap-4 lg:grid-cols-[var(--ledup-highlights-cols)] lg:gap-7\"\n              style={{ \"--ledup-highlights-cols\": row.cards.map((c) => `${c.weight ?? 1}fr`).join(\" \") } as CSSProperties}\n            >\n              {row.cards.map((card, i) => (\n                <LedupReveal key={card.title} distance={40} step={i} className={cn(\"h-40\", row.height === \"tall\" ? \"lg:h-[18.75rem]\" : \"lg:h-[16.25rem]\")}>\n                  <Card card={card} />\n                </LedupReveal>\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n\nfunction Card({ card }: { card: LedupHighlightCard }) {\n  const Tag = card.href ? \"a\" : \"div\";\n\n  if (card.kind === \"stat\") {\n    return (\n      <Tag\n        href={card.href}\n        className=\"relative isolate flex h-full flex-col items-center justify-center overflow-clip rounded-lg text-center text-highlight-foreground\"\n      >\n        <div className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n          {card.media ?? <div className=\"bg-[radial-gradient(90%_120%_at_10%_0%,var(--highlight),var(--glow)_60%,var(--highlight))]\" />}\n        </div>\n        <span className=\"text-4xl leading-[1.2] font-light\">{card.value}</span>\n        <span className=\"mt-1 text-xs font-medium\">{card.title}</span>\n      </Tag>\n    );\n  }\n\n  if (card.kind === \"product\") {\n    return (\n      <Tag\n        href={card.href}\n        className=\"group relative flex h-full flex-col overflow-clip rounded-lg bg-card p-4 text-card-foreground shadow-[0_0.1px_20px_var(--muted)] transition-[translate,box-shadow] duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1.5 hover:shadow-[0_12px_28px_color-mix(in_oklch,var(--foreground)_10%,transparent),0_2px_8px_color-mix(in_oklch,var(--foreground)_5%,transparent)] motion-reduce:transition-none lg:p-5\"\n      >\n        <div className=\"mx-auto size-[6.25rem] overflow-clip rounded-lg lg:mt-1 lg:size-[9.375rem] [&>*]:size-full [&>*]:object-contain\">\n          {card.media ?? <div className=\"bg-muted\" />}\n        </div>\n        <span className=\"mt-auto pr-20 text-base\">{card.title}</span>\n        {card.href && <Arrow tone=\"ink\" />}\n      </Tag>\n    );\n  }\n\n  return (\n    <Tag href={card.href} className=\"group relative isolate flex h-full flex-col justify-end overflow-clip rounded-lg p-5 text-background\">\n      <div className=\"absolute inset-0 -z-20 [&>*]:size-full [&>*]:object-cover\">{card.media ?? <div className=\"bg-muted\" />}</div>\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-gradient-to-t from-foreground/75 via-foreground/30 to-transparent\" />\n      <span className=\"pr-20 text-sm font-semibold lg:text-lg\">{card.title}</span>\n      {card.text && <span className=\"mt-1 pr-20 text-sm text-background/40\">{card.text}</span>}\n      {card.href && <Arrow tone=\"light\" />}\n    </Tag>\n  );\n}\n\nfunction Arrow({ tone }: { tone: \"light\" | \"ink\" }) {\n  return (\n    <span\n      aria-hidden\n      className={cn(\n        \"absolute right-4 bottom-4 grid size-[3.75rem] place-items-center rounded-full border transition-colors duration-300 group-hover:bg-background/90 group-hover:text-foreground motion-reduce:transition-none\",\n        tone === \"light\" ? \"border-background text-background\" : \"border-input text-input\",\n      )}\n    >\n      <ArrowUpRight strokeWidth={1} className=\"size-7\" />\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ledup-heading",
+    "ledup-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the small label above the headline"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the paragraph under the headline (desktop only, as on the original)"
+    },
+    {
+      "name": "rows",
+      "type": "LedupHighlightRow[]",
+      "required": true,
+      "description": "the bento rows; on phones all cards stack in order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fa41727d79bd3bda7b2831c9ded6f79715cf29c43f7de7a15f6e33591c8835d7"
+}

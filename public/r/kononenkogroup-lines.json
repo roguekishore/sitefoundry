@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Kononenkogroup lines",
+  "description": "Text whose lines rise into place from behind their own masks as they come up from the bottom of the window (or once on load, for the first screen), on a long soft ease-out. Works for 12px labels and 130px headlines alike. CSS only: each word's mask is its own view timeline, so the words of one line rise together.",
+  "category": "text-effect",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "reveal",
+    "mask",
+    "lines",
+    "rise",
+    "split",
+    "scroll",
+    "load",
+    "css-only",
+    "editorial"
+  ],
+  "notes": [
+    "takes plain text (split on spaces) or a list of forced lines",
+    "CSS only: without scroll-driven animations, or with reduced motion, the text simply stands",
+    "the masks leave room for ascenders and descenders down to a leading of about 0.7"
+  ],
+  "entry": "kononenkogroup-lines.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-lines",
+  "files": [
+    {
+      "path": "kononenkogroup-lines.css",
+      "content": "/* Every word sits in an inline-block mask that crops it (overflow: clip, which is not a scroll\n   container, so the view timeline still works). The padding and the equal negative margin give\n   ascenders and descenders room under the very tight leading without changing the layout. The\n   mask, not the moving word, is the view timeline, so the words of one line share their timing\n   and the line rises as one, the way the original's split lines do. */\n.kononenkogroup-lines-mask {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: baseline;\n  /* text-indent is inherited: only the paragraph's first line is indented, not every word */\n  text-indent: 0;\n  padding-block: 0.2em 0.25em;\n  margin-block: -0.2em -0.25em;\n  view-timeline-name: --kononenkogroup-lines;\n}\n\n.kononenkogroup-lines-word {\n  display: inline-block;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  /* first screen: rise once on load */\n  .kononenkogroup-lines[data-trigger=\"load\"] .kononenkogroup-lines-word {\n    animation: kononenkogroup-lines-rise 1.1s cubic-bezier(0.17, 0.84, 0.44, 1) both;\n    animation-delay: var(--kononenkogroup-lines-delay, 0ms);\n  }\n\n  /* further down: rise as the line comes up from the bottom of the window, over a fixed 200px\n     of scrolling (so a line already in view at load is simply there) */\n  @supports (animation-timeline: view()) {\n    .kononenkogroup-lines[data-trigger=\"scroll\"] .kononenkogroup-lines-word {\n      animation: kononenkogroup-lines-rise cubic-bezier(0.17, 0.84, 0.44, 1) both;\n      animation-timeline: --kononenkogroup-lines;\n      animation-range: entry 0px entry 200px;\n    }\n  }\n}\n\n@keyframes kononenkogroup-lines-rise {\n  from {\n    /* its own height plus the mask's padding: fully out of sight below the line */\n    transform: translateY(calc(100% + 0.5em));\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-lines.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-lines.css\";\n\nexport interface KononenkogroupLinesProps {\n  /** the text, split into words that each rise from their own mask; pass a list to force\n      line breaks (each item becomes its own line) */\n  text: string | string[];\n  /** the element to render: p by default */\n  as?: ElementType;\n  /** \"scroll\": words rise as they come into view (CSS scroll-driven); \"load\": they rise once\n      when the page loads, for text in the first screen */\n  trigger?: \"scroll\" | \"load\";\n  /** load only: delay before the rise, in ms */\n  delay?: number;\n  className?: string;\n}\n\nfunction Words({ text }: { text: string }) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <>\n      {words.map((word, i) => (\n        <Fragment key={i}>\n          <span className=\"kononenkogroup-lines-mask\">\n            <span className=\"kononenkogroup-lines-word\">{word}</span>\n          </span>\n          {i < words.length - 1 && \" \"}\n        </Fragment>\n      ))}\n    </>\n  );\n}\n\n/**\n * Text whose lines rise into place from behind their own masks, the way every line of the\n * original moves. CSS only: without scroll-driven animations, or with reduced motion, the text\n * simply stands.\n */\nexport function KononenkogroupLines({ text, as: Tag = \"p\", trigger = \"scroll\", delay = 0, className }: KononenkogroupLinesProps) {\n  return (\n    <Tag\n      data-trigger={trigger}\n      className={cn(\"kononenkogroup-lines\", className)}\n      style={delay ? ({ \"--kononenkogroup-lines-delay\": `${delay}ms` } as CSSProperties) : undefined}\n    >\n      {Array.isArray(text)\n        ? text.map((line, i) => (\n            <span key={i} className=\"block\">\n              <Words text={line} />\n            </span>\n          ))\n        : <Words text={text} />}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the text, split into words that each rise from their own mask; pass a list to force\nline breaks (each item becomes its own line)"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "p",
+      "description": "the element to render: p by default"
+    },
+    {
+      "name": "trigger",
+      "type": "enum",
+      "required": false,
+      "default": "scroll",
+      "description": "\"scroll\": words rise as they come into view (CSS scroll-driven); \"load\": they rise once\nwhen the page loads, for text in the first screen"
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "load only: delay before the rise, in ms"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0f1d0fb1879aae966de10b2376e7d8b8ff372c50038566a32c7231dfa47046d4"
+}

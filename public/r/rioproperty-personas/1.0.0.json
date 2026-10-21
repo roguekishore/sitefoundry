@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty personas",
+  "description": "A big capital heading and a violet sub-head over four tall photo cards (about 6:7), each with a wide capital title on a dark bottom gradient. On desktop the four columns drift up at four different speeds as you scroll, staggering the row; hovering a card opens a one-line description, shows an up-right arrow and slowly zooms the photo. On phones the cards stack with the line always shown.",
+  "category": "features",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "audiences",
+    "personas",
+    "photo",
+    "grid",
+    "parallax",
+    "scrubbed",
+    "stagger",
+    "hover",
+    "uppercase",
+    "wide-type",
+    "light"
+  ],
+  "notes": [
+    "each media slot fills its card like object-fit cover; empty, it is a bg-muted placeholder",
+    "the card text is paper-white over a dark gradient made from the secondary colour: the photos should be mid-to-dark",
+    "the desktop hover behaviour (line opening) is inferred: the capture only shows the titles at 1440"
+  ],
+  "entry": "rioproperty-personas.tsx",
+  "source": "foundry",
+  "name": "rioproperty-personas",
+  "files": [
+    {
+      "path": "rioproperty-personas.css",
+      "content": "/* Desktop: the columns drift up at four different speeds while they cross the window\n   (column i: from i x 37px below its place to i x 37px above), so the row staggers. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .rioproperty-personas-column {\n      animation: rioproperty-personas-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes rioproperty-personas-drift {\n  from {\n    translate: 0 calc(var(--rioproperty-personas-i, 1) * 37px);\n  }\n  to {\n    translate: 0 calc(var(--rioproperty-personas-i, 1) * -37px);\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-personas.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RiopropertyRiseText } from \"@foundry/rioproperty-rise-text\";\nimport \"./rioproperty-personas.css\";\n\nexport interface RiopropertyPersona {\n  /** the capital title over the photo */\n  title: string;\n  /** one line on what this kind of client needs (always shown on phones, on hover on desktop) */\n  line: string;\n  href: string;\n  /** a photo; fills the card like object-fit cover. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface RiopropertyPersonasProps {\n  /** the big capital heading */\n  heading: string;\n  /** the violet capital line under it */\n  subhead: string;\n  /** usually four cards */\n  personas: RiopropertyPersona[];\n  className?: string;\n}\n\n// The original's hover timing: 0.75s on a long, snappy ease.\nconst ease = \"duration-[750ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\nexport function RiopropertyPersonas({ heading, subhead, personas, className }: RiopropertyPersonasProps) {\n  return (\n    <section className={cn(\"bg-background pt-section pb-section text-foreground lg:pb-16\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RiopropertyRiseText\n          text={heading}\n          className=\"font-display text-[clamp(2.19rem,1.8rem+1.61vw,3.25rem)] leading-[0.966] font-semibold uppercase lg:max-w-[44rem]\"\n        />\n        <RiopropertyRiseText\n          as=\"p\"\n          split=\"block\"\n          text={subhead}\n          className=\"mt-6 max-w-[19rem] text-lg leading-normal text-primary uppercase sm:max-w-none lg:mt-8 lg:text-2xl\"\n        />\n\n        <ul className=\"mt-14 grid gap-4 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4\">\n          {personas.map((persona, i) => (\n            <li key={persona.title} className=\"rioproperty-personas-column\" style={{ \"--rioproperty-personas-i\": i + 1 } as CSSProperties}>\n              <a href={persona.href} className=\"group/persona relative isolate block aspect-[318/371] overflow-clip bg-muted\">\n                <div className={cn(\"absolute inset-0 -z-10 transition-[scale] group-hover/persona:scale-105\", ease)}>{persona.media}</div>\n                {/* the original's title gradient: clear at the top, ~60% dark near the bottom */}\n                <div aria-hidden className=\"absolute inset-0 -z-10 bg-[linear-gradient(transparent,color-mix(in_oklab,var(--secondary)_62%,transparent)_84%)]\" />\n                <div className=\"absolute inset-x-0 bottom-0 p-4 text-background dark:text-foreground\">\n                  <div className=\"flex items-end justify-between gap-4\">\n                    <h3 className=\"font-display text-[1.6875rem] leading-[1.17] font-semibold uppercase lg:text-[2.25rem]\">{persona.title}</h3>\n                    <ArrowUpRight\n                      aria-hidden\n                      strokeWidth={1.25}\n                      className={cn(\"mb-1.5 size-6 shrink-0 transition-[opacity,translate] lg:opacity-0 lg:group-hover/persona:opacity-100\", ease)}\n                    />\n                  </div>\n                  {/* the line opens on hover on desktop; on phones it is always there */}\n                  <div className={cn(\"grid grid-rows-[1fr] transition-[grid-template-rows] lg:grid-rows-[0fr] lg:group-hover/persona:grid-rows-[1fr]\", ease)}>\n                    <p className=\"min-h-0 overflow-hidden pt-1 leading-normal opacity-90\">{persona.line}</p>\n                  </div>\n                </div>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rioproperty-rise-text"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big capital heading"
+    },
+    {
+      "name": "subhead",
+      "type": "string",
+      "required": true,
+      "description": "the violet capital line under it"
+    },
+    {
+      "name": "personas",
+      "type": "RiopropertyPersona[]",
+      "required": true,
+      "description": "usually four cards"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0fe1b39f529f77655bb4f1f09fee092e1eab4179d661ff2cc2ef4a971926af75"
+}

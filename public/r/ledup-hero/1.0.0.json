@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup hero slider",
+  "description": "A full-bleed photo hero that fills 80% of a phone screen and almost the whole desktop window, with big soft rounded bottom corners. A calm brown headline and one line of text sit low at the left, with numbered tabs (01, 02) under them; slides cross-fade every few seconds or on a tab click.",
+  "category": "hero",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "slider",
+    "carousel",
+    "crossfade",
+    "full-bleed",
+    "photo",
+    "rounded",
+    "light",
+    "warm",
+    "window-height"
+  ],
+  "notes": [
+    "each slide's media fills the frame like object-fit: cover; empty shows a grey placeholder",
+    "the headline is ink-coloured, so it needs a light photo behind it, as on the original",
+    "auto-advance is off under reduced motion; needs JavaScript (hydrate: load), the static HTML shows the first slide"
+  ],
+  "entry": "ledup-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "ledup-hero",
+  "files": [
+    {
+      "path": "ledup-hero.tsx",
+      "content": "import { type ReactNode, useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LedupHeroSlide {\n  /** the headline */\n  title: ReactNode;\n  /** one line under the headline */\n  text?: ReactNode;\n  /** the full-bleed photo or video; empty shows a grey placeholder */\n  media?: ReactNode;\n}\n\nexport interface LedupHeroProps {\n  /** the slides (two in the original) */\n  slides: LedupHeroSlide[];\n  /** seconds each slide stays before the next one fades in (0 = no auto-advance) */\n  interval?: number;\n  /** screen-reader label for a tab, followed by its number (\"Show slide\") */\n  tabLabel: string;\n  className?: string;\n}\n\nexport function LedupHero({ slides, interval = 7, tabLabel, className }: LedupHeroProps) {\n  const [active, setActive] = useState(0);\n\n  useEffect(() => {\n    if (!interval || slides.length < 2) return;\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setTimeout(() => setActive((i) => (i + 1) % slides.length), interval * 1000);\n    return () => window.clearTimeout(id);\n  }, [active, interval, slides.length]);\n\n  return (\n    <section\n      className={cn(\n        \"relative isolate h-[80svh] min-h-[32rem] overflow-clip rounded-b-[1.5rem] bg-muted font-sans text-foreground lg:h-[calc(100svh-1rem)] lg:rounded-b-[3.125rem]\",\n        className,\n      )}\n    >\n      {slides.map((slide, i) => (\n        <div\n          key={i}\n          aria-hidden={i !== active}\n          className={cn(\n            \"absolute inset-0 -z-10 transition-opacity duration-[800ms] ease-out motion-reduce:transition-none [&>*]:size-full [&>*]:object-cover\",\n            i === active ? \"opacity-100\" : \"opacity-0\",\n          )}\n        >\n          {slide.media ?? <div className=\"bg-[radial-gradient(120%_90%_at_80%_10%,var(--muted),var(--secondary)_55%,color-mix(in_oklch,var(--muted-foreground)_45%,var(--secondary)))]\" />}\n        </div>\n      ))}\n\n      <div className=\"mx-auto flex h-full max-w-page flex-col justify-end px-gutter pb-9 lg:pb-[4.5rem]\">\n        <div className=\"grid\">\n          {slides.map((slide, i) => (\n            <div\n              key={i}\n              aria-hidden={i !== active}\n              className={cn(\n                \"[grid-area:1/1] transition-opacity duration-[800ms] ease-out motion-reduce:transition-none\",\n                i === active ? \"opacity-100\" : \"pointer-events-none opacity-0\",\n              )}\n            >\n              <h1 className=\"max-w-[12.5em] font-display text-4xl leading-[1.2] lg:text-[3.6rem]\">{slide.title}</h1>\n              {slide.text && <p className=\"mt-4 max-w-[34rem] text-sm leading-[1.6] lg:mt-7 lg:max-w-none lg:text-base\">{slide.text}</p>}\n            </div>\n          ))}\n        </div>\n\n        {slides.length > 1 && (\n          <div className=\"mt-[4.5rem] flex gap-12 lg:mt-24\">\n            {slides.map((_, i) => (\n              <button\n                key={i}\n                type=\"button\"\n                aria-label={`${tabLabel} ${i + 1}`}\n                aria-pressed={i === active}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"relative w-10 pb-2.5 text-center text-base transition-colors duration-300 motion-reduce:transition-none\",\n                  i === active ? \"text-foreground\" : \"text-muted-foreground hover:text-foreground\",\n                )}\n              >\n                {String(i + 1).padStart(2, \"0\")}\n                <span\n                  aria-hidden\n                  className={cn(\n                    \"absolute inset-x-0 bottom-0 h-px origin-left bg-foreground transition-transform duration-500 motion-reduce:transition-none\",\n                    i === active ? \"scale-x-100\" : \"scale-x-0\",\n                  )}\n                />\n              </button>\n            ))}\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "LedupHeroSlide[]",
+      "required": true,
+      "description": "the slides (two in the original)"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "7",
+      "description": "seconds each slide stays before the next one fades in (0 = no auto-advance)"
+    },
+    {
+      "name": "tabLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for a tab, followed by its number (\"Show slide\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a20b42cc4d95e73fe748ba4c144216a3a2e8b736337af6c6f102d4c964b709e9"
+}

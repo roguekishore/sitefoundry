@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Leome and Partners word reveal",
+  "description": "Inline text whose words rise out of clipping masks: once on page load with a staggered expo ease, or scrubbed as each word scrolls into view, so whole lines rise together and the next line follows. Pure CSS, no text splitting by JavaScript.",
+  "category": "text-effect",
+  "site": "leome-and-partners",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "reveal",
+    "mask",
+    "split-text",
+    "scroll-driven",
+    "load",
+    "stagger",
+    "css"
+  ],
+  "notes": [
+    "takes font, size and colour from its parent; put it inside the heading or paragraph",
+    "view mode uses CSS scroll-driven animations; without support the text stands still",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "leome-and-partners-word-reveal.tsx",
+  "source": "foundry",
+  "name": "leome-and-partners-word-reveal",
+  "files": [
+    {
+      "path": "leome-and-partners-word-reveal.css",
+      "content": "/* Each word sits in an inline-block mask (overflow: clip, so view timelines keep working)\n   with a little room below for descenders. The word starts 125% low and rises into place:\n   on load with a time-based ease, or scrubbed by the word's own view timeline as it enters,\n   over a fixed 240px of scroll so lines low in the first screen still finish. */\n.leome-and-partners-word-reveal-mask {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: top;\n  padding-bottom: 0.14em;\n  margin-bottom: -0.14em;\n  view-timeline-name: --leome-and-partners-word;\n}\n\n.leome-and-partners-word-reveal-word {\n  display: inline-block;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .leome-and-partners-word-reveal[data-trigger=\"load\"] .leome-and-partners-word-reveal-word {\n    animation: leome-and-partners-word-reveal-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;\n  }\n\n  @supports (animation-timeline: view()) {\n    .leome-and-partners-word-reveal[data-trigger=\"view\"] .leome-and-partners-word-reveal-word {\n      animation: leome-and-partners-word-reveal-rise linear both;\n      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);\n      animation-timeline: --leome-and-partners-word;\n      animation-range: entry 0% entry 240px;\n    }\n  }\n}\n\n@keyframes leome-and-partners-word-reveal-rise {\n  from {\n    transform: translateY(125%);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "leome-and-partners-word-reveal.tsx",
+      "content": "import { Fragment } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./leome-and-partners-word-reveal.css\";\n\nexport interface LeomeAndPartnersWordRevealProps {\n  /** the text; it is split on spaces and every word rises out of its own mask */\n  text: string;\n  /**\n   * \"load\": the words rise once as the page loads (use it in the first screen).\n   * \"view\": the words rise as they scroll into view; words on one line move together and\n   * the next line follows, which reads as the original's line-by-line reveal.\n   */\n  trigger?: \"load\" | \"view\";\n  /** load only: seconds before the first word starts */\n  delay?: number;\n  /** load only: seconds between one word and the next */\n  stagger?: number;\n  className?: string;\n}\n\n/**\n * Inline text whose words rise out of clipping masks. Put it inside a heading or paragraph;\n * it takes the font, size and colour of its parent. Without scroll-timeline support, or with\n * reduced motion, the text simply stands in place.\n */\nexport function LeomeAndPartnersWordReveal({\n  text,\n  trigger = \"view\",\n  delay = 0,\n  stagger = 0.06,\n  className,\n}: LeomeAndPartnersWordRevealProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <span className={cn(\"leome-and-partners-word-reveal\", className)} data-trigger={trigger}>\n      {words.map((word, i) => (\n        <Fragment key={i}>\n          <span className=\"leome-and-partners-word-reveal-mask\">\n            <span\n              className=\"leome-and-partners-word-reveal-word\"\n              style={trigger === \"load\" ? { animationDelay: `${(delay + i * stagger).toFixed(2)}s` } : undefined}\n            >\n              {word}\n            </span>\n          </span>\n          {i < words.length - 1 && \" \"}\n        </Fragment>\n      ))}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; it is split on spaces and every word rises out of its own mask"
+    },
+    {
+      "name": "trigger",
+      "type": "enum",
+      "required": false,
+      "default": "view",
+      "description": "\"load\": the words rise once as the page loads (use it in the first screen).\n\"view\": the words rise as they scroll into view; words on one line move together and\nthe next line follows, which reads as the original's line-by-line reveal."
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "load only: seconds before the first word starts"
+    },
+    {
+      "name": "stagger",
+      "type": "number",
+      "required": false,
+      "default": "0.06",
+      "description": "load only: seconds between one word and the next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "44ee6822cf449ed4e12a3a5a9f372a1c5320da35b90a858f3c947e21480c86ad"
+}
