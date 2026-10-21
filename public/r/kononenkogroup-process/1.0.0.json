@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup process",
+  "description": "The method in stages on white: each opens with a centred two-line grotesk heading over a wide drawing frame, an optional big serif statement with an indented first line, then a 30px serif paragraph on one side of a 15-column grid with a tiny serif label pinned (sticky) beside it, and an optional tiny list. Lines rise from their masks; the drawings fade in.",
+  "category": "features",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "process",
+    "method",
+    "steps",
+    "stages",
+    "editorial",
+    "serif",
+    "sticky",
+    "reveal",
+    "drawing",
+    "minimal",
+    "monochrome",
+    "grid"
+  ],
+  "notes": [
+    "the drawing frames are media slots (the original draws sketches in WebGL)",
+    "CSS only: reveals are scroll-driven; the label pins with position: sticky"
+  ],
+  "entry": "kononenkogroup-process.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-process",
+  "files": [
+    {
+      "path": "kononenkogroup-process.css",
+      "content": "/* The drawing appears as it comes up the window (on the original it draws itself in WebGL;\n   here the frame simply fades in). */\n.kononenkogroup-process-sketch {\n  view-timeline-name: --kononenkogroup-process-sketch;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-process-sketch > * {\n      animation: kononenkogroup-process-appear linear both;\n      animation-timeline: --kononenkogroup-process-sketch;\n      animation-range: entry 0px entry 360px;\n    }\n  }\n}\n\n@keyframes kononenkogroup-process-appear {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-process.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupMedia } from \"@foundry/kononenkogroup-media\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-process.css\";\n\nexport interface KononenkogroupProcessEntry {\n  /** first line, in ink */\n  title: string;\n  /** further lines, in grey */\n  detail?: string[];\n}\n\nexport interface KononenkogroupProcessStage {\n  /** centred grotesk heading, one item per line */\n  heading: string[];\n  /** the drawing under the heading (a wide frame) */\n  media?: ReactNode;\n  /** optional big serif statement under the drawing (first line indented) */\n  lead?: string;\n  /** small serif label that stays pinned beside the paragraph while it passes */\n  label?: string;\n  /** the serif paragraph */\n  body: string;\n  /** which side the paragraph sits on wide screens */\n  side?: \"left\" | \"right\";\n  /** indent the paragraph's first line by a column */\n  indent?: boolean;\n  /** an optional small list under the paragraph, with its label */\n  aside?: { label: string; entries: KononenkogroupProcessEntry[] };\n}\n\nexport interface KononenkogroupProcessProps {\n  /** the stages, one after another */\n  stages: KononenkogroupProcessStage[];\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\nconst serifLabel = cn(small, \"font-display tracking-[-0.01em]\");\n\nfunction Stage({ stage }: { stage: KononenkogroupProcessStage }) {\n  const right = (stage.side ?? \"right\") === \"right\";\n  return (\n    <div>\n      <KononenkogroupLines\n        as=\"h2\"\n        text={stage.heading}\n        className=\"text-center font-sans text-[10.67vw] leading-[0.85] tracking-[-0.045em] lg:text-[4.17vw] lg:leading-[0.875]\"\n      />\n      <div className=\"kononenkogroup-process-sketch mt-[5vw] lg:mt-[4.5vw]\">\n        <KononenkogroupMedia media={stage.media} className=\"aspect-[8/5] lg:aspect-[1394/860]\" />\n      </div>\n      {stage.lead && (\n        <KononenkogroupLines\n          text={stage.lead}\n          className=\"mt-[14vw] font-display text-[9.6vw] leading-[0.9] tracking-[-0.03em] indent-[10.8vw] lg:mt-[5vw] lg:text-[6.146vw] lg:indent-[6.53vw]\"\n        />\n      )}\n      <div className={cn(\"lg:grid lg:grid-cols-15 lg:gap-x-[1.11vw]\", stage.lead ? \"mt-[19vw] lg:mt-[4.6vw]\" : \"mt-[12vw] lg:mt-[4.6vw]\")}>\n        {stage.label && (\n          <div className=\"lg:col-span-3 lg:col-start-1 lg:row-start-1\">\n            <KononenkogroupLines text={stage.label} className={cn(serifLabel, \"lg:sticky lg:top-[5.5vw] lg:max-w-[6vw]\")} />\n          </div>\n        )}\n        <KononenkogroupLines\n          text={stage.body}\n          className={cn(\n            \"font-display text-[6.93vw] leading-[1.1] tracking-[-0.03em] lg:row-start-1 lg:text-[2.083vw]\",\n            stage.label && \"mt-[6vw] lg:mt-0\",\n            right ? \"lg:col-span-8 lg:col-start-8\" : \"lg:col-span-6 lg:col-start-1\",\n            stage.indent && \"indent-[10.8vw] lg:indent-[6.53vw]\",\n          )}\n        />\n      </div>\n      {stage.aside && (\n        <div className=\"mt-[14vw] lg:mt-[7.6vw] lg:grid lg:grid-cols-15 lg:gap-x-[1.11vw]\">\n          <KononenkogroupLines text={stage.aside.label} className={cn(serifLabel, \"lg:col-span-1 lg:col-start-7\")} />\n          <ul className=\"mt-[4vw] grid gap-[3vw] lg:col-span-4 lg:col-start-8 lg:mt-0 lg:gap-[0.75vw]\">\n            {stage.aside.entries.map((entry, i) => (\n              <li key={i}>\n                <KononenkogroupLines text={entry.title} className={small} />\n                {entry.detail?.map((line, j) => (\n                  <KononenkogroupLines key={j} text={line} className={cn(small, \"text-muted-foreground\")} />\n                ))}\n              </li>\n            ))}\n          </ul>\n        </div>\n      )}\n    </div>\n  );\n}\n\n/**\n * The method, told in stages: each opens with a centred grotesk heading over a wide drawing,\n * an optional big serif statement, then a serif paragraph on one side of the grid with a small\n * label pinned beside it while it passes, and an optional tiny list. Every line rises from its\n * mask; the drawings fade in.\n */\nexport function KononenkogroupProcess({ stages, className }: KononenkogroupProcessProps) {\n  return (\n    <section className={cn(\"grid gap-[24vw] bg-background px-gutter py-section text-foreground lg:gap-[12.5vw]\", className)}>\n      {stages.map((stage, i) => (\n        <Stage key={i} stage={stage} />\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-media"
+  ],
+  "props": [
+    {
+      "name": "stages",
+      "type": "KononenkogroupProcessStage[]",
+      "required": true,
+      "description": "the stages, one after another"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9d62948a8e4bebb1b2354e22916852a84b30ab6316d39fb6e7c2951351530326"
+}

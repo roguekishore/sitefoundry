@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline contact",
+  "description": "A contact band split down the middle by a hairline: on light sand, a tracked eyebrow and light heading at the top and a short company line with a social link at the bottom; on a darker beige, a form of flat white fields (two per row on wide screens), small print with an underlined link, and a bold uppercase submit underlined by a marker scribble. The heading's letters rise in and the top hairline draws itself out.",
+  "category": "contact",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "split",
+    "sand",
+    "flat",
+    "minimal",
+    "editorial",
+    "scribble",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "a plain HTML form: pass action (and method) to post it somewhere",
+    "the halves use secondary (left) and muted (right); fields use card",
+    "the fields' placeholders double as their labels (the labels are there for screen readers)"
+  ],
+  "entry": "lunchline-contact.tsx",
+  "source": "foundry",
+  "name": "lunchline-contact",
+  "files": [
+    {
+      "path": "lunchline-contact.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineLetterRise } from \"@foundry/lunchline-letter-rise\";\nimport { LunchlineDrawRule } from \"@foundry/lunchline-draw-rule\";\nimport { LunchlineScribbleLink } from \"@foundry/lunchline-scribble-link\";\n\nexport interface LunchlineContactField {\n  /** the form field's name */\n  name: string;\n  /** shown as the placeholder (and read out as the label) */\n  label: string;\n  type?: \"text\" | \"email\" | \"tel\";\n  autoComplete?: string;\n  required?: boolean;\n  /** wide screens: take half the row (two halves sit side by side) */\n  half?: boolean;\n  /** a tall message box instead of a one-line field */\n  multiline?: boolean;\n}\n\nexport interface LunchlineContactProps {\n  /** the small tracked label above the heading */\n  eyebrow: string;\n  /** the light heading; its letters rise in as it scrolls into view */\n  heading: string;\n  /** a short line about the company, at the bottom of the left half */\n  blurb: string;\n  /** a social link under the blurb, with its icon */\n  social?: { label: string; href: string; icon?: ReactNode };\n  /** where the form posts */\n  action?: string;\n  method?: \"get\" | \"post\";\n  fields: LunchlineContactField[];\n  /** the small print under the fields; the link sits between `before` and `after` */\n  consent?: { before: string; linkLabel: string; linkHref: string; after: string };\n  submitLabel: string;\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nexport function LunchlineContact({\n  eyebrow,\n  heading,\n  blurb,\n  social,\n  action,\n  method = \"post\",\n  fields,\n  consent,\n  submitLabel,\n  id,\n  className,\n}: LunchlineContactProps) {\n  return (\n    <section id={id} className={cn(\"relative grid text-foreground lg:min-h-[35.75rem] lg:grid-cols-2\", className)}>\n      <LunchlineDrawRule className=\"z-10\" />\n      <div className=\"flex flex-col justify-between gap-4 border-b border-border bg-secondary px-gutter pt-10 pb-10 text-secondary-foreground lg:border-r lg:border-b-0 lg:pt-[5.1rem] lg:pb-[5.2rem] lg:pl-[max(var(--page-gutter),calc((100vw_-_var(--page-width))/2_+_var(--page-gutter)))]\">\n        <div>\n          <p className=\"text-sm leading-none font-bold tracking-[0.08em] uppercase lg:text-base\">{eyebrow}</p>\n          <LunchlineLetterRise\n            text={heading}\n            className=\"mt-4 max-w-[34rem] font-display text-xl leading-[1.2] font-light lg:mt-[1.1rem] lg:text-[2.5rem]\"\n          />\n        </div>\n        <div>\n          <p className=\"max-w-[27rem] text-lg leading-[1.4] lg:text-[1.3125rem]\">{blurb}</p>\n          {social && (\n            <a\n              href={social.href}\n              target=\"_blank\"\n              rel=\"noreferrer\"\n              className=\"mt-5 inline-flex items-center gap-3 text-lg leading-none transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none lg:mt-[1.15rem] lg:text-[1.3125rem]\"\n            >\n              {social.icon && <span className=\"size-7 [&>svg]:size-full\">{social.icon}</span>}\n              {social.label}\n            </a>\n          )}\n        </div>\n      </div>\n\n      <form action={action} method={method} className=\"bg-muted px-gutter py-12 text-foreground lg:px-[3.8rem] lg:pt-20 lg:pb-16\">\n        <div className=\"grid gap-5 lg:grid-cols-2 lg:gap-x-3\">\n          {fields.map((field) => {\n            const shared = cn(\n              \"w-full bg-card px-4 text-lg leading-none font-normal text-card-foreground outline-none placeholder:text-foreground/45 focus-visible:ring-1 focus-visible:ring-ring\",\n            );\n            return (\n              <label key={field.name} className={cn(\"block\", !field.half && \"lg:col-span-2\")}>\n                <span className=\"sr-only\">{field.label}</span>\n                {field.multiline ? (\n                  <textarea name={field.name} placeholder={field.label} required={field.required} className={cn(shared, \"h-[8.75rem] resize-none py-3 lg:h-[11.4rem]\")} />\n                ) : (\n                  <input\n                    name={field.name}\n                    type={field.type ?? \"text\"}\n                    placeholder={field.label}\n                    autoComplete={field.autoComplete}\n                    required={field.required}\n                    className={cn(shared, \"h-12 lg:h-11\")}\n                  />\n                )}\n              </label>\n            );\n          })}\n        </div>\n        {consent && (\n          <p className=\"mt-3.5 max-w-[37rem] text-sm leading-[1.45]\">\n            {consent.before}\n            <a href={consent.linkHref} className=\"underline underline-offset-2 transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none\">\n              {consent.linkLabel}\n            </a>\n            {consent.after}\n          </p>\n        )}\n        <LunchlineScribbleLink type=\"submit\" className=\"mt-5 lg:mt-6\">\n          {submitLabel}\n        </LunchlineScribbleLink>\n      </form>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-draw-rule",
+    "lunchline-letter-rise",
+    "lunchline-scribble-link"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small tracked label above the heading"
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light heading; its letters rise in as it scrolls into view"
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": true,
+      "description": "a short line about the company, at the bottom of the left half"
+    },
+    {
+      "name": "social",
+      "type": "{ label: string; href: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "a social link under the blurb, with its icon"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "method",
+      "type": "enum",
+      "required": false,
+      "default": "post"
+    },
+    {
+      "name": "fields",
+      "type": "LunchlineContactField[]",
+      "required": true
+    },
+    {
+      "name": "consent",
+      "type": "{ before: string; linkLabel: string; linkHref: string; after: string; }",
+      "required": false,
+      "description": "the small print under the fields; the link sits between `before` and `after`"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "91663c61429a246ba83ac0ed9eaf6691ee8d21c11719df94f92ab3f2593bf894"
+}

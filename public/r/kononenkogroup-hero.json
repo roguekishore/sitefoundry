@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup hero",
+  "description": "A window-sized hero: one photo filling the screen edge to edge, with a two-line white title at the bottom left whose last word turns serif. The title lines rise from their masks on load; the photo drifts down by a fifth of the window as the hero scrolls away.",
+  "category": "hero",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-bleed",
+    "fullscreen",
+    "photo",
+    "parallax",
+    "reveal",
+    "load",
+    "minimal",
+    "architecture",
+    "serif",
+    "grotesk"
+  ],
+  "notes": [
+    "the title is white (dark-scope foreground) because it sits on a photo; a placeholder shows a muted surface",
+    "pair with the fixed kononenkogroup-header, which overlays it",
+    "CSS only: the parallax is scroll-driven and simply doesn't happen without support"
+  ],
+  "entry": "kononenkogroup-hero.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-hero",
+  "files": [
+    {
+      "path": "kononenkogroup-hero.css",
+      "content": "/* As the hero scrolls away, its photo drifts down by a fifth of the window: the slow,\n   heavier-than-the-page parallax of the original. */\n.kononenkogroup-hero {\n  view-timeline-name: --kononenkogroup-hero;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-hero-media {\n      animation: kononenkogroup-hero-drift linear both;\n      animation-timeline: --kononenkogroup-hero;\n      animation-range: exit 0% exit 100%;\n    }\n  }\n}\n\n@keyframes kononenkogroup-hero-drift {\n  from {\n    transform: none;\n  }\n  to {\n    transform: translateY(20%);\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupMedia } from \"@foundry/kononenkogroup-media\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-hero.css\";\n\nexport interface KononenkogroupHeroProps {\n  /** the title, one line each; the last word of the last line is set in the serif */\n  title: string[];\n  /** the full-window photo or video (fills the frame, cropped like object-fit: cover) */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A window-sized hero: one photo filling the screen, edge to edge, with a two-line title in\n * white at the bottom left whose last word turns serif. The title rises on load; the photo\n * drifts down slowly as the hero scrolls away.\n */\nexport function KononenkogroupHero({ title, media, className }: KononenkogroupHeroProps) {\n  const last = title[title.length - 1] ?? \"\";\n  const cut = last.lastIndexOf(\" \");\n  const lastHead = cut > 0 ? last.slice(0, cut) : \"\";\n  const lastWord = cut > 0 ? last.slice(cut + 1) : last;\n\n  return (\n    <section\n      className={cn(\n        \"kononenkogroup-hero relative h-[calc(100svh-0.5rem)] overflow-clip bg-foreground lg:h-svh\",\n        className,\n      )}\n    >\n      <div className=\"kononenkogroup-hero-media dark absolute inset-0\">\n        <KononenkogroupMedia media={media} className=\"size-full\" />\n      </div>\n      <h1 className=\"dark absolute inset-x-0 bottom-0 px-gutter pb-[3.5vw] font-sans text-[10.67vw] leading-[0.82] tracking-[-0.045em] text-foreground lg:pb-[1.6vw] lg:text-[4.17vw]\">\n        {title.slice(0, -1).map((line, i) => (\n          <KononenkogroupLines key={i} as=\"span\" trigger=\"load\" delay={200 + i * 90} text={line} className=\"block\" />\n        ))}\n        <span className=\"block\">\n          {lastHead && <KononenkogroupLines as=\"span\" trigger=\"load\" delay={200 + (title.length - 1) * 90} text={lastHead} />}{\" \"}\n          <KononenkogroupLines\n            as=\"span\"\n            trigger=\"load\"\n            delay={200 + (title.length - 1) * 90}\n            text={lastWord}\n            className=\"font-display tracking-[-0.04em]\"\n          />\n        </span>\n      </h1>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the title, one line each; the last word of the last line is set in the serif"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-window photo or video (fills the frame, cropped like object-fit: cover)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "da6d89b62e29a88ec302fd3a171de60687fa2fcf9066c892b4ba3ec8af95a3bf"
+}

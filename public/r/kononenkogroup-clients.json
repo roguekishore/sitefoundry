@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup clients",
+  "description": "Clients on black: a huge centred serif heading inside an oval ring of white circles with client names. The circles are full size and bright at the bottom of the oval and shrink and fade towards the top, as if the ring tilts towards you; as the section scrolls through, the ring fades in and turns into place. Phones show the heading alone.",
+  "category": "logos",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "clients",
+    "logos",
+    "ring",
+    "orbit",
+    "oval",
+    "circles",
+    "dark",
+    "serif",
+    "huge-type",
+    "scrubbed",
+    "rotate",
+    "monochrome"
+  ],
+  "notes": [
+    "always dark: its root carries the dark class, so it reads the theme's dark tokens even on a light page",
+    "client names are plain text in circles (no logos); 16–20 names fill the ring",
+    "the ring uses CSS cos()/sin() and a registered @property; where those are missing, and below 1024px, only the heading shows"
+  ],
+  "entry": "kononenkogroup-clients.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-clients",
+  "files": [
+    {
+      "path": "kononenkogroup-clients.css",
+      "content": "/* An oval ring of client circles around the heading. Every circle's place on the ring is an\n   angle; its position comes from cos/sin of that angle, and so do its size and strength: near\n   the bottom of the oval a circle is full size and bright, near the top it shrinks to 0.7 and\n   fades to a tenth, as if the ring were tilted towards you. As the section crosses the window\n   the ring fades in and turns into place. */\n\n@property --kononenkogroup-clients-turn {\n  syntax: \"<angle>\";\n  inherits: true;\n  initial-value: 0deg;\n}\n\n.kononenkogroup-clients {\n  view-timeline-name: --kononenkogroup-clients;\n}\n\n/* only on wide screens, and only where CSS trigonometry exists */\n.kononenkogroup-clients-ring {\n  display: none;\n}\n\n@media (min-width: 64rem) {\n  @supports (translate: calc(cos(0deg) * 1px) 0) {\n    .kononenkogroup-clients-ring {\n      display: block;\n    }\n  }\n}\n\n.kononenkogroup-clients-mark {\n  --kononenkogroup-clients-a: calc(var(--kononenkogroup-clients-turn) + var(--kononenkogroup-clients-at));\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  width: 8.75vw;\n  aspect-ratio: 1;\n  margin: -4.375vw 0 0 -4.375vw;\n  translate: calc(cos(var(--kononenkogroup-clients-a)) * 35vw) calc(sin(var(--kononenkogroup-clients-a)) * 26.7vw);\n  scale: calc(0.85 + 0.15 * sin(var(--kononenkogroup-clients-a)));\n  opacity: calc(0.55 + 0.45 * sin(var(--kononenkogroup-clients-a)));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-clients-ring {\n      animation: kononenkogroup-clients-arrive linear both;\n      animation-timeline: --kononenkogroup-clients;\n      animation-range: cover 0% cover 75%;\n    }\n  }\n}\n\n@keyframes kononenkogroup-clients-arrive {\n  from {\n    --kononenkogroup-clients-turn: 40deg;\n    opacity: 0;\n  }\n  to {\n    --kononenkogroup-clients-turn: 0deg;\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-clients.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-clients.css\";\n\nexport interface KononenkogroupClientsProps {\n  /** the big centred serif heading */\n  heading: string;\n  /** client names, each set in a circle on the ring (16–20 suit it) */\n  clients: string[];\n  className?: string;\n}\n\n/**\n * Clients on black: a huge centred serif heading inside an oval ring of white circles, each\n * holding a client's name. The circles are brightest and largest at the bottom of the ring and\n * fade and shrink towards the top; the ring fades in and turns into place as the section\n * scrolls through. Phones show the heading alone, as the original does.\n */\nexport function KononenkogroupClients({ heading, clients, className }: KononenkogroupClientsProps) {\n  return (\n    <section\n      className={cn(\n        \"kononenkogroup-clients dark relative flex items-center justify-center overflow-clip bg-background px-gutter py-[30vw] text-foreground lg:min-h-[62.7vw] lg:py-section\",\n        className,\n      )}\n    >\n      <ul className=\"kononenkogroup-clients-ring absolute inset-0\" aria-label={heading}>\n        {clients.map((client, i) => (\n          <li\n            key={client}\n            className=\"kononenkogroup-clients-mark flex items-center justify-center rounded-full bg-foreground p-[1vw] text-center font-display text-[0.9vw] leading-[1.05] tracking-[-0.01em] text-background\"\n            style={{ \"--kononenkogroup-clients-at\": `${(360 / clients.length) * i}deg` } as CSSProperties}\n          >\n            {client}\n          </li>\n        ))}\n      </ul>\n      <KononenkogroupLines\n        as=\"h2\"\n        text={heading}\n        className=\"relative max-w-[84vw] text-center font-display text-[9.6vw] leading-[0.9] tracking-[-0.03em] lg:max-w-[58vw] lg:text-[9.115vw] lg:leading-[0.817]\"\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big centred serif heading"
+    },
+    {
+      "name": "clients",
+      "type": "string[]",
+      "required": true,
+      "description": "client names, each set in a circle on the ring (16–20 suit it)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d14d91007bf722bb54b2630732f94d6a8c3cda720b608b458e1f42329726fe64"
+}

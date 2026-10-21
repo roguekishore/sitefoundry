@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Structure engineering work index",
+  "description": "A two-column work index on paper: a huge heading at the top left with a lead, outlined mono tags and an arrow button at the bottom, then a hairline and a column of ruled project rows (bold uppercase name at the left, near-square image at the right) that slides up through a 900px window as the page scrolls past. A hovered row turns ink and shows a 'view' box over its image. On phones the rows become a sideways track of wide cards that slides left with the scroll.",
+  "category": "gallery",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "portfolio",
+    "work",
+    "list",
+    "scrubbed",
+    "scroll-driven",
+    "horizontal",
+    "hover",
+    "invert",
+    "mono",
+    "minimal"
+  ],
+  "notes": [
+    "the list moves with a CSS view timeline on the section; without support it is a plain list (desktop) or a sideways-scrolling row (phones)",
+    "best with five or more projects so the list is taller than its 900px window"
+  ],
+  "entry": "structureengineering-work.tsx",
+  "source": "foundry",
+  "name": "structureengineering-work",
+  "files": [
+    {
+      "path": "structureengineering-work.css",
+      "content": "/* The project column moves with the page's scroll while the section passes: on phones the\n   track slides left until its last card is in view; at desktop the list slides up through a\n   window 900px tall. The section names the view timeline. Without view timelines (or with\n   reduced motion) phones get a sideways-scrolling row and desktop the full list. */\n.structureengineering-work {\n  view-timeline: --structureengineering-work block;\n}\n.structureengineering-work-window {\n  overflow-x: auto;\n  scrollbar-width: none;\n}\n@media (min-width: 64rem) {\n  .structureengineering-work-window { overflow: visible; }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .structureengineering-work-window { overflow: clip; }\n    .structureengineering-work-track {\n      animation: structureengineering-work-across linear both;\n      animation-timeline: --structureengineering-work;\n      animation-range: entry 100% exit 100%;\n    }\n    @media (min-width: 64rem) {\n      .structureengineering-work-window { height: 56.25rem; }\n      .structureengineering-work-track {\n        animation-name: structureengineering-work-up;\n        animation-range: cover 0% cover 100%;\n      }\n    }\n  }\n}\n\n@keyframes structureengineering-work-across {\n  from { transform: none; }\n  to { transform: translateX(calc(-100% + 100vw - 2 * var(--page-gutter))); }\n}\n\n@keyframes structureengineering-work-up {\n  from { transform: none; }\n  to { transform: translateY(calc(-100% + 56.25rem)); }\n}\n"
+    },
+    {
+      "path": "structureengineering-work.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StructureengineeringButton } from \"@foundry/structureengineering-button\";\nimport { StructureengineeringMedia } from \"@foundry/structureengineering-media\";\nimport { StructureengineeringTags, type StructureengineeringTag } from \"@foundry/structureengineering-tags\";\nimport \"./structureengineering-work.css\";\n\nexport interface StructureengineeringProject {\n  /** the project's name (bold uppercase) */\n  title: string;\n  /** where its row goes */\n  href: string;\n  /** its image. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface StructureengineeringWorkProps {\n  /** the huge heading at the top left */\n  heading: string;\n  /** the sans paragraph at the bottom left */\n  lead: string;\n  /** the sector tags under it */\n  tags: StructureengineeringTag[];\n  /** the button under the tags */\n  cta: { label: string; href: string };\n  /** the label of the box that appears over a hovered project's image */\n  viewLabel: string;\n  /** the projects, in order */\n  projects: StructureengineeringProject[];\n  className?: string;\n}\n\n// A two-column work index on paper. Left: a huge heading at the top and, at the bottom, a lead,\n// tags and a button. A hairline divides it from a column of project rows (name at the left,\n// a near-square image at the right) that slides up through a fixed window as you scroll past;\n// on phones the rows become a sideways track that slides left. A hovered row turns ink with a\n// \"view\" box over its image.\nexport function StructureengineeringWork({ heading, lead, tags, cta, viewLabel, projects, className }: StructureengineeringWorkProps) {\n  return (\n    <section className={cn(\"structureengineering-work bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-16 px-gutter py-section lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-0 lg:py-16 xl:grid-cols-[34rem_40.25rem]\">\n        <div className=\"flex flex-col lg:pr-10\">\n          <h2 className=\"font-display text-[3.7rem] leading-none font-medium tracking-[-0.04em] lg:text-[5.1rem]\">{heading}</h2>\n          <div className=\"mt-10 lg:mt-auto lg:pb-8\">\n            <p className=\"max-w-[30rem] text-xl leading-[1.25] font-medium tracking-tight\">{lead}</p>\n            <StructureengineeringTags tags={tags} className=\"mt-6\" />\n            <StructureengineeringButton href={cta.href} className=\"mt-12\">\n              {cta.label}\n            </StructureengineeringButton>\n          </div>\n        </div>\n\n        <div className=\"structureengineering-work-window -mx-gutter px-gutter lg:mx-0 lg:border-l lg:border-border lg:px-0 lg:pl-4\">\n          <ul className=\"structureengineering-work-track flex w-max gap-4 lg:w-auto lg:flex-col lg:gap-0\">\n            {projects.map((project) => (\n              <li key={project.title} className=\"w-[calc(100vw_-_2*var(--page-gutter))] shrink-0 lg:w-auto lg:border-t lg:border-border\">\n                <a\n                  href={project.href}\n                  className=\"group/secard flex flex-col gap-4 transition-colors duration-250 ease-out motion-reduce:transition-none lg:flex-row lg:justify-between lg:p-4 lg:hover:bg-foreground lg:hover:text-background\"\n                >\n                  <span className=\"text-xl leading-[1.25] font-semibold tracking-tight uppercase lg:max-w-[14rem]\">{project.title}</span>\n                  <span className=\"relative block\">\n                    <StructureengineeringMedia media={project.media} className=\"aspect-[2/1] w-full lg:aspect-[323/306] lg:w-[20.2rem]\" />\n                    <StructureengineeringButton\n                      decorative\n                      variant=\"solid\"\n                      className=\"absolute top-1/2 left-1/2 hidden h-16 w-44 -translate-x-1/2 -translate-y-1/2 border-transparent opacity-0 transition-opacity duration-250 group-hover/secard:opacity-100 lg:flex\"\n                    >\n                      {viewLabel}\n                    </StructureengineeringButton>\n                  </span>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "structureengineering-button",
+    "structureengineering-media",
+    "structureengineering-tags"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the huge heading at the top left"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the sans paragraph at the bottom left"
+    },
+    {
+      "name": "tags",
+      "type": "StructureengineeringTag[]",
+      "required": true,
+      "description": "the sector tags under it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button under the tags"
+    },
+    {
+      "name": "viewLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label of the box that appears over a hovered project's image"
+    },
+    {
+      "name": "projects",
+      "type": "StructureengineeringProject[]",
+      "required": true,
+      "description": "the projects, in order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "624cd0d911cd9bceec9358a4dab6d8adfb6503fcbdeab4a3be614de851503398"
+}

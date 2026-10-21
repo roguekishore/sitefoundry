@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "M3-PG projects accordion",
+  "description": "Selected work as a hairline-boxed accordion. On desktop a short intro and an 'all projects' link hold the first column, and the box fills the other three: one open panel (wide photo, title, text, link, a big grey index number) beside narrow closed columns, each a grey plus, a title running up the column and its number; hovering a column inks it dark, clicking it widens it open (flex and background, 0.25s). On phones it becomes a vertical list of numbered rows with plus signs. The photo zooms to 1.1 on hover.",
+  "category": "gallery",
+  "site": "m3-pg",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "portfolio",
+    "accordion",
+    "horizontal-accordion",
+    "hairline",
+    "numbers",
+    "vertical-text",
+    "hover",
+    "zoom",
+    "minimal",
+    "monochrome",
+    "light"
+  ],
+  "notes": [
+    "five or six projects suit the desktop row; closed columns are 66px wide each",
+    "sits on its own background above a sticky band before it (relative z-10)"
+  ],
+  "entry": "m3-pg-projects.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "m3-pg-projects",
+  "files": [
+    {
+      "path": "m3-pg-projects.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { M3PgLink } from \"@foundry/m3-pg-link\";\nimport { M3PgMedia } from \"@foundry/m3-pg-media\";\n\nexport interface M3PgProject {\n  /** the project's name */\n  title: string;\n  /** one or two sentences about it */\n  body: string;\n  /** the link to the project page */\n  link: { label: string; href: string };\n  /** a photo of it; empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface M3PgProjectsProps {\n  /** the small heading of the first column */\n  heading: string;\n  /** the intro under it */\n  intro: string;\n  /** the link to every project */\n  allLink: { label: string; href: string };\n  /** the projects; numbered 1, 2, 3… in order */\n  projects: M3PgProject[];\n  /** which project starts open (0 = the first) */\n  initialOpen?: number;\n  /** an id for in-page links */\n  id?: string;\n  className?: string;\n}\n\n// The original's accordion timing: background-color and flex over 0.25s, ease.\nconst swing = \"transition-[flex,background-color,color] duration-250 ease-[ease] motion-reduce:transition-none\";\n\nexport function M3PgProjects({ heading, intro, allLink, projects, initialOpen = 0, id, className }: M3PgProjectsProps) {\n  const [open, setOpen] = useState(initialOpen);\n\n  return (\n    <section id={id} className={cn(\"relative z-10 bg-background px-gutter pt-10 pb-24 text-foreground lg:pt-20 lg:pb-36\", className)}>\n      <div className=\"mx-auto max-w-page lg:grid lg:grid-cols-4 lg:gap-x-5\">\n        <div className=\"flex flex-col\">\n          <h2 className=\"text-xl leading-7 tracking-[-0.02em] lg:mt-2.5 lg:text-2xl lg:leading-7\">{heading}</h2>\n          <p className=\"mt-3 text-base leading-6 tracking-[-0.01em] lg:pr-4\">{intro}</p>\n          <M3PgLink href={allLink.href} className=\"mt-auto hidden text-2xl leading-7 lg:block\">\n            {allLink.label}\n          </M3PgLink>\n        </div>\n\n        {/* phones and tablets: a vertical list */}\n        <div className=\"mt-8 border border-border lg:hidden\">\n          {projects.map((project, i) =>\n            i === open ? (\n              <div key={project.title} className={cn(\"p-4\", i > 0 && \"border-t border-border\")}>\n                <a href={project.link.href} className=\"group/media block\">\n                  <M3PgMedia media={project.media} zoom className=\"aspect-[1.54] w-full md:aspect-[1.77]\" />\n                </a>\n                <h3 className=\"mt-6 text-2xl leading-8 font-semibold tracking-[-0.02em] text-highlight\">{project.title}</h3>\n                <p className=\"mt-3 text-base leading-6 tracking-[-0.01em]\">{project.body}</p>\n                <M3PgLink href={project.link.href} className=\"mt-3 inline-block text-base leading-6\">\n                  {project.link.label}\n                </M3PgLink>\n                <p className=\"mt-6 text-[2.25rem] leading-none text-muted-foreground\">{i + 1}</p>\n              </div>\n            ) : (\n              <button\n                key={project.title}\n                type=\"button\"\n                aria-expanded={false}\n                onClick={() => setOpen(i)}\n                className={cn(\n                  \"flex h-14 w-full items-center gap-3 border-t border-border px-4 text-left hover:bg-foreground hover:text-background\",\n                  swing,\n                )}\n              >\n                <span className=\"w-6 text-[2.25rem] leading-none text-muted-foreground\">{i + 1}</span>\n                <span className=\"flex-1 text-xl leading-6 font-semibold tracking-[-0.02em]\">{project.title}</span>\n                <Plus className=\"size-6 text-muted-foreground\" strokeWidth={1.5} aria-hidden />\n              </button>\n            ),\n          )}\n        </div>\n        <M3PgLink href={allLink.href} className=\"mt-6 inline-block text-base leading-6 lg:hidden\">\n          {allLink.label}\n        </M3PgLink>\n\n        {/* desktop: open panel beside narrow columns */}\n        <div className=\"hidden h-[42.5rem] border border-border lg:col-span-3 lg:flex\">\n          {projects.map((project, i) => {\n            const isOpen = i === open;\n            return (\n              <div\n                key={project.title}\n                className={cn(\n                  \"relative min-w-0 overflow-clip\",\n                  i > 0 && \"border-l border-border\",\n                  isOpen ? \"flex-[1_1_0%]\" : \"flex-[0_0_4.125rem] hover:bg-foreground hover:text-background\",\n                  swing,\n                )}\n              >\n                {isOpen ? (\n                  <div className=\"flex h-full min-w-[22rem] flex-col p-5\">\n                    <a href={project.link.href} className=\"group/media block\">\n                      <M3PgMedia media={project.media} zoom className=\"aspect-[1.77] w-full\" />\n                    </a>\n                    <h3 className=\"mt-8 text-2xl leading-7 font-semibold tracking-[-0.02em] text-highlight\">{project.title}</h3>\n                    <p className=\"mt-5 max-w-[42rem] text-base leading-6 tracking-[-0.01em]\">{project.body}</p>\n                    <M3PgLink href={project.link.href} className=\"mt-3 inline-block self-start text-lg leading-6\">\n                      {project.link.label}\n                    </M3PgLink>\n                    <p className=\"mt-auto text-[3.75rem] leading-none text-muted-foreground\">{i + 1}</p>\n                  </div>\n                ) : (\n                  <button\n                    type=\"button\"\n                    aria-expanded={false}\n                    aria-label={project.title}\n                    onClick={() => setOpen(i)}\n                    className=\"flex h-full w-full flex-col items-center px-1 pt-7 pb-5\"\n                  >\n                    <Plus className=\"size-10 text-muted-foreground\" strokeWidth={1.5} aria-hidden />\n                    <span className=\"mt-auto rotate-180 text-2xl leading-7 font-semibold tracking-[-0.02em] whitespace-nowrap [writing-mode:vertical-rl]\">\n                      {project.title}\n                    </span>\n                    <span className=\"mt-4 text-[3.75rem] leading-none text-muted-foreground\">{i + 1}</span>\n                  </button>\n                )}\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "m3-pg-link",
+    "m3-pg-media"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the small heading of the first column"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the intro under it"
+    },
+    {
+      "name": "allLink",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the link to every project"
+    },
+    {
+      "name": "projects",
+      "type": "M3PgProject[]",
+      "required": true,
+      "description": "the projects; numbered 1, 2, 3… in order"
+    },
+    {
+      "name": "initialOpen",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which project starts open (0 = the first)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7e4859193162182c869b2225fcf0bd2973dbe93bb395a667abb213f3bd91847f"
+}

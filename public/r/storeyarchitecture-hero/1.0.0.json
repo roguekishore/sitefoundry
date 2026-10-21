@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture hero",
+  "description": "A full-bleed photo slideshow 110% of the window tall. Near the bottom-left sit thin progress bars (the current one wider and filling), a short white statement in a narrow column and a wide white button with a dashed ring. Slides crossfade while easing from 110% scale to 100%; on load the copy rises in; as you scroll away the photo sinks and dims.",
+  "category": "hero",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "slideshow",
+    "carousel",
+    "photo",
+    "crossfade",
+    "parallax",
+    "scroll",
+    "load-in",
+    "minimal",
+    "vw"
+  ],
+  "notes": [
+    "white text over media: in light themes it uses --background; dark: swaps it for --foreground",
+    "empty slides show a stone-grey (glow) placeholder with the original's top scrim and bottom gradient",
+    "the slideshow needs JavaScript (hydrate: load); without it the first slide shows",
+    "under reduced motion the slides don't advance by themselves"
+  ],
+  "entry": "storeyarchitecture-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "storeyarchitecture-hero",
+  "files": [
+    {
+      "path": "storeyarchitecture-hero.css",
+      "content": "/* Load: the first slide eases in from 110% scale (fill backwards only, so afterwards the\n   slideshow's own classes decide its opacity); the copy rises 28px and fades in, the\n   button a little later. Leaving: the slides sink 20% and dim to 60% as the hero scrolls\n   out (the hero's own view timeline, exit range). */\n.storeyarchitecture-hero {\n  view-timeline-name: --storeyarchitecture-hero;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .storeyarchitecture-hero-first {\n    animation: storeyarchitecture-hero-settle 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;\n  }\n  .storeyarchitecture-hero-copy {\n    animation: storeyarchitecture-hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;\n    animation-delay: calc(0.35s + var(--storeyarchitecture-hero-step, 0) * 0.12s);\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-hero-media {\n      animation: storeyarchitecture-hero-sink linear both;\n      animation-timeline: --storeyarchitecture-hero;\n      animation-range: exit 0% exit 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-hero-settle {\n  from {\n    opacity: 0;\n    transform: scale(1.1);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes storeyarchitecture-hero-rise {\n  from {\n    opacity: 0;\n    transform: translateY(28px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n\n@keyframes storeyarchitecture-hero-sink {\n  from {\n    opacity: 1;\n    transform: translateY(0);\n  }\n  to {\n    opacity: 0.6;\n    transform: translateY(20%);\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-hero.tsx",
+      "content": "import { useEffect, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureButton } from \"@foundry/storeyarchitecture-button\";\nimport { StoreyarchitectureSlideBars } from \"@foundry/storeyarchitecture-slide-bars\";\nimport \"./storeyarchitecture-hero.css\";\n\nexport interface StoreyarchitectureHeroSlide {\n  /** the photo or video (object-cover); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface StoreyarchitectureHeroProps {\n  /** the photos, one per slide (one progress bar each) */\n  slides: StoreyarchitectureHeroSlide[];\n  /** the short statement at the bottom-left */\n  statement: string;\n  /** the wide white button */\n  cta: { label: string; href: string };\n  /** screen-reader label of each progress bar; the slide number is added */\n  slideLabel: string;\n  /** how long each slide stays, in ms */\n  interval?: number;\n  className?: string;\n}\n\nconst stagger = (step: number) => ({ \"--storeyarchitecture-hero-step\": step }) as CSSProperties;\n\nexport function StoreyarchitectureHero({ slides, statement, cta, slideLabel, interval = 6000, className }: StoreyarchitectureHeroProps) {\n  const [active, setActive] = useState(0);\n\n  // advance one slide per interval (not under reduced motion)\n  useEffect(() => {\n    if (slides.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setTimeout(() => setActive((a) => (a + 1) % slides.length), interval);\n    return () => window.clearTimeout(id);\n  }, [active, interval, slides.length]);\n\n  return (\n    <section\n      className={cn(\n        \"storeyarchitecture-hero relative h-[110svh] overflow-clip font-[450] bg-foreground text-background dark:bg-background dark:text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"storeyarchitecture-hero-media absolute inset-0\">\n        {slides.map((slide, i) => (\n          <div\n            key={i}\n            aria-hidden={i !== active}\n            className={cn(\n              \"absolute inset-0 transition-[opacity,scale] duration-[1200ms,1800ms] ease-[cubic-bezier(0.2,0.7,0.2,1)] motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n              i % 2 ? \"bg-glow/85\" : \"bg-glow\",\n              i === active ? \"scale-100 opacity-100\" : \"scale-110 opacity-0\",\n              i === 0 && \"storeyarchitecture-hero-first\",\n            )}\n          >\n            {slide.media}\n          </div>\n        ))}\n        {/* the original's scrims: a light shade at the top, a deep gradient at the bottom */}\n        <div aria-hidden className=\"absolute inset-x-0 top-0 h-1/4 bg-linear-to-b from-foreground/20 to-transparent dark:from-background/20\" />\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-b from-transparent to-foreground/55 dark:to-background/55\" />\n      </div>\n\n      <div className=\"absolute inset-x-0 bottom-0 grid grid-cols-6 gap-x-gutter px-gutter pb-[calc(10svh+4.3vw)] sm:grid-cols-12 sm:pb-[calc(10svh+1.5vw)]\">\n        <StoreyarchitectureSlideBars\n          count={slides.length}\n          active={active}\n          duration={interval}\n          onSelect={setActive}\n          label={slideLabel}\n          className=\"storeyarchitecture-hero-copy col-span-6\"\n        />\n        <p\n          className=\"storeyarchitecture-hero-copy col-span-6 mt-[4vw] text-[4.3vw] leading-[1.2] tracking-[-0.02em] sm:col-span-3 sm:col-start-1 sm:row-start-2 sm:mt-[1.6vw] sm:text-[1.6vw]\"\n          style={stagger(1)}\n        >\n          {statement}\n        </p>\n        <div\n          className=\"storeyarchitecture-hero-copy col-span-6 mt-[5vw] sm:col-span-2 sm:col-start-5 sm:row-start-2 sm:mt-0 sm:self-end sm:justify-self-end\"\n          style={stagger(2)}\n        >\n          <StoreyarchitectureButton href={cta.href} variant=\"light\">\n            {cta.label}\n          </StoreyarchitectureButton>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-button",
+    "storeyarchitecture-slide-bars"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "StoreyarchitectureHeroSlide[]",
+      "required": true,
+      "description": "the photos, one per slide (one progress bar each)"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the short statement at the bottom-left"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the wide white button"
+    },
+    {
+      "name": "slideLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of each progress bar; the slide number is added"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6000",
+      "description": "how long each slide stays, in ms"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c1f7b9348cada92f26e2d08d1e13ac56e6468299dbd5c51d90bf405ba96ef581"
+}

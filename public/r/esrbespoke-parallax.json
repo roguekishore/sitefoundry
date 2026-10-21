@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Esrbespoke parallax frame",
+  "description": "A cropped media frame whose picture drifts at a different speed from the page as it scrolls by (scrubbed parallax), optionally fading in as it enters or rising 16px on load. Empty, it is a plain muted placeholder of the frame's size.",
+  "category": "gallery",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "parallax",
+    "scrubbed",
+    "scroll",
+    "fade",
+    "full-bleed"
+  ],
+  "notes": [
+    "the frame takes its size from className (h-svh, aspect-[4/3]…); the media fills it like object-fit: cover",
+    "parallax is CSS scroll-driven (view timeline) inside @supports; elsewhere the picture simply sits still",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "esrbespoke-parallax.tsx",
+  "source": "foundry",
+  "name": "esrbespoke-parallax",
+  "files": [
+    {
+      "path": "esrbespoke-parallax.css",
+      "content": "/* \"cover\": the picture layer is 30% taller than the frame and travels from -15% to +15% of the\n   frame while the frame crosses the window, so it moves slower than the page.\n   \"exit\": for a frame at the very top of the page; the picture sinks by a third of the frame\n   while the frame leaves the window (it seems to stay behind). */\n.esrbespoke-parallax {\n  view-timeline: --esrbespoke-parallax block;\n}\n.esrbespoke-parallax-layer[data-drift=\"cover\"] {\n  top: -15%;\n  bottom: -15%;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .esrbespoke-parallax-layer[data-drift=\"cover\"] {\n      animation: esrbespoke-parallax-cover linear both;\n      animation-timeline: --esrbespoke-parallax;\n      animation-range: cover 0% cover 100%;\n    }\n    .esrbespoke-parallax-layer[data-drift=\"exit\"] {\n      animation: esrbespoke-parallax-exit linear both;\n      animation-timeline: --esrbespoke-parallax;\n      animation-range: exit 0% exit 100%;\n    }\n    .esrbespoke-parallax[data-fade] .esrbespoke-parallax-fade {\n      animation: esrbespoke-parallax-fade linear both;\n      animation-timeline: --esrbespoke-parallax;\n      animation-range: entry 0% cover 35%;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .esrbespoke-parallax[data-rise] {\n    animation: esrbespoke-parallax-rise 1.2s cubic-bezier(0.19, 1, 0.22, 1) 0.15s both;\n  }\n}\n\n@keyframes esrbespoke-parallax-cover {\n  from { transform: translateY(-11.5%); }\n  to { transform: translateY(11.5%); }\n}\n@keyframes esrbespoke-parallax-exit {\n  from { transform: translateY(0); }\n  to { transform: translateY(33%); }\n}\n@keyframes esrbespoke-parallax-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes esrbespoke-parallax-rise {\n  from { transform: translateY(1rem); }\n  to { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "esrbespoke-parallax.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./esrbespoke-parallax.css\";\n\nexport interface EsrbespokeParallaxProps {\n  /** the picture or video; it should fill its box (`h-full w-full object-cover`). Empty: a placeholder */\n  media?: ReactNode;\n  /** how the picture drifts: \"cover\" while the frame crosses the window, \"exit\" for a frame at the page top, \"none\" */\n  drift?: \"cover\" | \"exit\" | \"none\";\n  /** fade the picture in as the frame enters the window */\n  fadeIn?: boolean;\n  /** rise 16px into place on page load (the inner pages' hero photo) */\n  rise?: boolean;\n  /** sizes the frame: h-svh, aspect-[4/3], … */\n  className?: string;\n  /** classes for the placeholder surface when there is no media */\n  placeholderClassName?: string;\n}\n\n/** A cropped media frame with a scrubbed parallax drift; a plain muted surface when empty. */\nexport function EsrbespokeParallax({ media, drift = \"cover\", fadeIn = false, rise = false, className, placeholderClassName }: EsrbespokeParallaxProps) {\n  return (\n    <div\n      className={cn(\"esrbespoke-parallax relative overflow-clip bg-background\", className)}\n      data-fade={fadeIn || undefined}\n      data-rise={rise || undefined}\n    >\n      <div className=\"esrbespoke-parallax-layer absolute inset-0\" data-drift={drift}>\n        <div className=\"esrbespoke-parallax-fade h-full w-full [&>*]:h-full [&>*]:w-full [&>img]:object-cover [&>video]:object-cover\">\n          {media ?? <div aria-hidden className={cn(\"h-full w-full bg-muted\", placeholderClassName)} />}\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the picture or video; it should fill its box (`h-full w-full object-cover`). Empty: a placeholder"
+    },
+    {
+      "name": "drift",
+      "type": "enum",
+      "required": false,
+      "default": "cover",
+      "description": "how the picture drifts: \"cover\" while the frame crosses the window, \"exit\" for a frame at the page top, \"none\""
+    },
+    {
+      "name": "fadeIn",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "fade the picture in as the frame enters the window"
+    },
+    {
+      "name": "rise",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "rise 16px into place on page load (the inner pages' hero photo)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "sizes the frame: h-svh, aspect-[4/3], …"
+    },
+    {
+      "name": "placeholderClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the placeholder surface when there is no media"
+    }
+  ],
+  "hash": "655bf727bb49c1dc9c44bc6902461a206cc2cfa952362a168e807fd727fae15b"
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup values accordion",
+  "description": "A dark brown card with 20px corners holding a stack of numbered rows (01. Innovation … 05.), each a shade lighter than the one above and tucked under it like filing tabs. The open row shows a title, a short paragraph and photos (one on phones, two staggered on desktop) above its label; clicking another row slides it open (0.5s) and folds the others. On phones the card is 88% of the window tall.",
+  "category": "features",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "accordion",
+    "tabs",
+    "values",
+    "dark",
+    "brown",
+    "stacked",
+    "rounded",
+    "photo",
+    "expand",
+    "interactive",
+    "window-height"
+  ],
+  "notes": [
+    "drawn with bg-foreground and text-background: a dark band on light themes, a pale one on dark themes; the rows step toward the background colour",
+    "each item takes two photos (the second shows on desktop only); empty shows translucent placeholders",
+    "needs JavaScript to switch rows (hydrate: visible); the first item is open in the static HTML"
+  ],
+  "entry": "ledup-values.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "ledup-values",
+  "files": [
+    {
+      "path": "ledup-values.tsx",
+      "content": "import { type ReactNode, useId, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LedupValue {\n  /** the row's label, set in capitals after its number (\"Innovation\") */\n  label: string;\n  /** the title shown when the row is open */\n  title: ReactNode;\n  /** the paragraph shown when the row is open (desktop only, as on the original) */\n  text?: ReactNode;\n  /** up to two photos; the second shows on desktop only. Empty shows placeholders */\n  media?: [ReactNode?, ReactNode?];\n}\n\nexport interface LedupValuesProps {\n  /** the rows, top to bottom (five in the original) */\n  items: LedupValue[];\n  /** which row starts open */\n  initial?: number;\n  className?: string;\n}\n\nexport function LedupValues({ items, initial = 0, className }: LedupValuesProps) {\n  const [open, setOpen] = useState(initial);\n  const id = useId();\n\n  return (\n    <section className={cn(\"bg-background pt-6 pb-10 font-sans lg:pt-24 lg:pb-[13.25rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"mx-auto flex max-w-[74.375rem] flex-col overflow-clip rounded-lg bg-foreground text-background\">\n          {items.map((item, i) => {\n            const isOpen = i === open;\n            return (\n              <div\n                key={item.label}\n                className={cn(\"relative rounded-b-lg\", i > 0 && \"-mt-5 pt-5\")}\n                style={{\n                  zIndex: items.length - i,\n                  background: `color-mix(in oklch, var(--foreground), var(--background) ${i * 5.5}%)`,\n                }}\n              >\n                <div\n                  id={`${id}-${i}`}\n                  className={cn(\n                    \"grid transition-[grid-template-rows] duration-500 ease-in-out motion-reduce:transition-none\",\n                    isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\",\n                  )}\n                >\n                  <div className=\"min-h-0 overflow-hidden\" aria-hidden={!isOpen}>\n                    <div className=\"min-h-[calc(88svh-14.375rem)] px-5 pt-[5.625rem] pb-6 lg:grid lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_17.125rem_17.125rem] lg:gap-7 lg:px-[7.2rem] lg:pt-10 lg:pb-3\">\n                      <div className=\"hidden lg:col-start-2 lg:row-start-1 lg:block\">\n                        <Photo>{item.media?.[0]}</Photo>\n                      </div>\n                      <div className=\"hidden lg:col-start-3 lg:row-start-1 lg:mt-20 lg:block\">\n                        <Photo>{item.media?.[1]}</Photo>\n                      </div>\n                      <div className=\"lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:justify-end\">\n                        <div className=\"lg:hidden\">\n                          <Photo>{item.media?.[0]}</Photo>\n                        </div>\n                        <h3 className=\"mt-6 text-lg leading-[1.35] font-medium lg:mt-0 lg:max-w-[10em] lg:text-4xl lg:leading-[1.2]\">{item.title}</h3>\n                        {item.text && <p className=\"mt-3 hidden max-w-[22.5rem] text-sm leading-[1.6] font-medium lg:block\">{item.text}</p>}\n                      </div>\n                    </div>\n                  </div>\n                </div>\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  aria-controls={`${id}-${i}`}\n                  onClick={() => setOpen(i)}\n                  className=\"flex h-[2.875rem] w-full items-center gap-2.5 px-5 text-left text-xs uppercase lg:h-14 lg:gap-3 lg:px-[7.2rem] lg:text-sm lg:font-medium\"\n                >\n                  <span>{String(i + 1).padStart(2, \"0\")}.</span>\n                  <span>{item.label}</span>\n                </button>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n\nfunction Photo({ children }: { children?: ReactNode }) {\n  return (\n    <div className=\"aspect-[318/240] overflow-clip rounded-lg bg-background/10 lg:aspect-[329/384] [&>*]:size-full [&>*]:object-cover\">\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "LedupValue[]",
+      "required": true,
+      "description": "the rows, top to bottom (five in the original)"
+    },
+    {
+      "name": "initial",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which row starts open"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47b75da20facc60805a71a7a2a253a1d243f07fbfcac26b5263e00e6edb19593"
+}

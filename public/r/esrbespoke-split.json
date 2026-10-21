@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke split heading",
+  "description": "A big two-line heading at the left half and, from column 7, either a paragraph in 20px text or a short list of label / value rows separated by hairlines (tiny capital label, value in 20px). Used alone it is just the heading with generous air below.",
+  "category": "features",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "split",
+    "two-column",
+    "details",
+    "definition-list",
+    "hairline",
+    "minimal",
+    "editorial"
+  ],
+  "notes": [
+    "give either body or rows (or neither, for a heading alone)",
+    "on phones the rows stack label above value"
+  ],
+  "entry": "esrbespoke-split.tsx",
+  "source": "foundry",
+  "name": "esrbespoke-split",
+  "files": [
+    {
+      "path": "esrbespoke-split.tsx",
+      "content": "import { EsrbespokeLabel } from \"@foundry/esrbespoke-label\";\nimport { toneClass, type EsrbespokeTone } from \"@foundry/esrbespoke-tone\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EsrbespokeSplitRow {\n  /** the tiny label */\n  label: string;\n  /** the value, one line each */\n  value: string[];\n  /** makes the value a link (tel:, mailto:…) */\n  href?: string;\n}\n\nexport interface EsrbespokeSplitProps {\n  /** the big heading at the left */\n  heading: string;\n  /** paragraphs from column 7 */\n  body?: string[];\n  /** label / value rows from column 7 */\n  rows?: EsrbespokeSplitRow[];\n  tone?: EsrbespokeTone;\n  id?: string;\n  className?: string;\n}\n\nconst text = \"font-display text-[0.9375rem] leading-[1.2] font-medium tracking-[-0.01em] font-stretch-[106%] lg:text-[1.25rem]\";\n\n/** Big heading at the left; a paragraph or label/value rows at column 7. */\nexport function EsrbespokeSplit({ heading, body, rows, tone = \"light\", id, className }: EsrbespokeSplitProps) {\n  return (\n    <section id={id} className={cn(toneClass(tone), \"px-gutter pt-8 pb-20 lg:pb-32\", className)}>\n      <div className=\"grid grid-cols-2 gap-x-4 lg:grid-cols-12\">\n        <h2 className=\"col-span-2 max-w-[11em] font-display text-[2.375rem] leading-[0.95] font-medium tracking-[-0.01em] font-stretch-[106%] lg:col-span-6 lg:text-[3.875rem]\">\n          {heading}\n        </h2>\n        {body && (\n          <div className=\"col-span-2 mt-8 space-y-6 lg:col-span-6 lg:col-start-7 lg:mt-0\">\n            {body.map((p, i) => (\n              <p key={i} className={text}>{p}</p>\n            ))}\n          </div>\n        )}\n        {rows && (\n          <dl className=\"col-span-2 mt-10 lg:col-span-6 lg:col-start-7 lg:mt-0\">\n            {rows.map((row, i) => (\n              <div key={i} className=\"grid gap-y-6 border-t border-border pt-4 pb-10 lg:grid-cols-6 lg:gap-x-4 lg:pt-3 lg:pb-2.5 lg:first:border-t-0 lg:first:pt-1\">\n                <dt className=\"lg:col-span-2\">\n                  <EsrbespokeLabel className=\"text-[0.8125rem] leading-none lg:pt-1\">{row.label}</EsrbespokeLabel>\n                </dt>\n                <dd className={cn(text, \"lg:col-span-4\")}>\n                  {row.href ? (\n                    <a href={row.href} className=\"transition-opacity duration-300 hover:opacity-50\">\n                      {row.value.map((v, j) => <span key={j} className=\"block\">{v}</span>)}\n                    </a>\n                  ) : (\n                    row.value.map((v, j) => <span key={j} className=\"block\">{v}</span>)\n                  )}\n                </dd>\n              </div>\n            ))}\n          </dl>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "esrbespoke-label",
+    "esrbespoke-tone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big heading at the left"
+    },
+    {
+      "name": "body",
+      "type": "string[]",
+      "required": false,
+      "description": "paragraphs from column 7"
+    },
+    {
+      "name": "rows",
+      "type": "EsrbespokeSplitRow[]",
+      "required": false,
+      "description": "label / value rows from column 7"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "light"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "583dcf7310479e52d8c4c7b827a8f65657bb1ea7a321a70c4f2cc1f9f2c41764"
+}

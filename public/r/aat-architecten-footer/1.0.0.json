@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "AAT Architecten footer",
+  "description": "A sparse white footer under a single light hairline: wordmark, then address, mail and phone, and socials. From 1024px they sit in five columns with a page list (the current page in ink, the rest grey) and a row of small print on the same columns; on phones they stack, with the small print spread across the bottom. Grey links darken and ink links fade to grey over 0.6s on hover.",
+  "category": "footer",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "minimal",
+    "white",
+    "monochrome",
+    "columns",
+    "architecture",
+    "contact",
+    "hover"
+  ],
+  "notes": [
+    "the page list is hidden on phones, as on the original (the header's menu carries it)",
+    "the columns match aat-architecten-header's: the second starts 27% into the content width"
+  ],
+  "entry": "aat-architecten-footer.tsx",
+  "source": "foundry",
+  "name": "aat-architecten-footer",
+  "files": [
+    {
+      "path": "aat-architecten-footer.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { AatArchitectenWordmark } from \"@foundry/aat-architecten-wordmark\";\n\nexport interface AatArchitectenFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface AatArchitectenFooterNavLink extends AatArchitectenFooterLink {\n  /** the page you are on: shown in ink instead of grey */\n  current?: boolean;\n}\n\nexport interface AatArchitectenFooterProps {\n  /** the studio name in the wordmark */\n  brand: string;\n  /** the small word after the wordmark's hairline */\n  descriptor?: string;\n  homeHref?: string;\n  /** the page list (desktop only) */\n  nav: AatArchitectenFooterNavLink[];\n  /** the address, one entry per line */\n  address: string[];\n  /** where the address links (e.g. a map) */\n  addressHref?: string;\n  /** mail, phone… one per line */\n  contacts: AatArchitectenFooterLink[];\n  /** social profiles, one per line */\n  socials: AatArchitectenFooterLink[];\n  /** the copyright line */\n  copyright: string;\n  /** small legal links (privacy, cookies) */\n  legal: AatArchitectenFooterLink[];\n  /** a registration or licence line */\n  registration?: string;\n  /** a small italic credit at the far right (e.g. who made the site) */\n  credit?: AatArchitectenFooterLink;\n  className?: string;\n}\n\nconst fade = \"transition-colors duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\";\n// Five columns from 1024px; the second starts 27% in, as in the header.\nconst columns = \"lg:grid-cols-[27.3fr_18.2fr_22.7fr_22.8fr_9fr]\";\n\nexport function AatArchitectenFooter({\n  brand,\n  descriptor,\n  homeHref = \"/\",\n  nav,\n  address,\n  addressHref,\n  contacts,\n  socials,\n  copyright,\n  legal,\n  registration,\n  credit,\n  className,\n}: AatArchitectenFooterProps) {\n  const inkLink = cn(\"hover:text-muted-foreground\", fade);\n  return (\n    <footer className={cn(\"border-t border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-20 pb-11 lg:pt-28\">\n        <div className={cn(\"grid grid-cols-1 text-base leading-[1.75] lg:text-xl lg:leading-[1.9]\", columns)}>\n          <div>\n            <AatArchitectenWordmark name={brand} descriptor={descriptor} href={homeHref} />\n          </div>\n\n          <ul className=\"hidden lg:block\">\n            {nav.map((link) => (\n              <li key={link.href}>\n                <a\n                  href={link.href}\n                  aria-current={link.current ? \"page\" : undefined}\n                  className={cn(link.current ? \"text-foreground\" : \"text-muted-foreground hover:text-foreground\", fade)}\n                >\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n\n          <address className=\"mt-[4.5rem] not-italic lg:mt-0\">\n            {addressHref ? (\n              <a href={addressHref} className={cn(\"block\", inkLink)}>\n                {address.map((line) => (\n                  <span key={line} className=\"block\">\n                    {line}\n                  </span>\n                ))}\n              </a>\n            ) : (\n              address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))\n            )}\n          </address>\n\n          <ul className=\"mt-4 lg:mt-0\">\n            {contacts.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className={inkLink}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n\n          <ul className=\"mt-4 lg:mt-0\">\n            {socials.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className={inkLink}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        {/* small print: spread over three columns on phones, on the five columns from 1024px */}\n        <div className={cn(\"mt-[4.5rem] grid grid-cols-3 items-baseline gap-y-7 text-[0.8125rem] leading-none lg:mt-[7.5rem] lg:text-base\", columns)}>\n          <span>{copyright}</span>\n          {legal.map((link, i) => (\n            <a\n              key={link.href}\n              href={link.href}\n              className={cn(i === 0 ? \"justify-self-center\" : \"justify-self-end\", \"lg:justify-self-start\", inkLink)}\n            >\n              {link.label}\n            </a>\n          ))}\n          {registration && <span className=\"col-span-2 lg:col-span-1\">{registration}</span>}\n          {credit && (\n            <a href={credit.href} className={cn(\"col-start-3 justify-self-end text-base italic lg:col-start-auto\", inkLink)}>\n              {credit.label}\n            </a>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "aat-architecten-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the studio name in the wordmark"
+    },
+    {
+      "name": "descriptor",
+      "type": "string",
+      "required": false,
+      "description": "the small word after the wordmark's hairline"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "nav",
+      "type": "AatArchitectenFooterNavLink[]",
+      "required": true,
+      "description": "the page list (desktop only)"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "the address, one entry per line"
+    },
+    {
+      "name": "addressHref",
+      "type": "string",
+      "required": false,
+      "description": "where the address links (e.g. a map)"
+    },
+    {
+      "name": "contacts",
+      "type": "AatArchitectenFooterLink[]",
+      "required": true,
+      "description": "mail, phone… one per line"
+    },
+    {
+      "name": "socials",
+      "type": "AatArchitectenFooterLink[]",
+      "required": true,
+      "description": "social profiles, one per line"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "AatArchitectenFooterLink[]",
+      "required": true,
+      "description": "small legal links (privacy, cookies)"
+    },
+    {
+      "name": "registration",
+      "type": "string",
+      "required": false,
+      "description": "a registration or licence line"
+    },
+    {
+      "name": "credit",
+      "type": "AatArchitectenFooterLink",
+      "required": false,
+      "description": "a small italic credit at the far right (e.g. who made the site)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ffa3fec5d8363ca3d921e6e78bb055875d935865fe93887fbe3525abb3012f9d"
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup statement",
+  "description": "A manifesto band: a huge two-line grotesk heading centred on white (9vw), two small grey notes placed on a 15-column grid beneath it, then a full-bleed photo (2.4:1 on desktop, 3:2 on phones). The heading lines and notes rise from their masks as they enter; the photo travels slowly through its frame.",
+  "category": "features",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "manifesto",
+    "heading",
+    "huge-type",
+    "full-bleed",
+    "photo",
+    "parallax",
+    "reveal",
+    "minimal",
+    "monochrome",
+    "grid"
+  ],
+  "notes": [
+    "CSS only: reveals and parallax are scroll-driven and simply don't happen without support"
+  ],
+  "entry": "kononenkogroup-statement.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-statement",
+  "files": [
+    {
+      "path": "kononenkogroup-statement.css",
+      "content": "/* The photo sits on a layer 30% taller than its frame and travels through it as the frame\n   crosses the window: the original's inner parallax. */\n.kononenkogroup-statement-frame {\n  view-timeline-name: --kononenkogroup-statement;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-statement-layer {\n      animation: kononenkogroup-statement-parallax linear both;\n      animation-timeline: --kononenkogroup-statement;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes kononenkogroup-statement-parallax {\n  from {\n    transform: translateY(-16%);\n  }\n  to {\n    transform: translateY(16%);\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-statement.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupMedia } from \"@foundry/kononenkogroup-media\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-statement.css\";\n\nexport interface KononenkogroupStatementProps {\n  /** the huge centred heading, one item per line */\n  heading: string[];\n  /** two short grey notes under it (side by side on wide screens) */\n  notes: string[];\n  /** the full-bleed photo under the notes */\n  media?: ReactNode;\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\n\n/**\n * A manifesto band: a huge two-line grotesk heading centred on white, two small grey notes on\n * the grid beneath, then a full-bleed photo. The heading's lines and the notes rise into view;\n * the photo travels slowly through its frame (parallax).\n */\nexport function KononenkogroupStatement({ heading, notes, media, className }: KononenkogroupStatementProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <KononenkogroupLines\n        as=\"h2\"\n        text={heading}\n        className=\"px-gutter text-center font-sans text-[10.67vw] leading-[0.85] tracking-[-0.045em] lg:text-[9.115vw] lg:leading-[0.82]\"\n      />\n      <div className=\"mt-[7vw] grid gap-[5vw] px-gutter text-center text-muted-foreground lg:mt-[3.2vw] lg:grid-cols-15 lg:gap-x-[1.11vw] lg:text-left\">\n        {notes.map((note, i) => (\n          <KononenkogroupLines\n            key={i}\n            text={note}\n            className={cn(small, \"mx-auto max-w-[88vw] lg:col-span-3 lg:mx-0 lg:max-w-none\", i === 0 ? \"lg:col-start-5\" : \"lg:col-start-9\")}\n          />\n        ))}\n      </div>\n      <div className=\"kononenkogroup-statement-frame relative mt-[16vw] aspect-[3/2] overflow-clip lg:mt-[7.3vw] lg:aspect-[1440/590]\">\n        <div className=\"kononenkogroup-statement-layer absolute inset-x-0 -inset-y-[25%]\">\n          <KononenkogroupMedia media={media} className=\"size-full\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-media"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string[]",
+      "required": true,
+      "description": "the huge centred heading, one item per line"
+    },
+    {
+      "name": "notes",
+      "type": "string[]",
+      "required": true,
+      "description": "two short grey notes under it (side by side on wide screens)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed photo under the notes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1dcebb06b1bfb870e26d4a03599bba35f7a716be4147189cdd80f1f6d41d29a8"
+}

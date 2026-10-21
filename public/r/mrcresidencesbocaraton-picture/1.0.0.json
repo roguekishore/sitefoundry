@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mr C Residences picture band",
+  "description": "A full-bleed image or video band, as tall as the window on desktop (or a wide 1440:753 frame), with tiny white uppercase captions in its bottom corners. The picture is taller than its frame and slides down through it while the band crosses the window, a slow scrubbed parallax.",
+  "category": "gallery",
+  "site": "mrcresidencesbocaraton",
+  "license": "proprietary",
+  "tags": [
+    "image",
+    "video",
+    "fullscreen",
+    "full-bleed",
+    "parallax",
+    "scrubbed",
+    "scroll",
+    "caption",
+    "minimal"
+  ],
+  "notes": [
+    "phones: a 390:293 frame; desktop: the window's height (size 'window') or 1440:753 (size 'wide')",
+    "the media fills the frame like object-fit cover; empty, a soft highlight-to-secondary placeholder",
+    "the captions are primary-foreground (white) and assume a picture under them"
+  ],
+  "entry": "mrcresidencesbocaraton-picture.tsx",
+  "source": "foundry",
+  "name": "mrcresidencesbocaraton-picture",
+  "files": [
+    {
+      "path": "mrcresidencesbocaraton-picture.css",
+      "content": "/* The picture layer overhangs the frame by the drift at top and bottom, and slides from\n   -drift to +drift while the frame crosses the window: it moves slower than the page. */\n.mrcresidencesbocaraton-picture-layer {\n  --mrc-picture-drift: 14px;\n  top: calc(var(--mrc-picture-drift) * -1);\n  bottom: calc(var(--mrc-picture-drift) * -1);\n}\n\n@media (min-width: 64rem) {\n  .mrcresidencesbocaraton-picture-layer {\n    --mrc-picture-drift: 60px;\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mrcresidencesbocaraton-picture-layer {\n      animation: mrcresidencesbocaraton-picture-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes mrcresidencesbocaraton-picture-drift {\n  from {\n    transform: translateY(calc(var(--mrc-picture-drift) * -1));\n  }\n  to {\n    transform: translateY(var(--mrc-picture-drift));\n  }\n}\n"
+    },
+    {
+      "path": "mrcresidencesbocaraton-picture.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./mrcresidencesbocaraton-picture.css\";\n\nexport interface MrcresidencesbocaratonPictureProps {\n  /** an <img> or <video>; it covers the frame. Empty: a placeholder */\n  media?: ReactNode;\n  /** desktop height: the window's height, or a wide 1440:753 frame */\n  size?: \"window\" | \"wide\";\n  /** tiny caption at the bottom left (what the picture shows) */\n  caption?: string;\n  /** tiny note at the bottom right (e.g. \"artist's impression\") */\n  note?: string;\n  className?: string;\n}\n\nexport function MrcresidencesbocaratonPicture({ media, size = \"window\", caption, note, className }: MrcresidencesbocaratonPictureProps) {\n  return (\n    <section\n      className={cn(\n        \"relative aspect-[390/293] w-full overflow-clip bg-muted\",\n        size === \"window\" ? \"lg:aspect-auto lg:h-svh\" : \"lg:aspect-[1440/753]\",\n        className,\n      )}\n    >\n      <div className=\"mrcresidencesbocaraton-picture-layer absolute inset-x-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n        {media ?? <div aria-hidden className=\"size-full bg-linear-to-b from-muted via-highlight to-secondary/70\" />}\n      </div>\n      {(caption || note) && (\n        <div className=\"absolute inset-x-5 bottom-2.5 flex items-end justify-between gap-6 text-[9px] leading-[1.15] font-semibold text-primary-foreground uppercase lg:bottom-6\">\n          <span>{caption}</span>\n          <span className=\"text-right\">{note}</span>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an <img> or <video>; it covers the frame. Empty: a placeholder"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "window",
+      "description": "desktop height: the window's height, or a wide 1440:753 frame"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "tiny caption at the bottom left (what the picture shows)"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "tiny note at the bottom right (e.g. \"artist's impression\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9342bf71d9914d391c0d0ef87258bc56870701aaccdf8b1c989e32cdd8d7d0d8"
+}

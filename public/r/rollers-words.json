@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rollers words",
+  "description": "A two-tone heading (one sentence, part in the text colour, part in orange or the highlight) whose words rise about a line-height and fade in one after another as it scrolls into view. CSS view timeline only.",
+  "category": "text-effect",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "split-text",
+    "reveal",
+    "stagger",
+    "scroll",
+    "two-tone",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: without scroll-driven animation support, and under reduced motion, the heading shows in place",
+    "the rise is 1.1em, so it scales with the heading size",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "rollers-words.tsx",
+  "source": "foundry",
+  "name": "rollers-words",
+  "files": [
+    {
+      "path": "rollers-words.css",
+      "content": "/* Each word rises ~1.1em (75px at 68px type, 36px at 33px) and fades in over 150px of scroll\n   after it enters the window; each next word starts 6px of scroll later. A fixed distance,\n   so headings already in the first screen are in place at load. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rollers-words .rollers-words-w {\n      animation: rollers-words-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--rollers-words-i, 0) * 6px) entry calc(150px + var(--rollers-words-i, 0) * 6px);\n    }\n  }\n}\n\n@keyframes rollers-words-rise {\n  from {\n    opacity: 0;\n    transform: translateY(1.1em);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "rollers-words.tsx",
+      "content": "import type { CSSProperties, ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rollers-words.css\";\n\nexport interface RollersWordsSegment {\n  /** the words of this part of the sentence */\n  text: string;\n  /** base: the block's text colour · accent: the brand orange · highlight: the theme's second emphasis colour (navy on the blue band) */\n  tone?: \"base\" | \"accent\" | \"highlight\";\n  /** start this part on a new line */\n  newLine?: boolean;\n}\n\nexport interface RollersWordsProps {\n  /** the heading as parts, each in its own colour (one sentence, two tones) */\n  segments: RollersWordsSegment[];\n  /** the element to render (h2 by default) */\n  as?: ElementType;\n  /** false: no word-by-word reveal (for a first-screen heading) */\n  reveal?: boolean;\n  className?: string;\n}\n\nconst tones = { base: \"\", accent: \"text-primary\", highlight: \"text-highlight\" };\n\n/** A two-tone heading whose words rise about one line-height and fade in, one after another,\n    as it scrolls into view (CSS view timeline; static and in place without support or under\n    reduced motion). */\nexport function RollersWords({ segments, as: Tag = \"h2\", reveal = true, className }: RollersWordsProps) {\n  let index = 0;\n  return (\n    <Tag className={cn(reveal && \"rollers-words\", className)}>\n      {segments.map((segment, s) => {\n        const words = segment.text.split(/\\s+/).filter(Boolean);\n        return (\n          <span key={s} className={tones[segment.tone ?? \"base\"]}>\n            {segment.newLine && s > 0 ? <br /> : s > 0 ? \" \" : null}\n            {words.map((word, w) => {\n              const i = index++;\n              return (\n                <span key={w}>\n                  {w > 0 ? \" \" : null}\n                  <span className=\"rollers-words-w inline-block\" style={{ \"--rollers-words-i\": i } as CSSProperties}>\n                    {word}\n                  </span>\n                </span>\n              );\n            })}\n          </span>\n        );\n      })}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "segments",
+      "type": "RollersWordsSegment[]",
+      "required": true,
+      "description": "the heading as parts, each in its own colour (one sentence, two tones)"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render (h2 by default)"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "false: no word-by-word reveal (for a first-screen heading)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1c8c8e819b6924648db791f048f177a1e56b470843acb4fd2e6fad2b1b4ab8fa"
+}

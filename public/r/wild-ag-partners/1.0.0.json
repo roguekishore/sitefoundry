@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG partners",
+  "description": "A partner ticker on paper: a gradient serif-italic title, then a full-bleed row of light tiles with 16px corners (277×186 on desktop, 205×168 on phones), each holding a partner's mark, sliding sideways forever. With tuck it pulls up under a rounded band above it, so the band's corners sit on this section.",
+  "category": "logos",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "partners",
+    "logos",
+    "ticker",
+    "marquee",
+    "loop",
+    "tiles",
+    "minimal",
+    "serif"
+  ],
+  "notes": [
+    "each tile takes an optional logo (media); without one it shows the partner's name in the display serif",
+    "CSS only; the row stands still under reduced motion",
+    "tuck assumes the block above is one of this site's rounded bands (z-10)"
+  ],
+  "entry": "wild-ag-partners.tsx",
+  "source": "foundry",
+  "name": "wild-ag-partners",
+  "files": [
+    {
+      "path": "wild-ag-partners.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgHeading } from \"@foundry/wild-ag-heading\";\nimport { WildAgTicker } from \"@foundry/wild-ag-ticker\";\n\nexport interface WildAgPartner {\n  /** the partner's name; shown when there's no logo, and as the logo's label */\n  name: string;\n  /** a logo image. Empty: the name in the display serif */\n  media?: ReactNode;\n}\n\nexport interface WildAgPartnersProps {\n  /** an id for in-page links */\n  id?: string;\n  title: string;\n  partners: WildAgPartner[];\n  /** seconds for the row to pass once */\n  duration?: number;\n  /** pull up under the rounded band above by its corner radius */\n  tuck?: boolean;\n  className?: string;\n}\n\nexport function WildAgPartners({ id, title, partners, duration = 14.5, tuck = false, className }: WildAgPartnersProps) {\n  // repeat short lists so one copy is always wider than the window\n  const row = partners.length < 6 ? [...partners, ...partners] : partners;\n  return (\n    <section\n      id={id}\n      className={cn(\n        \"bg-background py-section\",\n        tuck &&\n          \"-mt-[calc(var(--radius)*3.4)] pt-[calc(var(--section-y)+var(--radius)*3.4)] lg:-mt-[calc(var(--radius)*4.5)] lg:pt-[calc(var(--section-y)+var(--radius)*4.5)]\",\n        className,\n      )}\n    >\n      <div className=\"px-gutter\">\n        <div className=\"mx-auto max-w-page\">\n          <WildAgHeading>{title}</WildAgHeading>\n        </div>\n      </div>\n      <ul className=\"sr-only\">\n        {partners.map((p) => (\n          <li key={p.name}>{p.name}</li>\n        ))}\n      </ul>\n      <WildAgTicker duration={duration} gap=\"1rem\" className=\"mt-8\">\n        {row.map((p, i) => (\n          <div\n            key={i}\n            aria-hidden\n            className=\"flex h-[10.5rem] w-[12.8rem] shrink-0 items-center justify-center rounded-lg bg-card px-6 lg:h-[11.6rem] lg:w-[17.3rem]\"\n          >\n            {p.media ?? (\n              <span className=\"text-center font-display text-[1.6rem] leading-tight text-primary/80 italic lg:text-[1.9rem]\">{p.name}</span>\n            )}\n          </div>\n        ))}\n      </WildAgTicker>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-heading",
+    "wild-ag-ticker"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "partners",
+      "type": "WildAgPartner[]",
+      "required": true
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "14.5",
+      "description": "seconds for the row to pass once"
+    },
+    {
+      "name": "tuck",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "pull up under the rounded band above by its corner radius"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "22feac598116d8e8bde33adaec8d8a46d6bf92499c8c23eb9f87422ca5152a2d"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline story",
+  "description": "An origin story: a large light headline and a plain paragraph in the left half, and in the right half a white polaroid frame with a soft shadow holding a portrait photo and a handwritten caption. The headline's letters rise into place as it scrolls in; the polaroid fades in and rises 32px.",
+  "category": "features",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "story",
+    "polaroid",
+    "photo",
+    "handwritten",
+    "editorial",
+    "light",
+    "split",
+    "reveal",
+    "scroll",
+    "letters"
+  ],
+  "notes": [
+    "the caption uses the theme's --typeface-hand when it has one (lunchline-theme: Reenie Beanie), otherwise the display face",
+    "phones: the polaroid runs full width under the text"
+  ],
+  "entry": "lunchline-story.tsx",
+  "source": "foundry",
+  "name": "lunchline-story",
+  "files": [
+    {
+      "path": "lunchline-story.css",
+      "content": "/* The polaroid fades in and rises 32px as it enters (a fixed distance, so a tall frame in\n   the first screen isn't left half-faded). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-story-polaroid {\n      animation: lunchline-story-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 220px;\n    }\n  }\n}\n\n@keyframes lunchline-story-rise {\n  from {\n    opacity: 0;\n    transform: translateY(2rem);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-story.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineLetterRise } from \"@foundry/lunchline-letter-rise\";\nimport \"./lunchline-story.css\";\n\nexport interface LunchlineStoryProps {\n  /** the light headline; its letters rise in as it scrolls into view */\n  heading: string;\n  /** the story, one entry per paragraph */\n  paragraphs: string[];\n  /** the photo inside the white polaroid frame (portrait, 0.79). Empty: a placeholder. */\n  media?: ReactNode;\n  /** the handwritten caption under the photo */\n  caption: string;\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nexport function LunchlineStory({ heading, paragraphs, media, caption, id, className }: LunchlineStoryProps) {\n  return (\n    <section id={id} className={cn(\"bg-background py-section text-foreground lg:pt-[7.6rem] lg:pb-[7.5rem]\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-10 px-gutter lg:grid-cols-2 lg:gap-12\">\n        <div>\n          <LunchlineLetterRise\n            text={heading}\n            className=\"font-display text-[2.375rem] leading-[1.2] font-light tracking-[-0.01em] lg:max-w-[41rem] lg:text-[3.5rem]\"\n          />\n          <div className=\"mt-4 space-y-4 text-lg leading-[1.4] lg:max-w-[41rem] lg:text-[1.3125rem]\">\n            {paragraphs.map((p, i) => (\n              <p key={i}>{p}</p>\n            ))}\n          </div>\n        </div>\n\n        <figure className=\"lunchline-story-polaroid w-full bg-card p-2 pb-0 text-card-foreground shadow-[0_4px_12px] shadow-foreground/10 lg:mt-6 lg:w-[20.4rem] lg:mr-[6.9rem] lg:self-start lg:justify-self-end lg:p-4 lg:pb-0\">\n          <div className=\"relative aspect-[0.79] w-full overflow-clip [&>img]:size-full [&>img]:object-cover\">\n            {media ?? <div className=\"size-full bg-muted\" />}\n          </div>\n          <figcaption className=\"py-3 text-center font-[family-name:var(--typeface-hand,var(--typeface-display))] text-[2rem] leading-none lg:py-3.5 lg:text-[1.85rem]\">\n            {caption}\n          </figcaption>\n        </figure>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-letter-rise"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light headline; its letters rise in as it scrolls into view"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "the story, one entry per paragraph"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo inside the white polaroid frame (portrait, 0.79). Empty: a placeholder."
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "the handwritten caption under the photo"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e3096dab6e24768a402d403caa57fbf733362272a987a5b0b8bf192b7397ee3b"
+}

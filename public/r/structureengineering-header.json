@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Structure engineering header",
+  "description": "A fixed overlay header. Desktop: a big single-letter logo at the far left and a row of small white uppercase-mono pills 2px apart, each inverting to ink on hover in 0.25s. Phones: a black bar with a looping marquee line and a contact link pinned at its end, then the logo beside two white boxes, Menu and a shortcut; Menu opens a full-screen ink panel of large links. The logo turns white over the dark photo sections and is ink everywhere else.",
+  "category": "header",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "pills",
+    "mono",
+    "marquee",
+    "loop",
+    "menu",
+    "minimal"
+  ],
+  "notes": [
+    "fixed: it overlays the page; the first section should be a full-bleed hero",
+    "the logo turns white over any section marked data-tone=\"dark\" (the hero, statement and feature blocks set it); mark your own dark sections the same way",
+    "the white pills stay white over every section (the original turns them transparent over white sections)"
+  ],
+  "entry": "structureengineering-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "structureengineering-header",
+  "files": [
+    {
+      "path": "structureengineering-header.css",
+      "content": "/* The phone bar's line runs left forever: the track holds the line twice and slides by half. */\n.structureengineering-header-marquee {\n  animation: structureengineering-header-marquee 20s linear infinite;\n}\n\n@keyframes structureengineering-header-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .structureengineering-header-marquee { animation: none; }\n}\n"
+    },
+    {
+      "path": "structureengineering-header.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { ArrowRight, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./structureengineering-header.css\";\n\nexport interface StructureengineeringLink {\n  /** the link text (set in uppercase mono) */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface StructureengineeringHeaderProps {\n  /** the logo: a short mark (one or two letters) typeset in the display face */\n  brand: { mark: string; name: string; href: string };\n  /** the main links: a row of white pills at desktop, the menu panel on phones */\n  links: StructureengineeringLink[];\n  /** the line that scrolls along the black bar on phones */\n  marquee: string;\n  /** the fixed link at the right end of that bar */\n  contact: StructureengineeringLink;\n  /** the second box beside \"Menu\" on phones */\n  shortcut: StructureengineeringLink;\n  /** the label of the phone menu button */\n  menuLabel: string;\n  /** the accessible label of the menu's close button */\n  closeLabel: string;\n  className?: string;\n}\n\nconst pill =\n  \"flex items-center rounded-md border border-transparent bg-secondary font-mono text-base leading-none text-secondary-foreground uppercase transition-colors duration-250 ease-out hover:border-background hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background motion-reduce:transition-none\";\n\n// A fixed header that overlays the page. Desktop: the logo at the far left and a row of small\n// white mono pills. Phones: a black bar with a looping marquee and a contact link, then the logo\n// with \"Menu\" and a shortcut box; Menu opens a full-screen ink panel. The logo is white with\n// switches to white whenever the section under it is marked data-tone=\"dark\" (the photo\n// sections), and is ink everywhere else.\nexport function StructureengineeringHeader({ brand, links, marquee, contact, shortcut, menuLabel, closeLabel, className }: StructureengineeringHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [onDark, setOnDark] = useState(false);\n  const logoRef = useRef<HTMLAnchorElement>(null);\n\n  // Look at what's under the logo after every scroll frame: white over dark sections.\n  useEffect(() => {\n    const logo = logoRef.current;\n    if (!logo) return;\n    let frame = 0;\n    const check = () => {\n      frame = 0;\n      const r = logo.getBoundingClientRect();\n      const under = document.elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2);\n      const hit = under.find((el) => !logo.contains(el) && el.closest(\"[data-tone]\"));\n      setOnDark(hit?.closest(\"[data-tone]\")?.getAttribute(\"data-tone\") === \"dark\");\n    };\n    const schedule = () => {\n      if (!frame) frame = requestAnimationFrame(check);\n    };\n    check();\n    window.addEventListener(\"scroll\", schedule, { passive: true });\n    window.addEventListener(\"resize\", schedule);\n    return () => {\n      cancelAnimationFrame(frame);\n      window.removeEventListener(\"scroll\", schedule);\n      window.removeEventListener(\"resize\", schedule);\n    };\n  }, []);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  const repeated = Array.from({ length: 6 }, () => marquee);\n\n  return (\n    <>\n      <header className={cn(\"fixed inset-x-0 top-0 z-40\", className)}>\n        {/* phones: the black marquee bar */}\n        <div className=\"relative flex h-[2.875rem] items-center overflow-clip bg-primary font-mono text-base text-primary-foreground uppercase lg:hidden\">\n          <div aria-hidden className=\"structureengineering-header-marquee flex w-max shrink-0 whitespace-nowrap\">\n            {[0, 1].map((half) => (\n              <span key={half} className=\"flex\">\n                {repeated.map((line, i) => (\n                  <span key={i}>{line}</span>\n                ))}\n              </span>\n            ))}\n          </div>\n          <span className=\"sr-only\">{marquee}</span>\n          <a href={contact.href} className=\"absolute inset-y-0 right-0 flex items-center gap-2 bg-primary pr-2 pl-3\">\n            {contact.label}\n            <ArrowRight className=\"size-4\" strokeWidth={1.25} />\n          </a>\n        </div>\n\n        <div className=\"flex items-start pt-3.5 pl-[4.25rem] pr-5 lg:pt-7 lg:pl-24 lg:pr-gutter\">\n          {/* phones: Menu + shortcut */}\n          <div className=\"grid flex-1 grid-cols-2 gap-[3px] lg:hidden\">\n            <button type=\"button\" onClick={() => setOpen(true)} aria-expanded={open} className={cn(pill, \"h-[2.625rem] justify-center gap-2\")}>\n              {menuLabel}\n              <Menu className=\"size-4\" strokeWidth={1.25} />\n            </button>\n            <a href={shortcut.href} className={cn(pill, \"h-[2.625rem] justify-center\")}>\n              {shortcut.label}\n            </a>\n          </div>\n\n          {/* desktop: the pill row */}\n          <nav className=\"hidden lg:block\">\n            <ul className=\"flex flex-wrap gap-0.5\">\n              {links.map((link) => (\n                <li key={link.label}>\n                  <a href={link.href} className={cn(pill, \"h-[2.3rem] px-5\")}>\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n        </div>\n      </header>\n\n      <a\n        ref={logoRef}\n        href={brand.href}\n        aria-label={brand.name}\n        className={cn(\n          \"fixed top-[3.6rem] left-2 z-50 font-display text-[3.25rem] leading-none font-medium tracking-tight transition-colors duration-250 motion-reduce:transition-none lg:top-[1.15rem] lg:left-7 lg:text-[3.4rem]\",\n          onDark ? \"text-card dark:text-card-foreground\" : \"text-foreground\",\n        )}\n      >\n        {brand.mark}\n      </a>\n\n      {/* phones: the menu panel */}\n      <div\n        className={cn(\n          \"fixed inset-0 z-[60] flex flex-col bg-primary px-gutter pt-4 pb-10 text-primary-foreground transition-[opacity,visibility] duration-400 ease-out motion-reduce:transition-none lg:hidden\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n        aria-hidden={!open}\n      >\n        <button\n          type=\"button\"\n          onClick={() => setOpen(false)}\n          aria-label={closeLabel}\n          className=\"ml-auto flex size-11 items-center justify-center rounded-md border border-primary-foreground transition-colors duration-250 hover:bg-primary-foreground hover:text-primary\"\n        >\n          <X className=\"size-5\" strokeWidth={1.25} />\n        </button>\n        <ul className=\"mt-10\">\n          {links.map((link) => (\n            <li key={link.label} className=\"border-b border-primary-foreground/25\">\n              <a href={link.href} onClick={() => setOpen(false)} className=\"block py-3 font-display text-[2.1rem] leading-tight tracking-tight\">\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ mark: string; name: string; href: string; }",
+      "required": true,
+      "description": "the logo: a short mark (one or two letters) typeset in the display face"
+    },
+    {
+      "name": "links",
+      "type": "StructureengineeringLink[]",
+      "required": true,
+      "description": "the main links: a row of white pills at desktop, the menu panel on phones"
+    },
+    {
+      "name": "marquee",
+      "type": "string",
+      "required": true,
+      "description": "the line that scrolls along the black bar on phones"
+    },
+    {
+      "name": "contact",
+      "type": "StructureengineeringLink",
+      "required": true,
+      "description": "the fixed link at the right end of that bar"
+    },
+    {
+      "name": "shortcut",
+      "type": "StructureengineeringLink",
+      "required": true,
+      "description": "the second box beside \"Menu\" on phones"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label of the phone menu button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "the accessible label of the menu's close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9d52d736673adade0b8f2ac2aafa220a90bfac94c7f8cbdc76de84f4d35570ba"
+}

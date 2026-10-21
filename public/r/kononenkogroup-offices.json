@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup offices",
+  "description": "A services statement in big serif with the first line indented by a column, then a hairline table of offices on the 15-column grid: name in ink, place and address in grey, a thin arrow at the row's end; on phones place and address stack. The statement rises line by line; each row rises as its hairline draws in from the left.",
+  "category": "contact",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "offices",
+    "locations",
+    "table",
+    "list",
+    "hairline",
+    "serif",
+    "statement",
+    "editorial",
+    "minimal",
+    "reveal",
+    "draw",
+    "monochrome"
+  ],
+  "notes": [
+    "rows with an href become links (hover dims them); CSS only, the reveals are scroll-driven"
+  ],
+  "entry": "kononenkogroup-offices.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-offices",
+  "files": [
+    {
+      "path": "kononenkogroup-offices.css",
+      "content": "/* Each row is its own view timeline: its hairline draws in from the left and its content\n   rises a little, so the table builds itself row by row as it scrolls in. */\n.kononenkogroup-offices-row {\n  view-timeline-name: --kononenkogroup-offices-row;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-offices-rule {\n      animation: kononenkogroup-offices-draw cubic-bezier(0.17, 0.84, 0.44, 1) both;\n      animation-timeline: --kononenkogroup-offices-row;\n      animation-range: entry 0px entry 260px;\n    }\n    .kononenkogroup-offices-cells {\n      animation: kononenkogroup-offices-rise cubic-bezier(0.17, 0.84, 0.44, 1) both;\n      animation-timeline: --kononenkogroup-offices-row;\n      animation-range: entry 0px entry 220px;\n    }\n  }\n}\n\n@keyframes kononenkogroup-offices-draw {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes kononenkogroup-offices-rise {\n  from {\n    transform: translateY(2.5vw);\n    opacity: 0;\n  }\n  to {\n    transform: none;\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-offices.tsx",
+      "content": "import { ArrowUpRight } from \"lucide-react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-offices.css\";\n\nexport interface KononenkogroupOffice {\n  /** e.g. \"Main studio\" */\n  name: string;\n  /** e.g. \"Portugal, Lisbon\" (grey) */\n  place: string;\n  /** street address (grey) */\n  address: string;\n  /** a map link; the row shows an arrow either way */\n  href?: string;\n}\n\nexport interface KononenkogroupOfficesProps {\n  /** the big serif statement above the table (first line indented) */\n  text: string;\n  /** small serif label beside the table */\n  label: string;\n  offices: KononenkogroupOffice[];\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\n\n/**\n * A services statement in big serif (first line indented by a column), then a hairline table of\n * offices: name, place and address in tiny type with a small arrow at the end of each row. The\n * statement rises line by line; the rows rise and their hairlines draw in from the left.\n */\nexport function KononenkogroupOffices({ text, label, offices, className }: KononenkogroupOfficesProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-section text-foreground\", className)}>\n      <KononenkogroupLines\n        as=\"h2\"\n        text={text}\n        className=\"font-display text-[9.6vw] leading-[0.9] tracking-[-0.03em] indent-[10.8vw] lg:text-[6.146vw] lg:indent-[6.53vw]\"\n      />\n      <div className=\"mt-[17vw] lg:mt-[6.4vw] lg:grid lg:grid-cols-15 lg:gap-x-[1.11vw]\">\n        <KononenkogroupLines text={label} className={cn(small, \"font-display tracking-[-0.01em] lg:col-span-1 lg:col-start-5 lg:pt-[0.45vw]\")} />\n        <ul className=\"mt-[10vw] border-b border-border lg:col-span-7 lg:col-start-6 lg:mt-0\">\n          {offices.map((office, i) => {\n            const Row = office.href ? \"a\" : \"div\";\n            return (\n              <li key={i} className=\"kononenkogroup-offices-row relative\">\n                <span aria-hidden className=\"kononenkogroup-offices-rule absolute inset-x-0 top-0 h-px origin-left bg-border\" />\n                <Row\n                  {...(office.href ? { href: office.href } : {})}\n                  className={cn(\n                    \"kononenkogroup-offices-cells grid grid-cols-[38.5vw_1fr_auto] gap-x-[2vw] py-[4.6vw] lg:grid-cols-7 lg:gap-x-[1.11vw] lg:py-[0.72vw]\",\n                    office.href && \"transition-opacity duration-300 hover:opacity-60\",\n                  )}\n                >\n                  <span className={cn(small, \"lg:col-span-2\")}>{office.name}</span>\n                  <span className={cn(small, \"text-muted-foreground lg:col-span-2\")}>{office.place}</span>\n                  <ArrowUpRight\n                    aria-hidden\n                    strokeWidth={1}\n                    className=\"col-start-3 row-span-2 row-start-1 size-[4vw] text-muted-foreground lg:col-start-7 lg:row-span-1 lg:size-[max(10px,0.8vw)] lg:justify-self-end\"\n                  />\n                  <span className={cn(small, \"col-start-2 mt-[1.5vw] text-muted-foreground lg:col-span-2 lg:col-start-5 lg:row-start-1 lg:mt-0\")}>\n                    {office.address}\n                  </span>\n                </Row>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the big serif statement above the table (first line indented)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "small serif label beside the table"
+    },
+    {
+      "name": "offices",
+      "type": "KononenkogroupOffice[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ac4300a46e959cff3c604aea182d90f35277668bea3026c6468b605d82ac6c94"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup about",
+  "description": "A studio profile on a 15-column grid: tiny serif-label / grotesk-value facts at the left, a 30px serif paragraph across the right two thirds, and a lower row of record lists (prizes, press) in tiny type with grey detail lines. On phones it stacks with a two-column fact grid. Every line rises from its mask as it enters.",
+  "category": "features",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "profile",
+    "facts",
+    "awards",
+    "press",
+    "grid",
+    "editorial",
+    "serif",
+    "minimal",
+    "reveal",
+    "monochrome"
+  ],
+  "notes": [
+    "designed for two record lists; more lists alternate between the two list columns on wide screens"
+  ],
+  "entry": "kononenkogroup-about.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-about",
+  "files": [
+    {
+      "path": "kononenkogroup-about.tsx",
+      "content": "import { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface KononenkogroupAboutFact {\n  /** small serif label, e.g. \"Established\" */\n  label: string;\n  /** the value beside it */\n  value: string;\n}\n\nexport interface KononenkogroupAboutEntry {\n  /** the entry's first line, in ink */\n  title: string;\n  /** further lines in grey */\n  detail?: string[];\n}\n\nexport interface KononenkogroupAboutList {\n  /** small serif label beside the list */\n  label: string;\n  /** groups of entries; a wider gap separates the groups */\n  groups: KononenkogroupAboutEntry[][];\n}\n\nexport interface KononenkogroupAboutProps {\n  /** label/value facts at the top left */\n  facts: KononenkogroupAboutFact[];\n  /** the serif paragraph beside the facts */\n  text: string;\n  /** small serif label that opens the lower row */\n  recordLabel: string;\n  /** the lists of the lower row (two on the original: awards and publications) */\n  lists: KononenkogroupAboutList[];\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\nconst label = cn(small, \"font-display tracking-[-0.01em]\");\n// where each list's label starts on the 15-column grid; its entries take the next column\nconst listStart = [\"lg:col-start-5\", \"lg:col-start-10\"];\nconst entriesStart = [\"lg:col-start-6\", \"lg:col-start-11\"];\n\nfunction Entries({ groups }: { groups: KononenkogroupAboutEntry[][] }) {\n  return (\n    <div className=\"grid gap-[7vw] lg:gap-[4.6vw]\">\n      {groups.map((group, g) => (\n        <ul key={g} className=\"grid gap-[3vw] lg:gap-[0.75vw]\">\n          {group.map((entry, i) => (\n            <li key={i}>\n              <KononenkogroupLines text={entry.title} className={small} />\n              {entry.detail?.map((line, j) => (\n                <KononenkogroupLines key={j} text={line} className={cn(small, \"text-muted-foreground\")} />\n              ))}\n            </li>\n          ))}\n        </ul>\n      ))}\n    </div>\n  );\n}\n\n/**\n * A studio profile on a 15-column grid: small label/value facts at the left, a serif\n * paragraph across the right two thirds, and below a row of record lists (awards,\n * publications) set in tiny type with grey details. Every line rises from its mask on entry.\n */\nexport function KononenkogroupAbout({ facts, text, recordLabel, lists, className }: KononenkogroupAboutProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-section text-foreground\", className)}>\n      <div className=\"lg:grid lg:grid-cols-15 lg:gap-x-[1.11vw]\">\n        <dl className=\"grid grid-cols-[33.3vw_1fr] gap-y-[5.5vw] lg:col-span-4 lg:grid-cols-4 lg:gap-x-[1.11vw] lg:gap-y-[1.1vw]\">\n          {facts.map((fact) => (\n            <div key={fact.label} className=\"contents\">\n              <dt className=\"lg:col-start-1\"><KononenkogroupLines as=\"span\" text={fact.label} className={cn(label, \"block\")} /></dt>\n              <dd className=\"lg:col-span-2\"><KononenkogroupLines as=\"span\" text={fact.value} className={cn(small, \"block\")} /></dd>\n            </div>\n          ))}\n        </dl>\n        <KononenkogroupLines\n          text={text}\n          className=\"mt-[11vw] font-display text-[6.93vw] leading-[1.1] tracking-[-0.03em] lg:col-span-9 lg:col-start-6 lg:mt-[-0.4vw] lg:text-[2.083vw]\"\n        />\n      </div>\n\n      <div className=\"mt-[17vw] grid gap-[17vw] lg:mt-[8.3vw] lg:grid-cols-15 lg:gap-x-[1.11vw] lg:gap-y-0\">\n        <KononenkogroupLines text={recordLabel} className={cn(label, \"lg:col-span-3\")} />\n        {lists.map((list, i) => (\n          <div key={list.label} className=\"contents\">\n            <KononenkogroupLines text={list.label} className={cn(label, \"lg:col-span-1\", listStart[i % 2])} />\n            <div className={cn(\"-mt-[7vw] lg:col-span-3 lg:mt-0\", entriesStart[i % 2])}>\n              <Entries groups={list.groups} />\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines"
+  ],
+  "props": [
+    {
+      "name": "facts",
+      "type": "KononenkogroupAboutFact[]",
+      "required": true,
+      "description": "label/value facts at the top left"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the serif paragraph beside the facts"
+    },
+    {
+      "name": "recordLabel",
+      "type": "string",
+      "required": true,
+      "description": "small serif label that opens the lower row"
+    },
+    {
+      "name": "lists",
+      "type": "KononenkogroupAboutList[]",
+      "required": true,
+      "description": "the lists of the lower row (two on the original: awards and publications)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2d9f3f8c3c9f2a5760ac6e9c521790cc56d7dee5236e406d4ded4aede5f04a1a"
+}

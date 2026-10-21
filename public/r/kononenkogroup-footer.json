@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup footer",
+  "description": "A window-tall closing screen on black, on a 15-column grid: the three-line wordmark, then tiny serif labels with white grotesk link runs (navigation, elsewhere, studios, opening hours with grey times) across the top; giant grotesk letters stretched exactly edge to edge; and a row of tiny grey serif credits at the foot. On phones the groups fall into two columns. Lines rise from their masks; links underline on hover.",
+  "category": "footer",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "monogram",
+    "huge-type",
+    "grid",
+    "links",
+    "minimal",
+    "editorial",
+    "underline",
+    "monochrome"
+  ],
+  "notes": [
+    "always dark: its root carries the dark class, so it reads the theme's dark tokens even on a light page",
+    "the giant letters are an SVG text stretched to the full width (textLength), so any 3–5 letters fill it",
+    "four top groups and five credits fit the grid; more are dropped"
+  ],
+  "entry": "kononenkogroup-footer.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-footer",
+  "files": [
+    {
+      "path": "kononenkogroup-footer.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupLink } from \"@foundry/kononenkogroup-link\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface KononenkogroupFooterLine {\n  text: string;\n  /** makes the line a link */\n  href?: string;\n  /** the current page: underlined */\n  active?: boolean;\n  /** grey instead of white */\n  muted?: boolean;\n}\n\nexport interface KononenkogroupFooterGroup {\n  /** small serif label, e.g. \"Navigation\" */\n  label: string;\n  /** runs of lines; a gap separates the runs */\n  runs: KononenkogroupFooterLine[][];\n}\n\nexport interface KononenkogroupFooterMeta {\n  /** small grey serif label, e.g. \"Registration\" */\n  label: string;\n  /** values beside it */\n  values?: string[];\n  href?: string;\n}\n\nexport interface KononenkogroupFooterProps {\n  /** the wordmark, one line each; the last line is serif */\n  wordmark: string[];\n  homeHref?: string;\n  /** up to four label + lines groups across the top */\n  groups: KononenkogroupFooterGroup[];\n  /** the giant letters stretched across the full width */\n  monogram: string;\n  /** up to five label + value pairs along the bottom */\n  meta: KononenkogroupFooterMeta[];\n  /** e.g. \"© 2026\", at the bottom right */\n  copyright: string;\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\nconst serif = \"font-display tracking-[-0.01em]\";\n// where things start on the 15-column grid\nconst groupStart = [4, 8, 11, 14];\nconst metaStart = [1, 4, 8, 11, 14];\n\nfunction Line({ line }: { line: KononenkogroupFooterLine }) {\n  const text = <KononenkogroupLines as=\"span\" text={line.text} className=\"block\" />;\n  return (\n    <li className={cn(line.muted && \"text-muted-foreground\")}>\n      {line.href ? (\n        <KononenkogroupLink href={line.href} active={line.active}>\n          {text}\n        </KononenkogroupLink>\n      ) : (\n        text\n      )}\n    </li>\n  );\n}\n\n/**\n * The closing screen on black, on the 15-column grid: the wordmark, then label + link groups\n * (navigation, media, addresses, hours) across the top; giant grotesk letters stretched edge to\n * edge; and a row of tiny grey serif credits at the foot. Lines rise from their masks.\n */\nexport function KononenkogroupFooter({ wordmark, homeHref = \"/\", groups, monogram, meta, copyright, className }: KononenkogroupFooterProps) {\n  return (\n    <footer\n      className={cn(\n        \"dark bg-background px-gutter pt-[26vw] pb-[5vw] text-foreground lg:flex lg:min-h-svh lg:flex-col lg:pt-[8.7vw] lg:pb-[1.2vw]\",\n        className,\n      )}\n    >\n      <div className={cn(small, \"grid grid-cols-2 gap-x-[4vw] gap-y-[14vw] lg:grid-cols-15 lg:gap-x-[1.11vw] lg:gap-y-0\")}>\n        <a href={homeHref} className=\"col-span-2 block lg:col-span-3 lg:text-[max(10px,0.99vw)] lg:leading-none\">\n          {wordmark.map((line, i) => (\n            <KononenkogroupLines key={i} as=\"span\" text={line} className={cn(\"block\", i === wordmark.length - 1 && serif)} />\n          ))}\n        </a>\n        {groups.slice(0, groupStart.length).map((group, i) => {\n          const start = groupStart[i];\n          const end = groupStart[i + 1] ?? 16;\n          const style = {\n            \"--kononenkogroup-footer-label\": `${start}`,\n            \"--kononenkogroup-footer-lines\": `${start + 1} / ${end}`,\n          } as CSSProperties;\n          return (\n            <div key={group.label} className=\"lg:contents\" style={style}>\n              <KononenkogroupLines text={group.label} className={cn(serif, \"lg:row-start-1 lg:[grid-column:var(--kononenkogroup-footer-label)]\")} />\n              <div className=\"mt-[4vw] grid content-start gap-[5vw] lg:row-start-1 lg:mt-0 lg:gap-[1em] lg:[grid-column:var(--kononenkogroup-footer-lines)]\">\n                {group.runs.map((run, r) => (\n                  <ul key={r}>\n                    {run.map((line, l) => (\n                      <Line key={l} line={line} />\n                    ))}\n                  </ul>\n                ))}\n              </div>\n            </div>\n          );\n        })}\n      </div>\n\n      <svg viewBox=\"0 0 1000 276\" role=\"img\" aria-label={monogram} className=\"mt-[14vw] block w-full lg:mt-auto lg:pt-[6vw]\">\n        <text x=\"0\" y=\"270\" textLength=\"1000\" lengthAdjust=\"spacing\" fontSize=\"375\" className=\"fill-current font-sans\">\n          {monogram}\n        </text>\n      </svg>\n\n      <div className={cn(small, serif, \"relative mt-[6vw] grid gap-[5vw] text-muted-foreground lg:mt-[1.6vw] lg:grid-cols-15 lg:gap-x-[1.11vw]\")}>\n        {meta.slice(0, metaStart.length).map((item, i) => {\n          const start = metaStart[i];\n          const end = Math.min(metaStart[i + 1] ?? 15, 15);\n          const inner = (\n            <>\n              <KononenkogroupLines as=\"span\" text={item.label} />\n              {item.values?.map((value, v) => (\n                <KononenkogroupLines key={v} as=\"span\" text={value} />\n              ))}\n            </>\n          );\n          return (\n            <div\n              key={item.label}\n              className=\"flex flex-wrap gap-x-[7vw] lg:gap-x-[1.1vw] lg:[grid-column:var(--kononenkogroup-footer-meta)]\"\n              style={{ \"--kononenkogroup-footer-meta\": `${start} / ${end}` } as CSSProperties}\n            >\n              {item.href ? (\n                <a href={item.href} className=\"flex flex-wrap gap-x-[7vw] transition-opacity lg:gap-x-[1.1vw] duration-300 hover:opacity-70\">\n                  {inner}\n                </a>\n              ) : (\n                inner\n              )}\n            </div>\n          );\n        })}\n        <KononenkogroupLines as=\"span\" text={copyright} className=\"absolute right-0 bottom-0 lg:static lg:col-start-15 lg:text-right\" />\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-link"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string[]",
+      "required": true,
+      "description": "the wordmark, one line each; the last line is serif"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "groups",
+      "type": "KononenkogroupFooterGroup[]",
+      "required": true,
+      "description": "up to four label + lines groups across the top"
+    },
+    {
+      "name": "monogram",
+      "type": "string",
+      "required": true,
+      "description": "the giant letters stretched across the full width"
+    },
+    {
+      "name": "meta",
+      "type": "KononenkogroupFooterMeta[]",
+      "required": true,
+      "description": "up to five label + value pairs along the bottom"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "e.g. \"© 2026\", at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "06a6f1eab66bd382696205b2d146e891e84552185e90e1801e31b35a793810c9"
+}

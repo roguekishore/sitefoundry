@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Structure engineering contact",
+  "description": "A whole band in the highlight colour (olive-gold on the original): a sans lead at the top right; below, a medium heading at the left over a huge callout set as ink blocks, one per word plus an arrow block, and at the right an underlined mono form with fields two to a row, a square-checkbox row, tall text areas, an outlined file box and an ink submit button with highlight text. The callout blocks fade up one after another; the lead and form rise 48px.",
+  "category": "contact",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "enquiry",
+    "band",
+    "gold",
+    "blocks",
+    "mono",
+    "underline",
+    "reveal",
+    "stagger",
+    "editorial"
+  ],
+  "notes": [
+    "the band uses highlight / highlight-foreground; pick a theme whose highlight works as a big surface",
+    "the form is plain HTML: pass action, or wire it up yourself"
+  ],
+  "entry": "structureengineering-contact.tsx",
+  "source": "foundry",
+  "name": "structureengineering-contact",
+  "files": [
+    {
+      "path": "structureengineering-contact.tsx",
+      "content": "import { ArrowRight, FileUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StructureengineeringButton } from \"@foundry/structureengineering-button\";\nimport { StructureengineeringReveal } from \"@foundry/structureengineering-reveal\";\n\nexport interface StructureengineeringField {\n  /** the form field name */\n  name: string;\n  /** its label (uppercase mono); a * is added when required */\n  label: string;\n  /** the input type */\n  type?: \"text\" | \"email\" | \"tel\";\n  /** must be filled in */\n  required?: boolean;\n}\n\nexport interface StructureengineeringContactProps {\n  /** the medium heading at the left */\n  heading: string;\n  /** the words of the big ink blocks under it, one block each; the last gets an arrow block */\n  callout: string[];\n  /** the sans paragraph at the top right */\n  lead: string;\n  /** the short underlined fields (two to a row at desktop) */\n  fields: StructureengineeringField[];\n  /** the checkbox group: its label and options */\n  roles: { name: string; label: string; options: string[] };\n  /** the tall underlined text areas */\n  questions: StructureengineeringField[];\n  /** the file upload box's label */\n  uploadLabel: string;\n  /** the submit button's label */\n  submitLabel: string;\n  /** where the form posts */\n  action?: string;\n  className?: string;\n}\n\nconst label = \"font-mono text-base leading-tight font-medium uppercase\";\nconst line = \"w-full border-0 border-b border-current bg-transparent font-mono text-base outline-none focus:border-b-2\";\n\n// A whole band in the highlight colour. At the top right a lead paragraph; below, at the left a\n// heading and a big callout set as ink blocks (each word its own block, then an arrow block),\n// at the right an underlined mono form (fields two to a row, a checkbox row, tall text areas,\n// a file box and an ink submit button). The callout blocks fade up one after another, the lead\n// and form rise 48px.\nexport function StructureengineeringContact({\n  heading,\n  callout,\n  lead,\n  fields,\n  roles,\n  questions,\n  uploadLabel,\n  submitLabel,\n  action,\n  className,\n}: StructureengineeringContactProps) {\n  return (\n    <section className={cn(\"bg-highlight text-highlight-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-12 px-gutter pt-16 pb-24 lg:grid-cols-2 lg:gap-x-12 lg:gap-y-28 lg:pt-[4.5rem] lg:pb-56\">\n        <StructureengineeringReveal className=\"lg:col-start-2 lg:row-start-1\">\n          <p className=\"max-w-[36rem] text-xl leading-[1.25] font-medium tracking-tight\">{lead}</p>\n        </StructureengineeringReveal>\n\n        <div className=\"-order-1 lg:order-none lg:col-start-1 lg:row-start-2\">\n          <StructureengineeringReveal as=\"h2\" className=\"max-w-[34rem] font-display text-[2.1rem] leading-[1.2] font-medium tracking-[-0.03em] lg:text-[2.8rem]\">\n            {heading}\n          </StructureengineeringReveal>\n          <p className=\"mt-12 flex flex-col items-start gap-1.5 font-display text-[3.7rem] leading-none font-medium tracking-[-0.04em] lg:mt-6 lg:text-[5.1rem]\">\n            {callout.map((word, i) => (\n              <span key={i} className=\"flex gap-1.5\">\n                <StructureengineeringReveal as=\"span\" step={i} rise={8} className=\"rounded-md bg-primary px-3 pt-1 pb-3 text-primary-foreground lg:px-4 lg:pb-4\">\n                  {word}\n                </StructureengineeringReveal>\n                {i === callout.length - 1 && (\n                  <StructureengineeringReveal as=\"span\" step={i + 1} rise={8} className=\"flex items-center rounded-md bg-primary px-5 text-primary-foreground lg:px-9\">\n                    <ArrowRight aria-hidden className=\"size-10 lg:size-12\" strokeWidth={1} />\n                  </StructureengineeringReveal>\n                )}\n              </span>\n            ))}\n          </p>\n        </div>\n\n        <StructureengineeringReveal className=\"lg:col-start-2 lg:row-start-2\">\n          <form action={action} method=\"post\" encType=\"multipart/form-data\" className=\"grid gap-x-4 gap-y-9 lg:grid-cols-2\">\n            {fields.map((f) => (\n              <label key={f.name} className=\"flex flex-col gap-3\">\n                <span className={label}>\n                  {f.label}\n                  {f.required && \" *\"}\n                </span>\n                <input name={f.name} type={f.type ?? \"text\"} required={f.required} className={cn(line, \"h-8\")} />\n              </label>\n            ))}\n\n            <fieldset className=\"lg:col-span-2\">\n              <legend className=\"font-mono text-base leading-tight uppercase\">{roles.label}</legend>\n              <div className=\"mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:flex sm:flex-wrap sm:gap-x-9\">\n                {roles.options.map((option) => (\n                  <label key={option} className=\"flex items-center gap-2 font-mono text-base uppercase\">\n                    <input type=\"checkbox\" name={roles.name} value={option} className=\"size-5 appearance-none rounded-sm border border-current checked:bg-primary\" />\n                    {option}\n                  </label>\n                ))}\n              </div>\n            </fieldset>\n\n            {questions.map((q) => (\n              <label key={q.name} className=\"flex flex-col gap-3 lg:col-span-2\">\n                <span className={label}>\n                  {q.label}\n                  {q.required && \" *\"}\n                </span>\n                <textarea name={q.name} required={q.required} rows={5} className={cn(line, \"resize-y\")} />\n              </label>\n            ))}\n\n            <div className=\"flex flex-wrap items-center justify-between gap-4 lg:col-span-2\">\n              <label className=\"flex h-10 cursor-pointer items-center gap-2 border border-current pr-2.5 pl-1.5 font-mono text-base uppercase transition-colors duration-200 hover:bg-primary hover:text-highlight\">\n                <FileUp aria-hidden className=\"size-6\" strokeWidth={0.9} />\n                {uploadLabel}\n                <input type=\"file\" name=\"files\" className=\"sr-only\" />\n              </label>\n              <StructureengineeringButton type=\"submit\" variant=\"submit\">\n                {submitLabel}\n              </StructureengineeringButton>\n            </div>\n          </form>\n        </StructureengineeringReveal>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "structureengineering-button",
+    "structureengineering-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the medium heading at the left"
+    },
+    {
+      "name": "callout",
+      "type": "string[]",
+      "required": true,
+      "description": "the words of the big ink blocks under it, one block each; the last gets an arrow block"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the sans paragraph at the top right"
+    },
+    {
+      "name": "fields",
+      "type": "StructureengineeringField[]",
+      "required": true,
+      "description": "the short underlined fields (two to a row at desktop)"
+    },
+    {
+      "name": "roles",
+      "type": "{ name: string; label: string; options: string[]; }",
+      "required": true,
+      "description": "the checkbox group: its label and options"
+    },
+    {
+      "name": "questions",
+      "type": "StructureengineeringField[]",
+      "required": true,
+      "description": "the tall underlined text areas"
+    },
+    {
+      "name": "uploadLabel",
+      "type": "string",
+      "required": true,
+      "description": "the file upload box's label"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the submit button's label"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fdb90b6f7fdf766c65c82d56f7353f012f2606d24d5c04f2c9f9215fe63dc2e4"
+}

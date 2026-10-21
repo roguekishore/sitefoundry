@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke marques",
+  "description": "A tall list of names in very big type (92px on desktop), all pale except one in full ink, with a small square picture at column 9 that stays pinned at a third of the window while the list scrolls past. The row crossing the middle of the window becomes the dark one and the picture crossfades to its own; hovering a row does the same.",
+  "category": "features",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "list",
+    "big-type",
+    "index",
+    "hover",
+    "scroll",
+    "sticky",
+    "pinned",
+    "crossfade",
+    "minimal",
+    "monochrome",
+    "automotive"
+  ],
+  "notes": [
+    "the active row follows the scroll with a small JavaScript listener (hydrate: visible); without it the last row stays active",
+    "pale rows are the ink at 10%, so it works on any background",
+    "one picture per row; empty pictures are muted placeholders"
+  ],
+  "entry": "esrbespoke-marques.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "esrbespoke-marques",
+  "files": [
+    {
+      "path": "esrbespoke-marques.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { EsrbespokeLabel } from \"@foundry/esrbespoke-label\";\nimport { toneClass, type EsrbespokeTone } from \"@foundry/esrbespoke-tone\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EsrbespokeMarque {\n  /** the name, in big type */\n  name: string;\n  /** a link for the row (optional) */\n  href?: string;\n  /** the square picture shown while this row is active. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface EsrbespokeMarquesProps {\n  /** the tiny label top left */\n  label: string;\n  /** a short note in tiny capitals at column 9 (phones: column 2) */\n  note: string;\n  /** the rows */\n  items: EsrbespokeMarque[];\n  tone?: EsrbespokeTone;\n  id?: string;\n  className?: string;\n}\n\nconst ease = \"ease-[cubic-bezier(0.19,1,0.22,1)]\";\n\n/** Big-type list whose active row follows the scroll, beside a pinned square picture. */\nexport function EsrbespokeMarques({ label, note, items, tone = \"light\", id, className }: EsrbespokeMarquesProps) {\n  const [scrolled, setScrolled] = useState(items.length - 1);\n  const [hovered, setHovered] = useState<number | null>(null);\n  const rows = useRef<(HTMLLIElement | null)[]>([]);\n  const active = hovered ?? scrolled;\n\n  useEffect(() => {\n    let frame = 0;\n    // the active row is the one crossing the middle of the window; above the list: the first,\n    // below it: the last\n    const update = () => {\n      frame = 0;\n      const middle = window.innerHeight / 2;\n      let pick = 0;\n      rows.current.forEach((row, i) => {\n        if (row && row.getBoundingClientRect().top <= middle) pick = i;\n      });\n      setScrolled(pick);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(update);\n    };\n    update();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    window.addEventListener(\"resize\", onScroll);\n    return () => {\n      cancelAnimationFrame(frame);\n      window.removeEventListener(\"scroll\", onScroll);\n      window.removeEventListener(\"resize\", onScroll);\n    };\n  }, [items.length]);\n\n  return (\n    <section id={id} className={cn(toneClass(tone), \"pt-8 pb-6 lg:pb-[18rem]\", className)}>\n      <div className=\"grid grid-cols-2 gap-x-4 px-gutter lg:grid-cols-12\">\n        <EsrbespokeLabel as=\"h2\" className=\"lg:col-span-3\">{label}</EsrbespokeLabel>\n        <EsrbespokeLabel as=\"p\" className=\"max-w-[14rem] lg:col-span-3 lg:col-start-9 lg:max-w-[12.5rem]\">\n          {note}\n        </EsrbespokeLabel>\n      </div>\n      <div className=\"relative mt-[5.5rem] grid gap-x-4 px-gutter lg:mt-[15.5rem] lg:grid-cols-12\">\n        <ul className=\"lg:col-span-8\" onPointerLeave={() => setHovered(null)}>\n          {items.map((item, i) => {\n            const text = (\n              <span\n                className={cn(\n                  \"block font-display text-[2.375rem] leading-[0.95] font-medium tracking-[-0.01em] font-stretch-[106%] transition-opacity duration-100 lg:-ml-1 lg:text-[5.75rem]\",\n                  ease,\n                  i === active ? \"opacity-100\" : \"opacity-10\",\n                )}\n              >\n                {item.name}\n              </span>\n            );\n            return (\n              <li key={i} ref={(el) => void (rows.current[i] = el)} onPointerEnter={() => setHovered(i)}>\n                {item.href ? <a href={item.href}>{text}</a> : text}\n              </li>\n            );\n          })}\n        </ul>\n        <div className=\"absolute top-1 right-gutter lg:static lg:col-span-2 lg:col-start-9\">\n          <div className=\"relative size-[5.625rem] lg:sticky lg:top-[30svh] lg:size-[13.5rem]\">\n            {items.map((item, i) => (\n              <div\n                key={i}\n                aria-hidden={i !== active}\n                className={cn(\n                  \"absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none [&>*]:h-full [&>*]:w-full [&>img]:object-cover\",\n                  ease,\n                  i === active ? \"opacity-100\" : \"opacity-0\",\n                )}\n              >\n                {item.media ?? <div className=\"h-full w-full bg-muted\" />}\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "esrbespoke-label",
+    "esrbespoke-tone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the tiny label top left"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": true,
+      "description": "a short note in tiny capitals at column 9 (phones: column 2)"
+    },
+    {
+      "name": "items",
+      "type": "EsrbespokeMarque[]",
+      "required": true,
+      "description": "the rows"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "light"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7a5dbe5378e841f54e9b67ba6913597cf5ce8a56309c51e5f60d111d6a4552ce"
+}

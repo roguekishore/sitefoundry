@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG footer",
+  "description": "A quiet one-row footer under a 2px hairline: the gradient wordmark at the left; at the right a small sand-coloured line of notes split by slashes (copyright, credits with taupe links, a follow-us label) and two round taupe social buttons that turn sand on hover. On phones everything stacks, centred.",
+  "category": "footer",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "minimal",
+    "wordmark",
+    "gradient",
+    "socials",
+    "hairline"
+  ],
+  "notes": [
+    "socials take any icon (lucide or your own)"
+  ],
+  "entry": "wild-ag-footer.tsx",
+  "source": "foundry",
+  "name": "wild-ag-footer",
+  "files": [
+    {
+      "path": "wild-ag-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WildAgWordmark } from \"@foundry/wild-ag-wordmark\";\n\nexport interface WildAgFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface WildAgFooterSocial extends WildAgFooterLink {\n  /** the icon inside the round button */\n  icon: ReactNode;\n}\n\nexport interface WildAgFooterProps {\n  /** the brand name, set as the wordmark */\n  brand: string;\n  homeHref?: string;\n  /** e.g. © 2026 All rights reserved */\n  copyright: string;\n  /** a credit line: a lead word, then links joined by \"&\" */\n  credit?: { lead: string; links: WildAgFooterLink[] };\n  /** the label before the social buttons */\n  followLabel?: string;\n  socials?: WildAgFooterSocial[];\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] motion-reduce:transition-none\";\n\nexport function WildAgFooter({ brand, homeHref = \"/\", copyright, credit, followLabel, socials = [], className }: WildAgFooterProps) {\n  const slash = <span aria-hidden className=\"hidden px-3 lg:inline\">/</span>;\n  return (\n    <footer className={cn(\"bg-background px-gutter\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center gap-4 border-t-2 border-border pt-9 pb-9 text-center lg:flex-row lg:justify-between lg:py-14 lg:text-left\">\n        <a href={homeHref} className=\"text-[1.6rem]\">\n          <WildAgWordmark text={brand} />\n        </a>\n        <div className=\"flex flex-col items-center gap-x-0 gap-y-3 text-[0.9rem] leading-[1.4] font-semibold text-highlight lg:flex-row lg:gap-y-0\">\n          <p>{copyright}</p>\n          {credit && (\n            <>\n              {slash}\n              <p>\n                {credit.lead}{\" \"}\n                {credit.links.map((l, i) => (\n                  <span key={l.href}>\n                    {i > 0 && \" & \"}\n                    <a href={l.href} className={cn(\"text-primary transition-colors hover:text-foreground\", ease)}>\n                      {l.label}\n                    </a>\n                  </span>\n                ))}\n              </p>\n            </>\n          )}\n          {followLabel && (\n            <>\n              {slash}\n              <p className=\"mt-2 lg:mt-0 lg:mr-3\">{followLabel}</p>\n            </>\n          )}\n          {socials.length > 0 && (\n            <ul className=\"flex gap-2\">\n              {socials.map((s) => (\n                <li key={s.href}>\n                  <a\n                    href={s.href}\n                    aria-label={s.label}\n                    className={cn(\n                      \"flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors hover:bg-highlight [&_svg]:size-4\",\n                      ease,\n                    )}\n                  >\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand name, set as the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "e.g. © 2026 All rights reserved"
+    },
+    {
+      "name": "credit",
+      "type": "{ lead: string; links: WildAgFooterLink[]; }",
+      "required": false,
+      "description": "a credit line: a lead word, then links joined by \"&\""
+    },
+    {
+      "name": "followLabel",
+      "type": "string",
+      "required": false,
+      "description": "the label before the social buttons"
+    },
+    {
+      "name": "socials",
+      "type": "WildAgFooterSocial[]",
+      "required": false,
+      "default": "[]"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d2e416d9eee7d5d5e71f188a1ea6bea851f631a445a0a6e506a0ba0b4bebe778"
+}

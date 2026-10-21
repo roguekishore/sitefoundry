@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Esrbespoke type-on",
+  "description": "Text that types itself on: when it comes into view its letters appear one after another (opacity 0 to 1, about 12ms apart), as the original's hero notes and footer lines do. Static HTML shows the whole text; the effect only arms after JavaScript runs.",
+  "category": "text-effect",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "typewriter",
+    "type-on",
+    "split-text",
+    "reveal",
+    "letters",
+    "stagger"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: visible); without it the text is simply shown",
+    "off under prefers-reduced-motion",
+    "words never break mid-word: each word is kept together"
+  ],
+  "entry": "esrbespoke-type-on.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "esrbespoke-type-on",
+  "files": [
+    {
+      "path": "esrbespoke-type-on.css",
+      "content": "/* The letters are only hidden once JavaScript has armed the text (data-armed), so static HTML\n   and no-JS visitors see everything. When it comes into view (data-on) each letter fades in\n   after its own delay (--esrbespoke-type-on-i × the step). */\n.esrbespoke-type-on[data-armed] .esrbespoke-type-on-char {\n  opacity: 0;\n}\n.esrbespoke-type-on[data-armed][data-on] .esrbespoke-type-on-char {\n  opacity: 1;\n  transition: opacity 60ms linear;\n  transition-delay: calc(var(--esrbespoke-type-on-start, 0ms) + var(--esrbespoke-type-on-i) * var(--esrbespoke-type-on-step, 12ms));\n}\n@media (prefers-reduced-motion: reduce) {\n  .esrbespoke-type-on[data-armed] .esrbespoke-type-on-char {\n    opacity: 1;\n    transition: none;\n  }\n}\n"
+    },
+    {
+      "path": "esrbespoke-type-on.tsx",
+      "content": "import { useEffect, useRef, type CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./esrbespoke-type-on.css\";\n\nexport interface EsrbespokeTypeOnProps {\n  /** the text to type on */\n  text: string;\n  /** milliseconds between two letters */\n  step?: number;\n  /** milliseconds to wait before the first letter */\n  delay?: number;\n  /** the element to render */\n  as?: \"span\" | \"p\" | \"div\";\n  /**\n   * when to start: \"view\" when it scrolls into view; \"page-end\" for text inside a footer the\n   * page lifts off (stuck underneath, so always \"in view\"): when the page is near its end.\n   * \"page-end\" falls back to \"view\" when no ancestor is actually sticky (e.g. on phones).\n   */\n  trigger?: \"view\" | \"page-end\";\n  className?: string;\n}\n\n/**\n * Text whose letters appear one after another when it comes into view. The text is complete\n * in static HTML; JavaScript hides the letters only once it can also show them again.\n */\nexport function EsrbespokeTypeOn({ text, step = 12, delay = 0, as: Tag = \"span\", trigger = \"view\", className }: EsrbespokeTypeOnProps) {\n  const ref = useRef<HTMLElement | null>(null);\n\n  useEffect(() => {\n    const el = ref.current;\n    if (!el || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    el.setAttribute(\"data-armed\", \"\");\n    // one frame later, so the hidden state is painted before the transition starts\n    const start = () => requestAnimationFrame(() => el.setAttribute(\"data-on\", \"\"));\n\n    let stuck = false;\n    for (let node = el.parentElement; node && trigger === \"page-end\"; node = node.parentElement) {\n      if (getComputedStyle(node).position === \"sticky\") {\n        stuck = true;\n        break;\n      }\n    }\n    if (stuck) {\n      const onScroll = () => {\n        const left = document.documentElement.scrollHeight - window.scrollY - window.innerHeight;\n        if (left < window.innerHeight * 0.4) {\n          start();\n          window.removeEventListener(\"scroll\", onScroll);\n        }\n      };\n      window.addEventListener(\"scroll\", onScroll, { passive: true });\n      onScroll();\n      return () => window.removeEventListener(\"scroll\", onScroll);\n    }\n\n    const io = new IntersectionObserver(\n      (entries) => {\n        if (entries.some((e) => e.isIntersecting)) {\n          start();\n          io.disconnect();\n        }\n      },\n      { threshold: 0.2 },\n    );\n    io.observe(el);\n    return () => io.disconnect();\n  }, [trigger]);\n\n  let index = 0;\n  const words = text.split(/(\\s+)/);\n  const style = { \"--esrbespoke-type-on-step\": `${step}ms`, \"--esrbespoke-type-on-start\": `${delay}ms` } as CSSProperties;\n\n  return (\n    <Tag ref={ref as never} className={cn(\"esrbespoke-type-on\", className)} style={style} aria-label={text}>\n      {words.map((word, w) =>\n        /^\\s+$/.test(word) ? (\n          <span key={w} aria-hidden>\n            {word}\n          </span>\n        ) : (\n          <span key={w} aria-hidden className=\"inline-block whitespace-nowrap\">\n            {Array.from(word).map((char, c) => (\n              <span\n                key={c}\n                className=\"esrbespoke-type-on-char\"\n                style={{ \"--esrbespoke-type-on-i\": index++ } as CSSProperties}\n              >\n                {char}\n              </span>\n            ))}\n          </span>\n        ),\n      )}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text to type on"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "12",
+      "description": "milliseconds between two letters"
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "milliseconds to wait before the first letter"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "span",
+      "description": "the element to render"
+    },
+    {
+      "name": "trigger",
+      "type": "enum",
+      "required": false,
+      "default": "view",
+      "description": "when to start: \"view\" when it scrolls into view; \"page-end\" for text inside a footer the\npage lifts off (stuck underneath, so always \"in view\"): when the page is near its end.\n\"page-end\" falls back to \"view\" when no ancestor is actually sticky (e.g. on phones)."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "177f6481fa8f1e26e18e167dd97309171298291d70f1d1adfa850e3955e49acf"
+}

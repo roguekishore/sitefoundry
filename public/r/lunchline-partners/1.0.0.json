@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline partners",
+  "description": "A team section built around one group photo. On wide screens the photo fills the window, a light heading with a hand-drawn underline sits top-left, and each person carries a small + square with a handwritten 'meet …' tag; clicking opens a cream bio card (handwritten name, tracked role, biography, scribble link) from that corner while the + turns to ×. On phones each person is stacked: a square portrait, then the same bio. The heading's letters rise in as it scrolls into view.",
+  "category": "team",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "people",
+    "founders",
+    "photo",
+    "full-bleed",
+    "window-height",
+    "hotspot",
+    "popover",
+    "handwritten",
+    "editorial",
+    "reveal",
+    "letters"
+  ],
+  "notes": [
+    "the bio cards are <details> elements: no JavaScript, keyboard-accessible",
+    "set each person's x/y (percent of the photo) and side to place their + on the photo; wide screens crop the photo like object-fit: cover, so keep people near the centre",
+    "names, tags and the heading underline use the theme's --typeface-hand when it has one (lunchline-theme: Reenie Beanie)",
+    "the heading sits over the top of the photo in ink: choose a photo with a light sky or band there"
+  ],
+  "entry": "lunchline-partners.tsx",
+  "source": "foundry",
+  "name": "lunchline-partners",
+  "files": [
+    {
+      "path": "lunchline-partners.css",
+      "content": "/* The bio card opens over its tag with a short fade and a 6px settle. */\n@media (prefers-reduced-motion: no-preference) {\n  .lunchline-partners-card {\n    animation: lunchline-partners-open 0.3s cubic-bezier(0.215, 0.61, 0.355, 1) both;\n  }\n}\n\n@keyframes lunchline-partners-open {\n  from {\n    opacity: 0;\n    transform: translateY(6px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-partners.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineLetterRise } from \"@foundry/lunchline-letter-rise\";\nimport { LunchlineScribble, LunchlineScribbleLink } from \"@foundry/lunchline-scribble-link\";\nimport \"./lunchline-partners.css\";\n\nexport interface LunchlinePartner {\n  /** full name, set in the handwriting face */\n  name: string;\n  /** the small tracked label under the name */\n  role: string;\n  /** a short biography */\n  bio: string;\n  /** e.g. a profile link, shown as a scribble-underlined link */\n  link?: { label: string; href: string };\n  /** phones: a square portrait above the name. Empty: a placeholder. */\n  portrait?: ReactNode;\n  /** wide screens: the handwritten tag beside the + button, e.g. \"meet theo\" */\n  tag: string;\n  /** wide screens: where the + button sits on the group photo, in % from the left and top */\n  x: number;\n  y: number;\n  /** wide screens: which way the tag and the bio card open from the + button */\n  side: \"left\" | \"right\";\n}\n\nexport interface LunchlinePartnersProps {\n  /** the light heading with its scribble underline */\n  heading: string;\n  partners: LunchlinePartner[];\n  /** wide screens: the group photo filling the section (cover). Empty: a placeholder. */\n  media?: ReactNode;\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst hand = \"font-[family-name:var(--typeface-hand,var(--typeface-display))]\";\nconst ease = \"duration-300 ease-[cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none\";\n\nfunction Bio({ partner, className }: { partner: LunchlinePartner; className?: string }) {\n  return (\n    <div className={className}>\n      <p className={cn(hand, \"text-5xl leading-[0.8] tracking-[-0.05em] lg:text-[2.75rem]\")}>{partner.name}</p>\n      <p className=\"mt-1.5 text-sm leading-none font-bold tracking-[0.08em] text-primary uppercase\">{partner.role}</p>\n      <p className=\"mt-5 text-[1.0625rem] leading-[1.4]\">{partner.bio}</p>\n      {partner.link && (\n        <LunchlineScribbleLink href={partner.link.href} external className=\"mt-7\">\n          {partner.link.label}\n        </LunchlineScribbleLink>\n      )}\n    </div>\n  );\n}\n\nexport function LunchlinePartners({ heading, partners, media, id, className }: LunchlinePartnersProps) {\n  return (\n    <section id={id} className={cn(\"relative bg-background text-foreground lg:h-[max(100svh,64vw)] lg:overflow-clip\", className)}>\n      {/* wide screens: the group photo under everything */}\n      <div className=\"absolute inset-0 hidden lg:block [&>img]:size-full [&>img]:object-cover\">\n        {media ?? <div className=\"size-full bg-linear-to-b from-glow/60 via-muted/70 to-highlight/80\" />}\n      </div>\n\n      <div className=\"relative z-10 px-gutter pt-10 lg:mx-auto lg:max-w-page lg:pt-[3.1rem]\">\n        <div className=\"inline-block\">\n          <LunchlineLetterRise text={heading} className=\"font-display text-[2.375rem] leading-[1.2] font-light tracking-[-0.01em] lg:text-[3.5rem]\" />\n          <LunchlineScribble className=\"mt-1 text-border\" />\n        </div>\n      </div>\n\n      {/* wide screens: a + button with a handwritten tag on each person; it opens a bio card */}\n      <div className=\"absolute inset-0 hidden lg:block\">\n        {partners.map((partner) => (\n          <details\n            key={partner.name}\n            className=\"group absolute z-10 open:z-20\"\n            style={{ left: `${partner.x}%`, top: `${partner.y}%` } as CSSProperties}\n          >\n            <summary className=\"block cursor-pointer list-none [&::-webkit-details-marker]:hidden\">\n              <span className={cn(\"grid size-10 place-items-center border border-background bg-foreground/25 text-background transition-colors hover:bg-accent/50\", ease)}>\n                <Plus className={cn(\"size-6 transition-transform group-open:rotate-45\", ease)} strokeWidth={1.75} />\n              </span>\n              <span\n                className={cn(\n                  hand,\n                  \"absolute top-full bg-background px-4 pt-2 pb-1.5 text-[2rem] leading-none whitespace-nowrap text-foreground\",\n                  partner.side === \"left\" ? \"right-full\" : \"left-full\",\n                )}\n              >\n                {partner.tag}\n              </span>\n            </summary>\n            <Bio\n              partner={partner}\n              className={cn(\n                \"lunchline-partners-card absolute top-full w-[26.25rem] bg-background p-6 pt-7 text-foreground\",\n                partner.side === \"left\" ? \"right-full\" : \"left-full\",\n              )}\n            />\n          </details>\n        ))}\n      </div>\n\n      {/* phones: each partner stacked, portrait first */}\n      <ul className=\"mt-9 lg:hidden\">\n        {partners.map((partner) => (\n          <li key={partner.name}>\n            <div className=\"aspect-square w-full overflow-clip [&>img]:size-full [&>img]:object-cover\">\n              {partner.portrait ?? <div className=\"size-full bg-linear-to-b from-glow/60 to-muted\" />}\n            </div>\n            <Bio partner={partner} className=\"px-gutter pt-9 pb-8\" />\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-letter-rise",
+    "lunchline-scribble-link"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light heading with its scribble underline"
+    },
+    {
+      "name": "partners",
+      "type": "LunchlinePartner[]",
+      "required": true
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "wide screens: the group photo filling the section (cover). Empty: a placeholder."
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b27fec5b2545f5c11c37198bd397d4961b7c277eac452d63af48bc9f73b66705"
+}

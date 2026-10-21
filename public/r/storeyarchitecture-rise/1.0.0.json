@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Storey Architecture rise",
+  "description": "A wrapper that lifts its content 28px into place and fades it in over the first stretch of scroll after it enters the window (CSS view timeline). Steps stagger paragraphs that sit side by side.",
+  "category": "animation",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "rise",
+    "fade",
+    "scroll",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: browsers without scroll-driven animations, and reduced motion, show the content in place",
+    "the original masks each line separately; this moves the whole block",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "storeyarchitecture-rise.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-rise",
+  "files": [
+    {
+      "path": "storeyarchitecture-rise.css",
+      "content": "/* Rise 28px and fade in over the first 220px of scroll after the element's top enters the\n   window (a fixed distance, so things already in the first screen are in place at load).\n   Each step starts 40px later. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-rise {\n      animation: storeyarchitecture-rise-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--storeyarchitecture-rise-step, 0) * 40px) entry calc(220px + var(--storeyarchitecture-rise-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes storeyarchitecture-rise-in {\n  from {\n    opacity: 0;\n    transform: translateY(28px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-rise.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./storeyarchitecture-rise.css\";\n\nexport interface StoreyarchitectureRiseProps {\n  children?: ReactNode;\n  /** the element to render (div by default) */\n  as?: ElementType;\n  /** position in a staggered row: 0, 1, 2… each arrives 40px of scroll later */\n  step?: number;\n  className?: string;\n}\n\nexport function StoreyarchitectureRise({ children, as: Tag = \"div\", step = 0, className }: StoreyarchitectureRiseProps) {\n  return (\n    <Tag className={cn(\"storeyarchitecture-rise\", className)} style={{ \"--storeyarchitecture-rise-step\": step } as CSSProperties}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered row: 0, 1, 2… each arrives 40px of scroll later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b93f637a276e27540562908067222e2fb3f41fb7e82e85f900d2f9e79945025b"
+}

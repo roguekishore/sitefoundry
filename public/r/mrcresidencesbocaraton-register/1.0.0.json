@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mr C Residences register form",
+  "description": "A blush interest-list form: a small thin-line mark and a centred two-line invitation, then a centred two-column grid of underline-only fields (text inputs, chevron selects and a square-checkbox group) in red, closed by a full-width bold red pill that empties to an outline on hover. One column on phones. The form fades in as it enters the view.",
+  "category": "contact",
+  "site": "mrcresidencesbocaraton",
+  "license": "proprietary",
+  "tags": [
+    "form",
+    "contact",
+    "register",
+    "underline-inputs",
+    "select",
+    "checkbox",
+    "pill-button",
+    "blush",
+    "red",
+    "minimal",
+    "reveal",
+    "fade",
+    "hover"
+  ],
+  "notes": [
+    "fields flow in rows of two on desktop, in the order given",
+    "fields are plain HTML (no state); point action/method at your handler",
+    "colours: primary for text, lines and the pill on the background colour"
+  ],
+  "entry": "mrcresidencesbocaraton-register.tsx",
+  "source": "foundry",
+  "name": "mrcresidencesbocaraton-register",
+  "files": [
+    {
+      "path": "mrcresidencesbocaraton-register.css",
+      "content": "/* The form fades in while it enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mrcresidencesbocaraton-register-reveal {\n      animation: mrcresidencesbocaraton-register-fade ease-out both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 220px;\n    }\n  }\n}\n\n@keyframes mrcresidencesbocaraton-register-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "mrcresidencesbocaraton-register.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, Wine } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./mrcresidencesbocaraton-register.css\";\n\n/** one cell of the form grid */\nexport type MrcresidencesbocaratonRegisterField =\n  | {\n      kind: \"text\";\n      name: string;\n      /** shown inside the field until something is typed */\n      label: string;\n      type?: \"text\" | \"email\" | \"tel\";\n      required?: boolean;\n    }\n  | {\n      kind: \"select\";\n      name: string;\n      /** shown as the empty choice */\n      label: string;\n      options: string[];\n      required?: boolean;\n    }\n  | {\n      kind: \"choices\";\n      name: string;\n      /** the group's heading */\n      label: string;\n      /** one square checkbox each */\n      options: string[];\n    };\n\nexport interface MrcresidencesbocaratonRegisterProps {\n  /** the small mark at the top; empty: a thin lucide glass icon */\n  mark?: ReactNode;\n  /** the centred invitation, one string per line */\n  intro: string[];\n  /** the fields, in order (rows of two on desktop) */\n  fields: MrcresidencesbocaratonRegisterField[];\n  /** the pill's label */\n  submitLabel: string;\n  action?: string;\n  method?: \"get\" | \"post\";\n  id?: string;\n  className?: string;\n}\n\nconst line = \"w-full border-b border-primary bg-transparent text-[16px] text-primary outline-none dark:text-foreground\";\n\nfunction Field({ field }: { field: MrcresidencesbocaratonRegisterField }) {\n  if (field.kind === \"text\") {\n    return (\n      <input\n        name={field.name}\n        type={field.type ?? \"text\"}\n        required={field.required}\n        placeholder={field.label}\n        aria-label={field.label}\n        className={cn(line, \"h-[42px] pb-2 placeholder:text-primary focus:border-b-2 dark:placeholder:text-foreground\")}\n      />\n    );\n  }\n  if (field.kind === \"select\") {\n    return (\n      <div className=\"relative mt-[18px]\">\n        <select\n          name={field.name}\n          required={field.required}\n          aria-label={field.label}\n          defaultValue=\"\"\n          className={cn(line, \"h-[42px] cursor-pointer appearance-none pr-8 pb-2 focus:border-b-2\")}\n        >\n          <option value=\"\" disabled>\n            {field.label}\n          </option>\n          {field.options.map((option) => (\n            <option key={option}>{option}</option>\n          ))}\n        </select>\n        <ChevronDown aria-hidden strokeWidth={1.25} className=\"pointer-events-none absolute top-2.5 right-2.5 size-5 text-primary dark:text-foreground\" />\n      </div>\n    );\n  }\n  return (\n    <fieldset className=\"mt-[28px] text-primary dark:text-foreground\">\n      <legend className=\"text-[16px]\">{field.label}</legend>\n      <div className=\"mt-[14px] flex flex-col gap-[18px]\">\n        {field.options.map((option) => (\n          <label key={option} className=\"flex cursor-pointer items-center gap-2.5 text-[16px] leading-[22px]\">\n            <input\n              type=\"checkbox\"\n              name={field.name}\n              value={option}\n              className=\"size-[18px] shrink-0 cursor-pointer appearance-none border border-primary transition-colors duration-300 checked:bg-primary dark:border-foreground dark:checked:bg-foreground\"\n            />\n            {option}\n          </label>\n        ))}\n      </div>\n    </fieldset>\n  );\n}\n\nexport function MrcresidencesbocaratonRegister({ mark, intro, fields, submitLabel, action, method = \"post\", id, className }: MrcresidencesbocaratonRegisterProps) {\n  return (\n    <section\n      id={id}\n      className={cn(\"relative bg-background px-[25px] pt-[60px] pb-[60px] text-primary lg:px-gutter lg:pt-20 lg:pb-[136px] dark:text-foreground\", className)}\n    >\n      <div className=\"mrcresidencesbocaraton-register-reveal mx-auto max-w-[825px]\">\n        <div className=\"flex justify-center [&>svg]:h-16 [&>svg]:w-auto lg:[&>svg]:h-[100px]\">\n          {mark ?? <Wine aria-hidden strokeWidth={0.75} />}\n        </div>\n        <p className=\"mt-6 text-center text-[16px] leading-[1.4] lg:mt-8 lg:leading-[1.5]\">\n          {intro.map((part, i) => (\n            <span key={i} className=\"block\">\n              {part}\n            </span>\n          ))}\n        </p>\n\n        <form action={action} method={method} className=\"mt-[52px] lg:mt-[48px]\">\n          <div className=\"grid gap-x-[33px] gap-y-2 lg:grid-cols-2 lg:gap-y-[28px]\">\n            {fields.map((field) => (\n              <Field key={field.name} field={field} />\n            ))}\n          </div>\n          <button\n            type=\"submit\"\n            className=\"mt-[22px] h-10 w-full rounded-full border border-primary bg-primary text-[16px] font-bold text-primary-foreground uppercase transition-colors duration-500 ease-in-out hover:bg-transparent hover:text-primary motion-reduce:transition-none lg:mt-[70px] lg:h-[54px] lg:text-[18px] dark:hover:text-foreground\"\n          >\n            {submitLabel}\n          </button>\n        </form>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small mark at the top; empty: a thin lucide glass icon"
+    },
+    {
+      "name": "intro",
+      "type": "string[]",
+      "required": true,
+      "description": "the centred invitation, one string per line"
+    },
+    {
+      "name": "fields",
+      "type": "MrcresidencesbocaratonRegisterField[]",
+      "required": true,
+      "description": "the fields, in order (rows of two on desktop)"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the pill's label"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "method",
+      "type": "enum",
+      "required": false,
+      "default": "post"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6f6a6ce5e6b26f0008763ef2658ade537882301b841717e52d04737d74c24c39"
+}

@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wild AG button",
+  "description": "A pill button with a bold uppercase 13.5px label: paper on bands (turns espresso on hover), a 2px light outline on card panels (fills with paper on hover), or the taupe-to-sand gradient for form submits (darkens to espresso on hover). 0.3s ease.",
+  "category": "button",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "uppercase",
+    "gradient",
+    "outline",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "paper and outline are made for the gradient bands and card panels; gradient for light surfaces",
+    "renders an <a> with href, otherwise a <button>"
+  ],
+  "entry": "wild-ag-button.tsx",
+  "source": "foundry",
+  "name": "wild-ag-button",
+  "files": [
+    {
+      "path": "wild-ag-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WildAgButtonProps {\n  /** the label (set in uppercase) */\n  children: ReactNode;\n  /** where it goes; without it the button is a <button> */\n  href?: string;\n  /** paper: paper pill on bands; outline: light ring on card panels; gradient: brand gradient on light surfaces */\n  variant?: \"paper\" | \"outline\" | \"gradient\";\n  /** md: 54px tall (hero, form); sm: 45px (inside cards) */\n  size?: \"md\" | \"sm\";\n  /** for a <button>: the form button type */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\n// The original's hover: 0.3s on cubic-bezier(.25,.46,.45,.94).\nconst ease = \"duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] motion-reduce:transition-none\";\n\nconst surfaces = {\n  paper: \"bg-background text-foreground hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background\",\n  outline:\n    \"border-2 border-primary-foreground/70 text-primary-foreground hover:bg-primary-foreground hover:text-foreground focus-visible:bg-primary-foreground focus-visible:text-foreground\",\n  gradient: \"bg-linear-15 from-primary to-highlight text-primary-foreground\",\n};\n\nexport function WildAgButton({ children, href, variant = \"paper\", size = \"md\", type = \"button\", className }: WildAgButtonProps) {\n  const classes = cn(\n    \"group/btn relative isolate inline-flex items-center justify-center overflow-clip rounded-full font-sans text-[0.84rem] leading-none font-bold whitespace-nowrap uppercase transition-colors\",\n    size === \"md\" ? \"h-[3.375rem] px-[2.85rem]\" : \"h-[2.8rem] px-[2.4rem]\",\n    ease,\n    surfaces[variant],\n    className,\n  );\n  const inner = (\n    <>\n      {/* the gradient can't fade to a flat colour, so an espresso layer fades in over it */}\n      {variant === \"gradient\" && (\n        <span aria-hidden className={cn(\"absolute inset-0 -z-10 bg-foreground opacity-0 transition-opacity group-hover/btn:opacity-100\", ease)} />\n      )}\n      {children}\n    </>\n  );\n  if (href) {\n    return (\n      <a href={href} className={classes}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label (set in uppercase)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it goes; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "paper",
+      "description": "paper: paper pill on bands; outline: light ring on card panels; gradient: brand gradient on light surfaces"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: 54px tall (hero, form); sm: 45px (inside cards)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: the form button type"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "debb66446a83e2785e87e34e30fd1dd17edbb7451a330a1ba82acf6e69241a26"
+}

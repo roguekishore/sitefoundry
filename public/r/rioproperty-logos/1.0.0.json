@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty logos",
+  "description": "A centred violet capital line over a single row of light-grey client marks that runs off both edges of the page. The row fades in as it enters and drifts sideways with the scroll (not on a clock); each mark turns violet on hover. The line's words ripple up out of masks.",
+  "category": "logos",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "clients",
+    "marquee",
+    "scrubbed",
+    "scroll",
+    "drift",
+    "grey",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "names render as plain text marks, alternating the display and body faces; swap in real logos by editing the item",
+    "the list repeats (repeat) so the row always covers the window"
+  ],
+  "entry": "rioproperty-logos.tsx",
+  "source": "foundry",
+  "name": "rioproperty-logos",
+  "files": [
+    {
+      "path": "rioproperty-logos.css",
+      "content": "/* The row fades in as it enters and drifts right (about a sixth of the window) while it\n   crosses the window, tied to the scroll rather than to a clock. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-logos-row {\n      animation:\n        rioproperty-logos-fade linear both,\n        rioproperty-logos-drift linear both;\n      animation-timeline: view(), view();\n      animation-range:\n        entry 0% entry 100%,\n        cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes rioproperty-logos-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes rioproperty-logos-drift {\n  from {\n    translate: -8vw 0;\n  }\n  to {\n    translate: 8vw 0;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-logos.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { RiopropertyRiseText } from \"@foundry/rioproperty-rise-text\";\nimport \"./rioproperty-logos.css\";\n\nexport interface RiopropertyLogosProps {\n  /** the centred violet capital line above the row */\n  heading: string;\n  /** client names, shown as plain-text marks in light grey (a real logo can replace each later) */\n  names: string[];\n  /** how many times the list repeats so the row always runs past both edges */\n  repeat?: number;\n  className?: string;\n}\n\nexport function RiopropertyLogos({ heading, names, repeat = 3, className }: RiopropertyLogosProps) {\n  const row = Array.from({ length: repeat }, () => names).flat();\n  return (\n    <section className={cn(\"overflow-clip bg-background pt-4 pb-8 lg:pt-24 lg:pb-28\", className)}>\n      <RiopropertyRiseText\n        text={heading}\n        className=\"mx-auto max-w-[19rem] px-gutter text-center font-sans text-lg leading-normal font-normal text-primary uppercase sm:max-w-none lg:text-2xl\"\n      />\n      <div className=\"rioproperty-logos-row mt-8 lg:mt-24\">\n        {/* starts a fifth of the window to the left, then drifts right with the scroll */}\n        <ul className=\"-ml-[20vw] flex w-max items-center\">\n          {row.map((name, i) => (\n            <li\n              key={i}\n              aria-hidden={i >= names.length || undefined}\n              className={cn(\n                \"flex h-24 w-[8.5rem] shrink-0 items-center justify-center px-2 text-center text-muted-foreground/45 transition-colors duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] hover:text-primary lg:h-28 lg:w-[15.25rem]\",\n                i % 2 === 0\n                  ? \"font-display text-base leading-none font-semibold uppercase lg:text-xl\"\n                  : \"font-sans text-lg leading-none font-semibold tracking-tight lg:text-[1.625rem]\",\n              )}\n            >\n              {name}\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rioproperty-rise-text"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the centred violet capital line above the row"
+    },
+    {
+      "name": "names",
+      "type": "string[]",
+      "required": true,
+      "description": "client names, shown as plain-text marks in light grey (a real logo can replace each later)"
+    },
+    {
+      "name": "repeat",
+      "type": "number",
+      "required": false,
+      "default": "3",
+      "description": "how many times the list repeats so the row always runs past both edges"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "933975405f7f4965e5471647f301aef0771b7e2c2782b05a9cece9138aac48cb"
+}

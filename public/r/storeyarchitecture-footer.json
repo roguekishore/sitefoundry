@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture footer",
+  "description": "A black footer: two columns of medium headings with small link lists (site index, legal), a contact block and the plain wordmark at the left; at the right a wide photo bleeding to the page edge with a small tilted paper note pinned over its corner. It rises 20vw into place as it arrives, and a 20vw strip below it holds a scene.",
+  "category": "footer",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "black",
+    "links",
+    "contact",
+    "photo",
+    "paper",
+    "note",
+    "rise",
+    "scroll",
+    "vw"
+  ],
+  "notes": [
+    "drawn with bg-foreground: a black footer on light themes, a pale one on dark themes",
+    "the strip below shows the scene slot (the original lets its page-wide WebGL layer show through); empty shows a soft fade",
+    "place it last on the page"
+  ],
+  "entry": "storeyarchitecture-footer.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-footer",
+  "files": [
+    {
+      "path": "storeyarchitecture-footer.css",
+      "content": "/* The footer's content rises 20vw into place while the footer enters the window. */\n.storeyarchitecture-footer {\n  view-timeline-name: --storeyarchitecture-footer;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-footer-panel {\n      animation: storeyarchitecture-footer-rise linear both;\n      animation-timeline: --storeyarchitecture-footer;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-footer-rise {\n  from {\n    transform: translateY(20vw);\n  }\n  to {\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureNoteCard, type StoreyarchitectureNoteCardProps } from \"@foundry/storeyarchitecture-note-card\";\nimport \"./storeyarchitecture-footer.css\";\n\nexport interface StoreyarchitectureFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface StoreyarchitectureFooterGroup {\n  /** the medium heading */\n  title: string;\n  /** the small links (or plain lines when href is empty) under it */\n  links: StoreyarchitectureFooterLink[];\n}\n\nexport interface StoreyarchitectureFooterProps {\n  /** the two link columns: site index, legal */\n  groups: StoreyarchitectureFooterGroup[];\n  /** the contact block under them */\n  contact: StoreyarchitectureFooterGroup;\n  /** the plain wordmark beside the contact block */\n  brand: string;\n  /** the wide photo at the right (object-cover); empty shows a placeholder */\n  media?: ReactNode;\n  /** the small tilted note pinned over the photo */\n  note?: StoreyarchitectureNoteCardProps;\n  /** what shows in the strip under the footer; empty shows a soft fade */\n  scene?: ReactNode;\n  className?: string;\n}\n\nfunction Group({ group, className }: { group: StoreyarchitectureFooterGroup; className?: string }) {\n  return (\n    <div className={className}>\n      <h2 className=\"text-[8vw] leading-none sm:text-[2.2vw]\">{group.title}</h2>\n      <ul className=\"mt-[2.5vw] text-[4.3vw] leading-[1.4] sm:mt-[1.2vw] sm:text-[1.1vw] sm:leading-[1.55]\">\n        {group.links.map((link) => (\n          <li key={link.label}>\n            {link.href ? (\n              <a href={link.href} className=\"transition-opacity duration-200 hover:opacity-60\">\n                {link.label}\n              </a>\n            ) : (\n              link.label\n            )}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport function StoreyarchitectureFooter({ groups, contact, brand, media, note, scene, className }: StoreyarchitectureFooterProps) {\n  return (\n    <footer className={cn(\"storeyarchitecture-footer overflow-clip bg-foreground font-[450] text-background\", className)}>\n      <div className=\"storeyarchitecture-footer-panel grid grid-cols-6 gap-x-gutter px-gutter pt-[10vw] tracking-[-0.02em] sm:grid-cols-12 sm:pt-[10vw]\">\n        <div className=\"col-span-6 grid grid-cols-6 gap-x-gutter gap-y-[11vw] sm:row-start-1 sm:gap-y-[5vw] sm:self-start\">\n          {groups.map((group) => (\n            <Group key={group.title} group={group} className=\"col-span-6 sm:col-span-3\" />\n          ))}\n          <Group group={contact} className=\"col-span-6 sm:col-span-3\" />\n          <p className=\"col-span-6 text-[8vw] leading-none sm:col-span-3 sm:text-[2.2vw]\">{brand}</p>\n        </div>\n\n        <div className=\"relative col-span-6 -mx-gutter mt-[9vw] sm:col-start-7 sm:row-start-1 sm:mt-0 sm:ml-0 sm:pt-[0.2vw]\">\n          <div className=\"aspect-[1.6] overflow-clip bg-muted [&>*]:size-full [&>*]:object-cover\">{media}</div>\n          {note && <StoreyarchitectureNoteCard {...note} className=\"absolute top-[0.5vw] left-[-1.4vw] rotate-[4deg] text-[0.82vw] sm:top-0\" />}\n        </div>\n      </div>\n      <div aria-hidden={!scene} className=\"h-[20vw] bg-linear-to-b from-background/75 to-background [&>*]:size-full [&>*]:object-cover\">\n        {scene}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-note-card"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "StoreyarchitectureFooterGroup[]",
+      "required": true,
+      "description": "the two link columns: site index, legal"
+    },
+    {
+      "name": "contact",
+      "type": "StoreyarchitectureFooterGroup",
+      "required": true,
+      "description": "the contact block under them"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the plain wordmark beside the contact block"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the wide photo at the right (object-cover); empty shows a placeholder"
+    },
+    {
+      "name": "note",
+      "type": "any",
+      "required": false,
+      "description": "the small tilted note pinned over the photo"
+    },
+    {
+      "name": "scene",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what shows in the strip under the footer; empty shows a soft fade"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9fd4d6e88fe7274e9e690cce7024f10e5e9038af4779842a0568f8e9fb519563"
+}

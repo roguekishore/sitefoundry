@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup about with light switches",
+  "description": "A centred label, headline, short paragraph and outline pill button over a wide photo with a pale switch bar under it: a row of five pill switches, each lighting one zone of the scene. As it comes up the window the photo and bar grow from 70% to full width (scrubbed with the scroll) and the switches fade in last. Text rises 24px into view.",
+  "category": "features",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "story",
+    "interactive",
+    "switches",
+    "toggle",
+    "photo",
+    "full-bleed",
+    "scale",
+    "scroll",
+    "scrubbed",
+    "reveal",
+    "light",
+    "warm",
+    "rounded"
+  ],
+  "notes": [
+    "the photo is 390×450 on phones and 2:1 full-bleed on desktop (cover); empty shows a muted placeholder",
+    "each zone can carry its own lit layer (a photo of the scene with that zone on) that fades in when switched on; empty zones show a soft glow wash over their part of the frame",
+    "the switches need JavaScript (hydrate: visible); the grow and fade are CSS scroll-driven and off under reduced motion"
+  ],
+  "entry": "ledup-about.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "ledup-about",
+  "files": [
+    {
+      "path": "ledup-about.css",
+      "content": "/* The photo and its switch bar grow from 70% to full size (from their centre) while their top\n   travels the first three quarters of their height up into the window (scrubbed); the switch\n   bar fades in over the last stretch, once the frame is nearly full. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ledup-about-figure {\n      transform-origin: 50% 50%;\n      animation: ledup-about-grow linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 75%;\n    }\n    .ledup-about-switches {\n      animation: ledup-about-fade linear both;\n      animation-timeline: --ledup-about-figure;\n      animation-range: entry 60% entry 100%;\n    }\n  }\n}\n\n.ledup-about-figure {\n  view-timeline-name: --ledup-about-figure;\n}\n\n@keyframes ledup-about-grow {\n  from {\n    transform: scale(0.7);\n  }\n  to {\n    transform: none;\n  }\n}\n\n@keyframes ledup-about-fade {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "ledup-about.tsx",
+      "content": "import { type CSSProperties, type ReactNode, useState } from \"react\";\nimport { Power } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LedupButton } from \"@foundry/ledup-button\";\nimport { LedupHeading } from \"@foundry/ledup-heading\";\nimport { LedupReveal } from \"@foundry/ledup-reveal\";\nimport \"./ledup-about.css\";\n\nexport interface LedupZone {\n  /** the switch's caption (\"Zone 1\") */\n  label: string;\n  /** the scene with this zone lit, laid over the photo when switched on; empty shows a soft glow wash */\n  media?: ReactNode;\n}\n\nexport interface LedupAboutProps {\n  /** the small label above the headline */\n  label?: string;\n  /** the headline */\n  title: ReactNode;\n  /** the paragraph (desktop only, as on the original) */\n  text?: ReactNode;\n  /** the outline pill button */\n  cta?: { label: string; href: string };\n  /** the photo of the scene, unlit; empty shows a muted placeholder */\n  media?: ReactNode;\n  /** the caption above the switches */\n  switchesLabel?: string;\n  /** one switch per zone (five in the original) */\n  zones: LedupZone[];\n  className?: string;\n}\n\nexport function LedupAbout({ label, title, text, cta, media, switchesLabel, zones, className }: LedupAboutProps) {\n  const [on, setOn] = useState<boolean[]>(() => zones.map(() => false));\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-background pt-section pb-4 font-sans text-foreground lg:pt-[8.5rem] lg:pb-[10.5rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter\">\n        <LedupHeading label={label} title={title} text={text} size=\"lg\" />\n        {cta && (\n          <LedupReveal className=\"mt-6 lg:mt-10\">\n            <LedupButton href={cta.href} variant=\"outline\" className=\"h-9 px-5 text-base lg:text-sm\">\n              {cta.label}\n            </LedupButton>\n          </LedupReveal>\n        )}\n      </div>\n\n      <figure className=\"ledup-about-figure mt-6 overflow-clip rounded-lg lg:mt-[7.5rem]\">\n        <div className=\"relative isolate aspect-[390/450] bg-muted lg:aspect-[2/1] [&>*]:absolute [&>*]:inset-0 [&>*]:size-full [&>*]:object-cover\">\n          {media}\n          {zones.map((zone, i) => (\n            <div\n              key={zone.label}\n              aria-hidden\n              className={cn(\"transition-opacity duration-500 ease-out motion-reduce:transition-none\", on[i] ? \"opacity-100\" : \"opacity-0\")}\n            >\n              {zone.media ?? (\n                <div\n                  className=\"size-full bg-[radial-gradient(28%_70%_at_var(--ledup-about-x)_35%,color-mix(in_oklch,var(--glow)_65%,transparent),transparent)]\"\n                  style={{ \"--ledup-about-x\": `${((i + 0.5) / zones.length) * 100}%` } as CSSProperties}\n                />\n              )}\n            </div>\n          ))}\n        </div>\n\n        <figcaption className=\"ledup-about-switches bg-secondary px-4 pt-2 pb-3 text-center text-secondary-foreground lg:pt-6 lg:pb-5\">\n          <div>\n            {switchesLabel && <p className=\"text-sm text-muted-foreground\">{switchesLabel}</p>}\n            <div className=\"mt-1.5 flex justify-center gap-[1.125rem] lg:mt-2 lg:gap-[1.375rem]\">\n              {zones.map((zone, i) => (\n                <div key={zone.label} className=\"flex flex-col items-center gap-1.5 lg:gap-2\">\n                  <button\n                    type=\"button\"\n                    role=\"switch\"\n                    aria-checked={on[i]}\n                    aria-label={zone.label}\n                    onClick={() => setOn((s) => s.map((v, j) => (j === i ? !v : v)))}\n                    className={cn(\n                      \"flex h-[1.875rem] w-[3.25rem] items-center rounded-full p-[3px] transition-colors duration-300 lg:h-[2.125rem] lg:w-[4.375rem] motion-reduce:transition-none\",\n                      on[i] ? \"bg-highlight\" : \"bg-foreground/75\",\n                    )}\n                  >\n                    <span\n                      className={cn(\n                        \"grid size-6 place-items-center rounded-full transition-[translate,background-color] duration-[400ms] ease-out lg:size-7 motion-reduce:transition-none\",\n                        on[i] ? \"translate-x-[1.375rem] bg-background text-highlight lg:translate-x-9\" : \"bg-background/25 text-background\",\n                      )}\n                    >\n                      <Power strokeWidth={2} className=\"size-3\" />\n                    </span>\n                  </button>\n                  <span className=\"text-[0.6875rem] text-muted-foreground uppercase lg:text-xs\">{zone.label}</span>\n                </div>\n              ))}\n            </div>\n          </div>\n        </figcaption>\n      </figure>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ledup-button",
+    "ledup-heading",
+    "ledup-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the small label above the headline"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the paragraph (desktop only, as on the original)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline pill button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo of the scene, unlit; empty shows a muted placeholder"
+    },
+    {
+      "name": "switchesLabel",
+      "type": "string",
+      "required": false,
+      "description": "the caption above the switches"
+    },
+    {
+      "name": "zones",
+      "type": "LedupZone[]",
+      "required": true,
+      "description": "one switch per zone (five in the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7cad49903f444f2d8c51463de48a7015fdc745949ef4bf6971bb2def26a24159"
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Storey Architecture button",
+  "description": "A hard-cornered rectangle with the label at the left and a small dashed ring at the right. On hover the label slides a hair to the right (0.2s) and the ring turns 115° (0.5s). Black, white or form-grey; a large size for heroes and a small one for inline actions, all sized in vw like the original.",
+  "category": "button",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "rectangle",
+    "square",
+    "minimal",
+    "monochrome",
+    "hover",
+    "icon",
+    "vw"
+  ],
+  "notes": [
+    "sizes are in vw (the original scales the whole page with the window); pass className to override",
+    "variant light is meant for photos and dark bands"
+  ],
+  "entry": "storeyarchitecture-button.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-button",
+  "files": [
+    {
+      "path": "storeyarchitecture-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CircleDashed } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface StoreyarchitectureButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** where it goes; without it the button is a <button> */\n  href?: string;\n  /** dark: black on white pages · light: white, for photos and black bands · grey: the form grey */\n  variant?: \"dark\" | \"light\" | \"grey\";\n  /** lg: the wide hero button · sm: the compact inline one (Contact, Read, Submit) */\n  size?: \"lg\" | \"sm\";\n  /** for a <button>: the form button type */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst variants = {\n  dark: \"bg-primary text-primary-foreground\",\n  light: \"bg-background text-foreground dark:bg-foreground dark:text-background\",\n  grey: \"bg-secondary text-secondary-foreground\",\n};\n\n// Phones first (vw of a 390 screen), then the desktop drawing from 640px (vw of 1440).\nconst sizes = {\n  lg: \"h-[16vw] w-[55vw] font-[450] px-[5vw] text-[4.3vw] sm:h-[3.6vw] sm:w-[16.1vw] sm:px-[1.2vw] sm:text-[1.1vw]\",\n  sm: \"h-[6.4vw] gap-[3vw] px-[2vw] text-[4.3vw] font-medium sm:h-[2.85vw] sm:gap-[2.4vw] sm:px-[0.9vw] sm:text-[1.1vw]\",\n};\nconst ring = { lg: \"size-[7.5vw] sm:size-[1.9vw]\", sm: \"size-[4vw] sm:size-[1.25vw]\" };\n\nexport function StoreyarchitectureButton({\n  children,\n  href,\n  variant = \"dark\",\n  size = \"lg\",\n  type = \"button\",\n  className,\n}: StoreyarchitectureButtonProps) {\n  const classes = cn(\n    \"group/btn inline-flex shrink-0 items-center justify-between leading-none tracking-[-0.02em] whitespace-nowrap\",\n    variants[variant],\n    sizes[size],\n    className,\n  );\n  const inner = (\n    <>\n      <span className=\"transition-transform duration-200 ease-[cubic-bezier(0,0,0.2,1)] group-hover/btn:translate-x-[0.5vw] group-focus-visible/btn:translate-x-[0.5vw] motion-reduce:transition-none\">\n        {children}\n      </span>\n      <CircleDashed\n        aria-hidden\n        strokeWidth={1.5}\n        className={cn(\n          \"shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/btn:rotate-[115deg] group-focus-visible/btn:rotate-[115deg] motion-reduce:transition-none\",\n          ring[size],\n        )}\n      />\n    </>\n  );\n  if (href) {\n    return (\n      <a href={href} className={classes}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it goes; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark: black on white pages · light: white, for photos and black bands · grey: the form grey"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "lg: the wide hero button · sm: the compact inline one (Contact, Read, Submit)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: the form button type"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "efdb579325c73c1d1f3da2335f89c45a0a29db13302941855a562d70ca7c8f3c"
+}

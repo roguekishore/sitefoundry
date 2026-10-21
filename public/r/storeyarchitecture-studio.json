@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture studio",
+  "description": "A full-bleed photo band exactly 160% of the window tall. A large three-line white statement sits centred a little above the middle with a wide white button under it; two white paragraphs sit side by side at the bottom-right. The oversized photo drifts down as the band scrolls past; the copy rises in.",
+  "category": "cta",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "statement",
+    "fullscreen",
+    "photo",
+    "parallax",
+    "scroll",
+    "reveal",
+    "centred",
+    "minimal",
+    "vw"
+  ],
+  "notes": [
+    "white text over media: in light themes it uses --background; dark: swaps it for --foreground",
+    "media is 120% of the band's height so the drift never shows an edge; empty shows a stone-grey (glow) placeholder"
+  ],
+  "entry": "storeyarchitecture-studio.tsx",
+  "source": "foundry",
+  "name": "storeyarchitecture-studio",
+  "files": [
+    {
+      "path": "storeyarchitecture-studio.css",
+      "content": "/* The media starts 20% above the band and, over the band's whole pass through the window,\n   drifts down by that 20% (16.7% of its own 120% height). */\n.storeyarchitecture-studio {\n  view-timeline-name: --storeyarchitecture-studio;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-studio-media {\n      animation: storeyarchitecture-studio-drift linear both;\n      animation-timeline: --storeyarchitecture-studio;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-studio-drift {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(16.7%);\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-studio.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureButton } from \"@foundry/storeyarchitecture-button\";\nimport { StoreyarchitectureRise } from \"@foundry/storeyarchitecture-rise\";\nimport \"./storeyarchitecture-studio.css\";\n\nexport interface StoreyarchitectureStudioProps {\n  /** the large centred statement, one string per line */\n  heading: string[];\n  /** the wide white button under it */\n  cta: { label: string; href: string };\n  /** two paragraphs side by side at the bottom-right */\n  paragraphs: string[];\n  /** the full-bleed photo (object-cover); empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function StoreyarchitectureStudio({ heading, cta, paragraphs, media, className }: StoreyarchitectureStudioProps) {\n  return (\n    <section\n      className={cn(\n        \"storeyarchitecture-studio relative h-[160svh] overflow-clip bg-foreground px-gutter pt-[39svh] font-[450] text-background dark:bg-background dark:text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"storeyarchitecture-studio-media absolute inset-x-0 top-[-20%] h-[120%] bg-glow [&>*]:size-full [&>*]:object-cover\">{media}</div>\n\n      <div className=\"relative flex flex-col items-center tracking-[-0.02em]\">\n        <StoreyarchitectureRise as=\"h2\" className=\"text-center text-[15vw] leading-none font-medium sm:text-[8vw]\">\n          {heading.map((line) => (\n            <span key={line} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </StoreyarchitectureRise>\n        <StoreyarchitectureRise step={1} className=\"mt-[14vw] sm:mt-[6.2vw]\">\n          <StoreyarchitectureButton href={cta.href} variant=\"light\">\n            {cta.label}\n          </StoreyarchitectureButton>\n        </StoreyarchitectureRise>\n      </div>\n\n      <div className=\"absolute inset-x-gutter bottom-[28vw] grid grid-cols-6 gap-x-gutter gap-y-[10vw] text-[4.3vw] sm:bottom-[11vw] leading-[1.2] tracking-[-0.02em] sm:grid-cols-12 sm:text-[1.6vw]\">\n        {paragraphs.map((text, i) => (\n          <StoreyarchitectureRise key={text} step={i} className={cn(\"col-span-4 col-start-3 sm:col-span-3\", i === 0 ? \"sm:col-start-7\" : \"sm:col-start-10\")}>\n            <p>{text}</p>\n          </StoreyarchitectureRise>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-button",
+    "storeyarchitecture-rise"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string[]",
+      "required": true,
+      "description": "the large centred statement, one string per line"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the wide white button under it"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "two paragraphs side by side at the bottom-right"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed photo (object-cover); empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e39a84ba58c2d8482073647f06cf997b8d731f5dd28829bba2b2caa1d4321a9c"
+}

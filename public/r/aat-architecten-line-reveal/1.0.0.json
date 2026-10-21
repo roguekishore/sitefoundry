@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "AAT Architecten line reveal",
+  "description": "A paragraph (or heading) whose lines rise one after another out of their own invisible masks the first time it scrolls into view: each line slides up about a line's height on a long expo ease, 80ms behind the one above. The text is plain and fully visible in the static HTML.",
+  "category": "text-effect",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "reveal",
+    "split-text",
+    "lines",
+    "mask",
+    "stagger",
+    "scroll",
+    "minimal"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: idle) to measure where the lines break; before that, and without JavaScript, the text simply shows",
+    "lines are re-measured on mount only; resizing after the reveal has no effect",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "aat-architecten-line-reveal.tsx",
+  "hydrate": "idle",
+  "source": "foundry",
+  "name": "aat-architecten-line-reveal",
+  "files": [
+    {
+      "path": "aat-architecten-line-reveal.css",
+      "content": "/* Each word sits in an inline-block mask. While armed, every word waits one line-height below\n   its mask; when the block is seen, the words slide up, delayed by their line number so the\n   lines arrive one after another. */\n.aat-architecten-line-reveal [data-word-inner] {\n  display: inline-block;\n  transition: translate 1.2s cubic-bezier(0.16, 1, 0.3, 1);\n  transition-delay: calc(var(--line, 0) * var(--aat-reveal-step, 80ms));\n}\n.aat-architecten-line-reveal[data-phase=\"armed\"] [data-word-inner] {\n  translate: 0 105%;\n  transition: none;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aat-architecten-line-reveal [data-word-inner] {\n    translate: none !important;\n    transition: none;\n  }\n}\n"
+    },
+    {
+      "path": "aat-architecten-line-reveal.tsx",
+      "content": "import { useEffect, useRef, useState, type CSSProperties, type RefObject } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./aat-architecten-line-reveal.css\";\n\nexport interface AatArchitectenLineRevealProps {\n  /** the text; it is split into words, and the words into the lines the browser breaks them into */\n  text: string;\n  /** which element to render */\n  as?: \"p\" | \"div\" | \"h2\" | \"h3\";\n  /** delay between one line and the next, in seconds */\n  step?: number;\n  className?: string;\n}\n\ntype Phase = \"static\" | \"armed\" | \"in\";\n\n/**\n * Text whose lines rise out of masks, one after another, the first time it enters the window.\n * Server HTML shows the text in place; the hiding only starts once JavaScript has measured it.\n */\nexport function AatArchitectenLineReveal({ text, as = \"p\", step = 0.08, className }: AatArchitectenLineRevealProps) {\n  const ref = useRef<HTMLElement>(null);\n  const [phase, setPhase] = useState<Phase>(\"static\");\n  const [lines, setLines] = useState<number[]>([]);\n  const words = text.split(/\\s+/).filter(Boolean);\n  const Tag = as as \"p\";\n\n  useEffect(() => {\n    const el = ref.current;\n    if (!el || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    // Already scrolled past (e.g. a reload halfway down): leave it shown.\n    if (el.getBoundingClientRect().bottom < 0) return;\n\n    // Group the words into lines by their distance from the top of the block.\n    const tops: number[] = [];\n    const lineOf = Array.from(el.querySelectorAll<HTMLElement>(\"[data-word]\")).map((word) => {\n      const top = word.offsetTop;\n      let line = tops.findIndex((t) => Math.abs(t - top) < 4);\n      if (line < 0) line = tops.push(top) - 1;\n      return line;\n    });\n    setLines(lineOf);\n    setPhase(\"armed\");\n\n    let frame = 0;\n    const io = new IntersectionObserver(\n      (entries) => {\n        if (!entries.some((e) => e.isIntersecting)) return;\n        io.disconnect();\n        // two frames, so the hidden state is painted before the slide starts\n        frame = requestAnimationFrame(() => {\n          frame = requestAnimationFrame(() => setPhase(\"in\"));\n        });\n      },\n      { threshold: 0.15 },\n    );\n    io.observe(el);\n    return () => {\n      io.disconnect();\n      cancelAnimationFrame(frame);\n    };\n  }, [text]);\n\n  return (\n    <Tag\n      ref={ref as RefObject<HTMLParagraphElement>}\n      data-phase={phase}\n      style={{ \"--aat-reveal-step\": `${step}s` } as CSSProperties}\n      className={cn(\"aat-architecten-line-reveal\", className)}\n    >\n      {words.map((word, i) => (\n        <span key={i}>\n          {i > 0 && \" \"}\n          {/* indent-0: inline-blocks inherit text-indent, which belongs only to the first line */}\n          <span data-word className=\"inline-block overflow-clip align-top indent-0\">\n            <span data-word-inner style={{ \"--line\": lines[i] ?? 0 } as CSSProperties}>\n              {word}\n            </span>\n          </span>\n        </span>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; it is split into words, and the words into the lines the browser breaks them into"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "p",
+      "description": "which element to render"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0.08",
+      "description": "delay between one line and the next, in seconds"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "044d3df19341f193d90c5055938e9b53101f0a23a902e04385380dad604e843e"
+}

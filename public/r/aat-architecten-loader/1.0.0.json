@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "AAT Architecten loader",
+  "description": "A page-load cover: the whole window in the page colour with one small ink dot in the middle. The dot pops in, holds, then shrinks away as the cover fades out after about a second, uncovering the page. Pure CSS.",
+  "category": "background",
+  "site": "aat-architecten",
+  "license": "proprietary",
+  "tags": [
+    "loader",
+    "preloader",
+    "intro",
+    "dot",
+    "minimal",
+    "load",
+    "fade"
+  ],
+  "notes": [
+    "fixed and full-window: place it once on a page; a fixed header with a higher z-index stays visible above it, as on the original",
+    "pure CSS, no JavaScript; not rendered at all under prefers-reduced-motion"
+  ],
+  "entry": "aat-architecten-loader.tsx",
+  "source": "foundry",
+  "name": "aat-architecten-loader",
+  "files": [
+    {
+      "path": "aat-architecten-loader.css",
+      "content": "/* The cover holds for most of the run, then fades out and stops catching clicks; the dot pops\n   in, holds, and shrinks just before the cover goes. */\n.aat-architecten-loader {\n  animation: aat-architecten-loader-cover var(--aat-loader-duration, 1.2s) cubic-bezier(0.4, 0, 0.2, 1) both;\n}\n.aat-architecten-loader-dot {\n  animation: aat-architecten-loader-dot var(--aat-loader-duration, 1.2s) cubic-bezier(0.4, 0, 0.2, 1) both;\n}\n\n@keyframes aat-architecten-loader-cover {\n  0%, 70% { opacity: 1; visibility: visible; }\n  100% { opacity: 0; visibility: hidden; }\n}\n@keyframes aat-architecten-loader-dot {\n  0% { scale: 0; }\n  15%, 60% { scale: 1; }\n  80%, 100% { scale: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aat-architecten-loader { display: none; }\n}\n"
+    },
+    {
+      "path": "aat-architecten-loader.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./aat-architecten-loader.css\";\n\nexport interface AatArchitectenLoaderProps {\n  /** how long the cover stays before it has fully faded, in seconds */\n  duration?: number;\n  className?: string;\n}\n\n/**\n * A full-window cover with a dot in the centre that fades away on its own after `duration`.\n * Sits at z-40, so a header at z-50 stays visible above it.\n */\nexport function AatArchitectenLoader({ duration = 1.2, className }: AatArchitectenLoaderProps) {\n  return (\n    <div\n      aria-hidden\n      style={{ \"--aat-loader-duration\": `${duration}s` } as CSSProperties}\n      className={cn(\"aat-architecten-loader pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-background\", className)}\n    >\n      <span className=\"aat-architecten-loader-dot size-5 rounded-full bg-foreground\" />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "1.2",
+      "description": "how long the cover stays before it has fully faded, in seconds"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "05b240b19581de1845da84727ae68747aa8818b4bdc7cb308db5303b686d13f8"
+}

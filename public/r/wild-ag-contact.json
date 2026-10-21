@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Wild AG contact",
+  "description": "A contact section on paper: at the left a light card with three pill-shaped fields outlined in soft taupe (name, email, a tall rounded message box) and a gradient pill submit; at the right, vertically centred, a gradient serif-italic title, a one-line invitation, the firm's name and address and a two-column list of phone and email in taupe. On phones the details come first, then the form. Text fades up on entering view.",
+  "category": "contact",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "pill",
+    "card",
+    "address",
+    "two-column",
+    "serif",
+    "gradient",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "the form posts to action (method post); it has no client-side logic"
+  ],
+  "entry": "wild-ag-contact.tsx",
+  "source": "foundry",
+  "name": "wild-ag-contact",
+  "files": [
+    {
+      "path": "wild-ag-contact.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { WildAgButton } from \"@foundry/wild-ag-button\";\nimport { WildAgHeading } from \"@foundry/wild-ag-heading\";\nimport { WildAgReveal } from \"@foundry/wild-ag-reveal\";\n\nexport interface WildAgContactDetail {\n  /** e.g. Phone */\n  label: string;\n  /** e.g. the number */\n  value: string;\n  href: string;\n}\n\nexport interface WildAgContactProps {\n  /** an id for in-page links */\n  id?: string;\n  title: string;\n  /** one line under the title */\n  lead: string;\n  /** the firm's name */\n  company: string;\n  /** address lines */\n  address: string[];\n  /** phone, email… */\n  details: WildAgContactDetail[];\n  /** the form's placeholders and button */\n  form: { name: string; email: string; message: string; submit: string; action?: string };\n  className?: string;\n}\n\nconst field =\n  \"w-full rounded-full border-2 border-border bg-background px-[1.6rem] text-[1.0625rem] font-medium text-foreground outline-none transition-colors duration-300 placeholder:text-muted-foreground/60 focus:border-primary motion-reduce:transition-none\";\n\nexport function WildAgContact({ id, title, lead, company, address, details, form, className }: WildAgContactProps) {\n  return (\n    <section id={id} className={cn(\"bg-background px-gutter pt-section pb-14 text-muted-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-12 lg:grid-cols-[670fr_375fr] lg:items-center lg:gap-x-[7.2rem]\">\n        <div>\n          <WildAgHeading>{title}</WildAgHeading>\n          <WildAgReveal as=\"p\" step={1} className=\"mt-6 text-[1.0625rem] leading-[1.4] font-semibold tracking-[-0.01em]\">\n            {lead}\n          </WildAgReveal>\n          <WildAgReveal step={2} className=\"mt-5\">\n            <p className=\"text-[1.4rem] leading-[1.4] font-medium tracking-[-0.01em] text-foreground\">{company}</p>\n            <p className=\"mt-2 text-[1.0625rem] leading-[1.4] font-medium tracking-[-0.01em]\">\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </p>\n            <dl className=\"mt-5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-[1.0625rem] leading-[1.4] font-medium tracking-[-0.01em]\">\n              {details.map((d) => (\n                <div key={d.label} className=\"contents\">\n                  <dt>{d.label}</dt>\n                  <dd>\n                    <a href={d.href} className=\"font-semibold text-primary transition-colors duration-300 hover:text-foreground\">\n                      {d.value}\n                    </a>\n                  </dd>\n                </div>\n              ))}\n            </dl>\n          </WildAgReveal>\n        </div>\n\n        <form action={form.action} method=\"post\" className=\"grid gap-3 rounded-lg bg-card p-[2.3rem] lg:order-first lg:p-14\">\n          <input type=\"text\" name=\"name\" aria-label={form.name} placeholder={form.name} className={cn(field, \"h-[3.75rem]\")} />\n          <input type=\"email\" name=\"email\" aria-label={form.email} placeholder={form.email} className={cn(field, \"h-[3.75rem]\")} />\n          <textarea\n            name=\"message\"\n            aria-label={form.message}\n            placeholder={form.message}\n            className={cn(field, \"h-[11.25rem] resize-none rounded-[calc(var(--radius)*1.9)] py-4\")}\n          />\n          <WildAgButton type=\"submit\" variant=\"gradient\" className=\"mt-4 w-full lg:w-fit\">\n            {form.submit}\n          </WildAgButton>\n        </form>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "wild-ag-button",
+    "wild-ag-heading",
+    "wild-ag-reveal"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one line under the title"
+    },
+    {
+      "name": "company",
+      "type": "string",
+      "required": true,
+      "description": "the firm's name"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "address lines"
+    },
+    {
+      "name": "details",
+      "type": "WildAgContactDetail[]",
+      "required": true,
+      "description": "phone, email…"
+    },
+    {
+      "name": "form",
+      "type": "{ name: string; email: string; message: string; submit: string; action?: string | undefined; }",
+      "required": true,
+      "description": "the form's placeholders and button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "55430253f44a4cdb5d8eb30706c05f7cab61e8ca3a2ecf9b8a982b27d2371603"
+}

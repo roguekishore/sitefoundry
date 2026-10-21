@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Structure engineering button",
+  "description": "A square-cornered 44px box with a 1px border: an uppercase mono label, then a separate square cell with a thin arrow. On hover the box inverts in 0.25s and the arrow shakes side to side twice. Outline (ink on paper), media (light over a dark photo), solid ink, and submit (ink with highlight text for the highlight band).",
+  "category": "button",
+  "site": "structureengineering",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "mono",
+    "outline",
+    "arrow",
+    "hover",
+    "invert",
+    "shake",
+    "minimal"
+  ],
+  "notes": [
+    "put the class group/secard on a parent card link to shake the arrow from the card's hover",
+    "media is meant for dark photo backdrops; submit for the highlight-coloured band"
+  ],
+  "entry": "structureengineering-button.tsx",
+  "source": "foundry",
+  "name": "structureengineering-button",
+  "files": [
+    {
+      "path": "structureengineering-button.css",
+      "content": "/* The arrow nudges left and right twice when the button (or a parent card marked\n   group/secard) is hovered or focused, as on the original. */\n.structureengineering-button:hover .structureengineering-button-arrow,\n.structureengineering-button:focus-visible .structureengineering-button-arrow,\n.group\\/secard:hover .structureengineering-button-arrow {\n  animation: structureengineering-button-shake 0.5s ease-in-out 2;\n}\n\n@keyframes structureengineering-button-shake {\n  0%, 100% { transform: translateX(0); }\n  25% { transform: translateX(-3px); }\n  75% { transform: translateX(3px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .structureengineering-button-arrow { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "structureengineering-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./structureengineering-button.css\";\n\nexport interface StructureengineeringButtonProps {\n  /** the label (set in uppercase mono) */\n  children: ReactNode;\n  /** where it goes; without it the button is a <button> */\n  href?: string;\n  /**\n   * outline: ink box on paper, fills ink on hover · media: light box over a dark photo, fills\n   * light on hover · solid: ink box with paper text · submit: ink box with highlight-coloured\n   * text that turns highlight on hover (for the highlight band)\n   */\n  variant?: \"outline\" | \"media\" | \"solid\" | \"submit\";\n  /** for a <button>: the form button type */\n  type?: \"button\" | \"submit\";\n  /** render a plain <span> that only looks like the button (for use inside a card link) */\n  decorative?: boolean;\n  className?: string;\n}\n\nconst variants = {\n  outline: \"border-foreground text-foreground hover:bg-foreground hover:text-background focus-visible:bg-foreground focus-visible:text-background\",\n  media:\n    \"border-card text-card hover:bg-card hover:text-card-foreground focus-visible:bg-card focus-visible:text-card-foreground dark:border-card-foreground dark:text-card-foreground dark:hover:bg-card-foreground dark:hover:text-card\",\n  solid: \"border-primary bg-primary text-primary-foreground hover:bg-background hover:text-foreground\",\n  submit: \"border-primary bg-primary text-highlight hover:bg-highlight hover:text-primary\",\n};\n\n// A box with a 1px border: the mono label, then a square cell holding an arrow that shakes\n// side to side twice on hover. The whole box inverts on hover in 0.25s.\nexport function StructureengineeringButton({ children, href, variant = \"outline\", type = \"button\", decorative = false, className }: StructureengineeringButtonProps) {\n  const classes = cn(\n    \"structureengineering-button group/sebtn inline-flex h-11 shrink-0 items-stretch border font-mono text-base leading-tight uppercase transition-colors duration-250 ease-out outline-none motion-reduce:transition-none\",\n    variants[variant],\n    className,\n  );\n  const inner = (\n    <>\n      <span className=\"flex items-center px-3 text-left\">{children}</span>\n      <span aria-hidden className=\"flex w-10 shrink-0 items-center justify-center border-l border-current\">\n        <ArrowRight className=\"structureengineering-button-arrow size-3.5\" strokeWidth={1.25} />\n      </span>\n    </>\n  );\n  if (decorative) {\n    return <span className={classes}>{inner}</span>;\n  }\n  if (href) {\n    return (\n      <a href={href} className={classes}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label (set in uppercase mono)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it goes; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "outline",
+      "description": "outline: ink box on paper, fills ink on hover · media: light box over a dark photo, fills\nlight on hover · solid: ink box with paper text · submit: ink box with highlight-coloured\ntext that turns highlight on hover (for the highlight band)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: the form button type"
+    },
+    {
+      "name": "decorative",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "render a plain <span> that only looks like the button (for use inside a card link)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8564603c02eb09e828e182df025afc3db94285b1f2e02509e0734f193d17ccfe"
+}

@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty hero",
+  "description": "A full-bleed photo hero with a giant wide capital headline across the bottom: words held to the left and right edges in staggered rows, a short stacked list and a capitalised blurb with a yellow-underlined link above it. On desktop it pins for three windows while every word flies apart sideways (left words out to the left, right words out to the right) and the scrim clears; on phones the same happens as it scrolls away. The photo then sinks so the next section slides over it. A violet curtain lifts off it on load.",
+  "category": "hero",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "photo",
+    "video",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "parallax",
+    "split-text",
+    "uppercase",
+    "wide-type",
+    "load-in",
+    "curtain"
+  ],
+  "notes": [
+    "the media slot fills the window like object-fit cover; empty, it is a deep indigo-to-violet placeholder",
+    "needs a dark media or a dark secondary/glow: the text is paper-white over it",
+    "desktop (1024+) is three windows tall when pinned; pinned false keeps it one window",
+    "each word's drift (vw) sets where it flies; negative goes left",
+    "made to sit under rioproperty-header, which overlays it"
+  ],
+  "entry": "rioproperty-hero.tsx",
+  "source": "foundry",
+  "name": "rioproperty-hero",
+  "files": [
+    {
+      "path": "rioproperty-hero.css",
+      "content": "/* The section is the scroll timeline. On phones (one window tall) the words fly apart while\n   the hero scrolls away; on desktop, with `data-pinned`, the section is three windows tall,\n   the stage is sticky, and they fly apart while it stays pinned. The media sinks at half\n   speed as the section leaves, so the next section slides over it. */\n.rioproperty-hero {\n  view-timeline: --rioproperty-hero block;\n}\n\n.rioproperty-hero-curtain {\n  display: none;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rioproperty-hero-fly,\n    .rioproperty-hero-scrim {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --rioproperty-hero;\n      animation-range: exit 35% exit 72%;\n    }\n    .rioproperty-hero-fly {\n      animation-name: rioproperty-hero-fly;\n    }\n    .rioproperty-hero-scrim {\n      animation-name: rioproperty-hero-clear;\n    }\n    .rioproperty-hero-media {\n      animation: rioproperty-hero-sink linear both;\n      animation-timeline: --rioproperty-hero;\n      animation-range: exit 0% exit 100%;\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .rioproperty-hero[data-pinned] .rioproperty-hero-fly,\n    .rioproperty-hero[data-pinned] .rioproperty-hero-scrim {\n      animation-range: contain 18% exit 60%;\n    }\n  }\n}\n\n/* The load-in: a violet curtain lifts off the first screen. */\n@media (prefers-reduced-motion: no-preference) {\n  .rioproperty-hero-curtain {\n    display: block;\n    animation: rioproperty-hero-lift 0.9s cubic-bezier(0.625, 0.05, 0, 1) 0.2s both;\n  }\n}\n\n@keyframes rioproperty-hero-fly {\n  to {\n    translate: calc(var(--rioproperty-hero-drift, 0) * 1vw) 0;\n  }\n}\n\n@keyframes rioproperty-hero-clear {\n  to {\n    opacity: 0;\n  }\n}\n\n@keyframes rioproperty-hero-sink {\n  to {\n    translate: 0 50svh;\n  }\n}\n\n@keyframes rioproperty-hero-lift {\n  from {\n    translate: 0 0;\n  }\n  to {\n    translate: 0 -100%;\n  }\n}\n"
+    },
+    {
+      "path": "rioproperty-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rioproperty-hero.css\";\n\nexport interface RiopropertyHeroWord {\n  /** the word (or words) */\n  text: string;\n  /** how far it flies sideways while the hero scrolls, in vw (negative: to the left) */\n  drift?: number;\n}\n\nexport interface RiopropertyHeroLine {\n  /** the part held at the left edge */\n  start?: RiopropertyHeroWord;\n  /** the part pushed to the right edge (on phones it gets its own row) */\n  end?: RiopropertyHeroWord;\n}\n\nexport interface RiopropertyHeroProps {\n  /** the giant headline, one entry per desktop row */\n  lines: RiopropertyHeroLine[];\n  /** the short stacked list at the left (e.g. the property types) */\n  kicker: string[];\n  /** the capitalised line across from it */\n  blurb: string;\n  /** an optional end of the blurb, underlined in yellow and linked */\n  blurbLink?: { label: string; href: string };\n  /** how far the kicker and the blurb fly, in vw */\n  kickerDrift?: number;\n  blurbDrift?: number;\n  /** a photo or looping video; fills the window like object-fit cover. Empty: a placeholder */\n  media?: ReactNode;\n  /** desktop: the section is three windows tall and the stage stays pinned while the words\n      fly apart (phones: always one window, the words fly as it scrolls away) */\n  pinned?: boolean;\n  /** a violet curtain that lifts off the hero on load */\n  curtain?: boolean;\n  className?: string;\n}\n\nfunction Word({ word, fallback, className }: { word: RiopropertyHeroWord; fallback: number; className?: string }) {\n  return (\n    <span className={cn(\"rioproperty-hero-fly block\", className)} style={{ \"--rioproperty-hero-drift\": word.drift ?? fallback } as CSSProperties}>\n      {word.text}\n    </span>\n  );\n}\n\nexport function RiopropertyHero({\n  lines,\n  kicker,\n  blurb,\n  blurbLink,\n  kickerDrift = -28,\n  blurbDrift = 85,\n  media,\n  pinned = true,\n  curtain = true,\n  className,\n}: RiopropertyHeroProps) {\n  return (\n    <section\n      data-pinned={pinned ? \"\" : undefined}\n      className={cn(\"rioproperty-hero relative bg-secondary text-background dark:text-foreground\", pinned ? \"h-svh lg:h-[300svh]\" : \"h-svh\", className)}\n    >\n      <div className=\"sticky top-0 isolate h-svh overflow-clip\">\n        {/* the media drifts down as the section leaves, so the next section slides over it */}\n        <div className=\"rioproperty-hero-media absolute inset-0 -z-10\">\n          {media ?? <div aria-hidden className=\"size-full bg-gradient-to-b from-secondary via-glow/60 to-secondary\" />}\n        </div>\n        {/* a dark scrim so the light text reads; it clears as the words fly away */}\n        <div aria-hidden className=\"rioproperty-hero-scrim absolute inset-0 -z-10 bg-secondary/40\" />\n\n        <div className=\"mx-auto flex h-full max-w-page flex-col justify-end px-gutter pb-12 lg:pb-[4.25rem]\">\n          <div className=\"flex flex-col gap-8 text-[1.117rem] leading-normal uppercase lg:grid lg:grid-cols-12 lg:gap-x-4 lg:text-base\">\n            <ul className=\"rioproperty-hero-fly lg:col-span-7\" style={{ \"--rioproperty-hero-drift\": kickerDrift } as CSSProperties}>\n              {kicker.map((item) => (\n                <li key={item}>{item}</li>\n              ))}\n            </ul>\n            <p\n              className=\"rioproperty-hero-fly max-w-[17rem] self-end text-right lg:col-span-4 lg:max-w-none lg:self-start lg:text-left\"\n              style={{ \"--rioproperty-hero-drift\": blurbDrift } as CSSProperties}\n            >\n              {blurb}\n              {blurbLink && (\n                <>\n                  {\" \"}\n                  <a href={blurbLink.href} className=\"border-b border-highlight transition-colors duration-500 hover:text-highlight\">\n                    {blurbLink.label}\n                  </a>\n                </>\n              )}\n            </p>\n          </div>\n\n          <h1 className=\"mt-14 font-display text-[12.7vw] leading-[0.966] font-semibold uppercase lg:mt-16 lg:text-[min(8.5vw,10.2rem)]\">\n            {lines.map((line, i) => (\n              <span key={i} className=\"flex flex-col lg:flex-row lg:justify-between lg:gap-[0.5em]\">\n                {line.start && <Word word={line.start} fallback={-30 - i * 15} className=\"whitespace-nowrap\" />}\n                {line.end && <Word word={line.end} fallback={50 + i * 15} className=\"self-end whitespace-nowrap lg:ml-auto\" />}\n              </span>\n            ))}\n          </h1>\n        </div>\n\n        {curtain && <div aria-hidden className=\"rioproperty-hero-curtain pointer-events-none absolute inset-0 z-10 bg-primary\" />}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lines",
+      "type": "RiopropertyHeroLine[]",
+      "required": true,
+      "description": "the giant headline, one entry per desktop row"
+    },
+    {
+      "name": "kicker",
+      "type": "string[]",
+      "required": true,
+      "description": "the short stacked list at the left (e.g. the property types)"
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": true,
+      "description": "the capitalised line across from it"
+    },
+    {
+      "name": "blurbLink",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an optional end of the blurb, underlined in yellow and linked"
+    },
+    {
+      "name": "kickerDrift",
+      "type": "number",
+      "required": false,
+      "default": "-28",
+      "description": "how far the kicker and the blurb fly, in vw"
+    },
+    {
+      "name": "blurbDrift",
+      "type": "number",
+      "required": false,
+      "default": "85"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a photo or looping video; fills the window like object-fit cover. Empty: a placeholder"
+    },
+    {
+      "name": "pinned",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "desktop: the section is three windows tall and the stage stays pinned while the words\nfly apart (phones: always one window, the words fly as it scrolls away)"
+    },
+    {
+      "name": "curtain",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "a violet curtain that lifts off the hero on load"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a2fae83ebfc9acf29da2a86ccd4360e8d2d970e12cc397b7eb0c553c666d0147"
+}

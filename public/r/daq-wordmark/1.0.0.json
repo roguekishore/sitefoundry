@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Daq wordmark",
+  "description": "A thin-line lucide cube beside a bold, widely tracked name with a tiny monospace sub-line under it. Optionally the name's letters rise in one after another on load.",
+  "category": "logos",
+  "site": "daq",
+  "license": "proprietary",
+  "tags": [
+    "wordmark",
+    "logo",
+    "mono",
+    "tracking",
+    "load-in",
+    "stagger"
+  ],
+  "notes": [
+    "the letter rise is CSS (fill-mode both) and is off under reduced motion"
+  ],
+  "entry": "daq-wordmark.tsx",
+  "source": "foundry",
+  "name": "daq-wordmark",
+  "files": [
+    {
+      "path": "daq-wordmark.css",
+      "content": "/* On load each letter of the name fades in and rises 10px, one after another. */\n@media (prefers-reduced-motion: no-preference) {\n  .daq-wordmark-letter {\n    animation: daq-wordmark-rise 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;\n    animation-delay: calc(0.2s + var(--daq-wordmark-i, 0) * 0.06s);\n  }\n}\n\n@keyframes daq-wordmark-rise {\n  from {\n    opacity: 0;\n    transform: translateY(10px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "daq-wordmark.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { Box } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./daq-wordmark.css\";\n\nexport interface DaqWordmarkProps {\n  /** the company name, set bold and tracked out */\n  name: string;\n  /** the small monospace line under the name */\n  sub?: string;\n  /** where the mark links to */\n  href?: string;\n  /** letters of the name rise in one after another on load */\n  animate?: boolean;\n  className?: string;\n}\n\nexport function DaqWordmark({ name, sub, href = \"/\", animate = false, className }: DaqWordmarkProps) {\n  return (\n    <a href={href} aria-label={name} className={cn(\"flex items-center gap-3.5 text-foreground\", className)}>\n      <Box aria-hidden strokeWidth={1} className=\"size-9 shrink-0\" />\n      <span aria-hidden className=\"flex flex-col gap-1\">\n        <span className=\"text-[0.9375rem] leading-none font-bold tracking-[0.25em]\">\n          {Array.from(name).map((letter, i) => (\n            <span\n              key={i}\n              className={cn(\"inline-block\", animate && \"daq-wordmark-letter\")}\n              style={{ \"--daq-wordmark-i\": i } as CSSProperties}\n            >\n              {letter}\n            </span>\n          ))}\n        </span>\n        {sub && <span className=\"font-mono text-[0.5rem] leading-none font-medium tracking-[0.35em] text-muted-foreground uppercase\">{sub}</span>}\n      </span>\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set bold and tracked out"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the small monospace line under the name"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the mark links to"
+    },
+    {
+      "name": "animate",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "letters of the name rise in one after another on load"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "91bb02ee88c48f72fe35c07aa2d018a8a1972c3f63200a7c9c2d1a490634a3e2"
+}

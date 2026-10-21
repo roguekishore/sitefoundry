@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Storey Architecture slide bars",
+  "description": "A row of thin slideshow progress bars with gutter gaps: the current one is wider and fills with solid ink over the slide's duration, the others are faint tracks. Each bar is a button that jumps to its slide.",
+  "category": "navigation",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "slideshow",
+    "progress",
+    "carousel",
+    "bars",
+    "minimal",
+    "timer"
+  ],
+  "notes": [
+    "inks with currentColor, so set the text colour of the parent (light on photos and dark bands)",
+    "controlled: the parent keeps the active index and the timer",
+    "under reduced motion the active bar is simply full"
+  ],
+  "entry": "storeyarchitecture-slide-bars.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "storeyarchitecture-slide-bars",
+  "files": [
+    {
+      "path": "storeyarchitecture-slide-bars.css",
+      "content": "/* The active bar's fill grows from the left over one slide's duration. It is keyed per\n   slide, so the animation restarts each time. Reduced motion: the bar is simply full. */\n@media (prefers-reduced-motion: no-preference) {\n  .storeyarchitecture-slide-bars-fill {\n    animation: storeyarchitecture-slide-bars-fill var(--storeyarchitecture-slide-bars-duration, 6s) linear both;\n    transform-origin: left center;\n  }\n}\n\n@keyframes storeyarchitecture-slide-bars-fill {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: scaleX(1);\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-slide-bars.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./storeyarchitecture-slide-bars.css\";\n\nexport interface StoreyarchitectureSlideBarsProps {\n  /** how many slides */\n  count: number;\n  /** the slide showing now */\n  active: number;\n  /** how long one slide stays, in ms (the fill takes this long) */\n  duration: number;\n  /** called with a slide's index when its bar is pressed */\n  onSelect?: (index: number) => void;\n  /** screen-reader label for each bar; the slide number is added after it */\n  label: string;\n  className?: string;\n}\n\nexport function StoreyarchitectureSlideBars({ count, active, duration, onSelect, label, className }: StoreyarchitectureSlideBarsProps) {\n  return (\n    <div className={cn(\"flex gap-gutter\", className)}>\n      {Array.from({ length: count }, (_, i) => (\n        <button\n          key={i}\n          type=\"button\"\n          aria-label={`${label} ${i + 1}`}\n          aria-current={i === active}\n          onClick={() => onSelect?.(i)}\n          className={cn(\n            \"relative h-[2px] min-w-0 bg-current/30 transition-[flex-grow] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] before:absolute before:inset-x-0 before:-inset-y-2 motion-reduce:transition-none\",\n            i === active ? \"grow-[2.2]\" : \"grow\",\n          )}\n          style={{ flexBasis: 0 }}\n        >\n          {i === active && (\n            <span\n              key={`fill-${active}`}\n              className=\"storeyarchitecture-slide-bars-fill absolute inset-0 bg-current\"\n              style={{ \"--storeyarchitecture-slide-bars-duration\": `${duration}ms` } as CSSProperties}\n            />\n          )}\n        </button>\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "count",
+      "type": "number",
+      "required": true,
+      "description": "how many slides"
+    },
+    {
+      "name": "active",
+      "type": "number",
+      "required": true,
+      "description": "the slide showing now"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": true,
+      "description": "how long one slide stays, in ms (the fill takes this long)"
+    },
+    {
+      "name": "onSelect",
+      "type": "((index: number) => void)",
+      "required": false,
+      "description": "called with a slide's index when its bar is pressed"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for each bar; the slide number is added after it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f1b4e51b638ec19a87f74565d4aa2a8ab7891f7767996a0f917dbc6fbeba0b98"
+}

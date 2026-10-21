@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lunchline philosophy",
+  "description": "A values section: a tiny tracked eyebrow, a large light two-line heading, then a numbered accordion of bold principles starting a quarter of the way across on wide screens, split by citron hairlines, each with a + that turns to × when opened. The heading's letters rise in, the rows fade in from 24px to the right one after another, and the top hairline draws itself out.",
+  "category": "faq",
+  "site": "lunchline",
+  "license": "proprietary",
+  "tags": [
+    "values",
+    "principles",
+    "accordion",
+    "faq",
+    "numbered",
+    "list",
+    "minimal",
+    "editorial",
+    "light",
+    "reveal",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "the rows are <details> elements: no JavaScript, keyboard-accessible",
+    "numbers come from the order of the items"
+  ],
+  "entry": "lunchline-philosophy.tsx",
+  "source": "foundry",
+  "name": "lunchline-philosophy",
+  "files": [
+    {
+      "path": "lunchline-philosophy.css",
+      "content": "/* Rows fade in from 24px to the right as they enter, each 40px of scroll after the last. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lunchline-philosophy-row {\n      animation: lunchline-philosophy-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--lunchline-philosophy-i, 0) * 40px) entry calc(180px + var(--lunchline-philosophy-i, 0) * 40px);\n    }\n  }\n}\n\n@keyframes lunchline-philosophy-in {\n  from {\n    opacity: 0;\n    transform: translateX(24px);\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "lunchline-philosophy.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LunchlineLetterRise } from \"@foundry/lunchline-letter-rise\";\nimport { LunchlineDrawRule } from \"@foundry/lunchline-draw-rule\";\nimport \"./lunchline-philosophy.css\";\n\nexport interface LunchlinePrinciple {\n  /** the principle, set bold (quotes included if you want them) */\n  title: string;\n  /** what it means in practice, shown when the row is opened */\n  body: string;\n}\n\nexport interface LunchlinePhilosophyProps {\n  /** the small tracked label above the heading */\n  eyebrow: string;\n  /** the light heading; its letters rise in as it scrolls into view */\n  heading: string;\n  /** the numbered principles (01, 02… are added) */\n  items: LunchlinePrinciple[];\n  /** section id, for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none\";\n\nexport function LunchlinePhilosophy({ eyebrow, heading, items, id, className }: LunchlinePhilosophyProps) {\n  return (\n    <section id={id} className={cn(\"relative overflow-x-clip bg-background py-section text-foreground lg:pb-[7rem]\", className)}>\n      <LunchlineDrawRule />\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <p className=\"text-sm leading-none font-bold tracking-[0.08em] uppercase lg:text-base\">{eyebrow}</p>\n        <LunchlineLetterRise\n          text={heading}\n          className=\"mt-[1.2rem] max-w-[62rem] font-display text-2xl leading-[1.2] font-light tracking-[-0.01em] lg:mt-6 lg:text-[3.5rem]\"\n        />\n\n        <ol className=\"mt-7 lg:mt-[5.6rem] lg:ml-[25%]\">\n          {items.map((item, i) => (\n            <li\n              key={item.title}\n              className=\"lunchline-philosophy-row border-b border-border last:border-b-0\"\n              style={{ \"--lunchline-philosophy-i\": i } as CSSProperties}\n            >\n              <details className=\"group\">\n                <summary className=\"flex cursor-pointer list-none items-start gap-3 py-[1.35rem] lg:items-center lg:gap-6 lg:py-[1.8rem] [&::-webkit-details-marker]:hidden\">\n                  <span className=\"w-6 shrink-0 pt-1 text-lg leading-none text-muted-foreground tabular-nums lg:pt-0\">{String(i + 1).padStart(2, \"0\")}</span>\n                  <span className=\"flex-1 text-[1.375rem] leading-[1.3] font-bold tracking-[-0.015em] lg:text-[1.75rem]\">{item.title}</span>\n                  <Plus className={cn(\"mt-0.5 size-6 shrink-0 transition-transform group-open:rotate-45 lg:mt-0 lg:mr-1.5\", ease)} strokeWidth={1.75} />\n                </summary>\n                <p className=\"max-w-[46rem] pb-7 pl-9 text-lg leading-[1.4] font-light lg:pl-12 lg:text-[1.3125rem]\">{item.body}</p>\n              </details>\n            </li>\n          ))}\n        </ol>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lunchline-draw-rule",
+    "lunchline-letter-rise"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small tracked label above the heading"
+    },
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light heading; its letters rise in as it scrolls into view"
+    },
+    {
+      "name": "items",
+      "type": "LunchlinePrinciple[]",
+      "required": true,
+      "description": "the numbered principles (01, 02… are added)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "section id, for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0751a2711601bcac4847eb1995dae316b2279883ca59aa0f3d07c195dc57562d"
+}

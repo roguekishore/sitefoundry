@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Wild AG reveal",
+  "description": "A wrapper that fades its content up into place as it scrolls into view: opacity 0 to 1 and a 40px rise, driven by the scroll itself (CSS view timeline). Give items in a column a step number to stagger them.",
+  "category": "animation",
+  "site": "wild-ag",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: browsers without scroll-driven animations, and reduced motion, show the content in place",
+    "the range is a fixed 240px of scroll after the element's top enters, so things in the first screen are already in place",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "wild-ag-reveal.tsx",
+  "source": "foundry",
+  "name": "wild-ag-reveal",
+  "files": [
+    {
+      "path": "wild-ag-reveal.css",
+      "content": "/* Fade and rise over the first 240px of scroll after the element's top enters the window (a\n   fixed distance, so text in the first screen is already in place at load). Each step shifts\n   the range by 40px, so a title, its paragraphs and its button arrive one after another. Only\n   where the browser supports view timelines and the visitor allows motion. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .wild-ag-reveal {\n      animation: wild-ag-reveal-in cubic-bezier(0.25, 0.46, 0.45, 0.94) both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--wild-ag-reveal-step, 0) * 40px) entry calc(240px + var(--wild-ag-reveal-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes wild-ag-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(var(--wild-ag-reveal-rise, 40px));\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "wild-ag-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./wild-ag-reveal.css\";\n\nexport interface WildAgRevealProps {\n  children?: ReactNode;\n  /** the element to render (div by default; p, li, h2… where it replaces one) */\n  as?: ElementType;\n  /** position in a staggered column: 0, 1, 2… each arrives a little later */\n  step?: number;\n  /** how far it rises, in px */\n  rise?: number;\n  className?: string;\n}\n\nexport function WildAgReveal({ children, as: Tag = \"div\", step = 0, rise = 40, className }: WildAgRevealProps) {\n  return (\n    <Tag\n      className={cn(\"wild-ag-reveal\", className)}\n      style={{ \"--wild-ag-reveal-step\": step, \"--wild-ag-reveal-rise\": `${rise}px` } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default; p, li, h2… where it replaces one)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered column: 0, 1, 2… each arrives a little later"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "default": "40",
+      "description": "how far it rises, in px"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a2f9d591d783938744b47159b055a57bdc1f20c89c62707bddf6885cbed6d4ff"
+}

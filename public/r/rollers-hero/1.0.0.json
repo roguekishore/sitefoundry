@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers hero",
+  "description": "A full-window video hero: white two-line headline and a lede at the bottom-left over a charcoal fade, a play button in the middle that fades out and shrinks to 80% over the first few hundred pixels of scroll, and on wide screens a photo card with a charcoal pill and an orange button in the bottom-right corner plus a looping vertical scroll cue on the right edge.",
+  "category": "hero",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "video",
+    "full-window",
+    "dark",
+    "overlay",
+    "scroll",
+    "fade",
+    "scale",
+    "loop",
+    "orange",
+    "industrial"
+  ],
+  "notes": [
+    "sized by the window minus the 64px sticky header (100svh − 4rem)",
+    "media and cardMedia are placeholders until you pass a <video> / <img> with object-cover and full size",
+    "uses the theme's dark palette for its text so it stays white over the media in both modes",
+    "the play button's fade is a CSS scroll timeline on the page scroll"
+  ],
+  "entry": "rollers-hero.tsx",
+  "source": "foundry",
+  "name": "rollers-hero",
+  "files": [
+    {
+      "path": "rollers-hero.css",
+      "content": "/* The play button fades out and shrinks to 80% between 174px and 574px of page scroll. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rollers-hero-play {\n      animation: rollers-hero-play-out linear both;\n      animation-timeline: scroll(root);\n      animation-range: 174px 574px;\n    }\n  }\n}\n\n@keyframes rollers-hero-play-out {\n  to {\n    opacity: 0;\n    scale: 0.8;\n  }\n}\n\n/* The scroll cue: a short segment slides down its track and fades, every 2s. */\n@media (prefers-reduced-motion: no-preference) {\n  .rollers-hero-cue {\n    animation: rollers-hero-cue-move 2s ease-in-out infinite;\n  }\n}\n\n@keyframes rollers-hero-cue-move {\n  0% {\n    transform: translateY(-100%);\n    opacity: 0;\n  }\n  30% {\n    opacity: 1;\n  }\n  100% {\n    transform: translateY(300%);\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "rollers-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RollersButton } from \"@foundry/rollers-button\";\nimport \"./rollers-hero.css\";\n\nexport interface RollersHeroAction {\n  label: string;\n  href: string;\n}\n\nexport interface RollersHeroProps {\n  /** the headline, one entry per line */\n  heading: string[];\n  /** the paragraph under the headline */\n  lede: string;\n  /** the full-bleed background (a looping video or a photo, object-cover); a placeholder when empty */\n  media?: ReactNode;\n  /** the centred play button's label and link (the showreel) */\n  showreel: RollersHeroAction;\n  /** wide screens: the photo of the card in the bottom-right corner; a placeholder when empty */\n  cardMedia?: ReactNode;\n  /** wide screens: the card's two buttons, charcoal pill then orange */\n  secondaryAction: RollersHeroAction;\n  primaryAction: RollersHeroAction;\n  /** wide screens: the vertical word beside the scroll cue */\n  scrollLabel: string;\n  className?: string;\n}\n\n/** A full-window video hero under the sticky header: white headline and lede at the\n    bottom-left over a charcoal fade, a play button in the middle that fades and shrinks away\n    as you start scrolling, and on wide screens a photo card with two buttons in the\n    bottom-right corner and a looping scroll cue on the right edge. */\nexport function RollersHero({\n  heading,\n  lede,\n  media,\n  showreel,\n  cardMedia,\n  secondaryAction,\n  primaryAction,\n  scrollLabel,\n  className,\n}: RollersHeroProps) {\n  return (\n    <section className={cn(\"dark relative h-[calc(100svh-4rem)] overflow-clip text-foreground\", className)}>\n      {/* the video: placeholder surface until media is passed */}\n      <div className=\"absolute inset-0 bg-muted-foreground\">{media}</div>\n      <div aria-hidden className=\"absolute inset-0 bg-linear-to-t from-background/75 via-background/15 via-45% to-transparent\" />\n\n      <a\n        href={showreel.href}\n        className=\"rollers-hero-play absolute top-[32%] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-[0.875rem] leading-none lg:top-[54%] lg:flex-row lg:text-[1.125rem] lg:uppercase\"\n      >\n        <span className=\"flex size-12 items-center justify-center rounded-full border-2 border-foreground lg:size-8\">\n          <Play className=\"ml-0.5 size-6 lg:size-4\" strokeWidth={1.5} />\n        </span>\n        {showreel.label}\n      </a>\n\n      <div className=\"absolute inset-x-0 bottom-0 flex items-end justify-between gap-10 px-gutter pb-[7.5rem] lg:pb-11\">\n        <div className=\"max-w-[44rem]\">\n          <h1 className=\"font-display text-[2.05rem] leading-[1.1] font-[550] tracking-[-0.015em] lg:text-[4.25rem]\">\n            {heading.map((line, i) => (\n              <span key={i} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h1>\n          <p className=\"mt-4 max-w-[42rem] font-display text-[0.875rem] leading-[1.5] lg:mt-6 lg:text-[1.125rem]\">{lede}</p>\n        </div>\n\n        <div className=\"hidden w-[23.75rem] shrink-0 lg:-mb-1 lg:block\">\n          <div className=\"aspect-[1.72] overflow-hidden rounded-t-[4px] bg-muted\">{cardMedia}</div>\n          <div className=\"flex bg-foreground p-2.5\">\n            <RollersButton href={secondaryAction.href} variant=\"pill\" size=\"wide\" className=\"bg-background text-foreground\">\n              {secondaryAction.label}\n            </RollersButton>\n            <RollersButton href={primaryAction.href} size=\"wide\">\n              {primaryAction.label}\n            </RollersButton>\n          </div>\n        </div>\n      </div>\n\n      {/* wide screens: the scroll cue */}\n      <div aria-hidden className=\"absolute top-[43%] right-8 hidden flex-col items-center gap-4 lg:flex\">\n        <span className=\"text-[0.75rem] leading-none tracking-[0.25em] uppercase [writing-mode:vertical-rl]\">{scrollLabel}</span>\n        <span className=\"relative h-15 w-px overflow-clip bg-foreground/25\">\n          <span className=\"rollers-hero-cue absolute inset-x-0 top-0 h-5 bg-foreground\" />\n        </span>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-button"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string[]",
+      "required": true,
+      "description": "the headline, one entry per line"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the headline"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed background (a looping video or a photo, object-cover); a placeholder when empty"
+    },
+    {
+      "name": "showreel",
+      "type": "RollersHeroAction",
+      "required": true,
+      "description": "the centred play button's label and link (the showreel)"
+    },
+    {
+      "name": "cardMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "wide screens: the photo of the card in the bottom-right corner; a placeholder when empty"
+    },
+    {
+      "name": "secondaryAction",
+      "type": "RollersHeroAction",
+      "required": true,
+      "description": "wide screens: the card's two buttons, charcoal pill then orange"
+    },
+    {
+      "name": "primaryAction",
+      "type": "RollersHeroAction",
+      "required": true
+    },
+    {
+      "name": "scrollLabel",
+      "type": "string",
+      "required": true,
+      "description": "wide screens: the vertical word beside the scroll cue"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f27e1a798bd0ad23329c62f05323d897d7534f01eb57a5019fc8a0bd3045a5f9"
+}

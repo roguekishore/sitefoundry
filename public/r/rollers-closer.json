@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers closer",
+  "description": "A charcoal textured band holding two cards side by side: an orange card whose client quotes (headline, paragraph, round avatar, name and company) slide sideways every six seconds with dots to pick one, and a wide white card with a chip, a centred very large two-tone heading, an orange paragraph and a pill + rectangle button pair. Stacked on phones.",
+  "category": "testimonials",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "slider",
+    "carousel",
+    "autoplay",
+    "cta",
+    "dark",
+    "orange",
+    "cards",
+    "two-tone",
+    "reveal"
+  ],
+  "notes": [
+    "autoplay pauses on hover and is off under reduced motion",
+    "dark in both modes: it uses the theme's .dark palette; the white card is drawn with foreground/background inside it",
+    "avatar is a placeholder circle with initials until you pass an <img>"
+  ],
+  "entry": "rollers-closer.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "rollers-closer",
+  "files": [
+    {
+      "path": "rollers-closer.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RollersBand } from \"@foundry/rollers-band\";\nimport { RollersButton } from \"@foundry/rollers-button\";\nimport { RollersEyebrow } from \"@foundry/rollers-eyebrow\";\nimport { RollersWords, type RollersWordsSegment } from \"@foundry/rollers-words\";\n\nexport interface RollersCloserQuote {\n  /** the headline sentence of the quote */\n  quote: string;\n  /** the rest of it */\n  body: string;\n  /** who said it */\n  name: string;\n  /** their company or role, set in capitals */\n  role: string;\n  /** the round client logo or portrait (80px); initials on a charcoal circle when empty */\n  avatar?: ReactNode;\n  /** shown in the empty avatar */\n  initials: string;\n}\n\nexport interface RollersCloserProps {\n  /** the client quotes, cycling in the orange card */\n  quotes: RollersCloserQuote[];\n  /** screen-reader label for each dot: \"Show quote\" + its number */\n  dotLabel: string;\n  /** the chip of the white card */\n  eyebrow: string;\n  /** the white card's heading as parts: orange first (tone: \"accent\"), then charcoal */\n  heading: RollersWordsSegment[];\n  /** the orange paragraph under it */\n  text: string;\n  /** the charcoal pill, then the orange button */\n  secondaryAction: { label: string; href: string };\n  primaryAction: { label: string; href: string };\n  /** an in-page anchor */\n  id?: string;\n  className?: string;\n}\n\n/** A charcoal band holding two cards side by side: an orange card whose client quotes slide\n    across every six seconds (dots to pick one), and a wide white card with a centred two-tone\n    heading, an orange paragraph and a button pair. */\nexport function RollersCloser({\n  quotes,\n  dotLabel,\n  eyebrow,\n  heading,\n  text,\n  secondaryAction,\n  primaryAction,\n  id,\n  className,\n}: RollersCloserProps) {\n  const [active, setActive] = useState(0);\n  const [paused, setPaused] = useState(false);\n\n  useEffect(() => {\n    if (paused || quotes.length < 2) return;\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const timer = window.setInterval(() => setActive((i) => (i + 1) % quotes.length), 6000);\n    return () => window.clearInterval(timer);\n  }, [paused, quotes.length]);\n\n  return (\n    <RollersBand id={id} className={cn(\"px-gutter pt-7.5 pb-7.5 md:pt-section md:pb-section\", className)}>\n      <div className=\"flex flex-col gap-7.5 lg:flex-row lg:gap-10\">\n        {/* the quotes */}\n        <div\n          className=\"flex flex-col overflow-clip bg-primary text-primary-foreground lg:w-[32.5rem] lg:shrink-0\"\n          onMouseEnter={() => setPaused(true)}\n          onMouseLeave={() => setPaused(false)}\n        >\n          <div\n            className=\"flex flex-1 transition-transform duration-700 ease-[cubic-bezier(0.42,0,0.58,1)] motion-reduce:transition-none\"\n            style={{ transform: `translateX(-${active * 100}%)` }}\n          >\n            {quotes.map((q, i) => (\n              <figure\n                key={q.name}\n                aria-hidden={i !== active}\n                className=\"flex w-full shrink-0 flex-col px-7.5 pt-10 md:px-10 md:pt-14\"\n              >\n                <blockquote>\n                  <p className=\"font-display text-[1.25rem] leading-[1.25] md:text-[2rem] md:leading-[1.2]\">{q.quote}</p>\n                  <p className=\"mt-6 font-display text-[0.875rem] leading-[1.5] md:mt-8 md:text-[1.125rem]\">{q.body}</p>\n                </blockquote>\n                <figcaption className=\"mt-auto flex items-center gap-5 pt-14\">\n                  <span className=\"flex size-20 shrink-0 items-center justify-center overflow-clip rounded-full bg-secondary font-display text-[1.25rem] text-secondary-foreground\">\n                    {q.avatar ?? q.initials}\n                  </span>\n                  <span>\n                    <span className=\"block font-display text-[1.5rem] leading-[1.3]\">{q.name}</span>\n                    <span className=\"block font-display text-[0.875rem] leading-[1.4] uppercase md:text-[1.125rem]\">{q.role}</span>\n                  </span>\n                </figcaption>\n              </figure>\n            ))}\n          </div>\n          <div className=\"flex justify-center gap-1.5 pt-5 pb-7.5 md:pb-10\">\n            {quotes.map((q, i) => (\n              <button\n                key={q.name}\n                type=\"button\"\n                aria-label={`${dotLabel} ${i + 1}`}\n                aria-current={i === active ? \"true\" : undefined}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"size-2 rounded-full border border-primary-foreground transition-colors duration-300\",\n                  i === active && \"bg-primary-foreground\",\n                )}\n              />\n            ))}\n          </div>\n        </div>\n\n        {/* the call to action: a white card inside the charcoal band */}\n        <div className=\"flex flex-1 flex-col items-start bg-foreground px-7.5 py-10 text-background md:px-10 lg:items-center lg:justify-center lg:py-10 lg:text-center\">\n          <RollersEyebrow className=\"bg-background text-foreground\">{eyebrow}</RollersEyebrow>\n          <RollersWords\n            segments={heading}\n            className=\"mt-5 max-w-[37.5rem] font-display text-[2.05rem] leading-[1.1] font-[550] tracking-[-0.015em] md:text-[3.25rem] lg:mt-6 lg:text-[4.25rem]\"\n          />\n          <p className=\"mt-5 max-w-[40rem] font-display text-[0.875rem] leading-[1.25] text-primary md:mt-8 md:text-[1.5rem] md:leading-[1.2]\">{text}</p>\n          <div className=\"mt-6 flex md:mt-8\">\n            <RollersButton href={secondaryAction.href} variant=\"pill\" className=\"bg-background text-foreground\">\n              {secondaryAction.label}\n            </RollersButton>\n            <RollersButton href={primaryAction.href}>{primaryAction.label}</RollersButton>\n          </div>\n        </div>\n      </div>\n    </RollersBand>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-band",
+    "rollers-button",
+    "rollers-eyebrow",
+    "rollers-words"
+  ],
+  "props": [
+    {
+      "name": "quotes",
+      "type": "RollersCloserQuote[]",
+      "required": true,
+      "description": "the client quotes, cycling in the orange card"
+    },
+    {
+      "name": "dotLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for each dot: \"Show quote\" + its number"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the chip of the white card"
+    },
+    {
+      "name": "heading",
+      "type": "RollersWordsSegment[]",
+      "required": true,
+      "description": "the white card's heading as parts: orange first (tone: \"accent\"), then charcoal"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the orange paragraph under it"
+    },
+    {
+      "name": "secondaryAction",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the charcoal pill, then the orange button"
+    },
+    {
+      "name": "primaryAction",
+      "type": "{ label: string; href: string; }",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an in-page anchor"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6586e260282cdc8200130dd1efbfabd75806a88527ace5a842f54463f2c30715"
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Daq manifesto",
+  "description": "A pinned statement 250% of the window tall: a bold monospace label with a rule, a row of keyword tags at the right, and a huge uppercase paragraph in thin type with a few heavy key words. While it is pinned the key words fill in from hollow outlines one after another and their tags light up; as it leaves, the whole block dims to 15% and lifts 40px.",
+  "category": "features",
+  "site": "daq",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "manifesto",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "outline-text",
+    "fill",
+    "uppercase",
+    "thin",
+    "dark",
+    "scroll-driven"
+  ],
+  "notes": [
+    "transparent: made to sit over daq-backdrop; pass a background in className without it",
+    "all motion is CSS scroll-driven (no JavaScript); without support the key words show filled",
+    "the tags show from 1024px; on phones the label's rule runs to the edge"
+  ],
+  "entry": "daq-manifesto.tsx",
+  "source": "foundry",
+  "name": "daq-manifesto",
+  "files": [
+    {
+      "path": "daq-manifesto.css",
+      "content": "/* The section is a named view timeline. Its \"contain\" range is the pinned stretch (the\n   sticky panel holds still from contain 0% to 100%). Each key word and tag reads its own\n   slice of that range from inline variables: hollow outline → solid, tag 25% → full.\n   Then, as the section leaves (exit 0–50%), the whole block dims to 15% and lifts 40px. */\n.daq-manifesto {\n  view-timeline: --daq-manifesto block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .daq-manifesto-key,\n    .daq-manifesto-tag {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --daq-manifesto;\n      animation-range: contain var(--daq-manifesto-from) contain var(--daq-manifesto-to);\n    }\n    .daq-manifesto-key {\n      animation-name: daq-manifesto-fill;\n    }\n    .daq-manifesto-tag {\n      animation-name: daq-manifesto-light;\n    }\n    .daq-manifesto-body {\n      animation: daq-manifesto-leave linear both;\n      animation-timeline: --daq-manifesto;\n      animation-range: exit 0% exit 50%;\n    }\n  }\n}\n\n@keyframes daq-manifesto-fill {\n  from {\n    color: transparent;\n    -webkit-text-stroke: 1px color-mix(in oklab, var(--foreground) 45%, transparent);\n  }\n  to {\n    color: var(--foreground);\n    -webkit-text-stroke: 1px transparent;\n  }\n}\n\n@keyframes daq-manifesto-light {\n  from {\n    opacity: 0.25;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes daq-manifesto-leave {\n  to {\n    opacity: 0.15;\n    transform: translateY(-40px);\n  }\n}\n"
+    },
+    {
+      "path": "daq-manifesto.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { DaqEyebrow } from \"@foundry/daq-eyebrow\";\nimport \"./daq-manifesto.css\";\n\nexport interface DaqManifestoPart {\n  /** a run of the statement (shown uppercase); keep the spaces between runs in the text */\n  text: string;\n  /** a key word: hollow at first, filled as you scroll */\n  key?: boolean;\n}\n\nexport interface DaqManifestoProps {\n  /** the bold label at the top left */\n  label: string;\n  /** the keyword tags at the top right, in the order the key words fill */\n  tags?: string[];\n  /** the statement, split into plain and key runs */\n  parts: DaqManifestoPart[];\n  className?: string;\n}\n\n// The key words fill one after another between 5% and 65% of the pinned stretch.\nconst FILL_START = 5;\nconst FILL_SPAN = 60;\n\nfunction slice(i: number, count: number): CSSProperties {\n  const step = FILL_SPAN / Math.max(count, 1);\n  return {\n    \"--daq-manifesto-from\": `${FILL_START + i * step}%`,\n    \"--daq-manifesto-to\": `${FILL_START + (i + 1) * step}%`,\n  } as CSSProperties;\n}\n\nexport function DaqManifesto({ label, tags = [], parts, className }: DaqManifestoProps) {\n  const keyCount = parts.filter((p) => p.key).length;\n  let keyIndex = 0;\n\n  return (\n    <section className={cn(\"daq-manifesto relative h-[250svh]\", className)}>\n      {/* the page frame: hairlines down both gutters */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-y-0 inset-x-gutter border-x border-foreground/5\" />\n\n      <div className=\"sticky top-0 flex h-svh flex-col justify-center px-gutter\">\n        <div className=\"daq-manifesto-body\">\n          <div className=\"flex items-center justify-between gap-8\">\n            <DaqEyebrow label={label} strong rule=\"short\" className=\"flex-1 lg:flex-none\" />\n            {tags.length > 0 && (\n              <ul className=\"hidden items-center gap-7 lg:flex\">\n                {tags.map((tag, i) => (\n                  <li\n                    key={tag}\n                    className=\"daq-manifesto-tag flex items-center gap-3 font-mono text-[0.625rem] leading-none font-bold tracking-[0.2em] uppercase\"\n                    style={slice(i, tags.length)}\n                  >\n                    <span aria-hidden className=\"h-px w-5 bg-foreground\" />\n                    {tag}\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n\n          <p className=\"mt-8 max-w-[82vw] font-display text-[clamp(1.7rem,4.8vw,6.5rem)] leading-[1.04] font-extralight tracking-[-0.025em] text-foreground/70 uppercase lg:mt-12 lg:max-w-[90vw]\">\n            {parts.map((part, i) =>\n              part.key ? (\n                <span key={i} className=\"daq-manifesto-key font-bold text-foreground\" style={slice(keyIndex++, keyCount)}>\n                  {part.text}\n                </span>\n              ) : (\n                <span key={i}>{part.text}</span>\n              ),\n            )}\n          </p>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "daq-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the bold label at the top left"
+    },
+    {
+      "name": "tags",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "the keyword tags at the top right, in the order the key words fill"
+    },
+    {
+      "name": "parts",
+      "type": "DaqManifestoPart[]",
+      "required": true,
+      "description": "the statement, split into plain and key runs"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5bf852458a690104522ad51416a0f9031c56826fa85c6b6c92cce83e06684e53"
+}

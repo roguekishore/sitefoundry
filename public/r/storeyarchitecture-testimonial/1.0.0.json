@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Storey Architecture testimonial",
+  "description": "A tall black band. At the left: a 4:3 photo slideshow with thin progress bars under it, then a client's short quote in a narrow column beside a small square thumbnail with the client's name and a mono company line. At the top-right: two white paragraphs side by side that lag behind the scroll. Slides crossfade from 105% scale; a wide empty black field closes the band.",
+  "category": "testimonials",
+  "site": "storeyarchitecture",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "slideshow",
+    "carousel",
+    "dark",
+    "black",
+    "parallax",
+    "crossfade",
+    "mono",
+    "vw"
+  ],
+  "notes": [
+    "drawn with bg-foreground: a black band on light themes, a pale one on dark themes",
+    "needs JavaScript for the slideshow (hydrate: visible); without it the first slide shows",
+    "the paragraphs' lag (0→27vw) is desktop only; on phones they follow the quote"
+  ],
+  "entry": "storeyarchitecture-testimonial.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "storeyarchitecture-testimonial",
+  "files": [
+    {
+      "path": "storeyarchitecture-testimonial.css",
+      "content": "/* Desktop: the paragraphs lag behind the scroll, sinking 27vw over the band's pass. */\n.storeyarchitecture-testimonial {\n  view-timeline-name: --storeyarchitecture-testimonial;\n}\n\n@supports (animation-timeline: view()) {\n  @media (min-width: 40rem) and (prefers-reduced-motion: no-preference) {\n    .storeyarchitecture-testimonial-lag {\n      animation: storeyarchitecture-testimonial-lag linear both;\n      animation-timeline: --storeyarchitecture-testimonial;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes storeyarchitecture-testimonial-lag {\n  from {\n    transform: translateY(0);\n  }\n  to {\n    transform: translateY(27vw);\n  }\n}\n"
+    },
+    {
+      "path": "storeyarchitecture-testimonial.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StoreyarchitectureRise } from \"@foundry/storeyarchitecture-rise\";\nimport { StoreyarchitectureSlideBars } from \"@foundry/storeyarchitecture-slide-bars\";\nimport \"./storeyarchitecture-testimonial.css\";\n\nexport interface StoreyarchitectureTestimonialSlide {\n  /** the client's words */\n  quote: string;\n  /** the client's name */\n  name: string;\n  /** the company or project line, set in mono capitals */\n  company: string;\n  /** the 4:3 photo (object-cover); empty shows a placeholder */\n  media?: ReactNode;\n  /** the small square thumbnail; empty shows a placeholder */\n  thumb?: ReactNode;\n}\n\nexport interface StoreyarchitectureTestimonialProps {\n  /** one slide per client */\n  slides: StoreyarchitectureTestimonialSlide[];\n  /** two paragraphs side by side at the top-right */\n  paragraphs: string[];\n  /** screen-reader label of each progress bar; the slide number is added */\n  slideLabel: string;\n  /** how long each slide stays, in ms */\n  interval?: number;\n  className?: string;\n}\n\nconst cover = \"[&>*]:size-full [&>*]:object-cover\";\n\nexport function StoreyarchitectureTestimonial({ slides, paragraphs, slideLabel, interval = 7000, className }: StoreyarchitectureTestimonialProps) {\n  const [active, setActive] = useState(0);\n\n  useEffect(() => {\n    if (slides.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setTimeout(() => setActive((a) => (a + 1) % slides.length), interval);\n    return () => window.clearTimeout(id);\n  }, [active, interval, slides.length]);\n\n  const current = slides[active];\n  const fade = (on: boolean) =>\n    cn(\"transition-[opacity,scale] duration-[800ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\", on ? \"scale-100 opacity-100\" : \"scale-105 opacity-0\");\n\n  return (\n    <section\n      className={cn(\n        \"storeyarchitecture-testimonial grid grid-cols-6 font-[450] gap-x-gutter bg-foreground px-gutter pt-gutter pb-[30vw] text-background tracking-[-0.02em] sm:grid-cols-12 sm:pt-[0.9vw] sm:pb-[55vw]\",\n        className,\n      )}\n    >\n      <div className=\"col-span-6 sm:row-start-1 sm:mt-[5vw]\">\n        <div className=\"relative aspect-[4/3] overflow-clip\">\n          {slides.map((slide, i) => (\n            <div key={i} aria-hidden={i !== active} className={cn(\"absolute inset-0 bg-background/15\", cover, fade(i === active))}>\n              {slide.media}\n            </div>\n          ))}\n        </div>\n        <StoreyarchitectureSlideBars count={slides.length} active={active} duration={interval} onSelect={setActive} label={slideLabel} className=\"mt-[4vw] sm:mt-[1.4vw]\" />\n\n        <figure key={active} className=\"mt-[4vw] grid grid-cols-6 gap-x-gutter sm:mt-[1.6vw]\">\n          <blockquote className=\"col-span-3 text-[4.3vw] leading-[1.2] sm:text-[1.6vw]\">\n            <p>{current?.quote}</p>\n          </blockquote>\n          <figcaption className=\"col-span-3 flex items-start gap-[3vw] sm:ml-[2.3vw] sm:gap-[1.4vw]\">\n            <span className={cn(\"size-[12vw] shrink-0 overflow-clip bg-background/15 grayscale sm:size-[4.5vw]\", cover)}>{current?.thumb}</span>\n            <span className=\"hidden flex-col gap-[0.5vw] pt-[0.4vw] text-[1.1vw] leading-none sm:flex\">\n              <span className=\"text-background/70\">{current?.name}</span>\n              <span className=\"font-mono tracking-[-0.06em] text-background/70 uppercase\">{current?.company}</span>\n            </span>\n          </figcaption>\n        </figure>\n      </div>\n\n      <div className=\"storeyarchitecture-testimonial-lag col-span-6 mt-[50vw] grid grid-cols-6 gap-x-gutter gap-y-[6vw] text-[4.3vw] leading-[1.2] sm:col-start-7 sm:row-start-1 sm:mt-0 sm:text-[1.6vw]\">\n        {paragraphs.map((text, i) => (\n          <StoreyarchitectureRise key={text} step={i} className=\"col-span-6 sm:col-span-3\">\n            <p>{text}</p>\n          </StoreyarchitectureRise>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "storeyarchitecture-rise",
+    "storeyarchitecture-slide-bars"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "StoreyarchitectureTestimonialSlide[]",
+      "required": true,
+      "description": "one slide per client"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "two paragraphs side by side at the top-right"
+    },
+    {
+      "name": "slideLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of each progress bar; the slide number is added"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "7000",
+      "description": "how long each slide stays, in ms"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d87d7e29eef5938e16de6c9593fc89cc422fb187918f2a8d7a2bcfb045725add"
+}

@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup footer",
+  "description": "A dark warm-brown panel with 50px top corners and a video (or soft light) behind it: one big, very thin statement line, four columns of small white links, and a tiny legal line at the bottom. On phones the columns fold into hairline accordion rows with a thin plus, and the legal line centres. Links brighten on hover (0.18s).",
+  "category": "footer",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "brown",
+    "warm",
+    "video",
+    "rounded",
+    "thin",
+    "accordion",
+    "links",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "drawn with bg-foreground and text-background: a dark panel on light themes, a pale one on dark themes",
+    "media is the background (a looping video on the original) and fills the panel (cover); empty shows soft glow and highlight light",
+    "the phone accordions are native <details>: no JavaScript"
+  ],
+  "entry": "ledup-footer.tsx",
+  "source": "foundry",
+  "name": "ledup-footer",
+  "files": [
+    {
+      "path": "ledup-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LedupFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface LedupFooterColumn {\n  /** the column's heading (also the phone accordion's label) */\n  title: string;\n  /** the links under it */\n  links: LedupFooterLink[];\n  /** hide the heading on desktop (the original's contact column has none) */\n  untitledOnDesktop?: boolean;\n}\n\nexport interface LedupFooterProps {\n  /** the big thin statement at the top */\n  statement: ReactNode;\n  /** the link columns (four in the original) */\n  columns: LedupFooterColumn[];\n  /** the copyright line */\n  copyright: string;\n  /** the legal links after it */\n  legal?: LedupFooterLink[];\n  /** the background video or photo; empty shows soft warm light */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function LedupFooter({ statement, columns, copyright, legal = [], media, className }: LedupFooterProps) {\n  return (\n    <footer className={cn(\"bg-background font-sans\", className)}>\n      <div className=\"relative isolate overflow-clip rounded-t-[3.125rem] bg-foreground text-background\">\n        <div aria-hidden={!media} className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n          {media ?? (\n            <div className=\"bg-[radial-gradient(60%_80%_at_75%_45%,color-mix(in_oklch,var(--glow)_35%,transparent),transparent),radial-gradient(40%_60%_at_15%_10%,color-mix(in_oklch,var(--highlight)_18%,transparent),transparent)]\" />\n          )}\n        </div>\n\n        <div className=\"mx-auto max-w-page px-gutter pt-[5.25rem] pb-5 lg:pt-[5.5rem] lg:pb-6\">\n          <div className=\"px-4 lg:px-[2.2rem]\">\n            <p className=\"max-w-[11em] text-[1.75rem] leading-[1.2] font-extralight lg:max-w-none lg:text-[3.24rem]\">{statement}</p>\n\n            {/* phones: hairline accordion rows */}\n            <div className=\"mt-14 lg:hidden\">\n              {columns.map((col) => (\n                <details key={col.title} className=\"group border-b border-background/50\">\n                  <summary className=\"flex h-[3.75rem] cursor-pointer list-none items-center justify-between text-sm font-semibold [&::-webkit-details-marker]:hidden\">\n                    {col.title}\n                    <Plus aria-hidden strokeWidth={1} className=\"size-6 transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none\" />\n                  </summary>\n                  <ul className=\"flex flex-col gap-3 pb-5\">\n                    {col.links.map((link) => (\n                      <li key={link.label}>\n                        <a href={link.href} className=\"text-sm text-background/85 transition-colors duration-200 hover:text-background\">\n                          {link.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </details>\n              ))}\n            </div>\n\n            {/* desktop: four columns */}\n            <div className=\"mt-24 hidden grid-cols-4 gap-8 lg:grid\">\n              {columns.map((col) => (\n                <div key={col.title}>\n                  <p className={cn(\"mb-2 text-sm font-semibold\", col.untitledOnDesktop && \"sr-only\")}>{col.title}</p>\n                  <ul className=\"flex flex-col\">\n                    {col.links.map((link) => (\n                      <li key={link.label}>\n                        <a\n                          href={link.href}\n                          className=\"block py-1 text-sm leading-5 text-background/85 transition-colors duration-[180ms] hover:text-background motion-reduce:transition-none\"\n                        >\n                          {link.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ))}\n            </div>\n\n            <div className=\"mt-12 flex flex-col items-center gap-5 text-xs lg:mt-24 lg:flex-row lg:gap-11\">\n              <p>{copyright}</p>\n              {legal.length > 0 && (\n                <ul className=\"flex gap-5\">\n                  {legal.map((link) => (\n                    <li key={link.label}>\n                      <a href={link.href} className=\"font-medium transition-colors duration-[180ms] hover:text-background/75 motion-reduce:transition-none\">\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              )}\n            </div>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "statement",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big thin statement at the top"
+    },
+    {
+      "name": "columns",
+      "type": "LedupFooterColumn[]",
+      "required": true,
+      "description": "the link columns (four in the original)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "LedupFooterLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "the legal links after it"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the background video or photo; empty shows soft warm light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e4c9e6eff9aba0480e5a541244d4635c2396cc7205fec088e311bf196fcf2e96"
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Daq backdrop",
+  "description": "A fixed, window-filling media layer behind the whole page (the original's liquid WebGL), overlaid with a faint 12-column hairline grid and a vignette into the page colour at the bottom. Transparent sections show it; solid ones cover it, so it appears and disappears as you scroll.",
+  "category": "background",
+  "site": "daq",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "fixed",
+    "fullscreen",
+    "grid",
+    "hairline",
+    "vignette",
+    "dark",
+    "webgl-slot"
+  ],
+  "notes": [
+    "place it first on the page; give the sections after it position: relative (all daq blocks are) so they paint above it",
+    "the media slot fills the window like object-fit cover; empty, it is a blue-grey muted surface with a soft glow wash",
+    "best on dark themes"
+  ],
+  "entry": "daq-backdrop.tsx",
+  "source": "foundry",
+  "name": "daq-backdrop",
+  "files": [
+    {
+      "path": "daq-backdrop.css",
+      "content": "/* The hairline grid: 4 columns between the page gutters on phones, 12 from 1024px, and a row line every half window.\n   Lines are the foreground at 5%, so they suit either mode. */\n.daq-backdrop-grid {\n  --daq-backdrop-line: color-mix(in oklab, var(--foreground) 5%, transparent);\n  background-image:\n    linear-gradient(var(--daq-backdrop-line) 1px, transparent 1px),\n    linear-gradient(90deg, var(--daq-backdrop-line) 1px, transparent 1px);\n  background-size: calc((100% - 2 * var(--page-gutter)) / 4) 50svh;\n  background-position: var(--page-gutter) 25svh;\n}\n\n@media (min-width: 64rem) {\n  .daq-backdrop-grid {\n    background-size: calc((100% - 2 * var(--page-gutter)) / 12) 50svh;\n  }\n}\n"
+    },
+    {
+      "path": "daq-backdrop.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./daq-backdrop.css\";\n\nexport interface DaqBackdropProps {\n  /** a looping video, canvas or image filling the window. Empty: a placeholder surface */\n  media?: ReactNode;\n  /** draw the faint 12-column hairline grid over the media */\n  grid?: boolean;\n  className?: string;\n}\n\n/**\n * The window-sized layer behind the page. It is fixed, so it stays put while transparent\n * sections (hero, manifesto, footer) scroll over it and solid ones hide it.\n */\nexport function DaqBackdrop({ media, grid = true, className }: DaqBackdropProps) {\n  return (\n    <div aria-hidden className={cn(\"pointer-events-none fixed inset-0 isolate overflow-clip\", className)}>\n      {media ? (\n        <div className=\"absolute inset-0 *:size-full *:object-cover\">{media}</div>\n      ) : (\n        <div className=\"absolute inset-0 bg-muted\">\n          <div className=\"absolute inset-0 bg-radial-[at_30%_25%] from-glow/45 to-transparent to-60%\" />\n          <div className=\"absolute inset-0 bg-radial-[at_80%_70%] from-glow/25 to-transparent to-50%\" />\n        </div>\n      )}\n      {/* darkens the media a touch so white text always reads */}\n      <div className=\"absolute inset-0 bg-background/35\" />\n      {grid && <div className=\"daq-backdrop-grid absolute inset-0\" />}\n      {/* a soft light from the top centre, and the fade into the page at the bottom */}\n      <div className=\"absolute inset-0 bg-radial-[circle_at_50%_0] from-foreground/3 to-transparent to-70%\" />\n      <div className=\"absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-b from-transparent to-background\" />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a looping video, canvas or image filling the window. Empty: a placeholder surface"
+    },
+    {
+      "name": "grid",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "draw the faint 12-column hairline grid over the media"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "af3da1e82723f0c2f04fcd8f263b788ccb0f507204b35a72fd25b748692f6e9b"
+}

@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ledup header",
+  "description": "A fixed, barless header: a plain italic wordmark at the left, a frosted light-grey pill of four links in the middle (the first with a chevron), and a taupe Contact pill with two taupe circle buttons (search, account) at the right. Links get a pale greige pill on hover (0.1s). On phones only the wordmark and a two-line burger show; the burger opens a full-screen link list.",
+  "category": "header",
+  "site": "ledup",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "pill",
+    "frosted",
+    "blur",
+    "light",
+    "warm",
+    "minimal",
+    "burger",
+    "hover"
+  ],
+  "notes": [
+    "fixed to the top with no background of its own: it floats over the hero and the page (the nav pill is translucent and blurred)",
+    "needs JavaScript for the phone menu (hydrate: load)"
+  ],
+  "entry": "ledup-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "ledup-header",
+  "files": [
+    {
+      "path": "ledup-header.tsx",
+      "content": "import { type ReactNode, useEffect, useState } from \"react\";\nimport { ChevronDown, Search, User } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LedupButton } from \"@foundry/ledup-button\";\n\nexport interface LedupHeaderLink {\n  /** the link text */\n  label: string;\n  href: string;\n  /** shows a small chevron (the original opens a mega menu there) */\n  hasMenu?: boolean;\n}\n\nexport interface LedupHeaderProps {\n  /** the wordmark text */\n  brand: string;\n  /** where the wordmark goes */\n  brandHref?: string;\n  /** the links in the centre pill (four in the original) */\n  links: LedupHeaderLink[];\n  /** the taupe pill at the right */\n  cta: { label: string; href: string };\n  /** the search circle */\n  search?: { label: string; href: string };\n  /** the account circle */\n  account?: { label: string; href: string };\n  /** screen-reader labels for the phone menu button */\n  menuLabels?: { open: string; close: string };\n  className?: string;\n}\n\nexport function LedupHeader({\n  brand,\n  brandHref = \"#\",\n  links,\n  cta,\n  search,\n  account,\n  menuLabels = { open: \"Open menu\", close: \"Close menu\" },\n  className,\n}: LedupHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  // Lock the page behind the open phone menu.\n  useEffect(() => {\n    document.documentElement.style.overflow = open ? \"hidden\" : \"\";\n    return () => {\n      document.documentElement.style.overflow = \"\";\n    };\n  }, [open]);\n\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 font-sans text-foreground\", className)}>\n      <div className=\"relative z-10 mx-auto flex max-w-page items-center px-gutter pt-6 lg:pt-10\">\n        <a href={brandHref} className=\"font-display text-[1.75rem] leading-10 font-semibold tracking-[-0.04em] italic lg:text-[2rem]\">\n          {brand}\n        </a>\n\n        <nav className=\"ml-20 hidden h-10 max-w-[48.5rem] flex-1 items-center justify-center gap-2 rounded-full bg-muted/75 backdrop-blur-xl lg:flex\">\n          {links.map((link) => (\n            <a\n              key={link.label}\n              href={link.href}\n              className=\"flex h-10 items-center gap-2 rounded-full px-5 text-sm transition-colors duration-100 ease-in-out hover:bg-secondary motion-reduce:transition-none\"\n            >\n              {link.label}\n              {link.hasMenu && <ChevronDown aria-hidden strokeWidth={1.5} className=\"size-3.5\" />}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"ml-auto hidden items-center gap-2.5 lg:flex\">\n          <LedupButton href={cta.href} className=\"text-[0.9375rem]\">\n            {cta.label}\n          </LedupButton>\n          {search && <Circle href={search.href} label={search.label} icon={<Search strokeWidth={1.5} className=\"size-3.5\" />} />}\n          {account && <Circle href={account.href} label={account.label} icon={<User strokeWidth={2} className=\"size-4\" />} />}\n        </div>\n\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          aria-label={open ? menuLabels.close : menuLabels.open}\n          onClick={() => setOpen((o) => !o)}\n          className=\"relative ml-auto flex size-10 flex-col items-end justify-center gap-2 lg:hidden\"\n        >\n          <span\n            className={cn(\n              \"h-px w-[1.625rem] bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n              open && \"translate-y-[4.5px] rotate-45\",\n            )}\n          />\n          <span\n            className={cn(\n              \"h-px w-[1.625rem] bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n              open && \"-translate-y-[4.5px] -rotate-45\",\n            )}\n          />\n        </button>\n      </div>\n\n      <div\n        className={cn(\n          \"fixed inset-0 flex flex-col bg-background px-gutter pt-28 pb-10 transition-opacity duration-300 lg:hidden motion-reduce:transition-none\",\n          open ? \"opacity-100\" : \"pointer-events-none invisible opacity-0\",\n        )}\n      >\n        <nav className=\"flex flex-col\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} onClick={() => setOpen(false)} className=\"border-b border-border py-4 text-2xl\">\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <LedupButton href={cta.href} className=\"mt-10 self-start\">\n          {cta.label}\n        </LedupButton>\n      </div>\n    </header>\n  );\n}\n\nfunction Circle({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {\n  return (\n    <a\n      href={href}\n      aria-label={label}\n      className=\"grid size-9 place-items-center rounded-full bg-primary/90 text-primary-foreground backdrop-blur-md transition-colors duration-100 ease-in-out hover:bg-foreground/85 motion-reduce:transition-none\"\n    >\n      {icon}\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ledup-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark text"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark goes"
+    },
+    {
+      "name": "links",
+      "type": "LedupHeaderLink[]",
+      "required": true,
+      "description": "the links in the centre pill (four in the original)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the taupe pill at the right"
+    },
+    {
+      "name": "search",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the search circle"
+    },
+    {
+      "name": "account",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the account circle"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": false,
+      "default": "{ open: \"Open menu\", close: \"Close menu\" }",
+      "description": "screen-reader labels for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d1f6e22b2866f1afaa3b3c56495fa42c134e342d3df12c86714d5f537a270d10"
+}

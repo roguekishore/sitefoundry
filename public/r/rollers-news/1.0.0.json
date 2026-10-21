@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rollers news",
+  "description": "Three article cards in hairline-ruled columns: a square-cornered photo with a small charcoal chip in its corner, a two-line title and an orange arrow tile; then a ruled row with one orange button that slides in from the right. Cards fade up one after another.",
+  "category": "features",
+  "site": "rollers",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "blog",
+    "cards",
+    "ruled",
+    "hairline",
+    "orange",
+    "arrow",
+    "reveal",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "media is a placeholder until you pass an <img> with object-cover and full size"
+  ],
+  "entry": "rollers-news.tsx",
+  "source": "foundry",
+  "name": "rollers-news",
+  "files": [
+    {
+      "path": "rollers-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RollersArrowCard } from \"@foundry/rollers-arrow-card\";\nimport { RollersButton } from \"@foundry/rollers-button\";\nimport { RollersRise } from \"@foundry/rollers-rise\";\nimport { RollersRule } from \"@foundry/rollers-rule\";\n\nexport interface RollersNewsItem {\n  /** the article's title (two lines at most) */\n  title: string;\n  href: string;\n  /** the chip over the photo (Guide, Safety…) */\n  tag: string;\n  /** the photo (aspect 1.45); a placeholder when empty */\n  media?: ReactNode;\n  /** screen-reader label of the arrow tile */\n  arrowLabel: string;\n}\n\nexport interface RollersNewsProps {\n  /** three articles, one per ruled column */\n  items: RollersNewsItem[];\n  /** the orange button in the ruled row under the cards */\n  action: { label: string; href: string };\n  className?: string;\n}\n\n/** Three article cards in ruled columns (photo with a chip, two-line title, orange arrow tile),\n    then a ruled row with one orange button that slides in from the right. */\nexport function RollersNews({ items, action, className }: RollersNewsProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"relative grid gap-7.5 px-gutter pt-7.5 pb-0 md:grid-cols-3 md:gap-0 md:px-0 md:py-10\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        {items.map((item, i) => (\n          <div key={item.title} className=\"relative md:px-10\">\n            {i > 0 ? <RollersRule orientation=\"vertical\" className=\"-inset-y-10 left-0 hidden md:block\" /> : null}\n            <RollersRise step={i}>\n              <RollersArrowCard title={item.title} href={item.href} tag={item.tag} media={item.media} arrowLabel={item.arrowLabel} size=\"md\" />\n            </RollersRise>\n          </div>\n        ))}\n      </div>\n\n      <div className=\"relative overflow-x-clip px-gutter pt-7.5 pb-7.5 md:pt-10 md:pb-[6.875rem]\">\n        <RollersRule className=\"inset-x-0 top-0\" />\n        <RollersRise from=\"right\" className=\"inline-block\">\n          <RollersButton href={action.href}>{action.label}</RollersButton>\n        </RollersRise>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rollers-arrow-card",
+    "rollers-button",
+    "rollers-rise",
+    "rollers-rule"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "RollersNewsItem[]",
+      "required": true,
+      "description": "three articles, one per ruled column"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the orange button in the ruled row under the cards"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d1beeb8ff9175914d50e8b26d81fc7d12419669e77def8c969f8f76bc9fe5d67"
+}

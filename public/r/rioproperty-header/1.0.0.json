@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rioproperty header",
+  "description": "A fixed, bare header: a very wide-tracked capital wordmark at the left (stacked on two lines on phones) and a three-line burger whose lines shorten downwards. It sits transparent over the hero, slides away once you scroll down and comes back on a paper background when you scroll up. The burger opens a full-screen violet panel of huge capital links that turn yellow on hover.",
+  "category": "header",
+  "site": "rioproperty",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "transparent",
+    "hide-on-scroll",
+    "burger",
+    "fullscreen-menu",
+    "wordmark",
+    "uppercase",
+    "minimal"
+  ],
+  "notes": [
+    "made to overlay a dark full-bleed hero (overMedia); set overMedia false on light pages",
+    "the wordmark is plain text in the display face, letter-spaced 0.35em"
+  ],
+  "entry": "rioproperty-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "rioproperty-header",
+  "files": [
+    {
+      "path": "rioproperty-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RiopropertyHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface RiopropertyHeaderProps {\n  /** the wordmark, in very wide-tracked capitals; its words stack on phones */\n  brand: string;\n  homeHref?: string;\n  /** screen-reader label of the burger button */\n  menuLabel: string;\n  /** screen-reader label of the close button inside the menu */\n  closeLabel: string;\n  /** links inside the menu panel */\n  links: RiopropertyHeaderLink[];\n  /** true: at the top it sits over dark media and uses light text */\n  overMedia?: boolean;\n  /** px the page scrolls down before the bar slides away (it returns on scroll up) */\n  threshold?: number;\n  className?: string;\n}\n\n// The original's transform timing: 0.75s on a long, snappy ease.\nconst ease = \"duration-[750ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\nexport function RiopropertyHeader({\n  brand,\n  homeHref = \"/\",\n  menuLabel,\n  closeLabel,\n  links,\n  overMedia = true,\n  threshold = 300,\n  className,\n}: RiopropertyHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [solid, setSolid] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const check = () => {\n      const y = window.scrollY;\n      setHidden(y > threshold && y > last);\n      setSolid(y > threshold);\n      last = y;\n    };\n    check();\n    window.addEventListener(\"scroll\", check, { passive: true });\n    return () => window.removeEventListener(\"scroll\", check);\n  }, [threshold]);\n\n  // light text over the hero media; once back over the paper sections the bar gets a background\n  const light = overMedia && !solid;\n  const words = brand.split(/\\s+/).filter(Boolean);\n\n  return (\n    <>\n      <header\n        className={cn(\n          \"fixed inset-x-0 top-0 z-50 transition-[translate,background-color]\",\n          ease,\n          hidden && !open ? \"-translate-y-full\" : \"translate-y-0\",\n          light ? \"bg-transparent text-background dark:text-foreground\" : \"bg-background text-foreground\",\n          className,\n        )}\n      >\n        <div className=\"mx-auto flex max-w-page items-center justify-between px-gutter py-9 lg:py-10\">\n          <a href={homeHref} aria-label={brand} className=\"flex flex-col font-display text-base leading-[1.6] font-semibold tracking-[0.35em] uppercase lg:flex-row lg:gap-[0.7em] lg:text-lg\">\n            {words.map((word, i) => (\n              <span key={i} aria-hidden>\n                {word}\n              </span>\n            ))}\n          </a>\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen(true)}\n            className=\"group/burger flex h-6 w-9 flex-col items-end justify-center gap-[5px]\"\n          >\n            {/* three lines, each shorter than the one above; on hover they even out */}\n            <span aria-hidden className={cn(\"h-0.5 w-8 bg-current transition-[width]\", ease)} />\n            <span aria-hidden className={cn(\"h-0.5 w-6 bg-current transition-[width] group-hover/burger:w-8\", ease)} />\n            <span aria-hidden className={cn(\"h-0.5 w-4 bg-current transition-[width] group-hover/burger:w-8\", ease)} />\n          </button>\n        </div>\n      </header>\n\n      {open && (\n        <div className=\"fixed inset-0 z-[60] flex flex-col bg-popover text-popover-foreground\">\n          <div className=\"mx-auto flex w-full max-w-page items-center justify-end px-gutter py-8 lg:py-9\">\n            <button type=\"button\" aria-label={closeLabel} onClick={() => setOpen(false)} className=\"transition-colors duration-200 hover:text-highlight\">\n              <X aria-hidden className=\"size-8\" strokeWidth={1.5} />\n            </button>\n          </div>\n          <nav className=\"mx-auto flex w-full max-w-page flex-1 flex-col justify-center px-gutter pb-16\">\n            <ul className=\"flex flex-col gap-2 lg:gap-3\">\n              {links.map((link) => (\n                <li key={link.href}>\n                  <a\n                    href={link.href}\n                    onClick={() => setOpen(false)}\n                    className=\"font-display text-[2.25rem] leading-[0.966] font-semibold uppercase transition-colors duration-500 hover:text-highlight lg:text-[4.625rem]\"\n                  >\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n        </div>\n      )}\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, in very wide-tracked capitals; its words stack on phones"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the burger button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the close button inside the menu"
+    },
+    {
+      "name": "links",
+      "type": "RiopropertyHeaderLink[]",
+      "required": true,
+      "description": "links inside the menu panel"
+    },
+    {
+      "name": "overMedia",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "true: at the top it sits over dark media and uses light text"
+    },
+    {
+      "name": "threshold",
+      "type": "number",
+      "required": false,
+      "default": "300",
+      "description": "px the page scrolls down before the bar slides away (it returns on scroll up)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4213bb36943fc32a79cb56ba598d6886f4f16539c4b33c4ae25d6c6d9328f380"
+}

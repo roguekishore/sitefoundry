@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Kononenkogroup people",
+  "description": "The studio on black: a tiny serif label and a big serif statement with an indented first line, then a ring of twelve square team photos turned to face a huge centred grotesk heading (the founding year), with two small grey notes beneath. Lines rise from their masks; the ring turns slowly with the scroll.",
+  "category": "testimonials",
+  "site": "kononenkogroup",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "people",
+    "studio",
+    "ring",
+    "orbit",
+    "circle",
+    "photos",
+    "rotate",
+    "scrubbed",
+    "dark",
+    "serif",
+    "editorial",
+    "monochrome"
+  ],
+  "notes": [
+    "always dark: its root carries the dark class, so it reads the theme's dark tokens even on a light page",
+    "the photos are media slots; the ring wants 8–14 of them",
+    "CSS only: the turn is scroll-driven and simply doesn't happen without support"
+  ],
+  "entry": "kononenkogroup-people.tsx",
+  "source": "foundry",
+  "name": "kononenkogroup-people",
+  "files": [
+    {
+      "path": "kononenkogroup-people.css",
+      "content": "/* A ring of photos around the year heading. Each slot is turned to face the centre and pushed\n   out to the radius; the whole ring turns slowly as it crosses the window. */\n.kononenkogroup-people-ring {\n  --kononenkogroup-people-r: 36.7vw;\n  --kononenkogroup-people-size: 14.5vw;\n  view-timeline-name: --kononenkogroup-people-ring;\n}\n\n@media (min-width: 64rem) {\n  .kononenkogroup-people-ring {\n    --kononenkogroup-people-r: 41.7vw;\n    --kononenkogroup-people-size: 14vw;\n  }\n}\n\n.kononenkogroup-people-slot {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  width: var(--kononenkogroup-people-size);\n  aspect-ratio: 1;\n  transform: translate(-50%, -50%) rotate(var(--kononenkogroup-people-angle))\n    translateY(calc(-1 * var(--kononenkogroup-people-r)));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .kononenkogroup-people-orbit {\n      animation: kononenkogroup-people-turn linear both;\n      animation-timeline: --kononenkogroup-people-ring;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes kononenkogroup-people-turn {\n  from {\n    transform: rotate(40deg);\n  }\n  to {\n    transform: rotate(-40deg);\n  }\n}\n"
+    },
+    {
+      "path": "kononenkogroup-people.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { KononenkogroupLines } from \"@foundry/kononenkogroup-lines\";\nimport { KononenkogroupMedia } from \"@foundry/kononenkogroup-media\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./kononenkogroup-people.css\";\n\nexport interface KononenkogroupPeopleProps {\n  /** small serif label beside the statement */\n  label: string;\n  /** the big serif statement */\n  text: string;\n  /** the centred heading inside the ring, one item per line */\n  heading: string[];\n  /** two short grey notes under the heading */\n  notes: string[];\n  /** the team photos around the ring; a number makes that many empty placeholders */\n  photos: ReactNode[] | number;\n  className?: string;\n}\n\nconst small = \"text-[3.733vw] leading-[1.2] tracking-[-0.02em] lg:text-[max(10px,0.833vw)]\";\n\n/**\n * The studio, on black: a small label and a big serif statement, then a ring of team photos\n * turned to face a huge centred heading (the founding year), with two grey notes beneath it.\n * Lines rise from their masks; the ring turns slowly with the scroll.\n */\nexport function KononenkogroupPeople({ label, text, heading, notes, photos, className }: KononenkogroupPeopleProps) {\n  const slots: (ReactNode | undefined)[] = typeof photos === \"number\" ? Array.from({ length: photos }) : photos;\n  return (\n    <section className={cn(\"dark overflow-clip bg-background pt-[16vw] pb-section text-foreground lg:pt-[13vw]\", className)}>\n      <div className=\"relative px-gutter\">\n        <KononenkogroupLines text={label} className={cn(small, \"font-display tracking-[-0.01em] lg:absolute lg:top-[0.6vw] lg:max-w-[5vw]\")} />\n        <KononenkogroupLines\n          as=\"h2\"\n          text={text}\n          className=\"mt-[2vw] font-display text-[9.6vw] leading-[0.9] tracking-[-0.03em] lg:mt-0 lg:w-[57.6vw] lg:text-[6.146vw] lg:indent-[6.53vw]\"\n        />\n      </div>\n\n      <div className=\"relative mt-[23vw] lg:mt-[21vw]\">\n        <div className=\"kononenkogroup-people-ring relative h-[91vw] lg:h-[97.4vw]\">\n          <div className=\"kononenkogroup-people-orbit absolute inset-0\" aria-hidden={typeof photos === \"number\"}>\n            {slots.map((photo, i) => (\n              <div\n                key={i}\n                className=\"kononenkogroup-people-slot\"\n                style={{ \"--kononenkogroup-people-angle\": `${(360 / slots.length) * i}deg` } as CSSProperties}\n              >\n                <KononenkogroupMedia media={photo} className=\"size-full\" />\n              </div>\n            ))}\n          </div>\n          <div className=\"absolute inset-0 flex items-center justify-center px-gutter\">\n            <KononenkogroupLines\n              as=\"p\"\n              text={heading}\n              className=\"relative text-center font-sans text-[10.67vw] leading-[0.85] tracking-[-0.045em] lg:text-[9.115vw] lg:leading-[0.82]\"\n            />\n          </div>\n        </div>\n        <div className=\"mt-[6vw] grid gap-[5vw] px-gutter text-center text-muted-foreground lg:absolute lg:inset-x-0 lg:top-[calc(50%+11.5vw)] lg:mt-0 lg:grid-cols-15 lg:gap-x-[1.11vw]\">\n          {notes.map((note, i) => (\n            <KononenkogroupLines\n              key={i}\n              text={note}\n              className={cn(small, \"mx-auto max-w-[88vw] lg:col-span-3 lg:max-w-none\", i === 0 ? \"lg:col-start-5\" : \"lg:col-start-9\")}\n            />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "kononenkogroup-lines",
+    "kononenkogroup-media"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "small serif label beside the statement"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the big serif statement"
+    },
+    {
+      "name": "heading",
+      "type": "string[]",
+      "required": true,
+      "description": "the centred heading inside the ring, one item per line"
+    },
+    {
+      "name": "notes",
+      "type": "string[]",
+      "required": true,
+      "description": "two short grey notes under the heading"
+    },
+    {
+      "name": "photos",
+      "type": "number | ReactNode[]",
+      "required": true,
+      "description": "the team photos around the ring; a number makes that many empty placeholders"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8e30ea4d958719346ad9c0e8923cc150abbb7bde3eec68c385f126e74b98e490"
+}

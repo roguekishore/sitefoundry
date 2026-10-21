@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Daq capabilities",
+  "description": "A two-weight uppercase heading over a row of large square-cornered service cards (number, monospace tech tags, a big title, a short line, an 'explore' link and a huge hairline-thin index numeral). On desktop the section pins for four windows of scroll while the card row slides left, a progress line fills under it, the current tab lights and each card's title fills with white from left to right as it arrives. On phones the cards stack and each title fills as its card scrolls in.",
+  "category": "features",
+  "site": "daq",
+  "license": "proprietary",
+  "tags": [
+    "services",
+    "cards",
+    "horizontal-scroll",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "progress",
+    "text-fill",
+    "clip",
+    "uppercase",
+    "dark",
+    "mono",
+    "scroll-driven"
+  ],
+  "notes": [
+    "all motion is CSS scroll-driven (no JavaScript); without support the cards sit in a row you can't slide on desktop, so keep to five or fewer there",
+    "430% of the window tall from 1024px (the pinned track); content-sized on phones",
+    "solid background: it covers daq-backdrop"
+  ],
+  "entry": "daq-capabilities.tsx",
+  "source": "foundry",
+  "name": "daq-capabilities",
+  "files": [
+    {
+      "path": "daq-capabilities.css",
+      "content": "/* Desktop: the section is a named view timeline; its \"contain\" range is the pinned stretch.\n   Over it the track slides left until its last card's right edge is at 64% of the window, the progress\n   lines grow, and each card reads its own slice (inline variables) to fill its title and\n   light its tab and border. Phones: each card's title fills as the card scrolls in.\n   Without scroll-driven animations everything shows filled and still. */\n.daq-capabilities {\n  view-timeline: --daq-capabilities block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .daq-capabilities-fill {\n      animation: daq-capabilities-fill linear both;\n      animation-timeline: view();\n      animation-range: entry 80px entry 380px;\n    }\n\n    @media (min-width: 64rem) {\n      .daq-capabilities-track {\n        animation: daq-capabilities-slide linear both;\n        animation-timeline: --daq-capabilities;\n        animation-range: contain 0% contain 100%;\n      }\n      .daq-capabilities-progress {\n        animation: daq-capabilities-grow linear both;\n        animation-timeline: --daq-capabilities;\n        animation-range: contain 0% contain 100%;\n      }\n      .daq-capabilities-fill {\n        animation-timeline: --daq-capabilities;\n        animation-range: contain var(--daq-cap-fill-from) contain var(--daq-cap-fill-to);\n      }\n      .daq-capabilities-tab {\n        animation: daq-capabilities-on linear;\n        animation-timeline: --daq-capabilities;\n        animation-range: contain var(--daq-cap-on-from) contain var(--daq-cap-on-to);\n      }\n      .daq-capabilities-card {\n        animation: daq-capabilities-edge linear;\n        animation-timeline: --daq-capabilities;\n        animation-range: contain var(--daq-cap-on-from) contain var(--daq-cap-on-to);\n      }\n      /* hovering a card shows the hover border, not the scroll-lit one */\n      .daq-capabilities-card:hover {\n        animation: none;\n      }\n    }\n  }\n}\n\n@keyframes daq-capabilities-slide {\n  to {\n    transform: translateX(calc(-100% + 64vw));\n  }\n}\n\n@keyframes daq-capabilities-grow {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: scaleX(1);\n  }\n}\n\n@keyframes daq-capabilities-fill {\n  from {\n    clip-path: inset(0 100% 0 0);\n  }\n  to {\n    clip-path: inset(0 0 0 0);\n  }\n}\n\n@keyframes daq-capabilities-on {\n  from,\n  to {\n    color: var(--foreground);\n  }\n}\n\n@keyframes daq-capabilities-edge {\n  from,\n  to {\n    border-color: color-mix(in oklab, var(--foreground) 30%, transparent);\n  }\n}\n"
+    },
+    {
+      "path": "daq-capabilities.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { DaqEyebrow } from \"@foundry/daq-eyebrow\";\nimport \"./daq-capabilities.css\";\n\nexport interface DaqCapability {\n  /** the card's big title */\n  title: string;\n  /** a short line under the title */\n  description: string;\n  /** monospace tech tags at the card's top right (shown uppercase) */\n  tags: string[];\n  /** where the card links to */\n  href: string;\n  /** the tab label under the row (shown uppercase); the title when left out */\n  tab?: string;\n}\n\nexport interface DaqCapabilitiesProps {\n  /** the eyebrow, e.g. \"02 / What we build\" */\n  eyebrow: string;\n  /** the heading's thin first line and heavy second line (shown uppercase) */\n  lead: string;\n  payoff: string;\n  /** the cards, in order */\n  items: DaqCapability[];\n  /** the small link label on every card, e.g. \"Explore\" */\n  linkLabel: string;\n  className?: string;\n}\n\nconst pct = (n: number) => `${Math.min(100, Math.max(0, n)).toFixed(2)}%`;\n\n// Each card's share of the pinned stretch: its title fills as it slides towards the left,\n// and its tab and border light up while it is the current one.\nfunction cardRange(i: number, count: number): CSSProperties {\n  const step = 100 / Math.max(count - 1, 1);\n  const fillFrom = Math.max(0, (i - 0.6) * step);\n  return {\n    \"--daq-cap-fill-from\": pct(fillFrom),\n    \"--daq-cap-fill-to\": pct(Math.max(fillFrom + 2, (i + 0.1) * step)),\n    \"--daq-cap-on-from\": pct((i - 0.5) * step),\n    \"--daq-cap-on-to\": pct((i + 0.5) * step),\n  } as CSSProperties;\n}\n\nexport function DaqCapabilities({ eyebrow, lead, payoff, items, linkLabel, className }: DaqCapabilitiesProps) {\n  return (\n    <section className={cn(\"daq-capabilities relative overflow-x-clip bg-background lg:h-[430svh]\", className)}>\n      <div className=\"py-section lg:sticky lg:top-0 lg:flex lg:h-svh lg:flex-col lg:pt-[6.5rem] lg:pb-0\">\n        <div className=\"px-gutter\">\n          <DaqEyebrow label={eyebrow} rule=\"short\" ruleFillClassName=\"daq-capabilities-progress hidden lg:block\" />\n          <h2 className=\"mt-5 font-display text-[clamp(2.4rem,4.8vw,6rem)] leading-[1.04] tracking-[-0.03em] uppercase lg:mt-9\">\n            <span className=\"block font-thin\">{lead}</span>\n            <span className=\"block font-bold\">{payoff}</span>\n          </h2>\n        </div>\n\n        <ul className=\"daq-capabilities-track mt-8 flex flex-col gap-4 px-gutter lg:mt-9 lg:w-max lg:flex-row lg:gap-[3vw]\">\n          {items.map((item, i) => (\n            <li key={item.title} className=\"lg:w-[50.7vw]\" style={cardRange(i, items.length)}>\n              <a\n                href={item.href}\n                className=\"daq-capabilities-card group/card relative flex h-full flex-col border border-border bg-foreground/2 p-6 transition-colors duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-foreground/40 hover:bg-foreground/4 lg:h-[max(22rem,46svh)] lg:p-10\"\n              >\n                <div className=\"flex items-start justify-between gap-6\">\n                  <span className=\"font-mono text-[0.5625rem] font-bold tracking-[0.2em] text-foreground/58\">{String(i + 1).padStart(2, \"0\")}</span>\n                  <ul className=\"flex flex-col items-end gap-2 text-right font-mono text-[0.5625rem] leading-snug font-bold tracking-[0.2em] text-foreground/58 uppercase lg:flex-row lg:flex-wrap lg:justify-end lg:gap-x-0 lg:gap-y-1\">\n                    {item.tags.map((tag, t) => (\n                      <li key={tag} className=\"flex items-center\">\n                        {t > 0 && (\n                          <span aria-hidden className=\"mx-2 hidden size-0.5 rounded-full bg-foreground/40 lg:inline-block\" />\n                        )}\n                        {tag}\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n\n                <div className=\"mt-10 lg:my-auto lg:pt-8\">\n                  {/* a dim copy of the title, with a white copy over it that is uncovered left to right */}\n                  <h3 className=\"relative w-max max-w-full text-[1.9rem] leading-[1.1] tracking-[-0.03em] lg:text-[3.2vw]\">\n                    <span className=\"text-foreground/30\">{item.title}</span>\n                    <span aria-hidden className=\"daq-capabilities-fill absolute inset-0 text-foreground\">\n                      {item.title}\n                    </span>\n                  </h3>\n                  <p className=\"mt-4 max-w-[22.5rem] text-sm leading-relaxed text-foreground/72 lg:mt-5 lg:text-[0.9375rem]\">{item.description}</p>\n                </div>\n\n                <span className=\"mt-12 flex items-center gap-3 font-mono text-[0.5625rem] font-bold tracking-[0.25em] text-foreground/58 uppercase transition-colors duration-300 group-hover/card:text-foreground lg:mt-8\">\n                  {linkLabel}\n                  <ArrowUpRight aria-hidden strokeWidth={1.75} className=\"size-3 transition-transform duration-300 group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5\" />\n                </span>\n\n                <span aria-hidden className=\"absolute right-6 bottom-4 text-[4.5rem] leading-none font-thin tracking-[-0.04em] text-foreground/20 lg:right-10 lg:bottom-8 lg:text-[7.2rem]\">\n                  {String(i + 1).padStart(2, \"0\")}\n                </span>\n              </a>\n            </li>\n          ))}\n        </ul>\n\n        {/* desktop: a progress line over the tab labels */}\n        <div className=\"mx-gutter mt-8 hidden lg:block\">\n          <div className=\"relative h-px bg-border\">\n            <span aria-hidden className=\"daq-capabilities-progress absolute inset-0 origin-left bg-foreground/80\" />\n          </div>\n          <ol className=\"flex justify-between pt-5\">\n            {items.map((item, i) => (\n              <li\n                key={item.title}\n                className=\"daq-capabilities-tab font-mono text-[0.625rem] font-bold tracking-[0.2em] text-foreground/58 uppercase\"\n                style={cardRange(i, items.length)}\n              >\n                {String(i + 1).padStart(2, \"0\")} {item.tab ?? item.title}\n              </li>\n            ))}\n          </ol>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "daq-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the eyebrow, e.g. \"02 / What we build\""
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the heading's thin first line and heavy second line (shown uppercase)"
+    },
+    {
+      "name": "payoff",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "items",
+      "type": "DaqCapability[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "linkLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small link label on every card, e.g. \"Explore\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e9723d439ad743fe611225f7d3c83508ca8192d283204625f59214cffd9d0a0f"
+}

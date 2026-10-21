@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Esrbespoke feature entry",
+  "description": "One partner or location on a hairline: a 20px name at the left (with an optional block of address lines in tiny capitals at column 4) and, from column 7, a 4:3 photo, a short lead paragraph and label / text rows divided by hairlines. The left column can stay pinned while the right one scrolls; the photo fades in as it enters.",
+  "category": "features",
+  "site": "esrbespoke",
+  "license": "proprietary",
+  "tags": [
+    "feature",
+    "partner",
+    "location",
+    "photo",
+    "details",
+    "hairline",
+    "sticky",
+    "pinned",
+    "fade",
+    "editorial",
+    "minimal"
+  ],
+  "notes": [
+    "a row with several items lists them one per line between hairlines; a row with one item reads as a paragraph",
+    "sticky keeps the name and address in view on desktop",
+    "the photo fade is CSS scroll-driven inside @supports, off under reduced motion"
+  ],
+  "entry": "esrbespoke-feature.tsx",
+  "source": "foundry",
+  "name": "esrbespoke-feature",
+  "files": [
+    {
+      "path": "esrbespoke-feature.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { EsrbespokeLabel } from \"@foundry/esrbespoke-label\";\nimport { EsrbespokeParallax } from \"@foundry/esrbespoke-parallax\";\nimport { toneClass, type EsrbespokeTone } from \"@foundry/esrbespoke-tone\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EsrbespokeFeatureMeta {\n  /** a prefix such as \"Phone:\" (optional) */\n  label?: string;\n  /** the line */\n  text: string;\n  /** makes the text an underlined link */\n  href?: string;\n}\n\nexport interface EsrbespokeFeatureRow {\n  /** the tiny label */\n  label: string;\n  /** one paragraph, or several items listed between hairlines */\n  items: string[];\n}\n\nexport interface EsrbespokeFeatureProps {\n  /** the name at the left */\n  title: string;\n  /** address lines in tiny capitals at column 4 (optional) */\n  meta?: EsrbespokeFeatureMeta[];\n  /** the 4:3 photo (fills like object-fit: cover). Empty: a placeholder */\n  media?: ReactNode;\n  /** the lead paragraph under the photo */\n  lead: string;\n  /** label / text rows */\n  rows: EsrbespokeFeatureRow[];\n  /** keep the left column in view while the right one scrolls (desktop) */\n  sticky?: boolean;\n  tone?: EsrbespokeTone;\n  id?: string;\n  className?: string;\n}\n\nconst text = \"font-display text-[0.9375rem] leading-[1.2] font-medium tracking-[-0.01em] font-stretch-[106%] lg:text-[1.25rem]\";\n\n/** A partner or location: name at the left, photo, lead and detail rows from column 7. */\nexport function EsrbespokeFeature({ title, meta, media, lead, rows, sticky = false, tone = \"light\", id, className }: EsrbespokeFeatureProps) {\n  return (\n    <section id={id} className={cn(toneClass(tone), \"pb-20 lg:pb-32\", className)}>\n      <div className=\"mx-gutter grid grid-cols-2 gap-x-4 border-t border-border pt-7 lg:grid-cols-12\">\n        <div className={cn(\"col-span-2 grid grid-cols-2 gap-x-4 self-start lg:col-span-6 lg:grid-cols-6\", sticky && \"lg:sticky lg:top-8\")}>\n          <h2 className=\"col-span-2 font-display text-[1.125rem] leading-[1.2] font-medium tracking-[-0.01em] font-stretch-[106%] lg:col-span-3 lg:text-[1.25rem]\">\n            {title}\n          </h2>\n          {meta && (\n            <div className=\"col-span-2 mt-4 lg:col-span-3 lg:mt-1\">\n              {meta.map((m, i) => (\n                <EsrbespokeLabel key={i} className=\"text-[0.8125rem] leading-none\">\n                  {m.label && <>{m.label} </>}\n                  {m.href ? (\n                    <a href={m.href} className=\"underline underline-offset-2 transition-opacity duration-300 hover:opacity-50\">{m.text}</a>\n                  ) : (\n                    m.text\n                  )}\n                </EsrbespokeLabel>\n              ))}\n            </div>\n          )}\n        </div>\n        <div className=\"col-span-2 mt-7 lg:col-span-6 lg:col-start-7 lg:mt-0\">\n          <EsrbespokeParallax media={media} drift=\"none\" fadeIn className=\"aspect-[4/3]\" />\n          <p className={cn(text, \"mt-4 lg:mt-6\")}>{lead}</p>\n          <dl className=\"mt-14\">\n            {rows.map((row, i) => (\n              <div key={i} className=\"grid gap-y-6 border-t border-border pt-4 pb-12 lg:grid-cols-6 lg:gap-x-4 lg:pt-0 lg:pb-0\">\n                <dt className=\"lg:col-span-2 lg:pt-4\">\n                  <EsrbespokeLabel className=\"text-[0.8125rem] leading-none\">{row.label}</EsrbespokeLabel>\n                </dt>\n                {row.items.length === 1 ? (\n                  <dd className={cn(text, \"lg:col-span-4 lg:py-3\")}>{row.items[0]}</dd>\n                ) : (\n                  <dd className=\"lg:col-span-4\">\n                    <ul>\n                      {row.items.map((item, j) => (\n                        <li key={j} className={cn(text, \"border-b border-border py-2.5 first:pt-0 lg:first:pt-3\")}>{item}</li>\n                      ))}\n                    </ul>\n                  </dd>\n                )}\n              </div>\n            ))}\n          </dl>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "esrbespoke-label",
+    "esrbespoke-parallax",
+    "esrbespoke-tone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the name at the left"
+    },
+    {
+      "name": "meta",
+      "type": "EsrbespokeFeatureMeta[]",
+      "required": false,
+      "description": "address lines in tiny capitals at column 4 (optional)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the 4:3 photo (fills like object-fit: cover). Empty: a placeholder"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the lead paragraph under the photo"
+    },
+    {
+      "name": "rows",
+      "type": "EsrbespokeFeatureRow[]",
+      "required": true,
+      "description": "label / text rows"
+    },
+    {
+      "name": "sticky",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "keep the left column in view while the right one scrolls (desktop)"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "light"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5f1a0dc1410b226caf4049af7ba45d8208268b171f9cf489d8b26891a354ad1e"
+}

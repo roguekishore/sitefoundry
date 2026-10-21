@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "M3-PG header",
+  "description": "A plain white sticky header on a 4-column grid: a semibold wordmark in the first column, five nav links spread evenly over the middle two, a language code at the right. As the page scrolls the first 120px, the wordmark fades into a short, larger mark and the bar settles from 96px to 80px; nav links underline on hover. Phones get a thin three-line menu that opens a full-width list.",
+  "category": "header",
+  "site": "m3-pg",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "minimal",
+    "monochrome",
+    "grid",
+    "scroll",
+    "crossfade",
+    "light"
+  ],
+  "notes": [
+    "sticky: put it first, directly inside the page wrapper",
+    "the wordmark-to-mark swap is a CSS scroll-driven animation; browsers without it keep the wordmark"
+  ],
+  "entry": "m3-pg-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "m3-pg-header",
+  "files": [
+    {
+      "path": "m3-pg-header.css",
+      "content": "/* Over the first 120px of page scroll the full wordmark fades out, the short mark fades in,\n   and the desktop bar gives up its extra top padding (96px -> 80px). Without scroll-driven\n   animations (or with reduced motion) the wordmark simply stays. */\n.m3-pg-header-mark {\n  opacity: 0;\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .m3-pg-header-full,\n    .m3-pg-header-mark,\n    .m3-pg-header-bar {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 120px;\n    }\n    .m3-pg-header-full {\n      animation-name: m3-pg-header-out;\n    }\n    .m3-pg-header-mark {\n      animation-name: m3-pg-header-in;\n    }\n    .m3-pg-header-bar {\n      animation-name: m3-pg-header-settle;\n    }\n  }\n}\n\n@keyframes m3-pg-header-out {\n  0%, 40% { opacity: 1; }\n  70%, 100% { opacity: 0; visibility: hidden; }\n}\n\n@keyframes m3-pg-header-in {\n  0%, 40% { opacity: 0; }\n  70%, 100% { opacity: 1; }\n}\n\n@keyframes m3-pg-header-settle {\n  to { padding-top: 0; }\n}\n"
+    },
+    {
+      "path": "m3-pg-header.tsx",
+      "content": "import { useState } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { M3PgLink } from \"@foundry/m3-pg-link\";\nimport \"./m3-pg-header.css\";\n\nexport interface M3PgHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface M3PgHeaderProps {\n  /** the full wordmark shown at the top of the page */\n  brand: string;\n  /** the short mark that replaces it once the page scrolls */\n  mark: string;\n  homeHref?: string;\n  /** the main links (five fit the desktop row) */\n  links: M3PgHeaderLink[];\n  /** the language switch at the right, e.g. { label: \"DE\", href: \"/de/\" } */\n  language?: M3PgHeaderLink;\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nexport function M3PgHeader({ brand, mark, homeHref = \"/\", links, language, menuLabel, className }: M3PgHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  return (\n    <header className={cn(\"sticky top-0 z-50 bg-background text-foreground\", className)}>\n      <div className=\"m3-pg-header-bar mx-auto max-w-page px-gutter lg:pt-4\">\n        <div className=\"flex h-14 items-center justify-between lg:grid lg:h-20 lg:grid-cols-4 lg:gap-x-5\">\n          {/* wordmark and short mark share one spot and cross-fade */}\n          <a href={homeHref} className=\"relative grid items-center text-highlight\">\n            <span className=\"m3-pg-header-full col-start-1 row-start-1 text-lg leading-6 font-semibold tracking-[-0.02em] whitespace-nowrap lg:text-xl\">\n              {brand}\n            </span>\n            <span\n              aria-hidden\n              className=\"m3-pg-header-mark col-start-1 row-start-1 text-[2rem] leading-none font-semibold tracking-[-0.05em] lg:text-[2.875rem]\"\n            >\n              {mark}\n            </span>\n          </a>\n\n          <nav className=\"hidden lg:col-span-2 lg:flex lg:items-center lg:justify-between\">\n            {links.map((link) => (\n              <M3PgLink key={link.href} href={link.href} variant=\"nav\" className=\"text-base leading-6 tracking-[-0.01em]\">\n                {link.label}\n              </M3PgLink>\n            ))}\n          </nav>\n\n          <div className=\"flex items-center justify-end\">\n            {language && (\n              <M3PgLink href={language.href} variant=\"nav\" className=\"hidden text-base leading-6 lg:inline\">\n                {language.label}\n              </M3PgLink>\n            )}\n            <button\n              type=\"button\"\n              aria-label={menuLabel}\n              aria-expanded={open}\n              onClick={() => setOpen((o) => !o)}\n              className=\"-mr-1 flex size-9 items-center justify-center lg:hidden\"\n            >\n              {open ? <X className=\"size-6\" strokeWidth={1.25} aria-hidden /> : <Menu className=\"size-6\" strokeWidth={1.25} aria-hidden />}\n            </button>\n          </div>\n        </div>\n      </div>\n\n      {open && (\n        <nav className=\"border-t border-border bg-background px-gutter pt-4 pb-8 lg:hidden\">\n          <ul className=\"flex flex-col gap-1\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} onClick={() => setOpen(false)} className=\"block py-1.5 text-2xl leading-8 font-semibold tracking-[-0.02em]\">\n                  {link.label}\n                </a>\n              </li>\n            ))}\n            {language && (\n              <li>\n                <a href={language.href} className=\"mt-3 block text-base text-muted-foreground\">\n                  {language.label}\n                </a>\n              </li>\n            )}\n          </ul>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "m3-pg-link"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the full wordmark shown at the top of the page"
+    },
+    {
+      "name": "mark",
+      "type": "string",
+      "required": true,
+      "description": "the short mark that replaces it once the page scrolls"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "M3PgHeaderLink[]",
+      "required": true,
+      "description": "the main links (five fit the desktop row)"
+    },
+    {
+      "name": "language",
+      "type": "M3PgHeaderLink",
+      "required": false,
+      "description": "the language switch at the right, e.g. { label: \"DE\", href: \"/de/\" }"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e5a0ba83c45f42491fd1881e6f27b4e088608748662dfb70434291de77f25be4"
+}

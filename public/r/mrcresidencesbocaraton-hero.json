@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Mr C Residences hero",
+  "description": "A sticky full-bleed video hero, as tall as the window on desktop, with one centred uppercase line (light words, then the name in bold), a thin white outline button that fills white on hover, and a small 'scroll' cue with a chevron at the bottom. The hero stays pinned while the rest of the page slides up over it; as it goes, the copy fades out, the black tint deepens from 30% to 80% and the content drifts slowly upward.",
+  "category": "hero",
+  "site": "mrcresidencesbocaraton",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "video",
+    "sticky",
+    "pinned",
+    "scrubbed",
+    "fade",
+    "tint",
+    "parallax",
+    "centred",
+    "uppercase",
+    "dark",
+    "outline-button"
+  ],
+  "notes": [
+    "it is sticky: put it first on the page, and give the sections after it position relative (all this site's blocks are) so they slide over it",
+    "the scroll effects follow the page's own scroll (scroll(root)), from the top of the page",
+    "phones: 390:429 under a 62px fixed header bar (mrcresidencesbocaraton-header); from 1024px: 101svh",
+    "white text over media in both modes; empty media is the primary colour under the tint"
+  ],
+  "entry": "mrcresidencesbocaraton-hero.tsx",
+  "source": "foundry",
+  "name": "mrcresidencesbocaraton-hero",
+  "files": [
+    {
+      "path": "mrcresidencesbocaraton-hero.css",
+      "content": "/* The hero is sticky; while the first screen of the page scrolls past, its copy fades out,\n   the tint deepens and the content drifts up (all scrubbed by the page's scroll). The media\n   fades in once on load. Without scroll timelines, or with reduced motion, all stays put. */\n@media (prefers-reduced-motion: no-preference) {\n  .mrcresidencesbocaraton-hero-media {\n    animation: mrcresidencesbocaraton-hero-media-in 0.5s ease both;\n  }\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mrcresidencesbocaraton-hero-tint {\n      animation: mrcresidencesbocaraton-hero-tint linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 75svh;\n    }\n    .mrcresidencesbocaraton-hero-wrap {\n      animation: mrcresidencesbocaraton-hero-drift linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 100svh;\n    }\n    .mrcresidencesbocaraton-hero-copy {\n      animation: mrcresidencesbocaraton-hero-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 50svh;\n    }\n    .mrcresidencesbocaraton-hero-cue {\n      animation: mrcresidencesbocaraton-hero-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 25svh;\n    }\n  }\n}\n\n@keyframes mrcresidencesbocaraton-hero-media-in {\n  from {\n    opacity: 0;\n  }\n  to {\n    opacity: 1;\n  }\n}\n\n@keyframes mrcresidencesbocaraton-hero-tint {\n  from {\n    opacity: 0.3;\n  }\n  to {\n    opacity: 0.8;\n  }\n}\n\n@keyframes mrcresidencesbocaraton-hero-drift {\n  from {\n    transform: none;\n  }\n  to {\n    transform: translateY(-8svh);\n  }\n}\n\n@keyframes mrcresidencesbocaraton-hero-fade {\n  from {\n    opacity: 1;\n  }\n  to {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "mrcresidencesbocaraton-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./mrcresidencesbocaraton-hero.css\";\n\nexport interface MrcresidencesbocaratonHeroProps {\n  /** the light part of the line, e.g. \"Life is slower at\" */\n  title: string;\n  /** the bold part that follows it (the name) */\n  titleStrong?: string;\n  /** the outline button under the line */\n  cta: { label: string; href: string };\n  /** the small cue at the bottom (desktop only) */\n  cue?: { label: string; href: string };\n  /** a looping video or an image; fills the hero like object-fit cover. Empty: a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function MrcresidencesbocaratonHero({ title, titleStrong, cta, cue, media, className }: MrcresidencesbocaratonHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"sticky top-0 isolate aspect-[390/429] w-full overflow-clip text-primary-foreground lg:aspect-auto lg:h-[101svh]\",\n        className,\n      )}\n    >\n      {/* media (the original fades its video in); empty, the primary colour shows under the tint */}\n      <div className=\"absolute inset-0 -z-20 bg-primary\">\n        <div className=\"mrcresidencesbocaraton-hero-media size-full [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n          {media}\n        </div>\n      </div>\n      <div aria-hidden className=\"mrcresidencesbocaraton-hero-tint absolute inset-0 -z-10 bg-glow opacity-30\" />\n\n      <div className=\"mrcresidencesbocaraton-hero-wrap absolute inset-0 flex flex-col items-center justify-center px-gutter pt-[62px] lg:pt-10\">\n        <div className=\"mrcresidencesbocaraton-hero-copy flex flex-col items-center text-center\">\n          <h1 className=\"text-[22px] leading-[1.15] font-normal uppercase lg:text-[42px]\">\n            {title}\n            {titleStrong && <strong className=\"font-bold\"> {titleStrong}</strong>}\n          </h1>\n          <a\n            href={cta.href}\n            className=\"mt-[23px] flex h-[31px] w-[126px] items-center justify-center border border-primary-foreground text-[11px] font-semibold uppercase transition-colors duration-500 ease-in-out hover:bg-primary-foreground hover:text-primary motion-reduce:transition-none lg:mt-[43px] lg:h-[47px] lg:w-[155px]\"\n          >\n            {cta.label}\n          </a>\n        </div>\n\n        {cue && (\n          <a\n            href={cue.href}\n            className=\"mrcresidencesbocaraton-hero-cue group/cue absolute bottom-10 left-1/2 hidden -translate-x-1/2 lg:block\"\n          >\n            <span className=\"flex flex-col items-center transition-opacity duration-500 group-hover/cue:opacity-70\">\n              <span className=\"text-[9px] leading-[1.15] font-bold tracking-[0.1em] uppercase\">{cue.label}</span>\n              <ChevronDown\n                aria-hidden\n                strokeWidth={3}\n                className=\"relative top-0 size-3 transition-[top] duration-500 ease-in-out group-hover/cue:top-2.5 motion-reduce:transition-none\"\n              />\n            </span>\n          </a>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the light part of the line, e.g. \"Life is slower at\""
+    },
+    {
+      "name": "titleStrong",
+      "type": "string",
+      "required": false,
+      "description": "the bold part that follows it (the name)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outline button under the line"
+    },
+    {
+      "name": "cue",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the small cue at the bottom (desktop only)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a looping video or an image; fills the hero like object-fit cover. Empty: a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "672af59712ca657e69c9f205ea5c1bfc39707d80d4d3123fcddb1d919b888d6a"
+}

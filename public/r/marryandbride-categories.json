@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Marryandbride category words",
+  "description": "Three or so garment categories as big light serif words, stacked and centred. From 1024px the section is as tall as the window and split in half: the words centred on white at the left, a photo filling the right half; pointing at (or focusing) a word crossfades the photo to that category's own in 0.4s. On phones only the words show.",
+  "category": "features",
+  "site": "marryandbride",
+  "license": "proprietary",
+  "tags": [
+    "categories",
+    "navigation",
+    "split",
+    "serif",
+    "big-type",
+    "editorial",
+    "fashion",
+    "hover",
+    "crossfade",
+    "window-height",
+    "minimal"
+  ],
+  "notes": [
+    "each category carries its own photo slot; empty ones show bg-muted placeholders in slightly different tints so the swap is visible",
+    "the photo swap needs JavaScript; static HTML shows the first category's photo"
+  ],
+  "entry": "marryandbride-categories.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "marryandbride-categories",
+  "files": [
+    {
+      "path": "marryandbride-categories.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface MarryandbrideCategory {\n  label: string;\n  href: string;\n  /** the photo shown at the right while this category is pointed at (desktop) */\n  media?: ReactNode;\n}\n\nexport interface MarryandbrideCategoriesProps {\n  /** the categories, one big word each */\n  categories: MarryandbrideCategory[];\n  className?: string;\n}\n\n// empty placeholders get a slightly different tint each, so the swap shows\nconst tints = [\"bg-muted\", \"bg-secondary\", \"bg-accent\"];\n\n/** Big serif category words; on desktop a window-high photo at the right follows the pointed word. */\nexport function MarryandbrideCategories({ categories, className }: MarryandbrideCategoriesProps) {\n  const [active, setActive] = useState(0);\n\n  return (\n    <section className={cn(\"bg-background text-foreground lg:grid lg:h-svh lg:grid-cols-2\", className)}>\n      <ul className=\"flex flex-col items-center justify-center px-gutter py-[4.25rem] text-center lg:py-0\">\n        {categories.map((category, i) => (\n          <li key={category.href}>\n            <a\n              href={category.href}\n              onMouseEnter={() => setActive(i)}\n              onFocus={() => setActive(i)}\n              className=\"block font-display text-[3.4rem] leading-[1.1] font-light tracking-[-0.01em] lg:text-[5.88rem]\"\n            >\n              {category.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n      <div className=\"relative hidden overflow-clip lg:block\">\n        {categories.map((category, i) => (\n          <div\n            key={category.href}\n            aria-hidden={i !== active}\n            className={cn(\n              \"absolute inset-0 transition-opacity duration-[400ms] ease-out motion-reduce:transition-none [&_img]:size-full [&_img]:object-cover\",\n              tints[i % tints.length],\n              i === active ? \"opacity-100\" : \"opacity-0\",\n            )}\n          >\n            {category.media}\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "categories",
+      "type": "MarryandbrideCategory[]",
+      "required": true,
+      "description": "the categories, one big word each"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f33ba0260e9fa543da79c721b437a5c37c3d4b942c875b69341915aceeeae77b"
+}
