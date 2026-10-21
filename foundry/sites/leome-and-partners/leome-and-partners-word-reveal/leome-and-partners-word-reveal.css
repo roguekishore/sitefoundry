@@ -1,0 +1,40 @@
+/* Each word sits in an inline-block mask (overflow: clip, so view timelines keep working)
+   with a little room below for descenders. The word starts 125% low and rises into place:
+   on load with a time-based ease, or scrubbed by the word's own view timeline as it enters,
+   over a fixed 240px of scroll so lines low in the first screen still finish. */
+.leome-and-partners-word-reveal-mask {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+  view-timeline-name: --leome-and-partners-word;
+}
+
+.leome-and-partners-word-reveal-word {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .leome-and-partners-word-reveal[data-trigger="load"] .leome-and-partners-word-reveal-word {
+    animation: leome-and-partners-word-reveal-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @supports (animation-timeline: view()) {
+    .leome-and-partners-word-reveal[data-trigger="view"] .leome-and-partners-word-reveal-word {
+      animation: leome-and-partners-word-reveal-rise linear both;
+      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      animation-timeline: --leome-and-partners-word;
+      animation-range: entry 0% entry 240px;
+    }
+  }
+}
+
+@keyframes leome-and-partners-word-reveal-rise {
+  from {
+    transform: translateY(125%);
+  }
+  to {
+    transform: none;
+  }
+}

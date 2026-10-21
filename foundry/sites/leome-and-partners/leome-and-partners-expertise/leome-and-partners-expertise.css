@@ -1,0 +1,67 @@
+/* Each card's slot (the grid item, which never moves) carries a view timeline.
+   - Entering: the primary cover shrinks from full size into the card's top-right corner and
+     the name brightens from 35%; from early in the slot's entry until it has risen another
+     quarter of the free space above it, so the cover is still shrinking while the whole card
+     is in view, as on the original.
+   - From 1024px the card itself drifts up through the window at its own speed (--lp-from to
+     --lp-to of its height), the original's staggered parallax. */
+.leome-and-partners-expertise-slot {
+  view-timeline-name: --leome-and-partners-expertise-slot;
+}
+
+.leome-and-partners-expertise-cover {
+  transform: scale(0);
+  transform-origin: top right;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .leome-and-partners-expertise-cover {
+      animation: leome-and-partners-expertise-uncover linear both;
+      animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      animation-timeline: --leome-and-partners-expertise-slot;
+      animation-range: entry 10% contain 25%;
+    }
+
+    .leome-and-partners-expertise-name {
+      animation: leome-and-partners-expertise-brighten linear both;
+      animation-timeline: --leome-and-partners-expertise-slot;
+      animation-range: entry 30% contain 25%;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+    .leome-and-partners-expertise-card {
+      animation: leome-and-partners-expertise-drift linear both;
+      animation-timeline: --leome-and-partners-expertise-slot;
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes leome-and-partners-expertise-uncover {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
+}
+
+@keyframes leome-and-partners-expertise-brighten {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes leome-and-partners-expertise-drift {
+  from {
+    translate: 0 var(--lp-from, 0);
+  }
+  to {
+    translate: 0 var(--lp-to, 0);
+  }
+}
