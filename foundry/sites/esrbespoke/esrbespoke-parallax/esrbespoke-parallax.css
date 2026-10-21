@@ -1,0 +1,54 @@
+/* "cover": the picture layer is 30% taller than the frame and travels from -15% to +15% of the
+   frame while the frame crosses the window, so it moves slower than the page.
+   "exit": for a frame at the very top of the page; the picture sinks by a third of the frame
+   while the frame leaves the window (it seems to stay behind). */
+.esrbespoke-parallax {
+  view-timeline: --esrbespoke-parallax block;
+}
+.esrbespoke-parallax-layer[data-drift="cover"] {
+  top: -15%;
+  bottom: -15%;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .esrbespoke-parallax-layer[data-drift="cover"] {
+      animation: esrbespoke-parallax-cover linear both;
+      animation-timeline: --esrbespoke-parallax;
+      animation-range: cover 0% cover 100%;
+    }
+    .esrbespoke-parallax-layer[data-drift="exit"] {
+      animation: esrbespoke-parallax-exit linear both;
+      animation-timeline: --esrbespoke-parallax;
+      animation-range: exit 0% exit 100%;
+    }
+    .esrbespoke-parallax[data-fade] .esrbespoke-parallax-fade {
+      animation: esrbespoke-parallax-fade linear both;
+      animation-timeline: --esrbespoke-parallax;
+      animation-range: entry 0% cover 35%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .esrbespoke-parallax[data-rise] {
+    animation: esrbespoke-parallax-rise 1.2s cubic-bezier(0.19, 1, 0.22, 1) 0.15s both;
+  }
+}
+
+@keyframes esrbespoke-parallax-cover {
+  from { transform: translateY(-11.5%); }
+  to { transform: translateY(11.5%); }
+}
+@keyframes esrbespoke-parallax-exit {
+  from { transform: translateY(0); }
+  to { transform: translateY(33%); }
+}
+@keyframes esrbespoke-parallax-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes esrbespoke-parallax-rise {
+  from { transform: translateY(1rem); }
+  to { transform: translateY(0); }
+}
