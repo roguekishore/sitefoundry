@@ -1,0 +1,76 @@
+/* Load: the pill, headline, line, buttons and window rise 16px and fade in, one after another. */
+.attio-hero-in {
+  animation: attio-hero-rise 0.7s cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+@keyframes attio-hero-rise {
+  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+
+/* A short light runs along the top edge of the news pill, over and over. */
+.attio-hero-spark {
+  animation: attio-hero-spark 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes attio-hero-spark {
+  0% { transform: translateX(-120%); opacity: 0; }
+  15% { opacity: 1; }
+  55% { transform: translateX(var(--attio-hero-spark-run, 16rem)); opacity: 0; }
+  100% { transform: translateX(var(--attio-hero-spark-run, 16rem)); opacity: 0; }
+}
+
+/* Scrubbed by the first 450px of scroll: the pinned text fades and blurs away while the
+   window slides over it and settles a little smaller; the wash behind deepens. */
+@supports (animation-timeline: scroll()) {
+  .attio-hero-text {
+    animation: attio-hero-text-out linear both;
+    animation-timeline: scroll();
+    animation-range: 0px 450px;
+  }
+  .attio-hero-window {
+    animation: attio-hero-window-settle linear both;
+    animation-timeline: scroll();
+    animation-range: 0px 600px;
+  }
+  .attio-hero-wash {
+    animation: attio-hero-wash-deepen linear both;
+    animation-timeline: scroll();
+    animation-range: 0px 450px;
+  }
+}
+
+@keyframes attio-hero-text-out {
+  to { opacity: 0; filter: blur(6px); }
+}
+@keyframes attio-hero-window-settle {
+  from { scale: 1; }
+  to { scale: 0.95; }
+}
+@keyframes attio-hero-wash-deepen {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+/* on desktop the wash starts as a band behind the window's top half and grows down to the
+   section's foot as you scroll */
+@keyframes attio-hero-wash-grow {
+  from { opacity: 0.55; clip-path: inset(0 0 50% 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+@supports (animation-timeline: scroll()) {
+  @media (min-width: 1024px) {
+    .attio-hero-wash {
+      animation-name: attio-hero-wash-grow;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attio-hero-in,
+  .attio-hero-spark,
+  .attio-hero-text,
+  .attio-hero-window,
+  .attio-hero-wash {
+    animation: none;
+  }
+}
