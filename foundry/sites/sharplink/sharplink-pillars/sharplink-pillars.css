@@ -1,0 +1,65 @@
+/* Each item has its own named view timeline (set inline, --sharplink-pillar-<i>); the section
+   makes those names visible to the pinned media column (timeline-scope). An item is at full
+   strength while it crosses the middle of the window and at 40% otherwise; its media fades in
+   and out over the same stretch. The dark band drifts up a little as the section scrolls. */
+.sharplink-pillars-media:not(:first-child) {
+  display: none;
+}
+
+@supports (timeline-scope: none) and (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .sharplink-pillars {
+      timeline-scope: var(--sharplink-pillars-scope);
+    }
+    .sharplink-pillars-item {
+      view-timeline-name: var(--sharplink-pillars-name);
+    }
+    .sharplink-pillars-dim {
+      animation: sharplink-pillars-focus linear both;
+      animation-timeline: var(--sharplink-pillars-name);
+      animation-range: cover 0% cover 100%;
+    }
+    .sharplink-pillars-media:not(:first-child) {
+      display: block;
+    }
+    .sharplink-pillars-media {
+      animation: sharplink-pillars-swap linear both;
+      animation-timeline: var(--sharplink-pillars-name);
+      animation-range: cover 0% cover 100%;
+    }
+    .sharplink-pillars-media:first-child {
+      animation-name: sharplink-pillars-swap-first;
+    }
+    .sharplink-pillars-media:last-child {
+      animation-name: sharplink-pillars-swap-last;
+    }
+    .sharplink-pillars-band {
+      animation: sharplink-pillars-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes sharplink-pillars-focus {
+  0%, 30% { opacity: 0.4; }
+  42%, 62% { opacity: 1; }
+  74%, 100% { opacity: 0.4; }
+}
+@keyframes sharplink-pillars-swap {
+  0%, 34% { opacity: 0; }
+  42%, 60% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+@keyframes sharplink-pillars-swap-first {
+  0%, 60% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+@keyframes sharplink-pillars-swap-last {
+  0%, 34% { opacity: 0; }
+  42%, 100% { opacity: 1; }
+}
+@keyframes sharplink-pillars-drift {
+  from { transform: translateY(8%); }
+  to { transform: translateY(-8%); }
+}
