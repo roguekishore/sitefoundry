@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo press strip",
+  "description": "A slim white band where a single row of grey publication names drifts sideways for ever, fading out under soft white edges at both ends.",
+  "category": "logos",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "press",
+    "marquee",
+    "loop",
+    "light",
+    "minimal",
+    "grayscale"
+  ],
+  "notes": [
+    "CSS only; one full pass takes 50s by default; with reduced motion the row stands still",
+    "names are plain text in assorted weights; pass styled nodes for real logos"
+  ],
+  "entry": "prenuvo-press.tsx",
+  "source": "foundry",
+  "name": "prenuvo-press",
+  "files": [
+    {
+      "path": "prenuvo-press.css",
+      "content": "/* The row is drawn twice side by side; sliding the pair left by half its width loops seamlessly. */\n@media (prefers-reduced-motion: no-preference) {\n  .prenuvo-press-track {\n    animation: prenuvo-press-loop var(--prenuvo-press-duration, 50s) linear infinite;\n  }\n}\n\n@keyframes prenuvo-press-loop {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "prenuvo-press.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./prenuvo-press.css\";\n\nexport interface PrenuvoPressItem {\n  /** the publication's name */\n  name: string;\n  /** how the name is set (plain text stands in for a logo) */\n  look?: \"heavy\" | \"caps\" | \"light\" | \"condensed\" | \"italic\";\n  /** a real logo instead of the text */\n  logo?: ReactNode;\n}\n\nexport interface PrenuvoPressProps {\n  /** the publications, in order */\n  items: PrenuvoPressItem[];\n  /** seconds for one full pass */\n  duration?: number;\n  /** a label for screen readers */\n  label?: string;\n  className?: string;\n}\n\nconst looks = {\n  heavy: \"font-display font-extrabold tracking-[-0.02em]\",\n  caps: \"font-display font-bold uppercase tracking-[-0.01em]\",\n  light: \"font-display font-light uppercase tracking-[0.3em]\",\n  condensed: \"font-display font-semibold uppercase tracking-[-0.04em] scale-x-90\",\n  italic: \"font-sans font-bold italic uppercase\",\n};\n\nexport function PrenuvoPress({ items, duration = 50, label, className }: PrenuvoPressProps) {\n  const row = (hidden: boolean) => (\n    <ul aria-hidden={hidden || undefined} className=\"flex shrink-0 items-center gap-10 pr-10 lg:gap-14 lg:pr-14\">\n      {items.map((it) => (\n        <li key={it.name} className={cn(\"text-xl whitespace-nowrap text-muted-foreground/55 lg:text-[2rem]\", looks[it.look ?? \"heavy\"])}>\n          {it.logo ?? it.name}\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <section aria-label={label} className={cn(\"relative z-10 overflow-x-clip bg-background py-10 lg:py-[3.25rem]\", className)}>\n      <div className=\"prenuvo-press-track flex w-max\" style={{ \"--prenuvo-press-duration\": `${duration}s` } as CSSProperties}>\n        {row(false)}\n        {row(true)}\n      </div>\n      {/* soft white edges */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-y-0 left-0 w-16 bg-[linear-gradient(90deg,var(--background)_15%,transparent)] lg:w-40\" />\n      <div aria-hidden className=\"pointer-events-none absolute inset-y-0 right-0 w-16 bg-[linear-gradient(270deg,var(--background)_15%,transparent)] lg:w-40\" />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "PrenuvoPressItem[]",
+      "required": true,
+      "description": "the publications, in order"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "50",
+      "description": "seconds for one full pass"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "a label for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0e87643e4e4f443de9fa76a78615d87ef6da273383f1a753caa76b4bfa02fd7f"
+}

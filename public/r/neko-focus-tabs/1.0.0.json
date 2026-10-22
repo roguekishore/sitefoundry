@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko focus tabs",
+  "description": "A pinned, scroll-told feature tour on a lemon wash. A white card fills the window (it grows from an inset card to full bleed as it arrives); a tall picture on the left (on top on phones) and, on the right, a row of capitalised tabs over a big soft-serif headline, a short paragraph and an arrow link. Scrolling slides each next picture up over the last, cross-fades the text with every word rising into place, and darkens the active tab (phones also fill an underline under it).",
+  "category": "features",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "pinned",
+    "sticky",
+    "scroll",
+    "scrubbed",
+    "slide",
+    "crossfade",
+    "split-text",
+    "serif",
+    "yellow",
+    "light"
+  ],
+  "notes": [
+    "about (tabs + 1.25) screens tall on desktop, (tabs + 1.7) on phones; works with 2 to 6 tabs",
+    "the tabs are links to markers down the section, so clicking one scrolls to its panel without JavaScript",
+    "pure CSS scroll-driven; without scroll timelines or with reduced motion it becomes a plain stack of cards"
+  ],
+  "entry": "neko-focus-tabs.tsx",
+  "source": "foundry",
+  "name": "neko-focus-tabs",
+  "files": [
+    {
+      "path": "neko-focus-tabs.css",
+      "content": "/* Plain layout (Tailwind classes in the .tsx): a stack of cards, one per tab.\n   Where scroll timelines exist and motion is welcome, the section becomes a pinned stage:\n   it is (tabs + 1.7) screens tall (+1.25 on desktop), its inner stage sticks, and every\n   change below is driven by the section's own view timeline (--neko-tabs). The `contain`\n   range is the pinned stretch; each panel's slice of it comes from custom properties set\n   inline by the component (--nft-*). */\n.neko-tabs {\n  view-timeline: --neko-tabs block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .neko-tabs {\n      --nft-media-h: 38svh;\n      --nft-inset: inset(1.5rem var(--page-gutter) round 1.25rem);\n      height: calc((var(--nft-n) + 1.7) * 100svh);\n      padding: 0;\n    }\n    .neko-tabs-stage {\n      position: sticky;\n      top: 0;\n      height: 100svh;\n    }\n    .neko-tabs-frame {\n      position: absolute;\n      inset: 0;\n      display: block;\n      clip-path: inset(0 round 0);\n      animation: neko-focus-tabs-open linear both;\n      animation-timeline: --neko-tabs;\n      animation-range: entry 40% entry 100%;\n    }\n    .neko-tabs-backdrop {\n      display: block;\n    }\n    .neko-tabs-panel {\n      position: absolute;\n      inset: 0;\n      display: block;\n      background: transparent;\n      border-radius: 0;\n      overflow: visible;\n    }\n    .neko-tabs-media {\n      position: absolute;\n      top: 0;\n      left: 0;\n      right: 0;\n      height: var(--nft-media-h);\n      aspect-ratio: auto;\n      min-height: 0;\n      border-radius: 0 0 1.25rem 1.25rem;\n    }\n    .neko-tabs-text {\n      position: absolute;\n      top: calc(var(--nft-media-h) + 3.25rem);\n      left: var(--page-gutter);\n      right: var(--page-gutter);\n      padding: 0;\n    }\n    .neko-tabs-eyebrow {\n      display: none;\n    }\n    .neko-tabs-row {\n      position: absolute;\n      top: calc(var(--nft-media-h) + 0.75rem);\n      left: var(--page-gutter);\n      right: var(--page-gutter);\n      display: flex;\n    }\n\n    /* the per-panel motion, all on the section's timeline */\n    .neko-tabs-media-inner,\n    .neko-tabs-copy,\n    .neko-tabs-word,\n    .neko-tabs-tab,\n    .neko-tabs-line {\n      animation-timing-function: linear;\n      animation-timeline: --neko-tabs;\n    }\n    .neko-tabs-media-inner {\n      animation-name: var(--nft-media-anim, none);\n      animation-range: var(--nft-media-range, normal);\n      animation-fill-mode: backwards;\n    }\n    .neko-tabs-copy {\n      animation-name: var(--nft-copy-anim, none);\n      animation-range: var(--nft-copy-range, normal);\n      animation-fill-mode: var(--nft-copy-fill, none);\n    }\n    .neko-tabs-word {\n      animation-name: var(--nft-word-anim, none);\n      animation-range: var(--nft-in-range, normal);\n      animation-fill-mode: backwards;\n    }\n    .neko-tabs-tab {\n      animation-name: var(--nft-tab-anim, none);\n      animation-range: var(--nft-tab-range, normal);\n      animation-fill-mode: var(--nft-tab-fill, none);\n    }\n    .neko-tabs-line {\n      display: block;\n      transform-origin: left center;\n      animation-name: var(--nft-line-anim, none);\n      animation-range: var(--nft-line-range, normal);\n      animation-fill-mode: var(--nft-line-fill, none);\n    }\n\n    @media (min-width: 64rem) {\n      .neko-tabs {\n        --nft-inset: inset(0 var(--page-gutter) round 1.8rem);\n        height: calc((var(--nft-n) + 1.25) * 100svh);\n      }\n      .neko-tabs-media {\n        right: auto;\n        bottom: 0;\n        width: 41.67%;\n        height: auto;\n        border-radius: 0 1.8rem 1.8rem 0;\n      }\n      .neko-tabs-text {\n        top: calc(23.5% + 3.6rem);\n        left: 50.4%;\n        max-width: 37rem;\n      }\n      .neko-tabs-row {\n        top: 23.5%;\n        left: 50.4%;\n        right: auto;\n        gap: 3rem;\n        border: 0;\n      }\n      .neko-tabs-line {\n        display: none;\n      }\n    }\n  }\n}\n\n/* the card grows from an inset card to full bleed while the section arrives */\n@keyframes neko-focus-tabs-open {\n  from { clip-path: var(--nft-inset); }\n}\n/* the next picture slides up from below, inside its frame */\n@keyframes neko-focus-tabs-slide {\n  from { transform: translateY(100%); }\n}\n@keyframes neko-focus-tabs-in {\n  from { opacity: 0; }\n}\n@keyframes neko-focus-tabs-out {\n  to { opacity: 0; }\n}\n/* each word starts lower the further along the headline it is */\n@keyframes neko-focus-tabs-word {\n  from { transform: translateY(var(--nft-rise, 0px)); }\n}\n@keyframes neko-focus-tabs-dim {\n  from, to { color: color-mix(in oklab, var(--foreground) 50%, transparent); }\n}\n@keyframes neko-focus-tabs-grow {\n  from { transform: scaleX(0); }\n}\n@keyframes neko-focus-tabs-gone {\n  from, to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "neko-focus-tabs.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoArrowLink } from \"@foundry/neko-arrow-link\";\nimport { NekoSlot } from \"@foundry/neko-slot\";\nimport \"./neko-focus-tabs.css\";\n\nexport interface NekoFocusTab {\n  /** the short tab label, shown in capitals */\n  tab: string;\n  /** the big headline of this panel */\n  title: string;\n  /** a sentence or two under it */\n  body: string;\n  /** the arrow link under the paragraph */\n  link?: { label: string; href: string };\n  /** the tall picture (top on phones); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface NekoFocusTabsProps {\n  /** two to six panels, told in scroll order */\n  tabs: NekoFocusTab[];\n  /** prefix for the in-page markers the tabs link to (must be unique on the page) */\n  id?: string;\n  className?: string;\n}\n\ntype Vars = Record<`--${string}`, string | number>;\nconst css = (v: Vars) => v as CSSProperties;\nconst tones = [\"muted\", \"lemon\", \"ice\", \"muted\", \"lemon\", \"ice\"] as const;\n\n/** Where each panel's changes sit on the pinned stretch, in % of the `contain` range. */\nfunction slices(k: number, n: number) {\n  const at = (x: number) => `${((x / n) * 100).toFixed(2)}%`;\n  const range = (a: number, b: number) => `contain ${at(a)} contain ${at(b)}`;\n  const first = k === 0;\n  const last = k === n - 1;\n  const inRange = range(k, k + 0.22); // text fades and rises in\n  const outRange = range(k + 0.78, k + 1); // text fades out as the next arrives\n  const copy = first ? { a: \"neko-focus-tabs-out\", r: outRange, f: \"forwards\" } : last ? { a: \"neko-focus-tabs-in\", r: inRange, f: \"backwards\" } : { a: \"neko-focus-tabs-in, neko-focus-tabs-out\", r: `${inRange}, ${outRange}`, f: \"backwards, forwards\" };\n  const dimBefore = range(k - 0.01, k);\n  const dimAfter = range(k + 1, k + 1.01);\n  const tab = first ? { a: \"neko-focus-tabs-dim\", r: dimAfter, f: \"forwards\" } : last ? { a: \"neko-focus-tabs-dim\", r: dimBefore, f: \"backwards\" } : { a: \"neko-focus-tabs-dim, neko-focus-tabs-dim\", r: `${dimBefore}, ${dimAfter}`, f: \"backwards, forwards\" };\n  const grow = range(k, last ? n : k + 1);\n  const line = last ? { a: \"neko-focus-tabs-grow\", r: grow, f: \"backwards\" } : { a: \"neko-focus-tabs-grow, neko-focus-tabs-gone\", r: `${grow}, ${dimAfter}`, f: \"backwards, forwards\" };\n  return {\n    media: first ? {} : { \"--nft-media-anim\": \"neko-focus-tabs-slide\", \"--nft-media-range\": range(k - 0.22, k + 0.22) },\n    copy: n < 2 ? {} : { \"--nft-copy-anim\": copy.a, \"--nft-copy-range\": copy.r, \"--nft-copy-fill\": copy.f, \"--nft-word-anim\": first ? \"none\" : \"neko-focus-tabs-word\", \"--nft-in-range\": inRange },\n    tab: n < 2 ? {} : { \"--nft-tab-anim\": tab.a, \"--nft-tab-range\": tab.r, \"--nft-tab-fill\": tab.f },\n    line: { \"--nft-line-anim\": line.a, \"--nft-line-range\": line.r, \"--nft-line-fill\": line.f },\n    // the marker a tab links to: a little after its panel has settled\n    marker: `calc((100% - 100svh) * ${((k + 0.3) / n).toFixed(4)})`,\n  };\n}\n\nexport function NekoFocusTabs({ tabs, id = \"focus\", className }: NekoFocusTabsProps) {\n  const n = tabs.length;\n  const s = tabs.map((_, k) => slices(k, n));\n  return (\n    <section className={cn(\"neko-tabs relative bg-highlight px-gutter py-[calc(var(--section-y)*0.4)] font-sans text-foreground\", className)} style={css({ \"--nft-n\": n })}>\n      {tabs.map((t, k) => (\n        <span key={t.tab} id={`${id}-${k}`} aria-hidden className=\"absolute left-0 h-px w-px\" style={{ top: s[k].marker }} />\n      ))}\n\n      <div className=\"neko-tabs-stage\">\n        <div className=\"neko-tabs-frame flex flex-col gap-4\">\n          <div aria-hidden className=\"neko-tabs-backdrop absolute inset-0 hidden bg-card\" />\n\n          {tabs.map((t, k) => (\n            <article key={t.tab} className=\"neko-tabs-panel overflow-clip rounded-2xl bg-card lg:grid lg:grid-cols-[41.67%_1fr]\">\n              <div className=\"neko-tabs-media relative aspect-[1.2] overflow-clip lg:aspect-auto lg:min-h-[34rem]\">\n                <NekoSlot media={t.media} tone={tones[k % tones.length]} className=\"neko-tabs-media-inner absolute inset-0\" />\n              </div>\n              <div className=\"neko-tabs-text px-5 py-7 lg:self-center lg:px-[16%] lg:py-16\">\n                <div className=\"neko-tabs-copy\" style={css(s[k].copy)}>\n                  <p className=\"neko-tabs-eyebrow mb-4 text-xs tracking-[0.08em] uppercase lg:text-base lg:tracking-[0.04em]\">{t.tab}</p>\n                  <h2 className=\"font-display text-[2.5rem] leading-[1.1] tracking-[-0.025em] lg:text-[4.25rem] lg:leading-[1.18]\">\n                    {t.title.split(\" \").map((w, j) => (\n                      <span key={j}>\n                        {j > 0 && \" \"}\n                        {/* each word rises inside its own mask, like a line of type sliding up */}\n                        <span className=\"-mb-[0.14em] inline-block overflow-clip pb-[0.14em] align-top\">\n                          <span className=\"neko-tabs-word inline-block\" style={css({ \"--nft-rise\": `${Math.min(10 + j * 14, 92)}px` })}>\n                            {w}\n                          </span>\n                        </span>\n                      </span>\n                    ))}\n                  </h2>\n                  <p className=\"mt-4 max-w-[34rem] text-base leading-6 lg:mt-8 lg:text-lg\">{t.body}</p>\n                  {t.link && <NekoArrowLink label={t.link.label} href={t.link.href} className=\"mt-5 lg:mt-8\" />}\n                </div>\n              </div>\n            </article>\n          ))}\n\n          <ul className=\"neko-tabs-row hidden justify-between border-b border-border\">\n            {tabs.map((t, k) => (\n              <li key={t.tab} className=\"relative\">\n                <a\n                  href={`#${id}-${k}`}\n                  className=\"neko-tabs-tab block pb-3 text-xs tracking-[0.08em] uppercase transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none lg:pb-0 lg:text-base lg:tracking-[0.04em]\"\n                  style={css(s[k].tab)}\n                >\n                  {t.tab}\n                </a>\n                <span aria-hidden className=\"neko-tabs-line absolute inset-x-0 -bottom-px hidden h-0.5 bg-foreground\" style={css(s[k].line)} />\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-arrow-link",
+    "neko-slot"
+  ],
+  "props": [
+    {
+      "name": "tabs",
+      "type": "NekoFocusTab[]",
+      "required": true,
+      "description": "two to six panels, told in scroll order"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "default": "focus",
+      "description": "prefix for the in-page markers the tabs link to (must be unique on the page)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1e1eeed30dcf4b96a8f6c077c4f368383a47740c7c3ba7f3342f0c665def51ff"
+}

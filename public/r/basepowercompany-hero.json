@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power hero",
+  "description": "A full-bleed photo hero 90% of the window tall: a star rating, a big tight headline, one line of copy and a white zip-code bar with a lime button inside. Desktop sets it bottom-left over a scrim from the left; phones stack it at the top, centred, with a full-width button. The photo settles from a slight zoom over 7s and the content rises in on load.",
+  "category": "hero",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "photo",
+    "full-bleed",
+    "dark",
+    "form",
+    "zip",
+    "ken-burns",
+    "load-in",
+    "rise"
+  ],
+  "notes": [
+    "carries the dark class itself (light ink over the photo); the form stays light via the foreground colour",
+    "sized by the window: 90svh, at least 38rem",
+    "CSS-only animations, off with reduced motion"
+  ],
+  "entry": "basepowercompany-hero.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-hero",
+  "files": [
+    {
+      "path": "basepowercompany-hero.css",
+      "content": "/* Load-in: the photo settles from a slight zoom (7s, once); the content rises 16px and fades in\n   (300ms each, staggered by the inline delays). Off with reduced motion. */\n.bp-hero-zoom {\n  animation: bp-hero-zoom 7s cubic-bezier(0.22, 1, 0.36, 1) both;\n}\n.bp-hero-rise {\n  animation: bp-hero-rise 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;\n}\n\n@keyframes bp-hero-zoom {\n  from { transform: scale(1.08); }\n  to { transform: scale(1); }\n}\n@keyframes bp-hero-rise {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .bp-hero-zoom,\n  .bp-hero-rise {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "basepowercompany-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { MapPin } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyButton } from \"@foundry/basepowercompany-button\";\nimport { BasepowercompanyMedia } from \"@foundry/basepowercompany-media\";\nimport { BasepowercompanyRating, type BasepowercompanyRatingProps } from \"@foundry/basepowercompany-rating\";\nimport \"./basepowercompany-hero.css\";\n\nexport interface BasepowercompanyHeroProps {\n  /** the review score above the headline */\n  rating: BasepowercompanyRatingProps;\n  /** the headline: one line on desktop, two on phones */\n  title: string;\n  /** one sentence under the headline */\n  subtitle: string;\n  /** the zip-code form: where it submits, the field's placeholder and label, and the button */\n  form: { action: string; placeholder: string; fieldLabel: string; fieldName?: string; button: string };\n  /** a small line under the form */\n  caption?: string;\n  /** the full-bleed photo or video behind everything */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/*\n * A full-bleed photo hero, 90% of the window tall. Phones stack the content at the top,\n * centred; desktop sets it bottom-left over a dark scrim from the left. The photo settles from\n * a slight zoom over 7s; the content rises in on load.\n */\nexport function BasepowercompanyHero({ rating, title, subtitle, form, caption, media, mediaLabel, className }: BasepowercompanyHeroProps) {\n  return (\n    <section className={cn(\"dark relative isolate h-[90svh] min-h-[38rem] overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"bp-hero-zoom absolute inset-0 -z-10\">\n        <BasepowercompanyMedia media={media} tone=\"photo\" label={mediaLabel} className=\"size-full\" />\n      </div>\n      {/* scrims: top and bottom on phones, from the left on desktop */}\n      <div\n        aria-hidden\n        className=\"absolute inset-0 -z-10 bg-[linear-gradient(color-mix(in_oklab,var(--background)_64%,transparent),transparent_40%,transparent_46%,color-mix(in_oklab,var(--background)_62%,transparent)_84%)] lg:bg-[linear-gradient(90deg,color-mix(in_oklab,var(--background)_45%,transparent),color-mix(in_oklab,var(--background)_31%,transparent)_45%,transparent_71%)]\"\n      />\n\n      <div className=\"mx-auto flex h-full max-w-page flex-col items-center px-gutter pt-[4.75rem] text-center lg:items-start lg:justify-end lg:pt-0 lg:pb-24 lg:text-left\">\n        <BasepowercompanyRating {...rating} className=\"bp-hero-rise\" />\n        <h1 className=\"bp-hero-rise mt-2 max-w-[20rem] font-display text-[2.5rem] leading-[1.1] font-bold tracking-[-0.035em] [animation-delay:60ms] sm:max-w-none lg:mt-3 lg:text-5xl lg:leading-[1.15]\">\n          {title}\n        </h1>\n        <p className=\"bp-hero-rise mt-5 max-w-[22rem] text-base leading-6 font-semibold tracking-[-0.005em] [animation-delay:120ms] sm:max-w-none lg:mt-6\">\n          {subtitle}\n        </p>\n\n        <form\n          action={form.action}\n          className=\"bp-hero-rise mt-7 flex w-full flex-col gap-2 [animation-delay:180ms] sm:max-w-[38.5rem] lg:mt-9 lg:flex-row lg:items-center lg:rounded-lg lg:border lg:border-foreground lg:bg-foreground lg:p-2\"\n        >\n          <label className=\"flex h-[3.125rem] items-center lg:flex-1 gap-2.5 rounded-lg border border-foreground bg-foreground px-4 text-background lg:h-[2.875rem] lg:border-0 lg:px-2\">\n            <MapPin aria-hidden className=\"size-5 shrink-0 stroke-[1.5] text-primary\" />\n            <span className=\"sr-only\">{form.fieldLabel}</span>\n            <input\n              name={form.fieldName ?? \"zip\"}\n              inputMode=\"numeric\"\n              autoComplete=\"postal-code\"\n              placeholder={form.placeholder}\n              className=\"w-full bg-transparent text-base text-background outline-none placeholder:text-background/50\"\n            />\n          </label>\n          <BasepowercompanyButton type=\"submit\" block className=\"h-[2.875rem] lg:w-auto lg:px-5\">\n            {form.button}\n          </BasepowercompanyButton>\n        </form>\n        {caption && <p className=\"bp-hero-rise mt-4 text-xs leading-[1.5] font-semibold [animation-delay:240ms] lg:mt-2 lg:ml-2\">{caption}</p>}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "basepowercompany-button",
+    "basepowercompany-media",
+    "basepowercompany-rating",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "rating",
+      "type": "BasepowercompanyRatingProps",
+      "required": true,
+      "description": "the review score above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline: one line on desktop, two on phones"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": true,
+      "description": "one sentence under the headline"
+    },
+    {
+      "name": "form",
+      "type": "{ action: string; placeholder: string; fieldLabel: string; fieldName?: string | undefined; button: string; }",
+      "required": true,
+      "description": "the zip-code form: where it submits, the field's placeholder and label, and the button"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "a small line under the form"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed photo or video behind everything"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "08288a2bb89274be36bbf86050a0d0362eafd3aa1dc08f71622cba2d946dfc0a"
+}

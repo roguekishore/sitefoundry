@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Anduril smooth scroll",
+  "description": "Invisible helper that makes wheel scrolling glide with a soft ease-out (Lenis), as the original does. Put it once on a page.",
+  "category": "background",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "smooth-scroll",
+    "lenis",
+    "motion",
+    "scroll"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: load)",
+    "off under prefers-reduced-motion"
+  ],
+  "entry": "anduril-smooth-scroll.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "anduril-smooth-scroll",
+  "files": [
+    {
+      "path": "anduril-smooth-scroll.tsx",
+      "content": "import { useEffect } from \"react\";\nimport Lenis from \"lenis\";\n\nexport interface AndurilSmoothScrollProps {\n  /** how long one wheel step glides, in seconds */\n  duration?: number;\n}\n\n/** Turns on gliding wheel scrolling for the whole page. Renders nothing; off under reduced motion. */\nexport function AndurilSmoothScroll({ duration = 1.2 }: AndurilSmoothScrollProps) {\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    // expo-out, the curve the original's own transitions use\n    const lenis = new Lenis({ duration, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });\n    let frame = requestAnimationFrame(function raf(time) {\n      lenis.raf(time);\n      frame = requestAnimationFrame(raf);\n    });\n    return () => {\n      cancelAnimationFrame(frame);\n      lenis.destroy();\n    };\n  }, [duration]);\n  return null;\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lenis": "^1.3.27",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [],
+  "props": [
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "1.2",
+      "description": "how long one wheel step glides, in seconds"
+    }
+  ],
+  "hash": "4fc193338257c22d2930393cf5818594c7b202fe963893dfbe78d6c6086c4003"
+}

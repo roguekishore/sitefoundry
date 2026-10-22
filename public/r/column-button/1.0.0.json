@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Column button",
+  "description": "Compact 8px-radius buttons: a deep navy filled one with a soft top sheen and a white one on a hairline ring. With an arrow, a stem draws in behind the chevron on hover while the chevron slides a few pixels right; the fill and ring deepen over 0.2s.",
+  "category": "button",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "navy",
+    "white",
+    "hairline",
+    "minimal",
+    "hover",
+    "arrow"
+  ],
+  "notes": [
+    "the arrow animation is CSS only; it stays still under reduced motion"
+  ],
+  "entry": "column-button.tsx",
+  "source": "foundry",
+  "name": "column-button",
+  "files": [
+    {
+      "path": "column-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ColumnButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary: navy fill · secondary: white on a hairline ring */\n  variant?: \"primary\" | \"secondary\";\n  /** trailing icon: an arrow whose stem draws in on hover, a chevron for menus, or none */\n  icon?: \"arrow\" | \"menu\" | \"none\";\n  /** stretch to the container's width on phones (below 1024px) */\n  fullOnMobile?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst variants = {\n  // Navy with a faint white sheen along the top edge; hover lifts it a step towards the ring colour.\n  primary:\n    \"bg-primary text-primary-foreground shadow-[0_0_0_1px_var(--primary),inset_0_1px_0_color-mix(in_oklab,var(--primary-foreground)_18%,transparent),0_1px_2px_color-mix(in_oklab,var(--foreground)_20%,transparent)] hover:bg-[color-mix(in_oklab,var(--primary)_88%,var(--ring))] hover:shadow-[0_0_0_1px_color-mix(in_oklab,var(--primary)_88%,var(--ring)),0_2px_4px_color-mix(in_oklab,var(--foreground)_25%,transparent)]\",\n  // White with a 1px ring and a 1px drop; hover tints the fill and darkens the ring.\n  secondary:\n    \"bg-secondary text-secondary-foreground shadow-[0_1px_1px_color-mix(in_oklab,var(--foreground)_6%,transparent),0_0_0_1px_var(--border)] hover:bg-accent hover:shadow-[0_1px_1px_color-mix(in_oklab,var(--foreground)_15%,transparent),0_0_0_1px_color-mix(in_oklab,var(--foreground)_18%,transparent)]\",\n};\n\n/** A chevron with a stem: the stem is drawn on hover (dash offset) as the chevron slides right. */\nfunction Arrow() {\n  return (\n    <svg aria-hidden viewBox=\"0 0 12 12\" fill=\"none\" className=\"size-3 shrink-0 overflow-visible\" strokeWidth={1.6} stroke=\"currentColor\" strokeLinecap=\"round\" strokeLinejoin=\"round\">\n      <path\n        d=\"M1 6h8.5\"\n        strokeDasharray=\"9\"\n        strokeDashoffset=\"9\"\n        className=\"-translate-x-[3px] transition-[stroke-dashoffset,translate] duration-200 ease-out group-hover:translate-x-0 group-hover:[stroke-dashoffset:0] motion-reduce:transition-none\"\n      />\n      <path d=\"M5.5 2l4 4-4 4\" className=\"-translate-x-[3px] transition-[translate] duration-200 ease-out group-hover:translate-x-0 motion-reduce:transition-none\" />\n    </svg>\n  );\n}\n\nexport function ColumnButton({ children, href, variant = \"primary\", icon = \"arrow\", fullOnMobile, onClick, className }: ColumnButtonProps) {\n  const classes = cn(\n    \"group inline-flex h-[2.375rem] shrink-0 items-center justify-center gap-2 rounded-lg px-4 font-sans text-[0.9375rem] font-medium tracking-[-0.01em] whitespace-nowrap\",\n    \"transition-[background-color,box-shadow,color] duration-200 ease-[ease] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variants[variant],\n    fullOnMobile && \"w-full lg:w-auto\",\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {icon === \"arrow\" && <Arrow />}\n      {icon === \"menu\" && <ChevronDown aria-hidden className=\"size-4 shrink-0\" strokeWidth={1.75} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: navy fill · secondary: white on a hairline ring"
+    },
+    {
+      "name": "icon",
+      "type": "enum",
+      "required": false,
+      "default": "arrow",
+      "description": "trailing icon: an arrow whose stem draws in on hover, a chevron for menus, or none"
+    },
+    {
+      "name": "fullOnMobile",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the container's width on phones (below 1024px)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8489f495ac63184be4528e849b68ad053540d2ea2c9219c31686eac89658ce40"
+}

@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink FAQ",
+  "description": "A plain, square FAQ on the dotted three-column grid: a big title on the left whose letters assemble as you scroll, a label and tinted button at the top right, and the questions across the two right columns as faint 74px rows (4px apart) with a small numbered badge, 19px question and a solid black plus box. Rows deepen on hover; answers open with a slow 1.2s height ease.",
+  "category": "faq",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "grid",
+    "dotted",
+    "light",
+    "square",
+    "minimal",
+    "reveal"
+  ],
+  "notes": [
+    "CSS only: native details elements; the height ease uses ::details-content and interpolate-size where supported (elsewhere answers open instantly)",
+    "transparent background: on the page it shows the Sharplink backdrop wash"
+  ],
+  "entry": "sharplink-faq.tsx",
+  "source": "foundry",
+  "name": "sharplink-faq",
+  "files": [
+    {
+      "path": "sharplink-faq.css",
+      "content": "/* Answers slide open with a slow ease (where the browser can animate to height: auto). */\n.sharplink-faq {\n  interpolate-size: allow-keywords;\n}\n.sharplink-faq-item::details-content {\n  block-size: 0;\n  overflow-y: clip;\n  transition: block-size 1.2s cubic-bezier(0.25, 1, 0.5, 1), content-visibility 1.2s allow-discrete;\n}\n.sharplink-faq-item[open]::details-content {\n  block-size: auto;\n}\n.sharplink-faq-item > summary::-webkit-details-marker {\n  display: none;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .sharplink-faq-item::details-content {\n    transition: none;\n  }\n}\n"
+    },
+    {
+      "path": "sharplink-faq.tsx",
+      "content": "import { Minus, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkGuides } from \"@foundry/sharplink-guides\";\nimport { SharplinkLabel } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\nimport { SharplinkTextReveal } from \"@foundry/sharplink-text-reveal\";\nimport \"./sharplink-faq.css\";\n\nexport interface SharplinkFaqItem {\n  /** the question */\n  question: string;\n  /** the answer, shown when the row opens */\n  answer: string;\n}\n\nexport interface SharplinkFaqProps {\n  /** the big title on the left */\n  title: string;\n  /** the small label before the button, e.g. \"Still curious?\" */\n  label?: string;\n  /** the tinted button at the top right */\n  cta?: { label: string; href: string };\n  /** the questions, in order (numbered 01, 02…) */\n  items: SharplinkFaqItem[];\n  className?: string;\n}\n\n/** Big title left, numbered question rows right, each opening with a slow ease. */\nexport function SharplinkFaq({ title, label, cta, items, className }: SharplinkFaqProps) {\n  return (\n    <section className={cn(\"sharplink-faq relative isolate overflow-clip text-foreground\", className)}>\n      <SharplinkGuides />\n      <div className=\"mx-auto max-w-page px-gutter pb-16 lg:pb-12\">\n        <SharplinkRule />\n        <div className=\"grid gap-y-6 pt-6 pb-14 lg:grid-cols-3 lg:gap-x-gutter lg:pt-5 lg:pb-14\">\n          <SharplinkTextReveal\n            text={title}\n            className=\"font-display text-[2.75rem] leading-[1.15] font-normal tracking-[-0.01em] lg:text-[4.25rem] lg:leading-[1.06] lg:tracking-[-0.02em]\"\n          />\n          {(label || cta) && (\n            <div className=\"flex flex-col items-start gap-6 lg:col-start-3 lg:flex-row lg:items-center lg:justify-end lg:gap-5 lg:pt-4\">\n              {label && <SharplinkLabel>{label}</SharplinkLabel>}\n              {cta && (\n                <SharplinkButton href={cta.href} variant=\"tint\" arrow>\n                  {cta.label}\n                </SharplinkButton>\n              )}\n            </div>\n          )}\n        </div>\n        <div className=\"-mx-gutter border-t border-dotted border-foreground/15 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-x-gutter\">\n          <ul className=\"grid gap-1 px-gutter lg:col-span-2 lg:col-start-2 lg:px-0\">\n            {items.map((item, i) => (\n              <li key={item.question}>\n                <details className=\"sharplink-faq-item group bg-foreground/[0.03] transition-colors duration-[250ms] hover:bg-foreground/[0.06] motion-reduce:transition-none\">\n                  <summary className=\"grid cursor-pointer list-none grid-cols-[1fr_auto] items-center gap-x-5 gap-y-5 p-4 lg:grid-cols-[2.375rem_1fr_auto] lg:p-5\">\n                    <span className=\"inline-flex h-[1.375rem] w-fit items-center gap-1 bg-foreground/10 px-1.5 text-foreground/60\">\n                      <span aria-hidden className=\"size-1 bg-foreground/60\" />\n                      <span className=\"font-sans text-xs font-medium tracking-[0.06em] [font-stretch:80%]\">{String(i + 1).padStart(2, \"0\")}</span>\n                    </span>\n                    <span className=\"col-span-2 row-start-2 max-w-[17rem] text-base leading-[1.35] font-medium tracking-[-0.01em] lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:max-w-none lg:text-[1.1875rem]\">\n                      {item.question}\n                    </span>\n                    <span className=\"col-start-2 row-start-1 grid size-[2.125rem] place-items-center bg-foreground text-background lg:col-start-3\">\n                      <Plus className=\"size-5 group-open:hidden\" strokeWidth={1.25} />\n                      <Minus className=\"hidden size-5 group-open:block\" strokeWidth={1.25} />\n                    </span>\n                  </summary>\n                  <p className=\"max-w-[42rem] px-4 pb-6 text-base leading-[1.4] text-foreground/60 lg:pr-20 lg:pb-7 lg:pl-[4.75rem]\">{item.answer}</p>\n                </details>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-guides",
+    "sharplink-label",
+    "sharplink-rule",
+    "sharplink-text-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big title on the left"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the small label before the button, e.g. \"Still curious?\""
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the tinted button at the top right"
+    },
+    {
+      "name": "items",
+      "type": "SharplinkFaqItem[]",
+      "required": true,
+      "description": "the questions, in order (numbered 01, 02…)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d7bfa17f8c71f6650ae31613ca02d1d7b2f499a7a4d7b8cd94322903d143ce8c"
+}

@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Anduril product tile",
+  "description": "A full-bleed media tile with 2px corners and a long eased dark scrim at the bottom, a bold product name and, under it, a tagline with a ↗ arrow. On phones the tagline is always there and decodes as the tile scrolls in; on desktop it opens under the name on hover (the name lifts) and decodes. The tile fades in as it enters the view.",
+  "category": "card",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "tile",
+    "media",
+    "scrim",
+    "hover",
+    "reveal",
+    "scramble",
+    "dark",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the parent sets the size (e.g. aspect-square, md:aspect-[3/1]); the tile fills it",
+    "the label is drawn in the foreground colour over the scrim: best on dark themes or with real photos",
+    "needs JavaScript for the tagline decode (hydrate: visible); without it the tagline simply shows"
+  ],
+  "entry": "anduril-product-tile.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "anduril-product-tile",
+  "files": [
+    {
+      "path": "anduril-product-tile.css",
+      "content": "/* The long, eased scrim under the label (the original's many-stop \"smooth\" gradient). */\n.anduril-product-tile-scrim {\n  background: linear-gradient(\n    to bottom,\n    transparent 0%,\n    color-mix(in oklab, var(--background) 2%, transparent) 9%,\n    color-mix(in oklab, var(--background) 7.5%, transparent) 19.8%,\n    color-mix(in oklab, var(--background) 19%, transparent) 35%,\n    color-mix(in oklab, var(--background) 38%, transparent) 53%,\n    color-mix(in oklab, var(--background) 54%, transparent) 66%,\n    color-mix(in oklab, var(--background) 66%, transparent) 80%,\n    color-mix(in oklab, var(--background) 72%, transparent) 100%\n  );\n}\n\n/* Fades in as it enters the view (1s expo-out in the original, here over 260px of scroll). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .anduril-product-tile {\n      animation: anduril-product-tile-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 260px;\n    }\n  }\n}\n\n@keyframes anduril-product-tile-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "anduril-product-tile.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilScramble } from \"@foundry/anduril-scramble\";\nimport \"./anduril-product-tile.css\";\n\nexport interface AndurilProductTileProps {\n  /** the product name, bottom left */\n  name: string;\n  /** a short line under the name (always shown on phones, on hover on desktop) */\n  tagline: string;\n  /** link target for the whole tile */\n  href: string;\n  /** an <img> or <video> filling the tile (object-fit cover); empty shows a placeholder surface */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Media tile with a bottom scrim, a bold name and a tagline that opens and decodes on hover. */\nexport function AndurilProductTile({ name, tagline, href, media, className }: AndurilProductTileProps) {\n  return (\n    <a\n      href={href}\n      data-scramble-host\n      className={cn(\"anduril-product-tile group relative block overflow-clip rounded-lg bg-muted text-foreground\", className)}\n    >\n      <div className=\"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">{media}</div>\n      <div aria-hidden className=\"anduril-product-tile-scrim absolute inset-x-0 bottom-0 h-1/2\" />\n\n      <div className=\"absolute inset-x-0 bottom-0 px-4 pb-[1.125rem] md:px-[1.125rem] md:pb-5\">\n        <p className=\"font-display text-[1.5rem] leading-[1.15] font-bold tracking-[-0.01em]\">{name}</p>\n        {/* Phones: always open. Desktop: closed (0fr) until the tile is hovered or focused. */}\n        <div className=\"grid grid-rows-[1fr] transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none md:grid-rows-[0fr] md:opacity-0 md:group-hover:grid-rows-[1fr] md:group-hover:opacity-100 md:group-focus-visible:grid-rows-[1fr] md:group-focus-visible:opacity-100\">\n          <div className=\"min-h-0 overflow-hidden\">\n            <div className=\"flex items-end justify-between gap-4 pt-2 md:pt-1.5\">\n              <AndurilScramble text={tagline} triggers={[\"view\", \"hover\"]} className=\"text-[1.125rem] leading-[1.2] tracking-[-0.01em] md:text-[0.9375rem]\" />\n              <ArrowUpRight aria-hidden className=\"mb-0.5 size-4 shrink-0\" strokeWidth={1.75} />\n            </div>\n          </div>\n        </div>\n      </div>\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "anduril-scramble",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product name, bottom left"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "a short line under the name (always shown on phones, on hover on desktop)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "link target for the whole tile"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an <img> or <video> filling the tile (object-fit cover); empty shows a placeholder surface"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6a0e94886a3961c65e6fad36fe6891555f90c7d17ea07df2f213be047ba70592"
+}

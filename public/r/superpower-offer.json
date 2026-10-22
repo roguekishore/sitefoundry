@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower offer panel",
+  "description": "A full-window welcome offer over warm photography: a small white tag pill, a big centred two-line white headline, a short question, and a stack of five tall white answer pills (the last one frosted and outlined), with a row of small facts near the foot. Centred on phones; on desktop it sits in the right half of the window. As an overlay it fades in on load and has a round frosted close button.",
+  "category": "cta",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "modal",
+    "popup",
+    "offer",
+    "quiz",
+    "fullscreen",
+    "photo",
+    "dark",
+    "fade-in"
+  ],
+  "notes": [
+    "forces the dark class on itself",
+    "overlay: covers the window (fixed) until closed; without it the panel is an ordinary window-tall section",
+    "not placed on the superpower landing page: the original shows it as a popup on arrival"
+  ],
+  "entry": "superpower-offer.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "superpower-offer",
+  "files": [
+    {
+      "path": "superpower-offer.css",
+      "content": "/* As an overlay, the panel fades in on arrival. */\n.superpower-offer-in {\n  animation: superpower-offer-fade 0.6s ease both;\n}\n\n@keyframes superpower-offer-fade {\n  from {\n    opacity: 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .superpower-offer-in {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "superpower-offer.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Tag, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerFacts, type SuperpowerFact } from \"@foundry/superpower-facts\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\nimport \"./superpower-offer.css\";\n\nexport interface SuperpowerOfferProps {\n  /** the small white pill above the headline */\n  tag?: string;\n  title: string;\n  /** the question above the answers */\n  question?: string;\n  /** the answer pills; the last one is drawn quieter (frosted) */\n  options: { label: string; href: string }[];\n  facts?: SuperpowerFact[];\n  /** the photo behind; empty: a warm placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n  /** cover the window as a popup with a close button */\n  overlay?: boolean;\n  /** close button label, for screen readers */\n  closeLabel?: string;\n  className?: string;\n}\n\nexport function SuperpowerOffer({ tag, title, question, options, facts, media, mediaLabel, overlay = false, closeLabel = \"Close\", className }: SuperpowerOfferProps) {\n  const [open, setOpen] = useState(true);\n  if (!open) return null;\n  return (\n    <section\n      role={overlay ? \"dialog\" : undefined}\n      aria-modal={overlay || undefined}\n      aria-label={overlay ? title : undefined}\n      className={cn(\n        \"dark relative min-h-svh overflow-clip bg-background text-foreground\",\n        overlay && \"superpower-offer-in fixed inset-0 z-50 overflow-y-auto\",\n        className,\n      )}\n    >\n      <SuperpowerMedia media={media} tone=\"warm\" label={mediaLabel} className=\"absolute inset-0\" />\n      <div className=\"absolute inset-0 bg-background/35\" aria-hidden />\n      {overlay && (\n        <button\n          type=\"button\"\n          aria-label={closeLabel}\n          onClick={() => setOpen(false)}\n          className=\"absolute top-5 right-5 z-10 grid size-[2.625rem] place-items-center rounded-full bg-foreground/20 backdrop-blur-md transition-colors duration-200 hover:bg-foreground/30 lg:top-[2.1rem] lg:right-[2.3rem]\"\n        >\n          <X className=\"size-5\" strokeWidth={1.75} aria-hidden />\n        </button>\n      )}\n      <div className=\"relative flex min-h-svh flex-col items-center px-gutter pt-[7.5rem] pb-16 lg:ml-auto lg:w-1/2 lg:pt-[9.4rem] lg:pr-[6.5rem] lg:pb-20\">\n        {tag && (\n          <span className=\"flex h-8 items-center gap-2 rounded-full bg-foreground px-3.5 text-[0.9375rem] text-background lg:h-[2.375rem] lg:px-4\">\n            <Tag className=\"size-3.5 fill-background\" aria-hidden />\n            {tag}\n          </span>\n        )}\n        <h2 className=\"mt-6 max-w-[17ch] text-center text-[1.75rem] leading-[1.15] font-normal tracking-[-0.02em] lg:mt-3 lg:text-[3.375rem] lg:leading-[1.05] lg:tracking-[-0.03em]\">\n          {title}\n        </h2>\n        {question && <p className=\"mt-4 text-center text-[0.9375rem] text-foreground/80 lg:mt-5 lg:text-[1.125rem] lg:text-foreground/90\">{question}</p>}\n        <ul className=\"mt-5 flex w-full flex-col gap-2.5 lg:mt-5 lg:w-[15.8rem]\">\n          {options.map((o, i) => (\n            <li key={o.label}>\n              <a\n                href={o.href}\n                className={cn(\n                  \"flex h-14 items-center justify-center rounded-full px-4 text-center text-[0.9375rem] leading-tight transition-[background-color,transform] duration-250 ease-out hover:-translate-y-px motion-reduce:transition-none lg:h-[3.25rem] lg:text-[0.875rem]\",\n                  i === options.length - 1 && options.length > 1\n                    ? \"border border-foreground/45 bg-foreground/20 backdrop-blur-md hover:bg-foreground/30\"\n                    : \"bg-foreground text-background hover:bg-foreground/90\",\n                )}\n              >\n                {o.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n        {facts && facts.length > 0 && (\n          <SuperpowerFacts items={facts} centered className=\"mt-auto max-w-[20rem] pt-12 text-[0.8125rem] lg:max-w-none lg:text-[0.9375rem] [&_svg]:fill-foreground [&_svg]:text-background\" />\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-facts",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the small white pill above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "question",
+      "type": "string",
+      "required": false,
+      "description": "the question above the answers"
+    },
+    {
+      "name": "options",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the answer pills; the last one is drawn quieter (frosted)"
+    },
+    {
+      "name": "facts",
+      "type": "SuperpowerFact[]",
+      "required": false
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo behind; empty: a warm placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "cover the window as a popup with a close button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close",
+      "description": "close button label, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d7dcaecd32fdd27abd5e780ae848208ef96955330ca4fd89205295dcfe647dd9"
+}

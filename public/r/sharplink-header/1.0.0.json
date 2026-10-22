@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink header",
+  "description": "A fixed, transparent bar: a wordmark on the left and, on the right, a row of separate square glass boxes (narrow uppercase links, 2px apart) ending in a square arrow box. Its colours flip between light and dark to match the section scrolling beneath it; on phones a MENU box and a hamburger box open a full-screen dark menu.",
+  "category": "header",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "glass",
+    "square",
+    "adaptive",
+    "light",
+    "dark",
+    "mobile-menu"
+  ],
+  "notes": [
+    "sections mark themselves with data-sharplink-tone=\"dark\" (or \"light\" inside a dark one) so the bar switches to the theme's dark colours over them",
+    "needs JavaScript for the tone switch and the phone menu (hydrate: load)"
+  ],
+  "entry": "sharplink-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "sharplink-header",
+  "files": [
+    {
+      "path": "sharplink-header.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowRight, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { sharplinkLabelType } from \"@foundry/sharplink-label\";\n\nexport interface SharplinkHeaderLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface SharplinkHeaderProps {\n  /** the company name, shown as the wordmark */\n  brand: string;\n  /** a small mark before the name (an icon or svg) */\n  brandMark?: ReactNode;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the navigation links, in order */\n  links: SharplinkHeaderLink[];\n  /** the square arrow box at the end of the row (e.g. to the main dashboard) */\n  action?: SharplinkHeaderLink;\n  /** the label of the phone menu button */\n  menuLabel: string;\n  /** colours before the page has been measured: dark when the first section is dark */\n  initialTone?: \"light\" | \"dark\";\n  className?: string;\n}\n\nconst box = cn(\n  \"grid h-[2.125rem] place-items-center bg-foreground/10 text-foreground backdrop-blur-md\",\n  \"transition-colors duration-[250ms] ease-[cubic-bezier(0.455,0.03,0.515,0.955)] hover:bg-foreground/[0.18] motion-reduce:transition-none\",\n);\n\n/** Fixed bar of square glass links whose colours follow the section beneath it. */\nexport function SharplinkHeader({ brand, brandMark, homeHref = \"/\", links, action, menuLabel, initialTone = \"light\", className }: SharplinkHeaderProps) {\n  const ref = useRef<HTMLElement>(null);\n  const [dark, setDark] = useState(initialTone === \"dark\");\n  const [open, setOpen] = useState(false);\n\n  // Take the tone of the last marked region (in page order, so nested marks win) that the\n  // bar's middle line crosses; unmarked parts of the page are light.\n  useEffect(() => {\n    const el = ref.current;\n    if (!el) return;\n    const update = () => {\n      const y = el.offsetHeight / 2;\n      let tone = \"light\";\n      document.querySelectorAll<HTMLElement>(\"[data-sharplink-tone]\").forEach((mark) => {\n        if (el.contains(mark)) return;\n        const box = mark.getBoundingClientRect();\n        if (box.height > 0 && box.top <= y && box.bottom > y) tone = mark.dataset.sharplinkTone ?? \"light\";\n      });\n      setDark(tone === \"dark\");\n    };\n    update();\n    window.addEventListener(\"scroll\", update, { passive: true });\n    window.addEventListener(\"resize\", update);\n    return () => {\n      window.removeEventListener(\"scroll\", update);\n      window.removeEventListener(\"resize\", update);\n    };\n  }, []);\n\n  return (\n    <header ref={ref} className={cn(\"fixed inset-x-0 top-0 z-50 text-foreground\", (dark || open) && \"dark\", className)}>\n      <div className=\"mx-auto flex max-w-page items-center justify-between px-gutter pt-3 lg:pt-4\">\n        <a href={homeHref} className=\"flex items-center gap-1.5 text-foreground\" onClick={() => setOpen(false)}>\n          {brandMark && <span className=\"[&_svg]:size-6\">{brandMark}</span>}\n          <span className=\"font-display text-[1.375rem] leading-none font-medium tracking-[-0.03em]\">{brand}</span>\n        </a>\n\n        <nav className=\"hidden items-center gap-0.5 lg:flex\">\n          {links.map((link) => (\n            <a key={link.href} href={link.href} className={cn(box, \"px-4\", sharplinkLabelType)}>\n              {link.label}\n            </a>\n          ))}\n          {action && (\n            <a href={action.href} aria-label={action.label} className={cn(box, \"w-[2.125rem]\")}>\n              <ArrowRight className=\"size-4\" strokeWidth={1.5} />\n            </a>\n          )}\n        </nav>\n\n        <div className=\"flex items-center gap-0.5 lg:hidden\">\n          <button type=\"button\" className={cn(box, \"px-4\", sharplinkLabelType)} aria-expanded={open} onClick={() => setOpen((o) => !o)}>\n            {menuLabel}\n          </button>\n          <button type=\"button\" className={cn(box, \"w-[2.125rem]\")} aria-label={menuLabel} aria-expanded={open} onClick={() => setOpen((o) => !o)}>\n            {open ? <X className=\"size-4\" strokeWidth={1.5} /> : <Menu className=\"size-4\" strokeWidth={1.5} />}\n          </button>\n        </div>\n      </div>\n\n      {open && (\n        <nav className=\"fixed inset-x-0 top-0 -z-10 flex h-svh flex-col justify-end bg-background px-gutter pb-10 lg:hidden\">\n          <ul className=\"grid gap-1\">\n            {[...links, ...(action ? [action] : [])].map((link) => (\n              <li key={link.href} className=\"border-t border-dotted border-foreground/20\">\n                <a href={link.href} className=\"block py-3 font-display text-[2rem] leading-[1.16] font-medium tracking-[-0.01em]\" onClick={() => setOpen(false)}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-label"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, shown as the wordmark"
+    },
+    {
+      "name": "brandMark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the name (an icon or svg)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "SharplinkHeaderLink[]",
+      "required": true,
+      "description": "the navigation links, in order"
+    },
+    {
+      "name": "action",
+      "type": "SharplinkHeaderLink",
+      "required": false,
+      "description": "the square arrow box at the end of the row (e.g. to the main dashboard)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label of the phone menu button"
+    },
+    {
+      "name": "initialTone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "colours before the page has been measured: dark when the first section is dark"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7d32c85eb2c606605c6c98080242d4a2472abac57cdcd128d682a37c6d61e4f3"
+}

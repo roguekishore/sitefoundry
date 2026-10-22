@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko hero",
+  "description": "A window-filling media hero with one big soft-serif headline and a charcoal call-to-action at the foot. On desktop it pins for three-quarters of a screen while the full-bleed first picture shrinks into a card inset from the edges with a deep rounded bottom, a second picture fades in and the headline rises into place. On phones it is a plain full-screen picture with the headline centred.",
+  "category": "hero",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "media",
+    "pinned",
+    "sticky",
+    "scroll",
+    "scrubbed",
+    "shrink",
+    "crossfade",
+    "serif",
+    "light"
+  ],
+  "notes": [
+    "two media slots (first screen, then the one the card settles on); empty they are plain token surfaces",
+    "the headline is foreground-coloured: pick light, airy media (or a dark theme with dark media)",
+    "CSS scroll-driven, from 1024px; without support or with reduced motion it shows the settled card"
+  ],
+  "entry": "neko-hero.tsx",
+  "source": "foundry",
+  "name": "neko-hero",
+  "files": [
+    {
+      "path": "neko-hero.css",
+      "content": "/* Desktop: the hero is 175svh tall and its inner screen sticks. While it is pinned\n   (the wrapper's `contain` range) the card shrinks from full bleed to an inset card with a\n   rounded foot, the second picture fades in over the first and the headline rises in.\n   The plain styles are the settled state, so without scroll timelines it just shows that. */\n.neko-hero {\n  view-timeline: --neko-hero block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n    .neko-hero-card,\n    .neko-hero-second,\n    .neko-hero-title {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --neko-hero;\n    }\n    .neko-hero-card {\n      animation-name: neko-hero-shrink;\n      animation-range: contain 0% contain 95%;\n    }\n    .neko-hero-second {\n      animation-name: neko-hero-fade;\n      animation-range: contain 5% contain 55%;\n    }\n    .neko-hero-title {\n      animation-name: neko-hero-rise;\n      animation-range: contain 30% contain 85%;\n    }\n  }\n}\n\n@keyframes neko-hero-shrink {\n  from {\n    inset: 0;\n    border-radius: 0;\n  }\n}\n\n@keyframes neko-hero-fade {\n  from { opacity: 0; }\n}\n\n@keyframes neko-hero-rise {\n  from { opacity: 0; transform: translateY(40px); }\n}\n"
+    },
+    {
+      "path": "neko-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoButton } from \"@foundry/neko-button\";\nimport { NekoSlot } from \"@foundry/neko-slot\";\nimport \"./neko-hero.css\";\n\nexport interface NekoHeroProps {\n  /** the big headline */\n  title: string;\n  /** the charcoal button at the foot */\n  cta: { label: string; href: string };\n  /** desktop only: the full-bleed picture of the first screen, before the card shrinks */\n  media?: ReactNode;\n  /** the picture the card settles on (the only one on phones), cropped like object-fit: cover */\n  settledMedia?: ReactNode;\n  className?: string;\n}\n\nexport function NekoHero({ title, cta, media, settledMedia, className }: NekoHeroProps) {\n  return (\n    <section className={cn(\"neko-hero relative h-svh bg-background lg:h-[175svh]\", className)}>\n      <div className=\"sticky top-0 h-svh overflow-clip\">\n        <div className=\"neko-hero-card absolute inset-0 overflow-clip lg:inset-x-gutter lg:top-0 lg:bottom-6 lg:rounded-b-[4rem]\">\n          <NekoSlot media={media} className=\"absolute inset-0 hidden lg:block\" />\n          <NekoSlot media={settledMedia} tone=\"lemon\" className=\"neko-hero-second absolute inset-0\" />\n\n          <h1 className=\"neko-hero-title absolute inset-x-0 top-[44%] -translate-y-1/2 px-gutter text-center font-display text-[3.375rem] leading-[1.05] tracking-[-0.025em] text-foreground text-balance lg:top-1/2 lg:text-[6.25rem] lg:leading-[1]\">\n            {title}\n          </h1>\n        </div>\n        <div className=\"absolute inset-x-0 bottom-12 flex justify-center px-gutter\">\n          <NekoButton href={cta.href}>{cta.label}</NekoButton>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-button",
+    "neko-slot"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big headline"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the charcoal button at the foot"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "desktop only: the full-bleed picture of the first screen, before the card shrinks"
+    },
+    {
+      "name": "settledMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the picture the card settles on (the only one on phones), cropped like object-fit: cover"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "21b0e1ea637a89543f16eb702c876bdb72a3fb20d11395744122ec2b1896e9ed"
+}

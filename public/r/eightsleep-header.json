@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep header",
+  "description": "A fixed two-tier header: a 42px blue promo strip in small spaced caps, then a dark frosted bar with a plain wordmark, three small uppercase links, log in, a cart icon and a small white shop button. After ~300px of scroll the promo strip tucks away upward (the bar slides up 42px with it). On phones the links move into a dropdown menu.",
+  "category": "header",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "frosted",
+    "dark",
+    "announcement",
+    "scroll",
+    "tuck"
+  ],
+  "notes": [
+    "fixed: it overlays the top of the page, so the first section should leave ~106px (or ~64px without a promo) of room or sit behind it like the hero",
+    "the bar is dark-scoped glass, made for photo or sky heroes; the tuck is a CSS scroll-driven animation (no JavaScript); the menu toggle needs JavaScript"
+  ],
+  "entry": "eightsleep-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "eightsleep-header",
+  "files": [
+    {
+      "path": "eightsleep-header.css",
+      "content": "/* The promo strip tucks away once the page has scrolled ~300px: the whole header moves up by\n   the strip's height over 120px of scroll, so it reads as a quick slide, not a drag. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .eightsleep-header-tuck {\n      animation: eightsleep-header-tuck linear both;\n      animation-timeline: scroll(root);\n      animation-range: 300px 420px;\n    }\n  }\n}\n\n@keyframes eightsleep-header-tuck {\n  to {\n    translate: 0 -42px;\n  }\n}\n"
+    },
+    {
+      "path": "eightsleep-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowRight, Menu, ShoppingCart, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./eightsleep-header.css\";\n\nexport interface EightsleepNavLink {\n  label: ReactNode;\n  href: string;\n}\n\nexport interface EightsleepHeaderProps {\n  /** the wordmark: plain text or a small logo */\n  brand: ReactNode;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the promo strip's text; leave out for no strip */\n  promo?: { label: ReactNode; href: string };\n  /** two to four main links */\n  links: EightsleepNavLink[];\n  /** the quiet account link at the right */\n  login?: EightsleepNavLink;\n  /** the small white button at the right (hidden on phones) */\n  cta?: EightsleepNavLink;\n  /** where the cart icon links */\n  cartHref?: string;\n  /** screen-reader labels */\n  cartLabel?: string;\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkText = \"text-[12px] font-medium tracking-[0.08em] uppercase transition-opacity duration-200 hover:opacity-70\";\n\nexport function EightsleepHeader({ brand, brandHref = \"/\", promo, links, login, cta, cartHref = \"#\", cartLabel, menuLabel, className }: EightsleepHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50\", promo && \"eightsleep-header-tuck\", className)}>\n      {promo && (\n        <a\n          href={promo.href}\n          className=\"flex h-[42px] items-center justify-center gap-2 bg-highlight px-gutter text-center text-[11px] font-medium tracking-[0.1em] text-highlight-foreground uppercase transition-opacity duration-200 hover:opacity-90 lg:text-[12px]\"\n        >\n          {promo.label}\n          <ArrowRight className=\"size-3.5 shrink-0\" strokeWidth={2} />\n        </a>\n      )}\n      <div className=\"dark relative bg-background/75 text-foreground backdrop-blur-xl\">\n        <nav className=\"mx-auto flex h-16 max-w-page items-center gap-8 px-gutter lg:px-16\">\n          <a href={brandHref} className=\"font-display text-[21px] leading-none font-semibold tracking-[-0.03em]\">\n            {brand}\n          </a>\n          <ul className=\"hidden items-center gap-8 lg:flex\">\n            {links.map((link, i) => (\n              <li key={i}>\n                <a href={link.href} className={linkText}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <div className=\"ml-auto flex items-center gap-5 lg:gap-7\">\n            {login && (\n              <a href={login.href} className={linkText}>\n                {login.label}\n              </a>\n            )}\n            <a href={cartHref} aria-label={cartLabel} className=\"transition-opacity duration-200 hover:opacity-70\">\n              <ShoppingCart className=\"size-5\" strokeWidth={1.5} />\n            </a>\n            {cta && (\n              <a\n                href={cta.href}\n                className=\"hidden h-9 items-center rounded-[calc(var(--radius)/2)] bg-primary px-4 text-[14px] font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/85 lg:inline-flex\"\n              >\n                {cta.label}\n              </a>\n            )}\n            <button type=\"button\" aria-label={menuLabel} aria-expanded={open} onClick={() => setOpen(!open)} className=\"lg:hidden\">\n              {open ? <X className=\"size-6\" strokeWidth={1.5} /> : <Menu className=\"size-6\" strokeWidth={1.5} />}\n            </button>\n          </div>\n        </nav>\n        {open && (\n          <ul className=\"absolute inset-x-0 top-full flex flex-col gap-1 border-t border-border bg-background/90 px-gutter py-4 backdrop-blur-xl lg:hidden\">\n            {links.map((link, i) => (\n              <li key={i}>\n                <a href={link.href} className={cn(linkText, \"block py-3 text-[13px]\")} onClick={() => setOpen(false)}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n            {cta && (\n              <li className=\"pt-3\">\n                <a href={cta.href} className=\"flex h-12 items-center justify-center rounded-[calc(var(--radius)/2)] bg-primary text-[15px] font-medium text-primary-foreground\">\n                  {cta.label}\n                </a>\n              </li>\n            )}\n          </ul>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark: plain text or a small logo"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "promo",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the promo strip's text; leave out for no strip"
+    },
+    {
+      "name": "links",
+      "type": "EightsleepNavLink[]",
+      "required": true,
+      "description": "two to four main links"
+    },
+    {
+      "name": "login",
+      "type": "EightsleepNavLink",
+      "required": false,
+      "description": "the quiet account link at the right"
+    },
+    {
+      "name": "cta",
+      "type": "EightsleepNavLink",
+      "required": false,
+      "description": "the small white button at the right (hidden on phones)"
+    },
+    {
+      "name": "cartHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the cart icon links"
+    },
+    {
+      "name": "cartLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader labels"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "522ecb3aed5d2941ba562c5523af4bed12795a5281b1a6a38ae483d932a2eb76"
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Radiant Nuclear statement band",
+  "description": "A window-high, full-bleed looping video (capped at 1100px) with one short bold all-caps statement in the top-left corner. As the band slides up to fill the screen, the statement's lines rise out of their masks and fade in, one after another.",
+  "category": "cta",
+  "site": "radiantnuclear",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "video",
+    "full-bleed",
+    "dark",
+    "uppercase",
+    "bold",
+    "reveal",
+    "mask",
+    "scroll",
+    "stagger"
+  ],
+  "notes": [
+    "sized by the window (100svh, at most 1100px); the video is cropped to it like object-fit: cover",
+    "type is set in the theme's card colour over a foreground gradient (foreground over a background gradient in dark mode), so it needs a theme whose foreground and card contrast",
+    "the line reveal is CSS scroll-driven; without support or with reduced motion the statement simply shows"
+  ],
+  "entry": "radiantnuclear-statement.tsx",
+  "source": "foundry",
+  "name": "radiantnuclear-statement",
+  "files": [
+    {
+      "path": "radiantnuclear-statement.css",
+      "content": "/* Each line rises out of its mask and fades in while the band slides up to fill the window\n   (on the original: as the band's top passes the upper third of the screen). The band is one\n   window high, so cover 50% is the moment it fills the screen. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .radiantnuclear-statement-line {\n      animation: radiantnuclear-statement-rise linear both;\n      animation-timeline: --radiantnuclear-statement;\n      animation-range: cover calc(28% + var(--rns-i) * 6%) cover calc(44% + var(--rns-i) * 6%);\n    }\n  }\n}\n.radiantnuclear-statement {\n  view-timeline: --radiantnuclear-statement block;\n}\n\n@keyframes radiantnuclear-statement-rise {\n  from { opacity: 0; transform: translateY(100%); }\n  to { opacity: 1; transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "radiantnuclear-statement.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RadiantnuclearSlot } from \"@foundry/radiantnuclear-slot\";\nimport \"./radiantnuclear-statement.css\";\n\nexport interface RadiantnuclearStatementProps {\n  /** the statement, one entry per line (each line rises on its own) */\n  lines: string[];\n  /** the looping video or photo filling the band; empty shows a dark placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function RadiantnuclearStatement({ lines, media, className }: RadiantnuclearStatementProps) {\n  return (\n    <section className={cn(\"radiantnuclear-statement relative isolate h-svh max-h-[68.75rem] min-h-[30rem] overflow-clip font-sans text-card dark:text-foreground\", className)}>\n      <RadiantnuclearSlot media={media} tone=\"night\" shade=\"soft\" className=\"absolute inset-0 -z-10\" />\n      <div className=\"mx-auto max-w-page px-gutter pt-section\">\n        <h2 className=\"text-[2.25rem] leading-[1.1667] font-bold uppercase lg:text-[4.5rem] lg:leading-[1.05]\">\n          {lines.map((line, i) => (\n            // each line sits in its own mask, so it slides up from behind the line above\n            <span key={i} className=\"block overflow-clip\">\n              <span className=\"radiantnuclear-statement-line block\" style={{ \"--rns-i\": i } as CSSProperties}>\n                {line}\n              </span>\n            </span>\n          ))}\n        </h2>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "radiantnuclear-slot"
+  ],
+  "props": [
+    {
+      "name": "lines",
+      "type": "string[]",
+      "required": true,
+      "description": "the statement, one entry per line (each line rises on its own)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the looping video or photo filling the band; empty shows a dark placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a529f9398b53ddb23a031575d80388caeac6f036560f0882204b0a6a89ea0a2e"
+}

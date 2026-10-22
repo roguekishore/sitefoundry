@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power press strip",
+  "description": "A quiet stone band: a small uppercase grey label and a row of grey press names set in mixed masthead styles, sliding left in an endless loop and faded out at both edges.",
+  "category": "logos",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "press",
+    "marquee",
+    "loop",
+    "light",
+    "minimal",
+    "social-proof"
+  ],
+  "notes": [
+    "names are plain text (no logos); pass at least six so the row fills a desktop width",
+    "CSS-only loop; still under reduced motion"
+  ],
+  "entry": "basepowercompany-press.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-press",
+  "files": [
+    {
+      "path": "basepowercompany-press.css",
+      "content": "/* Two copies of the list side by side; sliding by half the track makes a seamless loop. */\n.bp-press-track {\n  animation: bp-press-slide 40s linear infinite;\n}\n\n@keyframes bp-press-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .bp-press-track {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "basepowercompany-press.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./basepowercompany-press.css\";\n\nexport interface BasepowercompanyPressName {\n  /** the publication's name, set as plain text */\n  name: string;\n  /** how the name is set, so the row reads like a mix of mastheads */\n  look?: \"caps\" | \"heavy\" | \"italic\" | \"light\" | \"stacked\";\n}\n\nexport interface BasepowercompanyPressProps {\n  /** the small uppercase line above the row */\n  label: string;\n  /** the publications; the row repeats them in an endless slide */\n  names: BasepowercompanyPressName[];\n  /** seconds for one full pass of the list */\n  duration?: number;\n  className?: string;\n}\n\nconst looks = {\n  caps: \"text-[0.9375rem] font-bold tracking-[0.14em] uppercase\",\n  heavy: \"text-[1.625rem] font-black tracking-[-0.05em]\",\n  italic: \"text-xl font-bold tracking-[-0.025em] italic\",\n  light: \"text-2xl font-light tracking-[0.02em]\",\n  stacked: \"max-w-[7rem] text-center text-[0.9375rem] leading-[0.95] font-bold tracking-[0.04em] uppercase\",\n};\n\nfunction Row({ names, hidden }: { names: BasepowercompanyPressName[]; hidden?: boolean }) {\n  return (\n    <ul aria-hidden={hidden || undefined} className=\"flex shrink-0\">\n      {names.map((n, i) => (\n        <li key={`${n.name}-${i}`} className=\"flex h-16 w-[12.25rem] shrink-0 items-center justify-center px-4 text-muted-foreground/80\">\n          <span className={cn(\"font-display whitespace-nowrap\", looks[n.look ?? \"caps\"], n.look === \"stacked\" && \"whitespace-normal\")}>{n.name}</span>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/* A stone band under the hero: a quiet uppercase label and a row of press names sliding left\n   for ever, faded out at both edges. */\nexport function BasepowercompanyPress({ label, names, duration = 40, className }: BasepowercompanyPressProps) {\n  return (\n    <section className={cn(\"bg-background pt-10 pb-4 text-foreground lg:pb-0\", className)}>\n      <p className=\"px-gutter text-center text-sm leading-[1.5] tracking-[-0.005em] text-muted-foreground uppercase\">{label}</p>\n      <div className=\"relative mx-auto mt-6 max-w-page overflow-clip\">\n        <div className=\"bp-press-track flex w-max\" style={{ animationDuration: `${duration}s` }}>\n          <Row names={names} />\n          <Row names={names} hidden />\n        </div>\n        <div aria-hidden className=\"pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-background to-transparent\" />\n        <div aria-hidden className=\"pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-background to-transparent\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small uppercase line above the row"
+    },
+    {
+      "name": "names",
+      "type": "BasepowercompanyPressName[]",
+      "required": true,
+      "description": "the publications; the row repeats them in an endless slide"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "40",
+      "description": "seconds for one full pass of the list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7e81f036c1c215553ea78192e0c808ac21770100445d0bf89f87022047895008"
+}

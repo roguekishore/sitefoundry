@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rho reveal",
+  "description": "Wrapper that fades its content in and lifts it 14px as it enters the window; an optional step number staggers cards in a row.",
+  "category": "text-effect",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "fade",
+    "rise",
+    "scroll",
+    "stagger",
+    "minimal"
+  ],
+  "notes": [
+    "CSS scroll-driven (animation-timeline: view()); without support, or with reduced motion, content shows in place"
+  ],
+  "entry": "rho-reveal.tsx",
+  "source": "foundry",
+  "name": "rho-reveal",
+  "files": [
+    {
+      "path": "rho-reveal.css",
+      "content": "/* Fade in and lift 14px over the first quarter of the element's trip through the window.\n   --rho-step delays the start a little per step, so a row of cards arrives one by one. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rho-reveal {\n      animation: rho-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--rho-step, 0) * 10%) cover calc(20% + var(--rho-step, 0) * 4%);\n    }\n  }\n}\n\n@keyframes rho-reveal-rise {\n  from { opacity: 0; transform: translateY(14px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "rho-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rho-reveal.css\";\n\nexport interface RhoRevealProps {\n  children: ReactNode;\n  /** stagger step: 0 arrives first, 1 a little later, and so on */\n  step?: number;\n  /** element to render */\n  as?: \"div\" | \"li\" | \"p\";\n  className?: string;\n}\n\nexport function RhoReveal({ children, step = 0, as: Tag = \"div\", className }: RhoRevealProps) {\n  return (\n    <Tag className={cn(\"rho-reveal\", className)} style={{ \"--rho-step\": step } as CSSProperties}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger step: 0 arrives first, 1 a little later, and so on"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5d4b98a649678b5ef7837d780c0724cfc7ce30d98f0278c24840ee324e7e90fe"
+}

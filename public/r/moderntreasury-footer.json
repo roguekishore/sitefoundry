@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury footer",
+  "description": "A deep forest-green footer: a newsletter row (bold line, muted line, a white email field and a pale mint button), a hairline, six columns of small muted links under white headings (two columns on phones), and a legal row with the copyright, one link and grey social icons.",
+  "category": "footer",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "green",
+    "newsletter",
+    "links",
+    "columns",
+    "minimal",
+    "fintech",
+    "hover"
+  ],
+  "notes": [
+    "always dark: it carries the dark class, so it uses the theme's dark colours in both modes",
+    "social icons come in as nodes (any icon set)"
+  ],
+  "entry": "moderntreasury-footer.tsx",
+  "source": "foundry",
+  "name": "moderntreasury-footer",
+  "files": [
+    {
+      "path": "moderntreasury-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ModerntreasuryFooterColumn {\n  /** the column's white heading */\n  title: string;\n  /** its links */\n  links: { label: string; href: string }[];\n}\n\nexport interface ModerntreasuryFooterProps {\n  /** the newsletter row: a bold line, a muted line, the field's placeholder and the button */\n  newsletter?: { title: string; text: string; placeholder: string; button: string; action?: string };\n  /** the link columns; six fill the row on desktop */\n  columns: ModerntreasuryFooterColumn[];\n  /** the copyright line */\n  copyright: string;\n  /** small links beside the copyright */\n  legal?: { label: string; href: string }[];\n  /** social links on the right; label is for screen readers */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  className?: string;\n}\n\n/** Modern Treasury's footer: newsletter, six link columns, a legal row; always on dark green. */\nexport function ModerntreasuryFooter({ newsletter, columns, copyright, legal = [], socials = [], className }: ModerntreasuryFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-20 pb-9\">\n        {newsletter && (\n          <div className=\"flex flex-col gap-10 border-b border-border pb-8 lg:flex-row lg:items-center lg:justify-between lg:pb-9\">\n            <div className=\"text-base leading-6\">\n              <p className=\"font-bold\">{newsletter.title}</p>\n              <p className=\"text-muted-foreground\">{newsletter.text}</p>\n            </div>\n            <form action={newsletter.action} method=\"post\" className=\"flex gap-4\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                aria-label={newsletter.placeholder}\n                placeholder={newsletter.placeholder}\n                className=\"h-[2.625rem] w-[12.125rem] min-w-0 rounded-[calc(var(--radius)/4)] bg-foreground px-3 text-base text-background placeholder:text-background/50 focus-visible:outline-2 focus-visible:outline-ring\"\n              />\n              <button\n                type=\"submit\"\n                className=\"h-[2.625rem] shrink-0 rounded-[calc(var(--radius)/4)] bg-primary px-4 text-base font-semibold text-primary-foreground transition-colors duration-150 hover:bg-primary/85 motion-reduce:transition-none\"\n              >\n                {newsletter.button}\n              </button>\n            </form>\n          </div>\n        )}\n\n        <nav className=\"grid grid-cols-2 gap-x-4 gap-y-10 pt-10 lg:grid-cols-6 lg:gap-x-12 lg:pt-12\">\n          {columns.map((c) => (\n            <div key={c.title}>\n              <p className=\"text-sm leading-[1.5] font-bold\">{c.title}</p>\n              <ul className=\"mt-2 space-y-2 text-sm leading-[1.5]\">\n                {c.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"text-sm leading-[1.5] text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </nav>\n\n        <div className=\"mt-10 flex flex-col gap-6 border-t border-border pt-8 lg:mt-14 lg:flex-row lg:items-center lg:justify-between\">\n          <div className=\"flex flex-col gap-6 text-sm leading-[1.5] lg:flex-row lg:gap-6\">\n            <p>{copyright}</p>\n            {legal.map((l) => (\n              <a key={l.label} href={l.href} className=\"hover:text-muted-foreground\">\n                {l.label}\n              </a>\n            ))}\n          </div>\n          {socials.length > 0 && (\n            <ul className=\"flex gap-5\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a href={s.href} aria-label={s.label} className=\"flex text-foreground/60 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none [&_svg]:size-5\">\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "newsletter",
+      "type": "{ title: string; text: string; placeholder: string; button: string; action?: string; }",
+      "required": false,
+      "description": "the newsletter row: a bold line, a muted line, the field's placeholder and the button"
+    },
+    {
+      "name": "columns",
+      "type": "ModerntreasuryFooterColumn[]",
+      "required": true,
+      "description": "the link columns; six fill the row on desktop"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small links beside the copyright"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "social links on the right; label is for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9ff8de2e61c3b8a1e954b5eea0a76ca5e4e0e3849e8553b5a06f49c57b11fba1"
+}

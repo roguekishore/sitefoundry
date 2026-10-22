@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear footer",
+  "description": "A quiet footer under a full-width hairline: a small brand mark in the first of six columns, then five groups of grey 13px links under white medium-weight headings, and a dim legal row beneath. Links brighten on hover. On phones the groups pair up in two columns and the legal links become a group of their own.",
+  "category": "footer",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "dark",
+    "minimal",
+    "hairline",
+    "columns"
+  ],
+  "notes": [
+    "five groups fill the desktop row; the brand mark is hidden on phones, as on the original"
+  ],
+  "entry": "linear-footer.tsx",
+  "source": "foundry",
+  "name": "linear-footer",
+  "files": [
+    {
+      "path": "linear-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LinearFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface LinearFooterGroup {\n  /** the white heading */\n  title: string;\n  links: LinearFooterLink[];\n}\n\nexport interface LinearFooterProps {\n  /** the brand's name, for the home link */\n  brand: string;\n  /** the small brand mark at the top left (desktop) */\n  mark: ReactNode;\n  homeHref?: string;\n  /** link groups; five fill the desktop row */\n  groups: LinearFooterGroup[];\n  /** the dim legal links: a row on desktop, a titled group on phones */\n  legal?: LinearFooterGroup;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[0.8125rem] leading-[1.875rem] text-muted-foreground transition-colors duration-100 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:text-foreground motion-reduce:transition-none\";\n\n/** Brand mark, five link columns and a legal row. */\nexport function LinearFooter({ brand, mark, homeHref = \"/\", groups, legal, className }: LinearFooterProps) {\n  const group = (g: LinearFooterGroup, extra?: string) => (\n    <div key={g.title} className={extra}>\n      <h3 className=\"text-[0.8125rem] leading-5 font-[510] text-foreground\">{g.title}</h3>\n      <ul className=\"mt-4 lg:mt-6\">\n        {g.links.map((l) => (\n          <li key={l.href}>\n            <a href={l.href} className={linkClass}>\n              {l.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n\n  return (\n    <footer className={cn(\"border-t border-border bg-background pt-14 pb-12 text-foreground lg:pt-16\", className)}>\n      <div className=\"mx-auto grid max-w-[calc(var(--page-width)+2*var(--page-gutter))] grid-cols-2 gap-x-6 gap-y-12 px-gutter lg:grid-cols-6 lg:gap-x-6 lg:gap-y-0\">\n        <a href={homeHref} aria-label={brand} className=\"hidden h-5 items-center text-foreground lg:flex [&_svg]:size-5\">\n          {mark}\n        </a>\n        {groups.map((g) => group(g))}\n        {legal && group(legal, \"lg:hidden\")}\n        {legal && (\n          <ul className=\"col-span-5 col-start-2 mt-[5.5rem] hidden gap-5 lg:flex\">\n            {legal.links.map((l) => (\n              <li key={l.href}>\n                <a href={l.href} className={cn(linkClass, \"text-muted-foreground/70\")}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name, for the home link"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small brand mark at the top left (desktop)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "groups",
+      "type": "LinearFooterGroup[]",
+      "required": true,
+      "description": "link groups; five fill the desktop row"
+    },
+    {
+      "name": "legal",
+      "type": "LinearFooterGroup",
+      "required": false,
+      "description": "the dim legal links: a row on desktop, a titled group on phones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c414c8307d5bf7bbbd95583ff8751002cbb77e9618d4246fc5485ce9fd113c1c"
+}

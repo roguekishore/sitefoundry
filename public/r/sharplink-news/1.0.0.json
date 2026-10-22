@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink news",
+  "description": "A latest-articles section on the dotted three-column grid: label and big title on the left, a tinted button on the right, then square-cornered article cards (16:9 image with a tiny blue corner square, outlined tag and date chips, title, small arrow box). On hover a card gains a hairline outline, its image zooms to 108% and its arrow box turns blue. On phones the cards become a swipe track with previous / next boxes.",
+  "category": "features",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "news",
+    "cards",
+    "grid",
+    "dotted",
+    "light",
+    "hover",
+    "zoom",
+    "carousel"
+  ],
+  "notes": [
+    "images are slots; empty, each shows a black-to-glow gradient placeholder",
+    "the previous / next boxes (phones) need JavaScript (hydrate: visible); the track also swipes without it",
+    "transparent background: on the page it shows the Sharplink backdrop wash"
+  ],
+  "entry": "sharplink-news.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "sharplink-news",
+  "files": [
+    {
+      "path": "sharplink-news.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkGuides } from \"@foundry/sharplink-guides\";\nimport { SharplinkLabel, sharplinkLabelType } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\n\nexport interface SharplinkArticle {\n  /** the article's title */\n  title: string;\n  /** the small outlined tag, e.g. \"Research\" */\n  tag: string;\n  /** the date, as shown */\n  date: string;\n  /** where it goes */\n  href: string;\n  /** a 16:9 cover image; a gradient placeholder when empty */\n  image?: ReactNode;\n}\n\nexport interface SharplinkNewsProps {\n  /** the small label over the title */\n  label: string;\n  /** the section title */\n  title: string;\n  /** the tinted button (e.g. to all articles) */\n  cta: { label: string; href: string };\n  /** the articles (three fill the grid) */\n  articles: SharplinkArticle[];\n  /** screen-reader names for the phone arrows */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst chip = cn(\"inline-flex h-[1.875rem] items-center border border-foreground/15 px-2\", sharplinkLabelType, \"text-xs\");\nconst arrowBox = \"grid size-[2.125rem] place-items-center bg-foreground/10 transition-colors duration-[250ms] hover:bg-foreground/[0.18] motion-reduce:transition-none\";\n\n/** Latest articles: title row and a grid (a swipe track on phones) of square cards. */\nexport function SharplinkNews({ label, title, cta, articles, previousLabel, nextLabel, className }: SharplinkNewsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const move = (dir: number) => {\n    const el = track.current;\n    if (!el) return;\n    const card = el.firstElementChild as HTMLElement | null;\n    el.scrollBy({ left: dir * ((card?.offsetWidth ?? 300) + 16), behavior: \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"relative isolate overflow-clip text-foreground\", className)}>\n      <SharplinkGuides />\n      <div className=\"mx-auto max-w-page px-gutter pb-24 lg:pb-40\">\n        <SharplinkRule />\n        <div className=\"mt-7 grid gap-y-4 lg:grid-cols-[1fr_auto]\">\n          <SharplinkLabel>{label}</SharplinkLabel>\n          <h2 className=\"font-display text-[2.75rem] leading-[1.15] font-medium tracking-[-0.01em] lg:col-start-1 lg:text-[4.25rem] lg:leading-[1.06] lg:tracking-[-0.02em]\">\n            {title}\n          </h2>\n          <div className=\"flex items-center justify-between lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:items-start lg:pt-0\">\n            <SharplinkButton href={cta.href} variant=\"tint\" arrow>\n              {cta.label}\n            </SharplinkButton>\n            <div className=\"flex gap-0.5 lg:hidden\">\n              <button type=\"button\" aria-label={previousLabel} className={arrowBox} onClick={() => move(-1)}>\n                <ChevronLeft className=\"size-4\" strokeWidth={1.5} />\n              </button>\n              <button type=\"button\" aria-label={nextLabel} className={arrowBox} onClick={() => move(1)}>\n                <ChevronRight className=\"size-4\" strokeWidth={1.5} />\n              </button>\n            </div>\n          </div>\n        </div>\n\n        <ul\n          ref={track}\n          className=\"-mx-gutter mt-14 flex snap-x snap-mandatory scroll-px-gutter gap-4 overflow-x-auto px-gutter [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-gutter lg:overflow-visible lg:px-0\"\n        >\n          {articles.map((article) => (\n            <li key={article.href + article.title} className=\"w-[82%] max-w-[22rem] shrink-0 snap-start lg:w-auto lg:max-w-none\">\n              <a\n                href={article.href}\n                className=\"group block outline outline-transparent transition-[outline-color] duration-500 hover:outline-foreground/30 motion-reduce:transition-none\"\n              >\n                <div className=\"dark relative aspect-video overflow-clip bg-background\">\n                  <div className=\"h-full w-full transition-transform duration-500 ease-[cubic-bezier(0.785,0.135,0.15,0.86)] group-hover:scale-[1.08] motion-reduce:transition-none [&>*]:h-full [&>*]:w-full [&>*]:object-cover\">\n                    {article.image ?? (\n                      <div className=\"bg-[radial-gradient(120%_95%_at_75%_120%,color-mix(in_oklab,var(--glow)_60%,var(--foreground))_0%,var(--glow)_25%,var(--background)_65%)]\" />\n                    )}\n                  </div>\n                  <span aria-hidden className=\"absolute top-0 left-0 size-1 bg-highlight\" />\n                </div>\n                <div className=\"mt-5 flex items-center justify-between gap-3\">\n                  <span className={chip}>{article.tag}</span>\n                  <span className={chip}>{article.date}</span>\n                </div>\n                <h3 className=\"mt-4 text-base leading-[1.4] font-medium tracking-[-0.01em] lg:text-2xl\">{article.title}</h3>\n                <span\n                  aria-hidden\n                  className=\"mt-5 grid size-8 place-items-center bg-foreground/10 transition-colors duration-[250ms] group-hover:bg-primary group-hover:text-primary-foreground motion-reduce:transition-none\"\n                >\n                  <ArrowRight className=\"size-4\" strokeWidth={1.5} />\n                </span>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-guides",
+    "sharplink-label",
+    "sharplink-rule"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label over the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the tinted button (e.g. to all articles)"
+    },
+    {
+      "name": "articles",
+      "type": "SharplinkArticle[]",
+      "required": true,
+      "description": "the articles (three fill the grid)"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader names for the phone arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5cd5c30f071235914f4fbb1d82ba9055923f30c4532697084b47f3bb814a9a21"
+}

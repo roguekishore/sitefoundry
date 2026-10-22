@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anchorage hero",
+  "description": "A black, centred hero: a small bold caps eyebrow, a huge thin display headline in metallic silver (a left-to-right gradient that dims at both ends), a medium subtitle, and on wider screens two tall rounded product panels set side by side, the right one raised. A window-tall art slot glows behind it all from the top.",
+  "category": "hero",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "centred",
+    "gradient-text",
+    "metallic",
+    "glow",
+    "fintech",
+    "crypto"
+  ],
+  "notes": [
+    "art, cardLeft and cardRight are media slots; empty, they show token-coloured placeholders (a soft glow light; two bordered panels)",
+    "the art is as tall as the window on desktop (390×533 frame on phones) and sits under an overlaid header",
+    "phones hide the two panels, as the original does; best on dark themes"
+  ],
+  "entry": "anchorage-hero.tsx",
+  "source": "foundry",
+  "name": "anchorage-hero",
+  "files": [
+    {
+      "path": "anchorage-hero.css",
+      "content": "/* Metallic headline: silver at the left edge, bright through the middle, dimming at the\n   far right end. */\n.anchorage-hero-title {\n  background-image: linear-gradient(\n    90deg,\n    color-mix(in oklab, var(--foreground) 74%, transparent) 9.74%,\n    color-mix(in oklab, var(--foreground) 89%, transparent) 16%,\n    var(--foreground) 22%,\n    color-mix(in oklab, var(--foreground) 98%, transparent) 95%,\n    color-mix(in oklab, var(--foreground) 41%, transparent)\n  );\n  -webkit-background-clip: text;\n  background-clip: text;\n  color: transparent;\n}\n"
+    },
+    {
+      "path": "anchorage-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./anchorage-hero.css\";\n\nexport interface AnchorageHeroProps {\n  /** the small bold caps line above the headline */\n  eyebrow?: string;\n  /** the headline, set huge and thin in metallic silver */\n  title: string;\n  /** one sentence under the headline */\n  subtitle?: string;\n  /** the art behind the hero (image, video, canvas), as tall as the window; empty shows a soft glow placeholder */\n  art?: ReactNode;\n  /** the left product panel (about 340×418); empty shows a placeholder panel */\n  cardLeft?: ReactNode;\n  /** the right product panel (about 348×428), raised above the left one; empty shows a placeholder panel */\n  cardRight?: ReactNode;\n  /** hide the two panels (phones never show them) */\n  hideCards?: boolean;\n  className?: string;\n}\n\nfunction PanelSlot({ children, className }: { children?: ReactNode; className?: string }) {\n  return (\n    <div\n      className={cn(\n        \"overflow-clip rounded-xl border border-highlight/45 bg-linear-to-b from-background/90 to-card/25 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n        className,\n      )}\n    >\n      {children}\n    </div>\n  );\n}\n\n/** Centred black hero with a metallic headline and two staggered product panels. */\nexport function AnchorageHero({ eyebrow, title, subtitle, art, cardLeft, cardRight, hideCards, className }: AnchorageHeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background text-foreground\", className)}>\n      {/* window-tall art behind the text (390×533 frame on phones) */}\n      <div className=\"absolute inset-x-0 top-0 -z-10 h-[33.3rem] lg:h-svh [&>*]:size-full [&>img]:object-cover [&>video]:object-cover\">\n        {art ?? (\n          <div aria-hidden className=\"size-full bg-[radial-gradient(ellipse_70%_45%_at_50%_0%,color-mix(in_oklab,var(--glow)_55%,transparent),transparent_70%)]\" />\n        )}\n      </div>\n\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter pt-[10.7rem] pb-[8.75rem] text-center lg:pt-[15.875rem] lg:pb-[5.5rem]\">\n        {eyebrow && <p className=\"text-xs leading-[1.8] font-bold uppercase\">{eyebrow}</p>}\n        <h1 className=\"anchorage-hero-title mt-2 max-w-[22rem] font-display text-[3rem] leading-[1.16] font-[350] tracking-[0.005em] sm:max-w-none lg:mt-3 lg:text-[6rem] lg:leading-[1.15]\">\n          {title}\n        </h1>\n        {subtitle && <p className=\"mt-4 max-w-[21rem] text-base leading-[1.6] font-medium sm:max-w-none sm:text-lg lg:mt-6 lg:text-[1.69rem] lg:leading-[1.3]\">{subtitle}</p>}\n\n        {!hideCards && (\n          <div className=\"mt-14 hidden items-start justify-center gap-[3.125rem] md:flex lg:mt-[3.75rem]\">\n            <PanelSlot className=\"mt-[4.2rem] h-[26.1rem] w-[21.25rem]\">{cardLeft}</PanelSlot>\n            <PanelSlot className=\"h-[26.75rem] w-[21.75rem]\">{cardRight}</PanelSlot>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small bold caps line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline, set huge and thin in metallic silver"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "one sentence under the headline"
+    },
+    {
+      "name": "art",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the art behind the hero (image, video, canvas), as tall as the window; empty shows a soft glow placeholder"
+    },
+    {
+      "name": "cardLeft",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the left product panel (about 340×418); empty shows a placeholder panel"
+    },
+    {
+      "name": "cardRight",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the right product panel (about 348×428), raised above the left one; empty shows a placeholder panel"
+    },
+    {
+      "name": "hideCards",
+      "type": "boolean",
+      "required": false,
+      "description": "hide the two panels (phones never show them)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "afbd2e743a2b5574234f165e2376606819417fef39b1d51bd15cbb102a384f79"
+}

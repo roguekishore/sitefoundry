@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column infrastructure band",
+  "description": "A long deep-teal card inset from the page edges on a dot grid: a cyan mono eyebrow, a 48px pale-cyan gradient headline and a muted paragraph beside a layered-stack art slot whose labelled hairlines pull together as you scroll (the middle layers fade out and one merged label fades in). Below, each product gets a title, a paragraph and a curl snippet on the left while one panel stays pinned on the right, crossfading to the art and feature tiles of whichever product is in view. Phones show each product's panel under its snippet.",
+  "category": "features",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "teal",
+    "developer",
+    "code",
+    "sticky",
+    "pinned",
+    "crossfade",
+    "scroll-driven",
+    "gradient-text",
+    "dot-grid"
+  ],
+  "notes": [
+    "sets the dark class on its own card, so the theme's dark values apply even on a light page; under a theme whose dark mode is light-ish it loses its contrast",
+    "needs JavaScript to switch the pinned panel with the product in view (hydrate: visible); without it the first product's panel stays",
+    "the stack art and each product's panel art are media slots; empty, they're plain translucent surfaces"
+  ],
+  "entry": "column-infrastructure.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "column-infrastructure",
+  "files": [
+    {
+      "path": "column-infrastructure.css",
+      "content": "/* Stack labels: while the stack art crosses the window the outer labels pull together (top one\n   down 80px, bottom one up 80px), the middle ones fade and drift 36px, and the merged label\n   fades in. One named view timeline on the art keeps every label in step. */\n.column-infra-stack {\n  view-timeline-name: --column-infra-stack;\n}\n\n.column-infra-merged {\n  opacity: 0;\n}\n\n@supports (animation-timeline: view()) {\n  .column-infra-label-top,\n  .column-infra-label-bottom,\n  .column-infra-label-mid,\n  .column-infra-merged {\n    animation-timing-function: linear;\n    animation-fill-mode: both;\n    animation-timeline: --column-infra-stack;\n    animation-range: cover 40% cover 75%;\n  }\n  .column-infra-label-top { animation-name: column-infra-pull-down; }\n  .column-infra-label-bottom { animation-name: column-infra-pull-up; }\n  .column-infra-label-mid { animation-name: column-infra-fade-out; }\n  .column-infra-merged { animation-name: column-infra-fade-in; }\n\n  /* Phones: each panel's tiles rise in as they scroll into view. */\n  @media (width < 64rem) {\n    .column-infra-chip {\n      animation: column-infra-chip-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 25%;\n    }\n  }\n}\n\n@keyframes column-infra-pull-down { to { transform: translateY(80px); opacity: 0.4; } }\n@keyframes column-infra-pull-up { to { transform: translateY(-80px); } }\n@keyframes column-infra-fade-out { to { opacity: 0; transform: translateY(var(--drift, 0px)); } }\n@keyframes column-infra-fade-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }\n@keyframes column-infra-chip-in {\n  from { opacity: 0; transform: translateY(20px) scale(0.95); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-infra-label-top,\n  .column-infra-label-bottom,\n  .column-infra-label-mid,\n  .column-infra-merged,\n  .column-infra-chip { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-infrastructure.tsx",
+      "content": "import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ColumnCode } from \"@foundry/column-code\";\nimport { ColumnEyebrow, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-infrastructure.css\";\n\nexport interface ColumnInfraChip {\n  /** a small line icon (lucide works well) */\n  icon?: ReactNode;\n  label: string;\n}\n\nexport interface ColumnInfraProduct {\n  /** the product's name */\n  title: string;\n  /** a paragraph about it */\n  body: string;\n  /** a code snippet shown under the paragraph */\n  code: string;\n  /** feature tiles along the bottom of its panel */\n  chips: ColumnInfraChip[];\n  /** the panel's art; empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface ColumnInfrastructureProps {\n  /** the small mono tag (shown with a blinking cursor) */\n  eyebrow: string;\n  /** accent of the tag */\n  tone?: ColumnTone;\n  /** the big gradient headline */\n  title: string;\n  /** the paragraph under it */\n  lead: ReactNode;\n  /** labels along the stack art, top to bottom; the first and last pull together on scroll */\n  layers: string[];\n  /** the label that fades in once the middle layers have faded out */\n  mergedLabel?: string;\n  /** the stack art; empty: a placeholder */\n  stackMedia?: ReactNode;\n  /** the products, each with its own panel */\n  products: ColumnInfraProduct[];\n  className?: string;\n}\n\n/** Vertical position of each stack label, as a share of the art's height. */\nfunction labelTop(i: number, n: number) {\n  if (i === 0) return 18;\n  if (i === n - 1) return 81;\n  const mids = n - 2;\n  return mids === 1 ? 50 : 40 + ((i - 1) * 19) / (mids - 1);\n}\n\nfunction Panel({ product, active, className }: { product: ColumnInfraProduct; active: boolean; className?: string }) {\n  return (\n    <div aria-hidden={!active} className={cn(\"flex flex-col rounded-lg border border-border bg-card/55 shadow-[0_24px_48px_color-mix(in_oklab,var(--background)_60%,transparent)]\", className)}>\n      <div className=\"relative flex min-h-[18rem] flex-1 items-center justify-center p-8\">\n        {product.media ? (\n          <div className=\"absolute inset-0 overflow-clip rounded-t-lg [&>*]:size-full [&>*]:object-cover\">{product.media}</div>\n        ) : (\n          <div\n            className={cn(\n              \"aspect-[1.75] w-[min(46%,17.5rem)] min-w-[11rem] rounded-lg bg-foreground/15 shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_12%,transparent),0_20px_40px_color-mix(in_oklab,var(--background)_70%,transparent)] transition-[scale] duration-600 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none\",\n              active ? \"scale-100\" : \"scale-[0.97]\",\n            )}\n          />\n        )}\n      </div>\n      <ul className=\"grid gap-2 p-5 lg:grid-flow-col lg:auto-cols-fr\">\n        {product.chips.map((c, i) => (\n          <li\n            key={c.label}\n            style={{ transitionDelay: active ? `${i * 60}ms` : \"0ms\" }}\n            className={cn(\n              \"column-infra-chip flex h-8 items-center gap-2.5 rounded-md border border-border bg-secondary/45 px-3 text-[0.8125rem] font-semibold tracking-[-0.01em] [&_svg]:size-3.5 [&_svg]:shrink-0 [&_svg]:text-primary\",\n              \"lg:h-[3.625rem] lg:flex-col lg:items-start lg:justify-between lg:gap-0 lg:py-2.5 lg:transition-[opacity,translate,scale] lg:duration-500 lg:ease-[cubic-bezier(0.76,0,0.24,1)] lg:motion-reduce:transition-none\",\n              active ? \"lg:translate-y-0 lg:scale-100 lg:opacity-100\" : \"lg:translate-y-5 lg:scale-95 lg:opacity-0\",\n            )}\n          >\n            {c.icon}\n            {c.label}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport function ColumnInfrastructure({ eyebrow, tone = \"primary\", title, lead, layers, mergedLabel, stackMedia, products, className }: ColumnInfrastructureProps) {\n  const [active, setActive] = useState(0);\n  const items = useRef<(HTMLElement | null)[]>([]);\n\n  // The product crossing the middle of the window owns the pinned panel.\n  useEffect(() => {\n    const observer = new IntersectionObserver(\n      (entries) => {\n        for (const e of entries) {\n          if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.index));\n        }\n      },\n      { rootMargin: \"-45% 0px -45% 0px\" },\n    );\n    items.current.forEach((el) => el && observer.observe(el));\n    return () => observer.disconnect();\n  }, [products.length]);\n\n  return (\n    <section className={cn(\"bg-background px-3\", className)}>\n      <div className=\"dark relative overflow-clip rounded-xl bg-background text-foreground\">\n        <div aria-hidden className=\"pointer-events-none absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_9%,transparent)_0.9px,transparent_1.3px)] bg-size-[14px_14px]\" />\n\n        <div className=\"relative mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter pt-[4.5rem] pb-28 lg:pt-36 lg:pb-36\">\n          {/* Intro: copy left, stack art with labelled rules right. */}\n          <div className=\"grid gap-[6.5rem] lg:grid-cols-2 lg:gap-0\">\n            <div>\n              <ColumnEyebrow tone={tone} cursor>\n                {eyebrow}\n              </ColumnEyebrow>\n              <h2 className=\"mt-6 max-w-[28rem] bg-linear-to-br from-[color-mix(in_oklab,var(--foreground)_70%,var(--primary))] to-[color-mix(in_oklab,var(--primary)_80%,var(--foreground))] bg-clip-text pb-1 font-display text-5xl/[1.08] font-medium tracking-[-0.035em] text-transparent lg:mt-[2.875rem]\">\n                {title}\n              </h2>\n              <p className=\"mt-6 max-w-[26.5rem] text-base/[1.4] text-muted-foreground\">{lead}</p>\n            </div>\n            <div className=\"column-infra-stack relative h-[14.5rem] lg:h-[22.5rem]\">\n              <div className=\"absolute inset-y-0 left-0 w-[12.25rem] lg:w-[18.75rem]\">\n                {stackMedia ? (\n                  <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-contain\">{stackMedia}</div>\n                ) : (\n                  <div className=\"absolute inset-x-0 inset-y-[6%] rounded-xl bg-secondary/70 shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_8%,transparent),0_30px_50px_color-mix(in_oklab,var(--background)_80%,transparent)]\" />\n                )}\n              </div>\n              <ul className=\"absolute inset-y-0 right-0 left-[12.25rem] lg:left-[18.75rem]\">\n                {layers.map((label, i) => {\n                  const edge = i === 0 ? \"column-infra-label-top\" : i === layers.length - 1 ? \"column-infra-label-bottom\" : \"column-infra-label-mid\";\n                  const drift = i === 1 ? \"36px\" : i === layers.length - 2 ? \"-36px\" : \"0px\";\n                  return (\n                    <li\n                      key={label}\n                      className={cn(edge, \"absolute inset-x-0 -translate-y-full border-b border-border pb-1 text-right text-[0.625rem] font-medium text-muted-foreground lg:text-[0.6875rem]\")}\n                      style={{ top: `${labelTop(i, layers.length)}%`, \"--drift\": drift } as CSSProperties}\n                    >\n                      {label}\n                    </li>\n                  );\n                })}\n                {mergedLabel && (\n                  <li aria-hidden className=\"column-infra-merged absolute inset-x-0 top-[50%] -translate-y-full border-b border-border pb-1 text-right text-[0.625rem] font-medium text-foreground/80 lg:text-[0.6875rem]\">\n                    {mergedLabel}\n                  </li>\n                )}\n              </ul>\n            </div>\n          </div>\n\n          {/* Products: copy and snippets on the left, one pinned panel on the right. */}\n          <div className=\"mt-[12.5rem] grid grid-cols-1 lg:mt-[13.5rem] lg:grid-cols-[23.375rem_1fr] lg:gap-x-[5.125rem]\">\n            <div className=\"flex flex-col gap-24 lg:gap-0\">\n              {products.map((p, i) => (\n                <article\n                  key={p.title}\n                  ref={(el) => {\n                    items.current[i] = el;\n                  }}\n                  data-index={i}\n                  className=\"min-w-0 lg:min-h-[41.25rem] lg:last:min-h-[31.25rem]\"\n                >\n                  <h3 className=\"font-display text-xl/[1.2] font-medium tracking-[-0.02em]\">{p.title}</h3>\n                  <p className=\"mt-2 text-base/[1.4] text-muted-foreground\">{p.body}</p>\n                  <ColumnCode code={p.code} className=\"mt-9\" />\n                  <Panel product={p} active className=\"mt-12 h-[31.25rem] lg:hidden\" />\n                </article>\n              ))}\n            </div>\n            <div className=\"relative hidden lg:block\">\n              <div className=\"sticky top-[calc(50svh-15.625rem)] h-[31.25rem]\">\n                {products.map((p, i) => (\n                  <Panel\n                    key={p.title}\n                    product={p}\n                    active={i === active}\n                    className={cn(\n                      \"absolute inset-0 transition-opacity duration-600 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none\",\n                      i === active ? \"opacity-100\" : \"pointer-events-none opacity-0\",\n                    )}\n                  />\n                ))}\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "column-code",
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small mono tag (shown with a blinking cursor)"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "primary",
+      "description": "accent of the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big gradient headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "layers",
+      "type": "string[]",
+      "required": true,
+      "description": "labels along the stack art, top to bottom; the first and last pull together on scroll"
+    },
+    {
+      "name": "mergedLabel",
+      "type": "string",
+      "required": false,
+      "description": "the label that fades in once the middle layers have faded out"
+    },
+    {
+      "name": "stackMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the stack art; empty: a placeholder"
+    },
+    {
+      "name": "products",
+      "type": "ColumnInfraProduct[]",
+      "required": true,
+      "description": "the products, each with its own panel"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6f11cb2944317323d1053adcb1f92b490894a00aa748647543d3f39d76b876b9"
+}

@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp layer stack",
+  "description": "Typed tag and mono title over an ink-framed figure plate: a stack of full-width layer rows on a dot grid, each deeper in brand blue than the one above (a faint tint, a light wash, a mid wash, then solid blue with white text) and each title a little larger. A row carries a spaced 'LAYER 01' label, a geometric title, pill chips and a note at the right. An outline steps from row to row on a loop, lifting that row's chips to full strength.",
+  "category": "features",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "layers",
+    "stack",
+    "blue",
+    "gradient-steps",
+    "chips",
+    "figure",
+    "dot-grid",
+    "developer",
+    "loop",
+    "highlight",
+    "reveal",
+    "typewriter"
+  ],
+  "notes": [
+    "the stepping outline is CSS only (2 to 8 rows), desktop only; on phones and with reduced motion all chips stay at full strength",
+    "phones stack each row's parts"
+  ],
+  "entry": "warp-layers.tsx",
+  "source": "foundry",
+  "name": "warp-layers",
+  "files": [
+    {
+      "path": "warp-layers.css",
+      "content": "/* An outline steps from row to row; the lit row's chips come up from 50% to full\n   (desktop only; phones keep every chip at full strength). Each row\n   is lit for 1/n of an n × 3s loop. One keyframes pair per row count (2–8). */\n.warp-layers-row { outline: 1px solid transparent; outline-offset: -1px; }\n\n@media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n  .warp-layers-row,\n  .warp-layers-chips {\n    animation-duration: calc(var(--warp-layers-n) * 3s);\n    animation-delay: calc((var(--warp-layers-i) - var(--warp-layers-n)) * 3s);\n    animation-iteration-count: infinite;\n    animation-timing-function: linear;\n    animation-fill-mode: both;\n  }\n}\n\n@keyframes warp-layers-lit-2 {\n  0%, 49.50% { outline-color: var(--primary); }\n  50.00%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-2 {\n  0%, 49.50% { opacity: 1; }\n  50.00%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-3 {\n  0%, 32.83% { outline-color: var(--primary); }\n  33.33%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-3 {\n  0%, 32.83% { opacity: 1; }\n  33.33%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-4 {\n  0%, 24.50% { outline-color: var(--primary); }\n  25.00%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-4 {\n  0%, 24.50% { opacity: 1; }\n  25.00%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-5 {\n  0%, 19.50% { outline-color: var(--primary); }\n  20.00%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-5 {\n  0%, 19.50% { opacity: 1; }\n  20.00%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-6 {\n  0%, 16.17% { outline-color: var(--primary); }\n  16.67%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-6 {\n  0%, 16.17% { opacity: 1; }\n  16.67%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-7 {\n  0%, 13.79% { outline-color: var(--primary); }\n  14.29%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-7 {\n  0%, 13.79% { opacity: 1; }\n  14.29%, 100% { opacity: 0.5; }\n}\n@keyframes warp-layers-lit-8 {\n  0%, 12.00% { outline-color: var(--primary); }\n  12.50%, 100% { outline-color: transparent; }\n}\n@keyframes warp-layers-chips-8 {\n  0%, 12.00% { opacity: 1; }\n  12.50%, 100% { opacity: 0.5; }\n}\n"
+    },
+    {
+      "path": "warp-layers.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpPlate } from \"@foundry/warp-plate\";\nimport { WarpSection } from \"@foundry/warp-section\";\nimport \"./warp-layers.css\";\n\nexport interface WarpLayer {\n  title: string;\n  /** small pill chips after the title */\n  chips?: string[];\n  /** the note at the right */\n  note: string;\n}\n\nexport interface WarpLayersProps {\n  id?: string;\n  /** the typed label above the title */\n  tag?: string;\n  /** shown in brackets after the tag */\n  status?: string;\n  title: string;\n  lead?: string;\n  /** caption of the figure frame */\n  caption: string;\n  /** the word before each row's number, e.g. \"layer\" */\n  layerWord: string;\n  /** top to bottom; the last row is solid brand blue */\n  layers: WarpLayer[];\n  className?: string;\n}\n\n/** Tints from faint to solid; the last row always gets the solid one. */\nconst tones = [\n  { row: \"border-primary/20 bg-primary/5\", label: \"text-foreground/70\", num: \"text-primary\", title: \"lg:text-[1.0625rem]\", h: \"lg:min-h-[4.375rem]\", note: \"text-muted-foreground\", chip: \"border-primary/20 bg-card text-muted-foreground\" },\n  { row: \"border-primary/25 bg-primary/[0.14]\", label: \"text-foreground/70\", num: \"text-primary\", title: \"lg:text-[1.125rem]\", h: \"lg:min-h-[4.5625rem]\", note: \"text-muted-foreground\", chip: \"border-primary/20 bg-card/80 text-muted-foreground\" },\n  { row: \"border-primary/30 bg-primary/30\", label: \"text-foreground/80\", num: \"text-foreground\", title: \"lg:text-[1.25rem]\", h: \"lg:min-h-[4.9375rem]\", note: \"text-foreground\", chip: \"border-primary/25 bg-card/60 text-foreground/70\" },\n  { row: \"border-primary bg-primary text-primary-foreground\", label: \"text-primary-foreground/85\", num: \"text-primary-foreground\", title: \"lg:text-[1.5rem]\", h: \"lg:min-h-[5.3125rem]\", note: \"text-primary-foreground\", chip: \"border-primary-foreground/40 text-primary-foreground/80\" },\n];\n\n/** A stack of layer rows, deepening to solid brand blue, with a stepping outline. */\nexport function WarpLayers({ id, tag, status, title, lead, caption, layerWord, layers, className }: WarpLayersProps) {\n  const n = Math.min(Math.max(layers.length, 2), 8);\n  return (\n    <WarpSection id={id} tag={tag} status={status} title={title} lead={lead} className={className}>\n      <WarpPlate caption={caption} rules card={false} innerClassName=\"flex flex-col gap-2.5 p-0 lg:p-2.5\">\n        {layers.map((l, i) => {\n          const t = tones[Math.max(0, tones.length - layers.length + i)];\n          const vars = { \"--warp-layers-n\": n, \"--warp-layers-i\": i } as CSSProperties;\n          return (\n            <div\n              key={l.title}\n              className={cn(\"warp-layers-row border px-[1.125rem] py-5 lg:flex lg:items-center lg:gap-4 lg:px-7 lg:py-0\", t.row, t.h)}\n              style={{ ...vars, animationName: `warp-layers-lit-${n}` }}\n            >\n              <p className={cn(\"shrink-0 font-mono text-[0.625rem] tracking-[calc(0.22em_-_var(--warp-squeeze,0em))] uppercase\", t.label)}>\n                {layerWord} <span className={t.num}>{String(i + 1).padStart(2, \"0\")}</span>\n              </p>\n              <h3 className={cn(\"mt-3 font-display text-[1.1875rem] leading-[1.3] font-semibold tracking-[-0.02em] lg:mt-0 lg:shrink-0\", t.title)}>{l.title}</h3>\n              {l.chips && l.chips.length > 0 && (\n                <ul className=\"warp-layers-chips mt-2.5 flex flex-wrap gap-1.5 lg:mt-0 lg:flex-nowrap\" style={{ ...vars, animationName: `warp-layers-chips-${n}` }}>\n                  {l.chips.map((c) => (\n                    <li key={c} className={cn(\"rounded-full border px-2.5 py-1 font-mono text-[0.65625rem] leading-none tracking-[calc(0.03em_-_var(--warp-squeeze,0em))]\", t.chip)}>\n                      {c}\n                    </li>\n                  ))}\n                </ul>\n              )}\n              <p className={cn(\"mt-3 text-[0.8125rem] leading-[1.5] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] lg:mt-0 lg:ml-auto lg:pl-4 lg:text-right\", t.note)}>{l.note}</p>\n            </div>\n          );\n        })}\n      </WarpPlate>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-plate",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the typed label above the title"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": false,
+      "description": "shown in brackets after the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "caption of the figure frame"
+    },
+    {
+      "name": "layerWord",
+      "type": "string",
+      "required": true,
+      "description": "the word before each row's number, e.g. \"layer\""
+    },
+    {
+      "name": "layers",
+      "type": "WarpLayer[]",
+      "required": true,
+      "description": "top to bottom; the last row is solid brand blue"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7008386ea56cd141c1ea650c19ccc936afa5ae9665a2700f80afe7a3caefd001"
+}

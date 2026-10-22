@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril platform rows",
+  "description": "A full-bleed stone-grey band of big linked rows, each under a hairline: a 56px semibold name top left, a small all-caps line at the bottom of the text column, and a 4.25:1 media strip on the right 58%. Hovering a row (desktop) turns it black edge to edge, greys its text and draws in a ↗ link. Phones stack name, line, link and a 1.9:1 image. Rows fade in one after the other as they enter the view.",
+  "category": "features",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "rows",
+    "media",
+    "grey",
+    "hairline",
+    "hover",
+    "invert",
+    "reveal",
+    "scroll-driven",
+    "industrial"
+  ],
+  "notes": [
+    "uses the secondary surface (grey band, dark text); the hover inverts to secondary-foreground"
+  ],
+  "entry": "anduril-platforms.tsx",
+  "source": "foundry",
+  "name": "anduril-platforms",
+  "files": [
+    {
+      "path": "anduril-platforms.css",
+      "content": "/* Rows fade in as they enter the view, the second a little after the first. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .anduril-platforms-row {\n      animation: anduril-platforms-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 260px;\n    }\n    .anduril-platforms-row:nth-child(2) { animation-range: entry 40px entry 300px; }\n    .anduril-platforms-row:nth-child(n + 3) { animation-range: entry 80px entry 340px; }\n  }\n}\n\n@keyframes anduril-platforms-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "anduril-platforms.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilLink } from \"@foundry/anduril-link\";\nimport \"./anduril-platforms.css\";\n\nexport interface AndurilPlatformsRow {\n  /** the big name, top left */\n  title: string;\n  /** the small all-caps line under it */\n  kicker: string;\n  /** the link words shown under the line (always on phones, on hover on desktop) */\n  linkLabel: string;\n  /** link target for the whole row */\n  href: string;\n  /** an <img> or <video> for the strip on the right; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface AndurilPlatformsProps {\n  /** the rows, top to bottom */\n  rows: AndurilPlatformsRow[];\n  className?: string;\n}\n\n/** Grey band of hairline-ruled rows: name and line left, a wide media strip right; rows invert on hover. */\nexport function AndurilPlatforms({ rows, className }: AndurilPlatformsProps) {\n  return (\n    <section className={cn(\"bg-secondary pt-[2.625rem] text-secondary-foreground md:pt-12\", className)}>\n      {rows.map((row) => (\n        <a\n          key={row.title}\n          href={row.href}\n          className=\"anduril-platforms-row group block px-gutter transition-colors duration-300 ease-out motion-reduce:transition-none md:hover:bg-secondary-foreground md:hover:text-secondary\"\n        >\n          <div className=\"grid border-t border-current/30 pt-8 pb-14 md:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)] md:pt-8 md:pb-16 md:group-hover:border-transparent\">\n            <div className=\"flex flex-col md:justify-between\">\n              <h3 className=\"font-display text-[2.25rem] leading-[1.1] font-semibold tracking-[-0.02em] lg:text-[3.5rem]\">{row.title}</h3>\n              <div className=\"mt-5 md:mt-0\">\n                <p className=\"max-w-[20rem] text-[0.8125rem] leading-[1.05] font-medium tracking-[0.02em] uppercase md:text-[0.75rem]\">{row.kicker}</p>\n                {/* Phones: always open. Desktop: opens on hover and pushes the line up. */}\n                <div className=\"grid grid-rows-[1fr] transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.215,0.61,0.355,1)] motion-reduce:transition-none md:grid-rows-[0fr] md:opacity-0 md:group-hover:grid-rows-[1fr] md:group-hover:opacity-100\">\n                  <div className=\"min-h-0 overflow-hidden\">\n                    <AndurilLink as=\"span\" label={row.linkLabel} underline=\"hover\" className=\"mt-4 opacity-60 md:mt-5 md:opacity-100\" />\n                  </div>\n                </div>\n              </div>\n            </div>\n            <div className=\"mt-8 aspect-[1.89] overflow-clip rounded-lg bg-current/15 md:mt-0 md:aspect-[4.25] [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n              {row.media}\n            </div>\n          </div>\n        </a>\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anduril-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "rows",
+      "type": "AndurilPlatformsRow[]",
+      "required": true,
+      "description": "the rows, top to bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "33fcf4aa2d375578ba2d5a0f397fa7ced284bec8514f165f88b18aac25c3cfcc"
+}

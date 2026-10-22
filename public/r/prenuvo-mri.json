@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo MRI intro",
+  "description": "A black section that rises over the pinned hero: a large machine image (filling the window height on desktop, wider than the screen on phones) and, across its foot, three centred features, each with a glowing coloured dot, a semibold title and a short muted line. The section fades up from near-black as it arrives, and the features rise 80px into place one after another.",
+  "category": "features",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "black",
+    "centered",
+    "glow",
+    "dots",
+    "reveal",
+    "fade",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "dark by itself (dark class); made to follow prenuvo-hero, which it slides over",
+    "media is the machine image (1330×936 on desktop, contain); empty shows a placeholder of that shape",
+    "dot colours: chart-1, chart-2, chart-3 (green, blue, lilac in the prenuvo theme)"
+  ],
+  "entry": "prenuvo-mri.tsx",
+  "source": "foundry",
+  "name": "prenuvo-mri",
+  "files": [
+    {
+      "path": "prenuvo-mri.css",
+      "content": "/* The whole section brightens from 8% as it rises over the hero (over its first 420px in view). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .prenuvo-mri-in {\n      animation: prenuvo-mri-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 420px;\n    }\n  }\n}\n\n@keyframes prenuvo-mri-in {\n  from { opacity: 0.08; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "prenuvo-mri.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PrenuvoReveal } from \"@foundry/prenuvo-reveal\";\nimport \"./prenuvo-mri.css\";\n\nexport interface PrenuvoMriFeature {\n  /** the short title */\n  title: string;\n  /** one or two lines under it */\n  body: ReactNode;\n  /** the dot's colour */\n  tone?: \"green\" | \"blue\" | \"lilac\";\n}\n\nexport interface PrenuvoMriProps {\n  /** three features, shown in a row on desktop */\n  features: PrenuvoMriFeature[];\n  /** the machine image (contain); empty shows a placeholder */\n  media?: ReactNode;\n  /** an id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst dots = {\n  green: \"bg-chart-1 shadow-[0_0_12px_var(--chart-1)]\",\n  blue: \"bg-chart-2 shadow-[0_0_12px_var(--chart-2)]\",\n  lilac: \"bg-chart-3 shadow-[0_0_12px_var(--chart-3)]\",\n};\n\nexport function PrenuvoMri({ features, media, id, className }: PrenuvoMriProps) {\n  return (\n    <section id={id} className={cn(\"dark relative z-10 -mt-8 overflow-x-clip bg-background pb-20 text-foreground lg:mt-0 lg:pb-16\", className)}>\n      <div className=\"prenuvo-mri-in relative\">\n        {/* the machine: 630×444 centred (cropped by the screen) on phones; filling the window height on desktop */}\n        <div className=\"relative left-1/2 h-[27.75rem] w-[39.375rem] -translate-x-1/2 lg:h-[104svh] lg:w-auto lg:max-w-[min(83.125rem,100%)] lg:aspect-[1330/936] [&>*]:size-full [&>*]:object-contain\">\n          {media ?? <div className=\"rounded-2xl bg-[linear-gradient(to_bottom,var(--accent),var(--background)_90%)]\" />}\n        </div>\n\n        <ul className=\"relative mx-auto -mt-28 grid max-w-page gap-14 px-gutter text-center lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0 lg:grid-cols-3 lg:gap-12 lg:px-12\">\n          {features.map((f, i) => (\n            <PrenuvoReveal as=\"li\" key={f.title} step={i} className=\"flex flex-col items-center\">\n              <span aria-hidden className={cn(\"size-3 rounded-full\", dots[f.tone ?? ([\"green\", \"blue\", \"lilac\"] as const)[i % 3]])} />\n              <h3 className=\"mt-6 font-display text-[2rem] leading-[1.2] font-semibold tracking-[-0.01em] text-balance\">{f.title}</h3>\n              <p className=\"mt-3 max-w-[17.5rem] text-sm leading-[1.4] text-muted-foreground lg:max-w-xs lg:text-base\">{f.body}</p>\n            </PrenuvoReveal>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "prenuvo-reveal"
+  ],
+  "props": [
+    {
+      "name": "features",
+      "type": "PrenuvoMriFeature[]",
+      "required": true,
+      "description": "three features, shown in a row on desktop"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the machine image (contain); empty shows a placeholder"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "75c8bdc8a2d814b11a757a6bf03e4fe993762175a35334acf9010f3349464c82"
+}

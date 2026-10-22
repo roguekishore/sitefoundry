@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp control-plane plate",
+  "description": "Typed tag, mono title and lead over an ink-framed figure plate in two tiers. Above, two white cards on a dot grid: a cost card (mono title, big figure with a small delta and date, a colour-dot legend, a chart slot and a coloured breakdown line) and a live roster (bracketed caption, ruled rows of a status dot, a status, a model pill, an ink agent pill, a blue initial avatar and a time, then a closing note). Below, a rounded panel with a short title and text at the left and a browser shot at the right that fades in, with an agent reply rising in under it and a blinking three-dot 'working' line.",
+  "category": "features",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dashboard",
+    "figure",
+    "roster",
+    "metrics",
+    "agents",
+    "developer",
+    "mono",
+    "light",
+    "reveal",
+    "loop",
+    "typing-dots",
+    "typewriter"
+  ],
+  "notes": [
+    "the cost chart and the browser shot are media slots (plain placeholders while empty)",
+    "the shot's fade, the reply's rise and the dots are CSS; static HTML and reduced motion show them in place"
+  ],
+  "entry": "warp-governance.tsx",
+  "source": "foundry",
+  "name": "warp-governance",
+  "files": [
+    {
+      "path": "warp-governance.css",
+      "content": "/* The browser shot fades in and the agent reply rises 16px as the panel enters the window;\n   the working dots blink one after another. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .warp-governance-panel {\n      view-timeline: --warp-governance-panel block;\n    }\n    .warp-governance-shot {\n      animation: warp-governance-fade linear both;\n      animation-timeline: --warp-governance-panel;\n      animation-range: entry 80px entry 360px;\n    }\n    .warp-governance-reply {\n      animation: warp-governance-rise linear both;\n      animation-timeline: --warp-governance-panel;\n      animation-range: entry 260px entry 480px;\n    }\n  }\n}\n@media (prefers-reduced-motion: no-preference) {\n  .warp-governance-dot {\n    animation: warp-governance-blink 1100ms ease-in-out infinite;\n  }\n  .warp-governance-dot:nth-child(2) { animation-delay: 180ms; }\n  .warp-governance-dot:nth-child(3) { animation-delay: 360ms; }\n}\n\n@keyframes warp-governance-fade {\n  from { opacity: 0.1; }\n  to { opacity: 1; }\n}\n@keyframes warp-governance-rise {\n  from { opacity: 0; translate: 0 16px; }\n  to { opacity: 1; translate: 0 0; }\n}\n@keyframes warp-governance-blink {\n  0%, 100% { opacity: 0.2; }\n  40% { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "warp-governance.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpMedia } from \"@foundry/warp-media\";\nimport { WarpPlate } from \"@foundry/warp-plate\";\nimport { WarpSection } from \"@foundry/warp-section\";\nimport \"./warp-governance.css\";\n\n/** A series in the cost card: its colour comes from the theme's chart tokens. */\nexport interface WarpGovernanceSeries {\n  label: string;\n  value: string;\n  /** chart-1 … chart-5 */\n  colour: 1 | 2 | 3 | 4 | 5;\n}\n\nexport interface WarpGovernanceAgent {\n  /** what the agent is doing */\n  status: string;\n  /** the model pill */\n  model: string;\n  /** the ink agent pill */\n  agent: string;\n  /** one letter in the blue avatar */\n  initial: string;\n  /** e.g. \"now\", \"12m\" */\n  time: string;\n}\n\nexport interface WarpGovernanceProps {\n  id?: string;\n  /** the typed label above the title */\n  tag?: string;\n  /** shown in brackets after the tag */\n  status?: string;\n  title: string;\n  lead?: string;\n  /** caption of the figure frame */\n  caption: string;\n  /** the cost card */\n  cost: {\n    title: string;\n    value: string;\n    delta?: string;\n    date?: string;\n    series: WarpGovernanceSeries[];\n    /** the chart; a placeholder when empty */\n    chart?: ReactNode;\n    chartLabel?: string;\n  };\n  /** the roster card */\n  roster: {\n    label: string;\n    count?: string;\n    agents: WarpGovernanceAgent[];\n    note?: string;\n  };\n  /** the lower panel */\n  proof: {\n    title: string;\n    text: string;\n    /** the browser shot; a placeholder when empty */\n    shot?: ReactNode;\n    shotLabel?: string;\n    /** the agent's working line, followed by blinking dots */\n    working?: string;\n    /** the agent's reply under the shot */\n    reply: ReactNode;\n  };\n  className?: string;\n}\n\nconst tiny = \"font-mono text-[0.5625rem] leading-[1.65] tracking-[calc(0.12em_-_var(--warp-squeeze,0em))] uppercase\";\nconst dotsBg =\n  \"bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--foreground)_16%,transparent)_1.2px,transparent_0)] bg-[size:12px_12px]\";\nconst chartText = [\"\", \"text-chart-1\", \"text-chart-2\", \"text-chart-3\", \"text-chart-4\", \"text-chart-5\"];\nconst chartBg = [\"\", \"bg-chart-1\", \"bg-chart-2\", \"bg-chart-3\", \"bg-chart-4\", \"bg-chart-5\"];\n\n/** A control-plane figure: cost card, agent roster, and a proof panel with a browser shot. */\nexport function WarpGovernance({ id, tag, status, title, lead, caption, cost, roster, proof, className }: WarpGovernanceProps) {\n  return (\n    <WarpSection id={id} tag={tag} status={status} title={title} lead={lead} className={className}>\n      <WarpPlate caption={caption} bare>\n        <div className=\"px-3.5 pb-3.5\">\n          <div className={cn(\"grid grid-cols-1 border border-foreground bg-background lg:grid-cols-2\", dotsBg)}>\n            <div className=\"p-4 lg:p-[1.125rem]\">\n              <div className=\"h-full rounded-[calc(var(--radius)*3)] border border-foreground/10 bg-card p-6 lg:p-8\">\n                <p className=\"max-w-[16ch] text-sm leading-[1.65] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] sm:max-w-none\">{cost.title}</p>\n                <div className=\"mt-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between\">\n                  <p className=\"flex items-baseline gap-2\">\n                    <span className=\"font-mono text-[1.625rem] leading-none font-semibold\">{cost.value}</span>\n                    {cost.delta && <span className=\"text-[0.6875rem] text-muted-foreground\">{cost.delta}</span>}\n                    {cost.date && <span className={cn(tiny, \"text-muted-foreground/70\")}>{cost.date}</span>}\n                  </p>\n                  <ul className=\"flex flex-wrap gap-x-3 gap-y-1 text-[0.6875rem] text-muted-foreground\">\n                    {cost.series.map((s) => (\n                      <li key={s.label} className=\"flex items-center gap-1.5\">\n                        <span aria-hidden className={cn(\"size-1.5 rounded-full\", chartBg[s.colour])} />\n                        {s.label}\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n                <WarpMedia label={cost.chartLabel} className=\"mt-4 h-40 rounded-[calc(var(--radius)/2)]\">\n                  {cost.chart}\n                </WarpMedia>\n                <p className=\"mt-3 text-[0.6875rem] leading-[1.6] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))]\">\n                  {cost.series.map((s, i) => (\n                    <span key={s.label}>\n                      {i > 0 && <span className=\"text-muted-foreground/60\"> · </span>}\n                      <span className={chartText[s.colour]}>\n                        {s.label} {s.value}\n                      </span>\n                    </span>\n                  ))}\n                </p>\n              </div>\n            </div>\n            <div className=\"border-t border-foreground/15 p-4 lg:border-t-0 lg:border-l lg:p-[1.125rem]\">\n              <div className=\"flex h-full flex-col rounded-[calc(var(--radius)*3)] border border-foreground/10 bg-card p-6 lg:p-8\">\n                <div className={cn(tiny, \"flex items-start justify-between gap-4 border-b border-border pb-6 text-muted-foreground\")}>\n                  <span>[ {roster.label} ]</span>\n                  {roster.count && <span className=\"shrink-0\">{roster.count}</span>}\n                </div>\n                <ul className=\"mt-6 flex flex-col lg:mt-10\">\n                  {roster.agents.map((a) => (\n                    <li key={a.status + a.agent} className=\"flex items-center gap-2.5 border-b border-border py-3 last:border-b-0\">\n                      <span aria-hidden className=\"size-1.5 shrink-0 rounded-full bg-glow\" />\n                      <span className=\"min-w-0 flex-1 truncate font-display text-[0.875rem] text-foreground/78\">{a.status}</span>\n                      <span className=\"hidden rounded-full border border-border px-2 py-0.5 text-[0.5625rem] tracking-[calc(0.12em_-_var(--warp-squeeze,0em))] text-muted-foreground uppercase sm:inline\">{a.model}</span>\n                      <span className=\"rounded-full border border-foreground px-2 py-0.5 text-[0.5625rem] font-semibold tracking-[calc(0.1em_-_var(--warp-squeeze,0em))] uppercase\">{a.agent}</span>\n                      <span aria-hidden className=\"flex size-[1.125rem] shrink-0 items-center justify-center rounded-full bg-primary text-[0.5rem] font-semibold text-primary-foreground uppercase\">\n                        {a.initial}\n                      </span>\n                      <span className={cn(tiny, \"w-8 text-right text-muted-foreground/70\")}>{a.time}</span>\n                    </li>\n                  ))}\n                </ul>\n                {roster.note && <p className=\"mt-auto border-t border-border pt-3 font-display text-[0.9375rem] leading-[1.5] text-muted-foreground\">{roster.note}</p>}\n              </div>\n            </div>\n          </div>\n\n          <div className={cn(\"warp-governance-panel mt-3.5 grid grid-cols-1 gap-8 rounded-[calc(var(--radius)*2)] border border-foreground bg-background px-6 py-8 lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-8 lg:py-12\", dotsBg)}>\n            <div className=\"lg:pl-1\">\n              <h3 className=\"max-w-[20ch] font-display text-[1.0625rem] leading-[1.5] font-semibold tracking-[-0.015em] sm:max-w-none\">{proof.title}</h3>\n              <p className=\"mt-2 text-[0.8125rem] leading-[1.6] tracking-[calc(0.04em_-_var(--warp-squeeze,0em))] text-muted-foreground\">{proof.text}</p>\n            </div>\n            <div>\n              <WarpMedia label={proof.shotLabel} className=\"warp-governance-shot aspect-[1.54/1] border border-foreground/30 bg-card\">\n                {proof.shot}\n              </WarpMedia>\n              {proof.working && (\n                <p className=\"mt-4 flex items-center gap-1 pl-[2.375rem] font-mono text-[0.75rem] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] text-muted-foreground\">\n                  {proof.working}\n                  <span aria-hidden className=\"inline-flex\">\n                    <i className=\"warp-governance-dot not-italic\">.</i>\n                    <i className=\"warp-governance-dot not-italic\">.</i>\n                    <i className=\"warp-governance-dot not-italic\">.</i>\n                  </span>\n                </p>\n              )}\n              <div className=\"warp-governance-reply mt-3 flex gap-4 text-[0.8125rem] leading-[1.6] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))]\">\n                <span aria-hidden className=\"mt-1 size-3.5 shrink-0 bg-primary\" />\n                <p className=\"[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2\">{proof.reply}</p>\n              </div>\n            </div>\n          </div>\n        </div>\n      </WarpPlate>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-media",
+    "warp-plate",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the typed label above the title"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": false,
+      "description": "shown in brackets after the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "caption of the figure frame"
+    },
+    {
+      "name": "cost",
+      "type": "{ title: string; value: string; delta?: string | undefined; date?: string | undefined; series: WarpGovernanceSeries[]; chart?: ReactNode; chartLabel?: string | undefined; }",
+      "required": true,
+      "description": "the cost card"
+    },
+    {
+      "name": "roster",
+      "type": "{ label: string; count?: string | undefined; agents: WarpGovernanceAgent[]; note?: string | undefined; }",
+      "required": true,
+      "description": "the roster card"
+    },
+    {
+      "name": "proof",
+      "type": "{ title: string; text: string; shot?: ReactNode; shotLabel?: string | undefined; working?: string | undefined; reply: ReactNode; }",
+      "required": true,
+      "description": "the lower panel"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8a6e41914572a5e88b433ac4e16cec74b892481612de638d57d6b9eaedc00125"
+}

@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Anduril arrow link",
+  "description": "A small text link with a ↗ arrow and a hairline underline under the words; on hover the underline draws itself again from the left in 300ms. Can also hide the underline until hover, or render as a span inside a bigger link.",
+  "category": "button",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "link",
+    "arrow",
+    "underline",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "takes the surrounding text colour",
+    "as=\"span\" for use inside a card or row that is itself the link"
+  ],
+  "entry": "anduril-link.tsx",
+  "source": "foundry",
+  "name": "anduril-link",
+  "files": [
+    {
+      "path": "anduril-link.css",
+      "content": "/* The underline re-draws from the left on hover (the original's 300ms \"underline in\"). A\n   hover-only underline grows in the same way and is otherwise hidden. */\n.anduril-link-line {\n  transform-origin: left;\n}\n.anduril-link[data-underline=\"hover\"] .anduril-link-line {\n  transform: scaleX(0);\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .anduril-link:hover .anduril-link-line,\n  .group:hover .anduril-link .anduril-link-line,\n  .anduril-link:focus-visible .anduril-link-line {\n    animation: anduril-link-underline-in 300ms cubic-bezier(0.215, 0.61, 0.355, 1) both;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .anduril-link:hover .anduril-link-line,\n  .group:hover .anduril-link .anduril-link-line {\n    transform: none;\n  }\n}\n\n@keyframes anduril-link-underline-in {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n"
+    },
+    {
+      "path": "anduril-link.tsx",
+      "content": "import { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./anduril-link.css\";\n\nexport interface AndurilLinkProps {\n  /** the words */\n  label: string;\n  /** link target (ignored when as=\"span\") */\n  href?: string;\n  /** \"always\": a hairline under the words that re-draws on hover; \"hover\": no line until hover */\n  underline?: \"always\" | \"hover\";\n  /** render as a span, for use inside a card or row that is itself the link */\n  as?: \"a\" | \"span\";\n  className?: string;\n}\n\n/** Small text link with a ↗ arrow; the underline draws in from the left on hover. */\nexport function AndurilLink({ label, href, underline = \"always\", as = \"a\", className }: AndurilLinkProps) {\n  const Tag = as;\n  return (\n    <Tag\n      href={as === \"a\" ? href : undefined}\n      data-underline={underline}\n      className={cn(\"anduril-link inline-flex items-center gap-2.5 text-[0.9375rem] leading-[1.2] tracking-[-0.01em]\", className)}\n    >\n      <span className=\"relative pb-1\">\n        {label}\n        <span aria-hidden className=\"anduril-link-line absolute inset-x-0 bottom-0 h-px bg-current\" />\n      </span>\n      <ArrowUpRight aria-hidden className=\"size-3.5 shrink-0\" strokeWidth={1.75} />\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the words"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "link target (ignored when as=\"span\")"
+    },
+    {
+      "name": "underline",
+      "type": "enum",
+      "required": false,
+      "default": "always",
+      "description": "\"always\": a hairline under the words that re-draws on hover; \"hover\": no line until hover"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "a",
+      "description": "render as a span, for use inside a card or row that is itself the link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7d76c1afc701ceaf18ebe6603a6cef19069193c18741bfc79a951523d9c7a1b9"
+}

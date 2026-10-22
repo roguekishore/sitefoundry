@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Radiant Nuclear header",
+  "description": "A frosted bar floating 12px in from the top and sides of the window: a mark and a bold caps wordmark on the left, two or three small caps links on the right. Over the first screen it is an almost opaque warm white; within the first ~420px of scrolling the glass thins to a faint veil over whatever passes beneath.",
+  "category": "header",
+  "site": "radiantnuclear",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "floating",
+    "glass",
+    "blur",
+    "minimal",
+    "scroll",
+    "fade",
+    "light"
+  ],
+  "notes": [
+    "takes no height: it floats over the first section (the hero starts at the top of the page under it)",
+    "the glass fade is CSS scroll-driven (page scroll); without support the bar stays almost opaque",
+    "no phone menu: the links stay inline at every width, so keep them short"
+  ],
+  "entry": "radiantnuclear-header.tsx",
+  "source": "foundry",
+  "name": "radiantnuclear-header",
+  "files": [
+    {
+      "path": "radiantnuclear-header.css",
+      "content": "/* The glass under the bar thins from 90% to 20% while the page scrolls its first 422px. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .radiantnuclear-header-glass {\n      animation: radiantnuclear-header-thin linear both;\n      animation-timeline: scroll(root block);\n      animation-range: 0px 422px;\n    }\n  }\n}\n\n@keyframes radiantnuclear-header-thin {\n  from { opacity: 0.9; }\n  to { opacity: 0.2; }\n}\n"
+    },
+    {
+      "path": "radiantnuclear-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./radiantnuclear-header.css\";\n\nexport interface RadiantnuclearHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface RadiantnuclearHeaderProps {\n  /** the wordmark, set in bold capitals next to the mark */\n  brand: string;\n  /** the small mark before the wordmark (an svg, img or lucide icon) */\n  logo?: ReactNode;\n  homeHref?: string;\n  /** the links on the right, shown in small capitals (two or three short ones) */\n  links: RadiantnuclearHeaderLink[];\n  className?: string;\n}\n\nexport function RadiantnuclearHeader({ brand, logo, homeHref = \"/\", links, className }: RadiantnuclearHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-50 h-0 font-sans text-foreground\", className)}>\n      <div className=\"absolute inset-x-3 top-3 mx-auto flex h-14 max-w-[calc(var(--page-width)-1.5rem)] items-center justify-between pr-4 pl-4 lg:h-16 lg:pr-6 lg:pl-6\">\n        {/* the frosted glass sits on its own layer so only it fades, not the links */}\n        <div aria-hidden className=\"radiantnuclear-header-glass absolute inset-0 -z-10 bg-card/90 backdrop-blur-md\" />\n        <a href={homeHref} className=\"flex items-center gap-2 [&_svg]:size-7 lg:[&_svg]:size-8\">\n          {logo}\n          <span className=\"text-[1.375rem] leading-none font-extrabold tracking-[0.01em] uppercase lg:text-2xl\">{brand}</span>\n        </a>\n        <nav>\n          <ul className=\"flex items-center gap-5 lg:gap-8\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a\n                  href={l.href}\n                  className=\"text-sm leading-none font-medium uppercase text-foreground/85 transition-colors duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none lg:text-[0.9375rem]\"\n                >\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set in bold capitals next to the mark"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small mark before the wordmark (an svg, img or lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "RadiantnuclearHeaderLink[]",
+      "required": true,
+      "description": "the links on the right, shown in small capitals (two or three short ones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cd18f665c4cffa9847adf8fda593d8f825172f3e88834963790a3eb2f8c85dc4"
+}

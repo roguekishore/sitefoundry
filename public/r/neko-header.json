@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko header",
+  "description": "A see-through bar floating over the page: a charcoal squircle logo on the left, three quiet links centred, a blue 'book' button on the right. The centre links fade and lift away over the first 450px of scrolling, leaving just the logo and the button. On phones: the logo and a two-line menu button that opens a full-screen menu.",
+  "category": "header",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "transparent",
+    "minimal",
+    "scroll",
+    "fade",
+    "light"
+  ],
+  "notes": [
+    "takes no height: it sits on top of the first section (the hero starts at the top of the page under it)",
+    "the nav fade is CSS scroll-driven; the phone menu needs JavaScript"
+  ],
+  "hydrate": "load",
+  "entry": "neko-header.tsx",
+  "source": "foundry",
+  "name": "neko-header",
+  "files": [
+    {
+      "path": "neko-header.css",
+      "content": "/* The centre links fade out and lift 16px while the page scrolls its first 450px. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .neko-header-nav {\n      animation: neko-header-nav-away linear both;\n      animation-timeline: scroll(root block);\n      animation-range: 0px 450px;\n    }\n  }\n}\n\n@keyframes neko-header-nav-away {\n  from { opacity: 1; transform: translateY(0); }\n  to { opacity: 0; transform: translateY(-16px); visibility: hidden; }\n}\n"
+    },
+    {
+      "path": "neko-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoButton } from \"@foundry/neko-button\";\nimport \"./neko-header.css\";\n\nexport interface NekoHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface NekoHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the mark inside the charcoal square (an svg, img or lucide icon) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** the centre links */\n  links: NekoHeaderLink[];\n  /** the blue button on the right (also at the foot of the phone menu) */\n  cta: NekoHeaderLink;\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  /** label of the phone menu's close button, for screen readers */\n  closeLabel?: string;\n  className?: string;\n}\n\nexport function NekoHeader({ brand, logo, homeHref = \"/\", links, cta, menuLabel = \"Menu\", closeLabel = \"Close\", className }: NekoHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    document.documentElement.style.overflow = \"hidden\";\n    window.addEventListener(\"keydown\", onKey);\n    return () => {\n      document.documentElement.style.overflow = \"\";\n      window.removeEventListener(\"keydown\", onKey);\n    };\n  }, [open]);\n\n  return (\n    <header className={cn(\"sticky top-0 z-50 h-0 font-sans text-foreground\", className)}>\n      <div className=\"relative flex h-16 items-center justify-between px-gutter lg:h-26\">\n        <a\n          href={homeHref}\n          aria-label={brand}\n          className=\"flex size-12 items-center justify-center rounded-lg bg-foreground text-background lg:size-15 [&_svg]:size-6 lg:[&_svg]:size-8\"\n        >\n          {logo}\n        </a>\n\n        <nav className=\"neko-header-nav absolute inset-x-0 top-1/2 hidden -translate-y-1/2 justify-center lg:flex pointer-events-none\">\n          <ul className=\"pointer-events-auto flex items-center gap-12\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a href={l.href} className=\"text-base transition-colors duration-150 hover:text-primary motion-reduce:transition-none\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        <NekoButton href={cta.href} variant=\"primary\" className=\"hidden lg:inline-flex\">\n          {cta.label}\n        </NekoButton>\n\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen(true)}\n          className=\"flex size-12 flex-col items-end justify-center gap-[7px] pr-1.5 lg:hidden\"\n        >\n          <span className=\"h-[1.5px] w-5 bg-foreground\" />\n          <span className=\"h-[1.5px] w-5 bg-foreground\" />\n        </button>\n      </div>\n\n      {/* Phone menu: a full-screen sheet; parked inside a clipped layer so it never widens the page. */}\n      <div className={cn(\"pointer-events-none fixed inset-0 overflow-clip lg:hidden\", open && \"pointer-events-auto\")} aria-hidden={!open}>\n        <div\n          className={cn(\n            \"flex h-full flex-col bg-background px-gutter transition-[opacity,translate] duration-300 motion-reduce:transition-none\",\n            open ? \"translate-y-0 opacity-100\" : \"-translate-y-4 opacity-0\",\n          )}\n        >\n          <div className=\"flex h-16 items-center justify-between\">\n            <a href={homeHref} aria-label={brand} tabIndex={open ? 0 : -1} className=\"flex size-12 items-center justify-center rounded-lg bg-foreground text-background [&_svg]:size-6\">\n              {logo}\n            </a>\n            <button type=\"button\" aria-label={closeLabel} tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} className=\"flex size-12 items-center justify-center\">\n              <X aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            </button>\n          </div>\n          <ul className=\"mt-10 flex flex-col gap-2\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a href={l.href} tabIndex={open ? 0 : -1} onClick={() => setOpen(false)} className=\"block py-2 font-display text-[2.5rem] leading-[1.1] tracking-[-0.02em]\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <div className=\"mt-auto pb-8\">\n            <NekoButton href={cta.href} variant=\"primary\" className=\"w-full\">\n              {cta.label}\n            </NekoButton>\n          </div>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mark inside the charcoal square (an svg, img or lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "NekoHeaderLink[]",
+      "required": true,
+      "description": "the centre links"
+    },
+    {
+      "name": "cta",
+      "type": "NekoHeaderLink",
+      "required": true,
+      "description": "the blue button on the right (also at the foot of the phone menu)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close",
+      "description": "label of the phone menu's close button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "998908ebfecf366e31effee3ee29921b5ca13a3ebf20bd70aae28c4c96f33d3e"
+}

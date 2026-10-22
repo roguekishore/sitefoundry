@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink footer",
+  "description": "A footer where the page's paper gives way to a band of pale blue, saturated blue and black that rises as you scroll in: a three-column grid with a sign-up form on a dotted underline, navigation in two sub-columns of 19px links (underline grows on hover) and social links with a back-to-top box, a bottom row of narrow uppercase listing, legal and copyright lines, and a giant wordmark across the full width fading to the bottom edge.",
+  "category": "footer",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "gradient",
+    "blue",
+    "light-to-dark",
+    "wordmark",
+    "newsletter",
+    "dotted",
+    "grid",
+    "scrubbed",
+    "parallax"
+  ],
+  "notes": [
+    "the content uses the theme's dark colours (.dark); the band starts from the light page's paper",
+    "the band's rise is a CSS view timeline; without support or with reduced motion it sits in its final place",
+    "the giant wordmark is the company name as type (the original draws it in WebGL)"
+  ],
+  "entry": "sharplink-footer.tsx",
+  "source": "foundry",
+  "name": "sharplink-footer",
+  "files": [
+    {
+      "path": "sharplink-footer.css",
+      "content": "/* The band (paper → pale → blue → navy → black) sits in its final place by default; with view\n   timelines it starts lower and rises into place while the footer scrolls in. */\n.sharplink-footer-band {\n  transform: translateY(-14%);\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-footer {\n      view-timeline-name: --sharplink-footer;\n    }\n    .sharplink-footer-band {\n      animation: sharplink-footer-rise linear both;\n      animation-timeline: --sharplink-footer;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes sharplink-footer-rise {\n  from { transform: translateY(6%); }\n  to { transform: translateY(-14%); }\n}\n"
+    },
+    {
+      "path": "sharplink-footer.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkGuides } from \"@foundry/sharplink-guides\";\nimport { SharplinkLabel, sharplinkLabelType } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\nimport \"./sharplink-footer.css\";\n\nexport interface SharplinkFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface SharplinkFooterProps {\n  /** the sign-up heading, e.g. \"Stay in the loop:\" */\n  signupTitle: string;\n  /** the email field's placeholder */\n  emailPlaceholder: string;\n  /** the sign-up button's text */\n  signupButton: string;\n  /** where the form posts */\n  signupAction?: string;\n  /** the label over the navigation links */\n  navLabel: string;\n  /** the navigation links (shown in two sub-columns) */\n  nav: SharplinkFooterLink[];\n  /** the label over the social links */\n  socialLabel: string;\n  /** the social links */\n  social: SharplinkFooterLink[];\n  /** the back-to-top label and target */\n  backToTop?: SharplinkFooterLink;\n  /** the exchange mark over the listing line */\n  exchange?: ReactNode;\n  /** the listing line (narrow uppercase); strong parts can be wrapped in <strong> */\n  listing?: ReactNode;\n  /** the legal links (underlined) */\n  legal: SharplinkFooterLink[];\n  /** the copyright line */\n  copyright: string;\n  /** the giant wordmark across the bottom (the company name) */\n  wordmark: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"relative w-fit text-[1.1875rem] leading-[1.35] font-medium tracking-[-0.01em] after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-[width] after:duration-300 hover:after:w-full motion-reduce:after:transition-none\";\n\n/** Footer over a rising band of blue that deepens to the dark background, ending in a giant wordmark. */\nexport function SharplinkFooter({\n  signupTitle,\n  emailPlaceholder,\n  signupButton,\n  signupAction,\n  navLabel,\n  nav,\n  socialLabel,\n  social,\n  backToTop,\n  exchange,\n  listing,\n  legal,\n  copyright,\n  wordmark,\n  className,\n}: SharplinkFooterProps) {\n  const style = { \"--sl-paper\": \"var(--background)\", \"--sl-pale\": \"var(--accent)\" } as CSSProperties;\n  const half = Math.ceil(nav.length / 2);\n  return (\n    <footer className={cn(\"sharplink-footer relative isolate overflow-clip\", className)} style={style}>\n      <div data-sharplink-tone=\"dark\" className=\"dark relative text-foreground\">\n        <div\n          aria-hidden\n          className=\"sharplink-footer-band absolute inset-x-0 top-0 -z-20 h-[135%] bg-[linear-gradient(to_bottom,transparent_0%,var(--sl-pale)_14%,color-mix(in_oklab,var(--glow)_75%,var(--sl-pale))_26%,var(--glow)_38%,color-mix(in_oklab,var(--glow)_35%,var(--background))_56%,var(--background)_72%)]\"\n        />\n        <div aria-hidden data-sharplink-tone=\"light\" className=\"absolute inset-x-0 top-0 h-[8rem]\" />\n        <SharplinkGuides mobile />\n        <div className=\"mx-auto max-w-page px-gutter pt-28 lg:pt-[9.5rem]\">\n          <SharplinkRule markTone=\"foreground\" className=\"max-lg:mx-4\" />\n          <div className=\"grid gap-x-gutter gap-y-14 px-4 pt-8 lg:grid-cols-3 lg:px-0 lg:pt-7\">\n            <form action={signupAction} className=\"min-w-0 lg:pr-7\">\n              <p className=\"text-2xl leading-[1.4] font-medium tracking-[-0.01em]\">{signupTitle}</p>\n              <div className=\"mt-8 flex items-center gap-4 border-b border-dotted border-foreground/30 pb-4 lg:mt-10\">\n                <input\n                  type=\"email\"\n                  name=\"email\"\n                  required\n                  placeholder={emailPlaceholder}\n                  aria-label={emailPlaceholder}\n                  className=\"w-full min-w-0 flex-1 bg-transparent text-[1.1875rem] leading-[1.35] font-medium tracking-[-0.01em] placeholder:text-foreground/40 focus:outline-none\"\n                />\n                <SharplinkButton type=\"submit\" variant=\"tint\" arrow>\n                  {signupButton}\n                </SharplinkButton>\n              </div>\n            </form>\n\n            <nav aria-label={navLabel} className=\"lg:pl-7\">\n              <SharplinkLabel tone=\"muted\">{navLabel}</SharplinkLabel>\n              <div className=\"mt-4 grid grid-cols-2 gap-x-gutter\">\n                {[nav.slice(0, half), nav.slice(half)].map((col, c) => (\n                  <ul key={c} className=\"grid content-start gap-y-1\">\n                    {col.map((link) => (\n                      <li key={link.href}>\n                        <a href={link.href} className={linkClass}>\n                          {link.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                ))}\n              </div>\n            </nav>\n\n            <div className=\"flex flex-col justify-between gap-12 lg:flex-row lg:gap-6 lg:pl-7\">\n              <div>\n                <SharplinkLabel tone=\"muted\">{socialLabel}</SharplinkLabel>\n                <ul className=\"mt-4 grid gap-y-1\">\n                  {social.map((link) => (\n                    <li key={link.href}>\n                      <a href={link.href} className={linkClass}>\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n              {backToTop && (\n                <a href={backToTop.href} className=\"group flex items-center gap-3 lg:flex-col lg:items-end lg:gap-4\">\n                  <SharplinkLabel className=\"order-2 lg:order-1\">{backToTop.label}</SharplinkLabel>\n                  <span className=\"order-1 grid size-[2.125rem] place-items-center bg-foreground/10 transition-colors duration-[250ms] group-hover:bg-foreground/[0.18] motion-reduce:transition-none lg:order-2\">\n                    <ArrowUp className=\"size-4\" strokeWidth={1.5} />\n                  </span>\n                </a>\n              )}\n            </div>\n          </div>\n\n          <div className=\"grid gap-x-gutter gap-y-10 px-4 pt-16 pb-8 lg:grid-cols-3 lg:items-end lg:px-0 lg:pt-20 lg:pb-7\">\n            <div className=\"grid gap-5\">\n              {exchange && <span className=\"flex text-foreground/80 [&_svg]:h-6 [&_svg]:w-auto\">{exchange}</span>}\n              {listing && <p className={cn(sharplinkLabelType, \"text-foreground/60 [&_strong]:font-medium [&_strong]:text-foreground\")}>{listing}</p>}\n            </div>\n            <ul className=\"flex flex-wrap gap-x-3 gap-y-2 lg:pl-7\">\n              {legal.map((link) => (\n                <li key={link.href}>\n                  <a href={link.href} className={cn(sharplinkLabelType, \"text-foreground/60 underline underline-offset-4 transition-colors duration-200 hover:text-foreground\")}>\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <p className={cn(sharplinkLabelType, \"text-foreground/60 lg:pl-7\")}>{copyright}</p>\n          </div>\n          <div className=\"border-y border-dotted border-foreground/15 py-[0.8125rem] max-lg:hidden\" />\n        </div>\n\n        <div aria-hidden className=\"mx-auto mt-10 h-[0.68em] max-w-page overflow-clip px-gutter text-[min(24.5vw,22rem)] leading-[0.8] lg:mt-24\">\n          <p className=\"bg-[linear-gradient(to_bottom,var(--foreground)_10%,color-mix(in_oklab,var(--foreground)_25%,transparent)_70%)] bg-clip-text text-center font-display font-medium tracking-[-0.045em] text-transparent\">\n            {wordmark}\n          </p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-guides",
+    "sharplink-label",
+    "sharplink-rule"
+  ],
+  "props": [
+    {
+      "name": "signupTitle",
+      "type": "string",
+      "required": true,
+      "description": "the sign-up heading, e.g. \"Stay in the loop:\""
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": true,
+      "description": "the email field's placeholder"
+    },
+    {
+      "name": "signupButton",
+      "type": "string",
+      "required": true,
+      "description": "the sign-up button's text"
+    },
+    {
+      "name": "signupAction",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "navLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label over the navigation links"
+    },
+    {
+      "name": "nav",
+      "type": "SharplinkFooterLink[]",
+      "required": true,
+      "description": "the navigation links (shown in two sub-columns)"
+    },
+    {
+      "name": "socialLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label over the social links"
+    },
+    {
+      "name": "social",
+      "type": "SharplinkFooterLink[]",
+      "required": true,
+      "description": "the social links"
+    },
+    {
+      "name": "backToTop",
+      "type": "SharplinkFooterLink",
+      "required": false,
+      "description": "the back-to-top label and target"
+    },
+    {
+      "name": "exchange",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the exchange mark over the listing line"
+    },
+    {
+      "name": "listing",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the listing line (narrow uppercase); strong parts can be wrapped in <strong>"
+    },
+    {
+      "name": "legal",
+      "type": "SharplinkFooterLink[]",
+      "required": true,
+      "description": "the legal links (underlined)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant wordmark across the bottom (the company name)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0b383c5203451eb86a7b29f1104268c3e172f495d6082f9a98bf3be321b1d33c"
+}

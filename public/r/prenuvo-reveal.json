@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Prenuvo reveal",
+  "description": "A wrapper that fades its content in and lifts it 64, 80 or 96px into place as it scrolls into view, driven by the scroll itself (CSS view timeline). Give items in a row a step number to stagger them.",
+  "category": "animation",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "CSS only: browsers without scroll-driven animations, and reduced motion, show the content in place",
+    "don't put it inside an overflow-hidden box (use overflow-clip), or the timeline freezes"
+  ],
+  "entry": "prenuvo-reveal.tsx",
+  "source": "foundry",
+  "name": "prenuvo-reveal",
+  "files": [
+    {
+      "path": "prenuvo-reveal.css",
+      "content": "/* Fade and rise over the first 300px of scroll after the element's top enters the window (a\n   fixed distance, so anything in the first screen is already in place at load). Each step\n   shifts the range 40px later. Only where view timelines exist and motion is allowed. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .prenuvo-reveal {\n      animation: prenuvo-reveal-in linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--prenuvo-reveal-step, 0) * 40px) entry calc(300px + var(--prenuvo-reveal-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes prenuvo-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(var(--prenuvo-reveal-rise, 80px));\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "prenuvo-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./prenuvo-reveal.css\";\n\nexport interface PrenuvoRevealProps {\n  children?: ReactNode;\n  /** the element to render (div by default; li inside lists) */\n  as?: ElementType;\n  /** how far it rises into place, in px (the original uses 64, 80 and 96) */\n  rise?: number;\n  /** position in a staggered row: 0, 1, 2… each arrives a little later */\n  step?: number;\n  className?: string;\n}\n\nexport function PrenuvoReveal({ children, as: Tag = \"div\", rise = 80, step = 0, className }: PrenuvoRevealProps) {\n  return (\n    <Tag\n      className={cn(\"prenuvo-reveal\", className)}\n      style={{ \"--prenuvo-reveal-step\": step, \"--prenuvo-reveal-rise\": `${rise}px` } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default; li inside lists)"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "default": "80",
+      "description": "how far it rises into place, in px (the original uses 64, 80 and 96)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "position in a staggered row: 0, 1, 2… each arrives a little later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "09f9c8faf51b99002d26b101cd93af3a7d2c8f2c7d6c97d86a474adc86c5f2d1"
+}

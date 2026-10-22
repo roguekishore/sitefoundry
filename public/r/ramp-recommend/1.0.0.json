@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp prompt panel",
+  "description": "An edge-to-edge panel with 12px corners over a misty grey backdrop: a centred headline and grey subline, a wide white prompt box whose border has a light running around it, an example request typing itself in, a small arrow send button, and a fine italic disclaimer at the foot.",
+  "category": "cta",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "prompt",
+    "ai",
+    "textarea",
+    "typewriter",
+    "border-trace",
+    "loop",
+    "mist",
+    "light",
+    "centered"
+  ],
+  "notes": [
+    "backdrop is a media slot; empty, it shows layered grey radial gradients (darker toward the foot so the disclaimer reads)",
+    "the border light is CSS (@property angle); the typing needs JavaScript and shows the first example in static HTML"
+  ],
+  "hydrate": "visible",
+  "entry": "ramp-recommend.tsx",
+  "source": "foundry",
+  "name": "ramp-recommend",
+  "files": [
+    {
+      "path": "ramp-recommend.css",
+      "content": "/* A short arc of light runs around the prompt box's border every 3.4s. */\n@property --ramp-recommend-angle {\n  syntax: \"<angle>\";\n  inherits: false;\n  initial-value: 0deg;\n}\n\n.ramp-recommend-trace {\n  background:\n    conic-gradient(from var(--ramp-recommend-angle), transparent 0 72%, color-mix(in oklab, var(--foreground) 55%, transparent) 86%, transparent 100%),\n    var(--border);\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .ramp-recommend-trace {\n    animation: ramp-recommend-trace 3.4s linear infinite;\n  }\n}\n\n@keyframes ramp-recommend-trace {\n  to { --ramp-recommend-angle: 360deg; }\n}\n\n/* Placeholder backdrop: mist that darkens toward the bottom corners. */\n.ramp-recommend-mist {\n  background:\n    radial-gradient(60% 70% at 15% 95%, color-mix(in oklab, var(--foreground) 40%, transparent), transparent 70%),\n    radial-gradient(50% 60% at 90% 100%, color-mix(in oklab, var(--foreground) 32%, transparent), transparent 70%),\n    radial-gradient(70% 60% at 60% 0%, var(--card), transparent 70%),\n    linear-gradient(to bottom, var(--muted), color-mix(in oklab, var(--muted) 70%, var(--foreground)));\n}\n"
+    },
+    {
+      "path": "ramp-recommend.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\nimport \"./ramp-recommend.css\";\n\nexport interface RampRecommendProps {\n  /** the headline's first line, in ink */\n  title: string;\n  /** a second headline line, in ink too (optional) */\n  titleLine2?: string;\n  /** the grey line under it */\n  subtitle?: string;\n  /** example requests that type themselves into the box, one after another */\n  prompts: string[];\n  /** screen-reader label for the box */\n  fieldLabel: string;\n  /** screen-reader label for the send button */\n  sendLabel: string;\n  /** where the form posts (optional) */\n  action?: string;\n  /** the fine print at the foot (may hold a link) */\n  disclaimer?: ReactNode;\n  /** the backdrop photo; empty shows a misty gradient */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\n/** Types each prompt out, holds it, then moves on to the next. */\nfunction useTypedPrompt(prompts: string[]) {\n  const [text, setText] = useState(prompts[0] ?? \"\");\n  useEffect(() => {\n    if (!prompts.length || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let p = 0;\n    let i = 0;\n    let timer = 0;\n    const tick = () => {\n      const full = prompts[p];\n      if (i <= full.length) {\n        setText(full.slice(0, i));\n        i += 1;\n        timer = window.setTimeout(tick, 45);\n      } else {\n        timer = window.setTimeout(() => {\n          p = (p + 1) % prompts.length;\n          i = 0;\n          tick();\n        }, 2200);\n      }\n    };\n    tick();\n    return () => window.clearTimeout(timer);\n  }, [prompts]);\n  return text;\n}\n\n/** Ramp's \"tell us about your business\" panel: a prompt box on a misty full-width backdrop. */\nexport function RampRecommend({ title, titleLine2, subtitle, prompts, fieldLabel, sendLabel, action, disclaimer, backdrop, className }: RampRecommendProps) {\n  const typed = useTypedPrompt(prompts);\n  return (\n    <section className={cn(\"relative isolate overflow-clip rounded-lg bg-muted text-foreground\", className)}>\n      <div aria-hidden className=\"absolute inset-0 -z-10\">\n        {backdrop ?? <div className=\"ramp-recommend-mist size-full\" />}\n      </div>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter pt-[7.5rem] pb-8 lg:min-h-[43.75rem] lg:pt-[11.5rem]\">\n        <RampHeading\n          size=\"section\"\n          align=\"center\"\n          lead={title}\n          rest={titleLine2}\n          breakBeforeRest\n          className=\"text-[1.75rem]/[1.15] lg:text-[2.5rem]/[1.05] [&>span]:text-foreground\"\n        />\n        {subtitle && <p className=\"mt-3 max-w-[23rem] text-center text-base/[1.4] text-muted-foreground\">{subtitle}</p>}\n\n        <form action={action} className=\"ramp-recommend-trace mt-5 w-full max-w-[48rem] rounded-[calc(var(--radius)-6px)] p-px\">\n          <div className=\"relative h-[12.75rem] rounded-[calc(var(--radius)-7px)] bg-card lg:h-[10.25rem]\">\n            <label className=\"contents\">\n              <span className=\"sr-only\">{fieldLabel}</span>\n              <textarea\n                name=\"prompt\"\n                placeholder={typed}\n                className=\"size-full resize-none rounded-[inherit] bg-transparent px-6 pt-5 pb-14 text-base/6 text-foreground outline-none placeholder:text-muted-foreground\"\n              />\n            </label>\n            <button\n              type=\"submit\"\n              aria-label={sendLabel}\n              className=\"absolute right-1.5 bottom-1.5 grid size-8 place-items-center rounded-[calc(var(--radius)-8px)] bg-muted text-foreground transition-colors duration-300 hover:bg-foreground hover:text-background motion-reduce:transition-none\"\n            >\n              <ArrowRight aria-hidden className=\"size-4\" strokeWidth={1.5} />\n            </button>\n          </div>\n        </form>\n\n        {disclaimer && (\n          <p className=\"mt-auto max-w-[40rem] pt-16 text-center text-sm/5 text-background italic [&_a]:underline [&_a]:underline-offset-2 lg:pt-36\">\n            {disclaimer}\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline's first line, in ink"
+    },
+    {
+      "name": "titleLine2",
+      "type": "string",
+      "required": false,
+      "description": "a second headline line, in ink too (optional)"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "prompts",
+      "type": "string[]",
+      "required": true,
+      "description": "example requests that type themselves into the box, one after another"
+    },
+    {
+      "name": "fieldLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the box"
+    },
+    {
+      "name": "sendLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the send button"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts (optional)"
+    },
+    {
+      "name": "disclaimer",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the fine print at the foot (may hold a link)"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the backdrop photo; empty shows a misty gradient"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a6e49c552aef66e7d0ecce024e68654a3b7f5083a8e8e703b02795e33b9f287b"
+}

@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower stories carousel",
+  "description": "Member stories on a faint grey band: a rating line, a two-line headline and a grey lead, then a row of wide slides (a rounded photo, the member's name and age, a quote and a grey outcome line) separated by hairlines. It plays by itself: the active slide is full strength, the rest at half; under it a segmented bar where the current segment widens and fills over a few seconds before the row glides on, with a '2 / 5' counter.",
+  "category": "testimonials",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "carousel",
+    "autoplay",
+    "progress",
+    "quotes",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "autoplay pauses on hover, while the row is off-screen, and entirely under reduced motion (the segments stay clickable)",
+    "rewinds to the first story after the last one"
+  ],
+  "entry": "superpower-stories.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "superpower-stories",
+  "files": [
+    {
+      "path": "superpower-stories.css",
+      "content": "/* The track moves one slide (plus its gap) per step; the slide and gap sizes change at lg. */\n.superpower-stories-track {\n  --superpower-stories-slide: 20.25rem;\n  --superpower-stories-gap: 1rem;\n  transform: translateX(calc(var(--superpower-stories-index, 0) * -1 * (var(--superpower-stories-slide) + var(--superpower-stories-gap))));\n  transition: transform 0.75s cubic-bezier(0.45, 0, 0.55, 1);\n}\n@media (min-width: 64rem) {\n  .superpower-stories-track {\n    --superpower-stories-slide: 40.3rem;\n    --superpower-stories-gap: 5rem;\n  }\n}\n\n/* The current segment's fill runs across once per slide; when it ends, the next slide comes. */\n.superpower-stories-fill {\n  animation: superpower-stories-fill var(--superpower-stories-time, 6s) linear both;\n}\n\n@keyframes superpower-stories-fill {\n  from {\n    transform: scaleX(0);\n  }\n  to {\n    transform: scaleX(1);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .superpower-stories-track {\n    transition: none;\n  }\n  .superpower-stories-fill {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "superpower-stories.tsx",
+      "content": "import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\nimport \"./superpower-stories.css\";\n\nexport interface SuperpowerStory {\n  /** e.g. \"Priya, 41\" */\n  name: string;\n  quote: string;\n  /** a short grey line about what changed */\n  outcome?: string;\n  /** the photo or video still; empty: a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n}\n\nexport interface SuperpowerStoriesProps {\n  /** a small line above the title (a rating) */\n  eyebrow?: ReactNode;\n  title: string;\n  lead?: string;\n  stories: SuperpowerStory[];\n  /** seconds each story stays before the next */\n  seconds?: number;\n  /** label for the segment buttons, followed by the story's number */\n  goToLabel?: string;\n  id?: string;\n  className?: string;\n}\n\nexport function SuperpowerStories({ eyebrow, title, lead, stories, seconds = 6, goToLabel = \"Show story\", id, className }: SuperpowerStoriesProps) {\n  const [index, setIndex] = useState(0);\n  const [hovered, setHovered] = useState(false);\n  const [visible, setVisible] = useState(false);\n  const root = useRef<HTMLElement>(null);\n\n  // Only play while the carousel is on screen.\n  useEffect(() => {\n    const el = root.current;\n    if (!el) return;\n    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.25 });\n    io.observe(el);\n    return () => io.disconnect();\n  }, []);\n\n  const playing = visible && !hovered;\n  const next = () => setIndex((i) => (i + 1) % stories.length);\n\n  return (\n    <section\n      ref={root}\n      id={id}\n      className={cn(\"overflow-x-clip bg-secondary pt-14 pb-[4.5rem] text-foreground lg:py-[7.5rem]\", className)}\n      style={{ \"--superpower-stories-time\": `${seconds}s` } as CSSProperties}\n    >\n      <div className=\"mx-auto max-w-page px-gutter\">\n        {eyebrow && <div className=\"mb-5 text-[0.9375rem]\">{eyebrow}</div>}\n        <h2 className=\"max-w-[38rem] text-[1.5rem] leading-[1.3] font-normal tracking-[-0.02em] lg:text-[2.8125rem] lg:leading-[1.2]\">{title}</h2>\n        {lead && <p className=\"mt-4 max-w-[36rem] text-[1rem] leading-[1.5] text-muted-foreground lg:mt-5 lg:text-[1.0625rem]\">{lead}</p>}\n\n        <div className=\"mt-14 lg:mt-12\" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>\n          <ul className=\"superpower-stories-track flex\" style={{ \"--superpower-stories-index\": index } as CSSProperties}>\n            {stories.map((s, i) => (\n              <li\n                key={s.name}\n                aria-hidden={i !== index}\n                className={cn(\n                  \"relative mr-[var(--superpower-stories-gap)] w-[var(--superpower-stories-slide)] shrink-0 transition-opacity duration-400 motion-reduce:transition-none\",\n                  \"after:absolute after:inset-y-0 after:right-[calc(var(--superpower-stories-gap)/-2)] after:hidden after:w-px after:bg-border lg:after:block\",\n                  i === index ? \"opacity-100\" : \"opacity-50\",\n                )}\n              >\n                <SuperpowerMedia media={s.media} label={s.mediaLabel} className=\"h-60 rounded-sm lg:h-[18.75rem]\" />\n                <div className=\"px-4 pt-9 lg:pt-10\">\n                  <p className=\"text-[0.75rem] leading-[1.4] lg:text-[0.9375rem]\">{s.name}</p>\n                  <blockquote className=\"mt-3.5 text-[0.9375rem] leading-[1.45] lg:mt-4 lg:text-[1.0625rem]\">{s.quote}</blockquote>\n                  {s.outcome && <p className=\"mt-4 text-[0.75rem] leading-[1.45] text-muted-foreground lg:text-[0.875rem]\">{s.outcome}</p>}\n                </div>\n              </li>\n            ))}\n          </ul>\n\n          <div className=\"mt-9 flex items-center gap-6 lg:mt-14\">\n            <div className=\"flex w-[16.75rem] gap-2 lg:w-[40rem]\">\n              {stories.map((s, i) => (\n                <button\n                  key={s.name}\n                  type=\"button\"\n                  aria-label={`${goToLabel} ${i + 1}`}\n                  aria-current={i === index}\n                  onClick={() => setIndex(i)}\n                  className={cn(\n                    \"relative h-[3px] overflow-clip rounded-full bg-border transition-[flex-grow] duration-750 ease-[cubic-bezier(0.45,0,0.55,1)] motion-reduce:transition-none\",\n                    \"before:absolute before:-inset-y-2 before:inset-x-0\",\n                    i === index ? \"grow-[8]\" : \"grow\",\n                  )}\n                >\n                  {i === index && (\n                    <span\n                      key={index}\n                      onAnimationEnd={next}\n                      className={cn(\n                        \"superpower-stories-fill absolute inset-0 origin-left rounded-full bg-foreground motion-reduce:scale-x-100\",\n                        !playing && \"[animation-play-state:paused]\",\n                      )}\n                    />\n                  )}\n                </button>\n              ))}\n            </div>\n            <span className=\"text-[0.8125rem] text-muted-foreground tabular-nums\">\n              {index + 1} / {stories.length}\n            </span>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small line above the title (a rating)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "stories",
+      "type": "SuperpowerStory[]",
+      "required": true
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each story stays before the next"
+    },
+    {
+      "name": "goToLabel",
+      "type": "string",
+      "required": false,
+      "default": "Show story",
+      "description": "label for the segment buttons, followed by the story's number"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d5ec3faa4d59edc1362aa3d19c1857b82ccb70f26635e6e9b02746fd8b250272"
+}

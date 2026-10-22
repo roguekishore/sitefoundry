@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Eight Sleep marquee track",
+  "description": "An endless, slow sideways track: its items run in a single row from right to left at a steady pace and loop without a seam; hovering pauses it. With reduced motion it becomes a plain row you can scroll sideways.",
+  "category": "gallery",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "marquee",
+    "loop",
+    "carousel",
+    "track",
+    "css-only"
+  ],
+  "notes": [
+    "the items are drawn twice (the copy is hidden from screen readers) so the loop has no gap"
+  ],
+  "entry": "eightsleep-marquee.tsx",
+  "source": "foundry",
+  "name": "eightsleep-marquee",
+  "files": [
+    {
+      "path": "eightsleep-marquee.css",
+      "content": "/* The track holds the items twice; moving it by half its width lands on an identical frame. */\n.eightsleep-marquee-track {\n  animation: eightsleep-marquee-run var(--eightsleep-marquee-time, 60s) linear infinite;\n}\n.eightsleep-marquee:hover .eightsleep-marquee-track {\n  animation-play-state: paused;\n}\n\n@keyframes eightsleep-marquee-run {\n  to {\n    translate: -50% 0;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .eightsleep-marquee {\n    overflow-x: auto;\n  }\n  .eightsleep-marquee-track {\n    animation: none;\n  }\n  .eightsleep-marquee-copy {\n    display: none;\n  }\n}\n"
+    },
+    {
+      "path": "eightsleep-marquee.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./eightsleep-marquee.css\";\n\nexport interface EightsleepMarqueeProps {\n  /** the items, in order; each is one slot of the row */\n  items: ReactNode[];\n  /** seconds per full lap */\n  duration?: number;\n  /** gap between items: the default is 15px, wide is 16px on phones and 24px up */\n  gap?: \"default\" | \"wide\";\n  className?: string;\n}\n\nexport function EightsleepMarquee({ items, duration = 60, gap = \"default\", className }: EightsleepMarqueeProps) {\n  const gapClass = gap === \"wide\" ? \"gap-4 pr-4 lg:gap-6 lg:pr-6\" : \"gap-[15px] pr-[15px]\";\n  const row = (copy: boolean) => (\n    <ul className={cn(\"flex shrink-0\", gapClass, copy && \"eightsleep-marquee-copy\")} aria-hidden={copy || undefined}>\n      {items.map((item, i) => (\n        <li key={i} className=\"shrink-0\">\n          {item}\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <div className={cn(\"eightsleep-marquee overflow-x-clip\", className)} style={{ \"--eightsleep-marquee-time\": `${duration}s` } as CSSProperties}>\n      <div className=\"eightsleep-marquee-track flex w-max\">\n        {row(false)}\n        {row(true)}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the items, in order; each is one slot of the row"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "60",
+      "description": "seconds per full lap"
+    },
+    {
+      "name": "gap",
+      "type": "enum",
+      "required": false,
+      "default": "default",
+      "description": "gap between items: the default is 15px, wide is 16px on phones and 24px up"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "518a67b2416d772dd4e27dca43756e1272167bc0fa95340467c892aa0076ad3e"
+}

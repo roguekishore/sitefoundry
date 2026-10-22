@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp customer wall",
+  "description": "A two-tone social-proof line with a 'read more' arrow link, then a wall of square hairline tiles holding grey customer wordmarks (six by two on desktop, three across on phones) beside a tall photo card with a big white stat. Tiles fade in one after another as the wall scrolls into view; linked tiles carry a small round arrow chip.",
+  "category": "logos",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "grid",
+    "tiles",
+    "stat",
+    "light",
+    "minimal",
+    "reveal",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "the stat card's photo is a media slot; empty, it shows a grey-to-ink gradient so the white stat stays readable",
+    "the staggered fade is a CSS scroll-driven animation; browsers without it show every tile"
+  ],
+  "entry": "ramp-logos.tsx",
+  "source": "foundry",
+  "name": "ramp-logos",
+  "files": [
+    {
+      "path": "ramp-logos.css",
+      "content": "/* Entering view: each tile fades in; later tiles start later (per-tile range offset set\n   inline as --ramp-logos-at). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ramp-logos-tile {\n      animation: ramp-logos-fade linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--ramp-logos-at, 0) * 1%) cover calc(20% + var(--ramp-logos-at, 0) * 1%);\n    }\n  }\n}\n\n@keyframes ramp-logos-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "ramp-logos.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowRight, ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\nimport \"./ramp-logos.css\";\n\nexport interface RampLogo {\n  /** the customer's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n  /** makes the tile a link and shows the arrow chip */\n  href?: string;\n}\n\nexport interface RampLogosProps {\n  /** the line's first clause, in ink */\n  lead: string;\n  /** the rest, in hushed grey */\n  rest?: string;\n  /** the arrow link under it */\n  link?: { label: string; href: string };\n  /** twelve tiles read best (six by two on desktop, three by four on phones) */\n  logos: RampLogo[];\n  /** the tall card beside the tiles */\n  story?: {\n    /** the photo behind; empty shows a gradient placeholder */\n    media?: ReactNode;\n    /** a small label over the photo, e.g. the customer's name */\n    label?: ReactNode;\n    /** the big figure, e.g. \"$2.4M\" */\n    stat: string;\n    /** the line under it */\n    caption: string;\n    href?: string;\n  };\n  className?: string;\n}\n\n/** Ramp's customer wall: a statement, then hairline tiles of wordmarks and one photo stat card. */\nexport function RampLogos({ lead, rest, link, logos, story, className }: RampLogosProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[calc(var(--section-y)*2)] pb-section lg:px-[calc(var(--page-gutter)*4)] lg:pt-[calc(var(--section-y)*1.75)] lg:pb-[calc(var(--section-y)*1.5)]\">\n        <RampHeading size=\"row\" lead={lead} rest={rest} className=\"max-w-[20rem] lg:max-w-[33rem]\" />\n        {link && (\n          <RampButton variant=\"link\" href={link.href} className=\"mt-6 lg:mt-8\">\n            {link.label}\n          </RampButton>\n        )}\n\n        <div className=\"mt-12 grid grid-cols-3 gap-0.5 lg:mt-12 lg:grid-cols-8\">\n          {logos.map((l, i) => {\n            const Tile = l.href ? \"a\" : \"div\";\n            return (\n              <Tile\n                key={l.name}\n                href={l.href}\n                aria-label={l.name}\n                className=\"ramp-logos-tile group relative grid aspect-square place-items-center rounded-lg border border-border bg-card px-3 text-muted-foreground/70 transition-colors duration-300 hover:bg-muted\"\n                style={{ \"--ramp-logos-at\": (i % 6) * 3 + Math.floor(i / 6) * 6 } as CSSProperties}\n              >\n                {l.logo}\n                {l.href && (\n                  <span aria-hidden className=\"absolute top-3 right-3 grid size-6 place-items-center rounded-full bg-muted text-foreground transition-colors duration-300 group-hover:bg-foreground group-hover:text-background\">\n                    <ArrowRight className=\"size-3\" strokeWidth={2} />\n                  </span>\n                )}\n              </Tile>\n            );\n          })}\n\n          {story && (\n            <a\n              href={story.href}\n              className=\"group relative col-span-3 mt-0.5 aspect-[4/3] overflow-clip rounded-lg bg-muted text-background lg:col-span-2 lg:col-start-7 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:aspect-auto\"\n            >\n              <div className=\"absolute inset-0 transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none\">\n                {story.media ?? <div aria-hidden className=\"size-full bg-gradient-to-b from-muted-foreground/50 via-foreground/70 to-foreground\" />}\n              </div>\n              <div className=\"absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-foreground/40\" aria-hidden />\n              <span aria-hidden className=\"absolute top-3 right-3 grid size-6 place-items-center rounded-full bg-background/20 backdrop-blur\">\n                <ArrowUpRight className=\"size-3\" strokeWidth={2} />\n              </span>\n              <div className=\"absolute inset-x-6 bottom-6\">\n                {story.label && <div className=\"flex items-center gap-1.5 text-xs [&_svg]:size-3.5\">{story.label}</div>}\n                <p className=\"mt-1 font-display text-[3rem]/[1] tracking-[-0.02em] lg:text-[4rem]\">{story.stat}</p>\n                <p className=\"mt-2 text-base text-background/75\">{story.caption}</p>\n              </div>\n            </a>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the line's first clause, in ink"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the rest, in hushed grey"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the arrow link under it"
+    },
+    {
+      "name": "logos",
+      "type": "RampLogo[]",
+      "required": true,
+      "description": "twelve tiles read best (six by two on desktop, three by four on phones)"
+    },
+    {
+      "name": "story",
+      "type": "{ media?: ReactNode; label?: ReactNode; stat: string; caption: string; href?: string; }",
+      "required": false,
+      "description": "the tall card beside the tiles"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dc31da4e761078e0e8951f27caf7d41a3edca4f2161a807092225388d4dd4711"
+}

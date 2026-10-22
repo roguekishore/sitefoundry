@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio pinned quote",
+  "description": "A white framed stage with a faint 12px dot grid that pins under the header for half a screen of scrolling while a big centred serif quote inks in word by word, pale grey to full black; the speaker's name and role sit small underneath.",
+  "category": "testimonials",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "serif",
+    "light",
+    "sticky",
+    "pinned",
+    "scrubbed",
+    "text-reveal",
+    "dots",
+    "minimal"
+  ],
+  "notes": [
+    "the serif comes from the theme's --attio-serif, falling back to the display face",
+    "the wrapper is 1.5 window heights; the stage is one window minus a 100px / 116px header",
+    "CSS only; without scroll timelines (or with reduced motion) the quote is simply dark"
+  ],
+  "entry": "attio-quote.tsx",
+  "source": "foundry",
+  "name": "attio-quote",
+  "files": [
+    {
+      "path": "attio-quote.css",
+      "content": "/* While the stage is pinned, the quote's words darken from pale grey to full ink in reading\n   order. Each word has its own slice of the wrapper's scroll (set inline as --attio-quote-a\n   and --attio-quote-b). Without scroll timelines the words are simply dark. */\n@supports (animation-timeline: view()) {\n  .attio-quote-track {\n    view-timeline-name: --attio-quote;\n  }\n  .attio-quote-word {\n    animation: attio-quote-ink linear both;\n    animation-timeline: --attio-quote;\n    animation-range: cover var(--attio-quote-a) cover var(--attio-quote-b);\n  }\n}\n\n@keyframes attio-quote-ink {\n  from { color: color-mix(in oklab, var(--muted-foreground) 50%, transparent); }\n  to { color: var(--foreground); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-quote-word {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-quote.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./attio-quote.css\";\n\nexport interface AttioQuoteProps {\n  /** the quote, with its own quotation marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role and company, on the line under */\n  role?: string;\n  className?: string;\n}\n\n/**\n * A white stage with a faint dot grid that pins under the header for about half a screen of\n * scrolling while a big serif quote inks in word by word; the speaker's name and role sit\n * small underneath.\n */\nexport function AttioQuote({ quote, name, role, className }: AttioQuoteProps) {\n  const words = quote.split(/\\s+/).filter(Boolean);\n  // each word darkens over a short slice of the pinned stretch, in reading order\n  const slice = (i: number): CSSProperties =>\n    ({\n      \"--attio-quote-a\": `${30 + (i / words.length) * 28}%`,\n      \"--attio-quote-b\": `${36 + (i / words.length) * 28}%`,\n    }) as CSSProperties;\n\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"attio-quote-track mx-auto h-[150svh] max-w-page border-b border-border lg:border-x\">\n        <div className=\"sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] flex-col items-center justify-center bg-[radial-gradient(var(--border)_1px,transparent_1.2px)] bg-[size:12px_12px] px-gutter text-center lg:top-[7.25rem] lg:h-[calc(100svh-7.25rem)]\">\n          <blockquote className=\"max-w-[20rem] font-[family-name:var(--attio-serif,var(--typeface-display))] text-[2rem] leading-[1.13] tracking-[-0.01em] text-balance sm:max-w-[45rem] lg:text-5xl lg:leading-[1.08] lg:tracking-[-0.015em]\">\n            {words.map((w, i) => (\n              <span key={i} className=\"attio-quote-word\" style={slice(i)}>\n                {w}\n                {i < words.length - 1 ? \" \" : \"\"}\n              </span>\n            ))}\n          </blockquote>\n          <p className=\"mt-11 text-sm font-semibold tracking-[-0.01em] lg:mt-14\">{name}</p>\n          {role && <p className=\"mt-1 text-sm font-medium tracking-[-0.01em] text-foreground/85\">{role}</p>}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "quote",
+      "type": "string",
+      "required": true,
+      "description": "the quote, with its own quotation marks"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "who said it"
+    },
+    {
+      "name": "role",
+      "type": "string",
+      "required": false,
+      "description": "their role and company, on the line under"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "25cfa6766773a4111d12639d708d4daf9de110a5cf30c7a26c1f3880d59b4c0c"
+}

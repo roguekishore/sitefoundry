@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Base Power media slot",
+  "description": "A frame for a photo, video or illustration that takes its size, ratio and radius from the caller. Empty, it is a plainly-marked placeholder: a translucent ink tint on light bands, or a mid grey on the background colour for frames that sit under a dark scrim.",
+  "category": "card",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video"
+  ],
+  "notes": [
+    "pass an <img> or <video> as media; it is stretched to cover the frame (or contained with fit)",
+    "use tone photo inside a dark-scoped band"
+  ],
+  "entry": "basepowercompany-media.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-media",
+  "files": [
+    {
+      "path": "basepowercompany-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface BasepowercompanyMediaProps {\n  /** the photo, video or illustration; it covers the frame (contain: set fit) */\n  media?: ReactNode;\n  /** how a given media fills the frame */\n  fit?: \"cover\" | \"contain\";\n  /**\n   * placeholder look: light (a translucent ink tint for light bands) or photo (a mid grey on\n   * the background colour, for frames under a dark scrim)\n   */\n  tone?: \"light\" | \"photo\";\n  /** describes the placeholder for screen readers (ignored when media is given) */\n  label?: string;\n  /** size, ratio and radius of the frame */\n  className?: string;\n  /** anything drawn over the media (scrims, captions) */\n  children?: ReactNode;\n}\n\nexport function BasepowercompanyMedia({ media, fit = \"cover\", tone = \"light\", label, className, children }: BasepowercompanyMediaProps) {\n  return (\n    <div className={cn(\"relative overflow-clip\", className)}>\n      {media ? (\n        <div\n          className={cn(\n            \"absolute inset-0 [&>img]:size-full [&>video]:size-full\",\n            fit === \"cover\" ? \"[&>img]:object-cover [&>video]:object-cover\" : \"[&>img]:object-contain [&>video]:object-contain\",\n          )}\n        >\n          {media}\n        </div>\n      ) : (\n        <div\n          role={label ? \"img\" : undefined}\n          aria-label={label}\n          className={cn(\"absolute inset-0\", tone === \"light\" ? \"bg-muted-foreground/25\" : \"bg-background\")}\n        >\n          {tone === \"photo\" && <div className=\"absolute inset-0 bg-muted-foreground/40\" />}\n        </div>\n      )}\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo, video or illustration; it covers the frame (contain: set fit)"
+    },
+    {
+      "name": "fit",
+      "type": "enum",
+      "required": false,
+      "default": "cover",
+      "description": "how a given media fills the frame"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "placeholder look: light (a translucent ink tint for light bands) or photo (a mid grey on\nthe background colour, for frames under a dark scrim)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers (ignored when media is given)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, ratio and radius of the frame"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "anything drawn over the media (scrims, captions)"
+    }
+  ],
+  "hash": "7d94c7292fffd0f8b8c55aa635565c66b987db5a80f42ea95d077a7b45f6de66"
+}

@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp header",
+  "description": "A white 64px top bar with a hairline under it: lowercase wordmark, uppercase mono menu items with small chevrons, a sign-in link, a citron 'book a demo' button and a solid ink button. It sticks to the top; once the first screen has scrolled by (desktop), the menu slides up and a brand-blue bar of bracket-keyed jump links with a white button slides down in its place. A 2px brand line along the bottom of the window grows with page scroll, and vertical margin notes sit at both window edges on wide screens.",
+  "category": "header",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "mono",
+    "uppercase",
+    "square",
+    "blue",
+    "subnav",
+    "scroll",
+    "progress",
+    "developer",
+    "hover"
+  ],
+  "notes": [
+    "the menu-to-jump-bar swap and the progress line are CSS scroll-driven animations on the page scroll (scroll(root)); without support the plain menu stays and the line is hidden",
+    "the phone menu is a native <details> disclosure, so it works without JavaScript",
+    "margin notes only show from 1300px wide"
+  ],
+  "entry": "warp-header.tsx",
+  "source": "foundry",
+  "name": "warp-header",
+  "files": [
+    {
+      "path": "warp-header.css",
+      "content": "/* Desktop: after the first screen the menu slides up out of the bar and the jump bar slides\n   down into it (scrubbed over the last 64px of the first screen). The progress line grows\n   with the page scroll. Both follow the page's own scroll position. */\n.warp-header-progress {\n  display: none;\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .warp-header-progress {\n      display: block;\n      transform-origin: 0 50%;\n      animation: warp-header-grow linear both;\n      animation-timeline: scroll(root block);\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .warp-header-main {\n      animation: warp-header-out linear both;\n      animation-timeline: scroll(root block);\n      animation-range: calc(100svh - 128px) calc(100svh - 64px);\n    }\n    .warp-header-jumps {\n      display: flex;\n      animation: warp-header-in linear both;\n      animation-timeline: scroll(root block);\n      animation-range: calc(100svh - 128px) calc(100svh - 64px);\n    }\n  }\n}\n\n@keyframes warp-header-grow {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n@keyframes warp-header-out {\n  from { translate: 0 0; }\n  to { translate: 0 -100%; }\n}\n@keyframes warp-header-in {\n  from { translate: 0 -100%; }\n  to { translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "warp-header.tsx",
+      "content": "import { ChevronDown, ChevronUp, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpButton } from \"@foundry/warp-button\";\nimport { WarpMark, type WarpMarkProps } from \"@foundry/warp-mark\";\nimport \"./warp-header.css\";\n\nexport interface WarpHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron, as for items that open a menu */\n  menu?: boolean;\n}\n\nexport interface WarpHeaderJump {\n  /** the bracketed key shown before the label, e.g. \"C\" */\n  key: string;\n  label: string;\n  /** usually an anchor on the page, e.g. \"#config\" */\n  href: string;\n}\n\nexport interface WarpHeaderProps {\n  /** the logo */\n  mark: WarpMarkProps;\n  /** the main menu, left after the logo */\n  links: WarpHeaderLink[];\n  /** a quiet link with a chevron before the buttons (e.g. sign in) */\n  signIn?: { label: string; href: string };\n  /** the citron button */\n  demo: { label: string; href: string };\n  /** the solid ink button at the far right */\n  cta: { label: string; href: string };\n  /** jump links of the brand-blue bar that replaces the menu after the first screen (desktop) */\n  jumps?: WarpHeaderJump[];\n  /** the white button at the right of the jump bar */\n  jumpCta?: { label: string; href: string };\n  /** a short note set vertically at both window edges on wide screens */\n  marginNote?: string;\n  /** show the scroll progress line along the bottom of the window */\n  progress?: boolean;\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst navLink =\n  \"flex items-center gap-1 text-[0.8125rem] font-medium tracking-[calc(0.1em_-_var(--warp-squeeze,0em))] uppercase transition-colors duration-150 ease-out hover:text-primary motion-reduce:transition-none\";\n\n/** Warp's top bar: sticky, swaps to a jump bar after the first screen, with a scroll progress line. */\nexport function WarpHeader({ mark, links, signIn, demo, cta, jumps = [], jumpCta, marginNote, progress = true, menuLabel, className }: WarpHeaderProps) {\n  return (\n    <>\n      <header className={cn(\"sticky top-0 z-40 h-16 overflow-clip border-b border-border bg-card text-foreground\", className)}>\n        <div className=\"warp-header-main relative mx-auto flex h-16 max-w-page items-center justify-between gap-6 px-gutter lg:px-6\">\n          <div className=\"flex items-center gap-9\">\n            <WarpMark {...mark} />\n            <nav className=\"hidden items-center gap-10 lg:flex\">\n              {links.map((l) => (\n                <a key={l.label} href={l.href} className={navLink}>\n                  {l.label}\n                  {l.menu && <ChevronDown aria-hidden className=\"size-3.5\" strokeWidth={1.75} />}\n                </a>\n              ))}\n            </nav>\n          </div>\n\n          <div className=\"flex items-center gap-4\">\n            {signIn && (\n              <a href={signIn.href} className={cn(navLink, \"mr-2 hidden lg:flex\")}>\n                {signIn.label}\n                <ChevronDown aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n              </a>\n            )}\n            <WarpButton href={demo.href} variant=\"citron\" size=\"sm\">\n              {demo.label}\n            </WarpButton>\n            <WarpButton href={cta.href} size=\"sm\" className=\"hidden lg:inline-flex\" icon={<ChevronUp aria-hidden className=\"size-3.5\" strokeWidth={2.25} />}>\n              {cta.label}\n            </WarpButton>\n\n            <details className=\"group lg:hidden\">\n              <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n                <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.5} />\n                <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.5} />\n              </summary>\n              <div className=\"fixed inset-x-0 top-16 border-b border-border bg-card px-gutter pt-2 pb-6\">\n                <nav className=\"flex flex-col\">\n                  {links.map((l) => (\n                    <a key={l.label} href={l.href} className={cn(navLink, \"justify-between border-b border-border py-4\")}>\n                      {l.label}\n                      {l.menu && <ChevronDown aria-hidden className=\"size-4 -rotate-90\" strokeWidth={1.75} />}\n                    </a>\n                  ))}\n                  {signIn && (\n                    <a href={signIn.href} className={cn(navLink, \"border-b border-border py-4\")}>\n                      {signIn.label}\n                    </a>\n                  )}\n                </nav>\n                <WarpButton href={cta.href} className=\"mt-5 w-full\">\n                  {cta.label}\n                </WarpButton>\n              </div>\n            </details>\n          </div>\n        </div>\n\n        {jumps.length > 0 && (\n          <div className=\"warp-header-jumps absolute inset-0 hidden -translate-y-full bg-primary text-primary-foreground\">\n            <div className=\"mx-auto flex w-full max-w-page items-center justify-between gap-6 px-6\">\n              <nav className=\"flex items-center gap-5\">\n                {jumps.map((j) => (\n                  <a key={j.key} href={j.href} className=\"group flex items-center gap-3 font-display text-[0.9375rem] font-semibold tracking-[-0.01em]\">\n                    <span className=\"flex h-[1.125rem] min-w-6 items-center justify-center border border-primary-foreground/40 px-1 font-mono text-[0.5rem] font-semibold transition-colors duration-150 group-hover:bg-primary-foreground group-hover:text-primary motion-reduce:transition-none\">\n                      [{j.key}]\n                    </span>\n                    {j.label}\n                  </a>\n                ))}\n              </nav>\n              {jumpCta && (\n                <WarpButton href={jumpCta.href} variant=\"inverse\" size=\"sm\">\n                  {jumpCta.label}\n                </WarpButton>\n              )}\n            </div>\n          </div>\n        )}\n      </header>\n\n      {progress && <div aria-hidden className=\"warp-header-progress pointer-events-none fixed inset-x-0 bottom-0 z-40 h-0.5 bg-primary\" />}\n\n      {marginNote && (\n        <>\n          <p aria-hidden className=\"pointer-events-none fixed top-1/2 left-3 z-30 hidden -translate-y-1/2 rotate-180 font-mono text-[0.5625rem] tracking-[0.3em] text-foreground/40 uppercase [writing-mode:vertical-rl] min-[1300px]:block\">\n            {marginNote}\n          </p>\n          <p aria-hidden className=\"pointer-events-none fixed top-1/2 right-3 z-30 hidden -translate-y-1/2 font-mono text-[0.5625rem] tracking-[0.3em] text-foreground/40 uppercase [writing-mode:vertical-rl] min-[1300px]:block\">\n            {marginNote}\n          </p>\n        </>\n      )}\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-button",
+    "warp-mark"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "WarpMarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "links",
+      "type": "WarpHeaderLink[]",
+      "required": true,
+      "description": "the main menu, left after the logo"
+    },
+    {
+      "name": "signIn",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a quiet link with a chevron before the buttons (e.g. sign in)"
+    },
+    {
+      "name": "demo",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the citron button"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the solid ink button at the far right"
+    },
+    {
+      "name": "jumps",
+      "type": "WarpHeaderJump[]",
+      "required": false,
+      "default": "[]",
+      "description": "jump links of the brand-blue bar that replaces the menu after the first screen (desktop)"
+    },
+    {
+      "name": "jumpCta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white button at the right of the jump bar"
+    },
+    {
+      "name": "marginNote",
+      "type": "string",
+      "required": false,
+      "description": "a short note set vertically at both window edges on wide screens"
+    },
+    {
+      "name": "progress",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the scroll progress line along the bottom of the window"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d9e1a3bc5091b1065d072ec1f1c5cb3ee8eec8a77a085bedbbd1ab7badae86ec"
+}

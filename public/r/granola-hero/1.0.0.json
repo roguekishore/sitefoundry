@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola hero",
+  "description": "A two-screen editorial hero on white: a pill badge, a huge light serif headline, a short lead and an olive pill on the left; on the right a tall app window pinned in place with art cards fanned behind it and a call strip on its edge. As you scroll the window settles (shrinks from 1.2× and slides in), the art drifts in and fades, the strip rises in parallax, and a second screen of ruled icon rows inside a dashed frame scrolls up beside it.",
+  "category": "hero",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "editorial",
+    "serif",
+    "sticky",
+    "pinned",
+    "scroll",
+    "scrubbed",
+    "parallax",
+    "ruled",
+    "minimal"
+  ],
+  "notes": [
+    "200svh tall: two window-height rows beside a pinned column on desktop; on phones the copy, a 125svh pinned track for the window, then the rows",
+    "window, call strip and three art cards are media slots; empty, they are plain token surfaces at the original's sizes",
+    "all motion is a CSS view timeline on the section; without support, or with reduced motion, the window sits settled and the art stays visible",
+    "leaves 56px at the top for a fixed header"
+  ],
+  "entry": "granola-hero.tsx",
+  "source": "foundry",
+  "name": "granola-hero",
+  "files": [
+    {
+      "path": "granola-hero.css",
+      "content": "/* The hero is two screens tall and its scroll position drives everything (a view timeline on the\n   section; ranges in window heights, so phones and desktops settle at the same scroll). While the\n   second half of the first screen scrolls away, the pinned app window\n   settles: on desktop it shrinks from 1.2× and slides in from up-right; on phones it shrinks to\n   0.8×. The art cards behind it drift towards it, shrink to 0.75× and fade. The call strip on\n   the window's edge rises 130px a little more slowly (parallax). Without scroll timelines, or\n   with reduced motion, everything sits at its settled place and the art stays visible. */\n.granola-hero {\n  view-timeline: --granola-hero block;\n}\n\n.granola-hero-dash {\n  background-image: repeating-linear-gradient(to bottom, var(--border) 0 8px, transparent 8px 22px);\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .granola-hero-window,\n    .granola-hero-art {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --granola-hero;\n      animation-range: contain 50vh contain 100vh;\n    }\n    .granola-hero-window {\n      animation-name: granola-hero-window-sm;\n    }\n    .granola-hero-art {\n      animation-name: granola-hero-art;\n    }\n    .granola-hero-strip {\n      animation: granola-hero-strip linear both;\n      animation-timeline: --granola-hero;\n      animation-range: contain 50vh contain 150vh;\n    }\n    @media (min-width: 64rem) {\n      .granola-hero-window {\n        animation-name: granola-hero-window-lg;\n      }\n    }\n  }\n}\n\n@keyframes granola-hero-window-sm {\n  from { transform: none; }\n  to { transform: scale(0.8); }\n}\n\n@keyframes granola-hero-window-lg {\n  from { transform: translate(25%, -9.4%) scale(1.2); }\n  to { transform: none; }\n}\n\n@keyframes granola-hero-art {\n  from { transform: none; opacity: 1; }\n  to { transform: translate(var(--gx, 0), var(--gy, 0)) scale(0.75); opacity: 0; }\n}\n\n@keyframes granola-hero-strip {\n  from { transform: translateY(27px); }\n  to { transform: translateY(-103px); }\n}\n"
+    },
+    {
+      "path": "granola-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowDown, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaButton } from \"@foundry/granola-button\";\nimport { GranolaMedia } from \"@foundry/granola-media\";\nimport \"./granola-hero.css\";\n\nexport interface GranolaHeroRow {\n  /** a line icon at the start of the row (e.g. a lucide icon) */\n  icon: ReactNode;\n  /** the row text; wrap the words to stress in <strong> */\n  text: ReactNode;\n}\n\nexport interface GranolaHeroProps {\n  /** the small pill above the headline: a highlighted tag, a label and its link */\n  badge?: { tag: string; label: string; href: string };\n  /** the big serif headline */\n  title: string;\n  /** one or two short lines under the headline (a line break starts the second) */\n  lead: string;\n  /** the olive call to action */\n  cta: { label: string; href: string };\n  /** the small line under the button, with an optional icon */\n  note?: { label: string; icon?: ReactNode };\n  /** the app window (a screenshot or video, portrait 4:6); a plain oat card while empty */\n  app?: ReactNode;\n  /** the narrow video-call strip that sits over the window's right edge */\n  callStrip?: ReactNode;\n  /** up to three art cards fanned out behind the window; plain surfaces while empty */\n  art?: [ReactNode?, ReactNode?, ReactNode?];\n  /** the second screen: a serif heading and a list of icon rows between hairlines */\n  features: {\n    heading: string;\n    rows: GranolaHeroRow[];\n    /** empty hairline rows drawn after the list, as a ruled-paper tail */\n    emptyRows?: number;\n  };\n  className?: string;\n}\n\n/* Where each art card sits around the window (phone / desktop) and where it drifts to as it fades. */\nconst ART = [\n  \"left-[-4.5%] top-[-6%] h-[71%] w-[60%] [--gx:90px] [--gy:60px] lg:left-[-8.6%] lg:top-[1%] lg:h-[119%] lg:w-[98%] lg:[--gx:80px] lg:[--gy:20px]\",\n  \"left-[66%] top-[-3%] h-[73%] w-[60%] [--gx:-120px] [--gy:60px] lg:left-[39%] lg:top-[-15.5%] lg:h-[142%] lg:w-[120%] lg:[--gx:-110px] lg:[--gy:30px]\",\n  \"left-[74%] top-[66%] h-[67%] w-[80%] [--gx:-150px] [--gy:-150px] lg:left-[42.7%] lg:top-[98.6%] lg:h-[115%] lg:w-[138%] lg:[--gx:-150px] lg:[--gy:-200px]\",\n];\nconst ART_TONE = [\n  \"bg-[linear-gradient(180deg,color-mix(in_oklab,var(--highlight)_80%,var(--background))_0_58%,color-mix(in_oklab,var(--foreground)_88%,var(--background))_58%)]\",\n  \"bg-[linear-gradient(160deg,color-mix(in_oklab,var(--chart-2)_75%,var(--foreground)),color-mix(in_oklab,var(--chart-3)_60%,var(--foreground))_60%,color-mix(in_oklab,var(--chart-4)_50%,var(--foreground)))]\",\n  \"bg-muted\",\n];\n\nexport function GranolaHero({ badge, title, lead, cta, note, app, callStrip, art = [], features, className }: GranolaHeroProps) {\n  return (\n    <section className={cn(\"granola-hero relative overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid w-full max-w-[calc(var(--page-width)_+_2*var(--page-gutter))] px-gutter lg:grid-cols-2 lg:grid-rows-[100svh_100svh]\">\n        {/* first screen: the pitch */}\n        <div className=\"flex flex-col pt-24 pb-12 lg:col-start-1 lg:row-start-1 lg:justify-center lg:pt-14 lg:pb-0\">\n          {badge && (\n            <a\n              href={badge.href}\n              className=\"group/badge inline-flex w-fit items-center gap-2 rounded-full bg-accent py-1 pr-3 pl-1 text-[0.8125rem] transition-colors duration-150 hover:bg-secondary motion-reduce:transition-none\"\n            >\n              <span className=\"rounded-full bg-highlight px-2 py-0.5 text-xs font-medium text-highlight-foreground\">{badge.tag}</span>\n              {badge.label}\n              <ArrowRight aria-hidden className=\"size-3.5 transition-transform duration-150 group-hover/badge:translate-x-0.5 motion-reduce:transition-none\" />\n            </a>\n          )}\n          <h1 className=\"mt-6 font-display text-[clamp(2.5rem,12vw,4.5rem)] leading-[0.96] tracking-[-0.01em] text-balance lg:mt-8 lg:max-w-[12ch] lg:text-[min(6vw,6rem)] lg:leading-[0.95]\">\n            {title}\n          </h1>\n          <p className=\"mt-6 text-lg leading-snug whitespace-pre-line lg:mt-10 lg:text-xl lg:leading-7\">{lead}</p>\n          <GranolaButton href={cta.href} variant=\"brand\" size=\"lg\" trailingIcon={<ArrowDown />} className=\"mt-8 w-full sm:w-fit lg:mt-9\">\n            {cta.label}\n          </GranolaButton>\n          {note && (\n            <p className=\"mt-6 flex items-center gap-2 text-[0.8125rem] text-muted-foreground lg:mt-7 [&_svg]:size-[1.125rem] [&_svg]:stroke-[1.5]\">\n              {note.icon}\n              {note.label}\n            </p>\n          )}\n        </div>\n\n        {/* the window: pinned while the page scrolls past it (on desktop across both screens) */}\n        <div className=\"h-[125svh] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-auto\">\n          <div className=\"sticky top-36 lg:top-0 lg:flex lg:h-svh lg:items-center lg:justify-center lg:pt-6\">\n            <div className=\"relative aspect-[4/6] w-full lg:w-[min(64%,46svh)]\">\n              {ART.map((place, i) => (\n                <div key={place} className={cn(\"granola-hero-art absolute\", place)}>\n                  <GranolaMedia className={cn(\"size-full rounded-sm\", ART_TONE[i])}>{art[i]}</GranolaMedia>\n                </div>\n              ))}\n              <div className=\"granola-hero-window absolute inset-0 z-10 origin-top\">\n                <GranolaMedia\n                  tone=\"oat\"\n                  className=\"size-full rounded-2xl shadow-[0_20px_25px_-5px_color-mix(in_oklab,var(--foreground)_10%,transparent),0_8px_10px_-6px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\"\n                >\n                  {app}\n                </GranolaMedia>\n                <div className=\"granola-hero-strip absolute top-[34%] left-[80%] h-[34%] w-[24%] lg:top-[55%] lg:left-[86%] lg:h-[40%] lg:w-[28%]\">\n                  <GranolaMedia tone=\"ink\" className=\"size-full rounded-xl ring-4 ring-foreground\">\n                    {callStrip}\n                  </GranolaMedia>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        {/* second screen: the ruled list, drawn across the full frame under the pinned window */}\n        <div className=\"relative -mx-gutter pt-16 lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:-mx-gutter lg:pt-[25svh] xl:-mx-10\">\n          <span aria-hidden className=\"granola-hero-dash absolute inset-y-0 left-0 w-px\" />\n          <span aria-hidden className=\"granola-hero-dash absolute inset-y-0 right-0 w-px\" />\n          <h2 className=\"px-gutter font-display text-4xl leading-none tracking-[-0.01em] text-balance lg:max-w-[20ch] lg:px-gutter lg:text-5xl xl:px-10\">\n            {features.heading}\n          </h2>\n          <ul className=\"mt-16 lg:mt-24\">\n            {features.rows.map((row, i) => (\n              <li\n                key={i}\n                className=\"flex min-h-20 items-center gap-4 border-t border-foreground/10 px-gutter py-3 text-base leading-snug lg:gap-5 lg:px-gutter lg:text-sm xl:px-10 [&_strong]:font-medium [&>svg]:size-10 [&>svg]:shrink-0 [&>svg]:stroke-[1.25]\"\n              >\n                {row.icon}\n                <p className=\"max-w-[34ch] lg:max-w-none\">{row.text}</p>\n              </li>\n            ))}\n            {Array.from({ length: features.emptyRows ?? 2 }, (_, i) => (\n              <li key={`empty-${i}`} aria-hidden className=\"h-20 border-t border-foreground/10\" />\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-button",
+    "granola-media"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ tag: string; label: string; href: string; }",
+      "required": false,
+      "description": "the small pill above the headline: a highlighted tag, a label and its link"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big serif headline"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one or two short lines under the headline (a line break starts the second)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the olive call to action"
+    },
+    {
+      "name": "note",
+      "type": "{ label: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "the small line under the button, with an optional icon"
+    },
+    {
+      "name": "app",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the app window (a screenshot or video, portrait 4:6); a plain oat card while empty"
+    },
+    {
+      "name": "callStrip",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the narrow video-call strip that sits over the window's right edge"
+    },
+    {
+      "name": "art",
+      "type": "[ReactNode?, ReactNode?, ReactNode?]",
+      "required": false,
+      "default": "[]",
+      "description": "up to three art cards fanned out behind the window; plain surfaces while empty"
+    },
+    {
+      "name": "features",
+      "type": "{ heading: string; rows: GranolaHeroRow[]; emptyRows?: number | undefined; }",
+      "required": true,
+      "description": "the second screen: a serif heading and a list of icon rows between hairlines"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "18ea089afba3a67959210eef8f8d7abd1bc859da6a48d6d78ab980b61955a1cb"
+}

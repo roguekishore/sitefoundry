@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Eight Sleep media slot",
+  "description": "A frame for a photo or video that fills its box like object-fit: cover. Empty, it is a plain token-coloured placeholder: a muted surface, a soft glow-to-pale sky, a black-to-navy night, or a faint surface on dark.",
+  "category": "card",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video",
+    "cover"
+  ],
+  "notes": [
+    "the parent sets size, aspect ratio and radius; the slot fills it"
+  ],
+  "entry": "eightsleep-media.tsx",
+  "source": "foundry",
+  "name": "eightsleep-media",
+  "files": [
+    {
+      "path": "eightsleep-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EightsleepMediaProps {\n  /** an <img> or <video>; it is stretched to cover the frame */\n  media?: ReactNode;\n  /** placeholder look when empty: a muted-grey surface · sky (glow to pale) · night (black to navy) · faint (a light veil, for dark scopes) · inverse (a dark veil, for light cards inside dark scopes) */\n  tone?: \"muted\" | \"sky\" | \"night\" | \"faint\" | \"inverse\";\n  className?: string;\n}\n\nconst tones = {\n  muted: \"bg-muted-foreground/25\",\n  sky: \"bg-glow bg-linear-to-b from-transparent from-20% to-foreground/45\",\n  night: \"bg-linear-to-b from-background via-secondary to-accent\",\n  faint: \"bg-foreground/10\",\n  inverse: \"bg-background/10\",\n};\n\nexport function EightsleepMedia({ media, tone = \"muted\", className }: EightsleepMediaProps) {\n  return (\n    <div className={cn(\"relative overflow-clip\", !media && tones[tone], className)} aria-hidden={media ? undefined : true}>\n      {media && <div className=\"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">{media}</div>}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an <img> or <video>; it is stretched to cover the frame"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "placeholder look when empty: a muted-grey surface · sky (glow to pale) · night (black to navy) · faint (a light veil, for dark scopes) · inverse (a dark veil, for light cards inside dark scopes)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dc62cddab0ad8e4dcdc46046a27a877c87c0da9b006f021d41f5b6dd4bb53bf8"
+}

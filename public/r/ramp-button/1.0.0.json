@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Ramp button",
+  "description": "Flat, small-radius buttons at one weight: an acid-lime primary, a near-black solid, a warm light-grey secondary, a frosted glass pill for media, and a hushed text link whose arrow nudges right on hover. Colour changes ease over 0.3s.",
+  "category": "button",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "flat",
+    "minimal",
+    "lime",
+    "fintech",
+    "hover"
+  ],
+  "notes": [
+    "glass is meant for photo or video backdrops",
+    "link is the 'Read more →' style used under headings"
+  ],
+  "entry": "ramp-button.tsx",
+  "source": "foundry",
+  "name": "ramp-button",
+  "files": [
+    {
+      "path": "ramp-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RampButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: acid-lime fill · solid: near-black fill · secondary: warm light-grey fill ·\n   * glass: frosted pill with a play icon, for media · link: hushed text with a trailing arrow\n   */\n  variant?: \"primary\" | \"solid\" | \"secondary\" | \"glass\" | \"link\";\n  /** sm: 35px tall (header) · md: 43px tall (sections) · lg: 50px tall (banners) */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** the button's type when it isn't a link (e.g. \"submit\" inside a form) */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-[2.1875rem] px-4 text-base\",\n  md: \"h-[2.6875rem] px-4 text-base\",\n  lg: \"h-[3.125rem] px-5 text-base\",\n};\n\nconst variants = {\n  primary: \"rounded-[calc(var(--radius)-6px)] bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary)_88%,var(--foreground))]\",\n  solid: \"rounded-[calc(var(--radius)-6px)] bg-foreground text-background hover:bg-foreground/85\",\n  secondary: \"rounded-[calc(var(--radius)-6px)] bg-secondary text-secondary-foreground hover:bg-accent\",\n  glass: \"rounded-full bg-foreground/25 text-background ring-1 ring-background/30 ring-inset backdrop-blur-md hover:bg-foreground/40\",\n  link: \"h-auto! px-0! text-muted-foreground hover:text-foreground\",\n};\n\n/** Ramp's flat button: no shadow, one weight, just a colour change on hover. */\nexport function RampButton({ children, href, variant = \"primary\", size = \"md\", type = \"button\", className }: RampButtonProps) {\n  const classes = cn(\n    \"group/btn inline-flex shrink-0 items-center justify-center gap-2 font-normal whitespace-nowrap transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    variant === \"glass\" && \"text-[0.9375rem]\",\n    className,\n  );\n  const inner = (\n    <>\n      {variant === \"glass\" && <Play aria-hidden className=\"size-3.5 fill-current\" strokeWidth={0} />}\n      {children}\n      {variant === \"link\" && (\n        <ArrowRight\n          aria-hidden\n          className=\"size-3.5 transition-transform duration-300 group-hover/btn:translate-x-1 motion-reduce:transition-none\"\n          strokeWidth={1.5}\n        />\n      )}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: acid-lime fill · solid: near-black fill · secondary: warm light-grey fill ·\nglass: frosted pill with a play icon, for media · link: hushed text with a trailing arrow"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 35px tall (header) · md: 43px tall (sections) · lg: 50px tall (banners)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link (e.g. \"submit\" inside a form)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "340445d6a41c291515a04909b42af0b2f36aa093129fe7e5a6cc10436d92e2c9"
+}

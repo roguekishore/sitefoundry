@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp feature duo",
+  "description": "A centred two-line statement (ink line, then a grey line) with a short grey subline, over two side-by-side warm-grey media cards with 12px corners and a faint dot texture, each followed by a 28px title, a grey paragraph and an arrow link.",
+  "category": "features",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "two-up",
+    "cards",
+    "dot-grid",
+    "light",
+    "minimal",
+    "centered",
+    "hover"
+  ],
+  "notes": [
+    "each card's media slot is 5:4; empty, it shows the dotted grey surface"
+  ],
+  "entry": "ramp-duo.tsx",
+  "source": "foundry",
+  "name": "ramp-duo",
+  "files": [
+    {
+      "path": "ramp-duo.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\n\nexport interface RampDuoItem {\n  /** the card's title */\n  title: string;\n  /** the grey paragraph under it */\n  text: string;\n  /** the arrow link under the paragraph */\n  link?: { label: string; href: string };\n  /** the art in the 5:4 frame; empty shows a dotted grey placeholder */\n  media?: ReactNode;\n}\n\nexport interface RampDuoProps {\n  /** the statement's first line, in ink */\n  lead: string;\n  /** its second line, in grey */\n  rest?: string;\n  /** the short grey line under the statement */\n  subtitle?: string;\n  /** two items read best */\n  items: RampDuoItem[];\n  className?: string;\n}\n\n/** Ramp's \"scale the team\" pair: a centred statement over two media cards with copy. */\nexport function RampDuo({ lead, rest, subtitle, items, className }: RampDuoProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter py-section lg:px-[calc(var(--page-gutter)*4)] lg:py-[calc(var(--section-y)*1.5)]\">\n        <RampHeading align=\"center\" lead={lead} rest={rest} breakBeforeRest />\n        {subtitle && <p className=\"mx-auto mt-6 max-w-[16rem] text-center text-base/[1.4] text-muted-foreground sm:max-w-none\">{subtitle}</p>}\n        <div className=\"mt-10 grid gap-12 lg:mt-14 lg:grid-cols-2 lg:gap-6\">\n          {items.map((item) => (\n            <article key={item.title} className=\"group\">\n              <div className=\"relative aspect-[5/4] overflow-clip rounded-lg bg-muted\">\n                <div className=\"absolute inset-0 transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none\">\n                  {item.media ?? (\n                    <div\n                      aria-hidden\n                      className=\"size-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_14%,transparent)_1px,transparent_1.4px)] bg-[length:22px_22px] [mask-image:radial-gradient(closest-side,black,transparent)]\"\n                    />\n                  )}\n                </div>\n              </div>\n              <RampHeading as=\"h3\" size=\"row\" lead={item.title} className=\"mt-6 max-w-[20rem] lg:mt-10 lg:max-w-none\" />\n              <p className=\"mt-3 max-w-[24rem] text-base/[1.4] text-muted-foreground lg:mt-4 lg:max-w-[25.5rem]\">{item.text}</p>\n              {item.link && (\n                <RampButton variant=\"link\" href={item.link.href} className=\"mt-6\">\n                  {item.link.label}\n                </RampButton>\n              )}\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the statement's first line, in ink"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "its second line, in grey"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "the short grey line under the statement"
+    },
+    {
+      "name": "items",
+      "type": "RampDuoItem[]",
+      "required": true,
+      "description": "two items read best"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "68df7d685cf261a1e33f71443a36bf7962bbab9c3e3af4318fddf6537f243d40"
+}

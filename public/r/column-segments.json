@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column audience picker",
+  "description": "A lime mono eyebrow over a full-width hairline, then a stack of big 40px audience names in soft grey: the chosen one sits in a raised white pill with its icon, in dark ink. Two paragraphs about that audience follow and crossfade when you pick another. A tall art slot with a soft halo fills the right side on desktop.",
+  "category": "features",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "audience",
+    "light",
+    "big-type",
+    "pill",
+    "crossfade",
+    "selector"
+  ],
+  "notes": [
+    "needs JavaScript to switch audiences (hydrate: visible); without it the first one stays chosen",
+    "media fills the 448×600 art slot (desktop only, like the original); empty, it's a soft highlight wash with a faint dot grid"
+  ],
+  "entry": "column-segments.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "column-segments",
+  "files": [
+    {
+      "path": "column-segments.css",
+      "content": "/* Picking an audience: its paragraphs fade in and settle. */\n.column-segments-swap {\n  animation: column-segments-swap 0.4s cubic-bezier(0.76, 0, 0.24, 1) both;\n}\n\n@keyframes column-segments-swap {\n  from { opacity: 0; transform: translateY(6px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-segments-swap { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-segments.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ColumnEyebrow, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-segments.css\";\n\nexport interface ColumnSegment {\n  /** shown in the pill when this audience is chosen (lucide works well) */\n  icon?: ReactNode;\n  /** the audience's name */\n  label: string;\n  /** paragraphs about it */\n  body: string[];\n}\n\nexport interface ColumnSegmentsProps {\n  /** the small mono tag (shown with a blinking cursor) */\n  eyebrow: string;\n  /** accent of the tag and the art wash */\n  tone?: ColumnTone;\n  /** the audiences */\n  segments: ColumnSegment[];\n  /** which one starts chosen */\n  initial?: number;\n  /** the tall art on the right (desktop); empty: a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function ColumnSegments({ eyebrow, tone = \"chart-2\", segments, initial = 0, media, className }: ColumnSegmentsProps) {\n  const [active, setActive] = useState(initial);\n  const current = segments[active] ?? segments[0];\n\n  return (\n    <section className={cn(\"relative overflow-clip bg-background pt-[4.5rem] pb-28 text-foreground lg:pt-section lg:pb-[4.75rem]\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <ColumnEyebrow tone={tone} cursor>\n          {eyebrow}\n        </ColumnEyebrow>\n        <hr className=\"mt-6 border-border\" />\n\n        <div className=\"lg:grid lg:grid-cols-[1fr_28rem] lg:gap-12\">\n          <div className=\"pt-[3.75rem] lg:pt-12\">\n            <ul role=\"tablist\" className=\"flex flex-col items-start\">\n              {segments.map((s, i) => (\n                <li key={s.label}>\n                  <button\n                    type=\"button\"\n                    role=\"tab\"\n                    aria-selected={i === active}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"-mx-2 flex items-center gap-2.5 rounded-md px-2 font-display text-[1.625rem]/[2.75rem] font-medium tracking-[-0.025em] transition-[background-color,box-shadow,color] duration-400 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none lg:-mx-[1.125rem] lg:gap-3 lg:px-[1.125rem] lg:text-[2.5rem]/[3.625rem]\",\n                      i === active\n                        ? \"bg-secondary text-foreground shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_4px_14px_color-mix(in_oklab,var(--foreground)_8%,transparent)]\"\n                        : \"text-[color-mix(in_oklab,var(--muted-foreground)_55%,var(--background))] hover:text-muted-foreground\",\n                    )}\n                  >\n                    {i === active && s.icon && <span className=\"flex [&_svg]:size-6 lg:[&_svg]:size-[1.625rem]\">{s.icon}</span>}\n                    {s.label}\n                  </button>\n                </li>\n              ))}\n            </ul>\n            <div key={active} role=\"tabpanel\" className=\"column-segments-swap mt-10 flex max-w-[26.5rem] flex-col gap-6 text-base/[1.5] text-foreground/80\">\n              {current.body.map((p) => (\n                <p key={p}>{p}</p>\n              ))}\n            </div>\n          </div>\n\n          <div className=\"relative hidden lg:block\">\n            <div aria-hidden className=\"pointer-events-none absolute -inset-x-40 -inset-y-28 bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--muted-foreground)_9%,transparent),transparent)]\" />\n            <div className=\"relative mt-[3.125rem] h-[37.5rem] overflow-clip rounded-lg\" style={{ \"--tone\": `var(--${tone})` } as CSSProperties}>\n              {media ? (\n                <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">{media}</div>\n              ) : (\n                <>\n                  <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_40%_40%,color-mix(in_oklab,var(--tone)_16%,transparent),transparent_85%)]\" />\n                  <div className=\"absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--tone)_40%,transparent)_1px,transparent_1.6px)] bg-size-[10px_10px] [mask-image:linear-gradient(black,color-mix(in_oklab,black_35%,transparent))]\" />\n                </>\n              )}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small mono tag (shown with a blinking cursor)"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "chart-2",
+      "description": "accent of the tag and the art wash"
+    },
+    {
+      "name": "segments",
+      "type": "ColumnSegment[]",
+      "required": true,
+      "description": "the audiences"
+    },
+    {
+      "name": "initial",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which one starts chosen"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall art on the right (desktop); empty: a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1291e2335bb2bd42dc17e164999108946e87e21490438228f1dfc2c654d1d519"
+}

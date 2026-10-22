@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury API stepper",
+  "description": "A centred heading and lead over a four-step timeline (small rings on a hairline, mono step numbers, the active ring filled green and a soft ping pulsing on the next one), then a square-cornered code panel: a grey bar with the method and path and a two-way mono toggle, a white request pane and a mint response pane with highlighted values. Phones get dots, prev/next buttons and stacked panes.",
+  "category": "features",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "api",
+    "code",
+    "stepper",
+    "tabs",
+    "developer",
+    "mono",
+    "light",
+    "minimal",
+    "fintech",
+    "ping",
+    "loop"
+  ],
+  "notes": [
+    "click a step (or prev/next on phones) to change the sample; without JavaScript the first step shows",
+    "the ping is Tailwind's animate-ping (1s loop) and stops with reduced motion",
+    "mark values in the code by listing them in highlight"
+  ],
+  "entry": "moderntreasury-api.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "moderntreasury-api",
+  "files": [
+    {
+      "path": "moderntreasury-api.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ModerntreasuryHeading } from \"@foundry/moderntreasury-heading\";\n\nexport interface ModerntreasuryApiSample {\n  /** the toggle's label, e.g. \"Business\" (shown in capitals) */\n  label: string;\n  /** HTTP method, e.g. \"POST\" */\n  method: string;\n  /** the endpoint, e.g. \"/v2/customers\" */\n  path: string;\n  /** the request body, as it should be printed */\n  request: string;\n  /** the response body, as it should be printed */\n  response: string;\n  /** the response pane's caption, e.g. \"201 Response\" */\n  responseLabel: string;\n  /** exact bits of the code to mark with a mint background (each occurrence) */\n  highlight?: string[];\n}\n\nexport interface ModerntreasuryApiStep {\n  /** the mono number over the title, e.g. \"01\" */\n  number: string;\n  /** the step's name */\n  title: string;\n  /** a short line under the title (desktop only) */\n  text: string;\n  /** the code shown for this step; more than one adds the toggle */\n  samples: ModerntreasuryApiSample[];\n}\n\nexport interface ModerntreasuryApiProps {\n  /** the section title; a list of lines sets the desktop line breaks */\n  title: string | string[];\n  /** the lead under it */\n  lead?: string;\n  /** the steps, left to right; four fill the timeline */\n  steps: ModerntreasuryApiStep[];\n  /** the request pane's caption */\n  requestLabel: string;\n  /** screen-reader labels for the phone's prev/next buttons */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst escape = (s: string) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\");\n\n/** Prints code with the listed bits wrapped in a mint mark. */\nfunction marked(code: string, marks: string[] = []): ReactNode[] {\n  if (!marks.length) return [code];\n  const re = new RegExp(`(${marks.map(escape).join(\"|\")})`, \"g\");\n  return code.split(re).map((part, i) =>\n    marks.includes(part) ? (\n      <mark key={i} className=\"rounded-[1px] bg-highlight/25 text-foreground\">\n        {part}\n      </mark>\n    ) : (\n      part\n    ),\n  );\n}\n\n/** A ring on the timeline: green when active, a soft ping on the next one. */\nfunction Ring({ active, next }: { active: boolean; next: boolean }) {\n  return (\n    <span className=\"relative flex size-4 shrink-0\">\n      {next && <span aria-hidden className=\"absolute -inset-1 animate-ping rounded-full bg-highlight/20 motion-reduce:animate-none\" />}\n      <span\n        className={cn(\n          \"relative size-4 rounded-full bg-background transition-colors duration-150\",\n          active ? \"border-[5px] border-highlight\" : \"border-2 border-foreground/25\",\n        )}\n      />\n    </span>\n  );\n}\n\n/** Modern Treasury's API walkthrough: a four-step timeline driving a request/response panel. */\nexport function ModerntreasuryApi({ title, lead, steps, requestLabel, prevLabel, nextLabel, className }: ModerntreasuryApiProps) {\n  const [current, setCurrent] = useState(0);\n  const [variant, setVariant] = useState(0);\n  const step = steps[current];\n  const sample = step?.samples[variant] ?? step?.samples[0];\n  const go = (i: number) => {\n    setCurrent(Math.max(0, Math.min(steps.length - 1, i)));\n    setVariant(0);\n  };\n\n  const code = \"font-mono text-[0.71875rem] leading-[1.1875rem] whitespace-pre lg:text-[0.8125rem] lg:leading-[1.375rem]\";\n  const caption = \"font-mono text-[0.625rem] tracking-[0.04em] text-foreground/45 uppercase\";\n\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.66)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ModerntreasuryHeading title={title} lead={lead} />\n\n        {/* desktop timeline */}\n        <ol className=\"relative mt-12 hidden grid-cols-4 lg:mt-14 lg:grid\" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}>\n          <span aria-hidden className=\"absolute top-2 h-px bg-foreground/15\" style={{ left: `${50 / steps.length}%`, right: `${50 / steps.length}%` }} />\n          {steps.map((s, i) => (\n            <li key={s.number}>\n              <button\n                type=\"button\"\n                onClick={() => go(i)}\n                aria-current={i === current ? \"step\" : undefined}\n                className=\"group flex w-full flex-col items-center px-4 text-center\"\n              >\n                <Ring active={i === current} next={i === current + 1} />\n                <span className={cn(\"mt-4 font-mono text-[0.6875rem] leading-[1.5]\", i === current ? \"text-highlight\" : \"text-foreground/45\")}>{s.number}</span>\n                <span\n                  className={cn(\n                    \"mt-1.5 text-base leading-6 font-semibold transition-colors duration-150 motion-reduce:transition-none\",\n                    i === current ? \"text-foreground\" : \"text-foreground/60 group-hover:text-foreground/80\",\n                  )}\n                >\n                  {s.title}\n                </span>\n                <span className=\"mt-1 max-w-[17rem] text-sm leading-[1.5] text-foreground/60\">{s.text}</span>\n              </button>\n            </li>\n          ))}\n        </ol>\n\n        {/* phone timeline: dots, then prev / current / next */}\n        <div className=\"mt-10 lg:hidden\">\n          <ol className=\"relative flex justify-between\">\n            <span aria-hidden className=\"absolute inset-x-2 top-2 h-px bg-foreground/15\" />\n            {steps.map((s, i) => (\n              <li key={s.number}>\n                <button type=\"button\" onClick={() => go(i)} aria-label={s.title} aria-current={i === current ? \"step\" : undefined} className=\"flex\">\n                  <Ring active={i === current} next={i === current + 1} />\n                </button>\n              </li>\n            ))}\n          </ol>\n          <div className=\"mt-5 grid grid-cols-[2.5rem_1fr_2.5rem] items-center gap-4\">\n            <button\n              type=\"button\"\n              onClick={() => go(current - 1)}\n              disabled={current === 0}\n              aria-label={prevLabel}\n              className=\"flex size-10 items-center justify-center rounded-[calc(var(--radius)/4)] border border-foreground/15 text-foreground disabled:text-foreground/25\"\n            >\n              <ChevronLeft aria-hidden className=\"size-4\" />\n            </button>\n            <p>\n              <span className=\"block font-mono text-[0.6875rem] leading-[1.5] text-highlight\">{step?.number}</span>\n              <span className=\"block text-base leading-6 font-semibold\">{step?.title}</span>\n            </p>\n            <button\n              type=\"button\"\n              onClick={() => go(current + 1)}\n              disabled={current === steps.length - 1}\n              aria-label={nextLabel}\n              className=\"flex size-10 items-center justify-center rounded-[calc(var(--radius)/4)] border border-foreground/15 text-foreground disabled:text-foreground/25\"\n            >\n              <ChevronRight aria-hidden className=\"size-4\" />\n            </button>\n          </div>\n        </div>\n\n        {sample && (\n          <div className=\"mt-6 overflow-clip rounded-[calc(var(--radius)/2)] border border-foreground/15 lg:mt-12\">\n            <div className=\"flex flex-col gap-3 border-b border-foreground/15 bg-muted px-4 py-3 lg:h-11 lg:flex-row lg:items-center lg:justify-between lg:px-5 lg:py-0\">\n              <p className=\"font-mono text-[0.8125rem] leading-[1.5]\">\n                <span className=\"mr-2.5 text-[0.6875rem] text-foreground/70 uppercase\">{sample.method}</span>\n                {sample.path}\n              </p>\n              {step.samples.length > 1 && (\n                <div className=\"grid auto-cols-fr grid-flow-col gap-1.5 lg:flex\">\n                  {step.samples.map((v, i) => (\n                    <button\n                      key={v.label}\n                      type=\"button\"\n                      aria-pressed={i === variant}\n                      onClick={() => setVariant(i)}\n                      className={cn(\n                        \"h-6 rounded-[calc(var(--radius)/4)] px-2 font-mono text-[0.6875rem] font-semibold tracking-[0.06em] uppercase transition-colors duration-150 motion-reduce:transition-none\",\n                        i === variant\n                          ? \"bg-highlight text-highlight-foreground\"\n                          : \"bg-background font-normal text-foreground/50 ring-1 ring-foreground/15 ring-inset hover:text-foreground\",\n                      )}\n                    >\n                      {v.label}\n                    </button>\n                  ))}\n                </div>\n              )}\n            </div>\n            <div className=\"grid lg:grid-cols-[3fr_2fr]\">\n              <div className=\"min-w-0 bg-background p-4 lg:p-5\">\n                <p className={caption}>{requestLabel}</p>\n                <pre className={cn(code, \"mt-4 overflow-x-auto lg:mt-5\")}>{marked(sample.request, sample.highlight)}</pre>\n              </div>\n              <div className=\"min-w-0 border-t border-foreground/15 bg-accent p-4 lg:border-t-0 lg:border-l lg:p-5\">\n                <p className={caption}>{sample.responseLabel}</p>\n                <pre className={cn(code, \"mt-4 overflow-x-auto lg:mt-5\")}>{marked(sample.response, sample.highlight)}</pre>\n              </div>\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "moderntreasury-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the section title; a list of lines sets the desktop line breaks"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the lead under it"
+    },
+    {
+      "name": "steps",
+      "type": "ModerntreasuryApiStep[]",
+      "required": true,
+      "description": "the steps, left to right; four fill the timeline"
+    },
+    {
+      "name": "requestLabel",
+      "type": "string",
+      "required": true,
+      "description": "the request pane's caption"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the phone's prev/next buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2c12a2e65e81a77af03b7fd91137cad47d1554d037264218ca3f87ab8f4589bd"
+}

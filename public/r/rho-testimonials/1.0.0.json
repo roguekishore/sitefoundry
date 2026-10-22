@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho founder quotes",
+  "description": "A 60px heading over a three-by-two grid of flat tinted cards: a 20px quote at the top and, pinned to the bottom, a small square avatar with a name and an optional handle. Cards fade up one after another; on phones the grid becomes a sideways rail with arrows.",
+  "category": "testimonials",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "grid",
+    "cards",
+    "rail",
+    "reveal",
+    "stagger",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "avatar: a 40px image per quote; empty: initials on a muted square",
+    "needs JavaScript for the phone rail's arrows (hydrate: visible)"
+  ],
+  "entry": "rho-testimonials.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "rho-testimonials",
+  "files": [
+    {
+      "path": "rho-testimonials.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RhoHeading } from \"@foundry/rho-heading\";\nimport { RhoRail } from \"@foundry/rho-rail\";\nimport { RhoReveal } from \"@foundry/rho-reveal\";\n\nexport interface RhoQuote {\n  /** the quote, with its quotation marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** an optional social handle under the name */\n  handle?: string;\n  /** a 40px square portrait; empty: their initials */\n  avatar?: ReactNode;\n}\n\nexport interface RhoTestimonialsProps {\n  /** the heading */\n  title: string;\n  /** the quotes; six fill the desktop grid */\n  quotes: RhoQuote[];\n  /** screen-reader labels for the phone rail's arrows */\n  prevLabel: string;\n  nextLabel: string;\n  /** dark or light section */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nfunction initials(name: string) {\n  return name\n    .split(/\\s+/)\n    .map((p) => p[0])\n    .slice(0, 2)\n    .join(\"\");\n}\n\nfunction QuoteCard({ q }: { q: RhoQuote }) {\n  return (\n    <figure className=\"flex h-full flex-col justify-between gap-8 rounded-lg bg-card p-5 text-card-foreground lg:p-7\">\n      <blockquote className=\"text-lg leading-[1.3] tracking-[-0.01em] lg:text-xl lg:leading-[1.3]\">{q.quote}</blockquote>\n      <figcaption className=\"flex items-center gap-3\">\n        <span className=\"grid size-10 shrink-0 place-items-center overflow-clip rounded-md bg-muted text-[0.8125rem] font-medium text-muted-foreground\">\n          {q.avatar ?? initials(q.name)}\n        </span>\n        <span className=\"text-[0.75rem] leading-[1.4]\">\n          <span className=\"block font-medium\">{q.name}</span>\n          {q.handle && <span className=\"block text-muted-foreground\">{q.handle}</span>}\n        </span>\n      </figcaption>\n    </figure>\n  );\n}\n\nexport function RhoTestimonials({ title, quotes, prevLabel, nextLabel, tone = \"light\", className }: RhoTestimonialsProps) {\n  return (\n    <section data-rho-tone={tone} className={cn(tone === \"dark\" && \"dark\", \"bg-background py-14 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RhoHeading text={title} />\n      </div>\n      <RhoReveal className=\"mt-10 lg:mt-14 lg:[animation:none]! motion-reduce:[animation:none]!\">\n        <RhoRail\n          items={quotes.map((q, i) => (\n            <RhoReveal key={q.name} step={i % 3} className=\"h-full\">\n              <QuoteCard q={q} />\n            </RhoReveal>\n          ))}\n          prevLabel={prevLabel}\n          nextLabel={nextLabel}\n          gridOnDesktop\n          itemClassName=\"w-[85%] min-h-[15.5rem] sm:w-[22rem] lg:h-[15.625rem] lg:w-auto\"\n          trackClassName=\"lg:mx-auto lg:grid lg:max-w-page lg:grid-cols-3 lg:overflow-visible lg:px-gutter\"\n          arrowsClassName=\"lg:hidden\"\n        />\n      </RhoReveal>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-heading",
+    "rho-rail",
+    "rho-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "quotes",
+      "type": "RhoQuote[]",
+      "required": true,
+      "description": "the quotes; six fill the desktop grid"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the phone rail's arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "dark or light section"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5730110f2e31095176228e71223d014c2f1d91d44b78ef3f4cd511d0f033a780"
+}

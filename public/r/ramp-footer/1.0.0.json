@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp footer",
+  "description": "A near-black footer: six link columns (company links in white, then titled groups in 60% grey), a hairline, then fine print with underlined legal links, an address, app-store and social links, and a dark email bar with an acid-lime button. On phones the titled groups fold into chevron rows.",
+  "category": "footer",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "columns",
+    "accordion",
+    "legal",
+    "signup",
+    "lime",
+    "fintech"
+  ],
+  "notes": [
+    "forces the theme's dark colours with the dark class",
+    "tuck pulls it up under a rounded band above it (ramp-cta)",
+    "phone accordions are native <details>, no JavaScript"
+  ],
+  "entry": "ramp-footer.tsx",
+  "source": "foundry",
+  "name": "ramp-footer",
+  "files": [
+    {
+      "path": "ramp-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampEmailForm, type RampEmailFormProps } from \"@foundry/ramp-email-form\";\n\nexport interface RampFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface RampFooterProps {\n  /** the first column, in white (company pages) */\n  primaryLinks: RampFooterLink[];\n  /** the titled columns; they fold into chevron rows on phones */\n  groups: { title: string; links: RampFooterLink[] }[];\n  /** the underlined legal links */\n  legalLinks: RampFooterLink[];\n  /** fine-print paragraphs */\n  legal: string[];\n  /** address lines */\n  address?: string[];\n  /** small outlined badges, e.g. app-store links (label + optional icon) */\n  badges?: { label: string; href: string; icon?: ReactNode }[];\n  /** the underlined social links */\n  socials?: RampFooterLink[];\n  /** the line above the footer's sign-up bar (may hold bold parts) */\n  signupLead?: ReactNode;\n  /** the footer's sign-up bar */\n  form?: RampEmailFormProps;\n  /** pull up under a rounded band above it */\n  tuck?: boolean;\n  className?: string;\n}\n\nfunction Underlined({ links, className }: { links: RampFooterLink[]; className?: string }) {\n  return (\n    <ul className={cn(\"flex flex-wrap gap-x-4 gap-y-1\", className)}>\n      {links.map((l) => (\n        <li key={l.label}>\n          <a href={l.href} className=\"underline underline-offset-2 hover:text-foreground\">\n            {l.label}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/** Ramp's dark footer: link columns, fine print, apps, socials and one more sign-up bar. */\nexport function RampFooter({ primaryLinks, groups, legalLinks, legal, address, badges, socials, signupLead, form, tuck, className }: RampFooterProps) {\n  const signup = form && (\n    <div>\n      {signupLead && <p className=\"text-sm text-muted-foreground [&_b]:font-normal [&_b]:text-foreground\">{signupLead}</p>}\n      <RampEmailForm {...form} className=\"mt-4\" />\n    </div>\n  );\n  const extras = (\n    <div className=\"grid gap-5\">\n      {badges && (\n        <ul className=\"flex flex-wrap gap-2\">\n          {badges.map((b) => (\n            <li key={b.label}>\n              <a href={b.href} className=\"flex h-8 items-center gap-1.5 rounded-[calc(var(--radius)-8px)] border border-foreground/30 px-2.5 text-xs transition-colors hover:bg-foreground/10 [&_svg]:size-4\">\n                {b.icon}\n                {b.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      )}\n      {socials && <Underlined links={socials} className=\"text-sm text-muted-foreground sm:flex-col sm:gap-y-2\" />}\n    </div>\n  );\n\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", tuck && \"-mt-[calc(var(--radius)*2.5)] pt-[calc(var(--radius)*2.5)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-12 pb-20 lg:px-[calc(var(--page-gutter)*4)] lg:pt-[5.25rem] lg:pb-[8.5rem]\">\n        {/* link columns */}\n        <div className=\"lg:grid lg:grid-cols-6 lg:gap-x-6\">\n          <ul className=\"grid content-start gap-y-[0.875rem] text-base/5 lg:gap-y-1.5\">\n            {primaryLinks.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"transition-colors duration-200 hover:text-muted-foreground\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n\n          {groups.map((g) => (\n            <div key={g.title} className=\"hidden lg:block\">\n              <p className=\"text-base/5\">{g.title}</p>\n              <ul className=\"mt-1.5 grid gap-y-1.5 text-base/5 text-muted-foreground\">\n                {g.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"transition-colors duration-200 hover:text-foreground\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n\n          <div className=\"mt-9 border-t border-foreground/40 lg:hidden\">\n            {groups.map((g) => (\n              <details key={g.title} className=\"group border-b border-foreground/40\">\n                <summary className=\"flex cursor-pointer list-none items-center justify-between py-5 text-base [&::-webkit-details-marker]:hidden\">\n                  {g.title}\n                  <ChevronRight aria-hidden className=\"size-5 transition-transform duration-200 group-open:rotate-90 motion-reduce:transition-none\" strokeWidth={1.5} />\n                </summary>\n                <ul className=\"grid gap-y-3 pb-5 text-base text-muted-foreground\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href}>{l.label}</a>\n                    </li>\n                  ))}\n                </ul>\n              </details>\n            ))}\n          </div>\n        </div>\n\n        {/* phones: sign-up, apps, address before the fine print */}\n        <div className=\"mt-[4.5rem] grid gap-10 lg:hidden\">\n          {signup}\n          {extras}\n          {address && (\n            <address className=\"text-sm/[1.35] text-muted-foreground not-italic\">\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </address>\n          )}\n        </div>\n\n        <div className=\"mt-8 grid gap-10 lg:mt-14 lg:grid-cols-6 lg:gap-x-6 lg:border-t lg:border-foreground/40 lg:pt-12\">\n          <div className=\"lg:col-span-3\">\n            <Underlined links={legalLinks} className=\"text-sm text-muted-foreground\" />\n            <div className=\"mt-4 grid gap-3 text-sm/[1.35] text-muted-foreground\">\n              {legal.map((p) => (\n                <p key={p}>{p}</p>\n              ))}\n            </div>\n            <div className=\"mt-12 hidden lg:block\">{signup}</div>\n          </div>\n          {address && (\n            <address className=\"hidden text-sm/[1.35] text-muted-foreground not-italic lg:col-span-2 lg:block\">\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </address>\n          )}\n          <div className=\"hidden lg:block\">{extras}</div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-email-form"
+  ],
+  "props": [
+    {
+      "name": "primaryLinks",
+      "type": "RampFooterLink[]",
+      "required": true,
+      "description": "the first column, in white (company pages)"
+    },
+    {
+      "name": "groups",
+      "type": "{ title: string; links: RampFooterLink[]; }[]",
+      "required": true,
+      "description": "the titled columns; they fold into chevron rows on phones"
+    },
+    {
+      "name": "legalLinks",
+      "type": "RampFooterLink[]",
+      "required": true,
+      "description": "the underlined legal links"
+    },
+    {
+      "name": "legal",
+      "type": "string[]",
+      "required": true,
+      "description": "fine-print paragraphs"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": false,
+      "description": "address lines"
+    },
+    {
+      "name": "badges",
+      "type": "{ label: string; href: string; icon?: ReactNode; }[]",
+      "required": false,
+      "description": "small outlined badges, e.g. app-store links (label + optional icon)"
+    },
+    {
+      "name": "socials",
+      "type": "RampFooterLink[]",
+      "required": false,
+      "description": "the underlined social links"
+    },
+    {
+      "name": "signupLead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line above the footer's sign-up bar (may hold bold parts)"
+    },
+    {
+      "name": "form",
+      "type": "any",
+      "required": false,
+      "description": "the footer's sign-up bar"
+    },
+    {
+      "name": "tuck",
+      "type": "boolean",
+      "required": false,
+      "description": "pull up under a rounded band above it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "817852c73fa772a7e1132f977ce5ab0695b32f0910944a3266a9341c889aa8a5"
+}

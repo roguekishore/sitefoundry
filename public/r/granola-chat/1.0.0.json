@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola chat band",
+  "description": "A loud lime band: a small serif eyebrow and a huge three-line serif headline on the left, and a big white chat box with soft 28px corners and a deep soft shadow that runs off the right edge on desktop. Inside, questions type themselves in turn with a blinking caret, a pale-blue chip swaps with each, and attach and settings icons sit at the foot.",
+  "category": "features",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chat",
+    "ai",
+    "lime",
+    "bold",
+    "editorial",
+    "serif",
+    "typing",
+    "loop",
+    "caret"
+  ],
+  "notes": [
+    "the band is the theme's highlight colour; text uses highlight-foreground",
+    "shows up to three prompts in a 12s CSS loop; with reduced motion only the first prompt and chip show",
+    "the chat box is layout chrome, not a media slot"
+  ],
+  "entry": "granola-chat.tsx",
+  "source": "foundry",
+  "name": "granola-chat",
+  "files": [
+    {
+      "path": "granola-chat.css",
+      "content": "/* The prompts take turns in a 12s loop (4s each): a prompt types in left to right (a clip\n   reveal), holds with a blinking caret, then fades as the next one starts; its chip swaps in and\n   out with it. Only the first prompt and chip show without motion. */\n.granola-chat-prompt:not(:first-child),\n.granola-chat-chip:not(:first-child) {\n  opacity: 0;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .granola-chat-prompt {\n    animation: granola-chat-type 12s linear infinite both;\n  }\n  .granola-chat-chip {\n    animation: granola-chat-chip 12s ease-out infinite both;\n  }\n  .granola-chat-caret {\n    animation: granola-chat-caret 1.1s steps(1) infinite;\n  }\n}\n\n@keyframes granola-chat-type {\n  0% { clip-path: inset(0 100% 0 0); opacity: 1; }\n  15% { clip-path: inset(0 0 0 0); opacity: 1; }\n  29% { clip-path: inset(0 0 0 0); opacity: 1; }\n  33.33%, 100% { clip-path: inset(0 0 0 0); opacity: 0; }\n}\n\n@keyframes granola-chat-chip {\n  0% { opacity: 0; transform: translateY(4px); }\n  3%, 29% { opacity: 1; transform: none; }\n  33.33%, 100% { opacity: 0; transform: none; }\n}\n\n@keyframes granola-chat-caret {\n  0% { opacity: 1; }\n  50% { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "granola-chat.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Paperclip, SlidersHorizontal } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./granola-chat.css\";\n\nexport interface GranolaChatPrompt {\n  /** the question that types itself into the box */\n  text: string;\n  /** the chip under it: which notes the question searches */\n  chip: string;\n  /** the chip's small icon (e.g. a lucide icon) */\n  chipIcon?: ReactNode;\n}\n\nexport interface GranolaChatProps {\n  /** the small serif line above the headline */\n  eyebrow?: string;\n  /** the huge serif headline (one word per line suits it) */\n  title: string;\n  /** up to three prompts; they take turns typing into the box */\n  prompts: GranolaChatPrompt[];\n  /** screen-reader label for the decorative attach and settings icons */\n  toolsLabel?: string;\n  className?: string;\n}\n\nexport function GranolaChat({ eyebrow, title, prompts, toolsLabel, className }: GranolaChatProps) {\n  const shown = prompts.slice(0, 3);\n  return (\n    <section className={cn(\"overflow-x-clip bg-highlight text-highlight-foreground\", className)}>\n      <div className=\"mx-auto grid w-full max-w-[calc(var(--page-width)_+_2*var(--page-gutter))] gap-12 px-gutter pt-[5.5rem] pb-20 lg:grid-cols-2 lg:gap-4 lg:pt-28 lg:pb-[6.5rem]\">\n        <div>\n          {eyebrow && <p className=\"font-display text-base\">{eyebrow}</p>}\n          <h2 className=\"mt-6 max-w-[8ch] font-display text-[3.75rem] leading-[0.95] tracking-[-0.01em] lg:mt-7 lg:text-[min(7.5vw,6.75rem)] lg:leading-[0.98]\">\n            {title}\n          </h2>\n        </div>\n\n        {/* the chat box: on desktop it runs off the right edge of the window */}\n        <div className=\"flex min-h-[17.5rem] flex-col rounded-[calc(var(--radius)*3.5)] bg-popover p-5 text-popover-foreground shadow-[0_8px_48px_color-mix(in_oklab,var(--foreground)_15%,transparent)] lg:mr-[calc((min(100vw,var(--page-width)_+_2*var(--page-gutter))_-_100vw)/2_-_var(--page-gutter))] lg:ml-4 lg:min-h-80 lg:self-start lg:rounded-r-none lg:p-8\">\n          <div className=\"grid min-h-[3lh] text-lg leading-snug lg:text-xl\">\n            {shown.map((p, i) => (\n              <p key={p.text} className=\"granola-chat-prompt col-start-1 row-start-1 max-w-[34ch]\" style={{ animationDelay: `${i * 4}s` }}>\n                {p.text}\n                <span aria-hidden className=\"granola-chat-caret ml-0.5 inline-block h-[1.1em] w-px translate-y-[0.15em] bg-foreground\" />\n              </p>\n            ))}\n          </div>\n\n          <div className=\"mt-auto grid pt-8\">\n            {shown.map((p, i) => (\n              <span\n                key={p.chip}\n                aria-hidden={i > 0 || undefined}\n                className=\"granola-chat-chip col-start-1 row-start-1 inline-flex w-fit items-center gap-2.5 rounded-xl bg-muted p-2 pr-3 text-base text-foreground/85\"\n                style={{ animationDelay: `${i * 4}s` }}\n              >\n                {p.chipIcon && (\n                  <span className=\"flex size-8 items-center justify-center rounded-md bg-chart-4 text-foreground/80 dark:text-background [&_svg]:size-4 [&_svg]:stroke-[1.5]\">\n                    {p.chipIcon}\n                  </span>\n                )}\n                {p.chip}\n              </span>\n            ))}\n          </div>\n\n          <div aria-label={toolsLabel} role={toolsLabel ? \"img\" : undefined} aria-hidden={toolsLabel ? undefined : true} className=\"mt-10 flex items-center gap-6 text-foreground/80 lg:mt-12\">\n            <Paperclip className=\"size-5 stroke-[1.5]\" />\n            <SlidersHorizontal className=\"size-5 stroke-[1.5]\" />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small serif line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the huge serif headline (one word per line suits it)"
+    },
+    {
+      "name": "prompts",
+      "type": "GranolaChatPrompt[]",
+      "required": true,
+      "description": "up to three prompts; they take turns typing into the box"
+    },
+    {
+      "name": "toolsLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the decorative attach and settings icons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "991da7467f80483607bc24a2993d99976dd1c25e4781ceca5b745c37ca741307"
+}

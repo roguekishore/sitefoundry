@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Sharplink text reveal",
+  "description": "Text that assembles itself as you scroll: letters fade in in a scattered order (or brighten from 35%), or words light up one after another, scrubbed with the scroll by a CSS view timeline. Static HTML shows the full text.",
+  "category": "text-effect",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "letters",
+    "words",
+    "css-only"
+  ],
+  "notes": [
+    "CSS scroll-driven animation: browsers without view timelines, and reduced motion, show the text as is",
+    "pass `timeline` to follow a named view timeline of a parent (e.g. a pinned stage) instead of the text's own"
+  ],
+  "entry": "sharplink-text-reveal.tsx",
+  "source": "foundry",
+  "name": "sharplink-text-reveal",
+  "files": [
+    {
+      "path": "sharplink-text-reveal.css",
+      "content": "/* Each piece (a letter or a word) fades from --sharplink-text-reveal-from to full over its own\n   slice of the scroll (--sl-a → --sl-b, percentages of the timeline's cover range). The slices\n   are set inline: scattered for letters, in reading order for words. The timeline is the\n   text's own view timeline unless a parent's name is passed in. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-text-reveal {\n      view-timeline-name: --sharplink-text-reveal;\n    }\n    .sharplink-text-reveal-piece {\n      animation: sharplink-text-reveal-in linear both;\n      animation-timeline: var(--sharplink-text-reveal-timeline, --sharplink-text-reveal);\n      animation-range: cover var(--sl-a) cover var(--sl-b);\n    }\n  }\n}\n\n@keyframes sharplink-text-reveal-in {\n  from {\n    opacity: var(--sharplink-text-reveal-from, 0);\n  }\n  to {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "sharplink-text-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./sharplink-text-reveal.css\";\n\nexport interface SharplinkTextRevealProps {\n  /** the text; a line break (\"\\n\") forces a new line */\n  text: string;\n  /** the element to render (h2 by default) */\n  as?: ElementType;\n  /**\n   * letters: letters fade in from nothing in a scattered order.\n   * dim: letters brighten from 35% in a scattered order.\n   * words: words brighten from 35% one after another, in reading order.\n   */\n  mode?: \"letters\" | \"dim\" | \"words\";\n  /** where the reveal runs, as [start, end] percentages of the timeline's cover range */\n  range?: [number, number];\n  /** a parent's named view timeline to follow (e.g. \"--my-stage\"); the text's own by default */\n  timeline?: string;\n  className?: string;\n}\n\n/** A stable, scattered number between 0 and 1 for piece i. */\nfunction scatter(i: number) {\n  return ((i * 7919 + 13) % 101) / 100;\n}\n\n/** Text whose letters or words appear as it scrolls into view (CSS scroll-driven). */\nexport function SharplinkTextReveal({ text, as: Tag = \"h2\", mode = \"letters\", range, timeline, className }: SharplinkTextRevealProps) {\n  const [start, end] = range ?? (mode === \"words\" ? [20, 55] : [8, 42]);\n  const span = end - start;\n  const lines = text.split(\"\\n\").map((line) => line.split(\" \").filter(Boolean));\n  const total = lines.reduce((n, words) => n + (mode === \"words\" ? words.length : words.join(\"\").length), 0);\n  const slice = mode === \"words\" ? Math.max(span / Math.max(total, 1), span * 0.08) : span * 0.3;\n  let count = 0;\n  const piece = (content: string, key: string) => {\n    const i = count++;\n    const at = mode === \"words\" ? total > 1 ? i / (total - 1) : 0 : scatter(i);\n    const a = start + at * (span - slice);\n    return (\n      <span key={key} className=\"sharplink-text-reveal-piece\" style={{ \"--sl-a\": `${a.toFixed(2)}%`, \"--sl-b\": `${(a + slice).toFixed(2)}%` } as CSSProperties}>\n        {content}\n      </span>\n    );\n  };\n  const style = {\n    \"--sharplink-text-reveal-from\": mode === \"letters\" ? 0 : 0.35,\n    ...(timeline ? { \"--sharplink-text-reveal-timeline\": timeline } : {}),\n  } as CSSProperties;\n  return (\n    <Tag className={cn(\"sharplink-text-reveal\", className)} style={style} aria-label={text.replace(/\\n/g, \" \")}>\n      <span aria-hidden>\n        {lines.map((words, l) => (\n          <span key={l}>\n            {l > 0 && <br />}\n            {words.map((word, w) => (\n              <span key={w}>\n                {w > 0 && \" \"}\n                {mode === \"words\" ? (\n                  piece(word, \"w\")\n                ) : (\n                  <span className=\"inline-block whitespace-nowrap\">{[...word].map((ch, c) => piece(ch, String(c)))}</span>\n                )}\n              </span>\n            ))}\n          </span>\n        ))}\n      </span>\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; a line break (\"\\n\") forces a new line"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render (h2 by default)"
+    },
+    {
+      "name": "mode",
+      "type": "enum",
+      "required": false,
+      "default": "letters",
+      "description": "letters: letters fade in from nothing in a scattered order.\ndim: letters brighten from 35% in a scattered order.\nwords: words brighten from 35% one after another, in reading order."
+    },
+    {
+      "name": "range",
+      "type": "[number, number]",
+      "required": false,
+      "description": "where the reveal runs, as [start, end] percentages of the timeline's cover range"
+    },
+    {
+      "name": "timeline",
+      "type": "string",
+      "required": false,
+      "description": "a parent's named view timeline to follow (e.g. \"--my-stage\"); the text's own by default"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4551c86032a677ae4d66a0ee73ad8b74ab200deadfbb19764733d2029270c518"
+}

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Neko media slot",
+  "description": "A frame for a photo or video that fills it like object-fit: cover; when empty it shows a plain token-coloured placeholder surface (muted, lemon wash, slate or ice).",
+  "category": "card",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video"
+  ],
+  "notes": [
+    "size, radius and position come from className; a passed img or video is stretched to cover the frame"
+  ],
+  "entry": "neko-slot.tsx",
+  "source": "foundry",
+  "name": "neko-slot",
+  "files": [
+    {
+      "path": "neko-slot.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NekoSlotProps {\n  /** the real image or video; leave empty for the placeholder */\n  media?: ReactNode;\n  /** placeholder colour: muted grey, lemon wash, slate (dark enough for white text) or ice blue */\n  tone?: \"muted\" | \"lemon\" | \"slate\" | \"ice\";\n  className?: string;\n  children?: ReactNode;\n}\n\nconst tones = {\n  muted: \"bg-muted\",\n  lemon: \"bg-linear-to-br from-highlight/70 to-muted\",\n  slate: \"bg-linear-to-b from-muted-foreground/35 to-muted-foreground/60\",\n  ice: \"bg-linear-to-br from-accent to-glow/40\",\n};\n\n/** A media frame: whatever is passed fills it (cover); empty, it is a plain placeholder surface. */\nexport function NekoSlot({ media, tone = \"muted\", className, children }: NekoSlotProps) {\n  return (\n    <div className={cn(\"relative overflow-clip\", !media && tones[tone], className)}>\n      {media && <div className=\"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">{media}</div>}\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the real image or video; leave empty for the placeholder"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "placeholder colour: muted grey, lemon wash, slate (dark enough for white text) or ice blue"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "370c7a4806b5b4afacbc1178bc7e76aa93d1132bf3fdcbf8ebab04f27f94b263"
+}

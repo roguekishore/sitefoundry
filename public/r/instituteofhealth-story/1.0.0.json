@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health story",
+  "description": "A pinned scroll story over full-bleed dark media. The stage holds the window for about five screens of scrolling while the background slowly scales up 1 → 1.3 and drifts down. Large white statements, line by line, rise out of a blur, hold, and rise away into a blur; in the last step a scatter of word tags floats in and out before the final statement settles. A thin ring at the top counts the steps and a row of hairline bars at the bottom fills one by one. Pure CSS scroll-driven animation.",
+  "category": "features",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "story",
+    "scrollytelling",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "scroll-driven",
+    "blur",
+    "reveal",
+    "parallax",
+    "dark",
+    "fullscreen",
+    "progress"
+  ],
+  "notes": [
+    "CSS only (animation-timeline); browsers without it, and reduced motion, get a plain section with the statements stacked over the background",
+    "text sits on dark media in every theme (highlight-foreground over a black scrim); the placeholder is a red radial gradient from highlight and glow",
+    "very tall on purpose (550svh) while the effect runs"
+  ],
+  "entry": "instituteofhealth-story.tsx",
+  "source": "foundry",
+  "name": "instituteofhealth-story",
+  "files": [
+    {
+      "path": "instituteofhealth-story.css",
+      "content": "/* Without scroll-driven animations (or with reduced motion) the story is a plain section: the\n   statements stack over the background, tags sit in a row, no counter or bars. */\n.ioh-story-stage {\n  position: relative;\n  isolation: isolate;\n  min-height: 100svh;\n}\n.ioh-story-steps {\n  display: flex;\n  min-height: 100svh;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 3rem;\n  padding-block: 9rem;\n}\n.ioh-story-step {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  gap: 1.5rem;\n}\n.ioh-story-tags {\n  display: flex;\n  flex-wrap: wrap;\n  justify-content: center;\n  gap: 0.5rem;\n}\n.ioh-story-counter,\n.ioh-story-bars {\n  display: none;\n}\n\n/* With them: a tall track, a pinned 100svh stage, and everything driven by the track's\n   progress through the window (the named view timeline --ioh-story). Each element gets its\n   own slice of that progress through --from / --to, set inline. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ioh-story-track {\n      height: 575svh;\n      view-timeline: --ioh-story block;\n    }\n    @media (min-width: 64rem) {\n      .ioh-story-track { height: 545svh; }\n    }\n    .ioh-story-stage {\n      position: sticky;\n      top: 0;\n      height: 100svh;\n    }\n    .ioh-story-steps {\n      display: grid;\n      height: 100%;\n      min-height: 0;\n      padding-block: 0;\n      place-items: center;\n    }\n    .ioh-story-step {\n      display: contents;\n    }\n    .ioh-story-text {\n      grid-area: 1 / 1;\n    }\n    .ioh-story-tags {\n      position: absolute;\n      inset: 0;\n      display: block;\n    }\n    .ioh-story-tag {\n      position: absolute;\n      left: var(--x);\n      top: var(--y);\n      --rise: 20px;\n    }\n    .ioh-story-counter {\n      display: grid;\n    }\n    .ioh-story-bars {\n      display: flex;\n    }\n\n    .ioh-story-media {\n      animation: instituteofhealth-story-media linear both;\n      animation-timeline: --ioh-story;\n      animation-range: cover 0% cover 100%;\n    }\n    .ioh-story-line,\n    .ioh-story-tag {\n      animation: instituteofhealth-story-through linear both;\n      animation-timeline: --ioh-story;\n      animation-range: contain var(--from) contain var(--to);\n    }\n    .ioh-story-line.is-last {\n      animation-name: instituteofhealth-story-stay;\n    }\n    .ioh-story-digit {\n      animation: instituteofhealth-story-digit linear both;\n      animation-timeline: --ioh-story;\n      animation-range: contain var(--from) contain var(--to);\n    }\n    .ioh-story-digit.is-first {\n      animation-name: instituteofhealth-story-digit-first;\n    }\n    .ioh-story-digit.is-last {\n      animation-name: instituteofhealth-story-digit-last;\n    }\n    .ioh-story-digit.is-first.is-last {\n      animation: none;\n    }\n    .ioh-story-fill {\n      animation: instituteofhealth-story-fill linear both;\n      animation-timeline: --ioh-story;\n      animation-range: contain var(--from) contain var(--to);\n    }\n  }\n}\n\n@keyframes instituteofhealth-story-media {\n  from { transform: translateY(0) scale(1); }\n  to { transform: translateY(45px) scale(1.3); }\n}\n\n/* In, hold, out: rises out of a blur, waits, then rises on into a blur. */\n@keyframes instituteofhealth-story-through {\n  0% { opacity: 0; transform: translateY(var(--rise, 14px)); filter: blur(8px); }\n  28%, 72% { opacity: 1; transform: none; filter: blur(0); }\n  100% { opacity: 0; transform: translateY(calc(var(--rise, 14px) * -1)); filter: blur(8px); }\n}\n\n/* The last statement comes in and stays. */\n@keyframes instituteofhealth-story-stay {\n  0% { opacity: 0; transform: translateY(14px); filter: blur(8px); }\n  30%, 100% { opacity: 1; transform: none; filter: blur(0); }\n}\n\n@keyframes instituteofhealth-story-digit {\n  0%, 100% { opacity: 0; }\n  6%, 94% { opacity: 1; }\n}\n@keyframes instituteofhealth-story-digit-first {\n  0%, 94% { opacity: 1; }\n  100% { opacity: 0; }\n}\n@keyframes instituteofhealth-story-digit-last {\n  0% { opacity: 0; }\n  6%, 100% { opacity: 1; }\n}\n\n@keyframes instituteofhealth-story-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n"
+    },
+    {
+      "path": "instituteofhealth-story.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./instituteofhealth-story.css\";\n\nexport interface InstituteofhealthStoryStep {\n  /** the statement, one entry per line (each line blurs in on its own) */\n  lines: string[];\n  /** words that float in around the centre before this step's statement appears */\n  tags?: string[];\n}\n\nexport interface InstituteofhealthStoryProps {\n  /** the steps, in scroll order; the counter and the bars follow their number */\n  steps: InstituteofhealthStoryStep[];\n  /** the full-bleed background behind the pinned stage; empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Where the floating tags sit, as left/top percentages of the stage (cycled). */\nconst tagSpots = [\n  [18, 30],\n  [62, 22],\n  [74, 58],\n  [24, 66],\n  [44, 76],\n  [8, 48],\n];\n\n/** Sets the scroll range (a share of the pinned stretch) one element animates over. */\nfunction range(from: number, to: number, extra?: Record<string, string>): CSSProperties {\n  return { \"--from\": `${from.toFixed(2)}%`, \"--to\": `${to.toFixed(2)}%`, ...extra } as CSSProperties;\n}\n\nexport function InstituteofhealthStory({ steps, media, className }: InstituteofhealthStoryProps) {\n  const n = Math.max(steps.length, 1);\n  const share = 100 / n;\n\n  return (\n    <section className={cn(\"ioh-story relative text-highlight-foreground\", className)}>\n      <div className=\"ioh-story-track\">\n        <div className=\"ioh-story-stage overflow-clip\">\n          {/* Background: drifts down and scales 1 → 1.3 across the whole pin. */}\n          <div className=\"ioh-story-media absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">\n            {media ?? <div className=\"bg-[radial-gradient(ellipse_at_35%_35%,var(--glow),var(--highlight)_55%,color-mix(in_oklab,var(--highlight)_55%,var(--foreground)))]\" />}\n          </div>\n          <div aria-hidden className=\"absolute inset-0 -z-10 bg-[oklch(0_0_0/0.3)]\" /> {/* foundry-allow-colour: a plain black scrim keeps the white type readable */}\n\n          {/* Step counter: a thin ring at the top centre; its digit changes with the step. */}\n          <div aria-hidden className=\"ioh-story-counter absolute top-[6.25rem] left-1/2 size-11 -translate-x-1/2 place-items-center rounded-full border border-highlight-foreground/45 text-[0.675rem] leading-none font-medium lg:top-[6.875rem]\">\n            {steps.map((_, k) => (\n              <span\n                key={k}\n                className={cn(\"ioh-story-digit col-start-1 row-start-1\", k === 0 && \"is-first\", k === n - 1 && \"is-last\")}\n                style={range(k * share, (k + 1) * share)}\n              >\n                {k + 1}\n              </span>\n            ))}\n          </div>\n\n          {/* The statements (and floating tags), all in the same spot. */}\n          <div className=\"ioh-story-steps px-gutter\">\n            {steps.map((s, k) => {\n              const from = k * share;\n              const to = (k + 1) * share;\n              const last = k === n - 1;\n              const textFrom = s.tags?.length ? from + share * 0.55 : from + share * 0.06;\n              const textTo = last ? 100 : to - share * 0.04;\n              return (\n                <div key={k} className=\"ioh-story-step\">\n                  {s.tags && s.tags.length > 0 && (\n                    <ul className=\"ioh-story-tags\">\n                      {s.tags.map((t, i) => {\n                        const [x, y] = tagSpots[i % tagSpots.length];\n                        return (\n                          <li\n                            key={t}\n                            className=\"ioh-story-tag rounded-md border border-highlight-foreground/30 bg-highlight-foreground/12 px-3.5 py-2.5 text-[0.975rem] leading-none font-medium tracking-[-0.02em] backdrop-blur-sm lg:text-[1.035rem]\"\n                            style={range(from + share * 0.04 + i * 1.2, from + share * 0.55, { \"--x\": `${x}%`, \"--y\": `${y}%` })}\n                          >\n                            {t}\n                          </li>\n                        );\n                      })}\n                    </ul>\n                  )}\n                  <p className=\"ioh-story-text max-w-[44rem] text-center font-display text-[1.71rem] leading-[1.2] font-medium tracking-[-0.03em] lg:text-[2.25rem] lg:leading-[1.65]\">\n                    {s.lines.map((line, i) => (\n                      <span\n                        key={i}\n                        className={cn(\"ioh-story-line block\", last && \"is-last\")}\n                        style={range(textFrom + i * share * 0.03, textTo + (last ? 0 : i * share * 0.015))}\n                      >\n                        {line}\n                      </span>\n                    ))}\n                  </p>\n                </div>\n              );\n            })}\n          </div>\n\n          {/* One bar per step at the bottom centre; each fills while its step is on screen. */}\n          <div aria-hidden className=\"ioh-story-bars absolute bottom-6 left-1/2 w-[min(33rem,calc(100%-2*var(--page-gutter)))] -translate-x-1/2 gap-1.5\">\n            {steps.map((_, k) => (\n              <span key={k} className=\"relative h-px flex-1 bg-highlight-foreground/25\">\n                <span className=\"ioh-story-fill absolute inset-0 origin-left bg-highlight-foreground\" style={range(k * share, (k + 1) * share)} />\n              </span>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "steps",
+      "type": "InstituteofhealthStoryStep[]",
+      "required": true,
+      "description": "the steps, in scroll order; the counter and the bars follow their number"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed background behind the pinned stage; empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "42f12d3a179c2c4fdee8cc4f0264546c8ecf058e77dc27fa80e2d830957f70ce"
+}

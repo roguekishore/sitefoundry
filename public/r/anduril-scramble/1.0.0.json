@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Anduril scramble text",
+  "description": "Text that decodes itself: random letters flicker in each position and settle left to right into the real words, on load, each time it scrolls into view, or when a parent marked data-scramble-host is hovered.",
+  "category": "text-effect",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "scramble",
+    "decode",
+    "hover",
+    "reveal",
+    "technical"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: visible); static HTML shows the plain text",
+    "off under prefers-reduced-motion",
+    "put data-scramble-host on a card to scramble when the card (not just the text) is hovered"
+  ],
+  "entry": "anduril-scramble.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "anduril-scramble",
+  "files": [
+    {
+      "path": "anduril-scramble.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport type AndurilScrambleTrigger = \"load\" | \"view\" | \"hover\";\n\nexport interface AndurilScrambleProps {\n  /** the words to show */\n  text: string;\n  /** when to decode: on mount, each time it scrolls into view, and/or on hover of the nearest [data-scramble-host] */\n  triggers?: AndurilScrambleTrigger[];\n  /** how long the decode takes, in milliseconds */\n  duration?: number;\n  className?: string;\n}\n\nconst LOWER = \"abcdefghijklmnopqrstuvwxyz\";\nconst UPPER = LOWER.toUpperCase();\n\n// A random letter of the same case as the original one; spaces and punctuation stay put.\nfunction noise(ch: string) {\n  if (/[a-z]/.test(ch)) return LOWER[Math.floor(Math.random() * 26)];\n  if (/[A-Z]/.test(ch)) return UPPER[Math.floor(Math.random() * 26)];\n  return ch;\n}\n\n/** Text whose letters flicker and settle left to right, like a readout decoding. */\nexport function AndurilScramble({ text, triggers = [\"view\"], duration = 800, className }: AndurilScrambleProps) {\n  const ref = useRef<HTMLSpanElement>(null);\n  const [shown, setShown] = useState(text);\n\n  useEffect(() => {\n    setShown(text);\n    const el = ref.current;\n    if (!el || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n\n    let frame = 0;\n    const run = () => {\n      cancelAnimationFrame(frame);\n      const start = performance.now();\n      const tick = (now: number) => {\n        const t = Math.min(1, (now - start) / duration);\n        const settled = Math.floor(t * text.length);\n        setShown(text.slice(0, settled) + Array.from(text.slice(settled), noise).join(\"\"));\n        if (t < 1) frame = requestAnimationFrame(tick);\n      };\n      frame = requestAnimationFrame(tick);\n    };\n\n    const cleanups: (() => void)[] = [];\n    if (triggers.includes(\"load\")) run();\n    if (triggers.includes(\"view\")) {\n      const io = new IntersectionObserver((entries) => entries.forEach((e) => e.isIntersecting && run()), { threshold: 0.6 });\n      io.observe(el);\n      cleanups.push(() => io.disconnect());\n    }\n    if (triggers.includes(\"hover\")) {\n      const host = el.closest(\"[data-scramble-host]\") ?? el;\n      host.addEventListener(\"pointerenter\", run);\n      cleanups.push(() => host.removeEventListener(\"pointerenter\", run));\n    }\n    return () => {\n      cancelAnimationFrame(frame);\n      cleanups.forEach((c) => c());\n    };\n  }, [text, duration, triggers.join(\",\")]);\n\n  return (\n    <span ref={ref} className={cn(\"inline-block\", className)}>\n      <span className=\"sr-only\">{text}</span>\n      <span aria-hidden>{shown}</span>\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the words to show"
+    },
+    {
+      "name": "triggers",
+      "type": "AndurilScrambleTrigger[]",
+      "required": false,
+      "default": "[\"view\"]",
+      "description": "when to decode: on mount, each time it scrolls into view, and/or on hover of the nearest [data-scramble-host]"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "800",
+      "description": "how long the decode takes, in milliseconds"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2570a3ee4a128a72231fbe8fd6692a90d2815b1695f855985c11373ccf6e8d4a"
+}

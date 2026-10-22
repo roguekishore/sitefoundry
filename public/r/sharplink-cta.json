@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink call to action",
+  "description": "A black band holding a slightly lifted panel inside a dotted frame with tiny blue squares at its corners: an outline mark top left, a two-tone statement (bright first line, faded second) whose letters assemble as you scroll, two square buttons at the bottom, and a tall outline drawing on the right that is uncovered top-down by the scroll, with a small blue target square at its centre.",
+  "category": "cta",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "dark",
+    "black",
+    "frame",
+    "dotted",
+    "blueprint",
+    "reveal",
+    "clip",
+    "scrubbed",
+    "scroll"
+  ],
+  "notes": [
+    "always dark: it carries the .dark class",
+    "the drawing is a slot (about 0.73 wide per tall, contained); empty, it shows a dotted outline frame",
+    "CSS view timelines only; without support or with reduced motion everything is in place"
+  ],
+  "entry": "sharplink-cta.tsx",
+  "source": "foundry",
+  "name": "sharplink-cta",
+  "files": [
+    {
+      "path": "sharplink-cta.css",
+      "content": "/* The drawing is uncovered from the top as the band scrolls in (clip-path, scrubbed); the mark\n   settles from 96% to full size as it enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-cta-media {\n      animation: sharplink-cta-uncover linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 55%;\n    }\n    .sharplink-cta-mark {\n      animation: sharplink-cta-settle linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes sharplink-cta-uncover {\n  from { clip-path: inset(0 0 100% 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n@keyframes sharplink-cta-settle {\n  from { transform: scale(0.96); opacity: 0.3; }\n  to { transform: none; opacity: 1; }\n}\n"
+    },
+    {
+      "path": "sharplink-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkTextReveal } from \"@foundry/sharplink-text-reveal\";\nimport \"./sharplink-cta.css\";\n\nexport interface SharplinkCtaLink {\n  /** the button text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface SharplinkCtaProps {\n  /** a mark at the top left of the panel (an outline icon or logo mark) */\n  mark?: ReactNode;\n  /** the bright first line */\n  title: string;\n  /** the faded second line */\n  subtitle?: string;\n  /** the main button (solid, with the sliding arrow) */\n  primary: SharplinkCtaLink;\n  /** the tinted button next to it */\n  secondary?: SharplinkCtaLink;\n  /** a tall outline drawing on the right; a dotted frame when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Black band with a framed panel: mark, two-tone statement, buttons and a revealed drawing. */\nexport function SharplinkCta({ mark, title, subtitle, primary, secondary, media, className }: SharplinkCtaProps) {\n  const corner = \"absolute size-1.5 bg-highlight\";\n  return (\n    <section data-sharplink-tone=\"dark\" className={cn(\"dark relative bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"relative border border-dotted border-foreground/20 px-4 lg:px-7\">\n          <span aria-hidden className={cn(corner, \"-top-[3.5px] -left-[3.5px]\")} />\n          <span aria-hidden className={cn(corner, \"-top-[3.5px] -right-[3.5px]\")} />\n          <span aria-hidden className={cn(corner, \"-bottom-[3.5px] -left-[3.5px]\")} />\n          <span aria-hidden className={cn(corner, \"-right-[3.5px] -bottom-[3.5px]\")} />\n\n          <div className=\"relative isolate flex min-h-[41rem] flex-col overflow-clip bg-card p-4 lg:min-h-[37.5rem] lg:p-7\">\n            <div className=\"absolute inset-x-6 top-8 bottom-[12rem] -z-10 lg:inset-x-auto lg:top-7 lg:right-[8%] lg:bottom-7 lg:aspect-[0.73]\">\n              <div className=\"sharplink-cta-media h-full w-full [&>*]:h-full [&>*]:w-full [&>*]:object-contain\">\n                {media ?? <div className=\"border border-dotted border-foreground/20\" />}\n              </div>\n              <span aria-hidden className=\"absolute top-1/2 left-1/2 grid size-8 -translate-1/2 place-items-center border border-highlight\">\n                <span className=\"size-3 bg-highlight\" />\n              </span>\n            </div>\n\n            {mark && <div className=\"sharplink-cta-mark hidden text-foreground/40 lg:block [&_svg]:size-[5.5rem]\">{mark}</div>}\n\n            <div className=\"mt-auto lg:my-auto\">\n              <SharplinkTextReveal\n                text={title}\n                className=\"font-display text-2xl leading-[1.4] font-medium tracking-[-0.01em] lg:text-[2.75rem] lg:leading-[1.23]\"\n              />\n              {subtitle && (\n                <SharplinkTextReveal\n                  as=\"p\"\n                  text={subtitle}\n                  range={[14, 48]}\n                  className=\"font-display text-2xl leading-[1.4] font-medium tracking-[-0.01em] text-foreground/40 lg:text-[2.75rem] lg:leading-[1.23]\"\n                />\n              )}\n            </div>\n\n            <div className=\"mt-4 flex flex-col gap-1 lg:mt-0 lg:flex-row\">\n              <SharplinkButton href={primary.href} fullWidth=\"mobile\">\n                {primary.label}\n              </SharplinkButton>\n              {secondary && (\n                <SharplinkButton href={secondary.href} variant=\"tint\" fullWidth=\"mobile\">\n                  {secondary.label}\n                </SharplinkButton>\n              )}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-text-reveal"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a mark at the top left of the panel (an outline icon or logo mark)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bright first line"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "the faded second line"
+    },
+    {
+      "name": "primary",
+      "type": "SharplinkCtaLink",
+      "required": true,
+      "description": "the main button (solid, with the sliding arrow)"
+    },
+    {
+      "name": "secondary",
+      "type": "SharplinkCtaLink",
+      "required": false,
+      "description": "the tinted button next to it"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a tall outline drawing on the right; a dotted frame when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8d2dc46e1fcfdc6e1075fc9f1016d2bd87446f9cdba2215896a0cfa20b4ed81d"
+}

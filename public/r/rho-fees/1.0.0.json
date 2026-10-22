@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho fee table",
+  "description": "A dark pricing ledger: a two-line 60px heading and a lead, then full-width rows split by hairlines, each with a mono number, a semibold label and a bold value at the right edge followed by a blinking block caret. Rows take a faint tint on hover; fine print closes it.",
+  "category": "pricing",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "fees",
+    "table",
+    "dark",
+    "mono",
+    "caret",
+    "blink",
+    "hover",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "tone=\"dark\" by default; CSS only (caret blink loops, off with reduced motion)"
+  ],
+  "entry": "rho-fees.tsx",
+  "source": "foundry",
+  "name": "rho-fees",
+  "files": [
+    {
+      "path": "rho-fees.css",
+      "content": "/* A typing caret after each value, blinking once a second. */\n.rho-fees-caret {\n  animation: rho-fees-blink 1s steps(1, end) infinite;\n}\n@keyframes rho-fees-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n@media (prefers-reduced-motion: reduce) {\n  .rho-fees-caret { animation: none; }\n}\n"
+    },
+    {
+      "path": "rho-fees.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { RhoHeading } from \"@foundry/rho-heading\";\nimport { RhoReveal } from \"@foundry/rho-reveal\";\nimport \"./rho-fees.css\";\n\nexport interface RhoFeeRow {\n  /** what the fee is for */\n  label: string;\n  /** what it costs, e.g. \"$0\" */\n  value: string;\n  /** a footnote mark after the value, e.g. \"*\" */\n  mark?: string;\n}\n\nexport interface RhoFeesProps {\n  /** the heading */\n  title: string;\n  /** the sentence under it */\n  lead: string;\n  /** the rows; they are numbered 01, 02… */\n  rows: RhoFeeRow[];\n  /** small print under the table */\n  footnote?: string;\n  /** dark (as the original) or light */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nexport function RhoFees({ title, lead, rows, footnote, tone = \"dark\", className }: RhoFeesProps) {\n  return (\n    <section data-rho-tone={tone} className={cn(tone === \"dark\" && \"dark\", \"bg-background py-14 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <RhoHeading text={title} className=\"max-w-[38rem]\" />\n        <RhoReveal as=\"p\" className=\"mt-6 max-w-[34rem] text-[1.125rem] leading-[1.3] lg:mt-8 lg:text-xl lg:leading-[1.3]\">\n          {lead}\n        </RhoReveal>\n        <RhoReveal className=\"mt-10 border-t border-border lg:mt-14\">\n          <ol>\n            {rows.map((row, i) => (\n              <li\n                key={row.label}\n                className=\"grid h-[3.25rem] grid-cols-[2.25rem_1fr_auto] items-center border-b border-border pr-1 pl-1 transition-colors duration-[420ms] ease-[cubic-bezier(0.32,0,0.24,1)] hover:bg-card lg:h-[4.9375rem] lg:grid-cols-[5.25rem_1fr_auto]\"\n              >\n                <span className=\"font-mono text-[0.6875rem] font-medium\">{String(i + 1).padStart(2, \"0\")}</span>\n                <span className=\"text-[0.8125rem] font-semibold tracking-[-0.01em] lg:text-xl\">{row.label}</span>\n                <span className=\"flex items-center text-xl font-bold tracking-[-0.02em]\">\n                  {row.value}\n                  <span aria-hidden=\"true\" className=\"rho-fees-caret ml-0.5 inline-block h-[0.8em] w-[0.3em] bg-foreground\" />\n                  {row.mark && <sup className=\"ml-0.5 text-[0.625rem] font-normal\">{row.mark}</sup>}\n                </span>\n              </li>\n            ))}\n          </ol>\n        </RhoReveal>\n        {footnote && (\n          <RhoReveal as=\"p\" className=\"mt-8 max-w-[68rem] text-[0.6875rem] leading-[1.3] text-foreground/85 lg:mt-10\">\n            {footnote}\n          </RhoReveal>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-heading",
+    "rho-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the sentence under it"
+    },
+    {
+      "name": "rows",
+      "type": "RhoFeeRow[]",
+      "required": true,
+      "description": "the rows; they are numbered 01, 02…"
+    },
+    {
+      "name": "footnote",
+      "type": "string",
+      "required": false,
+      "description": "small print under the table"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark (as the original) or light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "620c79da790611e475b5b191281720250cbdbfdc0088b58bf2cd869b3c3d22d8"
+}

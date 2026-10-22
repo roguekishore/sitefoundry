@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio footer",
+  "description": "A dark full-width footer: the wordmark at the top left, link groups in four columns on the right (two on phones) with grey group titles, small blue 'new' pills and ↗ marks for outside links, then social icons and a quiet copyright and legal row along the bottom.",
+  "category": "footer",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "columns",
+    "minimal",
+    "saas"
+  ],
+  "notes": [
+    "forces the dark palette and marks itself data-header-tone=\"dark\" for the attio header",
+    "groups choose their desktop and phone column (column / phoneColumn); otherwise they fill columns in turn"
+  ],
+  "entry": "attio-footer.tsx",
+  "source": "foundry",
+  "name": "attio-footer",
+  "files": [
+    {
+      "path": "attio-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface AttioFooterLink {\n  label: string;\n  href: string;\n  /** a small blue pill after the label (e.g. \"New\") */\n  tag?: string;\n  /** opens elsewhere: adds a small ↗ */\n  external?: boolean;\n}\n\nexport interface AttioFooterGroup {\n  title: string;\n  links: AttioFooterLink[];\n}\n\nexport interface AttioFooterProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the wordmark */\n  logo: ReactNode;\n  homeHref?: string;\n  /**\n   * link groups, poured into four columns on desktop and two on phones; give `column`\n   * on each to choose its desktop column (0–3)\n   */\n  groups: (AttioFooterGroup & { column?: number; phoneColumn?: number })[];\n  /** small icon links at the bottom left (lucide icons work well) */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the copyright line */\n  copyright: string;\n  /** legal links after it */\n  legal?: AttioFooterLink[];\n  className?: string;\n}\n\nfunction Links({ links }: { links: AttioFooterLink[] }) {\n  return (\n    <ul className=\"mt-2 space-y-1.5\">\n      {links.map((l) => (\n        <li key={l.label}>\n          <a href={l.href} className=\"inline-flex items-center gap-1.5 text-sm leading-[1.6] font-medium text-foreground/80 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n            {l.label}\n            {l.external && <ArrowUpRight aria-hidden className=\"size-3 text-muted-foreground\" />}\n            {l.tag && <span className=\"rounded-full bg-highlight px-1.5 py-px text-[0.6875rem] leading-4 font-semibold text-highlight-foreground\">{l.tag}</span>}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/**\n * The dark footer: the wordmark at the top left, link groups in four columns on the right\n * (two on phones) with small \"new\" pills and ↗ marks, then social icons and a quiet\n * copyright and legal row along the bottom.\n */\nexport function AttioFooter({ brand, logo, homeHref = \"/\", groups, socials, copyright, legal, className }: AttioFooterProps) {\n  const columns = (count: number, key: \"column\" | \"phoneColumn\") =>\n    Array.from({ length: count }, (_, c) => groups.filter((g, i) => (g[key] ?? i % count) === c));\n\n  const group = (g: AttioFooterGroup) => (\n    <div key={g.title}>\n      <p className=\"text-sm font-medium text-muted-foreground/80\">{g.title}</p>\n      <Links links={g.links} />\n    </div>\n  );\n\n  return (\n    <footer data-header-tone=\"dark\" className={cn(\"dark border-t border-border bg-background text-foreground\", className)}>\n      <div className=\"px-gutter pt-20 pb-10 lg:px-8 lg:pt-[5.25rem] lg:pb-11\">\n        <div className=\"lg:grid lg:grid-cols-[1fr_minmax(0,58rem)]\">\n          <a href={homeHref} aria-label={brand} className=\"inline-flex self-start text-foreground [&_svg]:h-6 [&_svg]:w-auto\">\n            {logo}\n          </a>\n\n          <div className=\"mt-14 grid grid-cols-2 gap-x-5 lg:hidden\">\n            {columns(2, \"phoneColumn\").map((col, c) => (\n              <div key={c} className=\"space-y-12\">{col.map(group)}</div>\n            ))}\n          </div>\n          <div className=\"hidden grid-cols-4 gap-x-8 lg:grid lg:pl-2\">\n            {columns(4, \"column\").map((col, c) => (\n              <div key={c} className=\"space-y-12\">{col.map(group)}</div>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-20 flex flex-col gap-10 lg:mt-[8.25rem] lg:flex-row lg:items-center lg:justify-between\">\n          {socials && (\n            <ul className=\"flex items-center gap-4\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a href={s.href} aria-label={s.label} className=\"block text-muted-foreground transition-colors duration-150 hover:text-foreground [&_svg]:size-[1.125rem]\">\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          <div className=\"flex flex-col gap-6 text-[0.8125rem] font-medium text-muted-foreground lg:flex-row lg:items-center lg:gap-6\">\n            <p>{copyright}</p>\n            {legal && (\n              <ul className=\"flex flex-wrap gap-x-6 gap-y-2\">\n                {legal.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"transition-colors duration-150 hover:text-foreground\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "groups",
+      "type": "(AttioFooterGroup & { column?: number | undefined; phoneColumn?: number | undefined; })[]",
+      "required": true,
+      "description": "link groups, poured into four columns on desktop and two on phones; give `column`\non each to choose its desktop column (0–3)"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "description": "small icon links at the bottom left (lucide icons work well)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "AttioFooterLink[]",
+      "required": false,
+      "description": "legal links after it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ffdcc488e11d70e1fce774ae0c14993fd1dced92554a909bc9bf325c6d3f2cd6"
+}

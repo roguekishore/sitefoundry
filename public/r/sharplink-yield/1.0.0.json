@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink yield",
+  "description": "A three-column blueprint section with dotted column guides: a big title whose letters assemble as you scroll and a short paragraph on the left, a tall dark stats card in the middle (black fading to blue, two figures that rise into place, a chart slot and a tinted button), and three faint numbered feature cards on the right that slide in from the right one after another.",
+  "category": "features",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "stats",
+    "grid",
+    "blueprint",
+    "dotted",
+    "light",
+    "dark-card",
+    "gradient",
+    "reveal",
+    "scroll",
+    "stagger"
+  ],
+  "notes": [
+    "transparent background: on the page it shows the Sharplink backdrop wash",
+    "the stats card always uses the theme's dark colours (.dark)",
+    "chart and feature art are slots; empty, they show faint placeholders",
+    "all reveals are CSS view timelines; without support or with reduced motion everything is in place"
+  ],
+  "entry": "sharplink-yield.tsx",
+  "source": "foundry",
+  "name": "sharplink-yield",
+  "files": [
+    {
+      "path": "sharplink-yield.css",
+      "content": "/* Reveals on entering the window: the stats card fades in, its figures rise out of a mask,\n   its button rises and fades, and the feature cards slide in from the right one by one\n   (each card's range is shifted by its --sl-i). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-yield-card {\n      animation: sharplink-yield-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 60%;\n    }\n    .sharplink-yield-value {\n      animation: sharplink-yield-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 100% cover 45%;\n    }\n    .sharplink-yield-button {\n      animation: sharplink-yield-lift linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 30%;\n    }\n    .sharplink-yield-feature {\n      animation: sharplink-yield-slide linear both;\n      animation-timeline: view();\n      animation-range: entry calc(10% + var(--sl-i, 0) * 15%) cover calc(30% + var(--sl-i, 0) * 8%);\n    }\n  }\n}\n\n@keyframes sharplink-yield-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes sharplink-yield-rise {\n  from { transform: translateY(26px); }\n  to { transform: none; }\n}\n@keyframes sharplink-yield-lift {\n  from { opacity: 0; transform: translateY(30px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes sharplink-yield-slide {\n  from { opacity: 0; transform: translateX(100px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "sharplink-yield.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkGuides } from \"@foundry/sharplink-guides\";\nimport { SharplinkLabel } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\nimport { SharplinkTextReveal } from \"@foundry/sharplink-text-reveal\";\nimport \"./sharplink-yield.css\";\n\nexport interface SharplinkYieldStat {\n  /** the figure's name, e.g. \"Total held\" */\n  label: string;\n  /** the figure as shown, e.g. \"1,284,610\" */\n  value: string;\n}\n\nexport interface SharplinkYieldFeature {\n  /** the small number in the badge, e.g. \"01\" */\n  index: string;\n  /** the card's title */\n  title: string;\n  /** an illustration at the card's right; a faint placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface SharplinkYieldProps {\n  /** the section title; \"\\n\" breaks the line; its letters assemble as you scroll */\n  title: string;\n  /** the paragraph under the title */\n  body: string;\n  /** the figures at the top of the dark card (two read best) */\n  stats: SharplinkYieldStat[];\n  /** a chart inside the dark card; a dotted placeholder when empty */\n  chart?: ReactNode;\n  /** the tinted button at the bottom of the dark card */\n  cta: { label: string; href: string };\n  /** the numbered cards in the right column (three read best) */\n  features: SharplinkYieldFeature[];\n  className?: string;\n}\n\n/** Title + text, a dark stats card and numbered feature cards on a dotted three-column grid. */\nexport function SharplinkYield({ title, body, stats, chart, cta, features, className }: SharplinkYieldProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip text-foreground\", className)}>\n      <SharplinkGuides />\n      <div className=\"mx-auto grid max-w-page gap-y-10 px-gutter pt-20 pb-24 lg:grid-cols-3 lg:gap-x-gutter lg:py-[11rem]\">\n        <div className=\"flex flex-col lg:pt-[6.75rem]\">\n          <SharplinkRule />\n          <SharplinkTextReveal\n            text={title}\n            className=\"mt-7 font-display text-[2.75rem] leading-[1.15] font-medium tracking-[-0.01em] lg:text-[4.25rem] lg:leading-[1.06] lg:tracking-[-0.02em]\"\n          />\n          <SharplinkRule mark={false} className=\"mt-6 hidden lg:block\" />\n          <p className=\"mt-6 max-w-[18.5rem] text-base leading-[1.35] lg:mt-auto lg:border-t lg:border-dotted lg:border-foreground/20 lg:pt-7\">{body}</p>\n        </div>\n\n        <div className=\"sharplink-yield-card dark relative flex flex-col bg-[linear-gradient(to_bottom,var(--background)_12%,color-mix(in_oklab,var(--glow)_45%,var(--background))_55%,var(--glow)_85%,color-mix(in_oklab,var(--glow)_55%,var(--foreground))_100%)] p-4 text-foreground lg:h-[37rem] lg:p-7\">\n          <span aria-hidden className=\"absolute top-0 left-0 size-1 bg-highlight\" />\n          <dl>\n            {stats.map((stat) => (\n              <div key={stat.label} className=\"flex items-baseline justify-between gap-4 border-b border-dotted border-foreground/20 py-4 first:pt-1\">\n                <dt>\n                  <SharplinkLabel>{stat.label}</SharplinkLabel>\n                </dt>\n                <dd className=\"overflow-clip text-[1.1875rem] leading-[1.35] font-medium tracking-[-0.01em] lg:text-2xl\">\n                  <span className=\"sharplink-yield-value block\">{stat.value}</span>\n                </dd>\n              </div>\n            ))}\n          </dl>\n          <div className=\"mt-6 min-h-[10.5rem] flex-1 [&>*]:h-full [&>*]:w-full\">\n            {chart ?? <div className=\"border border-dotted border-foreground/20 bg-foreground/5\" />}\n          </div>\n          <SharplinkButton href={cta.href} variant=\"tint\" fullWidth className=\"sharplink-yield-button mt-6\">\n            {cta.label}\n          </SharplinkButton>\n        </div>\n\n        <ul className=\"grid content-start gap-2 lg:gap-gutter lg:pt-[6.75rem]\">\n          {features.map((feature, i) => (\n            <li\n              key={feature.index}\n              className=\"sharplink-yield-feature relative flex min-h-[6rem] flex-col justify-center bg-foreground/[0.03] p-5 lg:h-[11.25rem] lg:justify-start\"\n              style={{ \"--sl-i\": i } as CSSProperties}\n            >\n              <span className=\"relative z-10 inline-flex h-[1.375rem] w-fit items-center gap-1 bg-foreground px-1.5 text-background\">\n                <span aria-hidden className=\"size-1 bg-background\" />\n                <span className=\"font-sans text-xs font-medium tracking-[0.06em] [font-stretch:80%]\">{feature.index}</span>\n              </span>\n              <span className=\"relative z-10 mt-3 max-w-[60%] text-[1.1875rem] leading-[1.35] font-medium tracking-[-0.01em]\">{feature.title}</span>\n              <div className=\"absolute inset-y-3 right-3 w-[34%] lg:inset-y-4 lg:right-4 lg:w-[43%] [&>*]:h-full [&>*]:w-full [&>*]:object-contain\">\n                {feature.media ?? <div className=\"border border-dotted border-foreground/15\" />}\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-guides",
+    "sharplink-label",
+    "sharplink-rule",
+    "sharplink-text-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title; \"\\n\" breaks the line; its letters assemble as you scroll"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the title"
+    },
+    {
+      "name": "stats",
+      "type": "SharplinkYieldStat[]",
+      "required": true,
+      "description": "the figures at the top of the dark card (two read best)"
+    },
+    {
+      "name": "chart",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a chart inside the dark card; a dotted placeholder when empty"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the tinted button at the bottom of the dark card"
+    },
+    {
+      "name": "features",
+      "type": "SharplinkYieldFeature[]",
+      "required": true,
+      "description": "the numbered cards in the right column (three read best)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2dbeeb54c05186cbd245c66f4094bb839eba3fe386354913f92065f8e558ca04"
+}

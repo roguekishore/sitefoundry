@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Eight Sleep expanding card row",
+  "description": "A row of tall rounded media cards where one is open and wide (about 1.85× the others) and the rest are narrow. Each has a translucent pill tag top-left, a round + button top-right that turns into × when open, and a white caption over a bottom scrim; the open card also shows its sentence. Widths glide in 0.5s. On phones the cards stack, captions either under the media or over it.",
+  "category": "features",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "accordion",
+    "expand",
+    "media",
+    "dark-scrim",
+    "pill",
+    "interactive"
+  ],
+  "notes": [
+    "the media frames are dark-scoped so captions stay white over photos under any theme",
+    "click + to open a card (the others narrow); × closes it and the row evens out"
+  ],
+  "entry": "eightsleep-expand-cards.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "eightsleep-expand-cards",
+  "files": [
+    {
+      "path": "eightsleep-expand-cards.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\n\nexport interface EightsleepExpandCard {\n  /** the short pill label top-left (e.g. the part's name) */\n  tag: ReactNode;\n  /** caption title */\n  title: ReactNode;\n  /** the sentence shown when the card is open (and under the media on phones) */\n  text?: ReactNode;\n  /** photo or video filling the card; a muted placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface EightsleepExpandCardsProps {\n  /** two to four cards */\n  items: EightsleepExpandCard[];\n  /** which card starts open; -1 for none */\n  defaultOpen?: number;\n  /** phones: caption (title + text) under the media in page colours, or title only over the media */\n  phoneCaption?: \"below\" | \"over\";\n  /** corner size: xl (20px) or 2xl (24px) with the default theme */\n  radius?: \"xl\" | \"2xl\";\n  /** screen-reader labels for the toggle */\n  openLabel?: string;\n  closeLabel?: string;\n  className?: string;\n}\n\nexport function EightsleepExpandCards({\n  items,\n  defaultOpen = 0,\n  phoneCaption = \"over\",\n  radius = \"2xl\",\n  openLabel,\n  closeLabel,\n  className,\n}: EightsleepExpandCardsProps) {\n  const [open, setOpen] = useState(defaultOpen);\n  const below = phoneCaption === \"below\";\n  const round = radius === \"xl\" ? \"rounded-lg lg:rounded-xl\" : \"rounded-lg lg:rounded-2xl\";\n\n  return (\n    <ul className={cn(\"flex flex-col gap-4 lg:h-[clamp(360px,31.5vw,454px)] lg:flex-row\", below && \"gap-12 lg:gap-4\", className)}>\n      {items.map((item, i) => {\n        const isOpen = open === i;\n        return (\n          <li\n            key={i}\n            className={cn(\n              \"flex min-w-0 flex-col transition-[flex-grow] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none lg:basis-0\",\n              isOpen ? \"lg:grow-[1.85]\" : \"lg:grow\",\n            )}\n          >\n            {/* the frame is dark-scoped: white text and a black scrim over the photo */}\n            <div className={cn(\"dark relative w-full overflow-clip bg-background text-foreground lg:h-full\", round, below ? \"aspect-[350/263] lg:aspect-auto\" : \"aspect-[350/320] lg:aspect-auto\")}>\n              <EightsleepMedia media={item.media} className=\"absolute inset-0 bg-muted-foreground/40\" />\n              <div className=\"pointer-events-none absolute inset-0 bg-linear-to-b from-transparent from-50% to-background/50\" />\n              <span className=\"absolute top-4 left-4 rounded-full bg-foreground/25 px-3 py-1 text-[13px] leading-[1.2] backdrop-blur-md\">{item.tag}</span>\n              <button\n                type=\"button\"\n                aria-expanded={isOpen}\n                aria-label={isOpen ? closeLabel : openLabel}\n                onClick={() => setOpen(isOpen ? -1 : i)}\n                className={cn(\n                  \"absolute top-3 right-3 size-10 items-center justify-center rounded-full bg-foreground/20 backdrop-blur-md transition-colors duration-200 hover:bg-foreground/35\",\n                  below ? \"hidden lg:flex\" : \"flex\",\n                )}\n              >\n                <Plus strokeWidth={1.5} className={cn(\"size-6 transition-transform duration-500 motion-reduce:transition-none\", isOpen && \"rotate-45\")} />\n              </button>\n              <div className={cn(\"absolute inset-x-0 bottom-0 p-5 lg:p-8\", below && \"hidden lg:block\")}>\n                <h3 className=\"max-w-[30ch] text-[17px] leading-[1.2] font-medium lg:text-[22px]\">{item.title}</h3>\n                {item.text && (\n                  <div\n                    className={cn(\n                      \"grid transition-[grid-template-rows,opacity] duration-500 motion-reduce:transition-none max-lg:hidden\",\n                      isOpen ? \"grid-rows-[1fr] opacity-100\" : \"grid-rows-[0fr] opacity-0\",\n                    )}\n                  >\n                    <p className=\"min-h-0 max-w-[26rem] overflow-hidden pt-2 text-[15px] leading-[1.4] lg:text-[18px]\">{item.text}</p>\n                  </div>\n                )}\n              </div>\n            </div>\n            {below && (\n              <div className=\"mx-auto mt-5 max-w-[22rem] text-center lg:hidden\">\n                <h3 className=\"text-[22px] leading-[1.1] text-foreground\">{item.title}</h3>\n                {item.text && <p className=\"mt-2 text-[15px] leading-[1.35] text-muted-foreground\">{item.text}</p>}\n              </div>\n            )}\n          </li>\n        );\n      })}\n    </ul>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "eightsleep-media",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "EightsleepExpandCard[]",
+      "required": true,
+      "description": "two to four cards"
+    },
+    {
+      "name": "defaultOpen",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which card starts open; -1 for none"
+    },
+    {
+      "name": "phoneCaption",
+      "type": "enum",
+      "required": false,
+      "default": "over",
+      "description": "phones: caption (title + text) under the media in page colours, or title only over the media"
+    },
+    {
+      "name": "radius",
+      "type": "enum",
+      "required": false,
+      "default": "2xl",
+      "description": "corner size: xl (20px) or 2xl (24px) with the default theme"
+    },
+    {
+      "name": "openLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader labels for the toggle"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2b65494dba40c0c9a907452cfec6b452258aea10d84883390f6f662f9203a651"
+}

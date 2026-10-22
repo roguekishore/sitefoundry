@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Sharplink button",
+  "description": "Square 34px buttons in narrow uppercase type, made of a label box and a separate square arrow box 2px away. The main one is a solid box with a blue arrow box that slides across to the left on hover while the label shifts right (0.5s, easeInOutCirc); tinted ones deepen from 10% to 18% fill in 0.25s.",
+  "category": "button",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "square",
+    "flat",
+    "arrow",
+    "hover",
+    "slide",
+    "technical"
+  ],
+  "notes": [
+    "solid uses foreground / background, so it reads light on dark sections and dark on light ones",
+    "renders an <a> when given href, otherwise a <button>"
+  ],
+  "entry": "sharplink-button.tsx",
+  "source": "foundry",
+  "name": "sharplink-button",
+  "files": [
+    {
+      "path": "sharplink-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { sharplinkLabelType } from \"@foundry/sharplink-label\";\n\nexport interface SharplinkButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** a link target; without it the button is a <button> */\n  href?: string;\n  /**\n   * solid: a solid foreground box with a primary (blue) arrow box that slides to the left on hover.\n   * tint: a 10% foreground tint that deepens to 18% on hover.\n   */\n  variant?: \"solid\" | \"tint\";\n  /** show the separate square arrow box (always on for solid) */\n  arrow?: boolean;\n  /** the icon in the arrow box (an arrow by default) */\n  icon?: ReactNode;\n  /** stretch to the full width of the parent, label centred (\"mobile\": only below the lg breakpoint) */\n  fullWidth?: boolean | \"mobile\";\n  /** for a <button>: submit inside forms */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst ease = \"duration-500 ease-[cubic-bezier(0.785,0.135,0.15,0.86)] motion-reduce:transition-none\";\nconst tintFill = \"bg-foreground/10 transition-colors duration-[250ms] ease-[cubic-bezier(0.455,0.03,0.515,0.955)] group-hover/sl-btn:bg-foreground/[0.18] motion-reduce:transition-none\";\n\n/** A square label box plus a square arrow box; the arrow slides across on hover. */\nexport function SharplinkButton({\n  children,\n  href,\n  variant = \"solid\",\n  arrow = variant === \"solid\",\n  icon,\n  fullWidth = false,\n  type = \"button\",\n  className,\n}: SharplinkButtonProps) {\n  const solid = variant === \"solid\";\n  const showArrow = solid || arrow;\n  const arrowIcon = icon ?? <ArrowRight className=\"size-4\" strokeWidth={1.5} />;\n  const classes = cn(\n    \"group/sl-btn relative h-[2.125rem] shrink-0 items-stretch overflow-clip text-foreground\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    fullWidth === true ? \"flex w-full\" : fullWidth === \"mobile\" ? \"flex w-full lg:inline-flex lg:w-auto\" : \"inline-flex\",\n    showArrow && \"pr-9\",\n    className,\n  );\n  const inner = (\n    <>\n      <span\n        className={cn(\n          \"flex items-center px-4 whitespace-nowrap\",\n          sharplinkLabelType,\n          fullWidth && \"flex-1 justify-center\",\n          fullWidth === \"mobile\" && \"lg:flex-none\",\n          solid ? cn(\"bg-foreground text-background transition-transform group-hover/sl-btn:translate-x-9\", ease) : tintFill,\n        )}\n      >\n        {children}\n      </span>\n      {showArrow && (\n        <span\n          aria-hidden\n          className={cn(\n            \"absolute inset-y-0 right-0 grid w-[2.125rem] place-items-center\",\n            solid\n              ? cn(\"bg-primary text-primary-foreground transition-[right] group-hover/sl-btn:right-[calc(100%-2.125rem)]\", ease)\n              : tintFill,\n          )}\n        >\n          {arrowIcon}\n        </span>\n      )}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-label"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "a link target; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: a solid foreground box with a primary (blue) arrow box that slides to the left on hover.\ntint: a 10% foreground tint that deepens to 18% on hover."
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "variant === \"solid\"",
+      "description": "show the separate square arrow box (always on for solid)"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the icon in the arrow box (an arrow by default)"
+    },
+    {
+      "name": "fullWidth",
+      "type": "boolean | \"mobile\"",
+      "required": false,
+      "default": "false",
+      "description": "stretch to the full width of the parent, label centred (\"mobile\": only below the lg breakpoint)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: submit inside forms"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5616ced19808b391a4f44d341fb3a3e6f71c8a05339dc53986ff5d270cfde1e7"
+}

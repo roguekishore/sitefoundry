@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Granola wordmark",
+  "description": "A heavy, tightly tracked lowercase wordmark in the body face with an optional small mark. Inline for headers; fill mode stretches the name across the full width of its container, like a giant footer logo.",
+  "category": "logo",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "logo",
+    "wordmark",
+    "bold",
+    "minimal",
+    "footer"
+  ],
+  "notes": [
+    "fill mode is an SVG <text> with textLength, so it scales with its container and never overflows"
+  ],
+  "entry": "granola-wordmark.tsx",
+  "source": "foundry",
+  "name": "granola-wordmark",
+  "files": [
+    {
+      "path": "granola-wordmark.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GranolaWordmarkProps {\n  /** the company name, set in type (no logo) */\n  name: string;\n  /** a small mark before the name (e.g. a lucide icon); inline mode only */\n  mark?: ReactNode;\n  /** where it links; without it the wordmark is plain text */\n  href?: string;\n  /** inline: header size · fill: stretched to the full width of its container (footer) */\n  mode?: \"inline\" | \"fill\";\n  className?: string;\n}\n\nexport function GranolaWordmark({ name, mark, href, mode = \"inline\", className }: GranolaWordmarkProps) {\n  const body =\n    mode === \"fill\" ? (\n      // SVG text stretched with textLength, so the name always spans the container exactly.\n      <svg viewBox=\"0 0 1000 230\" role=\"img\" aria-label={name} className=\"block h-auto w-full overflow-visible\">\n        <text\n          x=\"0\"\n          y=\"182\"\n          textLength=\"1000\"\n          lengthAdjust=\"spacingAndGlyphs\"\n          className=\"fill-current font-sans font-bold\"\n          style={{ fontSize: 240, letterSpacing: \"-0.04em\" }}\n        >\n          {name}\n        </text>\n      </svg>\n    ) : (\n      <span className=\"inline-flex items-center gap-1 font-sans text-[1.375rem] leading-none font-bold tracking-[-0.04em] [&_svg]:size-[1.15em] [&_svg]:stroke-[2.6]\">\n        {mark}\n        {name}\n      </span>\n    );\n\n  if (href) {\n    return (\n      <a href={href} className={cn(\"inline-block text-foreground\", mode === \"fill\" && \"block\", className)}>\n        {body}\n      </a>\n    );\n  }\n  return <div className={cn(\"text-foreground\", mode === \"inline\" && \"inline-block\", className)}>{body}</div>;\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set in type (no logo)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the name (e.g. a lucide icon); inline mode only"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it links; without it the wordmark is plain text"
+    },
+    {
+      "name": "mode",
+      "type": "enum",
+      "required": false,
+      "default": "inline",
+      "description": "inline: header size · fill: stretched to the full width of its container (footer)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4159825aae5bd23ec587a5ac0025065a47d69f57fd284f95867ac07d2fca19d0"
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril news",
+  "description": "A warm cream band with one lead story: a 40px light heading with an underlined ↗ link at the half-way line, a hairline, then date, a 32px headline, a short excerpt and a read-more link on the left half and a 16:9 image on the right half. Phones put the image first. The image fades in as it enters the view; links re-draw their underline on hover.",
+  "category": "blog",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "news",
+    "article",
+    "editorial",
+    "cream",
+    "light",
+    "hairline",
+    "reveal",
+    "scroll-driven"
+  ],
+  "notes": [
+    "uses the card surface (cream band, dark text)"
+  ],
+  "entry": "anduril-news.tsx",
+  "source": "foundry",
+  "name": "anduril-news",
+  "files": [
+    {
+      "path": "anduril-news.css",
+      "content": "/* The lead image fades in as it enters the view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .anduril-news-media {\n      animation: anduril-news-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 260px;\n    }\n  }\n}\n\n@keyframes anduril-news-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "anduril-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilLink } from \"@foundry/anduril-link\";\nimport \"./anduril-news.css\";\n\nexport interface AndurilNewsArticle {\n  /** the date line, e.g. \"10/06/2026\" */\n  date: string;\n  /** the headline */\n  title: string;\n  /** one or two lines under the headline */\n  excerpt: string;\n  /** link words, e.g. \"Read more\" */\n  linkLabel: string;\n  href: string;\n  /** the lead image (16:9); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface AndurilNewsProps {\n  /** the section heading */\n  heading: string;\n  /** the link to every article, beside the heading */\n  allLabel: string;\n  allHref: string;\n  /** the lead story */\n  article: AndurilNewsArticle;\n  className?: string;\n}\n\n/** Cream news band: heading and link over a hairline, then the lead story beside its image. */\nexport function AndurilNews({ heading, allLabel, allHref, article, className }: AndurilNewsProps) {\n  return (\n    <section className={cn(\"bg-card px-gutter pt-11 pb-28 text-card-foreground md:pt-12 md:pb-[5.25rem]\", className)}>\n      <div className=\"grid grid-cols-[1fr_auto] items-end gap-[1.125rem] border-b border-current/60 pb-[1.875rem] md:grid-cols-2 md:pb-6\">\n        <h2 className=\"max-w-[6em] font-display text-[2rem] leading-[1.1] tracking-[-0.03em] md:max-w-none lg:text-[2.5rem]\">{heading}</h2>\n        <AndurilLink label={allLabel} href={allHref} className=\"mb-1 md:mb-2\" />\n      </div>\n\n      <div className=\"grid gap-[1.125rem] pt-7 md:grid-cols-2 md:pt-8\">\n        <div className=\"anduril-news-media aspect-video overflow-clip rounded-lg bg-muted md:order-last [&>img]:size-full [&>img]:object-cover\">{article.media}</div>\n        <div className=\"pt-[1.125rem] md:pt-0\">\n          <p className=\"text-[0.8125rem] leading-[1.05] font-medium tracking-[0.02em] md:text-[0.75rem]\">{article.date}</p>\n          <h3 className=\"mt-3 max-w-[35rem] font-display text-[1.6875rem] leading-[1.15] tracking-[-0.02em] lg:mt-2.5 lg:text-[2rem]\">{article.title}</h3>\n          <p className=\"mt-9 max-w-[22rem] text-[0.9375rem] leading-[1.25] tracking-[-0.01em] md:mt-14\">{article.excerpt}</p>\n          <AndurilLink label={article.linkLabel} href={article.href} className=\"mt-9 md:mt-14\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anduril-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "allLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link to every article, beside the heading"
+    },
+    {
+      "name": "allHref",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "article",
+      "type": "AndurilNewsArticle",
+      "required": true,
+      "description": "the lead story"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3b402322f77c6a0d0b546b583ad435ef2fbbd0864d48427de5b0a03e4053021e"
+}

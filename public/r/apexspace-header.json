@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Apexspace header",
+  "description": "A 65px sticky bar that starts transparent over the hero and fills with the page colour after about 400px of scroll. Wordmark left; on wide screens a row of numbered mono nav cells (\"1.0 LABEL +\") split by full-height hairlines, ending in a call-to-action cell with an arrow; the dim numbers and icons brighten on hover. Phones get a three-line menu button and a full-screen numbered menu.",
+  "category": "header",
+  "site": "apexspace",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "transparent",
+    "scroll-driven",
+    "mono",
+    "hairline",
+    "dark",
+    "hover"
+  ],
+  "notes": [
+    "sticky with a −65px bottom margin: the next section slides under it, so give that section 65px of room at its top (apexspace-hero does)",
+    "the background fade is a CSS scroll timeline on the page; browsers without it (and reduced motion) show the filled bar",
+    "needs JavaScript (hydrate: load) for the phone menu",
+    "the desktop row shows from 1280px; below that the menu button"
+  ],
+  "entry": "apexspace-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "apexspace-header",
+  "files": [
+    {
+      "path": "apexspace-header.css",
+      "content": "/* The bar's background layer: shown by default, faded in by the page scroll where the\n   browser supports scroll timelines (transparent over the hero, filled from ~450px). */\n@supports (animation-timeline: scroll()) {\n  .apexspace-header-fill {\n    animation: apexspace-header-fill linear both;\n    animation-timeline: scroll(root block);\n    animation-range: 380px 450px;\n  }\n}\n\n@keyframes apexspace-header-fill {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n/* An open phone menu always has the filled bar. */\n.apexspace-header[data-open=\"true\"] .apexspace-header-fill {\n  animation: none;\n  opacity: 1;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .apexspace-header-fill { animation: none; opacity: 1; }\n}\n"
+    },
+    {
+      "path": "apexspace-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ArrowRight, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ApexspaceWordmark, type ApexspaceWordmarkProps } from \"@foundry/apexspace-wordmark\";\nimport \"./apexspace-header.css\";\n\nexport interface ApexspaceHeaderLink {\n  /** the small index before the label, e.g. \"1.0\" */\n  number: string;\n  label: string;\n  href: string;\n  /** show a + after the label (a link that opens more) */\n  more?: boolean;\n}\n\nexport interface ApexspaceHeaderProps {\n  /** the logo */\n  wordmark: ApexspaceWordmarkProps;\n  /** the numbered navigation cells */\n  links: ApexspaceHeaderLink[];\n  /** the last cell, with an arrow */\n  cta: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Sticky transparent bar that fills on scroll; numbered nav cells split by hairlines. */\nexport function ApexspaceHeader({ wordmark, links, cta, menuLabel, className }: ApexspaceHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    document.documentElement.style.overflow = open ? \"hidden\" : \"\";\n    return () => {\n      document.documentElement.style.overflow = \"\";\n    };\n  }, [open]);\n\n  const cell = \"group/cell flex h-full items-center gap-3.5 border-l border-border px-6 font-mono text-[0.75rem] leading-none tracking-[0.06em] uppercase\";\n  const dim = \"text-foreground/60 transition-colors duration-250 ease-[ease] group-hover/cell:text-foreground motion-reduce:transition-none\";\n\n  return (\n    <header data-open={open} className={cn(\"apexspace-header sticky top-0 z-50 -mb-[4.0625rem] h-[4.0625rem] text-foreground\", className)}>\n      <div aria-hidden className=\"apexspace-header-fill absolute inset-0 bg-background\" />\n      <div className=\"relative flex h-full items-stretch justify-between border-b border-border\">\n        <div className=\"flex items-center pl-gutter\">\n          <ApexspaceWordmark {...wordmark} />\n        </div>\n\n        <nav className=\"hidden h-full xl:flex\">\n          {links.map((l, i) => (\n            <a key={l.label} href={l.href} className={cn(cell, i === 0 && \"border-l-0\")}>\n              <span className={dim}>{l.number}</span>\n              <span>{l.label}</span>\n              {l.more && <Plus aria-hidden className={cn(\"size-3\", dim)} strokeWidth={1.5} />}\n            </a>\n          ))}\n          <a href={cta.href} className={cn(cell, \"px-8\")}>\n            <span>{cta.label}</span>\n            <ArrowRight aria-hidden className={cn(\"size-3.5\", dim)} strokeWidth={1.5} />\n          </a>\n        </nav>\n\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((o) => !o)}\n          className=\"flex w-14 flex-col items-center justify-center gap-[0.3125rem] pr-gutter xl:hidden\"\n        >\n          <span className={cn(\"h-px w-6 bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"translate-y-[6px] rotate-45\")} />\n          <span className={cn(\"h-px w-6 bg-current transition-opacity duration-300 motion-reduce:transition-none\", open && \"opacity-0\")} />\n          <span className={cn(\"h-px w-6 bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"-translate-y-[6px] -rotate-45\")} />\n        </button>\n      </div>\n\n      {open && (\n        <nav className=\"fixed inset-x-0 top-[4.0625rem] bottom-0 flex flex-col overflow-y-auto bg-background px-gutter pt-4 pb-10 xl:hidden\">\n          {links.map((l) => (\n            <a\n              key={l.label}\n              href={l.href}\n              onClick={() => setOpen(false)}\n              className=\"flex items-center gap-4 border-b border-border py-5 font-mono text-[0.875rem] leading-none tracking-[0.06em] uppercase\"\n            >\n              <span className=\"text-foreground/60\">{l.number}</span>\n              <span>{l.label}</span>\n              {l.more && <Plus aria-hidden className=\"ml-auto size-3.5 text-foreground/60\" strokeWidth={1.5} />}\n            </a>\n          ))}\n          <a\n            href={cta.href}\n            onClick={() => setOpen(false)}\n            className=\"mt-8 flex h-[3.125rem] items-center justify-between bg-primary px-8 font-mono text-[0.75rem] leading-none tracking-[0.06em] text-primary-foreground uppercase\"\n          >\n            <span>{cta.label}</span>\n            <ArrowRight aria-hidden className=\"size-3.5\" strokeWidth={1.5} />\n          </a>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "apexspace-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "ApexspaceWordmarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "links",
+      "type": "ApexspaceHeaderLink[]",
+      "required": true,
+      "description": "the numbered navigation cells"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the last cell, with an arrow"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b081be03c1fc92022126be40a077e3b745a5d8ce34219d140d73b6f20f0a020e"
+}

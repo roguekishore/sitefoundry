@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp product trio",
+  "description": "A mono title with a brand-blue lead, then three product cards joined in one hairline-framed row: a big square image on top, a geometric semibold name, a muted mono line and an action — a full-width ink button, or a command box with a copy icon and a 'Mac | Linux | Windows' switch under it. Phones stack the cards.",
+  "category": "features",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "products",
+    "cards",
+    "download",
+    "install",
+    "command",
+    "developer",
+    "mono",
+    "light",
+    "interactive",
+    "reveal"
+  ],
+  "notes": [
+    "the platform switch and copy button use React state, so it needs hydrate",
+    "each image is a media slot (a dotted placeholder while empty)"
+  ],
+  "hydrate": "visible",
+  "entry": "warp-everywhere.tsx",
+  "source": "foundry",
+  "name": "warp-everywhere",
+  "files": [
+    {
+      "path": "warp-everywhere.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Check, Copy } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpButton } from \"@foundry/warp-button\";\nimport { WarpMedia } from \"@foundry/warp-media\";\nimport { WarpSection } from \"@foundry/warp-section\";\n\nexport interface WarpEverywhereCommand {\n  /** the platform name in the switch, e.g. \"Mac\" */\n  platform: string;\n  /** the install command shown after \"$\" */\n  command: string;\n}\n\nexport interface WarpEverywhereProduct {\n  name: string;\n  text: string;\n  /** the square image; a placeholder when empty */\n  media?: ReactNode;\n  /** what the image shows, for screen readers */\n  mediaLabel?: string;\n  /** a full-width ink button */\n  cta?: { label: ReactNode; href: string };\n  /** or an install command box with a platform switch */\n  commands?: WarpEverywhereCommand[];\n}\n\nexport interface WarpEverywhereProps {\n  id?: string;\n  title: string;\n  /** the brand-blue line under the title */\n  lead?: string;\n  /** three in the original */\n  products: WarpEverywhereProduct[];\n  /** screen-reader label for the copy button */\n  copyLabel?: string;\n  className?: string;\n}\n\nfunction CommandBox({ commands, copyLabel }: { commands: WarpEverywhereCommand[]; copyLabel?: string }) {\n  const [active, setActive] = useState(0);\n  const [copied, setCopied] = useState(false);\n  const current = commands[active] ?? commands[0];\n  return (\n    <div>\n      <div className=\"flex h-[3.75rem] items-center gap-3 border border-border px-5 font-mono text-[0.9375rem] text-muted-foreground\">\n        <span aria-hidden>$</span>\n        <span className=\"min-w-0 flex-1 truncate\">{current.command}</span>\n        <button\n          type=\"button\"\n          aria-label={copyLabel}\n          onClick={() => {\n            navigator.clipboard?.writeText(current.command).then(() => setCopied(true), () => setCopied(false));\n          }}\n          className=\"shrink-0 text-muted-foreground transition-colors duration-150 hover:text-primary motion-reduce:transition-none\"\n        >\n          {copied ? <Check aria-hidden className=\"size-3.5\" strokeWidth={1.75} /> : <Copy aria-hidden className=\"size-3.5\" strokeWidth={1.75} />}\n        </button>\n      </div>\n      <div className=\"mt-3 flex items-center gap-2 text-[0.8125rem] tracking-[calc(0.04em_-_var(--warp-squeeze,0em))]\">\n        {commands.map((c, i) => (\n          <span key={c.platform} className=\"flex items-center gap-2\">\n            {i > 0 && <span aria-hidden className=\"text-foreground/20\">|</span>}\n            <button\n              type=\"button\"\n              aria-pressed={i === active}\n              onClick={() => {\n                setActive(i);\n                setCopied(false);\n              }}\n              className={cn(\"transition-colors duration-150 motion-reduce:transition-none\", i === active ? \"text-foreground\" : \"text-foreground/40 hover:text-foreground\")}\n            >\n              {c.platform}\n            </button>\n          </span>\n        ))}\n      </div>\n    </div>\n  );\n}\n\n/** Three product cards in one framed row: image, name, line, and a button or command. */\nexport function WarpEverywhere({ id, title, lead, products, copyLabel, className }: WarpEverywhereProps) {\n  return (\n    <WarpSection id={id} title={title} lead={lead} leadTone=\"brand\" className={className}>\n      <div className=\"-mt-2 grid grid-cols-1 border border-border bg-card lg:grid-cols-3\">\n        {products.map((p, i) => (\n          <article key={p.name} className={cn(\"flex min-w-0 flex-col\", i > 0 && \"border-t border-border lg:border-t-0 lg:border-l\")}>\n            <WarpMedia label={p.mediaLabel} className=\"aspect-square\">\n              {p.media}\n            </WarpMedia>\n            <div className=\"flex flex-1 flex-col border-t border-border px-[1.125rem] pt-7 pb-5 lg:px-5\">\n              <h3 className=\"font-display text-[0.9375rem] leading-[1.4] font-semibold tracking-[-0.01em]\">{p.name}</h3>\n              <p className=\"mt-3 text-[0.8125rem] leading-[1.6] tracking-[calc(0.04em_-_var(--warp-squeeze,0em))] text-muted-foreground\">{p.text}</p>\n              <div className=\"mt-6\">\n                {p.commands && p.commands.length > 0 ? (\n                  <CommandBox commands={p.commands} copyLabel={copyLabel} />\n                ) : (\n                  p.cta && (\n                    <WarpButton href={p.cta.href} size=\"lg\" className=\"w-full justify-center font-semibold\">\n                      {p.cta.label}\n                    </WarpButton>\n                  )\n                )}\n              </div>\n            </div>\n          </article>\n        ))}\n      </div>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-button",
+    "warp-media",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the brand-blue line under the title"
+    },
+    {
+      "name": "products",
+      "type": "WarpEverywhereProduct[]",
+      "required": true,
+      "description": "three in the original"
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the copy button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bff5e740529f0352b75d41b121f97e134978e79d15aae2fbd59540db68bfe35c"
+}

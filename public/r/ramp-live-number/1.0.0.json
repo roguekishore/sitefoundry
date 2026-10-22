@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Ramp live number",
+  "description": "A mono figure that keeps counting up by small random steps, like a live usage counter; the digits that change roll up into place.",
+  "category": "stats",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "counter",
+    "number",
+    "live",
+    "mono",
+    "ticker",
+    "roll"
+  ],
+  "notes": [
+    "needs JavaScript to tick; static HTML shows the starting value",
+    "with reduced motion it holds still"
+  ],
+  "hydrate": "load",
+  "entry": "ramp-live-number.tsx",
+  "source": "foundry",
+  "name": "ramp-live-number",
+  "files": [
+    {
+      "path": "ramp-live-number.css",
+      "content": "/* A changed digit rolls up from below. */\n.ramp-live-number-digit {\n  display: inline-block;\n  animation: ramp-live-number-roll 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n}\n\n@keyframes ramp-live-number-roll {\n  from { opacity: 0; transform: translateY(55%); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ramp-live-number-digit { animation: none; }\n}\n"
+    },
+    {
+      "path": "ramp-live-number.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ramp-live-number.css\";\n\nexport interface RampLiveNumberProps {\n  /** the value shown first (and in static HTML) */\n  start: number;\n  /** the largest step per tick; each tick adds a random amount up to this */\n  step: number;\n  /** milliseconds between ticks */\n  every?: number;\n  /** digits after the decimal point */\n  decimals?: number;\n  /** text after the number, e.g. \"%\" */\n  suffix?: string;\n  className?: string;\n}\n\nfunction format(value: number, decimals: number) {\n  return value.toLocaleString(\"en-US\", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });\n}\n\n/** A counter that keeps climbing; the characters that change remount and roll in. */\nexport function RampLiveNumber({ start, step, every = 1800, decimals = 0, suffix, className }: RampLiveNumberProps) {\n  const [value, setValue] = useState(start);\n\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setInterval(() => {\n      const add = decimals ? Math.random() * step : Math.ceil(Math.random() * step);\n      setValue((v) => v + add);\n    }, every);\n    return () => window.clearInterval(id);\n  }, [step, every, decimals]);\n\n  const text = format(value, decimals);\n  return (\n    <span className={cn(\"inline-flex font-mono tabular-nums\", className)}>\n      <span className=\"sr-only\">{text}</span>\n      <span aria-hidden className=\"inline-flex overflow-clip\">\n        {text.split(\"\").map((ch, i) => (\n          <span key={`${i}-${ch}`} className=\"ramp-live-number-digit\">\n            {ch}\n          </span>\n        ))}\n      </span>\n      {suffix && <span aria-hidden>{suffix}</span>}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "start",
+      "type": "number",
+      "required": true,
+      "description": "the value shown first (and in static HTML)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": true,
+      "description": "the largest step per tick; each tick adds a random amount up to this"
+    },
+    {
+      "name": "every",
+      "type": "number",
+      "required": false,
+      "default": "1800",
+      "description": "milliseconds between ticks"
+    },
+    {
+      "name": "decimals",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "digits after the decimal point"
+    },
+    {
+      "name": "suffix",
+      "type": "string",
+      "required": false,
+      "description": "text after the number, e.g. \"%\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fd8c4eb5cad3e0b8ae08e01a4389dd7007fb09a91e68e075b9407e80a81284d9"
+}

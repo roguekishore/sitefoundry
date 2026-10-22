@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Aspen Search line reveal text",
+  "description": "Text that reveals line by line as it scrolls into view: each line rises out of a clip and fades in, lines lower down following a beat later. Display mode lets big words travel further.",
+  "category": "text-effect",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "reveal",
+    "split-lines",
+    "clip",
+    "scroll-driven",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only: every word is a clip box on its own view timeline, so words sharing a line move together",
+    "static HTML and browsers without scroll-driven animations show the text in place; off under reduced motion"
+  ],
+  "entry": "aspensearch-reveal-text.tsx",
+  "source": "foundry",
+  "name": "aspensearch-reveal-text",
+  "files": [
+    {
+      "path": "aspensearch-reveal-text.css",
+      "content": "/* Each word is a clipping box with its own view timeline; the word inside rises from below\n   the clip and fades in. Words on the same line share a position, so they move as one line,\n   and lines further down the paragraph start later: the original's line-by-line reveal.\n   The small padding keeps cap tops and descenders inside the clip, even at tight leading. */\n.aspensearch-reveal-word {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: top;\n  padding-block: 0.1em 0.14em;\n  margin-block: -0.1em -0.14em;\n  view-timeline-name: --aspensearch-reveal-word;\n}\n.aspensearch-reveal-word > span {\n  display: inline-block;\n}\n\n@supports (animation-timeline: view()) {\n  .aspensearch-reveal-word > span {\n    animation: aspensearch-reveal-text-rise linear both;\n    animation-timeline: --aspensearch-reveal-word;\n    animation-range: entry var(--aspensearch-reveal-delay, 0%) cover calc(22% + var(--aspensearch-reveal-delay, 0%));\n  }\n  .aspensearch-reveal-display .aspensearch-reveal-word > span {\n    animation-name: aspensearch-reveal-text-rise-far;\n    animation-range: entry var(--aspensearch-reveal-delay, 0%) cover calc(38% + var(--aspensearch-reveal-delay, 0%));\n  }\n}\n\n@keyframes aspensearch-reveal-text-rise {\n  from { opacity: 0; transform: translateY(105%); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes aspensearch-reveal-text-rise-far {\n  from { opacity: 0; transform: translateY(70%); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-reveal-word > span { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "aspensearch-reveal-text.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./aspensearch-reveal-text.css\";\n\nexport interface AspensearchRevealTextProps {\n  /** the text; it is split into words, and the words of one line rise together as that line scrolls into view */\n  text: string;\n  /** the element to render, e.g. \"p\", \"h2\", \"span\" (default \"p\") */\n  as?: ElementType;\n  /** copy: lines rise from their own height over a short scroll · display: big words rise further and slower */\n  variant?: \"copy\" | \"display\";\n  /** pushes the start of the reveal later, in % of the scroll range (staggers stacked display lines) */\n  delay?: number;\n  className?: string;\n}\n\n/**\n * Text that reveals line by line while scrolling, like the original's split-line reveals:\n * each word sits in its own clipping box on a CSS view timeline, so words sharing a line\n * enter the window together and rise, clipped, into place. No JavaScript; static HTML and\n * browsers without scroll-driven animations show the text as is.\n */\nexport function AspensearchRevealText({ text, as: Tag = \"p\", variant = \"copy\", delay = 0, className }: AspensearchRevealTextProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <Tag className={cn(\"aspensearch-reveal\", variant === \"display\" && \"aspensearch-reveal-display\", className)} style={{ \"--aspensearch-reveal-delay\": `${delay}%` } as CSSProperties}>\n      {words.map((word, i) => (\n        <Fragment key={i}>\n          {i > 0 && \" \"}\n          <span className=\"aspensearch-reveal-word\">\n            <span>{word}</span>\n          </span>\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; it is split into words, and the words of one line rise together as that line scrolls into view"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "p",
+      "description": "the element to render, e.g. \"p\", \"h2\", \"span\" (default \"p\")"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "copy",
+      "description": "copy: lines rise from their own height over a short scroll · display: big words rise further and slower"
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "pushes the start of the reveal later, in % of the scroll range (staggers stacked display lines)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "447a4e03ca06ba7cb4ac6fb8429061cc75d56e1530665b67bb3ebe87f0aec675"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko mission line",
+  "description": "One large soft-serif statement set in the right half of the page (full width on phones), with an arrow link under it, below a band that fades from the lemon wash to white. As it scrolls in, its words light up one after another from 30% to full strength.",
+  "category": "text-effect",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "mission",
+    "text-effect",
+    "scroll",
+    "scrubbed",
+    "word-reveal",
+    "serif",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "the fade band at the top runs from highlight to background, to follow a highlight section (turn it off with fadeFrom=\"none\")",
+    "CSS scroll-driven; without support or with reduced motion the words are simply at full strength"
+  ],
+  "entry": "neko-mission.tsx",
+  "source": "foundry",
+  "name": "neko-mission",
+  "files": [
+    {
+      "path": "neko-mission.css",
+      "content": "/* Each word brightens from 30% to full while the statement scrolls in; word n starts 40px of\n   scrolling after word n-1 (ranges set inline as --nm-range). */\n.neko-mission-text {\n  view-timeline: --neko-mission block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .neko-mission-word {\n      animation: neko-mission-light linear backwards;\n      animation-timeline: --neko-mission;\n      animation-range: var(--nm-range, normal);\n    }\n  }\n}\n\n@keyframes neko-mission-light {\n  from { opacity: 0.3; }\n}\n"
+    },
+    {
+      "path": "neko-mission.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoArrowLink } from \"@foundry/neko-arrow-link\";\nimport \"./neko-mission.css\";\n\nexport interface NekoMissionProps {\n  /** the statement; its words light up one by one */\n  text: string;\n  /** the arrow link under it */\n  link?: { label: string; href: string };\n  /** colour the band at the top fades from: highlight (after a lemon section) or none */\n  fadeFrom?: \"highlight\" | \"none\";\n  className?: string;\n}\n\nexport function NekoMission({ text, link, fadeFrom = \"highlight\", className }: NekoMissionProps) {\n  const words = text.split(\" \");\n  return (\n    <section className={cn(\"bg-background font-sans text-foreground\", className)}>\n      <div aria-hidden className={cn(\"h-section\", fadeFrom === \"highlight\" && \"bg-linear-to-b from-highlight to-background\")} />\n      <div className=\"mx-auto max-w-page px-gutter lg:grid lg:grid-cols-[50.45%_1fr]\">\n        <div className=\"lg:col-start-2\">\n          <h2 className=\"neko-mission-text max-w-[36rem] font-display text-[2.5rem] leading-[1.1] tracking-[-0.025em] lg:text-[4.25rem] lg:leading-[1.18]\">\n            {words.map((w, i) => (\n              <span key={i}>\n                {i > 0 && \" \"}\n                <span\n                  className=\"neko-mission-word\"\n                  style={{ \"--nm-range\": `cover ${180 + i * 40}px cover ${280 + i * 40}px` } as CSSProperties}\n                >\n                  {w}\n                </span>\n              </span>\n            ))}\n          </h2>\n          {link && <NekoArrowLink label={link.label} href={link.href} className=\"mt-10 lg:mt-12\" />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-arrow-link"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the statement; its words light up one by one"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the arrow link under it"
+    },
+    {
+      "name": "fadeFrom",
+      "type": "enum",
+      "required": false,
+      "default": "highlight",
+      "description": "colour the band at the top fades from: highlight (after a lemon section) or none"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a789eaa33972285265a46675b9fe8ef383fcce9bdf5e0f2f97f28843f84b009e"
+}

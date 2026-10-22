@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho footer",
+  "description": "A near-black footer opened by one huge word in a dotted, LED-like texture across the full column, then a wordmark with social links, four columns of mono-headed links (the last with contact lines and two app badges), a hairline, and long paragraphs of small legal print. Links turn mint on hover.",
+  "category": "footer",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "dotted",
+    "big-type",
+    "links",
+    "legal",
+    "mono",
+    "mint",
+    "hover"
+  ],
+  "notes": [
+    "tone=\"dark\" by default",
+    "the big dotted word is SVG text filled with a dot pattern, stretched to the column's width",
+    "backdrop: anything behind the footer (the original has a WebGL starfield); empty: nothing"
+  ],
+  "entry": "rho-footer.tsx",
+  "source": "foundry",
+  "name": "rho-footer",
+  "files": [
+    {
+      "path": "rho-footer.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RhoFooterLink {\n  /** visible text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface RhoFooterColumn {\n  /** mono heading */\n  title: string;\n  /** the links */\n  links: RhoFooterLink[];\n}\n\nexport interface RhoFooterBadge {\n  /** small line, e.g. \"Download on\" */\n  caption: string;\n  /** main line, e.g. the store's name */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** a small icon on the left */\n  icon?: ReactNode;\n}\n\nexport interface RhoFooterProps {\n  /** the huge dotted word at the top (keep it short: 5–8 letters) */\n  bigWord: string;\n  /** the company name, set as a wordmark */\n  brand: string;\n  /** social links under (desktop) or beside (phones) the wordmark */\n  socials: RhoFooterLink[];\n  /** link columns */\n  columns: RhoFooterColumn[];\n  /** the contact column: a heading and plain lines (phone, email, address) */\n  contact?: { title: string; lines: string[] };\n  /** app-store style badges under the contact lines */\n  badges?: RhoFooterBadge[];\n  /** paragraphs of legal print */\n  legal: string[];\n  /** the copyright line */\n  copyright: string;\n  /** anything behind the footer; empty: nothing */\n  backdrop?: ReactNode;\n  /** dark (as the original) or light */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nconst linkClass = \"transition-colors duration-[160ms] hover:text-primary motion-reduce:transition-none\";\nconst headClass = \"font-mono text-[0.75rem] font-medium tracking-[0.04em] text-muted-foreground uppercase lg:text-[0.8125rem]\";\n\nexport function RhoFooter({\n  bigWord,\n  brand,\n  socials,\n  columns,\n  contact,\n  badges,\n  legal,\n  copyright,\n  backdrop,\n  tone = \"dark\",\n  className,\n}: RhoFooterProps) {\n  const dots = useId().replace(/[^a-zA-Z0-9-]/g, \"\");\n  return (\n    <footer\n      data-rho-tone={tone}\n      className={cn(tone === \"dark\" && \"dark\", \"relative overflow-clip border-t border-border bg-background text-foreground\", className)}\n    >\n      {backdrop && (\n        <div aria-hidden=\"true\" className=\"pointer-events-none absolute inset-0\">\n          {backdrop}\n        </div>\n      )}\n      <div className=\"relative mx-auto max-w-page px-gutter pt-10 pb-12 lg:pt-16 lg:pb-[4.25rem]\">\n        {/* the big word: SVG text stretched to the full width, filled with a 6px dot grid */}\n        <svg viewBox=\"0 0 1000 190\" className=\"block w-full text-foreground\" role=\"img\" aria-label={bigWord}>\n          <defs>\n            <pattern id={`${dots}-dots`} width=\"5\" height=\"5\" patternUnits=\"userSpaceOnUse\">\n              <circle cx=\"2.5\" cy=\"2.5\" r=\"1.25\" fill=\"currentColor\" />\n            </pattern>\n          </defs>\n          <text\n            x=\"0\"\n            y=\"178\"\n            textLength=\"1000\"\n            lengthAdjust=\"spacingAndGlyphs\"\n            fill={`url(#${dots}-dots)`}\n            className=\"font-display text-[15.5rem] font-bold uppercase\"\n          >\n            {bigWord}\n          </text>\n        </svg>\n\n        <div className=\"mt-10 grid grid-cols-2 gap-x-6 gap-y-10 lg:mt-14 lg:grid-cols-[0.93fr_1fr_1fr_1fr_0.86fr] lg:gap-x-0\">\n          <div className=\"col-span-2 flex items-center justify-between lg:col-span-1 lg:block\">\n            <p className=\"font-display text-[2.25rem] leading-none tracking-[-0.04em]\">{brand}</p>\n            <ul className=\"flex gap-4 text-[0.875rem] lg:mt-6 lg:block lg:space-y-2 lg:text-[0.9375rem]\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a href={s.href} className={linkClass}>\n                    {s.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n          {columns.map((col) => (\n            <nav key={col.title} aria-label={col.title}>\n              <p className={headClass}>{col.title}</p>\n              <ul className=\"mt-5 space-y-2 text-[0.875rem] lg:mt-6 lg:space-y-[0.6rem] lg:text-[0.9375rem]\">\n                {col.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={linkClass}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </nav>\n          ))}\n          {contact && (\n            <div>\n              <p className={headClass}>{contact.title}</p>\n              <ul className=\"mt-5 space-y-2 text-[0.875rem] lg:mt-6 lg:space-y-[0.6rem] lg:text-[0.9375rem]\">\n                {contact.lines.map((line) => (\n                  <li key={line}>{line}</li>\n                ))}\n              </ul>\n              {badges && (\n                <div className=\"mt-5 flex flex-col items-start gap-2.5 lg:flex-row lg:flex-wrap\">\n                  {badges.map((b) => (\n                    <a\n                      key={b.label}\n                      href={b.href}\n                      className=\"flex items-center gap-1.5 rounded-md border border-input px-2 py-1 transition-colors duration-[160ms] hover:bg-card [&_svg]:size-4\"\n                    >\n                      {b.icon}\n                      <span className=\"leading-none\">\n                        <span className=\"block text-[0.5rem] uppercase\">{b.caption}</span>\n                        <span className=\"block text-[0.875rem] font-medium\">{b.label}</span>\n                      </span>\n                    </a>\n                  ))}\n                </div>\n              )}\n            </div>\n          )}\n        </div>\n\n        <div className=\"mt-12 space-y-4 border-t border-border pt-8 text-[0.6875rem] leading-[1.45] text-foreground/80 lg:mt-10 lg:space-y-5 lg:pt-10 lg:text-xs\">\n          {legal.map((p, i) => (\n            <p key={i} className=\"max-w-[69rem]\">\n              {p}\n            </p>\n          ))}\n          <p>{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "bigWord",
+      "type": "string",
+      "required": true,
+      "description": "the huge dotted word at the top (keep it short: 5–8 letters)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a wordmark"
+    },
+    {
+      "name": "socials",
+      "type": "RhoFooterLink[]",
+      "required": true,
+      "description": "social links under (desktop) or beside (phones) the wordmark"
+    },
+    {
+      "name": "columns",
+      "type": "RhoFooterColumn[]",
+      "required": true,
+      "description": "link columns"
+    },
+    {
+      "name": "contact",
+      "type": "{ title: string; lines: string[]; }",
+      "required": false,
+      "description": "the contact column: a heading and plain lines (phone, email, address)"
+    },
+    {
+      "name": "badges",
+      "type": "RhoFooterBadge[]",
+      "required": false,
+      "description": "app-store style badges under the contact lines"
+    },
+    {
+      "name": "legal",
+      "type": "string[]",
+      "required": true,
+      "description": "paragraphs of legal print"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "anything behind the footer; empty: nothing"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark (as the original) or light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "93d9a3b64cfc9ddf4f16e447dc0d6bca65ab64a482f0245789e90f3b212f8cf3"
+}

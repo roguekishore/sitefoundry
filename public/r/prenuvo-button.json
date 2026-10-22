@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Prenuvo button",
+  "description": "Bold pill buttons in the display face. Gradient is a green-to-teal pill (ocean runs green to blue) that takes on a seafoam tint and a light rim on hover; outline is a translucent pill with a light rim for dark backdrops; soft is a teal-tinted pill with a thin ink rim that fills with ink on hover. All changes take 0.2s.",
+  "category": "button",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "gradient",
+    "hover"
+  ],
+  "notes": [
+    "outline and soft follow the foreground colour, so they flip with the dark class"
+  ],
+  "entry": "prenuvo-button.tsx",
+  "source": "foundry",
+  "name": "prenuvo-button",
+  "files": [
+    {
+      "path": "prenuvo-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PrenuvoButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** where it goes; without it the button is a <button> */\n  href?: string;\n  /**\n   * gradient: green to teal (the main CTA) · ocean: green to blue · outline: translucent pill with\n   * a light rim (on dark) · soft: teal-tinted pill with a thin ink rim (on light)\n   */\n  variant?: \"gradient\" | \"ocean\" | \"outline\" | \"soft\";\n  /** sm: 40px tall (phone header) · md: 48px · lg: 54px */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** stretch to the width of its container */\n  block?: boolean;\n  /** for a <button>: the form button type */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-10 px-4 text-sm\",\n  md: \"h-12 px-6 text-sm\",\n  lg: \"h-[3.375rem] px-8 text-sm lg:text-base\",\n};\n\nexport function PrenuvoButton({ children, href, variant = \"gradient\", size = \"md\", block = false, type = \"button\", className }: PrenuvoButtonProps) {\n  const filled = variant === \"gradient\" || variant === \"ocean\";\n  const classes = cn(\n    \"group/btn relative isolate inline-flex shrink-0 items-center justify-center overflow-clip rounded-full border font-display font-bold whitespace-nowrap\",\n    \"transition-[background-color,color,border-color] duration-200 ease-[ease] motion-reduce:transition-none\",\n    filled && \"border-transparent text-primary-foreground hover:border-primary-foreground\",\n    variant === \"gradient\" && \"bg-[linear-gradient(101deg,var(--primary),var(--chart-4))]\",\n    variant === \"ocean\" && \"bg-[linear-gradient(101deg,var(--primary),var(--glow))]\",\n    variant === \"outline\" && \"border-foreground/90 bg-foreground/15 text-foreground hover:bg-foreground hover:text-background\",\n    variant === \"soft\" && \"border-foreground/60 bg-secondary text-secondary-foreground hover:bg-foreground hover:text-background\",\n    sizes[size],\n    block && \"w-full\",\n    className,\n  );\n\n  const inner = (\n    <>\n      {/* the hover tint over the gradient (a background colour can't show through a gradient) */}\n      {filled && (\n        <span\n          aria-hidden\n          className=\"absolute inset-0 -z-10 bg-highlight/75 opacity-0 transition-opacity duration-200 ease-[ease] group-hover/btn:opacity-100 motion-reduce:transition-none\"\n        />\n      )}\n      {children}\n    </>\n  );\n\n  if (href) {\n    return (\n      <a href={href} className={classes}>\n        {inner}\n      </a>\n    );\n  }\n  return (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where it goes; without it the button is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "gradient",
+      "description": "gradient: green to teal (the main CTA) · ocean: green to blue · outline: translucent pill with\na light rim (on dark) · soft: teal-tinted pill with a thin ink rim (on light)"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 40px tall (phone header) · md: 48px · lg: 54px"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "stretch to the width of its container"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "for a <button>: the form button type"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c0862903e2d23a2917c7c78a309ef03ab2e28e821012f2a3966d0ec35032040d"
+}

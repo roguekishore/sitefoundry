@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column customer stories",
+  "description": "One large near-white card with a row of customer-name tabs along its top: the chosen one fills with that customer's accent colour. Below, a 28px navy statement, small grey product chips and a pull quote with its author sit on the left, the customer's art on the right; switching tabs crossfades both. On phones the stories become a swipeable row of cards, art on top with the name over it, the next card peeking in.",
+  "category": "testimonials",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-study",
+    "tabs",
+    "carousel",
+    "light",
+    "card",
+    "quote",
+    "crossfade",
+    "scale-in"
+  ],
+  "notes": [
+    "needs JavaScript for the desktop tabs (hydrate: visible); the phone carousel is plain CSS scroll-snap",
+    "each story has its own accent (tone) and media slot; empty, the art is a soft wash of that accent with a faint dot grid and a plain card frame"
+  ],
+  "entry": "column-stories.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "column-stories",
+  "files": [
+    {
+      "path": "column-stories.css",
+      "content": "/* Tab switch: the new story fades in and settles. */\n.column-stories-swap {\n  animation: column-stories-swap 0.6s cubic-bezier(0.76, 0, 0.24, 1) both;\n}\n\n@keyframes column-stories-swap {\n  from { opacity: 0; transform: translateY(6px); }\n  to { opacity: 1; transform: none; }\n}\n\n/* Desktop art: the frame scales up from 85% and fades in as the card scrolls into view. */\n@supports (animation-timeline: view()) {\n  @media (width >= 64rem) {\n    .column-stories-art {\n      animation: column-stories-art-in linear both;\n      animation-timeline: view();\n      animation-range: entry 10% cover 40%;\n    }\n  }\n}\n\n@keyframes column-stories-art-in {\n  from { opacity: 0; transform: scale(0.85); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-stories-swap,\n  .column-stories-art { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-stories.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Quote } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { toneStyle, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-stories.css\";\n\nexport interface ColumnStoryTag {\n  /** a small line icon (lucide works well) */\n  icon?: ReactNode;\n  label: string;\n}\n\nexport interface ColumnStory {\n  /** the customer's name: the tab label and the wordmark over the phone art */\n  name: string;\n  /** the customer's accent: the active tab fill and the art wash */\n  tone: ColumnTone;\n  /** the statement, e.g. what they run on you */\n  title: string;\n  /** small grey chips under the statement (products they use) */\n  tags: ColumnStoryTag[];\n  /** the pull quote */\n  quote: string;\n  /** who said it */\n  author: string;\n  /** the story's art; empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface ColumnStoriesProps {\n  /** the customers; four fill the tab row */\n  stories: ColumnStory[];\n  /** which story starts selected (desktop) */\n  initial?: number;\n  className?: string;\n}\n\n/** Placeholder art: a soft wash and dot grid in the story's accent, and a plain card frame. */\nfunction Art({ story }: { story: ColumnStory }) {\n  if (story.media) return <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">{story.media}</div>;\n  return (\n    <div className=\"absolute inset-0\" style={toneStyle(story.tone)}>\n      <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_70%_65%_at_60%_60%,color-mix(in_oklab,var(--tone)_12%,transparent),transparent_80%)]\" />\n      <div className=\"absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--tone)_45%,transparent)_1.2px,transparent_1.7px)] bg-size-[8px_8px] [mask-image:radial-gradient(ellipse_55%_55%_at_70%_75%,black,transparent_85%)]\" />\n      <div className=\"column-stories-art absolute top-[30%] left-[18%] aspect-[1.45] w-[64%] rounded-lg bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_14px_30px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:top-[30%] lg:left-[20%] lg:w-[58%]\" />\n    </div>\n  );\n}\n\nfunction Copy({ story, large }: { story: ColumnStory; large?: boolean }) {\n  return (\n    <>\n      <h3 className={cn(\"font-display font-medium tracking-[-0.02em] text-foreground\", large ? \"max-w-[20.5rem] text-[1.75rem]/[1.12]\" : \"text-2xl/[1.15]\")}>{story.title}</h3>\n      <ul className=\"mt-5 flex flex-wrap gap-2\">\n        {story.tags.map((t) => (\n          <li key={t.label} className=\"flex h-7 items-center gap-2 rounded-md bg-muted px-2.5 text-[0.8125rem] font-medium text-foreground/85 [&_svg]:size-3.5 [&_svg]:text-muted-foreground\">\n            {t.icon}\n            {t.label}\n          </li>\n        ))}\n      </ul>\n      <figure className={cn(large ? \"mt-auto pt-10\" : \"mt-12\")}>\n        <Quote aria-hidden className=\"size-6 fill-muted-foreground/40 text-transparent\" />\n        <blockquote className={cn(\"mt-4 text-foreground\", large ? \"max-w-[22.5rem] text-xl/[1.3]\" : \"text-lg/[1.35]\")}>{story.quote}</blockquote>\n        <figcaption className={cn(\"mt-6 text-muted-foreground\", large ? \"text-base\" : \"text-[0.9375rem]\")}>{story.author}</figcaption>\n      </figure>\n    </>\n  );\n}\n\nexport function ColumnStories({ stories, initial = 0, className }: ColumnStoriesProps) {\n  const [active, setActive] = useState(initial);\n  const story = stories[active] ?? stories[0];\n\n  return (\n    <section className={cn(\"bg-background pt-24 pb-12 text-foreground lg:pt-36 lg:pb-0\", className)}>\n      {/* Phones: a swipeable row of cards. */}\n      <ul className=\"flex snap-x snap-mandatory scroll-px-gutter gap-5 overflow-x-auto px-gutter [scrollbar-width:none] lg:hidden\">\n        {stories.map((s) => (\n          <li key={s.name} className=\"flex w-[min(20.375rem,85vw)] shrink-0 snap-start flex-col overflow-clip rounded-xl bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_1px_3px_color-mix(in_oklab,var(--foreground)_5%,transparent)]\">\n            <div className=\"relative h-[22.5rem] overflow-clip rounded-t-xl\">\n              <Art story={s} />\n              <p className=\"absolute top-6 left-6 font-display text-2xl font-bold tracking-[-0.04em] text-foreground\">{s.name}</p>\n            </div>\n            <div className=\"flex flex-1 flex-col px-6 pt-6 pb-24\">\n              <Copy story={s} />\n            </div>\n          </li>\n        ))}\n      </ul>\n\n      {/* Desktop: one card with tabs. */}\n      <div className=\"mx-auto hidden max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter lg:block\">\n        <div className=\"overflow-clip rounded-xl bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_4%,transparent),0_1px_3px_color-mix(in_oklab,var(--foreground)_4%,transparent)]\">\n          <div role=\"tablist\" className=\"grid gap-6 p-6\" style={{ gridTemplateColumns: `repeat(${stories.length}, minmax(0, 1fr))` }}>\n            {stories.map((s, i) => (\n              <button\n                key={s.name}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={i === active}\n                onClick={() => setActive(i)}\n                style={toneStyle(s.tone)}\n                className={cn(\n                  \"flex h-12 items-center justify-center rounded-md font-display text-xl font-bold tracking-[-0.04em] transition-[background-color,color,box-shadow] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] motion-reduce:transition-none\",\n                  i === active\n                    ? \"bg-[var(--tone)] text-primary-foreground shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_15%,transparent),inset_0_1px_0_color-mix(in_oklab,var(--primary-foreground)_25%,transparent)]\"\n                    : \"text-foreground/85 hover:bg-muted\",\n                )}\n              >\n                {s.name}\n              </button>\n            ))}\n          </div>\n          <div key={active} role=\"tabpanel\" className=\"column-stories-swap grid h-[40.5rem] grid-cols-[29.75rem_1fr]\">\n            <div className=\"flex flex-col pt-[3.25rem] pb-[4.25rem] pl-[4.5rem]\">\n              <Copy story={story} large />\n            </div>\n            <div className=\"relative\">\n              <Art story={story} />\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "stories",
+      "type": "ColumnStory[]",
+      "required": true,
+      "description": "the customers; four fill the tab row"
+    },
+    {
+      "name": "initial",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which story starts selected (desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8149be1fb5d40182b164ac9b8c77f700f598fdf420f5d793e8c73c00ac7cb10c"
+}

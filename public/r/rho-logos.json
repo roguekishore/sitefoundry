@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho logo marquee",
+  "description": "A mono uppercase line of praise above an endless, slow marquee of customer names drifting left, edges fading out; continues the dark hero.",
+  "category": "logos",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "dark",
+    "mono",
+    "minimal"
+  ],
+  "notes": [
+    "tone=\"dark\" by default, to sit under rho-hero",
+    "CSS-only loop (38s desktop, 27s phones); with reduced motion the row stands still and wraps"
+  ],
+  "entry": "rho-logos.tsx",
+  "source": "foundry",
+  "name": "rho-logos",
+  "files": [
+    {
+      "path": "rho-logos.css",
+      "content": "/* Two copies of the row slide left by one copy's width, forever. */\n.rho-logos-track {\n  animation: rho-logos-scroll 27s linear infinite;\n}\n@media (min-width: 1024px) {\n  .rho-logos-track { animation-duration: 38s; }\n}\n@keyframes rho-logos-scroll {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n.rho-logos-mask {\n  mask-image: linear-gradient(90deg, transparent, var(--foreground) 10%, var(--foreground) 90%, transparent);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .rho-logos-track { animation: none; width: 100%; flex-wrap: wrap; justify-content: center; }\n  .rho-logos-copy { display: none; }\n}\n"
+    },
+    {
+      "path": "rho-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rho-logos.css\";\n\nexport interface RhoLogo {\n  /** the company's name (shown as a plain wordmark, and read by screen readers) */\n  name: string;\n  /** optional mark before the name (a lucide icon) */\n  icon?: ReactNode;\n}\n\nexport interface RhoLogosProps {\n  /** the mono line above the row */\n  label: string;\n  /** the companies; five or more fill the row */\n  logos: RhoLogo[];\n  /** dark (as the original) or light */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nfunction Row({ logos, copy }: { logos: RhoLogo[]; copy?: boolean }) {\n  return (\n    <ul className={cn(\"flex shrink-0 items-center\", copy && \"rho-logos-copy\")} aria-hidden={copy || undefined}>\n      {logos.map((l) => (\n        <li\n          key={l.name}\n          className=\"flex w-[11rem] shrink-0 items-center justify-center gap-2 font-display text-[1.375rem] font-medium tracking-[-0.03em] whitespace-nowrap lg:w-[15.25rem] lg:text-[1.625rem] [&_svg]:size-6\"\n        >\n          {l.icon}\n          {l.name}\n        </li>\n      ))}\n    </ul>\n  );\n}\n\nexport function RhoLogos({ label, logos, tone = \"dark\", className }: RhoLogosProps) {\n  return (\n    <section data-rho-tone={tone} className={cn(tone === \"dark\" && \"dark\", \"bg-background pt-12 pb-16 text-foreground lg:pt-16 lg:pb-[4.5rem]\", className)}>\n      <p className=\"mx-auto max-w-[22rem] px-gutter text-center font-mono text-[0.8125rem] leading-[1.35] font-medium tracking-[0.06em] uppercase lg:max-w-none\">\n        {label}\n      </p>\n      <div className=\"rho-logos-mask mt-8 overflow-clip lg:mx-auto lg:mt-10 lg:max-w-page\">\n        <div className=\"rho-logos-track flex w-max\">\n          <Row logos={logos} />\n          <Row logos={logos} copy />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the mono line above the row"
+    },
+    {
+      "name": "logos",
+      "type": "RhoLogo[]",
+      "required": true,
+      "description": "the companies; five or more fill the row"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark (as the original) or light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6a1dd3bd93bbc33640837866907616e80a92034cc84eb271a009662aec536736"
+}

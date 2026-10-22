@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Aspen Search mono button",
+  "description": "A square-cornered 36px button with a mono capital label on the left and a thin arrow on the right: ink-filled or outlined on paper. On hover a mint (or ink) fill sweeps in from the left over 0.8s and the label changes colour with it.",
+  "category": "button",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "mono",
+    "square",
+    "minimal",
+    "hover",
+    "sweep"
+  ],
+  "notes": [
+    "CSS only; the sweep is off under reduced motion"
+  ],
+  "entry": "aspensearch-button.tsx",
+  "source": "foundry",
+  "name": "aspensearch-button",
+  "files": [
+    {
+      "path": "aspensearch-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface AspensearchButtonProps {\n  /** the label; shown in mono capitals */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** ink: filled with the primary colour, a mint fill sweeps in on hover · paper: outlined, an ink fill sweeps in */\n  tone?: \"ink\" | \"paper\";\n  /** \"fixed\": the original's 200px width · \"full\": the container's width */\n  width?: \"fixed\" | \"full\";\n  onClick?: () => void;\n  className?: string;\n}\n\nconst tones = {\n  ink: \"bg-primary text-primary-foreground before:bg-highlight hover:text-highlight-foreground\",\n  paper: \"border border-foreground bg-background text-foreground before:bg-foreground hover:text-background\",\n};\n\n/**\n * The original's small square mono button: label left, arrow right. On hover a fill sweeps\n * in from the left behind the label (0.8s, expo out) and the text changes colour with it.\n */\nexport function AspensearchButton({ children, href, tone = \"ink\", width = \"fixed\", onClick, className }: AspensearchButtonProps) {\n  const classes = cn(\n    \"group relative isolate inline-flex h-9 shrink-0 items-center justify-between gap-4 overflow-clip px-3 font-mono text-xs/none tracking-normal uppercase\",\n    \"before:absolute before:inset-0 before:-z-10 before:origin-left before:scale-x-0 before:transition-transform before:duration-800 before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:before:scale-x-100\",\n    \"transition-colors duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:before:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    tones[tone],\n    width === \"fixed\" ? \"w-[12.5rem]\" : \"w-full\",\n    className,\n  );\n  const inner = (\n    <>\n      <span>{children}</span>\n      <ArrowRight aria-hidden className=\"size-3.5 shrink-0\" strokeWidth={1.5} />\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label; shown in mono capitals"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "ink",
+      "description": "ink: filled with the primary colour, a mint fill sweeps in on hover · paper: outlined, an ink fill sweeps in"
+    },
+    {
+      "name": "width",
+      "type": "enum",
+      "required": false,
+      "default": "fixed",
+      "description": "\"fixed\": the original's 200px width · \"full\": the container's width"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "23ec771b52bd8c55c7ea1b3b46918e8979345857c35d2b3cd949201103531f86"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko scan overview",
+  "description": "A narrow centred column on a white-to-lemon wash: a tracked eyebrow, a big soft-serif title and a short intro, then a stack of white rounded rows (square thumbnail, capitalised label, slate caption), then a white card with a wide photo, a smaller serif heading and a square-bulleted list, and a charcoal button below.",
+  "category": "features",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "card",
+    "centered",
+    "gradient",
+    "yellow",
+    "serif",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "the wash fades from background into highlight; the next section (neko-focus-tabs) continues on highlight",
+    "every thumbnail and the card photo are media slots"
+  ],
+  "entry": "neko-scan.tsx",
+  "source": "foundry",
+  "name": "neko-scan",
+  "files": [
+    {
+      "path": "neko-scan.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoButton } from \"@foundry/neko-button\";\nimport { NekoSlot } from \"@foundry/neko-slot\";\n\nexport interface NekoScanItem {\n  /** short label, shown in capitals */\n  title: string;\n  /** one-line caption under it */\n  caption: string;\n  /** the square thumbnail; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface NekoScanProps {\n  /** small tracked line above the title */\n  eyebrow: string;\n  title: string;\n  /** one or two sentences under the title */\n  intro: string;\n  /** the stacked rows */\n  items: NekoScanItem[];\n  /** the white card under the rows */\n  card: {\n    eyebrow: string;\n    title: string;\n    /** square-bulleted points */\n    points: string[];\n    /** the wide photo at the top of the card */\n    media?: ReactNode;\n  };\n  /** the charcoal button under the card */\n  cta?: { label: string; href: string };\n  className?: string;\n}\n\nexport function NekoScan({ eyebrow, title, intro, items, card, cta, className }: NekoScanProps) {\n  return (\n    <section className={cn(\"bg-linear-to-b from-background via-highlight/45 to-highlight pt-section pb-[calc(var(--section-y)*0.85)] font-sans text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(37.5rem+2*var(--page-gutter))] px-gutter\">\n        <div className=\"text-center\">\n          <p className=\"text-sm tracking-[0.04em] uppercase lg:text-base\">{eyebrow}</p>\n          <h2 className=\"mt-6 font-display text-[2.5rem] leading-[1.1] tracking-[-0.025em] lg:mt-8 lg:text-[4.25rem] lg:leading-[1.15]\">{title}</h2>\n          <p className=\"mx-auto mt-6 max-w-[32rem] text-base leading-6 lg:mt-10 lg:text-lg\">{intro}</p>\n        </div>\n\n        <ul className=\"mt-11 flex flex-col gap-3 lg:mt-15\">\n          {items.map((item) => (\n            <li key={item.title} className=\"flex items-center gap-4 rounded-2xl bg-card p-1 lg:gap-6\">\n              <NekoSlot media={item.media} className=\"size-[4.875rem] shrink-0 rounded-[0.875rem] lg:size-25 lg:rounded-2xl\" />\n              <div className=\"py-2 pr-4\">\n                <p className=\"text-sm tracking-[0.04em] uppercase lg:text-base\">{item.title}</p>\n                <p className=\"mt-1.5 text-sm leading-5 text-muted-foreground lg:text-base\">{item.caption}</p>\n              </div>\n            </li>\n          ))}\n        </ul>\n\n        <article className=\"mt-10 overflow-clip rounded-2xl bg-card lg:mt-15\">\n          <NekoSlot media={card.media} className=\"aspect-[600/338] rounded-b-[1.8rem]\" />\n          <div className=\"px-6 pt-7 pb-10 lg:px-10 lg:pt-8 lg:pb-10\">\n            <p className=\"text-sm tracking-[0.04em] uppercase lg:text-base\">{card.eyebrow}</p>\n            <h3 className=\"mt-3 max-w-[16ch] font-display text-[1.75rem] leading-8 tracking-[-0.02em] lg:max-w-none lg:text-[2rem] lg:leading-10\">{card.title}</h3>\n            <ul className=\"mt-8 flex flex-col gap-6\">\n              {card.points.map((p) => (\n                <li key={p} className=\"flex items-center gap-4 text-sm leading-5 lg:text-base\">\n                  <span aria-hidden className=\"size-3 shrink-0 rounded-[3px] bg-foreground\" />\n                  {p}\n                </li>\n              ))}\n            </ul>\n          </div>\n        </article>\n\n        {cta && (\n          <div className=\"mt-10 flex justify-center lg:mt-15\">\n            <NekoButton href={cta.href}>{cta.label}</NekoButton>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-button",
+    "neko-slot"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small tracked line above the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "one or two sentences under the title"
+    },
+    {
+      "name": "items",
+      "type": "NekoScanItem[]",
+      "required": true,
+      "description": "the stacked rows"
+    },
+    {
+      "name": "card",
+      "type": "{ eyebrow: string; title: string; points: string[]; media?: ReactNode; }",
+      "required": true,
+      "description": "the white card under the rows"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the charcoal button under the card"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c0d2a817d6f1e28e902eb1aa7f4c4b487b9b5cb338a8214037787107cbbd8160"
+}

@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Aspen Search odometer figure",
+  "description": "A big figure whose digits spin up like an odometer as it scrolls into view, each reel a little behind the one before; symbols like $, + and – stay still.",
+  "category": "stats",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "counter",
+    "odometer",
+    "scroll-driven",
+    "scrubbed"
+  ],
+  "notes": [
+    "CSS only (view timeline, scrubbed with the scroll); static HTML shows the final figure",
+    "set the font size on it or its parent; line height is 1",
+    "off under reduced motion"
+  ],
+  "entry": "aspensearch-odometer.tsx",
+  "source": "foundry",
+  "name": "aspensearch-odometer",
+  "files": [
+    {
+      "path": "aspensearch-odometer.css",
+      "content": "/* A digit is a 1em window onto a reel of 20 numbers (0–9 twice). At rest the reel shows its\n   digit from the second run; scrolling into view spins it up from the first 0. The timeline is\n   named on the window, not the moving reel, so the reel's own movement doesn't feed back. */\n.aspensearch-odometer-digit {\n  position: relative;\n  display: inline-block;\n  height: 1em;\n  overflow: clip;\n  view-timeline-name: --aspensearch-odometer;\n}\n.aspensearch-odometer-reel {\n  position: absolute;\n  inset: 0 -0.2em auto;\n  display: flex;\n  flex-direction: column;\n  transform: translateY(calc((var(--aspensearch-odometer-d) + 10) * -1em));\n}\n.aspensearch-odometer-reel > span {\n  display: block;\n  height: 1em;\n  text-align: center;\n}\n\n@supports (animation-timeline: view()) {\n  .aspensearch-odometer-reel {\n    animation: aspensearch-odometer-roll linear both;\n    animation-timeline: --aspensearch-odometer;\n    animation-range: entry calc(var(--aspensearch-odometer-i) * 4%) cover calc(48% + var(--aspensearch-odometer-i) * 4%);\n  }\n}\n\n@keyframes aspensearch-odometer-roll {\n  from { transform: translateY(0); }\n  to { transform: translateY(calc((var(--aspensearch-odometer-d) + 10) * -1em)); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-odometer-reel { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "aspensearch-odometer.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./aspensearch-odometer.css\";\n\nexport interface AspensearchOdometerProps {\n  /** the figure to show, e.g. \"500+\" or \"$1M–5M\"; each digit rolls, other characters stay put */\n  value: string;\n  className?: string;\n}\n\n// Two runs of 0–9 per reel, so every digit spins past at least one full turn before it lands.\nconst REEL = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];\n\n/**\n * A figure whose digits roll into place like an odometer as it scrolls into view (scrubbed\n * with the scroll). Each digit is a clipped reel of numbers; the static HTML already shows\n * the final figure. Set the font size on the parent; line height is forced to 1.\n */\nexport function AspensearchOdometer({ value, className }: AspensearchOdometerProps) {\n  return (\n    <span className={cn(\"inline-flex leading-none whitespace-nowrap\", className)}>\n      <span className=\"sr-only\">{value}</span>\n      {Array.from(value).map((ch, i) => {\n        if (!/\\d/.test(ch)) {\n          return (\n            <span key={i} aria-hidden>\n              {ch}\n            </span>\n          );\n        }\n        return (\n          <span key={i} aria-hidden className=\"aspensearch-odometer-digit\" style={{ \"--aspensearch-odometer-d\": Number(ch), \"--aspensearch-odometer-i\": i } as CSSProperties}>\n            {/* the real digit, invisible, sizes the window to its own width */}\n            <span className=\"invisible\">{ch}</span>\n            <span className=\"aspensearch-odometer-reel\">\n              {REEL.map((n, k) => (\n                <span key={k}>{n}</span>\n              ))}\n            </span>\n          </span>\n        );\n      })}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "the figure to show, e.g. \"500+\" or \"$1M–5M\"; each digit rolls, other characters stay put"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "002089fa4b84cd22b01ae1fae1a040c8e9c6ee2f386ddb794d562de3f82e361c"
+}

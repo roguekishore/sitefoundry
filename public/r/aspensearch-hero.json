@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search hero tile wall",
+  "description": "A Swiss wall of square tiles split by 1px ink lines: a giant two-word name spread over a white tile and a grey tile, halftone media windows, an ink tile with a shouted all-caps headline, an ink intro tile with a mono button and a mint statement tile with a looping marquee of names. Desktop rows are half a window tall. The first word rises in on load; headline lines and copy rise line by line out of clips as they scroll into view.",
+  "category": "hero",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "swiss",
+    "grid",
+    "tiles",
+    "bento",
+    "mint",
+    "halftone",
+    "marquee",
+    "reveal",
+    "split-lines",
+    "uppercase"
+  ],
+  "notes": [
+    "three media windows (mediaTop, mediaSide, mediaBottom); empty they're fixed halftone dot placeholders",
+    "rows are window-sized on desktop (half of 100svh minus the 61px header, at least 20rem)",
+    "giant words are sized in vw: about 5 and 6 letters fit the phone tiles",
+    "CSS only: load rise, marquee loop and view-timeline reveals are all off under reduced motion"
+  ],
+  "entry": "aspensearch-hero.tsx",
+  "source": "foundry",
+  "name": "aspensearch-hero",
+  "files": [
+    {
+      "path": "aspensearch-hero.css",
+      "content": "/* Load-in: the first giant word rises out of its clip (expo out, as the original's 0.8–1s\n   transitions). The marquee of names loops every 12.8s and pauses under the pointer. */\n.aspensearch-hero-rise > span {\n  animation: aspensearch-hero-rise 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;\n}\n\n.aspensearch-hero-marquee {\n  animation: aspensearch-hero-marquee 12.8s linear infinite;\n}\n.aspensearch-hero-marquee:hover {\n  animation-play-state: paused;\n}\n\n@keyframes aspensearch-hero-rise {\n  from { transform: translateY(105%); }\n  to { transform: none; }\n}\n@keyframes aspensearch-hero-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-hero-rise > span,\n  .aspensearch-hero-marquee { animation: none; }\n}\n"
+    },
+    {
+      "path": "aspensearch-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchButton } from \"@foundry/aspensearch-button\";\nimport { AspensearchHalftone } from \"@foundry/aspensearch-halftone\";\nimport { AspensearchRevealText } from \"@foundry/aspensearch-reveal-text\";\nimport \"./aspensearch-hero.css\";\n\nexport interface AspensearchHeroProps {\n  /** the first giant word, in the white tile top left (≈5 letters fit on phones) */\n  wordTop: string;\n  /** the second giant word, in the grey tile (≈6 letters fit on phones) */\n  wordBottom: string;\n  /** the shouted headline in the ink tile, one entry per line */\n  headline: string[];\n  /** the short intro in the ink tile */\n  intro: string;\n  /** the button under the intro */\n  action: { label: string; href: string };\n  /** the statement in the mint tile */\n  pitch: string;\n  /** the small line above the marquee, e.g. \"Recent hires from:\" */\n  hiresLabel: string;\n  /** names scrolling in the mint tile's marquee (plain text, no logos) */\n  hires: string[];\n  /** media for the top-right window; empty: halftone placeholder */\n  mediaTop?: ReactNode;\n  /** media for the tall left window (bottom-left square on phones); empty: halftone placeholder */\n  mediaSide?: ReactNode;\n  /** media for the bottom-right window (desktop only); empty: halftone placeholder */\n  mediaBottom?: ReactNode;\n  className?: string;\n}\n\nconst word = \"font-display text-[13.8vw]/none tracking-[-0.04em] lg:text-[12.5vw]/none\";\n\n/**\n * The original's opening wall of tiles. Phones: a 2×2 of square-ish tiles (giant word,\n * halftone window, window, grey tile with the second word), then an ink block with the\n * shouted headline, intro and an outlined button, and a mint block with a statement and a\n * looping marquee of names. Desktop: two columns of half-window rows: word / window,\n * window / [ink intro + mint statement], window / grey word, ink headline / window.\n * The first word rises in on load; the rest rises line by line as it scrolls into view.\n */\nexport function AspensearchHero({ wordTop, wordBottom, headline, intro, action, pitch, hiresLabel, hires, mediaTop, mediaSide, mediaBottom, className }: AspensearchHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"grid grid-cols-2 bg-background font-sans tracking-[-0.04em] text-foreground [--r:max(20rem,calc((100svh-3.8125rem)/2))] lg:grid-cols-4 lg:grid-rows-[var(--r)_var(--r)_var(--r)_calc(var(--r)*1.4)]\",\n        className,\n      )}\n    >\n      {/* Giant first word, rising in on load. */}\n      <div className=\"flex aspect-[195/251] items-end border-r border-b border-border px-3 pb-3 lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:aspect-auto lg:px-5 lg:pb-[0.13em] lg:text-[12.5vw]\">\n        <h1 className={cn(\"aspensearch-hero-rise overflow-clip pb-[0.14em] -mb-[0.14em]\", word)}>\n          <span className=\"block\">{wordTop}</span>\n        </h1>\n      </div>\n\n      <AspensearchHalftone media={mediaTop} className=\"aspect-[195/251] border-b border-border lg:col-span-2 lg:col-start-3 lg:row-start-1 lg:aspect-auto\" />\n      <AspensearchHalftone media={mediaSide} className=\"aspect-[195/251] border-r border-border lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-2 lg:aspect-auto\" />\n\n      {/* Grey tile with the second word. */}\n      <div className=\"flex aspect-[195/251] items-end bg-muted px-3 pb-3 lg:col-span-2 lg:col-start-3 lg:row-start-3 lg:aspect-auto lg:border-b lg:border-border lg:px-6 lg:pb-[0.18em] lg:text-[12.5vw]\">\n        <AspensearchRevealText as=\"p\" variant=\"display\" text={wordBottom} className={word} />\n      </div>\n\n      {/* Ink headline tile. */}\n      <div className=\"col-span-2 bg-foreground px-3 pt-4 text-background lg:col-span-2 lg:col-start-1 lg:row-start-4 lg:px-6 lg:pt-5\">\n        {headline.map((line, i) => (\n          <AspensearchRevealText\n            key={i}\n            as=\"p\"\n            variant=\"display\"\n            delay={i * 6}\n            text={line}\n            className=\"font-display text-[20.5vw]/[0.88] tracking-[-0.04em] whitespace-nowrap uppercase lg:text-[10.4vw]/[0.88]\"\n          />\n        ))}\n      </div>\n\n      {/* Ink intro tile: joins the headline on phones, sits beside the mint tile on desktop. */}\n      <div className=\"col-span-2 flex min-h-[90vw] flex-col bg-foreground px-3 pt-10 pb-5 text-background lg:col-span-1 lg:col-start-3 lg:row-start-2 lg:min-h-0 lg:px-5 lg:pt-6 lg:pb-0\">\n        <AspensearchRevealText text={intro} className=\"text-2xl/[1.1] lg:pr-2\" />\n        <div className=\"mt-auto flex justify-end pt-10 lg:hidden\">\n          <AspensearchButton href={action.href} tone=\"paper\">\n            {action.label}\n          </AspensearchButton>\n        </div>\n        <AspensearchButton href={action.href} width=\"full\" className=\"mt-auto mb-6 hidden h-[3.75rem] px-8 lg:-mx-5 lg:flex lg:w-auto\">\n          {action.label}\n        </AspensearchButton>\n      </div>\n\n      {/* Mint statement tile with the marquee of names along the bottom. */}\n      <div className=\"col-span-2 flex min-h-[114vw] flex-col overflow-clip bg-highlight pt-4 text-highlight-foreground lg:col-span-1 lg:col-start-4 lg:row-start-2 lg:min-h-0 lg:pt-6\">\n        <AspensearchRevealText text={pitch} className=\"px-3 text-2xl/[1.1] lg:px-5\" />\n        <p className=\"mt-6 px-3 text-2xl/[1.1] lg:px-5\">{hiresLabel}</p>\n        <div className=\"aspensearch-hero-marquee mt-auto flex w-max pb-6 lg:pb-7\">\n          {[0, 1].map((copy) => (\n            <ul key={copy} aria-hidden={copy === 1} className=\"flex shrink-0 items-center gap-10 pr-10\">\n              {hires.map((name) => (\n                <li key={name} className=\"font-display text-xl/none font-semibold tracking-[-0.03em] whitespace-nowrap\">\n                  {name}\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n\n      <AspensearchHalftone media={mediaBottom} className=\"hidden lg:col-span-2 lg:col-start-3 lg:row-start-4 lg:block\" />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "aspensearch-button",
+    "aspensearch-halftone",
+    "aspensearch-reveal-text",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordTop",
+      "type": "string",
+      "required": true,
+      "description": "the first giant word, in the white tile top left (≈5 letters fit on phones)"
+    },
+    {
+      "name": "wordBottom",
+      "type": "string",
+      "required": true,
+      "description": "the second giant word, in the grey tile (≈6 letters fit on phones)"
+    },
+    {
+      "name": "headline",
+      "type": "string[]",
+      "required": true,
+      "description": "the shouted headline in the ink tile, one entry per line"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the short intro in the ink tile"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button under the intro"
+    },
+    {
+      "name": "pitch",
+      "type": "string",
+      "required": true,
+      "description": "the statement in the mint tile"
+    },
+    {
+      "name": "hiresLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small line above the marquee, e.g. \"Recent hires from:\""
+    },
+    {
+      "name": "hires",
+      "type": "string[]",
+      "required": true,
+      "description": "names scrolling in the mint tile's marquee (plain text, no logos)"
+    },
+    {
+      "name": "mediaTop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media for the top-right window; empty: halftone placeholder"
+    },
+    {
+      "name": "mediaSide",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media for the tall left window (bottom-left square on phones); empty: halftone placeholder"
+    },
+    {
+      "name": "mediaBottom",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media for the bottom-right window (desktop only); empty: halftone placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d90dcd479ebd88915a5c4d4522f5bd5c2700b9f2e842beeefdbeed67f7723fb5"
+}

@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp customer stories",
+  "description": "A centred two-tone statement with an acid-lime button, then alternating half-and-half rows: a two-tone heading and arrow link at the top of the text column, a customer quote with a hanging opening mark at its foot, and a large square 12px-rounded film frame with a frosted 'watch' pill on the other side.",
+  "category": "testimonials",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "stories",
+    "quote",
+    "video",
+    "alternating",
+    "split",
+    "light",
+    "minimal",
+    "two-tone",
+    "hover"
+  ],
+  "notes": [
+    "each row's media slot is a square frame (753×753 at 1440); empty, it shows a grey gradient placeholder",
+    "on phones each row stacks heading, frame, then quote"
+  ],
+  "entry": "ramp-stories.tsx",
+  "source": "foundry",
+  "name": "ramp-stories",
+  "files": [
+    {
+      "path": "ramp-stories.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\n\nexport interface RampStory {\n  /** the row heading's first clause, in ink */\n  lead: string;\n  /** the rest, in grey */\n  rest?: string;\n  /** the arrow link under the heading */\n  link?: { label: string; href: string };\n  /** the film or photo; empty shows a placeholder frame */\n  media?: ReactNode;\n  /** the label of the frosted pill on the frame (leave out to hide it) */\n  watchLabel?: string;\n  /** where the pill goes */\n  watchHref?: string;\n  /** the customer's words, without quote marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** the arrow link under the quote */\n  storyLink?: { label: string; href: string };\n}\n\nexport interface RampStoriesProps {\n  /** the statement's first sentence, in ink */\n  lead: string;\n  /** the second sentence, in grey on its own line */\n  rest?: string;\n  /** the acid-lime button under it */\n  cta?: { label: string; href: string };\n  /** rows alternate: frame on the right, then on the left */\n  stories: RampStory[];\n  className?: string;\n}\n\n/** Ramp's intelligence statement and its alternating customer-story rows. */\nexport function RampStories({ lead, rest, cta, stories, className }: RampStoriesProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter py-section lg:px-[calc(var(--page-gutter)*4)] lg:py-[calc(var(--section-y)*1.5)]\">\n        <RampHeading align=\"center\" lead={lead} rest={rest} breakBeforeRest className=\"mx-auto max-w-[66rem]\" />\n        {cta && (\n          <div className=\"mt-8 flex justify-center\">\n            <RampButton href={cta.href}>{cta.label}</RampButton>\n          </div>\n        )}\n\n        <div className=\"mt-24 grid gap-28 lg:mt-32 lg:gap-32\">\n          {stories.map((s, i) => {\n            const flip = i % 2 === 1;\n            return (\n              <article\n                key={s.lead}\n                className={cn(\n                  \"grid grid-cols-1 gap-y-8 [grid-template-areas:'head'_'media'_'quote'] lg:gap-x-10 lg:gap-y-0\",\n                  flip\n                    ? \"lg:grid-cols-[1.46fr_1fr] lg:[grid-template-areas:'media_head'_'media_quote']\"\n                    : \"lg:grid-cols-[1fr_1.46fr] lg:[grid-template-areas:'head_media'_'quote_media']\",\n                )}\n              >\n                <div className=\"[grid-area:head]\">\n                  <RampHeading as=\"h3\" size=\"row\" lead={s.lead} rest={s.rest} className=\"max-w-[33rem]\" />\n                  {s.link && (\n                    <RampButton variant=\"link\" href={s.link.href} className=\"mt-6 lg:mt-8\">\n                      {s.link.label}\n                    </RampButton>\n                  )}\n                </div>\n\n                <div className=\"group relative aspect-square overflow-clip rounded-lg bg-muted [grid-area:media]\">\n                  <div className=\"absolute inset-0 transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none\">\n                    {s.media ?? <div aria-hidden className=\"size-full bg-gradient-to-br from-muted via-accent to-muted-foreground/30\" />}\n                  </div>\n                  {s.watchLabel && (\n                    <RampButton variant=\"glass\" size=\"lg\" href={s.watchHref} className=\"absolute right-4 bottom-4 lg:right-5 lg:bottom-5\">\n                      {s.watchLabel}\n                    </RampButton>\n                  )}\n                </div>\n\n                <figure className=\"self-end [grid-area:quote] lg:pb-1\">\n                  <blockquote className=\"text-base/[1.4] text-foreground [text-indent:-0.4em]\">“{s.quote}”</blockquote>\n                  <figcaption className=\"mt-6 lg:mt-8\">\n                    <span className=\"block text-base\">{s.name}</span>\n                    <span className=\"block text-sm text-muted-foreground\">{s.role}</span>\n                  </figcaption>\n                  {s.storyLink && (\n                    <RampButton variant=\"link\" href={s.storyLink.href} className=\"mt-6 lg:mt-8\">\n                      {s.storyLink.label}\n                    </RampButton>\n                  )}\n                </figure>\n              </article>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the statement's first sentence, in ink"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the second sentence, in grey on its own line"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the acid-lime button under it"
+    },
+    {
+      "name": "stories",
+      "type": "RampStory[]",
+      "required": true,
+      "description": "rows alternate: frame on the right, then on the left"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c52b506e7e7818b6e3b42d604d1445da10ec14dfbbb87ebfaa3e67034de18695"
+}

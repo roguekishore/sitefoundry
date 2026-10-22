@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health footer",
+  "description": "A charcoal footer slab: a small wordmark top left, two short link columns starting from 40% across (grey titles, white links, a contact block under the first), round white social buttons top right, a huge grey name that runs the full width near the bottom, and a hairline above a small copyright line. Links fade to 65% on hover.",
+  "category": "footer",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "big-type",
+    "wordmark",
+    "minimal",
+    "greyscale",
+    "links",
+    "social"
+  ],
+  "notes": [
+    "always dark: it adds the .dark class to itself and uses the theme's dark tokens",
+    "the giant name is sized in vw for about 14 characters; longer names need a smaller size via className"
+  ],
+  "entry": "instituteofhealth-footer.tsx",
+  "source": "foundry",
+  "name": "instituteofhealth-footer",
+  "files": [
+    {
+      "path": "instituteofhealth-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface InstituteofhealthFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface InstituteofhealthFooterProps {\n  /** the small wordmark at the top left */\n  brand: ReactNode;\n  /** first link column (desktop: from 40% across) */\n  primary: { title: string; links: InstituteofhealthFooterLink[] };\n  /** second link column */\n  secondary?: { title: string; links: InstituteofhealthFooterLink[] };\n  /** contact block under the first column */\n  contact?: { title: string; links: InstituteofhealthFooterLink[] };\n  /** round social buttons at the top right (pass lucide icons or small svgs) */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the giant grey name across the bottom; sized for about 14 characters */\n  wordmark: string;\n  /** small line at the bottom left */\n  legal: string;\n  /** small line at the bottom right */\n  credit?: string;\n  className?: string;\n}\n\nconst link = \"transition-opacity duration-400 ease-[ease] hover:opacity-65 motion-reduce:transition-none\";\n\nfunction Column({ title, links, className }: { title: string; links: InstituteofhealthFooterLink[]; className?: string }) {\n  return (\n    <div className={className}>\n      <p className=\"text-muted-foreground\">{title}</p>\n      <ul className=\"mt-4 lg:mt-3.5\">\n        {links.map((l) => (\n          <li key={l.label}>\n            <a href={l.href} className={link}>\n              {l.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\n/** Always dark: it switches itself to the theme's dark tokens. */\nexport function InstituteofhealthFooter({ brand, primary, secondary, contact, socials = [], wordmark, legal, credit, className }: InstituteofhealthFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"grid grid-cols-2 gap-x-4 px-gutter pt-10 text-[0.975rem] leading-[1.42] font-medium tracking-[-0.03em] lg:grid-cols-[40%_20.7%_1fr_auto] lg:gap-x-0 lg:pt-12 lg:text-[0.81rem] lg:leading-[1.46]\">\n        <div className=\"col-span-2 lg:col-span-1\">{brand}</div>\n        <div className=\"mt-[3.6rem] lg:mt-0\">\n          <Column {...primary} />\n          {contact && <Column {...contact} className=\"mt-[3.4rem] lg:mt-[5.5rem]\" />}\n        </div>\n        {secondary && <Column {...secondary} className=\"mt-[3.6rem] lg:mt-0\" />}\n        {socials.length > 0 && (\n          <ul className=\"col-span-2 mt-14 flex gap-1.5 lg:col-span-1 lg:col-start-4 lg:mt-0 lg:self-start\">\n            {socials.map((s) => (\n              <li key={s.label}>\n                <a\n                  href={s.href}\n                  aria-label={s.label}\n                  className={cn(\"flex size-11 items-center justify-center rounded-full bg-foreground text-background [&_svg]:size-[1.15rem]\", link)}\n                >\n                  {s.icon}\n                </a>\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n\n      <p\n        aria-hidden\n        className=\"mt-32 overflow-clip px-gutter font-display text-[13.3vw] leading-[0.8] font-medium tracking-[-0.05em] whitespace-nowrap text-foreground/25 lg:mt-[16.5rem] lg:text-[13.8vw]\"\n      >\n        {wordmark}\n      </p>\n\n      <div className=\"mt-5 flex items-center justify-between gap-4 border-t border-border px-gutter py-6 text-[0.8775rem] leading-none font-medium tracking-[-0.03em] text-muted-foreground lg:mt-[2.6rem] lg:py-[1.6rem] lg:text-[0.81rem]\">\n        <span>{legal}</span>\n        {credit && <span>{credit}</span>}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small wordmark at the top left"
+    },
+    {
+      "name": "primary",
+      "type": "{ title: string; links: InstituteofhealthFooterLink[]; }",
+      "required": true,
+      "description": "first link column (desktop: from 40% across)"
+    },
+    {
+      "name": "secondary",
+      "type": "{ title: string; links: InstituteofhealthFooterLink[]; }",
+      "required": false,
+      "description": "second link column"
+    },
+    {
+      "name": "contact",
+      "type": "{ title: string; links: InstituteofhealthFooterLink[]; }",
+      "required": false,
+      "description": "contact block under the first column"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "round social buttons at the top right (pass lucide icons or small svgs)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant grey name across the bottom; sized for about 14 characters"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": true,
+      "description": "small line at the bottom left"
+    },
+    {
+      "name": "credit",
+      "type": "string",
+      "required": false,
+      "description": "small line at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "959b2db793f7612be109caaaced29c3a259fc9b184575d92d55297f0ba888531"
+}

@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep reviews wall",
+  "description": "A night band that falls from black to navy: a big condensed 4.6 with a row of stars and a review count, a heading, a thin night-time curve with dots and a mono time label drawn across the band, a white button, and then an endless slow track of review cards: wide white story cards (a photo with the member's name over it and a large narrow-serif quote) alternating with pairs of grey social-post cards. Hovering a card lifts it with a soft shadow and nudges its photo up in scale; hovering the track pauses it.",
+  "category": "testimonials",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "reviews",
+    "rating",
+    "marquee",
+    "loop",
+    "dark",
+    "navy",
+    "serif-quote",
+    "hover",
+    "reveal"
+  ],
+  "notes": [
+    "dark-scoped; cards are light (the scope's inverse)",
+    "quotes use --eightsleep-quote (a narrow serif) when the theme sets it",
+    "photos and avatars are slots; muted placeholders when empty"
+  ],
+  "entry": "eightsleep-reviews.tsx",
+  "source": "foundry",
+  "name": "eightsleep-reviews",
+  "files": [
+    {
+      "path": "eightsleep-reviews.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepButton } from \"@foundry/eightsleep-button\";\nimport { EightsleepHeading } from \"@foundry/eightsleep-heading\";\nimport { EightsleepMarquee } from \"@foundry/eightsleep-marquee\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\nimport { EightsleepRating, type EightsleepRatingProps } from \"@foundry/eightsleep-rating\";\nimport { EightsleepReveal } from \"@foundry/eightsleep-reveal\";\n\nexport interface EightsleepStory {\n  type: \"story\";\n  /** the member's name, over the photo */\n  name: ReactNode;\n  /** under the name, e.g. \"Tidewell members\" */\n  role?: ReactNode;\n  /** the quote, set large in the narrow serif */\n  quote: ReactNode;\n  /** the photo */\n  media?: ReactNode;\n  /** the \"read more\" link */\n  link?: { label: ReactNode; href: string };\n}\n\nexport interface EightsleepPost {\n  name: ReactNode;\n  handle: ReactNode;\n  /** the post's text; wrap mentions in <span className=\"text-highlight\"> */\n  text: ReactNode;\n  /** e.g. \"9:12 PM · Mar 3, 2026\" */\n  date?: ReactNode;\n  /** the avatar image */\n  avatar?: ReactNode;\n  /** the network's icon, top-right */\n  icon?: ReactNode;\n}\n\nexport interface EightsleepPosts {\n  type: \"posts\";\n  /** one or two posts, stacked */\n  posts: EightsleepPost[];\n}\n\nexport interface EightsleepReviewsProps {\n  rating?: EightsleepRatingProps;\n  title: ReactNode;\n  /** the small mono label by the curve's last dot, e.g. \"7:00 AM\" */\n  curveLabel?: ReactNode;\n  /** the white button */\n  cta?: { label: ReactNode; href: string };\n  /** the cards in the track, in order */\n  items: (EightsleepStory | EightsleepPosts)[];\n  /** seconds per lap of the track */\n  duration?: number;\n  className?: string;\n}\n\nconst lift = \"transition-shadow duration-250 hover:shadow-[4px_4px_12px_color-mix(in_oklab,var(--background)_25%,transparent)]\";\n\nfunction Story({ item }: { item: EightsleepStory }) {\n  return (\n    <article className={cn(\"group flex h-[348px] w-[340px] flex-col rounded-2xl bg-foreground p-[7px] text-background lg:h-[330px] lg:w-[646px] lg:flex-row\", lift)}>\n      <div className=\"relative h-[175px] shrink-0 overflow-clip rounded-xl lg:h-full lg:w-[312px]\">\n        <EightsleepMedia media={item.media} tone=\"inverse\" className=\"absolute inset-0 transition-transform duration-250 group-hover:scale-[1.025] motion-reduce:transition-none\" />\n        <div className=\"absolute inset-0 bg-linear-to-b from-transparent from-50% to-background/50\" />\n        <div className=\"absolute bottom-4 left-4 text-foreground\">\n          <p className=\"text-[18px] leading-[1.2] font-bold\">{item.name}</p>\n          {item.role && <p className=\"text-[14px] leading-[1.3]\">{item.role}</p>}\n        </div>\n      </div>\n      <div className=\"flex flex-1 flex-col justify-between px-3 pt-4 pb-3 lg:px-7 lg:pt-6 lg:pb-5\">\n        <blockquote className=\"font-[family-name:var(--eightsleep-quote,var(--typeface-display))] text-[24px] leading-[1.1] tracking-[-0.01em] lg:text-[28px] lg:leading-[1.15]\">\n          {item.quote}\n        </blockquote>\n        {item.link && (\n          <a href={item.link.href} className=\"text-[14px] font-bold opacity-70 underline underline-offset-2 transition-opacity hover:opacity-100 lg:text-[15px]\">\n            {item.link.label}\n          </a>\n        )}\n      </div>\n    </article>\n  );\n}\n\nfunction Post({ post }: { post: EightsleepPost }) {\n  return (\n    <article className={cn(\"relative rounded-xl bg-foreground/95 p-4 text-background lg:px-4 lg:py-[18px]\", lift)}>\n      <div className=\"flex items-center gap-2\">\n        <EightsleepMedia media={post.avatar} tone=\"inverse\" className=\"size-[42px] shrink-0 rounded-full\" />\n        <div className=\"min-w-0\">\n          <p className=\"truncate text-[13px] leading-[1.3] font-bold\">{post.name}</p>\n          <p className=\"truncate text-[11px] leading-[1.3] opacity-55\">{post.handle}</p>\n        </div>\n      </div>\n      {post.icon && <span className=\"absolute top-4 right-4 [&_svg]:size-5\">{post.icon}</span>}\n      <p className=\"mt-3 text-[14px] leading-[1.4] lg:text-[15px]\">{post.text}</p>\n      {post.date && <p className=\"mt-3 text-[9px] opacity-55\">{post.date}</p>}\n    </article>\n  );\n}\n\nexport function EightsleepReviews({ rating, title, curveLabel, cta, items, duration = 90, className }: EightsleepReviewsProps) {\n  return (\n    <section className={cn(\"dark relative isolate overflow-clip bg-linear-to-b from-background from-25% via-secondary via-70% to-accent pt-[60px] pb-16 text-foreground lg:pt-[56px] lg:pb-[112px]\", className)}>\n      {/* a night-time curve with dots across the band, behind the copy */}\n      <svg aria-hidden viewBox=\"0 0 1440 380\" preserveAspectRatio=\"none\" className=\"absolute inset-x-0 top-[40px] -z-10 h-[300px] w-full text-foreground/30 lg:top-[80px] lg:h-[380px]\">\n        <path d=\"M0 278 C 180 340, 330 382, 452 380 S 760 330, 1000 205 S 1330 40, 1440 18\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1\" vectorEffect=\"non-scaling-stroke\" />\n      </svg>\n      <div aria-hidden className=\"absolute inset-x-0 top-[40px] -z-10 h-[300px] lg:top-[80px] lg:h-[380px]\">\n        {[\n          [16.7, 94],\n          [31.4, 99.8],\n          [46.3, 91],\n          [61.3, 69.5],\n          [74.6, 44.8],\n          [89.3, 18.7],\n        ].map(([x, y], i) => (\n          <span key={i} className=\"absolute size-1.5 -translate-1/2 rounded-full bg-foreground/55\" style={{ left: `${x}%`, top: `${y}%` }} />\n        ))}\n        {curveLabel && <span className=\"absolute top-[24%] left-[87.3%] hidden font-mono text-[11px] text-foreground/50 lg:block\">{curveLabel}</span>}\n      </div>\n\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter\">\n        {rating && (\n          <EightsleepReveal>\n            <EightsleepRating size=\"lg\" {...rating} />\n          </EightsleepReveal>\n        )}\n        <EightsleepHeading title={title} className=\"mt-8 lg:mt-10\" />\n        {cta && (\n          <EightsleepReveal step={2} className=\"mt-10 lg:mt-12\">\n            <EightsleepButton href={cta.href} size=\"lg\">\n              {cta.label}\n            </EightsleepButton>\n          </EightsleepReveal>\n        )}\n      </div>\n\n      <EightsleepMarquee\n        className=\"mt-14 lg:mt-20\"\n        duration={duration}\n        gap=\"wide\"\n        items={items.map((item, i) =>\n          item.type === \"story\" ? (\n            <Story key={i} item={item} />\n          ) : (\n            <div key={i} className=\"flex h-[348px] w-[300px] flex-col justify-center gap-4 lg:h-[330px] lg:w-[432px]\">\n              {item.posts.map((p, j) => (\n                <Post key={j} post={p} />\n              ))}\n            </div>\n          ),\n        )}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "eightsleep-button",
+    "eightsleep-heading",
+    "eightsleep-marquee",
+    "eightsleep-media",
+    "eightsleep-rating",
+    "eightsleep-reveal",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "rating",
+      "type": "any",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "curveLabel",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small mono label by the curve's last dot, e.g. \"7:00 AM\""
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the white button"
+    },
+    {
+      "name": "items",
+      "type": "(EightsleepStory | EightsleepPosts)[]",
+      "required": true,
+      "description": "the cards in the track, in order"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "90",
+      "description": "seconds per lap of the track"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3923567c3eacecb53c2273adeb7e89fabbdc209b34c320f6d6dbfda31a7d82e2"
+}

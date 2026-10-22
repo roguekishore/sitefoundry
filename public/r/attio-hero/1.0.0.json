@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio hero",
+  "description": "A centred product hero on white: a rounded news pill with a short blue light running along its top edge, a big tightly tracked headline, a grey line and outline + near-black buttons (an email field and full-width button on phones), then a wide grey-bezelled app window on a lavender pinstriped wash. Everything rises in on load; on scroll the text stays pinned and fades and blurs away as the window slides over it and settles 5% smaller.",
+  "category": "hero",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "centered",
+    "product-shot",
+    "glow",
+    "pinstripe",
+    "sticky",
+    "scrubbed",
+    "blur",
+    "load-in",
+    "saas"
+  ],
+  "notes": [
+    "the window is a media slot (1080×580 inside its bezel); empty, it is a white placeholder",
+    "scroll effects use the page's scroll position, so it belongs at the top of a page; CSS only",
+    "the pinned text sits under a 100px (phones) / 116px (desktop) header"
+  ],
+  "entry": "attio-hero.tsx",
+  "source": "foundry",
+  "name": "attio-hero",
+  "files": [
+    {
+      "path": "attio-hero.css",
+      "content": "/* Load: the pill, headline, line, buttons and window rise 16px and fade in, one after another. */\n.attio-hero-in {\n  animation: attio-hero-rise 0.7s cubic-bezier(0.2, 0, 0, 1) both;\n}\n\n@keyframes attio-hero-rise {\n  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }\n  to { opacity: 1; transform: none; filter: none; }\n}\n\n/* A short light runs along the top edge of the news pill, over and over. */\n.attio-hero-spark {\n  animation: attio-hero-spark 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;\n}\n\n@keyframes attio-hero-spark {\n  0% { transform: translateX(-120%); opacity: 0; }\n  15% { opacity: 1; }\n  55% { transform: translateX(var(--attio-hero-spark-run, 16rem)); opacity: 0; }\n  100% { transform: translateX(var(--attio-hero-spark-run, 16rem)); opacity: 0; }\n}\n\n/* Scrubbed by the first 450px of scroll: the pinned text fades and blurs away while the\n   window slides over it and settles a little smaller; the wash behind deepens. */\n@supports (animation-timeline: scroll()) {\n  .attio-hero-text {\n    animation: attio-hero-text-out linear both;\n    animation-timeline: scroll();\n    animation-range: 0px 450px;\n  }\n  .attio-hero-window {\n    animation: attio-hero-window-settle linear both;\n    animation-timeline: scroll();\n    animation-range: 0px 600px;\n  }\n  .attio-hero-wash {\n    animation: attio-hero-wash-deepen linear both;\n    animation-timeline: scroll();\n    animation-range: 0px 450px;\n  }\n}\n\n@keyframes attio-hero-text-out {\n  to { opacity: 0; filter: blur(6px); }\n}\n@keyframes attio-hero-window-settle {\n  from { scale: 1; }\n  to { scale: 0.95; }\n}\n@keyframes attio-hero-wash-deepen {\n  from { opacity: 0.55; }\n  to { opacity: 1; }\n}\n/* on desktop the wash starts as a band behind the window's top half and grows down to the\n   section's foot as you scroll */\n@keyframes attio-hero-wash-grow {\n  from { opacity: 0.55; clip-path: inset(0 0 50% 0); }\n  to { opacity: 1; clip-path: inset(0 0 0 0); }\n}\n@supports (animation-timeline: scroll()) {\n  @media (min-width: 1024px) {\n    .attio-hero-wash {\n      animation-name: attio-hero-wash-grow;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-hero-in,\n  .attio-hero-spark,\n  .attio-hero-text,\n  .attio-hero-window,\n  .attio-hero-wash {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioButton } from \"@foundry/attio-button\";\nimport \"./attio-hero.css\";\n\nexport interface AttioHeroLink {\n  label: string;\n  href: string;\n}\n\nexport interface AttioHeroProps {\n  /** the small news pill above the headline */\n  news?: AttioHeroLink;\n  /** the headline (one short sentence) */\n  title: string;\n  /** one or two lines under it */\n  subtitle?: string;\n  /** the outline button (desktop) and the text link under the form (phones) */\n  secondary?: AttioHeroLink;\n  /** the dark button (desktop) */\n  primary?: AttioHeroLink;\n  /** the email form shown instead of the buttons on phones */\n  form?: { placeholder: string; submitLabel: string; action?: string };\n  /** the product shot in the window frame (1080×620); empty shows a placeholder */\n  media?: ReactNode;\n  /** accessible label for the media slot */\n  mediaLabel?: string;\n  className?: string;\n}\n\nconst delay = (ms: number) => ({ animationDelay: `${ms}ms` });\n\n/**\n * A centred hero on white: a news pill with a light running along its edge, a big tight\n * headline, a grey line and two buttons; below, a wide app window on a lavender pinstriped\n * wash. The text stays pinned under the header and fades away as the window scrolls over it.\n */\nexport function AttioHero({ news, title, subtitle, secondary, primary, form, media, mediaLabel, className }: AttioHeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-x-clip bg-background text-foreground\", className)}>\n      {/* the lavender pinstripe wash behind the lower half; on desktop scrolling uncovers all of it */}\n      <div aria-hidden className=\"attio-hero-wash pointer-events-none absolute inset-x-0 top-[28.5rem] bottom-0 -z-10 lg:top-[22rem]\">\n        <div className=\"absolute inset-0 bg-gradient-to-b from-transparent via-glow/30 via-40% to-glow/45\" />\n        <div className=\"absolute inset-0 bg-[repeating-linear-gradient(to_right,color-mix(in_oklab,var(--glow)_45%,transparent)_0_1px,transparent_1px_8px)] [mask-image:linear-gradient(to_bottom,transparent,black_45%)]\" />\n      </div>\n      {/* the text block pins under the header while the window slides over it */}\n      <div className=\"attio-hero-text sticky top-[6.25rem] z-0 px-gutter pt-16 lg:top-[7.25rem] lg:pt-24\">\n        <div className=\"mx-auto flex max-w-[50rem] flex-col items-center text-center\">\n          {news && (\n            <a\n              href={news.href}\n              className=\"attio-hero-in group relative inline-flex h-[1.875rem] items-center gap-1 overflow-clip rounded-full border border-border bg-card pr-2.5 pl-3 text-sm font-medium tracking-[-0.01em] text-foreground transition-colors duration-300 hover:border-input motion-reduce:transition-none\"\n            >\n              <span aria-hidden className=\"attio-hero-spark absolute top-0 left-0 h-px w-10 bg-gradient-to-r from-transparent via-highlight to-transparent\" />\n              {news.label}\n              <ChevronRight aria-hidden className=\"size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none\" />\n            </a>\n          )}\n          <h1\n            style={delay(80)}\n            className=\"attio-hero-in mt-8 max-w-[20rem] font-display text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.035em] text-balance sm:max-w-none lg:mt-9 lg:text-[4rem] lg:leading-[1.02] lg:tracking-[-0.03em]\"\n          >\n            {title}\n          </h1>\n          {subtitle && (\n            <p\n              style={delay(160)}\n              className=\"attio-hero-in mt-7 max-w-[19rem] text-[1.0625rem] leading-[1.35] font-medium tracking-[-0.01em] text-muted-foreground sm:max-w-[26rem] lg:mt-9 lg:text-lg\"\n            >\n              {subtitle}\n            </p>\n          )}\n\n          {/* phones: an email field and a full-width button, then a text link */}\n          {form && (\n            <form action={form.action} style={delay(240)} className=\"attio-hero-in mt-7 flex w-full max-w-[20rem] flex-col gap-2 sm:hidden\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                required\n                placeholder={form.placeholder}\n                aria-label={form.placeholder}\n                className=\"h-10 rounded-[0.625rem] border border-input bg-card px-3.5 text-[0.9375rem] text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none\"\n              />\n              <AttioButton type=\"submit\" variant=\"primary\" size=\"lg\">\n                {form.submitLabel}\n              </AttioButton>\n              {secondary && (\n                <a href={secondary.href} className=\"mt-4 inline-flex items-center justify-center gap-2 text-[0.9375rem] font-medium\">\n                  {secondary.label}\n                  <ArrowRight aria-hidden className=\"size-3.5\" />\n                </a>\n              )}\n            </form>\n          )}\n\n          <div style={delay(240)} className={cn(\"attio-hero-in mt-6 flex items-center gap-2.5\", form ? \"hidden sm:flex\" : \"flex\")}>\n            {secondary && <AttioButton href={secondary.href}>{secondary.label}</AttioButton>}\n            {primary && (\n              <AttioButton href={primary.href} variant=\"primary\" className=\"font-semibold\">\n                {primary.label}\n              </AttioButton>\n            )}\n          </div>\n        </div>\n      </div>\n\n      {/* the window */}\n      <div className=\"relative z-10 mt-10 px-4 pb-6 sm:px-gutter lg:mt-24 lg:pb-[7.75rem]\">\n        <div className=\"attio-hero-window mx-auto w-[34rem] max-w-none origin-top sm:w-full sm:max-w-[67.5rem]\">\n          <div\n            style={delay(360)}\n            className=\"attio-hero-in rounded-xl border border-border bg-secondary p-1.5 pt-7 shadow-[0_0_1px_1px_color-mix(in_oklab,var(--foreground)_2%,transparent),0_4px_12px_-1px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_1px_3px_-1px_color-mix(in_oklab,var(--foreground)_16%,transparent)] lg:p-2 lg:pt-8\"\n          >\n            <div role=\"img\" aria-label={mediaLabel} className=\"aspect-[1080/580] overflow-clip rounded-lg border border-border bg-card [&>*]:size-full [&>img]:object-cover\">\n              {media}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "attio-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "news",
+      "type": "AttioHeroLink",
+      "required": false,
+      "description": "the small news pill above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline (one short sentence)"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "one or two lines under it"
+    },
+    {
+      "name": "secondary",
+      "type": "AttioHeroLink",
+      "required": false,
+      "description": "the outline button (desktop) and the text link under the form (phones)"
+    },
+    {
+      "name": "primary",
+      "type": "AttioHeroLink",
+      "required": false,
+      "description": "the dark button (desktop)"
+    },
+    {
+      "name": "form",
+      "type": "{ placeholder: string; submitLabel: string; action?: string; }",
+      "required": false,
+      "description": "the email form shown instead of the buttons on phones"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product shot in the window frame (1080×620); empty shows a placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "accessible label for the media slot"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3c61a2264caeacff82db89163bdaf342b76cc4999ea95f03cc26733a2de1c8f9"
+}

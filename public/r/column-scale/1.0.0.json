@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column scale and stats",
+  "description": "A tinted mono eyebrow over a hairline rule, then a 28px two-tone statement (navy lead-in fading into soft grey), a muted paragraph and a white button on the left with a wide chart art area on the right. Four big teal figures with small captions run along the bottom; they blur, rise and fade in one after another as they scroll into view.",
+  "category": "stats",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "light",
+    "fintech",
+    "two-tone",
+    "reveal",
+    "blur",
+    "stagger",
+    "scroll-driven"
+  ],
+  "notes": [
+    "media fills the chart area; empty, it's a soft highlight wash with a faint dot grid",
+    "the figure reveal is a CSS view timeline (scrubbed with the scroll); without support or with reduced motion they simply show"
+  ],
+  "entry": "column-scale.tsx",
+  "source": "foundry",
+  "name": "column-scale",
+  "files": [
+    {
+      "path": "column-scale.css",
+      "content": "/* Each figure fades in from 20px below and a 6px blur as it scrolls into view; --i staggers\n   them by pushing each one's range a little later. */\n@supports (animation-timeline: view()) {\n  .column-scale-stat {\n    animation: column-scale-stat-in linear both;\n    animation-timeline: view();\n    animation-range: entry calc(var(--i, 0) * 8%) cover calc(22% + var(--i, 0) * 6%);\n  }\n}\n\n@keyframes column-scale-stat-in {\n  from { opacity: 0; transform: translateY(20px); filter: blur(6px); }\n  to { opacity: 1; transform: none; filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-scale-stat { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-scale.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ColumnButton } from \"@foundry/column-button\";\nimport { ColumnEyebrow, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-scale.css\";\n\nexport interface ColumnStat {\n  /** the figure, e.g. \"$3.1T+\" */\n  value: string;\n  /** a short caption under it */\n  label: string;\n}\n\nexport interface ColumnScaleProps {\n  /** the small mono tag at the top */\n  eyebrow: string;\n  /** accent of the tag and the figures */\n  tone?: ColumnTone;\n  /** the statement's first words, in the ink colour */\n  titleStrong: string;\n  /** the rest of the statement, in soft grey */\n  titleSoft?: string;\n  /** a paragraph under the statement */\n  body: ReactNode;\n  /** the white button */\n  action?: { label: string; href: string };\n  /** the figures along the bottom (four fill the row) */\n  stats: ColumnStat[];\n  /** the chart art on the right; empty: a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function ColumnScale({ eyebrow, tone = \"highlight\", titleStrong, titleSoft, body, action, stats, media, className }: ColumnScaleProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-background pt-8 pb-12 text-foreground lg:pt-section lg:pb-6\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter\">\n        <ColumnEyebrow tone={tone}>{eyebrow}</ColumnEyebrow>\n        <hr className=\"mt-6 border-border\" />\n\n        <div className=\"relative lg:grid lg:min-h-[25.5rem] lg:grid-cols-[32rem_1fr]\">\n          {/* Chart art: a band above the copy on phones, the right side on desktop. */}\n          <div className=\"relative -mx-gutter mt-4 h-[24rem] lg:absolute lg:inset-y-[-4.5rem] lg:right-[-5.5rem] lg:left-[22rem] lg:mx-0 lg:mt-0 lg:h-auto\">\n            {media ?? (\n              <div className=\"absolute inset-0\">\n                <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_55%_55%_at_60%_50%,color-mix(in_oklab,var(--highlight)_14%,transparent),transparent_75%)]\" />\n                <div className=\"absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_10%,transparent)_1px,transparent_1.5px)] bg-size-[9px_9px] [mask-image:radial-gradient(ellipse_50%_50%_at_60%_50%,black,transparent_85%)]\" />\n              </div>\n            )}\n          </div>\n          <div className=\"relative mt-2 lg:mt-11\">\n            <h2 className=\"max-w-[32rem] font-display text-[1.75rem]/[1.15] font-medium tracking-[-0.02em] lg:text-[1.75rem]/[1.15]\">\n              {titleStrong}\n              {titleSoft && <span className=\"text-muted-foreground/70\"> {titleSoft}</span>}\n            </h2>\n            <p className=\"mt-5 max-w-[30rem] text-base/[1.4] text-muted-foreground\">{body}</p>\n            {action && (\n              <ColumnButton href={action.href} variant=\"secondary\" className=\"mt-7\">\n                {action.label}\n              </ColumnButton>\n            )}\n          </div>\n        </div>\n\n        <dl className=\"relative mt-16 grid grid-cols-2 gap-x-4 gap-y-6 lg:mt-[3.25rem] lg:grid-cols-4\">\n          {stats.map((s, i) => (\n            <div key={s.label} className=\"column-scale-stat\" style={{ \"--i\": i } as CSSProperties}>\n              <dt className=\"sr-only\">{s.label}</dt>\n              <dd className=\"font-display text-2xl/none font-medium tracking-[-0.03em] text-[color-mix(in_oklab,var(--highlight)_90%,var(--foreground))] lg:text-[1.625rem]\">{s.value}</dd>\n              <dd aria-hidden className=\"mt-2 max-w-[10rem] text-xs/[1.35] text-muted-foreground lg:text-[0.8125rem]/[1.3]\">\n                {s.label}\n              </dd>\n            </div>\n          ))}\n        </dl>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "column-button",
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small mono tag at the top"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "highlight",
+      "description": "accent of the tag and the figures"
+    },
+    {
+      "name": "titleStrong",
+      "type": "string",
+      "required": true,
+      "description": "the statement's first words, in the ink colour"
+    },
+    {
+      "name": "titleSoft",
+      "type": "string",
+      "required": false,
+      "description": "the rest of the statement, in soft grey"
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "a paragraph under the statement"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white button"
+    },
+    {
+      "name": "stats",
+      "type": "ColumnStat[]",
+      "required": true,
+      "description": "the figures along the bottom (four fill the row)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the chart art on the right; empty: a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e586f63a0b38eca80eff924e95d72ee3ae6ce634bdc7fbc67dde7c336c148bac"
+}

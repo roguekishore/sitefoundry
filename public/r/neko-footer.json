@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko footer",
+  "description": "A tall closing panel that fades from white into ice blue: a tracked eyebrow, a big soft-serif call to action whose words slide up out of their own masks as it scrolls in, and a blue button; then a divider row, a sans tagline and four columns of quiet links. The panel's deep rounded foot lifts off a navy strip holding a spaced-out wordmark, a locale link, the copyright and a 'talk to us' pill with a small portrait.",
+  "category": "footer",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "cta",
+    "links",
+    "gradient",
+    "rounded",
+    "navy",
+    "split-text",
+    "reveal",
+    "scroll",
+    "serif",
+    "light"
+  ],
+  "notes": [
+    "the panel fades from background to accent; the strip under it is secondary with secondary-foreground text",
+    "CSS scroll-driven heading reveal; without support or with reduced motion the words are simply in place"
+  ],
+  "entry": "neko-footer.tsx",
+  "source": "foundry",
+  "name": "neko-footer",
+  "files": [
+    {
+      "path": "neko-footer.css",
+      "content": "/* The call to action's words slide up out of their masks one after another as the heading\n   scrolls in (ranges set inline as --nf-range). */\n.neko-footer-title {\n  view-timeline: --neko-footer block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .neko-footer-word {\n      animation: neko-footer-rise linear backwards;\n      animation-timeline: --neko-footer;\n      animation-range: var(--nf-range, normal);\n    }\n  }\n}\n\n@keyframes neko-footer-rise {\n  from { transform: translateY(115%); }\n}\n"
+    },
+    {
+      "path": "neko-footer.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { Globe } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoButton } from \"@foundry/neko-button\";\nimport { NekoSectionLabel } from \"@foundry/neko-section-label\";\nimport { NekoSlot } from \"@foundry/neko-slot\";\nimport \"./neko-footer.css\";\n\nexport interface NekoFooterColumn {\n  /** the column heading, shown in capitals */\n  title: string;\n  links: { label: string; href: string; badge?: ReactNode }[];\n}\n\nexport interface NekoFooterProps {\n  /** small tracked line above the call to action */\n  eyebrow: string;\n  /** the big call to action; its words slide up in */\n  title: string;\n  /** the blue button under it */\n  cta: { label: string; href: string };\n  /** the divider row above the links */\n  label?: string;\n  /** a short line beside the link columns (desktop) */\n  tagline?: string;\n  columns: NekoFooterColumn[];\n  /** the spaced-out wordmark on the strip */\n  wordmark: string;\n  /** the locale switcher link */\n  locale?: { label: string; href: string };\n  copyright: string;\n  /** the contact pill at the right of the strip */\n  contact?: { title: string; email: string; media?: ReactNode };\n  className?: string;\n}\n\nexport function NekoFooter({ eyebrow, title, cta, label, tagline, columns, wordmark, locale, copyright, contact, className }: NekoFooterProps) {\n  const words = title.split(\" \");\n  return (\n    <footer className={cn(\"bg-secondary font-sans text-foreground\", className)}>\n      <div className=\"rounded-b-[2.5rem] bg-linear-to-b from-background to-accent to-55% lg:rounded-b-[4rem]\">\n        <div className=\"mx-auto max-w-page px-gutter pb-section\">\n          <div className=\"pt-[18.5rem] text-center lg:pt-[25rem]\">\n            <p className=\"text-sm tracking-[0.04em] uppercase lg:text-base\">{eyebrow}</p>\n            <h2 className=\"neko-footer-title mx-auto mt-10 max-w-[12ch] font-display text-[2.5rem] leading-[1.1] tracking-[-0.025em] lg:mt-12 lg:max-w-none lg:text-[4.25rem] lg:leading-[1.18]\">\n              {words.map((w, i) => (\n                <span key={i}>\n                  {i > 0 && \" \"}\n                  <span className=\"-mb-[0.14em] inline-block overflow-clip pb-[0.14em] align-top\">\n                    <span\n                      className=\"neko-footer-word inline-block\"\n                      style={{ \"--nf-range\": `cover ${260 + i * 50}px cover ${480 + i * 60}px` } as CSSProperties}\n                    >\n                      {w}\n                    </span>\n                  </span>\n                </span>\n              ))}\n            </h2>\n            <div className=\"mt-12 flex justify-center\">\n              <NekoButton href={cta.href} variant=\"primary\">\n                {cta.label}\n              </NekoButton>\n            </div>\n          </div>\n\n          {label && <NekoSectionLabel label={label} className=\"mt-[18rem] lg:mt-[25rem]\" />}\n\n          <div className=\"mt-[7.5rem] grid grid-cols-2 gap-x-6 gap-y-14 lg:mt-[13rem] lg:grid-cols-[2fr_1fr_1fr_1fr_1fr]\">\n            {tagline && <p className=\"hidden max-w-[24rem] text-[1.75rem] leading-8 lg:block\">{tagline}</p>}\n            {columns.map((c) => (\n              <div key={c.title}>\n                <p className=\"text-sm tracking-[0.04em] uppercase lg:text-base\">{c.title}</p>\n                <ul className=\"mt-6 flex flex-col gap-5 text-sm leading-5 lg:text-base\">\n                  {c.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"inline-flex items-center gap-1 transition-colors duration-150 hover:text-primary\">\n                        {l.label}\n                        {l.badge}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n\n      <div className=\"mx-auto max-w-page px-gutter pt-16 pb-12 text-secondary-foreground lg:flex lg:items-center lg:py-[4.5rem]\">\n        <div className=\"flex items-start justify-between lg:contents\">\n          <p className=\"text-[2.25rem] leading-none font-normal tracking-[0.3em] uppercase lg:basis-[33.6%] lg:text-[2.5rem]\">{wordmark}</p>\n          <p className=\"max-w-[9rem] text-right text-sm text-secondary-foreground/75 lg:order-3 lg:mr-6 lg:max-w-none lg:text-base\">{copyright}</p>\n        </div>\n        {locale && (\n          <a href={locale.href} className=\"mt-14 inline-flex items-center gap-3 text-sm underline underline-offset-4 lg:order-2 lg:mt-0 lg:flex-1 lg:text-base\">\n            <Globe aria-hidden className=\"size-5 shrink-0\" strokeWidth={1.5} />\n            {locale.label}\n          </a>\n        )}\n        {contact && (\n          <div className=\"mt-14 flex items-center gap-5 rounded-2xl bg-secondary-foreground/10 p-1 lg:order-4 lg:mt-0 lg:w-[22.7rem]\">\n            <NekoSlot media={contact.media} className=\"size-18 shrink-0 rounded-xl bg-secondary-foreground/15\" />\n            <div>\n              <p className=\"text-base font-medium lg:text-lg\">{contact.title}</p>\n              <a href={`mailto:${contact.email}`} className=\"text-sm text-secondary-foreground/75 underline underline-offset-2 lg:text-base\">\n                {contact.email}\n              </a>\n            </div>\n          </div>\n        )}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-button",
+    "neko-section-label",
+    "neko-slot"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small tracked line above the call to action"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big call to action; its words slide up in"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the blue button under it"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "the divider row above the links"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": false,
+      "description": "a short line beside the link columns (desktop)"
+    },
+    {
+      "name": "columns",
+      "type": "NekoFooterColumn[]",
+      "required": true
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the spaced-out wordmark on the strip"
+    },
+    {
+      "name": "locale",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the locale switcher link"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "contact",
+      "type": "{ title: string; email: string; media?: ReactNode; }",
+      "required": false,
+      "description": "the contact pill at the right of the strip"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "87247b24ede0f5b520094816f8091ab88674f6fa8755c567b20784484581ee40"
+}

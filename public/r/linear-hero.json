@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear hero",
+  "description": "A quiet near-black hero: a big tight-tracked 64px headline in two lines at the left, a grey one-line subtitle with a small 'New · feature →' link at the far right of the same row, then a wide product-window slot on a lit stage that fades from page black to a cool grey at its rounded bottom edge. The headline, row and window fade in from a slight blur and rise on load, one after another.",
+  "category": "hero",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "minimal",
+    "product-shot",
+    "gradient",
+    "stage",
+    "fade-in",
+    "blur"
+  ],
+  "notes": [
+    "media: a product screenshot or video at ~1.83:1; empty, a bordered placeholder panel of that size",
+    "on phones the window is ~660px wide and cropped by the stage's right edge, as on the original",
+    "the stage light mixes the background into the muted-foreground grey: best on dark themes"
+  ],
+  "entry": "linear-hero.tsx",
+  "source": "foundry",
+  "name": "linear-hero",
+  "files": [
+    {
+      "path": "linear-hero.css",
+      "content": "/* The stage: page black at the top, a cool grey at the bottom, darkened towards the edges by\n   a radial vignette, so the product window seems lit from below. */\n.linear-hero-stage {\n  background:\n    radial-gradient(52.5% 57.5% at 50% 100%, transparent 0%, color-mix(in oklab, var(--background) 65%, transparent) 100%),\n    linear-gradient(var(--background) 12%, color-mix(in oklab, var(--muted-foreground) 70%, var(--background)) 100%);\n}\n\n/* Load-in: each part rises 12px out of a soft blur, one after another. */\n.linear-hero-in {\n  animation: linear-hero-in 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;\n}\n\n@keyframes linear-hero-in {\n  from { opacity: 0; filter: blur(8px); transform: translateY(12px); }\n  to { opacity: 1; filter: blur(0); transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .linear-hero-in { animation: none; }\n}\n"
+    },
+    {
+      "path": "linear-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LinearPlaceholder } from \"@foundry/linear-placeholder\";\nimport \"./linear-hero.css\";\n\nexport interface LinearHeroAnnouncement {\n  /** the short bold word (e.g. \"New\") */\n  tag: string;\n  /** what's new, shown grey with an arrow */\n  label: string;\n  href: string;\n}\n\nexport interface LinearHeroProps {\n  /** the headline; two lines on desktop, four on phones */\n  title: ReactNode;\n  /** one grey line under it */\n  subtitle: ReactNode;\n  /** the small \"New · …\" link, right-aligned on desktop */\n  announcement?: LinearHeroAnnouncement;\n  /** the product screenshot or video (~1.83:1); empty shows a placeholder panel */\n  media?: ReactNode;\n  /** a name for the placeholder, for screen readers */\n  mediaLabel?: string;\n  className?: string;\n}\n\nconst frame = \"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter\";\n\n/** Headline, subtitle row and a big product window on a softly lit stage. */\nexport function LinearHero({ title, subtitle, announcement, media, mediaLabel, className }: LinearHeroProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className={cn(frame, \"pt-[8.5rem] lg:pt-[12.5rem]\")}>\n        <h1 className=\"linear-hero-in max-w-[13em] font-display text-[2.375rem] leading-[1.1] font-[510] tracking-[-0.022em] text-foreground sm:text-5xl lg:text-[4rem] lg:leading-[1.06]\">\n          {title}\n        </h1>\n        <div\n          className=\"linear-hero-in mt-6 flex flex-col gap-6 sm:flex-row sm:items-baseline sm:justify-between lg:mt-6\"\n          style={{ animationDelay: \"120ms\" }}\n        >\n          <p className=\"max-w-[28rem] text-base leading-6 text-muted-foreground sm:max-w-none\">{subtitle}</p>\n          {announcement && (\n            <a\n              href={announcement.href}\n              className=\"inline-flex shrink-0 items-center gap-2 text-[0.9375rem] transition-[filter] duration-150 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-130 motion-reduce:transition-none\"\n            >\n              <span className=\"font-[590] text-foreground\">{announcement.tag}</span>\n              <span className=\"text-muted-foreground\">\n                {announcement.label} <span aria-hidden>→</span>\n              </span>\n            </a>\n          )}\n        </div>\n      </div>\n\n      <div\n        className=\"linear-hero-in linear-hero-stage mt-4 overflow-clip pt-8 pb-8 sm:mx-3 sm:rounded-2xl lg:mt-9 lg:pt-10 lg:pb-12\"\n        style={{ animationDelay: \"240ms\" }}\n      >\n        <div className={frame}>\n          <LinearPlaceholder\n            label={media ? undefined : mediaLabel}\n            className=\"-ml-1.5 aspect-[1.83] w-[41rem] max-w-none sm:-mx-5 sm:w-[calc(100%+2.5rem)]\"\n          >\n            {media}\n          </LinearPlaceholder>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "linear-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline; two lines on desktop, four on phones"
+    },
+    {
+      "name": "subtitle",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one grey line under it"
+    },
+    {
+      "name": "announcement",
+      "type": "LinearHeroAnnouncement",
+      "required": false,
+      "description": "the small \"New · …\" link, right-aligned on desktop"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product screenshot or video (~1.83:1); empty shows a placeholder panel"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "a name for the placeholder, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "994122fa9a2fb451637afd5e8ae5c4989ef884e648269e9c78afa15284a31d9b"
+}

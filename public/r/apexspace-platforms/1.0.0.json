@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Apexspace bus platforms",
+  "description": "A pure-black product band: a light uppercase heading left, a paragraph and a small mono badge right, then three outlined product cards sharing hairlines with + crosshairs at the corners, and a centred mono link with a yellow underline. On phones the cards become a swipe track (one card with the next peeking), with arrow buttons and diamond name tabs that follow the scroll.",
+  "category": "features",
+  "site": "apexspace",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "products",
+    "cards",
+    "comparison",
+    "carousel",
+    "scroll-snap",
+    "hairline",
+    "crosshair",
+    "dark",
+    "mono",
+    "tone"
+  ],
+  "notes": [
+    "uses the card surface (pure black in the faithful theme) for the whole band",
+    "phones and tablets (below 1024px): scroll-snap track; the arrows and tabs need JavaScript (hydrate: visible), swiping works without it",
+    "three cards fill the desktop row; more than three wrap onto a new row"
+  ],
+  "entry": "apexspace-platforms.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "apexspace-platforms",
+  "files": [
+    {
+      "path": "apexspace-platforms.tsx",
+      "content": "import { useRef, useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ApexspaceBusCard, type ApexspaceBusCardProps } from \"@foundry/apexspace-bus-card\";\nimport { ApexspaceButton } from \"@foundry/apexspace-button\";\nimport { ApexspaceHeading } from \"@foundry/apexspace-heading\";\n\nexport interface ApexspacePlatformsProps {\n  /** the heading at the top left; a \\n starts a new line */\n  title: string;\n  /** the paragraph at the top right */\n  text: string;\n  /** the small mono badge under the paragraph */\n  badge: { icon: ReactNode; label: string };\n  /** the product cards, three in a row on desktop */\n  cards: ApexspaceBusCardProps[];\n  /** the centred link under the cards */\n  compare: { label: string; href: string };\n  /** screen-reader labels for the phone arrows */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst toneTab = { 1: \"border-chart-1 bg-chart-1/25\", 2: \"border-chart-2 bg-chart-2/25\", 3: \"border-chart-3 bg-chart-3/25\", 4: \"border-chart-4 bg-chart-4/25\" };\n\n/** Black band of outlined product cards; a swipe track with tabs on phones. */\nexport function ApexspacePlatforms({ title, text, badge, cards, compare, previousLabel, nextLabel, className }: ApexspacePlatformsProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const [active, setActive] = useState(0);\n\n  // Where card i starts inside the track, minus the track's side padding.\n  const offsetOf = (i: number) => {\n    const el = track.current;\n    const card = el?.children[i] as HTMLElement | undefined;\n    if (!el || !card) return 0;\n    return card.offsetLeft - parseFloat(getComputedStyle(el).paddingLeft);\n  };\n\n  const go = (i: number) => {\n    const el = track.current;\n    if (!el) return;\n    const next = Math.max(0, Math.min(cards.length - 1, i));\n    const smooth = !window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollTo({ left: offsetOf(next), behavior: smooth ? \"smooth\" : \"auto\" });\n    setActive(next);\n  };\n\n  const onScroll = () => {\n    const el = track.current;\n    if (!el) return;\n    let best = 0;\n    cards.forEach((_, i) => {\n      if (Math.abs(offsetOf(i) - el.scrollLeft) < Math.abs(offsetOf(best) - el.scrollLeft)) best = i;\n    });\n    setActive(best);\n  };\n\n  return (\n    <section className={cn(\"bg-card pt-section pb-20 text-card-foreground\", className)}>\n      <div className=\"flex flex-col gap-5 px-gutter lg:flex-row lg:items-start lg:justify-between lg:gap-10\">\n        <ApexspaceHeading text={title} />\n        <div className=\"lg:w-[30rem] lg:shrink-0\">\n          <p className=\"text-[length:clamp(0.875rem,0.82rem_+_0.19vw,1rem)] leading-[1.4]\">{text}</p>\n          <p className=\"mt-6 flex items-center gap-3 font-mono text-[0.75rem] leading-none tracking-[0.06em] uppercase\">\n            <span aria-hidden className=\"flex size-3 items-center [&>svg]:size-full\">\n              {badge.icon}\n            </span>\n            {badge.label}\n          </p>\n        </div>\n      </div>\n\n      <div\n        ref={track}\n        onScroll={onScroll}\n        className=\"relative mt-[4.25rem] flex snap-x snap-mandatory scroll-px-gutter gap-4 overflow-x-auto px-gutter py-1.5 [scrollbar-width:none] lg:mt-[7.4rem] lg:grid lg:grid-cols-3 lg:gap-0 lg:overflow-visible lg:py-0 [&::-webkit-scrollbar]:hidden\"\n      >\n        {cards.map((c, i) => (\n          <ApexspaceBusCard key={c.name} {...c} className={cn(\"w-[calc(100vw-2.5rem)] max-w-[24rem] shrink-0 snap-start lg:w-auto lg:max-w-none\", i % 3 !== 0 && \"lg:-ml-px\", c.className)} />\n        ))}\n      </div>\n\n      <div className=\"mt-6 flex items-center justify-between gap-3 px-gutter lg:hidden\">\n        <button type=\"button\" aria-label={previousLabel} onClick={() => go(active - 1)} className=\"flex size-5 items-center justify-center bg-foreground/15 transition-colors hover:bg-foreground/30\">\n          <ArrowLeft aria-hidden className=\"size-3\" strokeWidth={1.5} />\n        </button>\n        <div className=\"flex min-w-0 items-center gap-3 sm:gap-5\">\n          {cards.map((c, i) => (\n            <button key={c.name} type=\"button\" aria-current={i === active} onClick={() => go(i)} className=\"flex items-center gap-1.5\">\n              <span aria-hidden className={cn(\"flex size-[1.125rem] rotate-45 items-center justify-center border transition-colors duration-300\", i === active ? toneTab[c.tone] : \"border-foreground/40\")}>\n                <span className=\"-rotate-45 font-mono text-[0.625rem] leading-none\">{c.name.charAt(0)}</span>\n              </span>\n              <span className={cn(\"font-display text-[1rem] leading-none font-medium tracking-[0.04em] uppercase transition-opacity duration-300\", i === active ? \"opacity-100\" : \"opacity-60\")}>{c.name}</span>\n            </button>\n          ))}\n        </div>\n        <button type=\"button\" aria-label={nextLabel} onClick={() => go(active + 1)} className=\"flex size-5 items-center justify-center bg-foreground/15 transition-colors hover:bg-foreground/30\">\n          <ArrowRight aria-hidden className=\"size-3\" strokeWidth={1.5} />\n        </button>\n      </div>\n\n      <div className=\"mt-[5.5rem] flex justify-center px-gutter lg:mt-[7.4rem]\">\n        <ApexspaceButton {...compare} variant=\"line\" className=\"lg:w-[23.75rem]\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "apexspace-bus-card",
+    "apexspace-button",
+    "apexspace-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading at the top left; a \\n starts a new line"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph at the top right"
+    },
+    {
+      "name": "badge",
+      "type": "{ icon: ReactNode; label: string; }",
+      "required": true,
+      "description": "the small mono badge under the paragraph"
+    },
+    {
+      "name": "cards",
+      "type": "ApexspaceBusCardProps[]",
+      "required": true,
+      "description": "the product cards, three in a row on desktop"
+    },
+    {
+      "name": "compare",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the centred link under the cards"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the phone arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c23ce02c19c2cea20d8ec5959890a1464aefb55bfc5594eff9f17269de594615"
+}

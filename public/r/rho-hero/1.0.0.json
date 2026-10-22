@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho hero",
+  "description": "A centred near-black hero: a hairline mono badge with a blinking mint square, an 80px regular-weight headline on two lines, a short lead, an email field with a mint button beside an outline and a light button, small fine print, then a wide product shot that grows from 90% to full width as you scroll, over a faint glow.",
+  "category": "hero",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "centered",
+    "mint",
+    "mono",
+    "email-capture",
+    "product-shot",
+    "scroll",
+    "scale",
+    "glow"
+  ],
+  "notes": [
+    "best dark (tone=\"dark\" by default); the product-shot placeholder is an inverse (white on dark) panel",
+    "media: the product screenshot (1.57 wide); backdrop: anything behind the hero (the original has a WebGL starfield)",
+    "CSS only: the badge square blinks five times on load; the shot scales with a scroll-driven animation"
+  ],
+  "entry": "rho-hero.tsx",
+  "source": "foundry",
+  "name": "rho-hero",
+  "files": [
+    {
+      "path": "rho-hero.css",
+      "content": "/* The badge's mint square blinks five times after load, then stays on (no fill mode, so\n   it returns to fully visible). */\n.rho-hero-caret {\n  animation: rho-hero-blink 1s steps(1, end) 5;\n}\n@keyframes rho-hero-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n\n/* The product shot starts at 90% width and reaches full width as it rises into the\n   middle of the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rho-hero-shot {\n      animation: rho-hero-grow linear both;\n      animation-timeline: view();\n      animation-range: cover 8% cover 42%;\n    }\n  }\n}\n@keyframes rho-hero-grow {\n  from { transform: scale(0.9); }\n  to { transform: scale(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .rho-hero-caret { animation: none; }\n}\n"
+    },
+    {
+      "path": "rho-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RhoButton } from \"@foundry/rho-button\";\nimport { RhoEmailForm, type RhoEmailFormProps } from \"@foundry/rho-email-form\";\nimport { RhoHeading } from \"@foundry/rho-heading\";\nimport \"./rho-hero.css\";\n\nexport interface RhoHeroAction {\n  /** button text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** outline (hairline) or inverse (light fill on dark) */\n  variant: \"outline\" | \"inverse\";\n}\n\nexport interface RhoHeroProps {\n  /** the mono announcement in the hairline badge */\n  badge: string;\n  /** where the badge links to */\n  badgeHref?: string;\n  /** the headline */\n  title: string;\n  /** one or two sentences under the headline */\n  lead: string;\n  /** the email sign-up field */\n  form: RhoEmailFormProps;\n  /** up to two buttons beside the field */\n  actions: RhoHeroAction[];\n  /** small print under the buttons */\n  fineprint?: string;\n  /** the product screenshot; empty: a placeholder panel of the same shape */\n  media?: ReactNode;\n  /** anything behind the hero (a starfield, a video); empty: a faint glow */\n  backdrop?: ReactNode;\n  /** dark (as the original) or light */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nexport function RhoHero({\n  badge,\n  badgeHref,\n  title,\n  lead,\n  form,\n  actions,\n  fineprint,\n  media,\n  backdrop,\n  tone = \"dark\",\n  className,\n}: RhoHeroProps) {\n  const Badge = badgeHref ? \"a\" : \"span\";\n  return (\n    <section\n      data-rho-tone={tone}\n      className={cn(tone === \"dark\" && \"dark\", \"relative overflow-clip bg-background text-foreground\", className)}\n    >\n      <div aria-hidden=\"true\" className=\"pointer-events-none absolute inset-0\">\n        {backdrop ?? (\n          <div className=\"absolute inset-x-0 top-[22rem] h-[40rem] bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,color-mix(in_oklab,var(--foreground)_9%,transparent),transparent_70%)] lg:top-[18rem]\" />\n        )}\n      </div>\n\n      <div className=\"relative mx-auto flex max-w-page flex-col items-center px-gutter pt-16 text-center lg:pt-[4.5rem]\">\n        <Badge\n          {...(badgeHref ? { href: badgeHref } : {})}\n          className=\"flex w-full items-center justify-center gap-3 rounded-md border border-border px-5 py-3 font-mono text-[0.8125rem] leading-[1.3] font-medium tracking-[0.04em] uppercase transition-colors duration-[620ms] ease-[cubic-bezier(0.32,0,0.24,1)] hover:bg-card sm:w-auto\"\n        >\n          <span className=\"rho-hero-caret size-2.5 shrink-0 bg-primary\" />\n          <span>{badge}</span>\n        </Badge>\n\n        <RhoHeading as=\"h1\" size=\"hero\" text={title} reveal={false} className=\"mt-8 max-w-[22rem] lg:mt-8 lg:max-w-[40rem]\" />\n\n        <p className=\"mt-9 max-w-[43rem] text-[1.125rem] leading-[1.3] lg:mt-10 lg:text-xl lg:leading-[1.3]\">{lead}</p>\n\n        <div className=\"mt-8 flex w-full flex-col gap-3 lg:w-auto lg:flex-row lg:items-center\">\n          <RhoEmailForm {...form} className=\"lg:w-[27.5rem]\" />\n          <div className=\"grid grid-cols-2 gap-3 lg:flex\">\n            {actions.map((a) => (\n              <RhoButton key={a.label} href={a.href} variant={a.variant} size=\"lg\" className=\"lg:px-[1.375rem]\">\n                {a.label}\n              </RhoButton>\n            ))}\n          </div>\n        </div>\n\n        {fineprint && <p className=\"mt-9 max-w-[36.5rem] text-[0.6875rem] leading-[1.35] text-foreground/85 lg:mt-11\">{fineprint}</p>}\n      </div>\n\n      <div className=\"relative mx-auto mt-16 max-w-page px-gutter pb-4 lg:mt-[4.5rem]\">\n        <div className=\"rho-hero-shot origin-top overflow-clip rounded-lg shadow-[0_2.5rem_7.5rem_color-mix(in_oklab,var(--background)_55%,transparent)]\">\n          {media ?? <div className=\"aspect-[1.57] w-full bg-foreground/95\" />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-button",
+    "rho-email-form",
+    "rho-heading"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": true,
+      "description": "the mono announcement in the hairline badge"
+    },
+    {
+      "name": "badgeHref",
+      "type": "string",
+      "required": false,
+      "description": "where the badge links to"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one or two sentences under the headline"
+    },
+    {
+      "name": "form",
+      "type": "RhoEmailFormProps",
+      "required": true,
+      "description": "the email sign-up field"
+    },
+    {
+      "name": "actions",
+      "type": "RhoHeroAction[]",
+      "required": true,
+      "description": "up to two buttons beside the field"
+    },
+    {
+      "name": "fineprint",
+      "type": "string",
+      "required": false,
+      "description": "small print under the buttons"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product screenshot; empty: a placeholder panel of the same shape"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "anything behind the hero (a starfield, a video); empty: a faint glow"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark (as the original) or light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9bb9e943a301167ae8facfc781694d13a3b2110d900ee576a4398b63e89d6560"
+}

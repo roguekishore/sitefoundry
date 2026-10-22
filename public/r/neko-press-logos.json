@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko press marquee",
+  "description": "A single row of publication names, each set in its own typographic voice (bold grotesque, serif, spaced capitals, condensed), drifting slowly to the left in an endless loop.",
+  "category": "logos",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "press",
+    "marquee",
+    "loop",
+    "typographic",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "CSS loop (51s on desktop, 33s on phones); stops with reduced motion",
+    "names are plain text: pass a logo node to use a real mark"
+  ],
+  "entry": "neko-press-logos.tsx",
+  "source": "foundry",
+  "name": "neko-press-logos",
+  "files": [
+    {
+      "path": "neko-press-logos.css",
+      "content": "/* Two copies of the row side by side; the pair slides left by one copy, then repeats. */\n.neko-press-logos-run {\n  animation: neko-press-logos-scroll 33s linear infinite;\n}\n@media (min-width: 64rem) {\n  .neko-press-logos-run {\n    animation-duration: 51s;\n  }\n}\n\n@keyframes neko-press-logos-scroll {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .neko-press-logos-run {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "neko-press-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./neko-press-logos.css\";\n\nexport interface NekoPressName {\n  /** the publication's name (also read out when a logo is given) */\n  name: string;\n  /** how the plain-text name is set: grotesk (heavy sans), serif, caps (spaced capitals), condensed */\n  voice?: \"grotesk\" | \"serif\" | \"caps\" | \"condensed\";\n  /** a real logo instead of the typeset name */\n  logo?: ReactNode;\n}\n\nexport interface NekoPressLogosProps {\n  names: NekoPressName[];\n  className?: string;\n}\n\nconst voices = {\n  grotesk: \"font-sans font-bold tracking-[-0.03em]\",\n  serif: \"font-display font-semibold tracking-[-0.02em]\",\n  caps: \"font-sans font-medium tracking-[0.22em] uppercase\",\n  condensed: \"font-sans font-semibold tracking-[-0.06em] [font-stretch:80%]\",\n};\n\nfunction Row({ names, hidden }: { names: NekoPressName[]; hidden?: boolean }) {\n  return (\n    <ul aria-hidden={hidden || undefined} className=\"flex shrink-0 items-center gap-16 pr-16 lg:gap-32 lg:pr-32\">\n      {names.map((n) => (\n        <li key={n.name} className={cn(\"text-2xl whitespace-nowrap text-foreground lg:text-[2.5rem]\", voices[n.voice ?? \"grotesk\"])}>\n          {n.logo ?? n.name}\n        </li>\n      ))}\n    </ul>\n  );\n}\n\nexport function NekoPressLogos({ names, className }: NekoPressLogosProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background py-8 lg:py-14\", className)}>\n      <div className=\"neko-press-logos-run flex w-max\">\n        <Row names={names} />\n        <Row names={names} hidden />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "names",
+      "type": "NekoPressName[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fa7684f1bd0e23b3383d536b6464d3bf19325cf23b30792c7c26d623473c7887"
+}

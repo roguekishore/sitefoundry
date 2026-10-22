@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anchorage header",
+  "description": "A sticky black header that starts as a full-width bar with a hairline under it and, over the first scroll, lifts into a floating rounded box the width of the page, 24px from the top. Logo left, five semibold links with soft hover tiles, a quiet log-in link and a cobalt button right. Phones always show the floating box, with a three-line button opening a menu card.",
+  "category": "header",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "floating",
+    "scroll-driven",
+    "dark",
+    "fintech"
+  ],
+  "notes": [
+    "lies over the next section (the hero art shows behind the phone box); pass overlay={false} on plain pages",
+    "the bar-to-box change is a CSS scroll-driven animation (desktop, where supported); elsewhere it stays as drawn",
+    "the phone menu is a native <details> disclosure, so it works without JavaScript"
+  ],
+  "entry": "anchorage-header.tsx",
+  "source": "foundry",
+  "name": "anchorage-header",
+  "files": [
+    {
+      "path": "anchorage-header.css",
+      "content": "/* Desktop: over the first 160px of page scroll the full-width bar draws in to the page\n   width, drops 24px and rounds its corners: a floating box. Phones are always the box. */\n@supports (animation-timeline: scroll()) {\n  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n    .anchorage-header-shift {\n      animation: anchorage-header-drop linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 160px;\n    }\n    .anchorage-header-bg {\n      animation: anchorage-header-float linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 160px;\n    }\n  }\n}\n\n@keyframes anchorage-header-drop {\n  from { transform: translateY(0); }\n  to { transform: translateY(1.5rem); }\n}\n\n@keyframes anchorage-header-float {\n  from {\n    inset-inline: 0;\n    border-radius: 0;\n    border-color: transparent;\n    border-bottom-color: color-mix(in oklab, var(--foreground) 12%, transparent);\n  }\n  to {\n    inset-inline: max(0.625rem, calc(50% - var(--page-width) / 2));\n    border-radius: var(--radius);\n    border-color: color-mix(in oklab, var(--foreground) 12%, transparent);\n  }\n}\n"
+    },
+    {
+      "path": "anchorage-header.tsx",
+      "content": "import { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AnchorageButton } from \"@foundry/anchorage-button\";\nimport { AnchorageMark, type AnchorageMarkProps } from \"@foundry/anchorage-mark\";\nimport \"./anchorage-header.css\";\n\nexport interface AnchorageHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface AnchorageHeaderProps {\n  /** the logo */\n  mark: AnchorageMarkProps;\n  /** the main navigation, left of centre on desktop */\n  links: AnchorageHeaderLink[];\n  /** the quiet text link on the right, e.g. \"Log in\" */\n  login?: AnchorageHeaderLink;\n  /** the cobalt button on the right */\n  cta: AnchorageHeaderLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  /** lie on top of the next section instead of pushing it down (default on) */\n  overlay?: boolean;\n  className?: string;\n}\n\n/**\n * Sticky header. Desktop: a full-width black bar that floats into a rounded box as the page\n * scrolls. Phones: a rounded box inset from the edges, with a disclosure menu.\n */\nexport function AnchorageHeader({ mark, links, login, cta, menuLabel, overlay = true, className }: AnchorageHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-50 px-2.5 pt-6 lg:h-[4.375rem] lg:p-0\", overlay && \"-mb-[6rem] lg:-mb-[4.375rem]\", className)}>\n      <div className=\"anchorage-header-shift relative h-[4.5rem] lg:h-full\">\n        {/* the black box; on desktop it starts edge to edge and draws in on scroll */}\n        <div aria-hidden className=\"anchorage-header-bg absolute inset-0 rounded-lg border border-foreground/12 bg-background lg:rounded-none lg:border-x-transparent lg:border-t-transparent\" />\n\n        <div className=\"relative mx-auto flex h-full max-w-page items-center justify-between px-4 lg:px-[0.9375rem]\">\n          <AnchorageMark {...mark} />\n\n          <nav className=\"hidden items-center gap-1 lg:ml-[4rem] lg:mr-auto lg:flex\">\n            {links.map((l) => (\n              <a\n                key={l.label}\n                href={l.href}\n                className=\"rounded-sm px-[1.125rem] py-2 font-display text-base font-bold text-foreground transition-colors duration-300 ease-[ease] hover:bg-accent motion-reduce:transition-none\"\n              >\n                {l.label}\n              </a>\n            ))}\n          </nav>\n\n          <div className=\"hidden items-center gap-6 lg:flex\">\n            {login && (\n              <a href={login.href} className=\"rounded-sm px-2 py-2 font-display text-base font-bold text-foreground transition-colors duration-300 ease-[ease] hover:text-highlight motion-reduce:transition-none\">\n                {login.label}\n              </a>\n            )}\n            <AnchorageButton href={cta.href}>{cta.label}</AnchorageButton>\n          </div>\n\n          <details className=\"group lg:hidden\">\n            <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center text-foreground [&::-webkit-details-marker]:hidden\">\n              <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={2} />\n              <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={2} />\n            </summary>\n            <div className=\"absolute inset-x-0 top-full mt-2 rounded-lg border border-foreground/12 bg-background p-4\">\n              <nav className=\"flex flex-col\">\n                {links.map((l) => (\n                  <a key={l.label} href={l.href} className=\"rounded-sm px-2 py-3 text-lg font-semibold text-foreground hover:bg-accent\">\n                    {l.label}\n                  </a>\n                ))}\n                {login && (\n                  <a href={login.href} className=\"rounded-sm px-2 py-3 text-lg font-semibold text-foreground hover:bg-accent\">\n                    {login.label}\n                  </a>\n                )}\n              </nav>\n              <AnchorageButton href={cta.href} className=\"mt-4 w-full\">\n                {cta.label}\n              </AnchorageButton>\n            </div>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "anchorage-button",
+    "anchorage-mark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "AnchorageMarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "links",
+      "type": "AnchorageHeaderLink[]",
+      "required": true,
+      "description": "the main navigation, left of centre on desktop"
+    },
+    {
+      "name": "login",
+      "type": "AnchorageHeaderLink",
+      "required": false,
+      "description": "the quiet text link on the right, e.g. \"Log in\""
+    },
+    {
+      "name": "cta",
+      "type": "AnchorageHeaderLink",
+      "required": true,
+      "description": "the cobalt button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "lie on top of the next section instead of pushing it down (default on)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "76cab17cf76d289865b5ee96697c518eea124ed73bd38612a48d0a0d7f7e2aff"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio scale stats",
+  "description": "A white framed section about scale: a blue badge, a two-tone 40px heading and four big figures in a 2×2 grid, each with a 2px blue rule on its left; behind them an exponential growth line sweeps from the bottom left to the top right corner over a field of vertical hairlines and a faint blue wash. The blue line draws itself over a grey twin as the section scrolls up, and the figures come out of a blur one by one.",
+  "category": "stats",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "light",
+    "chart",
+    "line",
+    "hairline",
+    "framed",
+    "scrubbed",
+    "draw",
+    "reveal",
+    "blur",
+    "saas"
+  ],
+  "notes": [
+    "on phones the line sits below the figures in a 240px strip",
+    "CSS only (the line is a plain SVG path)"
+  ],
+  "entry": "attio-scale.tsx",
+  "source": "foundry",
+  "name": "attio-scale",
+  "files": [
+    {
+      "path": "attio-scale.css",
+      "content": "/* The blue growth line draws itself over its grey twin as the section scrolls up, and the\n   stats come up out of a blur one after another. */\n@supports (animation-timeline: view()) {\n  .attio-scale-track {\n    view-timeline-name: --attio-scale;\n  }\n  .attio-scale-line {\n    stroke-dasharray: 1;\n    animation: attio-scale-draw linear both;\n    animation-timeline: --attio-scale;\n    animation-range: entry 0% cover 50%;\n  }\n  .attio-scale-stat {\n    animation: attio-scale-unblur linear both;\n    animation-timeline: view();\n    animation-range: entry calc(var(--attio-scale-step, 0) * 40px) entry calc(220px + var(--attio-scale-step, 0) * 40px);\n  }\n}\n\n@keyframes attio-scale-draw {\n  from { stroke-dashoffset: 1; }\n  to { stroke-dashoffset: 0; }\n}\n@keyframes attio-scale-unblur {\n  from { opacity: 0; filter: blur(6px); }\n  to { opacity: 1; filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-scale-line,\n  .attio-scale-stat {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-scale.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioBadge } from \"@foundry/attio-badge\";\nimport { AttioHeading } from \"@foundry/attio-heading\";\nimport \"./attio-scale.css\";\n\nexport interface AttioScaleStat {\n  /** the figure, e.g. \"40M\" */\n  value: string;\n  /** what it counts */\n  label: string;\n}\n\nexport interface AttioScaleProps {\n  /** the small label over the heading */\n  badge?: string;\n  /** the heading: dark lead… */\n  lead: string;\n  /** …and grey rest, on its own line */\n  rest?: string;\n  /** four figures in a 2×2 grid, each with a blue rule */\n  stats: AttioScaleStat[];\n  className?: string;\n}\n\n// An exponential growth line across a 1392×760 box: flat at the bottom left, steep at the top right.\nconst W = 1392;\nconst H = 760;\nconst BASE = 700;\nconst points = Array.from({ length: 61 }, (_, i) => {\n  const t = i / 60;\n  const y = BASE - BASE * ((Math.exp(2.4 * t) - 1) / (Math.exp(2.4) - 1));\n  return `${(t * W).toFixed(1)},${y.toFixed(1)}`;\n});\nconst LINE = `M${points.join(\" L\")}`;\n// the area above the line, filled with the page colour so the hairlines only show beneath it\nconst COVER = `${LINE} L${W},0 L0,0 Z`;\n\n/**\n * A white framed section about scale: badge, two-tone heading and four big figures with blue\n * rules on the left; behind them, a growth line sweeping from the bottom left to the top\n * right corner over a field of vertical hairlines. The blue line draws itself over a grey\n * one as the section scrolls up.\n */\nexport function AttioScale({ badge, lead, rest, stats, className }: AttioScaleProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"attio-scale-track relative isolate mx-auto max-w-page overflow-clip border-b border-border lg:min-h-[47.5rem] lg:border-x\">\n        <div className=\"relative px-8 pt-[5.5rem] lg:px-[3.6875rem] lg:pt-section lg:pb-56\">\n          {badge && <AttioBadge>{badge}</AttioBadge>}\n          <AttioHeading lead={lead} rest={rest} restOnNewLine className=\"mt-5 max-w-[25rem] lg:mt-6\" />\n          <dl className=\"mt-10 grid max-w-[33rem] grid-cols-2 gap-x-6 gap-y-8 lg:mt-14\">\n            {stats.map((s, i) => (\n              <div\n                key={s.label}\n                style={{ \"--attio-scale-step\": i } as CSSProperties}\n                className=\"attio-scale-stat flex flex-col-reverse border-l-2 border-highlight pl-4 lg:pl-6\"\n              >\n                <dt className=\"text-[0.9375rem] leading-[1.1] font-medium tracking-[-0.01em] text-muted-foreground\">{s.label}</dt>\n                <dd className=\"font-display text-[2rem] leading-[1.15] font-normal tracking-[-0.02em]\">{s.value}</dd>\n              </div>\n            ))}\n          </dl>\n        </div>\n\n        {/* the growth line over vertical hairlines; in flow on phones, behind everything on desktop */}\n        <div aria-hidden className=\"relative -z-10 mt-6 h-60 lg:absolute lg:inset-0 lg:mt-0 lg:h-auto\">\n          <div className=\"absolute inset-0 bg-gradient-to-l from-highlight/8 to-transparent to-60%\" />\n          <div className=\"absolute inset-0 bg-[repeating-linear-gradient(to_right,var(--border)_0_1px,transparent_1px_10px)]\" />\n          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio=\"none\" className=\"absolute inset-0 size-full\">\n            <path d={COVER} className=\"fill-background\" />\n            <path d={LINE} fill=\"none\" vectorEffect=\"non-scaling-stroke\" strokeWidth={1.5} className=\"stroke-input\" />\n            <path d={LINE} pathLength={1} fill=\"none\" vectorEffect=\"non-scaling-stroke\" strokeWidth={1.5} className=\"attio-scale-line stroke-highlight\" />\n          </svg>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "attio-badge",
+    "attio-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the heading: dark lead…"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "…and grey rest, on its own line"
+    },
+    {
+      "name": "stats",
+      "type": "AttioScaleStat[]",
+      "required": true,
+      "description": "four figures in a 2×2 grid, each with a blue rule"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6388d5211608b437e9c0a77a7bcd70195c6508091659cea3a70c318bbaf02142"
+}

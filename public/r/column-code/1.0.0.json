@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Column code block",
+  "description": "A quiet monospaced code panel at 12px: optional uppercase label and line numbers, strings in the highlight colour, numbers in purple, null/true/false in orange, flags and keys in the primary colour. Long lines run off the edge instead of wrapping.",
+  "category": "card",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "code",
+    "mono",
+    "developer",
+    "api",
+    "syntax",
+    "minimal"
+  ],
+  "notes": [
+    "colours come from tokens, so it reads on light panels and inside a dark-class band alike",
+    "the highlighting is a tiny built-in tokenizer for shell and JSON-like snippets, not a full parser"
+  ],
+  "entry": "column-code.tsx",
+  "source": "foundry",
+  "name": "column-code",
+  "files": [
+    {
+      "path": "column-code.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ColumnCodeProps {\n  /** the snippet; lines are split on newlines */\n  code: string;\n  /** small uppercase label above the code, e.g. \"Response\" */\n  label?: string;\n  /** number each line in a quiet gutter */\n  lineNumbers?: boolean;\n  /** draw the panel (border, fill, padding); off when the parent already frames it */\n  framed?: boolean;\n  className?: string;\n}\n\n// One pass over a line: quoted strings (a string followed by \":\" is a JSON key), shell flags,\n// keywords, numbers and `key=` names. Everything else stays in the text colour.\nconst TOKEN = /(\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*')(\\s*:)?|(^|\\s)(-{1,2}[A-Za-z]+)|\\b(true|false|null)\\b|\\b(\\d[\\d.]*)\\b|([A-Za-z_][\\w]*)(?==)/g;\n\nfunction highlight(line: string): ReactNode[] {\n  const out: ReactNode[] = [];\n  let last = 0;\n  let k = 0;\n  for (const m of line.matchAll(TOKEN)) {\n    const start = m.index ?? 0;\n    if (start > last) out.push(line.slice(last, start));\n    if (m[1]) {\n      out.push(\n        <span key={k++} className={m[2] ? \"text-foreground\" : \"text-highlight\"}>\n          {m[1]}\n        </span>,\n      );\n      if (m[2]) out.push(m[2]);\n    } else if (m[4]) {\n      out.push(m[3]);\n      out.push(\n        <span key={k++} className=\"text-primary\">\n          {m[4]}\n        </span>,\n      );\n    } else if (m[5]) {\n      out.push(\n        <span key={k++} className=\"text-chart-3\">\n          {m[5]}\n        </span>,\n      );\n    } else if (m[6]) {\n      out.push(\n        <span key={k++} className=\"text-chart-4\">\n          {m[6]}\n        </span>,\n      );\n    } else if (m[7]) {\n      out.push(\n        <span key={k++} className=\"text-primary/80\">\n          {m[7]}\n        </span>,\n      );\n    }\n    last = start + m[0].length;\n  }\n  if (last < line.length) out.push(line.slice(last));\n  return out;\n}\n\nexport function ColumnCode({ code, label, lineNumbers, framed = true, className }: ColumnCodeProps) {\n  const lines = code.replace(/\\n$/, \"\").split(\"\\n\");\n  return (\n    <div className={cn(\"min-w-0 font-mono text-[0.6875rem]/[1.125rem] sm:text-xs/[1.125rem]\", framed && \"rounded-lg border border-border bg-background/60 p-4\", className)}>\n      {label && <p className=\"mb-5 text-xs tracking-[0.06em] text-muted-foreground/80 uppercase\">{label}</p>}\n      <pre className=\"overflow-x-auto [scrollbar-width:none]\">\n        <code className=\"block w-max min-w-full\">\n          {lines.map((line, i) => (\n            <span key={i} className=\"flex whitespace-pre text-foreground/90\">\n              {lineNumbers && <span className=\"w-7 shrink-0 text-muted-foreground/50 select-none\">{i + 1}</span>}\n              <span>{highlight(line)}</span>\n            </span>\n          ))}\n        </code>\n      </pre>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "description": "the snippet; lines are split on newlines"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "small uppercase label above the code, e.g. \"Response\""
+    },
+    {
+      "name": "lineNumbers",
+      "type": "boolean",
+      "required": false,
+      "description": "number each line in a quiet gutter"
+    },
+    {
+      "name": "framed",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "draw the panel (border, fill, padding); off when the parent already frames it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0ad8db0f60f99b44d01b14fe14e99d62d36b3f8bd941a3b22a42369b16e3f831"
+}

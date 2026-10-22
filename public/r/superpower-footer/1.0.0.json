@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower footer",
+  "description": "A calm, airy footer. Left: a heavy lowercase wordmark, a newsletter line with a pill email field and a dark pill button, an app box (QR code and a small 'get the app' tag) and a row of small grey icon tiles. Right: three columns of grouped links with grey group titles and a few social links with icons. A hairline, then copyright, legal links and a certification note. On desktop it is a white 12px-radius card (made to float over superpower-closer's photo); on phones it is flat on the faint grey page.",
+  "category": "footer",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "newsletter",
+    "links",
+    "card",
+    "light",
+    "minimal",
+    "app"
+  ],
+  "notes": [
+    "groups with newColumn start a new desktop column; phones show the groups two by two in order"
+  ],
+  "entry": "superpower-footer.tsx",
+  "source": "foundry",
+  "name": "superpower-footer",
+  "files": [
+    {
+      "path": "superpower-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerButton } from \"@foundry/superpower-button\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\n\nexport interface SuperpowerFooterLink {\n  label: string;\n  href: string;\n  /** a small icon before the label (social links) */\n  icon?: ReactNode;\n}\n\nexport interface SuperpowerFooterGroup {\n  title: string;\n  links: SuperpowerFooterLink[];\n  /** on desktop, start a new column with this group */\n  newColumn?: boolean;\n}\n\nexport interface SuperpowerFooterProps {\n  /** the wordmark */\n  logo: ReactNode;\n  /** the newsletter line: the dark lead, then the grey rest */\n  blurbLead?: string;\n  blurb?: string;\n  emailPlaceholder?: string;\n  signUpLabel?: string;\n  /** the app box: a QR code (empty: a placeholder) and a small tag under it */\n  app?: { qr?: ReactNode; qrLabel?: string; icon?: ReactNode; label: string; href: string };\n  /** a label over a row of small icon tiles (e.g. ask an assistant) */\n  tilesLabel?: string;\n  tiles?: { icon: ReactNode; label: string; href: string }[];\n  groups: SuperpowerFooterGroup[];\n  copyright: string;\n  legal: SuperpowerFooterLink[];\n  /** a certification note at the end of the bottom row */\n  certification?: { label: string; icon?: ReactNode };\n  className?: string;\n}\n\nexport function SuperpowerFooter({\n  logo,\n  blurbLead,\n  blurb,\n  emailPlaceholder,\n  signUpLabel,\n  app,\n  tilesLabel,\n  tiles,\n  groups,\n  copyright,\n  legal,\n  certification,\n  className,\n}: SuperpowerFooterProps) {\n  // desktop columns: a group with newColumn starts the next one\n  const columns: SuperpowerFooterGroup[][] = [];\n  for (const g of groups) {\n    if (!columns.length || g.newColumn) columns.push([]);\n    columns[columns.length - 1].push(g);\n  }\n  const groupBlock = (g: SuperpowerFooterGroup) => (\n    <div key={g.title}>\n      <p className=\"text-[0.875rem] text-muted-foreground/80 lg:text-[0.9375rem]\">{g.title}</p>\n      <ul className=\"mt-4 flex flex-col gap-3.5 lg:gap-3\">\n        {g.links.map((l) => (\n          <li key={l.label}>\n            <a\n              href={l.href}\n              className=\"flex items-center gap-2.5 truncate text-[0.875rem] transition-colors duration-200 hover:text-foreground/70 motion-reduce:transition-none lg:text-[0.9375rem] [&_svg]:size-5 [&_svg]:shrink-0 [&_svg]:text-muted-foreground\"\n            >\n              {l.icon}\n              <span className=\"truncate\">{l.label}</span>\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n\n  return (\n    <footer className={cn(\"bg-secondary text-foreground lg:rounded-lg lg:bg-card\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-14 pb-12 lg:max-w-none lg:px-[2.4rem] lg:pt-[5.4rem] lg:pb-24\">\n        <div className=\"grid gap-12 lg:grid-cols-[minmax(0,30.5rem)_minmax(0,1fr)] lg:gap-x-12 lg:gap-y-0 xl:gap-x-[10rem]\">\n          <div className=\"lg:col-start-1 lg:row-start-1\">\n            <div>{logo}</div>\n            {(blurbLead || blurb) && (\n              <p className=\"mt-6 max-w-[26rem] text-[0.875rem] leading-[1.45] text-muted-foreground lg:mt-7 lg:text-[0.8125rem]\">\n                {blurbLead && <span className=\"text-foreground\">{blurbLead} </span>}\n                {blurb}\n              </p>\n            )}\n            {signUpLabel && (\n              <form className=\"mt-8 flex gap-2 lg:mt-6\" onSubmit={(e) => e.preventDefault()}>\n                <input\n                  type=\"email\"\n                  aria-label={emailPlaceholder}\n                  placeholder={emailPlaceholder}\n                  className=\"h-12 min-w-0 flex-1 rounded-full border border-input bg-transparent px-3.5 text-[0.9375rem] placeholder:text-muted-foreground/70 focus:border-foreground focus:outline-none lg:h-[2.875rem] lg:max-w-[24.4rem]\"\n                />\n                <SuperpowerButton type=\"submit\" className=\"h-12 text-[1rem] lg:h-[2.875rem]\">\n                  {signUpLabel}\n                </SuperpowerButton>\n              </form>\n            )}\n          </div>\n\n          <div className=\"lg:col-start-2 lg:row-span-3 lg:row-start-1\">\n            <div className=\"grid grid-cols-2 gap-x-6 gap-y-12 lg:hidden\">{groups.map(groupBlock)}</div>\n            <div className=\"hidden grid-cols-3 gap-x-6 lg:grid xl:gap-x-8\">\n              {columns.map((col, i) => (\n                <div key={i} className=\"flex min-w-0 flex-col gap-14\">\n                  {col.map(groupBlock)}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          {app && (\n            <div className=\"lg:col-start-1 lg:row-start-2 lg:mt-11\">\n              <SuperpowerMedia media={app.qr} label={app.qrLabel} className=\"size-[8.625rem] rounded-lg border border-border bg-card lg:size-[7rem] lg:rounded-sm\" />\n              <a\n                href={app.href}\n                className=\"mt-2 flex h-12 w-[8.625rem] items-center justify-center gap-1.5 rounded-lg border border-border bg-card text-[0.875rem] transition-colors duration-200 hover:bg-muted lg:h-10 lg:w-[7rem] lg:rounded-sm lg:text-[0.8125rem] [&_svg]:size-4\"\n              >\n                {app.icon}\n                {app.label}\n              </a>\n            </div>\n          )}\n\n          {tiles && tiles.length > 0 && (\n            <div className=\"hidden lg:col-start-1 lg:row-start-3 lg:mt-12 lg:block\">\n              {tilesLabel && <p className=\"text-[0.9375rem]\">{tilesLabel}</p>}\n              <ul className=\"mt-4 flex gap-2\">\n                {tiles.map((t) => (\n                  <li key={t.label}>\n                    <a\n                      href={t.href}\n                      aria-label={t.label}\n                      className=\"grid size-[2.875rem] place-items-center rounded-sm border border-border bg-secondary text-muted-foreground/70 transition-colors duration-200 hover:text-foreground [&_svg]:size-5\"\n                    >\n                      {t.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          )}\n        </div>\n\n        <div className=\"mt-12 flex flex-col gap-6 border-t border-border pt-7 text-[0.875rem] text-muted-foreground lg:mt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-10 lg:text-[0.8125rem]\">\n          <p className=\"lg:max-w-[15rem]\">{copyright}</p>\n          <ul className=\"flex flex-wrap gap-x-6 gap-y-2 lg:gap-x-8\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"transition-colors duration-200 hover:text-foreground\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {certification && (\n            <p className=\"flex items-center gap-3 text-foreground lg:flex-row-reverse lg:text-muted-foreground [&_svg]:size-8 [&_svg]:text-muted-foreground/70 lg:[&_svg]:size-11\">\n              {certification.icon}\n              <span className=\"lg:max-w-[8rem]\">{certification.label}</span>\n            </p>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-button",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark"
+    },
+    {
+      "name": "blurbLead",
+      "type": "string",
+      "required": false,
+      "description": "the newsletter line: the dark lead, then the grey rest"
+    },
+    {
+      "name": "blurb",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "signUpLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "app",
+      "type": "{ qr?: ReactNode; qrLabel?: string; icon?: ReactNode; label: string; href: string; }",
+      "required": false,
+      "description": "the app box: a QR code (empty: a placeholder) and a small tag under it"
+    },
+    {
+      "name": "tilesLabel",
+      "type": "string",
+      "required": false,
+      "description": "a label over a row of small icon tiles (e.g. ask an assistant)"
+    },
+    {
+      "name": "tiles",
+      "type": "{ icon: ReactNode; label: string; href: string; }[]",
+      "required": false
+    },
+    {
+      "name": "groups",
+      "type": "SuperpowerFooterGroup[]",
+      "required": true
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "legal",
+      "type": "SuperpowerFooterLink[]",
+      "required": true
+    },
+    {
+      "name": "certification",
+      "type": "{ label: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "a certification note at the end of the bottom row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "55410a57a22c4379dee1b04d7b226edae68accdf9a4d53f2be88d023e5cf0ba4"
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola closing card",
+  "description": "A full-bleed art backdrop with a warm oat app-window card rising from the bottom edge: three window dots, a big three-line serif headline, a short paragraph and an ink pill beside an outline pill (stacked full width on phones). The backdrop fades in as the section enters.",
+  "category": "cta",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "light",
+    "editorial",
+    "serif",
+    "window",
+    "card",
+    "fade",
+    "full-bleed"
+  ],
+  "notes": [
+    "the card has no bottom edge: it runs into whatever comes next (the footer in the original)",
+    "backdrop is a media slot; empty, a two-tone highlight and lilac field",
+    "CSS view timeline fade; without support, or with reduced motion, the backdrop is simply there"
+  ],
+  "entry": "granola-cta.tsx",
+  "source": "foundry",
+  "name": "granola-cta",
+  "files": [
+    {
+      "path": "granola-cta.css",
+      "content": "/* The backdrop art fades in over the first 300px of the section entering the window. Without\n   scroll timelines, or with reduced motion, it is simply there. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .granola-cta-backdrop {\n      animation: granola-cta-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 300px;\n    }\n  }\n}\n\n@keyframes granola-cta-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "granola-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaButton } from \"@foundry/granola-button\";\nimport { GranolaMedia } from \"@foundry/granola-media\";\nimport { GranolaWindow } from \"@foundry/granola-window\";\nimport \"./granola-cta.css\";\n\nexport interface GranolaCtaProps {\n  /** the big serif headline in the card */\n  title: string;\n  /** a short paragraph under it */\n  body: string;\n  /** the ink button */\n  primary: { label: string; href: string };\n  /** the outline button beside it */\n  secondary?: { label: string; href: string };\n  /** the full-bleed art behind the card; a two-tone placeholder while empty */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nexport function GranolaCta({ title, body, primary, secondary, backdrop, className }: GranolaCtaProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"granola-cta-backdrop absolute inset-0 -z-10\">\n        <GranolaMedia tone=\"field\" className=\"size-full\">\n          {backdrop}\n        </GranolaMedia>\n      </div>\n      <div className=\"px-gutter pt-16 lg:pt-24\">\n        <GranolaWindow className=\"mx-auto max-w-[48rem] rounded-b-none shadow-[0_4px_50px_color-mix(in_oklab,var(--foreground)_25%,transparent)] lg:rounded-b-none lg:shadow-none\">\n          <div className=\"px-6 pt-10 pb-16 lg:px-12 lg:pt-16 lg:pb-24\">\n            <h2 className=\"max-w-[11ch] font-display text-4xl leading-[0.95] tracking-[-0.01em] lg:text-[5.4rem] lg:leading-[0.98]\">{title}</h2>\n            <p className=\"mt-6 max-w-[36ch] text-base leading-snug lg:mt-14 lg:text-[1.375rem] lg:leading-[1.45]\">{body}</p>\n            <div className=\"mt-8 flex flex-col gap-3 sm:flex-row lg:mt-10 lg:gap-5\">\n              <GranolaButton href={primary.href} trailingIcon={<ArrowDown />} className=\"h-12 text-base sm:w-fit lg:h-14\">\n                {primary.label}\n              </GranolaButton>\n              {secondary && (\n                <GranolaButton href={secondary.href} variant=\"outline\" className=\"h-12 text-base sm:w-fit lg:h-14\">\n                  {secondary.label}\n                </GranolaButton>\n              )}\n            </div>\n          </div>\n        </GranolaWindow>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-button",
+    "granola-media",
+    "granola-window"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big serif headline in the card"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "a short paragraph under it"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button beside it"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed art behind the card; a two-tone placeholder while empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0ba5518a845e46d0ccf4a64a177ffd9730602123eaceb13847d5763bfb2ab6a9"
+}

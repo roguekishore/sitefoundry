@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink thesis",
+  "description": "A long statement on black that stays pinned while its words light up one by one as you scroll, then fades and rises away as a huge arc of blue opens beneath it and turns to pale paper; below, a list of points (line icon, title, grey text) between dotted rules fades in beside a large media slot.",
+  "category": "features",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "statement",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "words",
+    "gradient",
+    "dark-to-light",
+    "blue",
+    "arc",
+    "reveal"
+  ],
+  "notes": [
+    "the top stage uses the theme's dark colours (.dark); the list below is on the light paper (transparent: on the page it shows the Sharplink backdrop)",
+    "the big media slot is shown on wide screens only; empty, it is a faint placeholder",
+    "CSS only: a sticky statement driven by the stage's named view timeline; without support or with reduced motion the statement is simply there"
+  ],
+  "entry": "sharplink-thesis.tsx",
+  "source": "foundry",
+  "name": "sharplink-thesis",
+  "files": [
+    {
+      "path": "sharplink-thesis.css",
+      "content": "/* The stage is taller than the window and names its view timeline; the statement inside is\n   sticky, its words light up over the first part of that timeline (via the text reveal) and the\n   whole block fades and rises 200px over the next. The points fade in as they enter, their\n   titles rising 22px. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-thesis-stage {\n      view-timeline-name: --sharplink-thesis;\n    }\n    .sharplink-thesis-pinned {\n      animation: sharplink-thesis-away linear both;\n      animation-timeline: --sharplink-thesis;\n      animation-range: cover 52% cover 72%;\n    }\n    .sharplink-thesis-point {\n      animation: sharplink-thesis-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 10% cover 35%;\n    }\n    .sharplink-thesis-point-title {\n      animation: sharplink-thesis-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 20% cover 35%;\n    }\n  }\n}\n\n@keyframes sharplink-thesis-away {\n  to { opacity: 0; transform: translateY(-200px); }\n}\n@keyframes sharplink-thesis-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes sharplink-thesis-rise {\n  from { transform: translateY(22px); }\n  to { transform: none; }\n}\n"
+    },
+    {
+      "path": "sharplink-thesis.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkLabel } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\nimport { SharplinkTextReveal } from \"@foundry/sharplink-text-reveal\";\nimport \"./sharplink-thesis.css\";\n\nexport interface SharplinkThesisPoint {\n  /** a small line icon or illustration (about 90px); a dotted square when empty */\n  icon?: ReactNode;\n  /** the point's title */\n  title: string;\n  /** the point's text */\n  body: string;\n}\n\nexport interface SharplinkThesisProps {\n  /** the small label at the top */\n  label: string;\n  /** the tinted button across from the label */\n  cta?: { label: string; href: string };\n  /** the long statement whose words light up as you scroll */\n  statement: string;\n  /** the points listed under the blue arc */\n  points: SharplinkThesisPoint[];\n  /** a large render or image beside the points (wide screens); a faint placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Pinned statement on black opening into a blue arc, then a list of points on paper. */\nexport function SharplinkThesis({ label, cta, statement, points, media, className }: SharplinkThesisProps) {\n  const style = { \"--sl-pale\": \"var(--accent)\" } as CSSProperties;\n  return (\n    <section className={cn(\"relative isolate overflow-clip text-foreground\", className)} style={style}>\n      <div data-sharplink-tone=\"dark\" className=\"sharplink-thesis-stage dark relative h-[165svh] text-foreground lg:h-[150svh]\">\n        <div\n          aria-hidden\n          className=\"absolute inset-0 -z-10 [mask-image:linear-gradient(to_bottom,var(--background)_78%,transparent)] bg-[radial-gradient(140%_80%_at_50%_100%,transparent_18%,color-mix(in_oklab,var(--sl-pale)_85%,transparent)_34%,var(--glow)_52%,color-mix(in_oklab,var(--glow)_40%,var(--background))_70%,var(--background)_90%)]\"\n        />\n        <div aria-hidden data-sharplink-tone=\"light\" className=\"absolute inset-x-0 bottom-0 h-[22%]\" />\n        <div className=\"sticky top-0 min-h-svh\">\n          <div className=\"sharplink-thesis-pinned mx-auto max-w-page px-gutter pt-[8rem] lg:pt-[10rem]\">\n            <SharplinkRule className=\"lg:border-transparent\" />\n            <div className=\"mt-7 flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between\">\n              <SharplinkLabel>{label}</SharplinkLabel>\n              {cta && (\n                <SharplinkButton href={cta.href} variant=\"tint\" arrow>\n                  {cta.label}\n                </SharplinkButton>\n              )}\n            </div>\n            <SharplinkTextReveal\n              as=\"p\"\n              mode=\"words\"\n              text={statement}\n              timeline=\"--sharplink-thesis\"\n              range={[22, 50]}\n              className=\"mt-8 max-w-[63rem] font-display text-2xl leading-[1.4] font-medium tracking-[-0.01em] lg:mt-6 lg:text-[2.75rem] lg:leading-[1.23]\"\n            />\n          </div>\n        </div>\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter pb-24 lg:pb-[8.5rem]\">\n        <div className=\"absolute top-0 right-0 hidden h-full max-h-[55rem] w-[42%] lg:block [&>*]:h-full [&>*]:w-full [&>*]:object-contain\">\n          {media ?? <div className=\"bg-[radial-gradient(55%_45%_at_60%_50%,color-mix(in_oklab,var(--foreground)_8%,transparent),transparent)]\" />}\n        </div>\n        <ul className=\"relative lg:max-w-[37.5rem]\">\n          {points.map((point) => (\n            <li\n              key={point.title}\n              className=\"sharplink-thesis-point grid gap-6 border-t border-dotted border-foreground/20 py-8 lg:grid-cols-[5.625rem_1fr] lg:gap-7 lg:py-9\"\n            >\n              <div className=\"size-[3.75rem] text-foreground/50 lg:size-[5.625rem] [&_svg]:size-full\">\n                {point.icon ?? <div className=\"size-full border border-dotted border-foreground/30\" />}\n              </div>\n              <div>\n                <h3 className=\"sharplink-thesis-point-title text-base leading-[1.35] font-medium\">{point.title}</h3>\n                <p className=\"mt-3 text-[1.0625rem] leading-[1.35] text-foreground/60 lg:mt-4\">{point.body}</p>\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-label",
+    "sharplink-rule",
+    "sharplink-text-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label at the top"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the tinted button across from the label"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the long statement whose words light up as you scroll"
+    },
+    {
+      "name": "points",
+      "type": "SharplinkThesisPoint[]",
+      "required": true,
+      "description": "the points listed under the blue arc"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a large render or image beside the points (wide screens); a faint placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0c55cf258d23cd99b807bf548bb624201f3118d5e5836707379ca1bfee1b2b00"
+}

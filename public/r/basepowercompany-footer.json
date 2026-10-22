@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power footer",
+  "description": "A deep forest-green footer: five columns of white links under small grey uppercase headings, dark download badges on the right, a contact row with social icons, the company name set huge and faint across the full width, then a hairline, the small print, a round seal and a lime uppercase sign-off. Two columns on phones.",
+  "category": "footer",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "green",
+    "dark",
+    "links",
+    "wordmark",
+    "watermark",
+    "legal"
+  ],
+  "notes": [
+    "the giant name is an SVG word stretched to the width (short names read best)",
+    "badges and the seal are plain text (no store or certifier logos)"
+  ],
+  "entry": "basepowercompany-footer.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-footer",
+  "files": [
+    {
+      "path": "basepowercompany-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface BasepowercompanyFooterColumn {\n  /** the small uppercase heading */\n  heading: string;\n  /** the links under it */\n  links: { label: string; href: string }[];\n}\n\nexport interface BasepowercompanyFooterProps {\n  /** the company name, set huge and faint across the footer */\n  brand: string;\n  /** the link columns (five across on desktop, two on phones) */\n  columns: BasepowercompanyFooterColumn[];\n  /** small dark download badges: an icon, a tiny top line and a label */\n  badges?: { icon?: ReactNode; top: string; label: string; href: string }[];\n  /** the contact blocks: an optional bold heading and lines */\n  contact?: { heading?: string; lines: string[] }[];\n  /** social links, shown as icons */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the small print paragraphs; the first is set bold */\n  legal?: ReactNode[];\n  /** the underlined policy links at the very bottom */\n  legalLinks?: { label: string; href: string }[];\n  /** a round certification seal beside the small print (two short lines) */\n  seal?: [string, string];\n  /** the sign-off line at the bottom right, with an optional icon above */\n  signoff?: { text: string; icon?: ReactNode };\n  className?: string;\n}\n\n/*\n * A deep forest-green footer: link columns and download badges, a contact row with social\n * icons, the company name set huge and faint across the full width, then a hairline and the\n * small print with a round seal and a lime sign-off.\n */\nexport function BasepowercompanyFooter({ brand, columns, badges = [], contact = [], socials = [], legal = [], legalLinks = [], seal, signoff, className }: BasepowercompanyFooterProps) {\n  return (\n    <footer className={cn(\"bg-primary text-primary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-12 pb-14 lg:px-[calc(var(--page-gutter)*2)] lg:pt-14 lg:pb-14\">\n        <div className=\"grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[repeat(5,minmax(0,14rem))_1fr] lg:gap-x-0\">\n          {columns.map((c) => (\n            <nav key={c.heading} aria-label={c.heading}>\n              <p className=\"text-sm leading-[1.5] tracking-[-0.005em] text-primary-foreground/65 uppercase\">{c.heading}</p>\n              <ul className=\"mt-4 space-y-3 lg:mt-5\">\n                {c.links.map((l) => (\n                  <li key={l.href}>\n                    <a href={l.href} className=\"text-base leading-6 transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </nav>\n          ))}\n          {badges.length > 0 && (\n            <ul className=\"flex flex-col items-start gap-3 lg:items-end\">\n              {badges.map((b) => (\n                <li key={b.href}>\n                  <a\n                    href={b.href}\n                    className=\"flex h-[2.125rem] w-[6.75rem] items-center gap-1.5 rounded-md border border-primary-foreground/40 bg-foreground px-2.5 text-background transition-opacity duration-150 hover:opacity-85 motion-reduce:transition-none [&_svg]:size-4\"\n                  >\n                    {b.icon}\n                    <span className=\"flex flex-col leading-none\">\n                      <span className=\"text-[0.5rem] tracking-[0.04em] uppercase\">{b.top}</span>\n                      <span className=\"text-sm font-bold\">{b.label}</span>\n                    </span>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n        </div>\n\n        {(contact.length > 0 || socials.length > 0) && (\n          <div className=\"mt-14 flex flex-col gap-10 lg:mt-[3.75rem] lg:flex-row lg:items-start lg:justify-between\">\n            <div className=\"flex flex-col gap-8 lg:flex-row lg:gap-14\">\n              {contact.map((c, i) => (\n                <div key={i} className=\"text-base leading-[1.45]\">\n                  {c.heading && <p className=\"mb-1 font-bold\">{c.heading}</p>}\n                  {c.lines.map((l) => (\n                    <p key={l}>{l}</p>\n                  ))}\n                </div>\n              ))}\n            </div>\n            {socials.length > 0 && (\n              <ul className=\"flex gap-5\">\n                {socials.map((s) => (\n                  <li key={s.href}>\n                    <a href={s.href} aria-label={s.label} className=\"block transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none [&_svg]:size-6 [&_svg]:stroke-[1.5]\">\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n        )}\n\n        {/* the giant faint name: an SVG word stretched to the full width */}\n        <svg aria-hidden viewBox=\"0 0 1000 200\" className=\"mt-12 block h-auto w-full text-foreground/20 lg:mt-14\">\n          <text x=\"0\" y=\"192\" textLength=\"1000\" lengthAdjust=\"spacingAndGlyphs\" fill=\"currentColor\" className=\"font-display text-[268px] font-black tracking-[-0.025em] uppercase\">\n            {brand}\n          </text>\n        </svg>\n\n        <div className=\"mt-8 border-t border-primary-foreground/20 pt-8 lg:mt-[3.25rem] lg:pt-8\">\n          <div className=\"flex flex-col gap-8 lg:flex-row lg:justify-between\">\n            <div className=\"max-w-[48rem] space-y-1.5 text-xs leading-[1.5] text-primary-foreground/75 [&>p:first-child]:font-bold\">\n              {legal.map((p, i) => (\n                <p key={i}>{p}</p>\n              ))}\n            </div>\n            {seal && (\n              <span className=\"flex size-[5.875rem] shrink-0 flex-col items-center justify-center rounded-full border-4 border-primary-foreground/25 bg-foreground text-center leading-none text-background\">\n                <span className=\"text-lg\">{seal[0]}</span>\n                <span className=\"mt-0.5 text-lg\">{seal[1]}</span>\n              </span>\n            )}\n          </div>\n          <div className=\"mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between\">\n            <ul className=\"flex flex-wrap gap-x-4 gap-y-3 text-sm\">\n              {legalLinks.map((l) => (\n                <li key={l.href}>\n                  <a href={l.href} className=\"text-primary-foreground/85 underline underline-offset-2 transition-opacity duration-150 hover:opacity-70 motion-reduce:transition-none\">\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            {signoff && (\n              <p className=\"flex flex-col items-start gap-2 font-display text-sm font-black tracking-[0.06em] text-accent uppercase lg:items-end [&_svg]:size-4\">\n                {signoff.icon}\n                {signoff.text}\n              </p>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set huge and faint across the footer"
+    },
+    {
+      "name": "columns",
+      "type": "BasepowercompanyFooterColumn[]",
+      "required": true,
+      "description": "the link columns (five across on desktop, two on phones)"
+    },
+    {
+      "name": "badges",
+      "type": "{ icon?: ReactNode; top: string; label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small dark download badges: an icon, a tiny top line and a label"
+    },
+    {
+      "name": "contact",
+      "type": "{ heading?: string; lines: string[]; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "the contact blocks: an optional bold heading and lines"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "social links, shown as icons"
+    },
+    {
+      "name": "legal",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "the small print paragraphs; the first is set bold"
+    },
+    {
+      "name": "legalLinks",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "the underlined policy links at the very bottom"
+    },
+    {
+      "name": "seal",
+      "type": "[string, string]",
+      "required": false,
+      "description": "a round certification seal beside the small print (two short lines)"
+    },
+    {
+      "name": "signoff",
+      "type": "{ text: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "the sign-off line at the bottom right, with an optional icon above"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "28bc6728f158d088ca652accfdcbf3451140f152440f08c2e480f8d7a78c1d39"
+}

@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola header",
+  "description": "A fixed, airy top bar: heavy lowercase wordmark, five quiet centred links, a hairline 'talk to us' pill and a Download pill. Bare at the top of the page; once you scroll it gains a hairline, translucent paper fill and blur (an inset rounded pill on desktop) and the Download pill turns olive. Phones get the wordmark, a 'get the app' pill and a burger menu.",
+  "category": "header",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "light",
+    "fixed",
+    "pill",
+    "blur",
+    "scroll",
+    "minimal"
+  ],
+  "notes": [
+    "fixed: it floats over the block below, so the next block should leave ~56px at its top",
+    "the scrolled look fades in over the first 120px of page scroll (CSS scroll timeline); without support, or with reduced motion, it is always on",
+    "the phone menu is a <details> disclosure: no JavaScript"
+  ],
+  "entry": "granola-header.tsx",
+  "source": "foundry",
+  "name": "granola-header",
+  "files": [
+    {
+      "path": "granola-header.css",
+      "content": "/* At the top of the page the bar is bare and the main pill is a quiet grey. Over the first 120px\n   of scrolling the bar gains its hairline, translucent fill and blur (an inset pill on desktop)\n   and the main pill turns brand olive. Without scroll timelines, or with reduced motion, the\n   scrolled look is always on. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .granola-header-fill {\n      animation: granola-header-fill linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 120px;\n    }\n    .granola-header-cta {\n      animation: granola-header-cta linear both;\n      animation-timeline: scroll(root);\n      animation-range: 60px 120px;\n    }\n  }\n}\n\n@keyframes granola-header-fill {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes granola-header-cta {\n  from {\n    background-color: var(--secondary);\n    color: var(--foreground);\n  }\n  to {\n    background-color: var(--primary);\n    color: var(--primary-foreground);\n  }\n}\n"
+    },
+    {
+      "path": "granola-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaButton } from \"@foundry/granola-button\";\nimport { GranolaWordmark } from \"@foundry/granola-wordmark\";\nimport \"./granola-header.css\";\n\nexport interface GranolaHeaderLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface GranolaHeaderProps {\n  /** the company name, shown as the wordmark */\n  brand: string;\n  /** a small mark before the wordmark (e.g. a lucide icon) */\n  mark?: ReactNode;\n  /** where the wordmark links */\n  homeHref?: string;\n  /** the centred links (desktop row, phone menu) */\n  links: GranolaHeaderLink[];\n  /** the quiet hairline pill before the main one (desktop and phone menu) */\n  secondaryCta?: GranolaHeaderLink;\n  /** the main pill: desktop label, a shorter phone label, link and an optional icon */\n  cta: { label: string; mobileLabel?: string; href: string; icon?: ReactNode };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nexport function GranolaHeader({ brand, mark, homeHref = \"#\", links, secondaryCta, cta, menuLabel = \"Menu\", className }: GranolaHeaderProps) {\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 lg:top-2\", className)}>\n      <div className=\"relative mx-auto flex h-14 max-w-[calc(var(--page-width)_+_1rem)] items-center gap-4 pr-2 pl-gutter lg:pl-4\">\n        {/* the bar's fill: hairline, translucent paper and blur, faded in once the page scrolls */}\n        <div\n          aria-hidden\n          className=\"granola-header-fill absolute inset-0 border-b border-border bg-background/85 backdrop-blur-md lg:rounded-full lg:border lg:shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_6%,transparent)]\"\n        />\n\n        <GranolaWordmark name={brand} mark={mark} href={homeHref} className=\"relative\" />\n\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 lg:flex\">\n          {links.map((l) => (\n            <a\n              key={l.href}\n              href={l.href}\n              className=\"text-sm text-foreground/85 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\"\n            >\n              {l.label}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"relative ml-auto flex items-center gap-1\">\n          {secondaryCta && (\n            <GranolaButton href={secondaryCta.href} variant=\"soft\" size=\"sm\" className=\"hidden lg:inline-flex\">\n              {secondaryCta.label}\n            </GranolaButton>\n          )}\n          <GranolaButton href={cta.href} variant=\"brand\" size=\"sm\" icon={cta.icon} className=\"granola-header-cta hidden lg:inline-flex\">\n            {cta.label}\n          </GranolaButton>\n          <GranolaButton href={cta.href} variant=\"brand\" size=\"sm\" className=\"granola-header-cta h-10 px-3.5 text-[0.9375rem] lg:hidden\">\n            {cta.mobileLabel ?? cta.label}\n          </GranolaButton>\n\n          {/* phone menu: a disclosure, no JavaScript */}\n          <details className=\"group/menu lg:hidden\">\n            <summary className=\"flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n              <span className=\"sr-only\">{menuLabel}</span>\n              <Menu aria-hidden className=\"size-6 stroke-[1.5] group-open/menu:hidden\" />\n              <X aria-hidden className=\"hidden size-6 stroke-[1.5] group-open/menu:block\" />\n            </summary>\n            <nav className=\"fixed inset-x-0 top-14 border-y border-border bg-background px-gutter pt-2 pb-6\">\n              <ul className=\"flex flex-col\">\n                {links.map((l) => (\n                  <li key={l.href} className=\"border-b border-border\">\n                    <a href={l.href} className=\"block py-3.5 font-display text-2xl\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n              {secondaryCta && (\n                <GranolaButton href={secondaryCta.href} variant=\"outline\" block className=\"mt-6\">\n                  {secondaryCta.label}\n                </GranolaButton>\n              )}\n            </nav>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-button",
+    "granola-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, shown as the wordmark"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the wordmark (e.g. a lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "GranolaHeaderLink[]",
+      "required": true,
+      "description": "the centred links (desktop row, phone menu)"
+    },
+    {
+      "name": "secondaryCta",
+      "type": "GranolaHeaderLink",
+      "required": false,
+      "description": "the quiet hairline pill before the main one (desktop and phone menu)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; mobileLabel?: string | undefined; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the main pill: desktop label, a shorter phone label, link and an optional icon"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "625e9186f492c6bbafc821f1d56f9fc69111422fa1614caa3a0ef05a56bac037"
+}

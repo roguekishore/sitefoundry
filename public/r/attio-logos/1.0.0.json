@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio logo grid",
+  "description": "Customer wordmarks in a hairline grid of pale-grey 96px cells inside the page frame: two rows of five on desktop, three rows of two on phones. Cells that link to a story carry a tiny ↗ in the corner and darken a shade on hover.",
+  "category": "logos",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "grid",
+    "hairline",
+    "light",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "give ten logos; phones show the first six",
+    "the frame's side lines appear from lg, matching the other attio blocks"
+  ],
+  "entry": "attio-logos.tsx",
+  "source": "foundry",
+  "name": "attio-logos",
+  "files": [
+    {
+      "path": "attio-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface AttioLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n  /** a customer story to link to: the cell gets a small ↗ in its corner */\n  href?: string;\n}\n\nexport interface AttioLogosProps {\n  /** ten logos: five a row on desktop; phones show the first six, two a row */\n  logos: AttioLogo[];\n  className?: string;\n}\n\n/**\n * A hairline grid of customer wordmarks inside the page frame: two rows of five pale-grey\n * cells on desktop, three rows of two on phones. Cells with a story carry a ↗ and darken\n * a shade on hover.\n */\nexport function AttioLogos({ logos, className }: AttioLogosProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <ul className=\"mx-auto grid max-w-page grid-cols-2 gap-px border-b border-border bg-border lg:grid-cols-5 lg:border-x\">\n        {logos.map((item, i) => {\n          const body = (\n            <>\n              <span role=\"img\" aria-label={item.name} className=\"flex items-center [&_svg]:h-6 [&_svg]:w-auto\">\n                {item.logo}\n              </span>\n              {item.href && <ArrowUpRight aria-hidden className=\"absolute top-3 right-3 size-3 text-muted-foreground/70\" />}\n            </>\n          );\n          const cell = \"relative flex h-24 items-center justify-center bg-muted transition-colors duration-200 ease-[cubic-bezier(0,0,0,1)] motion-reduce:transition-none\";\n          return (\n            <li key={item.name} className={cn(\"flex\", i >= 6 && \"hidden lg:flex\", i >= 10 && \"lg:hidden\")}>\n              {item.href ? (\n                <a href={item.href} className={cn(cell, \"w-full hover:bg-secondary\")}>\n                  {body}\n                </a>\n              ) : (\n                <div className={cn(cell, \"w-full\")}>{body}</div>\n              )}\n            </li>\n          );\n        })}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "AttioLogo[]",
+      "required": true,
+      "description": "ten logos: five a row on desktop; phones show the first six, two a row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9e573c56d5cf9fd396e64da4a432038865f7b1c842e2980fe4abb3f89429bc48"
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anchorage stats",
+  "description": "Between two hairlines that fade out at both ends: a centred heading over three huge, thin figures in a white-to-cobalt gradient, each with a small cobalt caption. A soft blue glow rises from the left edge. The figures count up and fade in one after another as they scroll into view.",
+  "category": "stats",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "count-up",
+    "gradient-text",
+    "dark",
+    "glow",
+    "hairline",
+    "reveal",
+    "stagger"
+  ],
+  "notes": [
+    "the count-up needs JavaScript (static HTML shows the final figures); the fade-in is CSS scroll-driven",
+    "three across even on phones, as the original; best with short figures (\"7+\", \"2K+\", \"3.1B\")"
+  ],
+  "hydrate": "visible",
+  "entry": "anchorage-stats.tsx",
+  "source": "foundry",
+  "name": "anchorage-stats",
+  "files": [
+    {
+      "path": "anchorage-stats.css",
+      "content": "/* Figures: white at the top fading to cobalt at the foot of the digits. */\n.anchorage-stats-figure {\n  background-image: linear-gradient(180deg, var(--foreground) 35%, var(--primary) 85%);\n  -webkit-background-clip: text;\n  background-clip: text;\n  color: transparent;\n}\n\n/* Hairlines that fade out at both ends. */\n.anchorage-stats-rule {\n  height: 1px;\n  background-image: linear-gradient(90deg, transparent, color-mix(in oklab, var(--foreground) 22%, transparent) 30%, color-mix(in oklab, var(--foreground) 22%, transparent) 70%, transparent);\n}\n\n/* Each figure fades and rises in, one after another. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .anchorage-stats-item {\n      animation: anchorage-stats-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 200px;\n    }\n    .anchorage-stats-item:nth-child(2) { animation-range: entry 60px entry 260px; }\n    .anchorage-stats-item:nth-child(3) { animation-range: entry 120px entry 320px; }\n    .anchorage-stats-item:nth-child(n + 4) { animation-range: entry 180px entry 380px; }\n  }\n}\n\n@keyframes anchorage-stats-rise {\n  from { opacity: 0; transform: translateY(1.5rem); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "anchorage-stats.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { AnchorageCount } from \"@foundry/anchorage-count\";\nimport \"./anchorage-stats.css\";\n\nexport interface AnchorageStat {\n  /** the figure, e.g. \"7+\", \"2K+\", \"3.1B\"; its number counts up */\n  value: string;\n  /** the small caption under it */\n  label: string;\n}\n\nexport interface AnchorageStatsProps {\n  /** the centred heading */\n  title: string;\n  /** the figures, usually three */\n  stats: AnchorageStat[];\n  /** the soft glow at the left edge */\n  glow?: boolean;\n  className?: string;\n}\n\n/** A heading over three huge gradient figures, between fading hairlines. */\nexport function AnchorageStats({ title, stats, glow = true, className }: AnchorageStatsProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip py-10 text-foreground lg:py-[5.25rem]\", className)}>\n      {glow && (\n        <div aria-hidden className=\"pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_0%_50%,color-mix(in_oklab,var(--glow)_65%,transparent),color-mix(in_oklab,var(--glow)_22%,transparent)_55%,transparent)] lg:bg-[radial-gradient(ellipse_36%_50%_at_0%_50%,color-mix(in_oklab,var(--glow)_65%,transparent),color-mix(in_oklab,var(--glow)_22%,transparent)_55%,transparent)]\" />\n      )}\n      <div className=\"mx-auto max-w-[51.25rem] px-gutter\">\n        <div aria-hidden className=\"anchorage-stats-rule\" />\n      </div>\n\n      <div className=\"mx-auto max-w-[60.75rem] px-gutter pt-[3.75rem] pb-[5.75rem] lg:pt-[9.75rem] lg:pb-[8.25rem]\">\n        <h2 className=\"mx-auto max-w-[22rem] text-center font-display text-[2rem] leading-[1.1] font-[550] sm:max-w-none lg:text-[2.5rem] lg:leading-[1.2]\">{title}</h2>\n        <dl className=\"mt-14 grid grid-cols-3 gap-x-2 lg:mt-[3.75rem] lg:gap-x-8\">\n          {stats.map((s) => (\n            <div key={s.label} className=\"anchorage-stats-item flex flex-col-reverse items-center text-center\">\n              <dt className=\"mt-1 max-w-[11.5rem] text-xs leading-[1.15] text-primary lg:mt-2 lg:text-base lg:leading-[1.65]\">{s.label}</dt>\n              <dd className=\"font-display text-[3.5rem] leading-[1] font-[250] tracking-[-0.02em] lg:text-[7.25rem]\">\n                <AnchorageCount value={s.value} className=\"anchorage-stats-figure\" />\n              </dd>\n            </div>\n          ))}\n        </dl>\n      </div>\n\n      <div className=\"mx-auto max-w-[51.25rem] px-gutter\">\n        <div aria-hidden className=\"anchorage-stats-rule\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anchorage-count",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred heading"
+    },
+    {
+      "name": "stats",
+      "type": "AnchorageStat[]",
+      "required": true,
+      "description": "the figures, usually three"
+    },
+    {
+      "name": "glow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "the soft glow at the left edge"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "db79bd39e7e13755afd789c0e219e19ea0689640df71d41f7c47840d5871ff77"
+}

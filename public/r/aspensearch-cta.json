@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search word-block call to action",
+  "description": "A halftone field one and a half windows tall with a call to action set in huge all-caps word blocks: ink boxes spread across the top row (left edge, middle, right edge), a paper box for the long word beneath and a mint arrow square closing it. The words rise inside their boxes one after another as the phrase scrolls into view.",
+  "category": "cta",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "light",
+    "swiss",
+    "uppercase",
+    "halftone",
+    "mint",
+    "word-blocks",
+    "reveal",
+    "scroll-driven",
+    "stagger"
+  ],
+  "notes": [
+    "height follows the window: 153svh, as on the original",
+    "media fills the field; empty it's a fixed halftone placeholder",
+    "type is sized in vw, so the word blocks keep their interlocking positions at every width; three short words + one long word fit best",
+    "CSS only; the rise is off under reduced motion"
+  ],
+  "entry": "aspensearch-cta.tsx",
+  "source": "foundry",
+  "name": "aspensearch-cta",
+  "files": [
+    {
+      "path": "aspensearch-cta.css",
+      "content": "/* Each word rises inside its box as the phrase enters the window; --aspensearch-cta-i starts\n   later words a little later, so they arrive one after another. The timeline is the box's\n   own (it doesn't move), the moving part is the word inside it. */\n.aspensearch-cta-word {\n  view-timeline-name: --aspensearch-cta-word;\n}\n\n@supports (animation-timeline: view()) {\n  .aspensearch-cta-word > span {\n    animation: aspensearch-cta-rise linear both;\n    animation-timeline: --aspensearch-cta-word;\n    animation-range: entry calc(var(--aspensearch-cta-i, 0) * 12%) cover calc(30% + var(--aspensearch-cta-i, 0) * 4%);\n  }\n}\n\n@keyframes aspensearch-cta-rise {\n  from { transform: translateY(100%); }\n  to { transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-cta-word > span { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "aspensearch-cta.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchHalftone } from \"@foundry/aspensearch-halftone\";\nimport \"./aspensearch-cta.css\";\n\nexport interface AspensearchCtaProps {\n  /** the top row's words: the first sits at the left edge, the last at the right edge (three short words work best) */\n  lineOne: string[];\n  /** the long word of the second row, indented, followed by the mint arrow box */\n  lineTwo: string;\n  /** where the whole phrase links to */\n  href: string;\n  /** the field behind the words; empty: halftone placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nconst box = \"aspensearch-cta-word inline-block overflow-clip px-[0.06em] font-display leading-[0.94] tracking-[-0.04em] uppercase\";\n\n/**\n * A field one and a half windows tall with a call to action set as word blocks across it:\n * ink boxes for the top row (left edge, middle, right edge) and a paper box for the long word\n * below, closed by a mint arrow square. Each word rises inside its box as the phrase scrolls\n * into view, one after another.\n */\nexport function AspensearchCta({ lineOne, lineTwo, href, media, className }: AspensearchCtaProps) {\n  return (\n    <section className={cn(\"relative isolate min-h-[153svh] overflow-clip bg-background text-foreground\", className)}>\n      <AspensearchHalftone media={media} className=\"absolute inset-0 -z-10\" />\n      <a href={href} aria-label={[...lineOne, lineTwo].join(\" \")} className=\"absolute inset-x-0 top-[62%] block text-[8.8vw] lg:text-[9.2vw]\">\n        <span className=\"flex items-start\">\n          {lineOne.map((w, i) => (\n            <span\n              key={i}\n              aria-hidden\n              className={cn(box, \"bg-foreground text-background\", i === 1 && \"ml-[15vw]\", i > 0 && i === lineOne.length - 1 && \"ml-auto\")}\n              style={{ \"--aspensearch-cta-i\": i } as CSSProperties}\n            >\n              <span className=\"block\">{w}</span>\n            </span>\n          ))}\n        </span>\n        <span className=\"flex pl-[21.25vw]\">\n          <span aria-hidden className={cn(box, \"bg-background text-foreground\")} style={{ \"--aspensearch-cta-i\": lineOne.length } as CSSProperties}>\n            <span className=\"block\">{lineTwo}</span>\n          </span>\n          <span aria-hidden className=\"flex size-[0.94em] shrink-0 items-center justify-center bg-highlight text-highlight-foreground\">\n            <ArrowRight className=\"size-[0.45em]\" strokeWidth={1.25} />\n          </span>\n        </span>\n      </a>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "aspensearch-halftone",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lineOne",
+      "type": "string[]",
+      "required": true,
+      "description": "the top row's words: the first sits at the left edge, the last at the right edge (three short words work best)"
+    },
+    {
+      "name": "lineTwo",
+      "type": "string",
+      "required": true,
+      "description": "the long word of the second row, indented, followed by the mint arrow box"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where the whole phrase links to"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the field behind the words; empty: halftone placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ad89bcd311de4af08b73ff149053efeb4532f331c2eab7149de9ffafc7a707f9"
+}

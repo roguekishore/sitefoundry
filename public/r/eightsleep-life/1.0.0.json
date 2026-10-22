@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep life scenes",
+  "description": "A light-grey band of everyday scenes: a centered heading with a sub-line and link, then three big rounded photos set in a zig-zag (tall, small, wide), each with a dark frosted widget card overlapping its edge (a mono label, a big condensed figure or a row of chips, a short caption). On desktop the widgets fade in and float upward faster than the page (180px → -180px), so they hover over the photos as you scroll.",
+  "category": "features",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "zig-zag",
+    "parallax",
+    "scrubbed",
+    "glass",
+    "widget",
+    "light",
+    "reveal",
+    "media"
+  ],
+  "notes": [
+    "reconstructed from the media sizes and motion list: the original's capture hid this section behind a popup",
+    "three media slots: 621×720, 388×450, 720×726 on desktop (350×406/406/420 on phones), radius 20px",
+    "CSS only: a named view timeline per scene drives its widget; reduced motion holds them still"
+  ],
+  "entry": "eightsleep-life.tsx",
+  "source": "foundry",
+  "name": "eightsleep-life",
+  "files": [
+    {
+      "path": "eightsleep-life.css",
+      "content": "/* Each scene names a view timeline; its widget fades in on entry and, on desktop, drifts from\n   180px below its place to 180px above it across the scene's whole pass through the window. */\n.eightsleep-life-scene {\n  view-timeline: --eightsleep-life-scene block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .eightsleep-life-widget {\n      animation: eightsleep-life-fade linear both;\n      animation-timeline: --eightsleep-life-scene;\n      animation-range: entry 10% entry 60%;\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .eightsleep-life-widget {\n      animation: eightsleep-life-fade linear both, eightsleep-life-drift linear both;\n      animation-timeline: --eightsleep-life-scene, --eightsleep-life-scene;\n      animation-range: entry 10% entry 60%, cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes eightsleep-life-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes eightsleep-life-drift {\n  from { translate: 0 180px; }\n  to { translate: 0 -180px; }\n}\n"
+    },
+    {
+      "path": "eightsleep-life.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepHeading } from \"@foundry/eightsleep-heading\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\nimport \"./eightsleep-life.css\";\n\nexport interface EightsleepLifeWidget {\n  /** small mono label at the top, e.g. \"Bed temperature\" */\n  label: ReactNode;\n  /** a big condensed figure, e.g. \"66°\" */\n  figure?: ReactNode;\n  /** or a row of chips instead, e.g. [\"Warm\", \"Even\", \"Cool\"]; the first is lit */\n  chips?: ReactNode[];\n  /** a short caption under it */\n  caption?: ReactNode;\n}\n\nexport interface EightsleepLifeScene {\n  /** the photo or video */\n  media?: ReactNode;\n  /** the floating widget card */\n  widget: EightsleepLifeWidget;\n}\n\nexport interface EightsleepLifeProps {\n  title: ReactNode;\n  sub?: ReactNode;\n  link?: { label: ReactNode; href: string };\n  /** three scenes: tall (left), small (right), wide (left) */\n  scenes: EightsleepLifeScene[];\n  className?: string;\n}\n\n// desktop sizes and sides of the three scenes, from the original's media slots\nconst shapes = [\n  { frame: \"aspect-[350/406] lg:aspect-[621/720] lg:w-[47%]\", row: \"lg:flex-row\", pull: \"lg:-ml-20\" },\n  { frame: \"aspect-[350/406] lg:aspect-[388/450] lg:w-[30%]\", row: \"lg:flex-row-reverse lg:pr-[12%]\", pull: \"lg:-mr-16\" },\n  { frame: \"aspect-[350/420] lg:aspect-[720/726] lg:w-[55%]\", row: \"lg:flex-row lg:pl-[6%]\", pull: \"lg:-ml-24\" },\n];\n\nfunction Widget({ widget }: { widget: EightsleepLifeWidget }) {\n  return (\n    <div className=\"dark w-full rounded-xl border border-border bg-background/60 p-5 text-foreground backdrop-blur-xl lg:w-[300px] lg:p-6\">\n      <span className=\"font-mono text-[11px] tracking-[0.12em] text-muted-foreground uppercase\">{widget.label}</span>\n      {widget.figure && (\n        <span className=\"mt-1 block font-[family-name:var(--eightsleep-figures,var(--typeface-display))] text-[56px] leading-none tracking-[-0.01em] lg:text-[64px]\">\n          {widget.figure}\n        </span>\n      )}\n      {widget.chips && (\n        <span className=\"mt-3 flex flex-wrap gap-2\">\n          {widget.chips.map((chip, i) => (\n            <span key={i} className={cn(\"rounded-full px-3 py-1 text-[13px]\", i === 0 ? \"bg-foreground text-background\" : \"bg-foreground/12\")}>\n              {chip}\n            </span>\n          ))}\n        </span>\n      )}\n      {widget.caption && <p className=\"mt-3 text-[14px] leading-[1.35] text-foreground/85\">{widget.caption}</p>}\n    </div>\n  );\n}\n\nexport function EightsleepLife({ title, sub, link, scenes, className }: EightsleepLifeProps) {\n  return (\n    <section className={cn(\"bg-muted pt-section pb-10 text-foreground lg:pt-[120px] lg:pb-16\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-16\">\n        <EightsleepHeading title={title} sub={sub} link={link} />\n        <div className=\"mt-14 flex flex-col gap-24 lg:mt-24 lg:gap-28\">\n          {scenes.map((scene, i) => {\n            const shape = shapes[i % shapes.length];\n            return (\n              <div key={i} className={cn(\"eightsleep-life-scene flex flex-col items-center lg:items-center\", shape.row)}>\n                <EightsleepMedia media={scene.media} className={cn(\"w-full rounded-xl\", shape.frame)} />\n                <div className={cn(\"eightsleep-life-widget relative z-10 mt-4 w-full lg:mt-0 lg:w-auto\", shape.pull)}>\n                  <Widget widget={scene.widget} />\n                </div>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "eightsleep-heading",
+    "eightsleep-media",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "sub",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "link",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false
+    },
+    {
+      "name": "scenes",
+      "type": "EightsleepLifeScene[]",
+      "required": true,
+      "description": "three scenes: tall (left), small (right), wide (left)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5e7c5cbebf0398a22897f63eb8d7063e37a9dacadd2d26f84d659ac102b3a41d"
+}
