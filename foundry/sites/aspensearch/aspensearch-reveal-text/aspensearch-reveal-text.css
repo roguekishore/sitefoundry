@@ -1,0 +1,40 @@
+/* Each word is a clipping box with its own view timeline; the word inside rises from below
+   the clip and fades in. Words on the same line share a position, so they move as one line,
+   and lines further down the paragraph start later: the original's line-by-line reveal.
+   The small padding keeps cap tops and descenders inside the clip, even at tight leading. */
+.aspensearch-reveal-word {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding-block: 0.1em 0.14em;
+  margin-block: -0.1em -0.14em;
+  view-timeline-name: --aspensearch-reveal-word;
+}
+.aspensearch-reveal-word > span {
+  display: inline-block;
+}
+
+@supports (animation-timeline: view()) {
+  .aspensearch-reveal-word > span {
+    animation: aspensearch-reveal-text-rise linear both;
+    animation-timeline: --aspensearch-reveal-word;
+    animation-range: entry var(--aspensearch-reveal-delay, 0%) cover calc(22% + var(--aspensearch-reveal-delay, 0%));
+  }
+  .aspensearch-reveal-display .aspensearch-reveal-word > span {
+    animation-name: aspensearch-reveal-text-rise-far;
+    animation-range: entry var(--aspensearch-reveal-delay, 0%) cover calc(38% + var(--aspensearch-reveal-delay, 0%));
+  }
+}
+
+@keyframes aspensearch-reveal-text-rise {
+  from { opacity: 0; transform: translateY(105%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes aspensearch-reveal-text-rise-far {
+  from { opacity: 0; transform: translateY(70%); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aspensearch-reveal-word > span { animation: none !important; }
+}

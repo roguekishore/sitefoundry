@@ -1,0 +1,39 @@
+/* A digit is a 1em window onto a reel of 20 numbers (0–9 twice). At rest the reel shows its
+   digit from the second run; scrolling into view spins it up from the first 0. The timeline is
+   named on the window, not the moving reel, so the reel's own movement doesn't feed back. */
+.aspensearch-odometer-digit {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  overflow: clip;
+  view-timeline-name: --aspensearch-odometer;
+}
+.aspensearch-odometer-reel {
+  position: absolute;
+  inset: 0 -0.2em auto;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(calc((var(--aspensearch-odometer-d) + 10) * -1em));
+}
+.aspensearch-odometer-reel > span {
+  display: block;
+  height: 1em;
+  text-align: center;
+}
+
+@supports (animation-timeline: view()) {
+  .aspensearch-odometer-reel {
+    animation: aspensearch-odometer-roll linear both;
+    animation-timeline: --aspensearch-odometer;
+    animation-range: entry calc(var(--aspensearch-odometer-i) * 4%) cover calc(48% + var(--aspensearch-odometer-i) * 4%);
+  }
+}
+
+@keyframes aspensearch-odometer-roll {
+  from { transform: translateY(0); }
+  to { transform: translateY(calc((var(--aspensearch-odometer-d) + 10) * -1em)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aspensearch-odometer-reel { animation: none !important; }
+}
