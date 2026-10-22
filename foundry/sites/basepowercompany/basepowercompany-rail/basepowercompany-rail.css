@@ -1,0 +1,98 @@
+/* Pinned rail. Only with scroll timelines and motion allowed: the section grows to 5.2 windows
+   (4.6 on desktop), its screen sticks, and everything below runs on the section's own view
+   timeline (--bp-rail). The "contain" range is the pinned stretch. Each point's open/close
+   pair is set per item with inline --bp-anim / --bp-range: "open" fills backwards (closed
+   before its turn), "close" fills forwards (closed after it), and the base style between them
+   is the open look. Without support every point stays open and the first photo shows. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bp-rail {
+      height: 520svh;
+      view-timeline: --bp-rail block;
+    }
+    @media (min-width: 64rem) {
+      .bp-rail {
+        height: 460svh;
+      }
+    }
+    .bp-rail-screen {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      height: 100svh;
+      padding-block: 0;
+    }
+
+    /* the heading, list, buttons and photo card rise in as the section arrives */
+    .bp-rail-in {
+      animation-name: bp-rail-in;
+      animation-duration: auto;
+      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      animation-fill-mode: both;
+      animation-timeline: --bp-rail;
+      animation-range: entry 30% entry 80%;
+    }
+
+    .bp-rail-fill {
+      animation-name: bp-rail-fill;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --bp-rail;
+      animation-range: contain 0% contain 100%;
+    }
+
+    .bp-rail-desc {
+      max-height: 8rem;
+    }
+    .bp-rail-desc,
+    .bp-rail-title,
+    .bp-rail-title h3,
+    .bp-rail-photo {
+      animation-name: var(--bp-anim);
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: backwards, forwards;
+      animation-timeline: --bp-rail;
+      animation-range: var(--bp-range);
+    }
+    .bp-rail-title h3 {
+      animation-name: var(--bp-anim-size);
+    }
+  }
+}
+
+@keyframes bp-rail-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes bp-rail-fill {
+  from { transform: scaleY(0.04); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes bp-rail-desc-open {
+  from { max-height: 0; opacity: 0; }
+}
+@keyframes bp-rail-desc-close {
+  to { max-height: 0; opacity: 0; }
+}
+@keyframes bp-rail-title-open {
+  from { color: var(--muted-foreground); }
+}
+@keyframes bp-rail-title-close {
+  to { color: var(--muted-foreground); }
+}
+@keyframes bp-rail-size-open {
+  from { font-size: 1rem; }
+}
+@keyframes bp-rail-size-close {
+  to { font-size: 1rem; }
+}
+@keyframes bp-rail-photo-open {
+  from { opacity: 0; transform: scale(1.05); }
+}
+@keyframes bp-rail-photo-close {
+  to { opacity: 0; }
+}
