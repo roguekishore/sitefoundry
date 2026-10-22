@@ -1,0 +1,52 @@
+/* Stack labels: while the stack art crosses the window the outer labels pull together (top one
+   down 80px, bottom one up 80px), the middle ones fade and drift 36px, and the merged label
+   fades in. One named view timeline on the art keeps every label in step. */
+.column-infra-stack {
+  view-timeline-name: --column-infra-stack;
+}
+
+.column-infra-merged {
+  opacity: 0;
+}
+
+@supports (animation-timeline: view()) {
+  .column-infra-label-top,
+  .column-infra-label-bottom,
+  .column-infra-label-mid,
+  .column-infra-merged {
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: --column-infra-stack;
+    animation-range: cover 40% cover 75%;
+  }
+  .column-infra-label-top { animation-name: column-infra-pull-down; }
+  .column-infra-label-bottom { animation-name: column-infra-pull-up; }
+  .column-infra-label-mid { animation-name: column-infra-fade-out; }
+  .column-infra-merged { animation-name: column-infra-fade-in; }
+
+  /* Phones: each panel's tiles rise in as they scroll into view. */
+  @media (width < 64rem) {
+    .column-infra-chip {
+      animation: column-infra-chip-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 25%;
+    }
+  }
+}
+
+@keyframes column-infra-pull-down { to { transform: translateY(80px); opacity: 0.4; } }
+@keyframes column-infra-pull-up { to { transform: translateY(-80px); } }
+@keyframes column-infra-fade-out { to { opacity: 0; transform: translateY(var(--drift, 0px)); } }
+@keyframes column-infra-fade-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+@keyframes column-infra-chip-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .column-infra-label-top,
+  .column-infra-label-bottom,
+  .column-infra-label-mid,
+  .column-infra-merged,
+  .column-infra-chip { animation: none; }
+}
