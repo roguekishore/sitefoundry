@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rho rail",
+  "description": "A horizontal snap-scrolling row of cards with a pair of quiet chevron arrows centred underneath; the arrow at an end fades to 30%. Can turn into a plain grid from a breakpoint up.",
+  "category": "gallery",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "rail",
+    "scroll-snap",
+    "arrows",
+    "minimal"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows (hydrate: visible); swiping works without it",
+    "pass trackClassName to switch to a grid on desktop (and arrowsClassName=\"lg:hidden\")",
+    "lines the first card up with the page column and lets the row bleed off the right edge"
+  ],
+  "entry": "rho-rail.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "rho-rail",
+  "files": [
+    {
+      "path": "rho-rail.css",
+      "content": ".rho-rail-track {\n  scrollbar-width: none;\n  scroll-snap-type: x mandatory;\n}\n.rho-rail-track::-webkit-scrollbar {\n  display: none;\n}\n.rho-rail-track > * {\n  scroll-snap-align: start;\n}\n/* Cards inside a scrolling row have no vertical view timeline of their own: keep them shown\n   (the row as a whole is revealed by its wrapper). A row that turns into a grid on desktop\n   keeps its card reveals there. */\n.rho-rail-track:not(.rho-rail-grid-lg) .rho-reveal {\n  animation: none;\n}\n@media (max-width: 1023.98px) {\n  .rho-rail-track.rho-rail-grid-lg .rho-reveal {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "rho-rail.tsx",
+      "content": "import { useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rho-rail.css\";\n\nexport interface RhoRailProps {\n  /** the cards, in order */\n  items: ReactNode[];\n  /** screen-reader label for the left arrow */\n  prevLabel: string;\n  /** screen-reader label for the right arrow */\n  nextLabel: string;\n  /** extra classes for each card's slot (set its width here, e.g. \"w-[85%] lg:w-[40rem]\") */\n  itemClassName?: string | ((index: number) => string);\n  /** extra classes for the scrolling row, e.g. \"lg:grid lg:grid-cols-3\" to become a grid */\n  trackClassName?: string;\n  /** true when trackClassName turns the row into a grid from 1024px up (re-enables card reveals there) */\n  gridOnDesktop?: boolean;\n  /** extra classes for the arrow pair, e.g. \"lg:hidden\" */\n  arrowsClassName?: string;\n  className?: string;\n}\n\nexport function RhoRail({\n  items,\n  prevLabel,\n  nextLabel,\n  itemClassName,\n  trackClassName,\n  gridOnDesktop = false,\n  arrowsClassName,\n  className,\n}: RhoRailProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [atStart, setAtStart] = useState(true);\n  const [atEnd, setAtEnd] = useState(false);\n\n  const update = useCallback(() => {\n    const el = track.current;\n    if (!el) return;\n    setAtStart(el.scrollLeft <= 4);\n    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);\n  }, []);\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    update();\n    el.addEventListener(\"scroll\", update, { passive: true });\n    window.addEventListener(\"resize\", update);\n    return () => {\n      el.removeEventListener(\"scroll\", update);\n      window.removeEventListener(\"resize\", update);\n    };\n  }, [update]);\n\n  const step = (direction: 1 | -1) => {\n    const el = track.current;\n    if (!el) return;\n    const card = el.firstElementChild as HTMLElement | null;\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const distance = card ? card.offsetWidth + gap : el.clientWidth * 0.8;\n    const smooth = !window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: direction * distance, behavior: smooth ? \"smooth\" : \"auto\" });\n  };\n\n  const arrow =\n    \"grid size-11 place-items-center rounded-md text-foreground transition-opacity duration-[160ms] disabled:opacity-30 enabled:hover:bg-card motion-reduce:transition-none\";\n\n  return (\n    <div className={className}>\n      <ul\n        ref={track}\n        className={cn(\n          \"rho-rail-track flex gap-5 overflow-x-auto overscroll-x-contain\",\n          // the first card lines up with the page column; the row bleeds off the right edge\n          \"px-gutter [scroll-padding-inline:var(--page-gutter)]\",\n          \"lg:px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))] lg:[scroll-padding-inline:max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))]\",\n          gridOnDesktop && \"rho-rail-grid-lg\",\n          trackClassName,\n        )}\n      >\n        {items.map((item, i) => (\n          <li key={i} className={cn(\"shrink-0\", typeof itemClassName === \"function\" ? itemClassName(i) : itemClassName)}>\n            {item}\n          </li>\n        ))}\n      </ul>\n      <div className={cn(\"mt-8 flex justify-center gap-2 lg:mt-10\", arrowsClassName)}>\n        <button type=\"button\" className={arrow} onClick={() => step(-1)} disabled={atStart} aria-label={prevLabel}>\n          <ChevronLeft className=\"size-5\" strokeWidth={1.5} />\n        </button>\n        <button type=\"button\" className={arrow} onClick={() => step(1)} disabled={atEnd} aria-label={nextLabel}>\n          <ChevronRight className=\"size-5\" strokeWidth={1.5} />\n        </button>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the left arrow"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the right arrow"
+    },
+    {
+      "name": "itemClassName",
+      "type": "string | ((index: number) => string)",
+      "required": false,
+      "description": "extra classes for each card's slot (set its width here, e.g. \"w-[85%] lg:w-[40rem]\")"
+    },
+    {
+      "name": "trackClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the scrolling row, e.g. \"lg:grid lg:grid-cols-3\" to become a grid"
+    },
+    {
+      "name": "gridOnDesktop",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "true when trackClassName turns the row into a grid from 1024px up (re-enables card reveals there)"
+    },
+    {
+      "name": "arrowsClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the arrow pair, e.g. \"lg:hidden\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3a7dc70fa9c6c857845370f97e4fb1328d7a321f819c811dac72a244c0f4feed"
+}

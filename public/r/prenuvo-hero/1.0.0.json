@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo hero",
+  "description": "A full-window photo hero that pins in place while the next section slides up over it. A big semibold headline with one phrase in seafoam, a soft lead and a gradient pill, centred on phones and set left on desktop, over a darkened backdrop. The copy settles in on load, then fades away and the backdrop drifts up 128px as you begin to scroll.",
+  "category": "hero",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "photo",
+    "full-bleed",
+    "sticky",
+    "pinned",
+    "parallax",
+    "fade",
+    "load-in",
+    "scroll"
+  ],
+  "notes": [
+    "dark by itself (dark class); sized by the window (100svh)",
+    "it is sticky: every block after it needs an opaque background and position relative (the prenuvo blocks have both)",
+    "media fills the window like object-fit: cover (a photo or video); empty shows a placeholder",
+    "wrap the phrase to highlight in <em> inside the title",
+    "the scroll fade and drift follow the page scroll (scroll timeline), so it belongs at the top of the page"
+  ],
+  "entry": "prenuvo-hero.tsx",
+  "source": "foundry",
+  "name": "prenuvo-hero",
+  "files": [
+    {
+      "path": "prenuvo-hero.css",
+      "content": "/* Load-in: headline, lead and pill rise 24px and fade in, one after another. Then, as the page\n   begins to scroll, the copy fades out and the backdrop drifts up 128px while the next section\n   covers the pinned hero. */\n@media (prefers-reduced-motion: no-preference) {\n  .prenuvo-hero-in {\n    animation: prenuvo-hero-in 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .prenuvo-hero-fade {\n      animation: prenuvo-hero-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 60svh;\n    }\n    .prenuvo-hero-drift {\n      animation: prenuvo-hero-drift linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 100svh;\n    }\n  }\n}\n\n@keyframes prenuvo-hero-in {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes prenuvo-hero-fade {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n\n@keyframes prenuvo-hero-drift {\n  from { transform: none; }\n  to { transform: translateY(-128px); }\n}\n"
+    },
+    {
+      "path": "prenuvo-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PrenuvoButton } from \"@foundry/prenuvo-button\";\nimport \"./prenuvo-hero.css\";\n\nexport interface PrenuvoHeroProps {\n  /** the headline; wrap the phrase to highlight in <em> */\n  title: ReactNode;\n  /** the lead under it */\n  lead: ReactNode;\n  /** the gradient pill */\n  cta: { label: string; href: string };\n  /** the backdrop that fills the window (a photo or video, cover); empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function PrenuvoHero({ title, lead, cta, media, className }: PrenuvoHeroProps) {\n  return (\n    <section className={cn(\"dark sticky top-0 h-svh overflow-clip bg-background text-foreground\", className)}>\n      {/* the backdrop is 128px taller than the window so it can drift up without a gap */}\n      <div className=\"prenuvo-hero-drift absolute inset-x-0 top-0 h-[calc(100%+8rem)] [&>*]:size-full [&>*]:object-cover\">\n        {media ?? <div className=\"bg-[radial-gradient(ellipse_at_70%_35%,color-mix(in_oklab,var(--primary)_30%,var(--muted)),var(--muted)_70%)]\" />}\n      </div>\n      {/* scrims: darker at the foot, and from the left on desktop where the copy sits */}\n      <div aria-hidden className=\"absolute inset-0 bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--background)_35%,transparent),color-mix(in_oklab,var(--background)_15%,transparent)_45%,var(--background))]\" />\n      <div aria-hidden className=\"absolute inset-0 hidden bg-[linear-gradient(to_right,color-mix(in_oklab,var(--background)_45%,transparent),transparent_60%)] lg:block\" />\n\n      <div className=\"prenuvo-hero-fade relative mx-auto flex h-full max-w-page flex-col items-center justify-center px-gutter pb-[22svh] text-center lg:items-start lg:px-12 lg:pb-0 lg:text-left\">\n        <div className=\"lg:pl-24\">\n          <h1 className=\"prenuvo-hero-in max-w-[22rem] font-display text-[2.5rem] leading-none font-semibold tracking-[-0.01em] text-balance sm:max-w-xl lg:max-w-[36rem] lg:text-[4rem] [&_em]:text-highlight [&_em]:not-italic\">\n            {title}\n          </h1>\n          <p className=\"prenuvo-hero-in mx-auto mt-6 max-w-[21rem] font-display text-base leading-[1.6] text-muted-foreground sm:max-w-md lg:mx-0 lg:mt-10 lg:max-w-[34rem] lg:text-2xl lg:leading-normal\" style={{ animationDelay: \"120ms\" }}>\n            {lead}\n          </p>\n          <div className=\"prenuvo-hero-in mt-5 lg:mt-12\" style={{ animationDelay: \"240ms\" }}>\n            <PrenuvoButton href={cta.href}>{cta.label}</PrenuvoButton>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "prenuvo-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline; wrap the phrase to highlight in <em>"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lead under it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the gradient pill"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the backdrop that fills the window (a photo or video, cover); empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "caa45fa95b3d31331a75dac32b8995e24e44c1e30f067de65decacc7029dd7be"
+}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho header",
+  "description": "A full-width 72px bar stuck to the top: a large wordmark, four plain nav links beside it, and on the right two text links and a mint button. On phones the wordmark and a menu icon open a simple dropdown list. Its colours follow the page's tone.",
+  "category": "header",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "minimal",
+    "mint",
+    "dark",
+    "light"
+  ],
+  "notes": [
+    "tone=\"dark\" by default (sits over the dark hero); inside rho-tone-flow it follows the page",
+    "the phone menu is a native <details> dropdown: no JavaScript"
+  ],
+  "entry": "rho-header.tsx",
+  "source": "foundry",
+  "name": "rho-header",
+  "files": [
+    {
+      "path": "rho-header.tsx",
+      "content": "import { Menu } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RhoButton } from \"@foundry/rho-button\";\n\nexport interface RhoLink {\n  /** visible text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface RhoHeaderProps {\n  /** the company name, set as a wordmark */\n  brand: string;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** main navigation, beside the wordmark on desktop */\n  links: RhoLink[];\n  /** quiet text links on the right (sign in, demo) */\n  secondary: RhoLink[];\n  /** the mint button on the right */\n  cta: RhoLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  /** dark or light bar (inside rho-tone-flow it follows the page instead) */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nexport function RhoHeader({ brand, brandHref = \"/\", links, secondary, cta, menuLabel, tone = \"dark\", className }: RhoHeaderProps) {\n  const link = \"transition-colors duration-[160ms] hover:text-foreground/80 motion-reduce:transition-none\";\n  return (\n    <header\n      data-rho-tone={tone}\n      className={cn(tone === \"dark\" && \"dark\", \"sticky top-0 z-40 border-b border-border bg-background text-foreground\", className)}\n    >\n      <div className=\"flex h-14 items-center gap-6 px-gutter lg:h-[4.5rem] lg:px-10\">\n        <a href={brandHref} className=\"font-display text-[2rem] leading-none font-normal tracking-[-0.04em] lg:text-[2.25rem]\">\n          {brand}\n        </a>\n        <nav className=\"ml-[4.25rem] hidden items-center gap-7 text-[0.9375rem] lg:flex\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className={link}>\n              {l.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto hidden items-center gap-5 text-[0.9375rem] lg:flex\">\n          {secondary.map((l) => (\n            <a key={l.label} href={l.href} className={link}>\n              {l.label}\n            </a>\n          ))}\n          <RhoButton href={cta.href} size=\"sm\" className=\"ml-1\">\n            {cta.label}\n          </RhoButton>\n        </div>\n        <details className=\"group relative ml-auto lg:hidden\">\n          <summary className=\"grid size-10 cursor-pointer list-none place-items-center rounded-md [&::-webkit-details-marker]:hidden\" aria-label={menuLabel}>\n            <Menu className=\"size-6\" strokeWidth={1.5} />\n          </summary>\n          <div className=\"absolute top-12 right-0 flex w-[min(20rem,calc(100vw-2rem))] flex-col gap-1 rounded-lg border border-border bg-popover p-3 text-popover-foreground shadow-lg\">\n            {[...links, ...secondary].map((l) => (\n              <a key={l.label} href={l.href} className=\"rounded-md px-3 py-2.5 text-[0.9375rem] transition-colors hover:bg-card\">\n                {l.label}\n              </a>\n            ))}\n            <RhoButton href={cta.href} className=\"mt-2 w-full\">\n              {cta.label}\n            </RhoButton>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "RhoLink[]",
+      "required": true,
+      "description": "main navigation, beside the wordmark on desktop"
+    },
+    {
+      "name": "secondary",
+      "type": "RhoLink[]",
+      "required": true,
+      "description": "quiet text links on the right (sign in, demo)"
+    },
+    {
+      "name": "cta",
+      "type": "RhoLink",
+      "required": true,
+      "description": "the mint button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark or light bar (inside rho-tone-flow it follows the page instead)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ed299c6232a77ca2b47164fb8d63485abe8be481f622abe22f4ca67d301fbc29"
+}

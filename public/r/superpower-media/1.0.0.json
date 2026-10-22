@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Superpower media slot",
+  "description": "A frame for a photo or video that takes its size, ratio and radius from the caller. Empty, it is a plainly-marked placeholder: a flat muted surface, or on the photo bands a warm amber light falling into the dark.",
+  "category": "card",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video",
+    "warm"
+  ],
+  "notes": [
+    "pass an <img> or <video> as media; it is stretched to cover the frame",
+    "the warm tone uses the theme's glow and highlight colours over the background"
+  ],
+  "entry": "superpower-media.tsx",
+  "source": "foundry",
+  "name": "superpower-media",
+  "files": [
+    {
+      "path": "superpower-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface SuperpowerMediaProps {\n  /** the photo or video; it covers the frame. Empty: a placeholder surface */\n  media?: ReactNode;\n  /** placeholder look: muted (flat grey) or warm (amber light into the dark, for photo bands) */\n  tone?: \"muted\" | \"warm\";\n  /** describes the placeholder for screen readers (ignored when media is given) */\n  label?: string;\n  /** size, ratio and radius of the frame */\n  className?: string;\n  /** anything drawn over the media (badges, captions) */\n  children?: ReactNode;\n}\n\nexport function SuperpowerMedia({ media, tone = \"muted\", label, className, children }: SuperpowerMediaProps) {\n  return (\n    <div className={cn(\"relative overflow-clip\", className)}>\n      {media ? (\n        <div className=\"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">{media}</div>\n      ) : (\n        <div\n          role={label ? \"img\" : undefined}\n          aria-label={label}\n          className={cn(\n            \"absolute inset-0\",\n            tone === \"muted\" && \"bg-muted\",\n            tone === \"warm\" &&\n              \"bg-background bg-[radial-gradient(70%_80%_at_62%_38%,color-mix(in_oklab,var(--highlight)_70%,transparent),color-mix(in_oklab,var(--glow)_30%,transparent)_45%,transparent_80%)]\",\n          )}\n        />\n      )}\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo or video; it covers the frame. Empty: a placeholder surface"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "placeholder look: muted (flat grey) or warm (amber light into the dark, for photo bands)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers (ignored when media is given)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, ratio and radius of the frame"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "anything drawn over the media (badges, captions)"
+    }
+  ],
+  "hash": "e888197e9e01594b7d4b93ec9dbf3b2f2befcf6ae324cb312bfe8a2790f63ca8"
+}

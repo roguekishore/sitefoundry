@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Neko button",
+  "description": "A soft-cornered 48/60px pill-rectangle with the label and a thin arrow after it: brand blue for joining, charcoal for everything else. Darkens or lightens on hover in 150ms.",
+  "category": "button",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "arrow",
+    "minimal",
+    "light",
+    "hover"
+  ],
+  "notes": [
+    "the dark variant is foreground-coloured: charcoal on light themes, near-white on dark ones"
+  ],
+  "entry": "neko-button.tsx",
+  "source": "foundry",
+  "name": "neko-button",
+  "files": [
+    {
+      "path": "neko-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface NekoButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary: the brand blue (joining, booking) · dark: charcoal (everything else) */\n  variant?: \"primary\" | \"dark\";\n  /** md: 48px tall on phones, 60px from 1024px · sm: 48px everywhere */\n  size?: \"sm\" | \"md\";\n  /** show the thin arrow after the label (default true) */\n  arrow?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst variants = {\n  primary: \"bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary)_88%,var(--foreground))]\",\n  dark: \"bg-foreground text-background hover:bg-foreground/85\",\n};\n\nconst sizes = {\n  md: \"h-12 gap-3 px-4 text-[0.9375rem] lg:h-15 lg:gap-4 lg:px-6 lg:text-lg\",\n  sm: \"h-12 gap-3 px-4 text-[0.9375rem]\",\n};\n\nexport function NekoButton({ children, href, variant = \"dark\", size = \"md\", arrow = true, onClick, className }: NekoButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center rounded-lg font-sans font-medium whitespace-nowrap\",\n    \"transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variants[variant],\n    sizes[size],\n    className,\n  );\n  const inner = (\n    <>\n      <span>{children}</span>\n      {arrow && <ArrowRight aria-hidden className=\"size-5 shrink-0 lg:size-6\" strokeWidth={1.5} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "primary: the brand blue (joining, booking) · dark: charcoal (everything else)"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: 48px tall on phones, 60px from 1024px · sm: 48px everywhere"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the thin arrow after the label (default true)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d00e5015c50a596d7e507ced10fa01f18ad5cd7a6df6283b355040b69b97104c"
+}

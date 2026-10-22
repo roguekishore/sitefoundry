@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp metric plate",
+  "description": "Typed tag, mono title and lead over an ink-framed figure plate: a white card with a tiny bracketed caption row and three metric columns split by hairlines. Each column has a small uppercase label with a boxed badge, a light geometric subtitle, a big mono figure, a chart slot and a short ruled log of rows (label, pass or struck-through fail, value). Phones stack the columns.",
+  "category": "stats",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "metrics",
+    "figure",
+    "dashboard",
+    "mono",
+    "light",
+    "developer",
+    "technical",
+    "reveal",
+    "typewriter"
+  ],
+  "notes": [
+    "each column's chart is a media slot (a plain placeholder strip while empty)"
+  ],
+  "entry": "warp-quality.tsx",
+  "source": "foundry",
+  "name": "warp-quality",
+  "files": [
+    {
+      "path": "warp-quality.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpMedia } from \"@foundry/warp-media\";\nimport { WarpPlate } from \"@foundry/warp-plate\";\nimport { WarpSection } from \"@foundry/warp-section\";\n\nexport interface WarpQualityRow {\n  label: string;\n  /** the verdict word, e.g. \"pass\" */\n  verdict: string;\n  /** struck through and muted when false */\n  ok: boolean;\n  value: string;\n}\n\nexport interface WarpQualityMetric {\n  /** small uppercase label at the top left */\n  label: string;\n  /** the boxed badge at the top right */\n  badge?: string;\n  /** the light subtitle */\n  subtitle: string;\n  /** the big figure, e.g. \"94%\" */\n  value: string;\n  /** the chart; a placeholder strip when empty */\n  chart?: ReactNode;\n  /** what the chart shows, for screen readers */\n  chartLabel?: string;\n  rows: WarpQualityRow[];\n}\n\nexport interface WarpQualityProps {\n  id?: string;\n  /** the typed label above the title */\n  tag?: string;\n  /** shown in brackets after the tag */\n  status?: string;\n  title: string;\n  lead?: string;\n  /** caption of the figure frame */\n  caption: string;\n  /** small caption at the top left of the card */\n  figureLabel?: string;\n  /** small note at the top right of the card */\n  figureMeta?: string;\n  /** the columns (three in the original) */\n  metrics: WarpQualityMetric[];\n  className?: string;\n}\n\nconst tiny = \"font-mono text-[0.5625rem] leading-[1.65] tracking-[calc(0.12em_-_var(--warp-squeeze,0em))] uppercase\";\n\n/** Three metric columns in a figure plate: label, figure, chart and a short log. */\nexport function WarpQuality({ id, tag, status, title, lead, caption, figureLabel, figureMeta, metrics, className }: WarpQualityProps) {\n  return (\n    <WarpSection id={id} tag={tag} status={status} title={title} lead={lead} className={className}>\n      <WarpPlate caption={caption} innerClassName=\"px-6 pt-6 pb-8 lg:px-8 lg:pt-8 lg:pb-8\">\n        {(figureLabel || figureMeta) && (\n          <div className={cn(tiny, \"flex items-start justify-between gap-4 text-muted-foreground\")}>\n            {figureLabel && <span>[ {figureLabel} ]</span>}\n            {figureMeta && <span className=\"text-right\">{figureMeta}</span>}\n          </div>\n        )}\n        <div className=\"mt-8 grid grid-cols-1 gap-8 lg:mt-7 lg:grid-cols-3 lg:gap-0\">\n            {metrics.map((m, i) => (\n              <div key={m.label} className={cn(\"min-w-0 lg:px-5 lg:first:pl-0 lg:last:pr-0\", i > 0 && \"border-t border-border pt-8 lg:border-t-0 lg:border-l lg:pt-0\")}>\n                <div className=\"flex items-center justify-between gap-3\">\n                  <span className={cn(tiny, \"text-muted-foreground\")}>{m.label}</span>\n                  {m.badge && <span className={cn(tiny, \"border border-foreground/60 px-1.5 font-medium text-foreground\")}>{m.badge}</span>}\n                </div>\n                <p className=\"mt-1 font-display text-[0.9375rem] leading-[1.5] font-light text-foreground/78\">{m.subtitle}</p>\n                <p className=\"mt-1 font-mono text-[2.125rem] leading-[1.25] font-medium tracking-[calc(0.03em_-_var(--warp-squeeze,0em))]\">{m.value}</p>\n                <WarpMedia label={m.chartLabel} className=\"mt-4 h-20 rounded-[calc(var(--radius)/2)] lg:h-[6.75rem]\">\n                  {m.chart}\n                </WarpMedia>\n                <ul className=\"mt-5 border-t border-border\">\n                  {m.rows.map((r) => (\n                    <li key={r.label + r.value} className=\"flex h-[1.875rem] items-center gap-3 border-b border-border/70 text-[0.6875rem] tracking-[calc(0.11em_-_var(--warp-squeeze,0em))] uppercase last:border-b-0\">\n                      <span className=\"min-w-0 flex-1 truncate text-muted-foreground\">{r.label}</span>\n                      <span className={cn(\"text-[0.625rem]\", r.ok ? \"font-medium text-foreground\" : \"text-muted-foreground line-through\")}>{r.verdict}</span>\n                      <span className=\"w-10 text-right font-medium\">{r.value}</span>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n        </div>\n      </WarpPlate>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-media",
+    "warp-plate",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the typed label above the title"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": false,
+      "description": "shown in brackets after the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "caption of the figure frame"
+    },
+    {
+      "name": "figureLabel",
+      "type": "string",
+      "required": false,
+      "description": "small caption at the top left of the card"
+    },
+    {
+      "name": "figureMeta",
+      "type": "string",
+      "required": false,
+      "description": "small note at the top right of the card"
+    },
+    {
+      "name": "metrics",
+      "type": "WarpQualityMetric[]",
+      "required": true,
+      "description": "the columns (three in the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e1f32e71481f8be65a4aef035a5456f17b3f87e888c9d556f51a88969eb56595"
+}

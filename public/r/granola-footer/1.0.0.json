@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola footer",
+  "description": "A white editorial footer: serif column headings over small grey links (one column alone on the left, three on the right on desktop; 2×2 on phones), a row of small social icons and the copyright, and a giant heavy wordmark stretched across the full content width. On desktop it stays pinned under the page, so the content above slides up off it.",
+  "category": "footer",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "editorial",
+    "serif",
+    "wordmark",
+    "reveal",
+    "sticky",
+    "minimal"
+  ],
+  "notes": [
+    "reveal (default on): lg:sticky bottom-0 -z-10, so put it last inside an `isolate` page wrapper whose other blocks all have a background",
+    "social icons come in as props (e.g. lucide icons)",
+    "the wordmark is SVG text stretched to the width"
+  ],
+  "entry": "granola-footer.tsx",
+  "source": "foundry",
+  "name": "granola-footer",
+  "files": [
+    {
+      "path": "granola-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaWordmark } from \"@foundry/granola-wordmark\";\n\nexport interface GranolaFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface GranolaFooterGroup {\n  /** the serif column heading */\n  heading: string;\n  /** the links under it */\n  links: GranolaFooterLink[];\n}\n\nexport interface GranolaFooterProps {\n  /** the company name, set as a giant wordmark across the foot */\n  brand: string;\n  /** link columns: the first sits alone on the left on desktop, the rest on the right */\n  groups: GranolaFooterGroup[];\n  /** social links, shown as small icons */\n  socials?: (GranolaFooterLink & { icon: ReactNode })[];\n  /** the copyright line */\n  legal: string;\n  /** on desktop, stay pinned under the page so the content above slides up off it */\n  reveal?: boolean;\n  className?: string;\n}\n\nexport function GranolaFooter({ brand, groups, socials = [], legal, reveal = true, className }: GranolaFooterProps) {\n  const [first, ...rest] = groups;\n  const column = (g: GranolaFooterGroup) => (\n    <div key={g.heading}>\n      <h2 className=\"font-display text-2xl leading-none\">{g.heading}</h2>\n      <ul className=\"mt-5 flex flex-col gap-[0.9375rem] text-sm leading-5 lg:mt-4 lg:gap-2.5\">\n        {g.links.map((l) => (\n          <li key={l.href + l.label}>\n            <a href={l.href} className=\"text-foreground/85 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n              {l.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n\n  return (\n    <footer className={cn(\"bg-background text-foreground\", reveal && \"lg:sticky lg:bottom-0 lg:-z-10\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)_+_2*var(--page-gutter))] px-gutter pt-16 pb-12\">\n        <div className=\"grid grid-cols-2 gap-x-4 gap-y-12 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-x-16\">\n          {first && column(first)}\n          {rest.map(column)}\n        </div>\n\n        <div className=\"mt-14 flex flex-col gap-8 lg:mt-20 lg:flex-row lg:items-center lg:justify-between\">\n          {socials.length > 0 && (\n            <ul className=\"flex items-center gap-4\">\n              {socials.map((s) => (\n                <li key={s.href}>\n                  <a\n                    href={s.href}\n                    aria-label={s.label}\n                    className=\"block text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none [&_svg]:size-5\"\n                  >\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          <p className=\"text-sm text-muted-foreground\">{legal}</p>\n        </div>\n\n        <GranolaWordmark name={brand} mode=\"fill\" className=\"mt-14 lg:mt-20\" />\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a giant wordmark across the foot"
+    },
+    {
+      "name": "groups",
+      "type": "GranolaFooterGroup[]",
+      "required": true,
+      "description": "link columns: the first sits alone on the left on desktop, the rest on the right"
+    },
+    {
+      "name": "socials",
+      "type": "(GranolaFooterLink & { icon: ReactNode; })[]",
+      "required": false,
+      "default": "[]",
+      "description": "social links, shown as small icons"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "on desktop, stay pinned under the page so the content above slides up off it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "972ab26f878cfb4e8a454382f1a46082e041e221e983f667c25dcd606304626d"
+}

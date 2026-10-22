@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search client list",
+  "description": "A giant word beside a halftone window, then a hairline grid: label with a running mono counter, a paragraph and mono button, a colour panel per client, and a list of firms in large tight type with mono sector tags. As the list scrolls up the window the active row fills with ink from the bottom (0.8s, expo out) while the colour panel slides to that client and the counter follows; hovering a row makes it active.",
+  "category": "logos",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "clients",
+    "list",
+    "light",
+    "swiss",
+    "grid",
+    "halftone",
+    "hover",
+    "scroll-driven",
+    "counter",
+    "mono"
+  ],
+  "notes": [
+    "needs JavaScript: the active row follows the scroll (motion useScroll) and the pointer",
+    "colour panels use chart-1…5; each client's logo slot is empty (its name in mono) until given",
+    "the panel, counter and label are desktop only; phones show the window, word, copy and list"
+  ],
+  "entry": "aspensearch-clients.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "aspensearch-clients",
+  "files": [
+    {
+      "path": "aspensearch-clients.tsx",
+      "content": "import { useRef, useState, type ReactNode } from \"react\";\nimport { useMotionValueEvent, useScroll } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchButton } from \"@foundry/aspensearch-button\";\nimport { AspensearchHalftone } from \"@foundry/aspensearch-halftone\";\nimport { AspensearchLabel } from \"@foundry/aspensearch-label\";\nimport { AspensearchRevealText } from \"@foundry/aspensearch-reveal-text\";\n\nexport interface AspensearchClient {\n  /** the firm's name, shown large in the list */\n  name: string;\n  /** a mono tag beside it, e.g. \"Quant finance\" */\n  sector: string;\n  /** its logo for the colour panel (desktop); empty: the name in mono as a placeholder */\n  logo?: ReactNode;\n}\n\nexport interface AspensearchClientsProps {\n  /** the giant word top left, e.g. \"Firms\" */\n  word: string;\n  /** the \"■ LABEL\" tag */\n  label: string;\n  /** the paragraph beside the label */\n  text: string;\n  /** the ink button under it */\n  action: { label: string; href: string };\n  /** the firms, one row each */\n  clients: AspensearchClient[];\n  /** media for the window beside the giant word; empty: halftone placeholder */\n  media?: ReactNode;\n  /** anchor id for header links */\n  id?: string;\n  className?: string;\n}\n\nconst panelTones = [\"bg-chart-1\", \"bg-chart-2\", \"bg-chart-3\", \"bg-chart-4\", \"bg-chart-5\"];\nconst ease = \"duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none\";\nconst pad = (n: number) => String(n).padStart(2, \"0\");\n\n/**\n * A client list that follows the scroll. A giant word and a halftone window, then a label with\n * a running counter, a paragraph and button, and a stack of colour panels (one per client) on\n * the left; on the right a list of firms in 38px rows. As the list scrolls up the window the\n * active row fills with ink from the bottom, and the panel and counter follow it; hovering a\n * row makes it active too. Phones: window, label, word, paragraph, button, then the list.\n */\nexport function AspensearchClients({ word, label, text, action, clients, media, id, className }: AspensearchClientsProps) {\n  const listRef = useRef<HTMLUListElement>(null);\n  const [active, setActive] = useState(0);\n  const { scrollYProgress } = useScroll({ target: listRef, offset: [\"start 0.75\", \"end 0.6\"] });\n  useMotionValueEvent(scrollYProgress, \"change\", (p) => {\n    setActive(Math.min(clients.length - 1, Math.max(0, Math.floor(p * clients.length))));\n  });\n  const current = clients[active];\n\n  return (\n    <section id={id} className={cn(\"grid border-t border-border bg-background font-sans tracking-[-0.04em] text-foreground lg:grid-cols-4\", className)}>\n      <AspensearchHalftone media={media} className=\"aspect-square lg:order-2 lg:col-span-2 lg:aspect-auto lg:h-[40.6vw] lg:border-l lg:border-border\" />\n\n      <div className=\"px-3 pt-5 lg:order-1 lg:col-span-2 lg:px-5 lg:pt-0\">\n        <AspensearchLabel className=\"lg:hidden\">{label}</AspensearchLabel>\n        <AspensearchRevealText as=\"h2\" variant=\"display\" text={word} className=\"mt-14 font-display text-[13.8vw]/none lg:mt-0 lg:text-[12.5vw]/none\" />\n      </div>\n\n      {/* Left half of the lower row: label + counter, the colour panels, and the paragraph. */}\n      <div className=\"order-3 grid lg:col-span-2 lg:grid-cols-2 lg:border-t lg:border-border\">\n        <div className=\"hidden lg:flex lg:flex-col\">\n          <div className=\"flex h-[29.2vw] flex-col justify-between border-b border-border px-5 pt-5 pb-5\">\n            <AspensearchLabel>{label}</AspensearchLabel>\n            <p className=\"flex items-center justify-between font-mono text-xs/none tracking-normal uppercase\">\n              <span>{current.name}</span>\n              <span className=\"text-muted-foreground\">\n                {pad(active + 1)} - {pad(clients.length)}\n              </span>\n            </p>\n          </div>\n          <div className=\"relative h-[29.2vw] overflow-clip\">\n            <div className={cn(\"flex h-full flex-col transition-transform\", ease)} style={{ transform: `translateY(${-active * 100}%)` }}>\n              {clients.map((c, i) => (\n                <div key={c.name} className={cn(\"flex h-full shrink-0 items-center justify-center text-background\", panelTones[i % panelTones.length])}>\n                  {c.logo ?? <span className=\"font-mono text-xs tracking-normal uppercase opacity-80\">{c.name}</span>}\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n        <div className=\"px-3 pt-16 pb-6 lg:border-l lg:border-border lg:px-5 lg:pt-7\">\n          <AspensearchRevealText text={text} className=\"text-base/[1.3]\" />\n          <div className=\"mt-48 flex justify-end lg:mt-16 lg:justify-start\">\n            <AspensearchButton href={action.href}>{action.label}</AspensearchButton>\n          </div>\n        </div>\n      </div>\n\n      <ul ref={listRef} className=\"order-4 border-t border-border lg:col-span-2 lg:border-l\">\n        {clients.map((c, i) => (\n          <li key={c.name}>\n            <button\n              type=\"button\"\n              onMouseEnter={() => setActive(i)}\n              onFocus={() => setActive(i)}\n              className={cn(\n                \"relative isolate flex h-[26vw] w-full items-end justify-between border-b border-border px-3 pb-4 text-left transition-colors lg:grid lg:h-[8.4vw] lg:grid-cols-2 lg:pb-3\",\n                ease,\n                i === active && \"text-background\",\n              )}\n            >\n              <span aria-hidden className={cn(\"absolute inset-0 -z-10 origin-bottom bg-foreground transition-transform\", ease, i === active ? \"scale-y-100\" : \"scale-y-0\")} />\n              <span className=\"text-2xl/none lg:text-[2.63vw]/none\">{c.name}</span>\n              <span className={cn(\"pb-0.5 font-mono text-xs/none tracking-normal uppercase lg:pl-5\", i === active ? \"text-background/70\" : \"text-muted-foreground\")}>{c.sector}</span>\n            </button>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "aspensearch-button",
+    "aspensearch-halftone",
+    "aspensearch-label",
+    "aspensearch-reveal-text",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "word",
+      "type": "string",
+      "required": true,
+      "description": "the giant word top left, e.g. \"Firms\""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the \"■ LABEL\" tag"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside the label"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink button under it"
+    },
+    {
+      "name": "clients",
+      "type": "AspensearchClient[]",
+      "required": true,
+      "description": "the firms, one row each"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media for the window beside the giant word; empty: halftone placeholder"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for header links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b7d270a5b3ce699b60abfb8093a09185fb0918e57f98521adfce060dc75370ef"
+}

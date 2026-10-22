@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search practice areas",
+  "description": "A huge three-line all-caps heading (middle line pushed to the right edge) on a grey tile with a small paragraph and mono button in its bottom-right corner, beside a dark column of practice rows: mono index, a 38px title, a short paragraph, a square line-art slot and a mono capital list with mint square bullets. Heading lines rise far out of their clips as they enter view; copy rises line by line.",
+  "category": "features",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "services",
+    "light",
+    "dark",
+    "swiss",
+    "grid",
+    "tiles",
+    "uppercase",
+    "mono",
+    "mint",
+    "reveal",
+    "split-lines"
+  ],
+  "notes": [
+    "each row's media slot is a 176px square; empty it's a dashed hairline placeholder",
+    "the heading tile is grey on desktop and plain paper on phones, as on the original",
+    "CSS only; reveals are off under reduced motion"
+  ],
+  "entry": "aspensearch-services.tsx",
+  "source": "foundry",
+  "name": "aspensearch-services",
+  "files": [
+    {
+      "path": "aspensearch-services.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchButton } from \"@foundry/aspensearch-button\";\nimport { AspensearchRevealText } from \"@foundry/aspensearch-reveal-text\";\n\nexport interface AspensearchServicesLine {\n  /** one line of the shouted heading */\n  text: string;\n  /** pushes this line to the right edge (the original staggers its middle line) */\n  alignRight?: boolean;\n}\n\nexport interface AspensearchService {\n  /** the small mono index, e.g. \"01\" */\n  index: string;\n  /** the practice's name; put a line break in with \"\\n\" */\n  title: string;\n  /** a short paragraph about it */\n  text: string;\n  /** the mono capital list with mint bullets */\n  points: string[];\n  /** the line drawing in the 176px square; empty: a dashed placeholder square */\n  media?: ReactNode;\n}\n\nexport interface AspensearchServicesProps {\n  /** the shouted all-caps heading, one entry per line */\n  heading: AspensearchServicesLine[];\n  /** the paragraph under the heading */\n  intro: string;\n  /** the ink button under the paragraph */\n  action: { label: string; href: string };\n  /** the practices, one dark row each */\n  services: AspensearchService[];\n  className?: string;\n}\n\n/**\n * Practice areas. Phones: the shouted heading, an indented paragraph and a button, then dark\n * rows (index and a square line-art slot, title, paragraph, mono list with mint bullets).\n * Desktop: a two-row grey tile holds the heading on the left half (middle line pushed right)\n * with the paragraph and button in its bottom-right corner; the right half is a dark column\n * of rows. Heading lines rise far out of their clips as they enter view, copy line by line.\n */\nexport function AspensearchServices({ heading, intro, action, services, className }: AspensearchServicesProps) {\n  return (\n    <section className={cn(\"grid border-t border-border bg-background font-sans tracking-[-0.04em] text-foreground lg:grid-cols-2 lg:items-start\", className)}>\n      <div className=\"flex flex-col px-3 pt-5 pb-5 lg:h-[58.3vw] lg:bg-muted lg:px-5 lg:pt-4\">\n        {heading.map((line, i) => (\n          <AspensearchRevealText\n            key={i}\n            as=\"p\"\n            variant=\"display\"\n            delay={i * 5}\n            text={line.text}\n            className={cn(\"font-display text-[13.8vw]/[0.8] whitespace-nowrap uppercase lg:text-[8.6vw]/[0.77]\", line.alignRight && \"text-right\")}\n          />\n        ))}\n        <div className=\"mt-14 flex flex-col pl-3 lg:mt-auto lg:pl-[50%]\">\n          <AspensearchRevealText text={intro} className=\"text-base/[1.3] lg:pr-2\" />\n          <AspensearchButton href={action.href} className=\"mt-48 self-end lg:mt-16 lg:self-start\">\n            {action.label}\n          </AspensearchButton>\n        </div>\n      </div>\n\n      <div className=\"bg-foreground text-background\">\n        {services.map((s, i) => (\n          <article\n            key={s.index}\n            className={cn(\n              \"grid grid-cols-2 px-3 pt-5 pb-6 lg:min-h-[29.2vw] lg:grid-cols-[2.375rem_1fr_1fr] lg:grid-rows-[auto_1fr] lg:px-10 lg:pt-10 lg:pb-10\",\n              i > 0 && \"border-t border-background/15\",\n            )}\n          >\n            <p className=\"font-mono text-sm/none text-background/50 lg:pt-1\">{s.index}</p>\n            <div className=\"justify-self-end lg:col-start-2 lg:row-start-2 lg:self-end lg:justify-self-start\">\n              {s.media ?? <div aria-hidden className=\"size-44 border border-dashed border-background/30\" />}\n            </div>\n            <h3 className=\"col-span-2 mt-20 text-2xl/[1.1] whitespace-pre-line lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mt-0 lg:text-[2.63vw]/[1.1]\">\n              {s.title}\n            </h3>\n            <AspensearchRevealText text={s.text} className=\"col-span-2 mt-8 text-base/[1.3] lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:mt-0\" />\n            <ul className=\"col-span-2 mt-6 flex flex-col gap-2 font-mono text-sm/none tracking-normal uppercase lg:col-span-1 lg:col-start-3 lg:row-start-2 lg:mt-10 lg:self-end\">\n              {s.points.map((p) => (\n                <li key={p} className=\"flex items-center gap-2\">\n                  <span aria-hidden className=\"size-2 shrink-0 bg-highlight\" />\n                  {p}\n                </li>\n              ))}\n            </ul>\n          </article>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "aspensearch-button",
+    "aspensearch-reveal-text",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "AspensearchServicesLine[]",
+      "required": true,
+      "description": "the shouted all-caps heading, one entry per line"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the heading"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink button under the paragraph"
+    },
+    {
+      "name": "services",
+      "type": "AspensearchService[]",
+      "required": true,
+      "description": "the practices, one dark row each"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "64466fe75266368283c71e6813b4355fbdeb56dd93bbb4df5f7794c7417c613c"
+}

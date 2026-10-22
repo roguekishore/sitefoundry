@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho split feature",
+  "description": "Two equal halves: an optional mono eyebrow, a 60px heading whose words rise into place, a calm 20px paragraph and an optional outline button on one side; a near-square dark media panel on the other (either side on desktop, below the text on phones). Text fades up as it arrives.",
+  "category": "features",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "split",
+    "media",
+    "reveal",
+    "scroll",
+    "minimal",
+    "light",
+    "dark"
+  ],
+  "notes": [
+    "media: a video or image about 1:1; empty: a dark panel of that shape (it stays dark in light sections, like the original's black video frame)",
+    "tone sets dark or light; mediaSide puts the panel left or right on desktop"
+  ],
+  "entry": "rho-split.tsx",
+  "source": "foundry",
+  "name": "rho-split",
+  "files": [
+    {
+      "path": "rho-split.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RhoButton } from \"@foundry/rho-button\";\nimport { RhoHeading } from \"@foundry/rho-heading\";\nimport { RhoReveal } from \"@foundry/rho-reveal\";\n\nexport interface RhoSplitProps {\n  /** small mono label above the heading */\n  eyebrow?: string;\n  /** the heading */\n  title: string;\n  /** the paragraph under it */\n  body: string;\n  /** an optional outline button under the paragraph */\n  action?: { label: string; href: string };\n  /** the video or image; empty: a dark placeholder panel */\n  media?: ReactNode;\n  /** width ÷ height of the media panel on desktop (phones use 0.97) */\n  mediaRatio?: number;\n  /** which side the media sits on from 1024px up */\n  mediaSide?: \"left\" | \"right\";\n  /** dark or light section */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nexport function RhoSplit({\n  eyebrow,\n  title,\n  body,\n  action,\n  media,\n  mediaRatio = 576 / 560,\n  mediaSide = \"right\",\n  tone = \"light\",\n  className,\n}: RhoSplitProps) {\n  return (\n    <section\n      data-rho-tone={tone}\n      className={cn(tone === \"dark\" && \"dark\", \"bg-background py-14 text-foreground lg:py-section\", className)}\n    >\n      <div className=\"mx-auto grid max-w-page items-center gap-10 px-gutter lg:grid-cols-2 lg:gap-16\">\n        <div className={cn(mediaSide === \"left\" && \"lg:order-2\")}>\n          {eyebrow && (\n            <RhoReveal as=\"p\" className=\"mb-6 font-mono text-[0.6875rem] font-medium tracking-[0.06em] text-muted-foreground uppercase\">\n              {eyebrow}\n            </RhoReveal>\n          )}\n          <RhoHeading text={title} className=\"max-w-[36rem]\" />\n          <RhoReveal as=\"p\" className=\"mt-6 max-w-[32rem] text-[1.125rem] leading-[1.45] lg:mt-8 lg:text-xl lg:leading-[1.5]\">\n            {body}\n          </RhoReveal>\n          {action && (\n            <RhoReveal className=\"mt-8\">\n              <RhoButton href={action.href} variant=\"outline\" className=\"h-11 px-[1.375rem] text-sm font-medium\">\n                {action.label}\n              </RhoButton>\n            </RhoReveal>\n          )}\n        </div>\n        <div\n          className={cn(\n            \"aspect-[0.97] w-full overflow-clip rounded-lg lg:aspect-[var(--rho-ratio)]\",\n            mediaSide === \"left\" && \"lg:order-1\",\n          )}\n          style={{ \"--rho-ratio\": mediaRatio } as CSSProperties}\n        >\n          {media ?? <div className=\"dark size-full border border-border bg-background\" />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-button",
+    "rho-heading",
+    "rho-reveal"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small mono label above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an optional outline button under the paragraph"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the video or image; empty: a dark placeholder panel"
+    },
+    {
+      "name": "mediaRatio",
+      "type": "number",
+      "required": false,
+      "default": "576 / 560",
+      "description": "width ÷ height of the media panel on desktop (phones use 0.97)"
+    },
+    {
+      "name": "mediaSide",
+      "type": "enum",
+      "required": false,
+      "default": "right",
+      "description": "which side the media sits on from 1024px up"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "dark or light section"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "727db77bb1f7ce6383c1790715f6b5cfafa99efee09535e5f2358947b69d71cc"
+}

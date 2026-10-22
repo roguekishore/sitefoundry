@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep hero",
+  "description": "A tall, airy product hero on a pale-blue sky: a tiny mono 'NEW' label, an enormous soft-gradient product name, the product floating over it, then a two-line lede, a bold price line, a white button and a condensed 4.6-star rating. On load a dark veil lifts off the sky and the title fades up; while you scroll (desktop) the words drift up 224px and the product 400px, so they part like layers.",
+  "category": "hero",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "product",
+    "sky",
+    "gradient-text",
+    "parallax",
+    "scrubbed",
+    "load-in",
+    "centered",
+    "dark"
+  ],
+  "notes": [
+    "dark-scoped: white text over a sky; the empty sky slot is a glow-to-pale gradient from the theme",
+    "the product slot is 795×1023 (418×538 on phones), drawn as a soft glow when empty because the original's video is contain-fitted",
+    "sits behind a fixed header: it starts with ~120px of top room",
+    "CSS only: load-in keyframes and scroll(root) parallax; reduced motion shows everything still"
+  ],
+  "entry": "eightsleep-hero.tsx",
+  "source": "foundry",
+  "name": "eightsleep-hero",
+  "files": [
+    {
+      "path": "eightsleep-hero.css",
+      "content": "/* Load-in: the dark veil over the sky lifts, the title rises from half-faded, the copy fades in.\n   The veil rests at opacity 0, so without animation the sky is simply clear. */\n.eightsleep-hero-veil {\n  opacity: 0;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .eightsleep-hero-veil {\n    animation: eightsleep-hero-veil 1.45s cubic-bezier(0.4, 0, 0.2, 1) both;\n  }\n  .eightsleep-hero-title {\n    animation: eightsleep-hero-title 2s cubic-bezier(0.4, 0, 0.2, 1) both;\n  }\n  .eightsleep-hero-copy {\n    animation: eightsleep-hero-copy 0.4s ease-out 0.35s both;\n  }\n}\n\n@keyframes eightsleep-hero-veil {\n  from { opacity: 0.92; }\n  to { opacity: 0; }\n}\n@keyframes eightsleep-hero-title {\n  from { opacity: 0.48; }\n  to { opacity: 1; }\n}\n@keyframes eightsleep-hero-copy {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n/* Desktop parallax, scrubbed with the page scroll: words up 224px, product up 400px. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .eightsleep-hero-drift-words,\n    .eightsleep-hero-drift-product {\n      animation: eightsleep-hero-drift linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 1350px;\n    }\n    .eightsleep-hero-drift-words { --eightsleep-hero-drift: -224px; }\n    .eightsleep-hero-drift-product { --eightsleep-hero-drift: -400px; }\n  }\n}\n\n@keyframes eightsleep-hero-drift {\n  to {\n    translate: 0 var(--eightsleep-hero-drift);\n  }\n}\n"
+    },
+    {
+      "path": "eightsleep-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepButton } from \"@foundry/eightsleep-button\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\nimport { EightsleepRating, type EightsleepRatingProps } from \"@foundry/eightsleep-rating\";\nimport \"./eightsleep-hero.css\";\n\nexport interface EightsleepHeroProps {\n  /** the tiny mono label over the title, e.g. \"New\" */\n  eyebrow?: ReactNode;\n  /** the product name, set enormous */\n  title: ReactNode;\n  /** one or two lines under the product */\n  lede: ReactNode;\n  /** a short bold line, e.g. the starting price */\n  price?: ReactNode;\n  /** the white button */\n  cta: { label: ReactNode; href: string };\n  /** the rating under the button */\n  rating?: EightsleepRatingProps;\n  /** the sky photo behind everything (cover); a glow-to-pale gradient when empty */\n  sky?: ReactNode;\n  /** the product cut-out or video (contain-fitted, transparent around it) */\n  product?: ReactNode;\n  className?: string;\n}\n\nexport function EightsleepHero({ eyebrow, title, lede, price, cta, rating, sky, product, className }: EightsleepHeroProps) {\n  return (\n    <section className={cn(\"dark relative isolate overflow-clip text-foreground\", className)}>\n      <EightsleepMedia media={sky} tone=\"sky\" className=\"absolute inset-0 -z-10\" />\n      <div className=\"eightsleep-hero-veil pointer-events-none absolute inset-0 -z-10 bg-background\" />\n\n      <div className=\"relative mx-auto flex max-w-page flex-col items-center px-gutter pb-[78px] lg:px-16 lg:pb-[96px]\">\n        {/* the stage: title at the top, product floating over it; window-sized on desktop */}\n        <div className=\"relative flex h-[570px] w-full flex-col items-center pt-[124px] lg:h-[calc(82svh+165px)] lg:pt-[150px]\">\n          <div className=\"eightsleep-hero-drift-product pointer-events-none absolute top-[88px] left-1/2 -ml-[209px] h-[538px] w-[418px] lg:top-[96px] lg:-ml-[397.5px] lg:h-[1023px] lg:w-[795px]\">\n            {product ? (\n              <div className=\"size-full [&>img]:size-full [&>img]:object-contain [&>video]:size-full [&>video]:object-contain\">{product}</div>\n            ) : (\n              <div aria-hidden className=\"size-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--foreground)_30%,transparent),transparent)] [background-size:70%_42%] bg-center bg-no-repeat\" />\n            )}\n          </div>\n          <div className=\"eightsleep-hero-drift-words relative flex flex-col items-center\">\n            {eyebrow && (\n              <span className=\"eightsleep-hero-copy font-mono text-[13px] font-medium tracking-[0.16em] uppercase lg:text-[14px]\">{eyebrow}</span>\n            )}\n            <h1 className=\"eightsleep-hero-title mt-2 bg-linear-to-b from-foreground from-30% to-foreground/55 bg-clip-text pb-[0.08em] font-display text-[72px] leading-[0.95] font-medium tracking-[-0.04em] text-transparent sm:text-[120px] lg:text-[184px]\">\n              {title}\n            </h1>\n          </div>\n        </div>\n\n        <div className=\"eightsleep-hero-drift-words relative\">\n          <div className=\"eightsleep-hero-copy flex flex-col items-center text-center\">\n            <p className=\"max-w-[18ch] text-[22px] leading-[1.15] font-medium text-balance lg:max-w-[30ch] lg:text-[32px] lg:leading-[1.25]\">{lede}</p>\n            {price && <p className=\"mt-4 text-[16px] font-semibold lg:mt-8 lg:text-[20px]\">{price}</p>}\n            <EightsleepButton size=\"lg\" href={cta.href} className=\"mt-6 lg:mt-9\">\n              {cta.label}\n            </EightsleepButton>\n            {rating && <EightsleepRating {...rating} className=\"mt-11\" />}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "eightsleep-button",
+    "eightsleep-media",
+    "eightsleep-rating",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tiny mono label over the title, e.g. \"New\""
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the product name, set enormous"
+    },
+    {
+      "name": "lede",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one or two lines under the product"
+    },
+    {
+      "name": "price",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a short bold line, e.g. the starting price"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the white button"
+    },
+    {
+      "name": "rating",
+      "type": "any",
+      "required": false,
+      "description": "the rating under the button"
+    },
+    {
+      "name": "sky",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the sky photo behind everything (cover); a glow-to-pale gradient when empty"
+    },
+    {
+      "name": "product",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product cut-out or video (contain-fitted, transparent around it)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6d111ad30bb0ade864e79a80ba4f98fab9db9fa1d7fec3065a7e78e24ebe768f"
+}

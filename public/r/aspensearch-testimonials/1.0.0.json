@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search testimonial slider",
+  "description": "One long quote at a time in large tight type on a hairline grid, with the speaker's name and mono role at its foot, a portrait frame, an ink tile of facts (position, company) and a halftone window. A thin ink bar fills across two square arrow buttons and moves on to the next quote by itself; each quote rises in and its lines reveal as they scroll into view.",
+  "category": "testimonials",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "carousel",
+    "slider",
+    "light",
+    "swiss",
+    "grid",
+    "mono",
+    "autoplay",
+    "progress",
+    "reveal"
+  ],
+  "notes": [
+    "needs JavaScript for the slides; the progress bar is a CSS animation that pauses on hover",
+    "photo per quote and the desktop window are media slots; empty, grey frame and halftone placeholder",
+    "no autoplay under reduced motion"
+  ],
+  "entry": "aspensearch-testimonials.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "aspensearch-testimonials",
+  "files": [
+    {
+      "path": "aspensearch-testimonials.css",
+      "content": "/* The progress bar fills across the arrows over the interval, then the block moves to the next\n   quote (onAnimationEnd). Hovering the section holds it. Each new quote rises and fades in.\n   Under reduced motion there is no bar and no autoplay: the arrows still work. */\n.aspensearch-testimonials-bar {\n  width: 100%;\n  transform-origin: left;\n  animation: aspensearch-testimonials-progress var(--aspensearch-testimonials-interval, 9s) linear both;\n}\n.group\\/quotes:hover .aspensearch-testimonials-bar {\n  animation-play-state: paused;\n}\n.aspensearch-testimonials-quote {\n  animation: aspensearch-testimonials-quote-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n\n@keyframes aspensearch-testimonials-progress {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n@keyframes aspensearch-testimonials-quote-in {\n  from { opacity: 0; transform: translateY(1.5rem); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-testimonials-bar { display: none; }\n  .aspensearch-testimonials-quote { animation: none; }\n}\n"
+    },
+    {
+      "path": "aspensearch-testimonials.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchArrows } from \"@foundry/aspensearch-arrows\";\nimport { AspensearchHalftone } from \"@foundry/aspensearch-halftone\";\nimport { AspensearchLabel } from \"@foundry/aspensearch-label\";\nimport { AspensearchRevealText } from \"@foundry/aspensearch-reveal-text\";\nimport \"./aspensearch-testimonials.css\";\n\nexport interface AspensearchTestimonial {\n  /** the quote; separate paragraphs with a blank line */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role, shown in mono under the name */\n  role: string;\n  /** facts for the ink tile, e.g. [{ label: \"Position\", value: \"Quant developer\" }] */\n  facts: { label: string; value: string }[];\n  /** their portrait; empty: a grey placeholder frame */\n  photo?: ReactNode;\n}\n\nexport interface AspensearchTestimonialsProps {\n  /** the \"■ LABEL\" tag */\n  label: string;\n  /** the opening quote glyph, e.g. \"“\" */\n  quoteMark: string;\n  /** the quotes, shown one at a time */\n  items: AspensearchTestimonial[];\n  /** seconds each quote stays before the next one (the bar fills meanwhile) */\n  interval?: number;\n  /** screen-reader names of the arrows */\n  prevLabel: string;\n  nextLabel: string;\n  /** media for the window under the facts tile (desktop); empty: halftone placeholder */\n  media?: ReactNode;\n  /** anchor id for header links */\n  id?: string;\n  className?: string;\n}\n\nconst pad = (n: number) => String(n).padStart(2, \"0\");\n\n/**\n * One quote at a time on a hairline grid. Desktop: a narrow column with the label, a progress\n * bar over two arrow buttons and the portrait; a wide column with the 38px quote and the name,\n * role and counter at its foot; an ink facts tile above a halftone window. Phones: label and\n * counter, the quote, name with a small portrait, an ink facts strip and the arrows. The bar\n * fills over the interval and moves on by itself; each new quote rises in.\n */\nexport function AspensearchTestimonials({ label, quoteMark, items, interval = 9, prevLabel, nextLabel, media, id, className }: AspensearchTestimonialsProps) {\n  const [index, setIndex] = useState(0);\n  const count = items.length;\n  const go = (step: number) => setIndex((i) => (i + step + count) % count);\n  const item = items[index];\n  const counter = `${pad(index + 1)} - ${pad(count)}`;\n\n  const bar = (\n    <span\n      key={index}\n      aria-hidden\n      onAnimationEnd={() => go(1)}\n      className=\"aspensearch-testimonials-bar absolute top-0 left-0 h-[3px] bg-foreground\"\n      style={{ \"--aspensearch-testimonials-interval\": `${interval}s` } as CSSProperties}\n    />\n  );\n  const facts = (\n    <dl className=\"grid grid-cols-2 gap-x-3 gap-y-5 lg:grid-cols-1\">\n      {item.facts.map((f) => (\n        <div key={f.label}>\n          <dt className=\"text-sm/none font-medium\">{f.label}</dt>\n          <dd className=\"mt-1.5 font-mono text-xs/none tracking-normal text-background/65 uppercase\">{f.value}</dd>\n        </div>\n      ))}\n    </dl>\n  );\n\n  return (\n    <section id={id} className={cn(\"group/quotes grid border-t border-border bg-background font-sans tracking-[-0.04em] text-foreground lg:grid-cols-4\", className)}>\n      {/* Narrow column: label, bar + arrows, portrait (desktop). */}\n      <div className=\"hidden lg:flex lg:flex-col\">\n        <div className=\"h-[25vw] px-5 pt-5\">\n          <AspensearchLabel>{label}</AspensearchLabel>\n        </div>\n        <div className=\"relative border-y border-border\">\n          {bar}\n          <AspensearchArrows onPrev={() => go(-1)} onNext={() => go(1)} prevLabel={prevLabel} nextLabel={nextLabel} />\n        </div>\n        <div className=\"flex-1 bg-muted\">{item.photo}</div>\n      </div>\n\n      {/* The quote. */}\n      <div className=\"flex flex-col px-3 pt-6 pb-6 lg:col-span-2 lg:min-h-[58.3vw] lg:border-x lg:border-border lg:px-5 lg:pt-5 lg:pb-5\">\n        <div className=\"flex items-center justify-between lg:hidden\">\n          <AspensearchLabel>{label}</AspensearchLabel>\n          <span className=\"font-mono text-xs/none tracking-normal text-muted-foreground\">{counter}</span>\n        </div>\n        <p aria-hidden className=\"mt-12 font-display text-3xl/none font-semibold lg:mt-0\">\n          {quoteMark}\n        </p>\n        <div key={index} className=\"aspensearch-testimonials-quote mt-6 flex flex-col gap-[1.1em] text-2xl/[1.1] lg:mt-12 lg:text-[2.63vw]/[1.1]\">\n          {item.quote.split(/\\n\\s*\\n/).map((p, i) => (\n            <AspensearchRevealText key={i} text={p} />\n          ))}\n        </div>\n        <div className=\"mt-auto flex items-end justify-between gap-4 pt-16\">\n          <div>\n            <p className=\"text-base/tight\">{item.name}</p>\n            <p className=\"mt-1.5 font-mono text-xs/none tracking-normal text-muted-foreground uppercase\">{item.role}</p>\n          </div>\n          <div className=\"size-[6.25rem] shrink-0 overflow-clip bg-muted lg:hidden\">{item.photo}</div>\n          <span className=\"hidden font-mono text-xs/none tracking-normal text-muted-foreground lg:block\">{counter}</span>\n        </div>\n      </div>\n\n      {/* Ink facts tile, then a window (desktop) / facts strip and arrows (phones). */}\n      <div className=\"flex flex-col\">\n        <div className=\"bg-foreground px-5 py-5 text-background lg:h-[29.2vw]\">{facts}</div>\n        <AspensearchHalftone media={media} className=\"hidden flex-1 lg:block\" />\n        <div className=\"relative border-b border-border lg:hidden\">\n          {bar}\n          <AspensearchArrows onPrev={() => go(-1)} onNext={() => go(1)} prevLabel={prevLabel} nextLabel={nextLabel} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "aspensearch-arrows",
+    "aspensearch-halftone",
+    "aspensearch-label",
+    "aspensearch-reveal-text",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the \"■ LABEL\" tag"
+    },
+    {
+      "name": "quoteMark",
+      "type": "string",
+      "required": true,
+      "description": "the opening quote glyph, e.g. \"“\""
+    },
+    {
+      "name": "items",
+      "type": "AspensearchTestimonial[]",
+      "required": true,
+      "description": "the quotes, shown one at a time"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "9",
+      "description": "seconds each quote stays before the next one (the bar fills meanwhile)"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader names of the arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media for the window under the facts tile (desktop); empty: halftone placeholder"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for header links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cb89cb44eec4e4b02f144dd5ec30aa812dbe412779383321138ce2300e2e0983"
+}

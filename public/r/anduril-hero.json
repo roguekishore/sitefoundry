@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril hero",
+  "description": "A film that fills 96% of the window under a 72px black band: edge to edge on phones, inset by the page gutter with 2px corners on desktop. No headline; an optional all-caps caption appears over the film every 12 seconds, decoding letter by letter, then fades away.",
+  "category": "hero",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "video",
+    "full-height",
+    "dark",
+    "minimal",
+    "scramble",
+    "loop",
+    "cinematic"
+  ],
+  "notes": [
+    "pass the film (or an image) as media; empty shows a placeholder surface",
+    "leaves 72px at the top for the fixed anduril-header (underHeader={false} to drop it)",
+    "needs JavaScript (hydrate: load) only for the caption decode; the caption loop itself is CSS"
+  ],
+  "entry": "anduril-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "anduril-hero",
+  "files": [
+    {
+      "path": "anduril-hero.css",
+      "content": "/* The caption shows for ~4s of every 12s cycle; each new cycle re-runs the decode (JS). */\n@media (prefers-reduced-motion: no-preference) {\n  .anduril-hero-caption {\n    animation: anduril-hero-caption-cycle 12s linear 0.4s infinite both;\n  }\n}\n\n@keyframes anduril-hero-caption-cycle {\n  0% { opacity: 0; }\n  2%, 32% { opacity: 1; }\n  36%, 100% { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "anduril-hero.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilScramble } from \"@foundry/anduril-scramble\";\nimport \"./anduril-hero.css\";\n\nexport interface AndurilHeroProps {\n  /** the film (a <video> or <img>), cropped like object-fit: cover; empty shows a placeholder */\n  media?: ReactNode;\n  /** optional all-caps caption over the film, one entry per line; it decodes in every 12 seconds */\n  caption?: string[];\n  /** leave 72px at the top for the fixed header (default on) */\n  underHeader?: boolean;\n  className?: string;\n}\n\n/** Window-tall film under the header band; edge to edge on phones, inset with 2px corners on desktop. */\nexport function AndurilHero({ media, caption = [], underHeader = true, className }: AndurilHeroProps) {\n  // each loop of the caption animation re-mounts the lines so they decode again\n  const [round, setRound] = useState(0);\n\n  return (\n    <section className={cn(\"flex h-[96svh] flex-col bg-background\", underHeader && \"pt-[4.5rem]\", className)}>\n      <div className=\"relative min-h-0 flex-1 md:px-gutter\">\n        <div className=\"relative h-full overflow-clip bg-muted md:rounded-lg [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n          {media}\n        </div>\n        {caption.length > 0 && (\n          <p\n            onAnimationIteration={() => setRound((r) => r + 1)}\n            className=\"anduril-hero-caption pointer-events-none absolute inset-x-0 top-[22%] flex flex-col items-center px-2 text-center font-display text-[2.25rem] leading-none font-medium tracking-[-0.02em] text-foreground uppercase md:text-[3.5rem]\"\n          >\n            {caption.map((line, i) => (\n              <AndurilScramble key={`${round}-${i}`} text={line} triggers={[\"load\"]} duration={1100} />\n            ))}\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "anduril-scramble",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the film (a <video> or <img>), cropped like object-fit: cover; empty shows a placeholder"
+    },
+    {
+      "name": "caption",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "optional all-caps caption over the film, one entry per line; it decodes in every 12 seconds"
+    },
+    {
+      "name": "underHeader",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "leave 72px at the top for the fixed header (default on)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d2579f235728673c4d636d368e1ce3983084fc7f5dc1f8b5357af92f03304592"
+}

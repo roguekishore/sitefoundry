@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Increase engineering band",
+  "description": "A tall dark navy band inside the frame: a two-tone white-and-grey statement with a mint button, then three hairline-ruled rows. Each row has a bold-lead statement and a small mint link at the top left, a customer quote at the bottom left, and on desktop a diagram on a faint dot grid at the right that fades in and rises 16px as it scrolls into view.",
+  "category": "features",
+  "site": "increase",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "developer",
+    "dot-grid",
+    "reveal",
+    "scroll",
+    "framed",
+    "hairline",
+    "fintech"
+  ],
+  "notes": [
+    "forces dark tokens with the dark class, on light or dark themes",
+    "media per row: a diagram or screenshot (desktop only, as in the original); empty it shows the dot grid alone",
+    "the reveal is a CSS scroll-driven animation; browsers without it, and reduced motion, show the diagram in place"
+  ],
+  "entry": "increase-developers.tsx",
+  "source": "foundry",
+  "name": "increase-developers",
+  "files": [
+    {
+      "path": "increase-developers.css",
+      "content": "/* The dot grid behind each row's diagram (and the placeholder when there is none). */\n.increase-developers-dots {\n  background-image: radial-gradient(circle, color-mix(in oklab, var(--foreground) 14%, transparent) 1px, transparent 1.5px);\n  background-size: 12px 12px;\n  background-position: center;\n}\n\n/* Each diagram fades in and rises 16px as it enters the window, with a long ease-out\n   (the original's 1.2s ease-out-quint), finishing within the first 220px of its entry. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .increase-developers-media {\n      animation: increase-developers-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 220px;\n    }\n  }\n}\n\n@keyframes increase-developers-rise {\n  from { opacity: 0; transform: translateY(16px); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }\n  to { opacity: 1; transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "increase-developers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { IncreaseButton } from \"@foundry/increase-button\";\nimport { IncreaseHeading } from \"@foundry/increase-heading\";\nimport { IncreaseQuote, type IncreaseQuoteProps } from \"@foundry/increase-quote\";\nimport \"./increase-developers.css\";\n\nexport interface IncreaseDeveloperRow {\n  /** the row statement's bold opening words */\n  lead: string;\n  /** the rest of the statement, in grey */\n  rest?: string;\n  /** a small primary-coloured link under the statement */\n  link?: { label: string; href: string };\n  /** a customer quote at the bottom of the row */\n  quote?: IncreaseQuoteProps;\n  /** the diagram on the right (desktop only). Empty: the dot grid alone, as a placeholder */\n  media?: ReactNode;\n}\n\nexport interface IncreaseDevelopersProps {\n  /** the intro statement's dark opening clause */\n  lead: string;\n  /** the rest of it, in grey */\n  rest?: string;\n  /** the mint button under the intro */\n  action?: { label: string; href: string };\n  /** the ruled rows below: statement, link and quote left, a diagram on a dot grid right */\n  rows: IncreaseDeveloperRow[];\n  className?: string;\n}\n\n/**\n * Increase's engineering band, always dark navy: a two-tone statement and a mint button,\n * then ruled rows, each with a statement and link at the top left, a customer quote at the\n * bottom left and a diagram on a dot grid at the right that fades up as it scrolls in.\n */\nexport function IncreaseDevelopers({ lead, rest, action, rows, className }: IncreaseDevelopersProps) {\n  return (\n    <section className={cn(\"dark border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-x border-border\">\n        <div className=\"px-gutter pt-[5.25rem] pb-12 lg:pt-[7.25rem]\">\n          <IncreaseHeading lead={lead} rest={rest} className=\"lg:max-w-[47rem]\" />\n          {action && (\n            <IncreaseButton href={action.href} className=\"mt-8\">\n              {action.label}\n            </IncreaseButton>\n          )}\n        </div>\n\n        {rows.map((row) => (\n          <div\n            key={row.lead}\n            className=\"grid gap-12 border-t border-border px-gutter pt-[3.75rem] pb-12 lg:min-h-[34.25rem] lg:grid-cols-[1fr_32.5rem] lg:gap-16 lg:pt-[3.25rem]\"\n          >\n            <div className=\"flex flex-col\">\n              <IncreaseHeading as=\"h3\" size=\"row\" lead={row.lead} rest={row.rest} className=\"lg:max-w-[33rem]\" />\n              {row.link && (\n                <a href={row.link.href} className=\"group mt-6 inline-flex items-center gap-2 self-start text-sm font-medium text-primary hover:underline lg:mt-8\">\n                  {row.link.label}\n                  <ArrowUpRight className=\"size-3.5 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transition-none\" strokeWidth={2} />\n                </a>\n              )}\n              {row.quote && <IncreaseQuote size=\"sm\" {...row.quote} className=\"mt-12 lg:mt-auto lg:pt-12\" />}\n            </div>\n            <div\n              aria-hidden={row.media ? undefined : true}\n              className=\"increase-developers-media increase-developers-dots hidden min-h-[27.5rem] items-center justify-center lg:flex\"\n            >\n              {row.media}\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "increase-button",
+    "increase-heading",
+    "increase-quote"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the intro statement's dark opening clause"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the rest of it, in grey"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the mint button under the intro"
+    },
+    {
+      "name": "rows",
+      "type": "IncreaseDeveloperRow[]",
+      "required": true,
+      "description": "the ruled rows below: statement, link and quote left, a diagram on a dot grid right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "38a067dddd38a775b3a22b8b1732ba33a7727928ef5147045f324e770bd83237"
+}

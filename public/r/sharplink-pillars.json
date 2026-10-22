@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink pillars",
+  "description": "A long list of principles beside a tall media slot pinned on the right: each item is a narrow label, a two-line title and a short paragraph, lit up while it crosses the middle of the window (its title's letters brighten in a scattered order) and dimmed otherwise; the pinned media crossfades to the item being read. Down the section the paper turns pale blue, then saturated blue, then black, and the text turns light with it.",
+  "category": "features",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "sticky",
+    "pinned",
+    "scroll",
+    "scrubbed",
+    "gradient",
+    "light-to-dark",
+    "blue",
+    "reveal",
+    "crossfade"
+  ],
+  "notes": [
+    "items from `darkFrom` on sit on the dark band and use the theme's dark colours (.dark)",
+    "one media slot per item: pinned on the right on wide screens (crossfading by named view timelines, timeline-scope), under each item on phones",
+    "without view-timeline support or with reduced motion: the first item's media stays, every item is at full strength",
+    "transparent at the top: on the page it shows the Sharplink backdrop wash"
+  ],
+  "entry": "sharplink-pillars.tsx",
+  "source": "foundry",
+  "name": "sharplink-pillars",
+  "files": [
+    {
+      "path": "sharplink-pillars.css",
+      "content": "/* Each item has its own named view timeline (set inline, --sharplink-pillar-<i>); the section\n   makes those names visible to the pinned media column (timeline-scope). An item is at full\n   strength while it crosses the middle of the window and at 40% otherwise; its media fades in\n   and out over the same stretch. The dark band drifts up a little as the section scrolls. */\n.sharplink-pillars-media:not(:first-child) {\n  display: none;\n}\n\n@supports (timeline-scope: none) and (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-pillars {\n      timeline-scope: var(--sharplink-pillars-scope);\n    }\n    .sharplink-pillars-item {\n      view-timeline-name: var(--sharplink-pillars-name);\n    }\n    .sharplink-pillars-dim {\n      animation: sharplink-pillars-focus linear both;\n      animation-timeline: var(--sharplink-pillars-name);\n      animation-range: cover 0% cover 100%;\n    }\n    .sharplink-pillars-media:not(:first-child) {\n      display: block;\n    }\n    .sharplink-pillars-media {\n      animation: sharplink-pillars-swap linear both;\n      animation-timeline: var(--sharplink-pillars-name);\n      animation-range: cover 0% cover 100%;\n    }\n    .sharplink-pillars-media:first-child {\n      animation-name: sharplink-pillars-swap-first;\n    }\n    .sharplink-pillars-media:last-child {\n      animation-name: sharplink-pillars-swap-last;\n    }\n    .sharplink-pillars-band {\n      animation: sharplink-pillars-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes sharplink-pillars-focus {\n  0%, 30% { opacity: 0.4; }\n  42%, 62% { opacity: 1; }\n  74%, 100% { opacity: 0.4; }\n}\n@keyframes sharplink-pillars-swap {\n  0%, 34% { opacity: 0; }\n  42%, 60% { opacity: 1; }\n  68%, 100% { opacity: 0; }\n}\n@keyframes sharplink-pillars-swap-first {\n  0%, 60% { opacity: 1; }\n  68%, 100% { opacity: 0; }\n}\n@keyframes sharplink-pillars-swap-last {\n  0%, 34% { opacity: 0; }\n  42%, 100% { opacity: 1; }\n}\n@keyframes sharplink-pillars-drift {\n  from { transform: translateY(8%); }\n  to { transform: translateY(-8%); }\n}\n"
+    },
+    {
+      "path": "sharplink-pillars.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkLabel } from \"@foundry/sharplink-label\";\nimport { SharplinkRule } from \"@foundry/sharplink-rule\";\nimport { SharplinkTextReveal } from \"@foundry/sharplink-text-reveal\";\nimport \"./sharplink-pillars.css\";\n\nexport interface SharplinkPillar {\n  /** the narrow label over the title, e.g. \"Stewardship\" */\n  label: string;\n  /** the title; \"\\n\" breaks the line */\n  title: string;\n  /** the short paragraph */\n  body: string;\n  /** a tall render or image for this item (about 0.73 wide per tall); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface SharplinkPillarsProps {\n  /** the small label over the section title */\n  label: string;\n  /** the section title; \"\\n\" breaks the line */\n  title: string;\n  /** the principles, in order */\n  items: SharplinkPillar[];\n  /** the index of the first item on the dark band (items before it stay on the light paper) */\n  darkFrom?: number;\n  className?: string;\n}\n\nconst placeholder = (\n  <div className=\"border border-dotted border-foreground/20 bg-[radial-gradient(60%_50%_at_50%_45%,color-mix(in_oklab,var(--glow)_22%,transparent),transparent)]\" />\n);\n\n/** Principles list beside a pinned media slot, running from light paper into a dark band. */\nexport function SharplinkPillars({ label, title, items, darkFrom = 1, className }: SharplinkPillarsProps) {\n  const name = (i: number) => `--sharplink-pillar-${i}`;\n  const sectionStyle = {\n    \"--sharplink-pillars-scope\": items.map((_, i) => name(i)).join(\", \"),\n    \"--sl-paper\": \"var(--background)\",\n    \"--sl-pale\": \"var(--accent)\",\n  } as CSSProperties;\n\n  const item = (pillar: SharplinkPillar, i: number) => (\n    <li\n      key={pillar.label + i}\n      className=\"sharplink-pillars-item py-10 lg:min-h-[12.8rem] lg:py-9\"\n      style={{ \"--sharplink-pillars-name\": name(i) } as CSSProperties}\n    >\n      <div className=\"sharplink-pillars-dim grid gap-y-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,20rem)] lg:gap-x-[1.5rem]\">\n        <SharplinkLabel tone=\"muted\" className=\"lg:col-span-2\">\n          {pillar.label}\n        </SharplinkLabel>\n        <SharplinkTextReveal\n          as=\"h3\"\n          mode=\"dim\"\n          text={pillar.title}\n          range={[15, 45]}\n          className=\"font-display text-[2rem] leading-[1.16] font-medium tracking-[-0.01em]\"\n        />\n        <p className=\"max-w-[21rem] text-base leading-[1.1] lg:pt-1\">{pillar.body}</p>\n      </div>\n      <div className=\"mx-auto mt-10 aspect-[0.73] w-full max-w-[22rem] lg:hidden [&>*]:h-full [&>*]:w-full [&>*]:object-contain\">\n        {pillar.media ?? placeholder}\n      </div>\n    </li>\n  );\n\n  return (\n    <section className={cn(\"sharplink-pillars relative isolate overflow-clip text-foreground\", className)} style={sectionStyle}>\n      <div className=\"mx-auto grid max-w-page px-gutter lg:grid-cols-[minmax(0,1fr)_35rem] lg:gap-x-gutter\">\n        <div className=\"pb-28 lg:pb-[12.5rem]\">\n          <SharplinkRule />\n          <SharplinkLabel className=\"mt-7\">{label}</SharplinkLabel>\n          <SharplinkTextReveal\n            text={title}\n            className=\"mt-5 font-display text-[2.75rem] leading-[1.15] font-medium tracking-[-0.01em] lg:mt-6 lg:max-w-[40rem] lg:text-[4.25rem] lg:leading-[1.06] lg:tracking-[-0.02em]\"\n          />\n          <ul className=\"mt-20 border-t border-dotted border-foreground/15 lg:mt-[6.5rem]\">{items.slice(0, darkFrom).map(item)}</ul>\n          {darkFrom < items.length && (\n            <div data-sharplink-tone=\"dark\" className=\"dark relative text-foreground\">\n              <div\n                aria-hidden\n                className=\"sharplink-pillars-band absolute -inset-x-[100vw] -top-[14rem] -bottom-[16rem] -z-10 bg-[linear-gradient(to_bottom,transparent_0%,var(--sl-pale)_12%,color-mix(in_oklab,var(--glow)_75%,var(--sl-pale))_22%,color-mix(in_oklab,var(--glow)_55%,var(--background))_48%,var(--background)_78%)]\"\n              />\n              <ul>{items.slice(darkFrom).map((p, i) => item(p, i + darkFrom))}</ul>\n            </div>\n          )}\n        </div>\n\n        <div className=\"relative hidden lg:block\">\n          <div className=\"sticky top-[4.5rem] grid aspect-[0.73] max-h-[calc(100svh-5.5rem)] w-full\">\n            {items.map((pillar, i) => (\n              <div\n                key={pillar.label + i}\n                className=\"sharplink-pillars-media [grid-area:1/1] [&>*]:h-full [&>*]:w-full [&>*]:object-contain\"\n                style={{ \"--sharplink-pillars-name\": name(i) } as CSSProperties}\n              >\n                {pillar.media ?? placeholder}\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-label",
+    "sharplink-rule",
+    "sharplink-text-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label over the section title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title; \"\\n\" breaks the line"
+    },
+    {
+      "name": "items",
+      "type": "SharplinkPillar[]",
+      "required": true,
+      "description": "the principles, in order"
+    },
+    {
+      "name": "darkFrom",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "the index of the first item on the dark band (items before it stay on the light paper)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ffda867682ee709d3abd4ce7a30a89a1531adf3997bbcef626c4b3f50e4f12b6"
+}

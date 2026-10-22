@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Increase logo marquee",
+  "description": "A 94px framed strip of customer wordmarks, cut off cleanly at the frame's hairlines, sliding slowly left in an endless 54-second loop. It pauses while hovered or focused.",
+  "category": "logos",
+  "site": "increase",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "framed",
+    "hairline",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only; stops under reduced motion",
+    "each wordmark sits in a 156px cell; pass at least eight so the strip is always full"
+  ],
+  "entry": "increase-logos.tsx",
+  "source": "foundry",
+  "name": "increase-logos",
+  "files": [
+    {
+      "path": "increase-logos.css",
+      "content": "/* The logo track holds the list twice; sliding it by half its width loops seamlessly.\n   Slow (54s for a lap), linear, and it stops while the pointer or focus is on the strip. */\n.increase-logos-track {\n  animation: increase-logos-marquee 54s linear infinite;\n}\n\n.increase-logos:hover .increase-logos-track,\n.increase-logos:focus-within .increase-logos-track {\n  animation-play-state: paused;\n}\n\n@keyframes increase-logos-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .increase-logos-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "increase-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./increase-logos.css\";\n\nexport interface IncreaseLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text), about 24px tall */\n  logo: ReactNode;\n}\n\nexport interface IncreaseLogosProps {\n  /** the customer wordmarks; eight or more fill a desktop row */\n  logos: IncreaseLogo[];\n  className?: string;\n}\n\n/** A framed strip of customer wordmarks sliding slowly left for ever; it pauses on hover. */\nexport function IncreaseLogos({ logos, className }: IncreaseLogosProps) {\n  // the list twice, so the track can slide by half its width and start over unnoticed\n  const loop = [...logos, ...logos];\n  return (\n    <section className={cn(\"increase-logos border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page overflow-clip border-x border-border\">\n        <ul className=\"increase-logos-track flex w-max items-center\">\n          {loop.map((item, i) => (\n            <li\n              key={`${item.name}-${i}`}\n              aria-hidden={i >= logos.length ? true : undefined}\n              className=\"flex h-[5.875rem] w-[9.75rem] shrink-0 items-center justify-center text-foreground [&_svg]:h-6 [&_svg]:w-auto\"\n            >\n              <span role=\"img\" aria-label={item.name} className=\"flex items-center\">\n                {item.logo}\n              </span>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "IncreaseLogo[]",
+      "required": true,
+      "description": "the customer wordmarks; eight or more fill a desktop row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cbebdd1e91a7e924e22b9c8a03404fa453248bd7667e4c3fe0d31c5d6b0945b6"
+}

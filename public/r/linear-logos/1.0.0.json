@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear logo row",
+  "description": "A row of white customer wordmarks spread edge to edge across the page frame, with a small grey monospace caption in capitals under it. On phones the row becomes a slow, endless marquee sliding left.",
+  "category": "logos",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "dark",
+    "minimal",
+    "marquee",
+    "mono",
+    "loop"
+  ],
+  "notes": [
+    "seven logos fit the desktop row; phones loop the same list (it is drawn twice for a seamless loop)",
+    "CSS only; with reduced motion the phone row stays still and can be swiped"
+  ],
+  "entry": "linear-logos.tsx",
+  "source": "foundry",
+  "name": "linear-logos",
+  "files": [
+    {
+      "path": "linear-logos.css",
+      "content": "/* Phones: the list is drawn twice side by side; sliding by half the track loops seamlessly. */\n.linear-logos-track {\n  animation: linear-logos-scroll 30s linear infinite;\n}\n\n@keyframes linear-logos-scroll {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (min-width: 64rem) {\n  .linear-logos-track { animation: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .linear-logos-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "linear-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./linear-logos.css\";\n\nexport interface LinearLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n}\n\nexport interface LinearLogosProps {\n  /** the wordmarks; seven fill the desktop row */\n  logos: LinearLogo[];\n  /** the small monospace line under the row */\n  caption?: ReactNode;\n  className?: string;\n}\n\n/** Customer wordmarks in one row (a marquee on phones) with a mono caption. */\nexport function LinearLogos({ logos, caption, className }: LinearLogosProps) {\n  const item = (l: LinearLogo, i: number, copy: boolean) => (\n    <li\n      key={`${copy ? \"b\" : \"a\"}-${l.name}-${i}`}\n      aria-hidden={copy || undefined}\n      className={cn(\"flex h-10 shrink-0 items-center text-foreground [&_svg]:h-5 [&_svg]:w-auto lg:[&_svg]:h-6\", copy && \"lg:hidden\")}\n    >\n      <span role=\"img\" aria-label={l.name} className=\"flex items-center\">\n        {l.logo}\n      </span>\n    </li>\n  );\n\n  return (\n    <section className={cn(\"bg-background pt-10 pb-14 text-foreground lg:pt-28 lg:pb-24\", className)}>\n      <div className=\"overflow-clip lg:mx-auto lg:max-w-[calc(var(--page-width)+2*var(--page-gutter))] lg:px-gutter\">\n        <ul className=\"linear-logos-track flex w-max gap-10 pr-10 lg:w-full lg:justify-between lg:gap-6 lg:pr-0\">\n          {logos.map((l, i) => item(l, i, false))}\n          {logos.map((l, i) => item(l, i, true))}\n        </ul>\n      </div>\n      {caption && (\n        <p className=\"mx-auto mt-10 max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter font-mono text-xs tracking-[0.02em] text-muted-foreground/70 uppercase\">\n          {caption}\n        </p>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "LinearLogo[]",
+      "required": true,
+      "description": "the wordmarks; seven fill the desktop row"
+    },
+    {
+      "name": "caption",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small monospace line under the row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "275b402bf4cf504983041e980a02b332ca0b96a67a054ee84cc6f961748fe98a"
+}

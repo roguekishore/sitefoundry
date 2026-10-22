@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Apexspace footer",
+  "description": "A charcoal footer over a faint full-bleed backdrop. Left: the wordmark, a full-width black contact bar with an arrow, a mono 'subscribe' label, an outlined email field with an arrow button and a small consent line. Right, from about 44%: four columns of uppercase mono links (white heading, grey links that turn white on hover) and a copyright line with social icons. On phones everything stacks: wordmark, link groups, contact, subscribe, socials, copyright.",
+  "category": "footer",
+  "site": "apexspace",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "newsletter",
+    "mono",
+    "uppercase",
+    "dark",
+    "hairline",
+    "hover"
+  ],
+  "notes": [
+    "backdrop is a media slot (a faint line drawing in the original, cropped like object-fit: cover); empty shows a faint muted tint",
+    "the email field is a plain form: point action at your own endpoint"
+  ],
+  "entry": "apexspace-footer.tsx",
+  "source": "foundry",
+  "name": "apexspace-footer",
+  "files": [
+    {
+      "path": "apexspace-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ApexspaceButton } from \"@foundry/apexspace-button\";\nimport { ApexspaceWordmark, type ApexspaceWordmarkProps } from \"@foundry/apexspace-wordmark\";\n\nexport interface ApexspaceFooterColumn {\n  heading: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface ApexspaceFooterProps {\n  /** the logo, top left */\n  wordmark: ApexspaceWordmarkProps;\n  /** the black contact bar */\n  contact: { label: string; href: string };\n  /** the newsletter sign-up */\n  subscribe: {\n    /** the mono label over the field */\n    label: string;\n    /** the field's placeholder */\n    placeholder: string;\n    /** screen-reader label for the arrow button */\n    submitLabel: string;\n    /** where the form posts */\n    action: string;\n    /** the consent line, followed by the policy link */\n    consent: string;\n    policy: { label: string; href: string };\n  };\n  /** the link columns, four in a row on desktop */\n  columns: ApexspaceFooterColumn[];\n  /** the copyright line */\n  copyright: string;\n  /** social links, shown as icons */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** the faint full-bleed backdrop (cropped like object-fit: cover); empty shows a faint tint */\n  media?: ReactNode;\n  className?: string;\n}\n\nconst mono = \"font-mono text-[0.75rem] leading-[1.4] tracking-[0.06em] uppercase\";\n\n/** Wordmark, contact and sign-up left; mono link columns, copyright and socials right. */\nexport function ApexspaceFooter({ wordmark, contact, subscribe, columns, copyright, socials, media, className }: ApexspaceFooterProps) {\n  return (\n    <footer className={cn(\"relative isolate overflow-clip bg-background text-foreground\", className)}>\n      <div aria-hidden className=\"absolute inset-0 -z-10 [&>*]:size-full [&>img]:object-cover [&>video]:object-cover\">{media ?? <div className=\"bg-muted/15\" />}</div>\n\n      {/* Phones: the four parts stack in source order. Desktop: brand and contact share the left\n          column, links and the copyright row the right one (from 44%). */}\n      <div className=\"grid grid-cols-1 gap-y-8 px-gutter py-[3.75rem] lg:grid-cols-[44.1%_minmax(0,1fr)] lg:gap-y-0 lg:py-20\">\n        <div className=\"lg:col-start-1 lg:row-start-1\">\n          <ApexspaceWordmark {...wordmark} size=\"lg\" />\n        </div>\n\n        <div className=\"grid gap-[2.6rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-[48rem] lg:grid-cols-4 lg:gap-4\">\n          {columns.map((col) => (\n            <div key={col.heading}>\n              <p className={mono}>{col.heading}</p>\n              <ul className=\"mt-[0.3rem] flex flex-col gap-[0.3rem] lg:mt-[0.45rem] lg:gap-[0.45rem]\">\n                {col.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={cn(mono, \"block w-fit text-muted-foreground transition-colors duration-300 ease-[ease] hover:text-foreground motion-reduce:transition-none\")}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n\n        <div className=\"lg:col-start-1 lg:row-span-2 lg:row-start-2 lg:mt-[3.75rem] lg:max-w-[22rem]\">\n          <ApexspaceButton {...contact} variant=\"dark\" className=\"h-[3.125rem] w-full justify-between px-8\" />\n          <form action={subscribe.action} className=\"mt-6 lg:mt-14\">\n            <label className={cn(mono, \"block\")}>\n              {subscribe.label}\n              <span className=\"mt-4 flex h-[3.125rem] items-center border border-foreground/30 transition-colors duration-300 focus-within:border-foreground\">\n                <input\n                  type=\"email\"\n                  name=\"email\"\n                  placeholder={subscribe.placeholder}\n                  className=\"h-full min-w-0 flex-1 bg-transparent px-4 font-sans text-base tracking-normal normal-case placeholder:text-muted-foreground focus:outline-none\"\n                />\n                <button type=\"submit\" aria-label={subscribe.submitLabel} className=\"flex h-full w-12 items-center justify-center\">\n                  <ArrowRight aria-hidden className=\"size-3.5\" strokeWidth={1.5} />\n                </button>\n              </span>\n            </label>\n            <p className=\"mt-6 text-[0.8125rem] leading-[1.4]\">\n              {subscribe.consent}{\" \"}\n              <a href={subscribe.policy.href} className=\"underline underline-offset-2\">\n                {subscribe.policy.label}\n              </a>\n            </p>\n          </form>\n        </div>\n\n        <div className=\"flex flex-col-reverse gap-12 lg:col-start-2 lg:row-start-3 lg:flex-row lg:items-center lg:gap-16 lg:self-end\">\n          <p className=\"text-base leading-[1.4]\">{copyright}</p>\n          <ul className=\"flex items-center gap-3\">\n            {socials.map((s) => (\n              <li key={s.label}>\n                <a href={s.href} aria-label={s.label} className=\"flex size-5 items-center justify-center transition-colors duration-300 hover:text-muted-foreground motion-reduce:transition-none [&>svg]:size-4\">\n                  {s.icon}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "apexspace-button",
+    "apexspace-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "ApexspaceWordmarkProps",
+      "required": true,
+      "description": "the logo, top left"
+    },
+    {
+      "name": "contact",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the black contact bar"
+    },
+    {
+      "name": "subscribe",
+      "type": "{ label: string; placeholder: string; submitLabel: string; action: string; consent: string; policy: { label: string; href: string; }; }",
+      "required": true,
+      "description": "the newsletter sign-up"
+    },
+    {
+      "name": "columns",
+      "type": "ApexspaceFooterColumn[]",
+      "required": true,
+      "description": "the link columns, four in a row on desktop"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links, shown as icons"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the faint full-bleed backdrop (cropped like object-fit: cover); empty shows a faint tint"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a6600080715eb9a2700c87eafc7427dc31aae8b150e77e70d99bd03614c0e904"
+}

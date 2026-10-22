@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column footer",
+  "description": "The bottom of a soft grey inset panel: a large, faint, embossed-looking wordmark on the left and airy link columns on the right (navy headings, grey links on generous 44px rows, a long product list split over two columns). Links darken over 0.2s on hover. Phones stack everything.",
+  "category": "footer",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "light",
+    "grey",
+    "panel",
+    "minimal",
+    "airy"
+  ],
+  "notes": [
+    "continues column-cta's inset panel; set open={false} to give it its own rounded top when used alone",
+    "a group with columns: 2 splits its links over two columns on desktop"
+  ],
+  "entry": "column-footer.tsx",
+  "source": "foundry",
+  "name": "column-footer",
+  "files": [
+    {
+      "path": "column-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ColumnFooterGroup {\n  title: string;\n  links: { label: string; href: string }[];\n  /** split the links over two columns on desktop (the second has no heading) */\n  columns?: 1 | 2;\n}\n\nexport interface ColumnFooterProps {\n  /** the wordmark, set large and faint */\n  brand: ReactNode;\n  /** the link columns */\n  groups: ColumnFooterGroup[];\n  /** a small line at the very bottom, e.g. legal text */\n  legal?: string;\n  /** continue the panel above (column-cta); off: a panel of its own */\n  open?: boolean;\n  className?: string;\n}\n\nfunction Links({ links }: { links: ColumnFooterGroup[\"links\"] }) {\n  return (\n    <ul className=\"mt-5 flex flex-col\">\n      {links.map((l) => (\n        <li key={l.label}>\n          <a href={l.href} className=\"block py-[0.8125rem] lg:py-[0.9375rem] text-[0.9375rem]/[1.1] text-muted-foreground transition-colors duration-200 ease-[ease] hover:text-foreground lg:text-sm/[1.1]\">\n            {l.label}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\nexport function ColumnFooter({ brand, groups, legal, open = true, className }: ColumnFooterProps) {\n  return (\n    <footer className={cn(\"bg-background px-3 pb-3\", !open && \"pt-3\", className)}>\n      <div className={cn(\"border border-border bg-muted px-[1.3125rem] pt-24 pb-16 text-foreground lg:pt-[7.5rem] lg:pb-[9.5rem]\", open ? \"rounded-b-xl border-t-0\" : \"rounded-xl\")}>\n        <div className=\"mx-auto max-w-page lg:grid lg:grid-cols-[18.75rem_1fr]\">\n          <div className=\"font-display text-[1.75rem] font-semibold tracking-[-0.045em] text-muted-foreground/25 [text-shadow:0_1px_0_var(--secondary)] lg:-mt-2 lg:text-[2.125rem]\">{brand}</div>\n          <div className=\"mt-12 grid gap-11 lg:mt-0 lg:grid-cols-4 lg:gap-0\">\n            {groups.map((g) => {\n              const half = Math.ceil(g.links.length / 2);\n              return g.columns === 2 ? (\n                <div key={g.title} className=\"lg:col-span-2\">\n                  <p className=\"text-[0.9375rem] font-medium lg:text-sm\">{g.title}</p>\n                  <div className=\"flex flex-col gap-12 lg:grid lg:grid-cols-2 lg:gap-0\">\n                    <Links links={g.links.slice(0, half)} />\n                    <Links links={g.links.slice(half)} />\n                  </div>\n                </div>\n              ) : (\n                <div key={g.title}>\n                  <p className=\"text-[0.9375rem] font-medium lg:text-sm\">{g.title}</p>\n                  <Links links={g.links} />\n                </div>\n              );\n            })}\n          </div>\n        </div>\n        {legal && <p className=\"mx-auto mt-16 max-w-page text-xs text-muted-foreground/80\">{legal}</p>}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark, set large and faint"
+    },
+    {
+      "name": "groups",
+      "type": "ColumnFooterGroup[]",
+      "required": true,
+      "description": "the link columns"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": false,
+      "description": "a small line at the very bottom, e.g. legal text"
+    },
+    {
+      "name": "open",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "continue the panel above (column-cta); off: a panel of its own"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5a5ecf6eb87e35e61af877fb08410ff4517a0ed0c566383fb9a841d9e7caf8a4"
+}

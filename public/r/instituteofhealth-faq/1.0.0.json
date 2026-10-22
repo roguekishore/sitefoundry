@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health FAQ",
+  "description": "A grey FAQ band split down the middle: a large two-line heading with a small 'need help' prompt and a dark button on the left, and on the right a list of questions between hairlines, each with a flat grey square plus that turns into a cross as its answer eases open. Phones stack heading, list, then the prompt and a full-width button.",
+  "category": "faq",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "details",
+    "split",
+    "hairline",
+    "minimal",
+    "greyscale"
+  ],
+  "notes": [
+    "native <details> (one open at a time via name=); no JavaScript needed"
+  ],
+  "entry": "instituteofhealth-faq.tsx",
+  "source": "foundry",
+  "name": "instituteofhealth-faq",
+  "files": [
+    {
+      "path": "instituteofhealth-faq.css",
+      "content": "/* An opened answer eases down into place. */\ndetails[open] > .ioh-faq-answer {\n  animation: instituteofhealth-faq-open 0.4s ease both;\n}\n\n@keyframes instituteofhealth-faq-open {\n  from { opacity: 0; transform: translateY(-6px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  details[open] > .ioh-faq-answer { animation: none; }\n}\n"
+    },
+    {
+      "path": "instituteofhealth-faq.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { InstituteofhealthButton } from \"@foundry/instituteofhealth-button\";\nimport { InstituteofhealthIconButton } from \"@foundry/instituteofhealth-icon-button\";\nimport \"./instituteofhealth-faq.css\";\n\nexport interface InstituteofhealthFaqItem {\n  question: string;\n  answer: string;\n}\n\nexport interface InstituteofhealthFaqProps {\n  /** the large heading on the left */\n  heading: string;\n  /** the questions, in order */\n  items: InstituteofhealthFaqItem[];\n  /** a short two-line prompt above the button, one entry per line */\n  helpLines?: string[];\n  /** the dark button under the prompt */\n  action?: { label: string; href: string };\n  className?: string;\n}\n\nexport function InstituteofhealthFaq({ heading, items, helpLines = [], action, className }: InstituteofhealthFaqProps) {\n  const help = (helpLines.length > 0 || action) && (\n    <div>\n      {helpLines.length > 0 && (\n        <p className=\"text-[0.8775rem] leading-[1.25] font-medium tracking-[-0.03em] lg:text-[0.765rem]\">\n          {helpLines.map((l) => (\n            <span key={l} className=\"block\">\n              {l}\n            </span>\n          ))}\n        </p>\n      )}\n      {action && (\n        <InstituteofhealthButton href={action.href} className=\"mt-4 w-full lg:mt-3 lg:w-[15.2rem]\">\n          {action.label}\n        </InstituteofhealthButton>\n      )}\n    </div>\n  );\n\n  return (\n    <section className={cn(\"bg-muted pt-14 pb-14 text-foreground lg:py-[7rem]\", className)}>\n      <div className=\"grid gap-7 px-gutter lg:grid-cols-2 lg:items-center lg:gap-0\">\n        <div className=\"lg:pr-gutter\">\n          <h2 className=\"max-w-[16rem] font-display text-[1.46rem] leading-[1.2] font-medium tracking-[-0.03em] lg:max-w-[33rem] lg:text-[3.15rem] lg:leading-none lg:tracking-[-0.035em]\">\n            {heading}\n          </h2>\n          <div className=\"mt-[3.6rem] hidden lg:block\">{help}</div>\n        </div>\n\n        <div className=\"border-t border-border\">\n          {items.map((it) => (\n            <details key={it.question} name=\"ioh-faq\" className=\"group border-b border-border\">\n              <summary className=\"flex min-h-[3.1rem] cursor-pointer list-none items-center justify-between gap-6 py-2 transition-opacity duration-400 hover:opacity-95 lg:min-h-[3.8rem] [&::-webkit-details-marker]:hidden\">\n                <span className=\"text-[1.097rem] leading-[1.3] font-medium tracking-[-0.025em] lg:text-[1.035rem] lg:tracking-[-0.02em]\">{it.question}</span>\n                <InstituteofhealthIconButton as=\"span\" icon=\"plus\" className=\"size-8 lg:size-9\" />\n              </summary>\n              <p className=\"ioh-faq-answer max-w-[36rem] pr-12 pb-5 text-[0.975rem] leading-[1.45] font-normal tracking-[-0.01em] text-muted-foreground lg:text-[0.945rem]\">\n                {it.answer}\n              </p>\n            </details>\n          ))}\n        </div>\n\n        <div className=\"mt-3 lg:hidden\">{help}</div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "instituteofhealth-button",
+    "instituteofhealth-icon-button"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the large heading on the left"
+    },
+    {
+      "name": "items",
+      "type": "InstituteofhealthFaqItem[]",
+      "required": true,
+      "description": "the questions, in order"
+    },
+    {
+      "name": "helpLines",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "a short two-line prompt above the button, one entry per line"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the dark button under the prompt"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "136c78315a837cbef8de124c32cb94fd51b6c794669307a1dca5897085c6a4fd"
+}

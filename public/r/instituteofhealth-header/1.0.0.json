@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health header",
+  "description": "Two navs in one. Phones: a fixed 64px top bar with the wordmark and a 'Menu' label beside a two-line burger, see-through with light text over the first screen and page-grey after it; the burger opens a full-screen list of large links. From 1024px: a flat 60px bar docked to the bottom of the window with the wordmark, five centred small links, two more on the right and a dark login button; it slides down out of view while you scroll down and comes back when you scroll up.",
+  "category": "header",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "bottom-bar",
+    "hide-on-scroll",
+    "transparent",
+    "minimal",
+    "greyscale",
+    "fullscreen-menu"
+  ],
+  "notes": [
+    "needs JavaScript for the menu, the hide-on-scroll and the colour switch (hydrate: load)",
+    "fixed: it takes no space; the first section sits under the phone bar",
+    "the phone bar's light text over the first screen expects a dark hero (it uses highlight-foreground); set overMedia={false} otherwise"
+  ],
+  "entry": "instituteofhealth-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "instituteofhealth-header",
+  "files": [
+    {
+      "path": "instituteofhealth-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { CornerDownRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface InstituteofhealthNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface InstituteofhealthHeaderProps {\n  /** the wordmark (text, svg or img); it inherits the bar's text colour */\n  brand: ReactNode;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** the links centred in the desktop bar (and listed first in the phone menu) */\n  links: InstituteofhealthNavLink[];\n  /** the links at the right of the desktop bar, before the button */\n  sideLinks?: InstituteofhealthNavLink[];\n  /** the dark button at the far right of the desktop bar (and at the foot of the phone menu) */\n  action: { label: string; href: string };\n  /** the word next to the burger */\n  menuLabel: string;\n  /** the word next to the burger while the menu is open */\n  closeLabel: string;\n  /** light text on a see-through phone bar until you scroll past the first screen (a dark hero) */\n  overMedia?: boolean;\n  className?: string;\n}\n\nconst smallLink = \"text-[0.765rem] font-medium tracking-[-0.02em] transition-opacity duration-400 ease-[ease] hover:opacity-65 motion-reduce:transition-none\";\n\nexport function InstituteofhealthHeader({\n  brand,\n  brandHref = \"/\",\n  links,\n  sideLinks = [],\n  action,\n  menuLabel,\n  closeLabel,\n  overMedia = true,\n  className,\n}: InstituteofhealthHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [hidden, setHidden] = useState(false);\n  const [pastFirstScreen, setPastFirstScreen] = useState(false);\n\n  // Desktop bar: hide while scrolling down past 100px, show again on the way up.\n  // Phone bar: switch from see-through to solid once the first screen has scrolled by.\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      setPastFirstScreen(y > window.innerHeight - 64);\n      if (Math.abs(y - last) < 6) return;\n      setHidden(y > last && y > 100);\n      last = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  const light = overMedia && !pastFirstScreen && !open;\n\n  return (\n    <>\n      {/* Phones: top bar */}\n      <header\n        className={cn(\n          \"fixed inset-x-0 top-0 z-50 lg:hidden\",\n          \"transition-[background-color,color] duration-400 ease-[ease] motion-reduce:transition-none\",\n          light ? \"bg-transparent text-highlight-foreground\" : \"bg-background text-foreground\",\n          className,\n        )}\n      >\n        <nav className=\"flex h-16 items-center justify-between px-gutter\">\n          <a href={brandHref} className=\"flex items-center\">\n            {brand}\n          </a>\n          <button\n            type=\"button\"\n            aria-expanded={open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"flex items-center gap-3.5 text-[0.975rem] leading-none font-medium tracking-[-0.03em]\"\n          >\n            {open ? closeLabel : menuLabel}\n            <span aria-hidden className=\"relative block h-2 w-7\">\n              <span\n                className={cn(\n                  \"absolute inset-x-0 top-0 h-0.5 bg-current transition-transform duration-400 motion-reduce:transition-none\",\n                  open && \"translate-y-[3px] rotate-45\",\n                )}\n              />\n              <span\n                className={cn(\n                  \"absolute inset-x-0 bottom-0 h-0.5 bg-current transition-transform duration-400 motion-reduce:transition-none\",\n                  open && \"-translate-y-[3px] -rotate-45\",\n                )}\n              />\n            </span>\n          </button>\n        </nav>\n        {open && (\n          <div className=\"flex h-[calc(100svh-4rem)] flex-col justify-between bg-background px-gutter pt-6 pb-8\">\n            <ul className=\"flex flex-col gap-1\">\n              {[...links, ...sideLinks].map((l) => (\n                <li key={l.label}>\n                  <a\n                    href={l.href}\n                    className=\"block py-1 font-display text-[2.07rem] leading-[1.1] font-medium tracking-[-0.03em] transition-opacity duration-400 hover:opacity-65\"\n                  >\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <a\n              href={action.href}\n              className=\"flex h-12 items-center justify-center gap-2 rounded-md bg-primary text-[0.975rem] font-medium tracking-[-0.03em] text-primary-foreground\"\n            >\n              <CornerDownRight aria-hidden className=\"size-4\" strokeWidth={1.5} />\n              {action.label}\n            </a>\n          </div>\n        )}\n      </header>\n\n      {/* Desktop: bar docked to the bottom of the window */}\n      <header\n        className={cn(\n          \"fixed inset-x-0 bottom-0 z-50 hidden bg-background text-foreground lg:block\",\n          \"transition-transform duration-400 ease-[ease] motion-reduce:transition-none\",\n          hidden && \"translate-y-full\",\n        )}\n      >\n        <nav className=\"relative flex h-[3.75rem] items-center justify-between px-gutter\">\n          <a href={brandHref} className=\"flex items-center\">\n            {brand}\n          </a>\n          <ul className=\"absolute left-1/2 flex -translate-x-1/2 items-center gap-6\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={smallLink}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <div className=\"flex items-center gap-6\">\n            {sideLinks.map((l) => (\n              <a key={l.label} href={l.href} className={smallLink}>\n                {l.label}\n              </a>\n            ))}\n            <a\n              href={action.href}\n              className=\"-mr-[0.5rem] flex h-[2.875rem] items-center gap-2 rounded-md border-2 border-primary bg-primary px-6 text-[0.765rem] font-medium tracking-[-0.02em] text-primary-foreground transition-[border-color] duration-[450ms] ease-[ease] hover:border-muted-foreground motion-reduce:transition-none\"\n            >\n              <CornerDownRight aria-hidden className=\"size-4\" strokeWidth={1.5} />\n              {action.label}\n            </a>\n          </div>\n        </nav>\n      </header>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (text, svg or img); it inherits the bar's text colour"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "InstituteofhealthNavLink[]",
+      "required": true,
+      "description": "the links centred in the desktop bar (and listed first in the phone menu)"
+    },
+    {
+      "name": "sideLinks",
+      "type": "InstituteofhealthNavLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "the links at the right of the desktop bar, before the button"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the dark button at the far right of the desktop bar (and at the foot of the phone menu)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word next to the burger"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word next to the burger while the menu is open"
+    },
+    {
+      "name": "overMedia",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "light text on a see-through phone bar until you scroll past the first screen (a dark hero)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cf7bccfecbc96d15b362bfa6c8f8f9d7f2fa9c21b3662ce6d815481281105bd8"
+}

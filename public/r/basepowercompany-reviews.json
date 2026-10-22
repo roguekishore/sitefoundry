@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power reviews track",
+  "description": "A heading with a star score and a green link, then a sideways track that mixes white review cards (yellow stars, a five-line quote, the reviewer) with wider dark photo cards holding a member's pull quote and a lime link. Swipe it, or step through with two small square arrow buttons; it snaps card by card.",
+  "category": "testimonials",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "reviews",
+    "carousel",
+    "scroll-snap",
+    "stars",
+    "light",
+    "dark-cards"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows only; the track swipes and snaps without it",
+    "story cards carry the dark class themselves"
+  ],
+  "hydrate": "visible",
+  "entry": "basepowercompany-reviews.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-reviews",
+  "files": [
+    {
+      "path": "basepowercompany-reviews.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight, Star } from \"lucide-react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyMedia } from \"@foundry/basepowercompany-media\";\nimport { BasepowercompanyRating, type BasepowercompanyRatingProps } from \"@foundry/basepowercompany-rating\";\n\nexport interface BasepowercompanyReview {\n  /** a written review: white card */\n  kind: \"review\";\n  /** the review text (clamped to five lines) */\n  quote: string;\n  /** who wrote it */\n  author: string;\n  /** one letter for the review site's disc */\n  sourceInitial: string;\n  /** how many stars */\n  stars?: number;\n}\n\nexport interface BasepowercompanyStory {\n  /** a member story: wide photo card */\n  kind: \"story\";\n  /** a short pull quote */\n  quote: string;\n  /** name and place */\n  byline: string;\n  /** the lime link to the full story */\n  link: { label: string; href: string };\n  /** the photo behind (under a dark scrim) */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n}\n\nexport interface BasepowercompanyReviewsProps {\n  /** the section heading */\n  title: string;\n  /** the score row under the heading */\n  rating: BasepowercompanyRatingProps;\n  /** the link beside the score */\n  link?: { label: string; href: string };\n  /** reviews and stories, in order along the track */\n  items: (BasepowercompanyReview | BasepowercompanyStory)[];\n  /** screen-reader labels for the arrow buttons */\n  prevLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\nconst cardBase = \"h-[17.5rem] shrink-0 snap-start overflow-clip rounded-[calc(var(--radius)*2.5)]\";\n\n/*\n * Social proof: a heading with the score, then a sideways track mixing white review cards and\n * wider dark photo cards for member stories. Swipe it, or step through with the arrows.\n */\nexport function BasepowercompanyReviews({ title, rating, link, items, prevLabel = \"Previous\", nextLabel = \"Next\", className }: BasepowercompanyReviewsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const reduce = useReducedMotion();\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    if (!el) return;\n    const first = el.querySelector(\"li\");\n    const by = first ? first.getBoundingClientRect().width + 24 : el.clientWidth * 0.8;\n    el.scrollBy({ left: dir * by, behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-background py-12 text-foreground lg:pt-[5.5rem] lg:pb-16\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <h2 className=\"max-w-[20ch] font-display text-[2rem] leading-[1.2] font-bold tracking-[-0.025em] lg:max-w-none lg:text-[2.5rem] lg:leading-[1.1]\">{title}</h2>\n        <div className=\"mt-4 flex flex-col gap-3 lg:mt-3 lg:flex-row lg:items-center lg:gap-3.5\">\n          <BasepowercompanyRating {...rating} />\n          {link && (\n            <a\n              href={link.href}\n              className=\"group inline-flex items-center gap-1.5 text-sm font-bold text-primary transition-opacity duration-150 hover:opacity-70 motion-reduce:transition-none\"\n            >\n              {link.label}\n              <ChevronRight aria-hidden className=\"size-4 stroke-2\" />\n            </a>\n          )}\n        </div>\n      </div>\n\n      <ul\n        ref={track}\n        className=\"mt-8 flex snap-x snap-mandatory scroll-px-6 gap-6 overflow-x-auto px-6 [scrollbar-width:none] lg:mt-11 lg:scroll-px-[calc(var(--page-gutter)+0.25rem)] lg:px-[calc(var(--page-gutter)+0.25rem)] [&::-webkit-scrollbar]:hidden\"\n      >\n        {items.map((it, i) =>\n          it.kind === \"review\" ? (\n            <li key={i} className={cn(cardBase, \"flex w-[calc(100vw-3rem)] max-w-[23.75rem] flex-col bg-card p-6 text-card-foreground\")}>\n              <div className=\"flex gap-1\" role=\"img\" aria-label={`${it.stars ?? 5} / 5`}>\n                {Array.from({ length: it.stars ?? 5 }, (_, s) => (\n                  <Star key={s} aria-hidden className=\"size-[1.125rem] fill-chart-4 text-chart-4\" strokeWidth={1.5} />\n                ))}\n              </div>\n              <blockquote className=\"mt-4 line-clamp-6 text-base leading-6 tracking-[-0.005em]\">{it.quote}</blockquote>\n              <p className=\"mt-auto flex items-center gap-2.5 text-xs font-bold\">\n                <span aria-hidden className=\"flex size-4 items-center justify-center rounded-full text-[0.625rem] font-bold text-primary ring-1 ring-border\">\n                  {it.sourceInitial}\n                </span>\n                {it.author}\n              </p>\n            </li>\n          ) : (\n            <li key={i} className={cn(cardBase, \"dark relative isolate flex w-[calc(100vw-3rem)] max-w-[35rem] flex-col justify-center bg-background px-8 text-foreground\")}>\n              <BasepowercompanyMedia media={it.media} tone=\"photo\" label={it.mediaLabel} className=\"absolute inset-0 -z-10\" />\n              <div aria-hidden className=\"absolute inset-0 -z-10 bg-background/55\" />\n              <blockquote className=\"font-display text-xl leading-[1.35] font-bold tracking-[-0.025em]\">{it.quote}</blockquote>\n              <p className=\"mt-3 text-sm leading-[1.5] font-semibold text-foreground/85\">{it.byline}</p>\n              <a\n                href={it.link.href}\n                className=\"mt-4 inline-flex items-center gap-1.5 self-start text-sm font-bold text-accent transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none\"\n              >\n                {it.link.label}\n                <ChevronRight aria-hidden className=\"size-4 stroke-2\" />\n              </a>\n            </li>\n          ),\n        )}\n      </ul>\n\n      <div className=\"mx-auto mt-10 flex max-w-page justify-center gap-3 px-gutter lg:justify-start\">\n        {([-1, 1] as const).map((d) => (\n          <button\n            key={d}\n            type=\"button\"\n            aria-label={d < 0 ? prevLabel : nextLabel}\n            onClick={() => step(d)}\n            className=\"flex size-11 items-center justify-center rounded-lg border border-border bg-card text-card-foreground transition-colors duration-150 hover:bg-accent/40 motion-reduce:transition-none\"\n          >\n            {d < 0 ? <ChevronLeft aria-hidden className=\"size-5 stroke-[1.5]\" /> : <ChevronRight aria-hidden className=\"size-5 stroke-[1.5]\" />}\n          </button>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "basepowercompany-media",
+    "basepowercompany-rating",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "rating",
+      "type": "BasepowercompanyRatingProps",
+      "required": true,
+      "description": "the score row under the heading"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the link beside the score"
+    },
+    {
+      "name": "items",
+      "type": "(BasepowercompanyReview | BasepowercompanyStory)[]",
+      "required": true,
+      "description": "reviews and stories, in order along the track"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": false,
+      "default": "Previous",
+      "description": "screen-reader labels for the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "default": "Next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6c10c72f4c7635e60ff01297244d5eb991c4b3bd627e92c852a5869248c665b8"
+}

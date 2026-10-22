@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear feature section",
+  "description": "A product-area section under a full-width hairline: a 48px two-line title on the left, a 24px pale description and a grey 'Learn more →' on the right, then a wide product-window slot whose edges fade into the page, and a small 'Features' index of links with plus signs in two columns split by a vertical hairline. On phones the window comes first as a full-bleed band, cropped off the right edge, followed by the title and text.",
+  "category": "features",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "minimal",
+    "hairline",
+    "product-shot",
+    "two-column",
+    "fade",
+    "mask"
+  ],
+  "notes": [
+    "made to repeat: the page stacks four of these, one per product area",
+    "media: a product screenshot or video at ~2.36:1 (390×312 band on phones); empty, a bordered placeholder panel",
+    "the feature index is hidden on phones, as on the original"
+  ],
+  "entry": "linear-feature.tsx",
+  "source": "foundry",
+  "name": "linear-feature",
+  "files": [
+    {
+      "path": "linear-feature.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LinearArrowLink } from \"@foundry/linear-arrow-link\";\nimport { LinearPlaceholder } from \"@foundry/linear-placeholder\";\n\nexport interface LinearFeatureLink {\n  label: string;\n  href: string;\n}\n\nexport interface LinearFeatureProps {\n  /** the two-line title (use a <br /> to choose the break) */\n  title: ReactNode;\n  /** the pale description beside it */\n  text: ReactNode;\n  /** the \"Learn more\" link under the description */\n  link?: LinearFeatureLink;\n  /** the product screenshot or video (~2.36:1); empty shows a placeholder panel */\n  media?: ReactNode;\n  /** a name for the placeholder, for screen readers */\n  mediaLabel?: string;\n  /** the small label before the feature index (e.g. \"Features\") */\n  indexLabel?: string;\n  /** the feature index: two columns of links (desktop only) */\n  index?: [LinearFeatureLink[], LinearFeatureLink[]];\n  className?: string;\n}\n\nconst frame = \"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter\";\n\n/** One product area: title and text, a wide fading product window, a small feature index. */\nexport function LinearFeature({ title, text, link, media, mediaLabel, indexLabel, index, className }: LinearFeatureProps) {\n  return (\n    <section className={cn(\"flex flex-col border-t border-border bg-background pb-12 text-foreground lg:pt-32 lg:pb-32\", className)}>\n      <div className={cn(frame, \"w-full lg:grid lg:grid-cols-2 lg:gap-16\")}>\n        <h2 className=\"mt-9 font-display text-2xl leading-[1.33] font-[510] tracking-[-0.012em] text-foreground lg:mt-0 lg:text-5xl lg:leading-none lg:tracking-[-0.022em]\">\n          {title}\n        </h2>\n        <div className=\"lg:-mt-1\">\n          <p className=\"mt-4 max-w-[35rem] text-[0.9375rem] leading-6 text-muted-foreground lg:mt-0 lg:text-2xl lg:leading-8 lg:text-foreground/85\">\n            {text}\n          </p>\n          {link && (\n            <LinearArrowLink href={link.href} className=\"mt-6 lg:mt-12\">\n              {link.label}\n            </LinearArrowLink>\n          )}\n        </div>\n      </div>\n\n      {/* phones: a full-bleed band before the text; desktop: a wide window under it */}\n      <div className=\"-order-1 w-full overflow-clip lg:order-none\">\n        <div className=\"mx-auto lg:max-w-[calc(var(--page-width)+2*var(--page-gutter))] lg:px-gutter\">\n          <div className=\"relative aspect-[1.25] overflow-clip [mask-image:linear-gradient(to_bottom,black_70%,transparent)] lg:-mx-5 lg:mt-[4.5rem] lg:aspect-[2.36] lg:[mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]\">\n            {media ?? (\n              <LinearPlaceholder\n                label={mediaLabel}\n                className=\"absolute top-10 bottom-0 left-[1.125rem] w-[150%] lg:inset-0 lg:w-auto\"\n              />\n            )}\n          </div>\n        </div>\n      </div>\n\n      {index && (\n        <div className={cn(frame, \"mt-32 hidden w-full grid-cols-2 gap-16 lg:grid\")}>\n          {indexLabel && <p className=\"text-[0.9375rem] leading-7 text-muted-foreground\">{indexLabel}</p>}\n          <div className=\"col-start-2 grid grid-cols-2\">\n            {index.map((col, c) => (\n              <ul key={c} className={cn(\"flex flex-col\", c === 1 && \"border-l border-border pl-8\")}>\n                {col.map((item) => (\n                  <li key={item.href}>\n                    <a\n                      href={item.href}\n                      className=\"group inline-flex items-center gap-2 text-[0.9375rem] leading-7 text-foreground/70 transition-colors duration-150 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:text-foreground motion-reduce:transition-none\"\n                    >\n                      {item.label}\n                      <Plus aria-hidden className=\"size-3.5 text-muted-foreground transition-colors duration-150 group-hover:text-foreground motion-reduce:transition-none\" strokeWidth={1.75} />\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ))}\n          </div>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "linear-arrow-link",
+    "linear-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the two-line title (use a <br /> to choose the break)"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the pale description beside it"
+    },
+    {
+      "name": "link",
+      "type": "LinearFeatureLink",
+      "required": false,
+      "description": "the \"Learn more\" link under the description"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product screenshot or video (~2.36:1); empty shows a placeholder panel"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "a name for the placeholder, for screen readers"
+    },
+    {
+      "name": "indexLabel",
+      "type": "string",
+      "required": false,
+      "description": "the small label before the feature index (e.g. \"Features\")"
+    },
+    {
+      "name": "index",
+      "type": "[LinearFeatureLink[], LinearFeatureLink[]]",
+      "required": false,
+      "description": "the feature index: two columns of links (desktop only)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "710c32be98c9c3cedcdafee3fa52a1bc0c2673dffe26dfda5486a5f5b62ed4f2"
+}

@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Apexspace bus card",
+  "description": "A black, hairline-outlined product card with small + crosshairs at its corners: a wide uppercase name and a row of orbit tags (solid border = standard, dashed = option, dim dashed = not offered), a 16:9 media frame in a tall empty field, two spec rows split by hairlines (mono label + icon left, big light figure with a unit and a grey note right), and a full-width bar in the product's tone whose text lightens on hover.",
+  "category": "card",
+  "site": "apexspace",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "product",
+    "specs",
+    "hairline",
+    "crosshair",
+    "mono",
+    "dark",
+    "tone",
+    "technical"
+  ],
+  "notes": [
+    "tone picks the product colour from chart-1 … chart-4 (tag borders and the bottom bar)",
+    "media is a 16:9 clip shown like object-fit: contain; empty shows a muted placeholder frame",
+    "the corner crosshairs sit 5px outside the card: leave a little room around it"
+  ],
+  "entry": "apexspace-bus-card.tsx",
+  "source": "foundry",
+  "name": "apexspace-bus-card",
+  "files": [
+    {
+      "path": "apexspace-bus-card.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ApexspaceButton } from \"@foundry/apexspace-button\";\n\nexport type ApexspaceTone = 1 | 2 | 3 | 4;\n\nexport interface ApexspaceBusTag {\n  /** short orbit or size name, e.g. \"LEO\" */\n  label: string;\n  /** standard (solid border) · option (dashed) · off (dim dashed, not offered) */\n  state: \"standard\" | \"option\" | \"off\";\n  /** a tone of its own instead of the card's */\n  tone?: ApexspaceTone;\n}\n\nexport interface ApexspaceBusStat {\n  /** the mono label, e.g. \"Payload mass\" */\n  label: string;\n  /** a small line icon under the label */\n  icon: ReactNode;\n  /** optional mono words before the figure, e.g. \"Up\\nto\" */\n  prefix?: string;\n  /** the figure, e.g. \"120\" */\n  value: string;\n  /** the unit beside the figure, e.g. \"KG\" or \"kW\" (kept as written) */\n  unit: string;\n  /** the grey note under the figure */\n  note: string;\n}\n\nexport interface ApexspaceBusCardProps {\n  /** the product name, set wide and uppercase */\n  name: string;\n  /** which product colour it uses (chart-1 … chart-4) */\n  tone: ApexspaceTone;\n  /** the orbit or size tags beside the name */\n  tags: ApexspaceBusTag[];\n  /** the 16:9 product clip (shown like object-fit: contain); empty shows a placeholder */\n  media?: ReactNode;\n  /** the spec rows (two in the original) */\n  stats: ApexspaceBusStat[];\n  /** the full-width bar at the bottom */\n  cta: { label: string; href: string };\n  className?: string;\n}\n\nconst toneBorder = { 1: \"border-chart-1\", 2: \"border-chart-2\", 3: \"border-chart-3\", 4: \"border-chart-4\" };\nconst toneBorderDim = { 1: \"border-chart-1/40\", 2: \"border-chart-2/40\", 3: \"border-chart-3/40\", 4: \"border-chart-4/40\" };\n\nconst corner = \"absolute size-2.5 text-foreground/40\";\n\n/** Outlined product card: name + orbit tags, media field, spec rows, tone bar. */\nexport function ApexspaceBusCard({ name, tone, tags, media, stats, cta, className }: ApexspaceBusCardProps) {\n  return (\n    <article className={cn(\"relative flex flex-col border border-border bg-card p-4 text-card-foreground\", className)}>\n      <Plus aria-hidden strokeWidth={1} className={cn(corner, \"-top-[5.5px] -left-[5.5px]\")} />\n      <Plus aria-hidden strokeWidth={1} className={cn(corner, \"-top-[5.5px] -right-[5.5px]\")} />\n      <Plus aria-hidden strokeWidth={1} className={cn(corner, \"-bottom-[5.5px] -left-[5.5px]\")} />\n      <Plus aria-hidden strokeWidth={1} className={cn(corner, \"-right-[5.5px] -bottom-[5.5px]\")} />\n\n      <div className=\"flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between\">\n        <h3 className=\"font-display text-[length:clamp(2.5rem,2.4rem_+_0.2vw,2.75rem)] leading-[0.8] font-medium tracking-[0.06em] uppercase\">{name}</h3>\n        <ul className=\"flex gap-[0.3125rem]\">\n          {tags.map((t) => {\n            const tagTone = t.tone ?? tone;\n            return (\n              <li\n                key={t.label}\n                className={cn(\n                  \"flex h-[2.1875rem] w-14 items-center justify-center border font-mono text-[0.75rem] leading-none uppercase\",\n                  t.state === \"standard\" && toneBorder[tagTone],\n                  t.state === \"option\" && cn(\"border-dashed\", toneBorder[tagTone]),\n                  t.state === \"off\" && cn(\"border-dashed text-foreground/25\", toneBorderDim[tagTone]),\n                )}\n              >\n                {t.label}\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n\n      <div className=\"flex h-[15rem] items-center justify-center lg:h-[21rem]\">\n        <div className=\"aspect-video w-full overflow-clip [&>*]:size-full [&>img]:object-contain [&>video]:object-contain\">{media ?? <div className=\"bg-muted\" />}</div>\n      </div>\n\n      {stats.map((s, i) => (\n        <div key={s.label} className=\"grid min-h-[8.75rem] grid-cols-2 gap-4 border-t border-border pt-4 pb-6 lg:min-h-[11rem]\">\n          <div>\n            <p className=\"font-mono text-[0.75rem] leading-[1.4] tracking-[0.06em] uppercase\">{s.label}</p>\n            <span aria-hidden className=\"mt-5 flex size-5 items-center text-foreground/80 [&>svg]:size-full\">\n              {s.icon}\n            </span>\n          </div>\n          <div>\n            <div className=\"flex items-start gap-3\">\n              {s.prefix && <span className=\"mt-0.5 font-mono text-[0.75rem] leading-[1.6] tracking-[0.06em] whitespace-pre-line uppercase\">{s.prefix}</span>}\n              <span\n                className={cn(\n                  i === 0 ? \"text-[length:clamp(1.8rem,1.464rem_+_1.429vw,2.75rem)]\" : \"text-[length:clamp(1.5625rem,1.2rem_+_1.43vw,2.5rem)]\",\n                  \"font-display leading-none font-light tracking-[-0.01em] whitespace-nowrap\",\n                )}\n              >\n                {s.value}\n              </span>\n              <span className=\"font-display text-[length:clamp(1.25rem,1.1rem_+_0.57vw,1.625rem)] leading-none font-light\">{s.unit}</span>\n            </div>\n            <p className=\"mt-4 text-[0.875rem] leading-[1.4] text-muted-foreground\">{s.note}</p>\n          </div>\n        </div>\n      ))}\n\n      <ApexspaceButton {...cta} variant=\"tone\" tone={tone} className=\"mt-auto\" />\n    </article>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "apexspace-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product name, set wide and uppercase"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": true,
+      "description": "which product colour it uses (chart-1 … chart-4)"
+    },
+    {
+      "name": "tags",
+      "type": "ApexspaceBusTag[]",
+      "required": true,
+      "description": "the orbit or size tags beside the name"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the 16:9 product clip (shown like object-fit: contain); empty shows a placeholder"
+    },
+    {
+      "name": "stats",
+      "type": "ApexspaceBusStat[]",
+      "required": true,
+      "description": "the spec rows (two in the original)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the full-width bar at the bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1f4f09d4bdb316783dd678626c6ceaa1a95f8c10fad7ac95e912c5694dbd6e13"
+}

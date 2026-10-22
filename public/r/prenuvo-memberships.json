@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo memberships",
+  "description": "A light section with an arced top and a cool grey-blue fog fading to white. A big centred headline and lead, then three dark plan cards in a row (stacked on phones): title, a small uppercase spec line, a hairline, a short description, a gradient pill, and a blurred light beam (lilac, blue, green) slanting up from the bottom-right corner. A centred pill closes it. The cards rise 80px and fade in one after another.",
+  "category": "pricing",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "cards",
+    "light",
+    "dark-cards",
+    "arc",
+    "gradient",
+    "beams",
+    "reveal",
+    "stagger",
+    "scroll"
+  ],
+  "notes": [
+    "the cards are dark by themselves (dark class) on a light section",
+    "beam colours: chart-3, chart-2, chart-1 (lilac, blue, green in the prenuvo theme)"
+  ],
+  "entry": "prenuvo-memberships.tsx",
+  "source": "foundry",
+  "name": "prenuvo-memberships",
+  "files": [
+    {
+      "path": "prenuvo-memberships.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PrenuvoArc } from \"@foundry/prenuvo-arc\";\nimport { PrenuvoButton } from \"@foundry/prenuvo-button\";\nimport { PrenuvoReveal } from \"@foundry/prenuvo-reveal\";\n\nexport interface PrenuvoPlan {\n  /** the plan's name */\n  name: string;\n  /** the small uppercase line under it (e.g. how long the scan takes) */\n  spec?: string;\n  /** what it includes */\n  body: ReactNode;\n  /** the card's pill */\n  cta: { label: string; href: string };\n  /** the corner beam's colour */\n  beam?: \"lilac\" | \"blue\" | \"green\";\n}\n\nexport interface PrenuvoMembershipsProps {\n  /** the centred headline */\n  title: ReactNode;\n  /** the lead under it */\n  lead?: ReactNode;\n  /** the plans, usually three */\n  plans: PrenuvoPlan[];\n  /** the closing pill under the cards */\n  cta?: { label: string; href: string };\n  /** an id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst beams = {\n  lilac: \"var(--chart-3)\",\n  blue: \"var(--chart-2)\",\n  green: \"var(--chart-1)\",\n};\nconst order = [\"lilac\", \"blue\", \"green\"] as const;\n\nexport function PrenuvoMemberships({ title, lead, plans, cta, id, className }: PrenuvoMembershipsProps) {\n  return (\n    <PrenuvoArc\n      id={id}\n      className={cn(\n        \"z-10 bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--muted-foreground)_24%,var(--background)),var(--background))] pt-[5.5rem] pb-28 text-foreground lg:pt-44 lg:pb-32\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter lg:px-12\">\n        <h2 className=\"mx-auto max-w-[20rem] text-center font-display text-[2.75rem] leading-none font-semibold tracking-[-0.01em] text-balance sm:max-w-3xl lg:text-[4rem]\">{title}</h2>\n        {lead && <p className=\"mx-auto mt-6 max-w-[18rem] text-center text-base leading-normal sm:max-w-2xl lg:mt-9 lg:text-lg lg:leading-[1.67]\">{lead}</p>}\n\n        <ul className=\"mt-12 grid gap-5 lg:mt-12 lg:grid-cols-3 lg:gap-6\">\n          {plans.map((p, i) => (\n            <PrenuvoReveal\n              as=\"li\"\n              key={p.name}\n              step={i}\n              className=\"dark relative isolate flex flex-col overflow-clip rounded-lg bg-[linear-gradient(135deg,var(--background)_30%,var(--card))] p-6 text-foreground lg:rounded-2xl\"\n            >\n              {/* the corner beam: a blurred band slanting up from the bottom-right */}\n              <span\n                aria-hidden\n                className=\"absolute right-[-30%] bottom-[-55%] -z-10 h-[70%] w-[90%] -rotate-45 blur-[2px]\"\n                style={{ background: `linear-gradient(to bottom, ${beams[p.beam ?? order[i % 3]]}, transparent 75%)` }}\n              />\n              <h3 className=\"font-display text-2xl leading-tight font-semibold\">{p.name}</h3>\n              {p.spec && <p className=\"mt-2 font-display text-xs font-bold text-muted-foreground uppercase\">{p.spec}</p>}\n              <hr className=\"mt-4 border-border\" />\n              <p className=\"mt-6 text-sm leading-normal lg:mt-8\">{p.body}</p>\n              <div className=\"mt-auto pt-6\">\n                <PrenuvoButton href={p.cta.href} variant=\"ocean\">\n                  {p.cta.label}\n                </PrenuvoButton>\n              </div>\n            </PrenuvoReveal>\n          ))}\n        </ul>\n\n        {cta && (\n          <div className=\"mt-8 flex justify-center lg:mt-12\">\n            <PrenuvoButton href={cta.href} className=\"px-6\">\n              {cta.label}\n            </PrenuvoButton>\n          </div>\n        )}\n      </div>\n    </PrenuvoArc>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "prenuvo-arc",
+    "prenuvo-button",
+    "prenuvo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the centred headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the lead under it"
+    },
+    {
+      "name": "plans",
+      "type": "PrenuvoPlan[]",
+      "required": true,
+      "description": "the plans, usually three"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the closing pill under the cards"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ad0aa3d70183126333613a90896e8e2b6373e9b62d8e9ea648f14c03483b6de8"
+}

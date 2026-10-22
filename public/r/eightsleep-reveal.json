@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Eight Sleep reveal",
+  "description": "A wrapper that fades its content in and lifts it 18px (or any distance) as it scrolls into view, over a fixed 220px of scroll; steps stagger it by 40px each. Pure CSS scroll-driven animation; static HTML shows everything.",
+  "category": "text-effect",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "browsers without animation-timeline, and reduced motion, show the content in place",
+    "don't put it inside an overflow-hidden box: use overflow-clip, or the timeline freezes"
+  ],
+  "entry": "eightsleep-reveal.tsx",
+  "source": "foundry",
+  "name": "eightsleep-reveal",
+  "files": [
+    {
+      "path": "eightsleep-reveal.css",
+      "content": "/* Fade + rise on entering view. The range is a fixed 220px of scroll (not a % of the\n   element), shifted 40px per stagger step, so tall elements in the first screen still finish. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .eightsleep-reveal {\n      animation: eightsleep-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--eightsleep-step, 0) * 40px) entry calc(220px + var(--eightsleep-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes eightsleep-reveal-rise {\n  from {\n    opacity: 0;\n    translate: 0 var(--eightsleep-rise, 18px);\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "eightsleep-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./eightsleep-reveal.css\";\n\nexport interface EightsleepRevealProps {\n  children: ReactNode;\n  /** stagger position: each step starts 40px of scroll later */\n  step?: number;\n  /** how far it rises, in px (18 for text, 24 for list items) */\n  rise?: number;\n  /** the element to render */\n  as?: \"div\" | \"span\" | \"li\" | \"p\";\n  className?: string;\n}\n\nexport function EightsleepReveal({ children, step = 0, rise = 18, as: Tag = \"div\", className }: EightsleepRevealProps) {\n  const style = { \"--eightsleep-step\": step, \"--eightsleep-rise\": `${rise}px` } as CSSProperties;\n  return (\n    <Tag className={cn(\"eightsleep-reveal\", Tag === \"span\" && \"block\", className)} style={style}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position: each step starts 40px of scroll later"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "default": "18",
+      "description": "how far it rises, in px (18 for text, 24 for list items)"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "28875809b47b3b75bf1a62286bac4fd68a13232fb42d09a5bd3239a1f56f123e"
+}

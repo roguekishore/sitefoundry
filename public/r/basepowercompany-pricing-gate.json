@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power pricing gate",
+  "description": "A pricing table you can't read yet: a plan card and a pitch sit heavily blurred across the band, and a deep forest-green card with soft shadow floats over the middle with a lime icon, a white heading, a line of copy and a white utility picker.",
+  "category": "pricing",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "gate",
+    "blur",
+    "form",
+    "select",
+    "green",
+    "light",
+    "floating-card"
+  ],
+  "notes": [
+    "the blurred preview is real text from props, hidden from screen readers",
+    "the picker is a native <select> inside a form (no JavaScript)"
+  ],
+  "entry": "basepowercompany-pricing-gate.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-pricing-gate",
+  "files": [
+    {
+      "path": "basepowercompany-pricing-gate.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check, ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface BasepowercompanyPricingPreview {\n  /** the small pill on the plan card */\n  badge: string;\n  /** the plan's name */\n  plan: string;\n  /** the price lines on the plan card: a small label and a big figure */\n  prices: { label: string; value: string }[];\n  /** the lime bar under the prices */\n  highlight: string;\n  /** the ticked lines on the plan card */\n  features: string[];\n  /** the two buttons at the foot of the card */\n  buttons: [string, string];\n  /** the eyebrow and big line on the right */\n  eyebrow: string;\n  headline: string;\n  /** the short points under it */\n  points: { title: string; body: string }[];\n}\n\nexport interface BasepowercompanyPricingGateProps {\n  /** a small icon at the top of the card (lucide), shown in lime */\n  icon?: ReactNode;\n  /** the card's heading */\n  title: string;\n  /** a line under it */\n  subtitle?: string;\n  /** the utility picker: placeholder, screen-reader label, form action and the choices */\n  select: { placeholder: string; label: string; action: string; name?: string; options: { label: string; value: string }[] };\n  /** the pricing that shows, blurred, behind the card (decoration: hidden from screen readers) */\n  preview: BasepowercompanyPricingPreview;\n  className?: string;\n}\n\nfunction Preview({ p }: { p: BasepowercompanyPricingPreview }) {\n  return (\n    <div aria-hidden inert className=\"pointer-events-none grid gap-10 blur-[7px] select-none lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-16\">\n      <div className=\"rounded-[calc(var(--radius)*2.5)] bg-card/70 p-6\">\n        <span className=\"inline-block rounded-full bg-accent px-3 py-0.5 text-xs font-bold text-accent-foreground\">{p.badge}</span>\n        <p className=\"mt-3 text-xl font-bold\">{p.plan}</p>\n        <div className=\"mt-6 grid grid-cols-2 gap-6 border-t border-border pt-6\">\n          {p.prices.map((x) => (\n            <div key={x.label}>\n              <p className=\"text-xs text-muted-foreground\">{x.label}</p>\n              <p className=\"mt-1 text-2xl font-bold text-primary\">{x.value}</p>\n            </div>\n          ))}\n        </div>\n        <p className=\"mt-6 rounded-lg bg-accent/70 px-4 py-2 text-sm font-bold text-accent-foreground\">{p.highlight}</p>\n        <ul className=\"mt-5 space-y-2 text-sm text-muted-foreground\">\n          {p.features.map((f) => (\n            <li key={f} className=\"flex items-center gap-2\">\n              <Check className=\"size-4 text-primary\" />\n              {f}\n            </li>\n          ))}\n        </ul>\n        <div className=\"mt-6 grid grid-cols-2 gap-3\">\n          <span className=\"rounded-lg border border-border py-3 text-center text-sm font-bold\">{p.buttons[0]}</span>\n          <span className=\"rounded-lg bg-accent py-3 text-center text-sm font-bold text-accent-foreground\">{p.buttons[1]}</span>\n        </div>\n      </div>\n      <div className=\"hidden lg:block lg:pt-6\">\n        <p className=\"text-sm text-muted-foreground uppercase\">{p.eyebrow}</p>\n        <p className=\"mt-4 max-w-[30rem] text-[2.5rem] leading-[1.1] font-bold\">{p.headline}</p>\n        <ul className=\"mt-10 space-y-6\">\n          {p.points.map((x) => (\n            <li key={x.title} className=\"flex gap-4\">\n              <span className=\"mt-1 size-6 shrink-0 rounded-full bg-accent\" />\n              <span>\n                <span className=\"block font-bold\">{x.title}</span>\n                <span className=\"block text-sm text-muted-foreground\">{x.body}</span>\n              </span>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </div>\n  );\n}\n\n/*\n * A pricing table you can't read yet: the plans sit blurred across the band, and a deep green\n * card in the middle asks for your utility before showing them.\n */\nexport function BasepowercompanyPricingGate({ icon, title, subtitle, select, preview, className }: BasepowercompanyPricingGateProps) {\n  return (\n    <section className={cn(\"relative bg-background px-gutter pt-6 pb-10 text-foreground lg:pt-6 lg:pb-14\", className)}>\n      <div className=\"relative mx-auto max-w-[calc(var(--page-width)-var(--page-gutter)*2)]\">\n        <div className=\"rounded-[calc(var(--radius)*3)] bg-card/40 px-0 py-12 opacity-70 lg:px-6 lg:py-[5.5rem]\">\n          <Preview p={preview} />\n        </div>\n\n        <div className=\"absolute inset-x-0 top-[7.5rem] flex justify-center lg:top-[9.75rem]\">\n          <form\n            action={select.action}\n            className=\"w-full max-w-[36.125rem] rounded-[calc(var(--radius)*4)] bg-primary px-8 pt-14 pb-14 text-center text-primary-foreground shadow-[0_12px_32px_color-mix(in_oklab,var(--foreground)_16%,transparent)] lg:px-[3.25rem] lg:pt-[3.75rem]\"\n          >\n            {icon && <span className=\"flex justify-center text-accent [&_svg]:size-10 [&_svg]:stroke-[1.5]\">{icon}</span>}\n            <h2 className=\"mt-4 font-display text-[2rem] leading-[1.2] font-bold tracking-[-0.025em]\">{title}</h2>\n            {subtitle && <p className=\"mx-auto mt-3 max-w-[20rem] text-sm leading-[1.5] font-semibold text-primary-foreground/85\">{subtitle}</p>}\n            <label className=\"relative mt-9 block\">\n              <span className=\"sr-only\">{select.label}</span>\n              <select\n                name={select.name ?? \"utility\"}\n                defaultValue=\"\"\n                className=\"h-[3.625rem] w-full cursor-pointer appearance-none rounded-lg bg-card pr-12 pl-5 text-base text-card-foreground/70 outline-none focus-visible:ring-2 focus-visible:ring-ring\"\n              >\n                <option value=\"\" disabled>\n                  {select.placeholder}\n                </option>\n                {select.options.map((o) => (\n                  <option key={o.value} value={o.value}>\n                    {o.label}\n                  </option>\n                ))}\n              </select>\n              <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-5 size-4 -translate-y-1/2 text-card-foreground/60\" />\n            </label>\n          </form>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon at the top of the card (lucide), shown in lime"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the card's heading"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "a line under it"
+    },
+    {
+      "name": "select",
+      "type": "{ placeholder: string; label: string; action: string; name?: string | undefined; options: { label: string; value: string; }[]; }",
+      "required": true,
+      "description": "the utility picker: placeholder, screen-reader label, form action and the choices"
+    },
+    {
+      "name": "preview",
+      "type": "BasepowercompanyPricingPreview",
+      "required": true,
+      "description": "the pricing that shows, blurred, behind the card (decoration: hidden from screen readers)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "28af4fbd12ca3c74614f1e0ee7bbf143b250cf45054a3cab313421600ef949eb"
+}

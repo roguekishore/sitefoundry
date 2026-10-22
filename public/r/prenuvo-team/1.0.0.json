@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo clinical team",
+  "description": "A white section with an arced top over the section before it: a large teal-ink claim, a lead, a small italic footnote and a soft pill on the left, with three blurred light beams (blue, lilac, green) slanting in from the top right. Below, a row of seven portrait tiles that bleeds off both edges with every other tile dropped lower, then a centred grid of partner names in muted grey. The copy rises 96px into place, the portraits fade in one by one as you scroll, and the partner grid rises 64px.",
+  "category": "features",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "features",
+    "light",
+    "arc",
+    "portraits",
+    "staggered",
+    "beams",
+    "gradient",
+    "logos",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "seven portraits fit the bleeding row best; each portrait slot takes an image (204×262 on desktop, 64×80 on phones, radius 12px) and shows a placeholder when empty",
+    "partner names are plain text; pass styled nodes for real logos"
+  ],
+  "entry": "prenuvo-team.tsx",
+  "source": "foundry",
+  "name": "prenuvo-team",
+  "files": [
+    {
+      "path": "prenuvo-team.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PrenuvoArc } from \"@foundry/prenuvo-arc\";\nimport { PrenuvoButton } from \"@foundry/prenuvo-button\";\nimport { PrenuvoReveal } from \"@foundry/prenuvo-reveal\";\n\nexport interface PrenuvoTeamProps {\n  /** the big claim */\n  title: ReactNode;\n  /** the lead under it */\n  body: ReactNode;\n  /** a small italic footnote */\n  footnote?: ReactNode;\n  /** the soft pill */\n  cta?: { label: string; href: string };\n  /** the portraits (about seven); each an image, or null for a placeholder */\n  portraits: (ReactNode | null)[];\n  /** partner names under the portraits: plain text, or a styled node for a real logo */\n  partners?: { name: string; logo?: ReactNode }[];\n  /** an id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nexport function PrenuvoTeam({ title, body, footnote, cta, portraits, partners, id, className }: PrenuvoTeamProps) {\n  return (\n    <PrenuvoArc id={id} className={cn(\"z-10 overflow-x-clip bg-background pt-16 pb-32 text-foreground lg:pt-28 lg:pb-48\", className)}>\n      {/* three slanted light beams, top right (desktop) */}\n      <div aria-hidden className=\"pointer-events-none absolute top-0 right-0 hidden h-[44rem] w-[48%] overflow-clip lg:block\">\n        <span className=\"absolute top-[-6rem] right-[-14rem] h-40 w-[64rem] origin-right -rotate-45 bg-[linear-gradient(to_right,transparent,color-mix(in_oklab,var(--chart-3)_35%,transparent)_35%,var(--glow))] blur-[6px]\" />\n        <span className=\"absolute top-[3rem] right-[-12rem] h-24 w-[56rem] origin-right -rotate-45 bg-[linear-gradient(to_right,transparent,color-mix(in_oklab,var(--chart-3)_45%,transparent)_45%,var(--chart-3))] opacity-80 blur-[6px]\" />\n        <span className=\"absolute top-[9rem] right-[-12rem] h-24 w-[56rem] origin-right -rotate-45 bg-[linear-gradient(to_right,transparent,color-mix(in_oklab,var(--chart-1)_40%,transparent)_40%,var(--chart-1))] opacity-80 blur-[6px]\" />\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter lg:px-12\">\n        <PrenuvoReveal rise={96} className=\"max-w-[41rem]\">\n          <h2 className=\"font-display text-[2rem] leading-[1.15] font-semibold tracking-[-0.01em] lg:text-5xl lg:leading-[1.1]\">{title}</h2>\n          <p className=\"mt-8 max-w-[38rem] text-base leading-normal lg:mt-12 lg:text-lg lg:leading-[1.67]\">{body}</p>\n          {footnote && <p className=\"mt-6 text-xs leading-normal italic lg:text-[0.8125rem]\">{footnote}</p>}\n          {cta && (\n            <PrenuvoButton href={cta.href} variant=\"soft\" size=\"lg\" className=\"mt-8 w-[11.75rem] lg:mt-12\">\n              {cta.label}\n            </PrenuvoButton>\n          )}\n        </PrenuvoReveal>\n      </div>\n\n      {/* the portrait row: centred, wider than the screen, every other tile dropped lower */}\n      <ul className=\"relative mt-10 flex justify-center gap-2 lg:mt-[5.5rem] lg:gap-[1.125rem]\">\n        {portraits.map((p, i) => (\n          <PrenuvoReveal\n            as=\"li\"\n            key={i}\n            rise={0}\n            step={i}\n            className={cn(\n              \"h-20 w-16 shrink-0 overflow-clip rounded-[0.375rem] lg:h-[16.375rem] lg:w-[12.75rem] lg:rounded-lg [&>*]:size-full [&>*]:object-cover\",\n              i % 2 === 1 && \"mt-6 lg:mt-10\",\n            )}\n          >\n            {p ?? <div className=\"bg-accent\" />}\n          </PrenuvoReveal>\n        ))}\n      </ul>\n\n      {partners && partners.length > 0 && (\n        <PrenuvoReveal rise={64} className=\"relative mx-auto mt-14 max-w-[23rem] px-gutter lg:mt-28 lg:max-w-page lg:px-12\">\n          <ul className=\"flex flex-wrap justify-center gap-y-8 lg:gap-y-16\">\n            {partners.map((p) => (\n              <li key={p.name} className=\"flex w-1/3 items-center justify-center text-center text-muted-foreground/70 lg:w-1/6\">\n                {p.logo ?? <span className=\"font-display text-[0.6875rem] leading-tight font-semibold tracking-[0.1em] uppercase lg:text-sm\">{p.name}</span>}\n              </li>\n            ))}\n          </ul>\n        </PrenuvoReveal>\n      )}\n    </PrenuvoArc>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "prenuvo-arc",
+    "prenuvo-button",
+    "prenuvo-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big claim"
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lead under it"
+    },
+    {
+      "name": "footnote",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small italic footnote"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the soft pill"
+    },
+    {
+      "name": "portraits",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the portraits (about seven); each an image, or null for a placeholder"
+    },
+    {
+      "name": "partners",
+      "type": "{ name: string; logo?: ReactNode; }[]",
+      "required": false,
+      "description": "partner names under the portraits: plain text, or a styled node for a real logo"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9725ab7b694a831db592d84d6552198a3d1221656859946b33a6dfcbb09edce1"
+}

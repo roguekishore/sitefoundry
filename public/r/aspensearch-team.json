@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search team cards",
+  "description": "A giant word and a two-line subheading on a hairline grid, a label, square arrow buttons and a paragraph, then 4:5 portrait cards with a mono role tag in the corner and a mint name bar with an arrow. On desktop four cards sit side by side over a halftone backdrop and each drifts up at its own speed as the page scrolls (scrubbed parallax); the arrows slide the row one card at a time. Phones stack the cards.",
+  "category": "team",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "people",
+    "cards",
+    "carousel",
+    "light",
+    "swiss",
+    "grid",
+    "mint",
+    "halftone",
+    "parallax",
+    "scroll-driven",
+    "reveal"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows; the parallax is a CSS view timeline (desktop only, off under reduced motion)",
+    "photo per card and the backdrop are media slots; empty, grey frames and a halftone placeholder"
+  ],
+  "entry": "aspensearch-team.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "aspensearch-team",
+  "files": [
+    {
+      "path": "aspensearch-team.css",
+      "content": "/* Desktop parallax: the strip (which doesn't move) names a view timeline; each card drifts\n   from +shift below its place to -shift above it while the strip crosses the window, so\n   neighbouring cards slide past one another at different speeds. */\n@media (min-width: 64rem) {\n  .aspensearch-team-strip {\n    view-timeline-name: --aspensearch-team;\n  }\n  @supports (animation-timeline: view()) {\n    .aspensearch-team-card {\n      animation: aspensearch-team-drift linear both;\n      animation-timeline: --aspensearch-team;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes aspensearch-team-drift {\n  from { transform: translateY(var(--aspensearch-team-shift)); }\n  to { transform: translateY(calc(var(--aspensearch-team-shift) * -1)); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-team-card { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "aspensearch-team.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchArrows } from \"@foundry/aspensearch-arrows\";\nimport { AspensearchHalftone } from \"@foundry/aspensearch-halftone\";\nimport { AspensearchLabel } from \"@foundry/aspensearch-label\";\nimport { AspensearchRevealText } from \"@foundry/aspensearch-reveal-text\";\nimport \"./aspensearch-team.css\";\n\nexport interface AspensearchTeamMember {\n  /** full name; each word gets its own line in the mint bar */\n  name: string;\n  /** role, in the mono tag on the card's corner */\n  role: string;\n  /** where the card links to */\n  href?: string;\n  /** portrait; empty: a grey placeholder frame */\n  photo?: ReactNode;\n}\n\nexport interface AspensearchTeamProps {\n  /** the giant word top left, e.g. \"Partners\" */\n  word: string;\n  /** the 38px line in the top-right tile; \"\\n\" breaks it */\n  subheading: string;\n  /** the \"■ LABEL\" tag */\n  label: string;\n  /** the paragraph in the right half */\n  text: string;\n  /** the people, as cards (four show at a time on desktop) */\n  members: AspensearchTeamMember[];\n  /** screen-reader names of the arrows */\n  prevLabel: string;\n  nextLabel: string;\n  /** media behind the cards (desktop); empty: halftone placeholder */\n  media?: ReactNode;\n  /** anchor id for header links */\n  id?: string;\n  className?: string;\n}\n\n// How far each card drifts (in vw, either side of its place) as the strip scrolls past,\n// cycling: the original's uneven parallax.\nconst SHIFTS = [6.25, 17.2, 10.9, 21.8, 12.5, 7.8, 18.7, 14];\nconst VISIBLE = 4;\n\n/**\n * The people. A giant word and a two-line subheading, a label, arrow buttons and a paragraph,\n * then portrait cards: a mono role tag on the corner, a portrait frame and a mint name bar with\n * an arrow. Desktop shows four cards side by side over a halftone backdrop, each drifting up at\n * its own speed as the page scrolls (scrubbed parallax); the arrows slide the row one card at\n * a time. Phones stack the cards full width.\n */\nexport function AspensearchTeam({ word, subheading, label, text, members, prevLabel, nextLabel, media, id, className }: AspensearchTeamProps) {\n  const [index, setIndex] = useState(0);\n  const last = Math.max(0, members.length - VISIBLE);\n\n  return (\n    <section id={id} className={cn(\"border-t border-border bg-background font-sans tracking-[-0.04em] text-foreground\", className)}>\n      <div className=\"grid lg:grid-cols-4\">\n        <div className=\"px-3 pt-6 lg:col-span-2 lg:h-[29.2vw] lg:px-5 lg:pt-0\">\n          <AspensearchLabel className=\"lg:hidden\">{label}</AspensearchLabel>\n          <AspensearchRevealText as=\"h2\" variant=\"display\" text={word} className=\"mt-12 font-display text-[13.8vw]/none lg:mt-0 lg:text-[12.5vw]/none\" />\n        </div>\n        <div className=\"flex items-end px-3 pt-12 lg:col-span-2 lg:border-l lg:border-border lg:px-5 lg:pt-0 lg:pb-5\">\n          <p className=\"text-2xl/[1.1] whitespace-pre-line lg:text-[2.63vw]/[1.1]\">{subheading}</p>\n        </div>\n\n        <div className=\"hidden px-5 pt-5 lg:block lg:border-t lg:border-border\">\n          <AspensearchLabel>{label}</AspensearchLabel>\n        </div>\n        <div className=\"hidden lg:block lg:border-t lg:border-border\">\n          <AspensearchArrows\n            prevLabel={prevLabel}\n            nextLabel={nextLabel}\n            onPrev={() => setIndex((i) => Math.max(0, i - 1))}\n            onNext={() => setIndex((i) => Math.min(last, i + 1))}\n            prevDisabled={index === 0}\n            nextDisabled={index >= last}\n            className=\"border-b border-l border-border\"\n          />\n        </div>\n        <div className=\"px-3 pt-12 pb-6 lg:col-span-2 lg:h-[23vw] lg:border-t lg:border-l lg:border-border lg:px-5 lg:pt-7\">\n          <AspensearchRevealText text={text} className=\"max-w-[22rem] text-base/[1.3]\" />\n        </div>\n      </div>\n\n      {/* The cards: a clipped row on desktop (sideways only), stacked on phones. */}\n      <div className=\"relative isolate lg:overflow-x-clip\">\n        <AspensearchHalftone media={media} className=\"absolute inset-x-0 top-[6vw] bottom-0 -z-10 hidden lg:block\" />\n        <div className=\"aspensearch-team-strip lg:pb-[6vw]\">\n          <ul\n            className=\"flex flex-col transition-transform duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none lg:flex-row lg:[transform:translateX(var(--aspensearch-team-x))]\"\n            style={{ \"--aspensearch-team-x\": `${-index * (100 / VISIBLE)}%` } as CSSProperties}\n          >\n            {members.map((m, i) => (\n              <li\n                key={m.name}\n                className=\"aspensearch-team-card shrink-0 lg:w-1/4\"\n                style={{ \"--aspensearch-team-shift\": `${SHIFTS[i % SHIFTS.length]}vw` } as CSSProperties}\n              >\n                <a href={m.href ?? \"#\"} className=\"group relative flex aspect-[4/5] flex-col border-t border-border bg-background lg:border-x lg:border-r-0\">\n                  <span className=\"absolute top-0 right-0 z-10 border-b border-l border-border bg-background px-2.5 py-2.5 font-mono text-xs/none tracking-normal uppercase\">\n                    {m.role}\n                  </span>\n                  <div className=\"relative flex-1 overflow-clip bg-muted\">{m.photo}</div>\n                  <div className=\"flex h-[7.8rem] shrink-0 items-end justify-between bg-highlight px-3 pb-5 text-highlight-foreground lg:px-5\">\n                    <span className=\"w-min text-2xl/[1.1]\">{m.name}</span>\n                    <ArrowRight\n                      aria-hidden\n                      className=\"size-8 shrink-0 transition-transform duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1.5 motion-reduce:transition-none\"\n                      strokeWidth={1.25}\n                    />\n                  </div>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "aspensearch-arrows",
+    "aspensearch-halftone",
+    "aspensearch-label",
+    "aspensearch-reveal-text",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "word",
+      "type": "string",
+      "required": true,
+      "description": "the giant word top left, e.g. \"Partners\""
+    },
+    {
+      "name": "subheading",
+      "type": "string",
+      "required": true,
+      "description": "the 38px line in the top-right tile; \"\\n\" breaks it"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the \"■ LABEL\" tag"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph in the right half"
+    },
+    {
+      "name": "members",
+      "type": "AspensearchTeamMember[]",
+      "required": true,
+      "description": "the people, as cards (four show at a time on desktop)"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader names of the arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media behind the cards (desktop); empty: halftone placeholder"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for header links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fff822de594677385cbd171acacea0d67caa92820ba2203bb2fe158a361c6f3f"
+}

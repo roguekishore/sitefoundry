@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp testimonial wall",
+  "description": "A centred grey eyebrow, a big 'proof' headline and a grey button, over three rows of white hairline quote cards (16px corners, a small square logo chip, name, role and a grey quote) that drift left on endless loops at different speeds, offset from each other and fading out at both edges.",
+  "category": "testimonials",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "marquee",
+    "wall",
+    "cards",
+    "loop",
+    "light",
+    "minimal",
+    "centered",
+    "faded-edges"
+  ],
+  "notes": [
+    "rows loop with CSS (each row is drawn twice); hovering a row pauses it; with reduced motion the rows sit still",
+    "the logo chip takes any node; the demo uses initials"
+  ],
+  "entry": "ramp-testimonials.tsx",
+  "source": "foundry",
+  "name": "ramp-testimonials",
+  "files": [
+    {
+      "path": "ramp-testimonials.css",
+      "content": "/* Each row is two copies of its cards; sliding by half loops seamlessly. Speed and starting\n   offset come from inline custom properties. */\n@media (prefers-reduced-motion: no-preference) {\n  .ramp-testimonials-track {\n    animation: ramp-testimonials-drift var(--ramp-testimonials-speed, 80s) linear infinite;\n    animation-delay: var(--ramp-testimonials-offset, 0s);\n  }\n  .ramp-testimonials-row:hover .ramp-testimonials-track {\n    animation-play-state: paused;\n  }\n}\n\n@keyframes ramp-testimonials-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n.ramp-testimonials-row {\n  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);\n}\n"
+    },
+    {
+      "path": "ramp-testimonials.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\nimport \"./ramp-testimonials.css\";\n\nexport interface RampTestimonial {\n  /** the person's name */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** their words */\n  quote: string;\n  /** the company's mark for the small square chip (a logo or initials) */\n  logo: ReactNode;\n}\n\nexport interface RampTestimonialsProps {\n  /** the small grey line above the headline */\n  eyebrow?: string;\n  /** the headline */\n  title: string;\n  /** the grey button under it */\n  cta?: { label: string; href: string };\n  /** up to three rows of cards; each row loops on its own */\n  rows: RampTestimonial[][];\n  className?: string;\n}\n\nconst speeds = [\"90s\", \"100s\", \"180s\"];\nconst offsets = [\"0s\", \"-35s\", \"-60s\"];\n\nfunction Card({ t }: { t: RampTestimonial }) {\n  return (\n    <li className=\"flex h-[12rem] w-[17.5rem] shrink-0 flex-col rounded-xl border border-border bg-card p-5 sm:w-[20rem]\">\n      <div className=\"flex items-center gap-3\">\n        <span className=\"grid size-10 shrink-0 place-items-center overflow-clip rounded-[calc(var(--radius)-6px)] border border-border text-xs text-foreground\">{t.logo}</span>\n        <span className=\"min-w-0\">\n          <span className=\"block truncate text-base/5 text-foreground\">{t.name}</span>\n          <span className=\"block truncate text-base/5 text-muted-foreground\">{t.role}</span>\n        </span>\n      </div>\n      <p className=\"mt-4 line-clamp-4 text-base/5 text-muted-foreground\">{t.quote}</p>\n    </li>\n  );\n}\n\n/** Ramp's \"receipts\" wall: three drifting rows of quote cards. */\nexport function RampTestimonials({ eyebrow, title, cta, rows, className }: RampTestimonialsProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-section lg:px-[calc(var(--page-gutter)*4)] lg:pt-[calc(var(--section-y)*1.5)]\">\n        {eyebrow && <p className=\"text-center text-base text-muted-foreground\">{eyebrow}</p>}\n        <RampHeading align=\"center\" lead={title} className=\"mt-2 lg:mt-3\" />\n        {cta && (\n          <div className=\"mt-4 flex justify-center lg:mt-5\">\n            <RampButton href={cta.href} variant=\"secondary\">\n              {cta.label}\n            </RampButton>\n          </div>\n        )}\n      </div>\n      <div className=\"mx-auto mt-12 grid max-w-page grid-cols-1 gap-4 pb-section lg:mt-[4.75rem] lg:px-[calc(var(--page-gutter)*4)]\">\n        {rows.slice(0, 3).map((row, r) => (\n          <div key={r} className=\"ramp-testimonials-row min-w-0 overflow-clip\">\n            <div\n              className=\"ramp-testimonials-track flex w-max\"\n              style={{ \"--ramp-testimonials-speed\": speeds[r], \"--ramp-testimonials-offset\": offsets[r] } as CSSProperties}\n            >\n              <ul className=\"flex gap-4 pr-4\">\n                {row.map((t) => (\n                  <Card key={t.name} t={t} />\n                ))}\n              </ul>\n              <ul aria-hidden className=\"flex gap-4 pr-4\">\n                {row.map((t) => (\n                  <Card key={t.name} t={t} />\n                ))}\n              </ul>\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small grey line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the grey button under it"
+    },
+    {
+      "name": "rows",
+      "type": "RampTestimonial[][]",
+      "required": true,
+      "description": "up to three rows of cards; each row loops on its own"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9fb86475cb1a5eb89124d383ae94b4247d3d4a452f35395434c9241e34a76448"
+}

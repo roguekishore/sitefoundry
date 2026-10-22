@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power grid switch",
+  "description": "A centred heading under a torn-tape label, then a big rounded grey card: an illustration on the left and, on the right, a pill switch (lime ON, grey OFF) above a heading and a short text. Flipping the switch slides the knob and crossfades the illustration and the text to the other state. Phones put the illustration on top.",
+  "category": "features",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "how-it-works",
+    "toggle",
+    "switch",
+    "crossfade",
+    "light",
+    "interactive",
+    "rounded"
+  ],
+  "notes": [
+    "two states, each with its own illustration slot (contained)",
+    "CSS only: a checkbox and :has() selectors; starts switched on"
+  ],
+  "entry": "basepowercompany-grid-switch.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-grid-switch",
+  "files": [
+    {
+      "path": "basepowercompany-grid-switch.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyMedia } from \"@foundry/basepowercompany-media\";\nimport { BasepowercompanyTape } from \"@foundry/basepowercompany-tape\";\n\nexport interface BasepowercompanyGridState {\n  /** the heading for this state */\n  title: string;\n  /** a sentence or two under it */\n  body: string;\n  /** the illustration for this state (contained in its frame) */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n}\n\nexport interface BasepowercompanyGridSwitchProps {\n  /** the torn-tape label above the heading */\n  tape?: string;\n  /** the section heading */\n  title: string;\n  /** a line under the heading */\n  subtitle?: string;\n  /** the word before the switch, e.g. \"Grid\" */\n  switchLabel: string;\n  /** the words inside the switch */\n  onLabel: string;\n  offLabel: string;\n  /** what the card shows with the switch on, and with it off */\n  on: BasepowercompanyGridState;\n  off: BasepowercompanyGridState;\n  className?: string;\n}\n\nconst show = \"transition-[opacity,visibility] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\";\n\n/*\n * \"How it works\": a centred heading, then a big grey card with an illustration and a pill\n * switch. Flipping the switch crossfades the illustration and the text between two states.\n * Pure CSS: a checkbox and :has() selectors, no JavaScript.\n */\nexport function BasepowercompanyGridSwitch({ tape, title, subtitle, switchLabel, onLabel, offLabel, on, off, className }: BasepowercompanyGridSwitchProps) {\n  const states = [\n    { s: on, cls: \"visible opacity-100 group-has-[input:not(:checked)]:invisible group-has-[input:not(:checked)]:opacity-0\" },\n    { s: off, cls: \"invisible opacity-0 group-has-[input:not(:checked)]:visible group-has-[input:not(:checked)]:opacity-100\" },\n  ];\n  return (\n    <section className={cn(\"bg-background px-gutter pt-10 pb-12 text-foreground lg:pt-[4.25rem] lg:pb-24\", className)}>\n      <div className=\"mx-auto max-w-[44rem] text-center\">\n        {tape && <BasepowercompanyTape>{tape}</BasepowercompanyTape>}\n        <h2 className=\"mt-3 font-display text-[2rem] leading-[1.2] font-bold tracking-[-0.025em] text-primary lg:text-[2.5rem] lg:leading-[1.1]\">{title}</h2>\n        {subtitle && <p className=\"mt-4 text-base leading-6 tracking-[-0.005em] text-muted-foreground/85 lg:mt-6\">{subtitle}</p>}\n      </div>\n\n      <div className=\"group mx-auto mt-10 grid max-w-[calc(var(--page-width)-var(--page-gutter)*4)] overflow-clip rounded-[calc(var(--radius)*3)] bg-muted lg:mt-12 lg:h-[37.1875rem] lg:grid-cols-[minmax(0,1fr)_24.5rem] lg:gap-x-12\">\n        <div className=\"grid aspect-[1.47] lg:aspect-auto lg:h-full\">\n          {states.map(({ s, cls }, i) => (\n            <BasepowercompanyMedia key={i} media={s.media} fit=\"contain\" label={s.mediaLabel} className={cn(\"[grid-area:1/1]\", show, cls)} />\n          ))}\n        </div>\n\n        <div className=\"px-8 pt-8 pb-10 lg:px-0 lg:pt-12 lg:pr-12\">\n          <label className=\"inline-flex cursor-pointer items-center gap-4 rounded-full bg-background py-2 pr-2 pl-5 select-none\">\n            <span className=\"text-base font-bold\">{switchLabel}</span>\n            <input type=\"checkbox\" defaultChecked className=\"peer sr-only\" />\n            <span className=\"relative flex h-11 w-24 items-center rounded-full bg-muted-foreground/40 px-3.5 text-base font-bold text-primary-foreground transition-colors duration-300 peer-checked:bg-accent peer-focus-visible:ring-2 peer-focus-visible:ring-ring motion-reduce:transition-none\">\n              <span className=\"ml-auto group-has-[input:checked]:hidden\">{offLabel}</span>\n              <span className=\"hidden group-has-[input:checked]:block\">{onLabel}</span>\n              <span\n                aria-hidden\n                className=\"absolute top-1.5 left-1.5 size-8 rounded-full bg-card transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-has-[input:checked]:translate-x-[3.25rem] motion-reduce:transition-none\"\n              />\n            </span>\n          </label>\n\n          <div className=\"mt-7 grid lg:mt-10\">\n            {states.map(({ s, cls }, i) => (\n              <div key={i} className={cn(\"[grid-area:1/1]\", show, cls)}>\n                <h3 className=\"font-display text-xl leading-[1.35] font-bold tracking-[-0.025em] lg:text-[2rem] lg:leading-[1.2]\">{s.title}</h3>\n                <p className=\"mt-5 text-base leading-6 tracking-[-0.005em] text-muted-foreground lg:mt-9\">{s.body}</p>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "basepowercompany-media",
+    "basepowercompany-tape",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tape",
+      "type": "string",
+      "required": false,
+      "description": "the torn-tape label above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "a line under the heading"
+    },
+    {
+      "name": "switchLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word before the switch, e.g. \"Grid\""
+    },
+    {
+      "name": "onLabel",
+      "type": "string",
+      "required": true,
+      "description": "the words inside the switch"
+    },
+    {
+      "name": "offLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "on",
+      "type": "BasepowercompanyGridState",
+      "required": true,
+      "description": "what the card shows with the switch on, and with it off"
+    },
+    {
+      "name": "off",
+      "type": "BasepowercompanyGridState",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47276ec5479abfdd57cd1b60ac3b5164731683af5fdb53c6b9bfc49153340977"
+}

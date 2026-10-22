@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rho tone flow",
+  "description": "Page wrapper that turns the whole window dark or light to match whichever section sits in the middle of the screen: page, header and cards crossfade their colours over 0.62s as you scroll from a dark section into a light one and back.",
+  "category": "background",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "scroll",
+    "theme-switch",
+    "dark",
+    "light",
+    "crossfade",
+    "motion",
+    "page"
+  ],
+  "notes": [
+    "needs JavaScript (hydrate: load); without it each section simply keeps its own tone",
+    "sections opt in with data-rho-tone=\"dark\" | \"light\" (the rho blocks' tone prop sets it)",
+    "dark sections only switch when the page itself is in light mode; in dark mode everything stays dark",
+    "no crossfade under reduced motion (the colours still follow)"
+  ],
+  "entry": "rho-tone-flow.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "rho-tone-flow",
+  "files": [
+    {
+      "path": "rho-tone-flow.css",
+      "content": "/* Once the flow is on, toned sections stop setting their own colours and take the page's:\n   the wrapper carries `.dark` (or not) for the section in the middle of the window. Custom\n   properties set to `inherit` read the wrapper's values. Unlayered and more specific than the\n   theme's `.dark`, so it wins over it. */\n[data-rho-flow=\"on\"] [data-rho-tone] {\n  --background: inherit;\n  --foreground: inherit;\n  --card: inherit;\n  --card-foreground: inherit;\n  --popover: inherit;\n  --popover-foreground: inherit;\n  --primary: inherit;\n  --primary-foreground: inherit;\n  --secondary: inherit;\n  --secondary-foreground: inherit;\n  --muted: inherit;\n  --muted-foreground: inherit;\n  --accent: inherit;\n  --accent-foreground: inherit;\n  --destructive: inherit;\n  --destructive-foreground: inherit;\n  --border: inherit;\n  --input: inherit;\n  --ring: inherit;\n  --highlight: inherit;\n  --highlight-foreground: inherit;\n  --glow: inherit;\n}\n\n/* The crossfade: every colour on the page eases over 0.62s, like the original. In the base\n   layer, so an element's own transition utilities (hover timings) still win. */\n@layer base {\n  @media (prefers-reduced-motion: no-preference) {\n    [data-rho-flow=\"on\"],\n    [data-rho-flow=\"on\"] * {\n      transition-property: color, background-color, border-color, fill, stroke;\n      transition-duration: 0.62s;\n      transition-timing-function: cubic-bezier(0.32, 0, 0.24, 1);\n    }\n  }\n}\n"
+    },
+    {
+      "path": "rho-tone-flow.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rho-tone-flow.css\";\n\nexport interface RhoToneFlowProps {\n  /** the page's sections; those with data-rho-tone take part */\n  children: ReactNode;\n  /** tone before the first section is measured */\n  initialTone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nexport function RhoToneFlow({ children, initialTone = \"dark\", className }: RhoToneFlowProps) {\n  const root = useRef<HTMLDivElement>(null);\n  const [tone, setTone] = useState(initialTone);\n  const [on, setOn] = useState(false);\n\n  useEffect(() => {\n    const el = root.current;\n    if (!el) return;\n    const sections = Array.from(el.querySelectorAll<HTMLElement>(\"[data-rho-tone]\"));\n    if (!sections.length) return;\n    // A one-pixel line across the middle of the window: the section it crosses sets the tone.\n    const observer = new IntersectionObserver(\n      (entries) => {\n        for (const entry of entries) {\n          if (entry.isIntersecting) {\n            const next = (entry.target as HTMLElement).dataset.rhoTone;\n            if (next === \"dark\" || next === \"light\") setTone(next);\n          }\n        }\n      },\n      { rootMargin: \"-50% 0px -50% 0px\" },\n    );\n    sections.forEach((s) => observer.observe(s));\n    setOn(true);\n    return () => observer.disconnect();\n  }, []);\n\n  return (\n    <div\n      ref={root}\n      data-rho-flow={on ? \"on\" : undefined}\n      className={cn(on && tone === \"dark\" && \"dark\", \"bg-background text-foreground\", className)}\n    >\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the page's sections; those with data-rho-tone take part"
+    },
+    {
+      "name": "initialTone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "tone before the first section is measured"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "66815bc8506126290132732132bdc2ff4dc04ee99e3e5b9fdb24cdcf92300969"
+}

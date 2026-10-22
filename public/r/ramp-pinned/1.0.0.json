@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp pinned before/after",
+  "description": "A pinned storytelling section: the stage sticks under the header for three screens of scrolling while a centred headline, subline and wide media frame (the 'before') fade out, and a second headline and frame (the 'after') rise in to replace them. Light, quiet and centred.",
+  "category": "features",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "sticky",
+    "pinned",
+    "scroll",
+    "scrubbed",
+    "crossfade",
+    "before-after",
+    "storytelling",
+    "light",
+    "centered"
+  ],
+  "notes": [
+    "300% of the window tall from lg, 200% on phones; the swap is scrubbed by a CSS view timeline",
+    "browsers without scroll-driven animations, and reduced motion, show the two scenes one after the other",
+    "topOffset should match the height of a sticky header above it"
+  ],
+  "entry": "ramp-pinned.tsx",
+  "source": "foundry",
+  "name": "ramp-pinned",
+  "files": [
+    {
+      "path": "ramp-pinned.css",
+      "content": "/* Without scroll-driven animations the two scenes simply follow each other. */\n.ramp-pinned-stage {\n  display: grid;\n  gap: 4rem;\n}\n.ramp-pinned-media {\n  aspect-ratio: 16 / 10;\n}\n\n/* Pinned: the wrapper is several windows tall and names a view timeline; the stage sticks\n   under the header; scene A fades out and scene B rises in around the middle. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ramp-pinned {\n      height: 200svh;\n      view-timeline-name: --ramp-pinned;\n    }\n    .ramp-pinned-stage {\n      position: sticky;\n      top: var(--ramp-pinned-top, 0px);\n      height: calc(100svh - var(--ramp-pinned-top, 0px));\n      gap: 0;\n    }\n    .ramp-pinned-scene {\n      grid-area: 1 / 1;\n      min-height: 0;\n    }\n    .ramp-pinned-media {\n      aspect-ratio: auto;\n      flex: 1;\n      min-height: 0;\n    }\n    .ramp-pinned-a {\n      animation: ramp-pinned-out linear both;\n      animation-timeline: --ramp-pinned;\n      animation-range: contain 38% contain 52%;\n    }\n    .ramp-pinned-b {\n      animation: ramp-pinned-in linear both;\n      animation-timeline: --ramp-pinned;\n      animation-range: contain 50% contain 66%;\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .ramp-pinned {\n      height: 300svh;\n    }\n  }\n}\n\n@keyframes ramp-pinned-out {\n  from { opacity: 1; transform: none; filter: blur(0); }\n  to { opacity: 0; transform: translateY(-24px); filter: blur(4px); visibility: hidden; }\n}\n\n@keyframes ramp-pinned-in {\n  from { opacity: 0; transform: translateY(32px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ramp-pinned.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\nimport \"./ramp-pinned.css\";\n\nexport interface RampPinnedScene {\n  /** the centred headline */\n  title: string;\n  /** the grey line under it */\n  subtitle?: string;\n  /** the wide art (image or video); empty shows a placeholder frame */\n  media?: ReactNode;\n}\n\nexport interface RampPinnedProps {\n  /** what is shown first: the problem */\n  before: RampPinnedScene;\n  /** what replaces it halfway through: the answer */\n  after: RampPinnedScene;\n  /** how far below the window's top the stage sticks (a CSS length; match the sticky header) */\n  topOffset?: string;\n  className?: string;\n}\n\nfunction Scene({ scene, which }: { scene: RampPinnedScene; which: \"a\" | \"b\" }) {\n  return (\n    <div className={cn(\"ramp-pinned-scene flex flex-col items-center\", which === \"a\" ? \"ramp-pinned-a\" : \"ramp-pinned-b\")}>\n      <RampHeading align=\"center\" size=\"section\" lead={scene.title} className=\"max-w-[20rem] sm:max-w-none lg:text-[3.25rem]/[1.05]\" />\n      {scene.subtitle && <p className=\"mt-4 max-w-[17rem] text-center text-base/[1.4] text-muted-foreground sm:max-w-none lg:mt-5\">{scene.subtitle}</p>}\n      <div className=\"ramp-pinned-media relative mt-8 w-full max-w-[69rem] overflow-clip rounded-lg lg:mt-10\">\n        {scene.media ?? (\n          <div\n            aria-hidden\n            className={cn(\n              \"absolute inset-0 rounded-lg border border-border\",\n              which === \"a\" ? \"bg-muted\" : \"bg-gradient-to-b from-card to-muted\",\n            )}\n          />\n        )}\n      </div>\n    </div>\n  );\n}\n\n/** Ramp's \"systems that never spoke → now in one place\" pinned swap. */\nexport function RampPinned({ before, after, topOffset = \"6.5rem\", className }: RampPinnedProps) {\n  return (\n    <section\n      className={cn(\"ramp-pinned relative bg-background text-foreground\", className)}\n      style={{ \"--ramp-pinned-top\": topOffset } as CSSProperties}\n    >\n      <div className=\"ramp-pinned-stage mx-auto max-w-page px-gutter py-section lg:px-[calc(var(--page-gutter)*4)] lg:pt-14 lg:pb-10\">\n        <Scene scene={before} which=\"a\" />\n        <Scene scene={after} which=\"b\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "before",
+      "type": "RampPinnedScene",
+      "required": true,
+      "description": "what is shown first: the problem"
+    },
+    {
+      "name": "after",
+      "type": "RampPinnedScene",
+      "required": true,
+      "description": "what replaces it halfway through: the answer"
+    },
+    {
+      "name": "topOffset",
+      "type": "string",
+      "required": false,
+      "default": "6.5rem",
+      "description": "how far below the window's top the stage sticks (a CSS length; match the sticky header)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "28ce1ed00b4c10294aeafa0c65538ea9d76d75da2440d564786bfec18495cf5b"
+}

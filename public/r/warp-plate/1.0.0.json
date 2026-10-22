@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Warp figure plate",
+  "description": "A technical-drawing figure frame: a 1px ink border, a title bar with a small code-bracket box on the left, a bracketed figure caption in mono (optionally between two rules) and a grid box on the right, then an inset ink frame over a faint dot grid holding a white, softly rounded card.",
+  "category": "card",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "figure",
+    "frame",
+    "card",
+    "dot-grid",
+    "mono",
+    "technical",
+    "developer",
+    "minimal"
+  ],
+  "notes": [
+    "tone soft swaps the ink frame for hairlines (for code panels)",
+    "card=false drops the white inner card so the content sits on the dot grid"
+  ],
+  "entry": "warp-plate.tsx",
+  "source": "foundry",
+  "name": "warp-plate",
+  "files": [
+    {
+      "path": "warp-plate.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronsLeftRight, Grid2x2 } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WarpPlateProps {\n  /** the caption in the title bar, shown in brackets, e.g. \"fig. 1 — the floor\" */\n  caption: string;\n  /** draw a rule on each side of the caption */\n  rules?: boolean;\n  /** ink: solid 1px ink frames · soft: hairline frames and a muted caption */\n  tone?: \"ink\" | \"soft\";\n  /** wrap the content in a white rounded card (otherwise it sits on the dot grid) */\n  card?: boolean;\n  /** drop the inset frame and dot grid: the content fills the plate under the title bar */\n  bare?: boolean;\n  /** the figure's content */\n  children?: ReactNode;\n  className?: string;\n  /** classes for the inner card (padding, layout) */\n  innerClassName?: string;\n}\n\nconst box = \"flex h-[1.125rem] w-[1.375rem] shrink-0 items-center justify-center border\";\n\n/** The figure frame used across the site: title bar + inset frame on a dot grid. */\nexport function WarpPlate({ caption, rules, tone = \"ink\", card = true, bare, children, className, innerClassName }: WarpPlateProps) {\n  const ink = tone === \"ink\";\n  return (\n    <figure className={cn(\"border bg-secondary\", ink ? \"border-foreground\" : \"border-border bg-card\", className)}>\n      <figcaption\n        className={cn(\n          \"flex min-h-9 items-center gap-3 px-3 py-2 font-mono text-[0.6875rem] leading-[1.6] tracking-[calc(0.11em_-_var(--warp-squeeze,0em))] lg:text-xs\",\n          ink ? \"text-foreground\" : \"text-muted-foreground\",\n          !ink && \"border-b border-border\",\n        )}\n      >\n        <span aria-hidden className={cn(box, ink ? \"border-foreground\" : \"border-border\")}>\n          <ChevronsLeftRight className=\"size-3\" strokeWidth={1.5} />\n        </span>\n        {rules && <span aria-hidden className={cn(\"hidden h-px flex-1 sm:block\", ink ? \"bg-foreground\" : \"bg-border\")} />}\n        <span className={cn(\"min-w-0 flex-1 px-2 sm:text-center\", rules && \"sm:flex-none\")}>\n          [ {caption} ]\n        </span>\n        {rules && <span aria-hidden className={cn(\"hidden h-px flex-1 sm:block\", ink ? \"bg-foreground\" : \"bg-border\")} />}\n        <span aria-hidden className={cn(box, ink ? \"border-foreground\" : \"border-border\")}>\n          <Grid2x2 className=\"size-2.5\" strokeWidth={1.5} />\n        </span>\n      </figcaption>\n      {bare ? (\n        children\n      ) : (\n        <div\n          className={cn(\n            \"mx-3.5 mb-3.5 border bg-background p-4 lg:p-[1.125rem]\",\n            \"bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--foreground)_16%,transparent)_1.2px,transparent_0)] bg-[size:12px_12px]\",\n            ink ? \"border-foreground\" : \"border-border\",\n          )}\n        >\n          {card ? (\n            <div className={cn(\"rounded-[calc(var(--radius)*3)] border border-foreground/10 bg-card p-6 lg:p-8\", innerClassName)}>{children}</div>\n          ) : (\n            <div className={innerClassName}>{children}</div>\n          )}\n        </div>\n      )}\n    </figure>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "the caption in the title bar, shown in brackets, e.g. \"fig. 1 — the floor\""
+    },
+    {
+      "name": "rules",
+      "type": "boolean",
+      "required": false,
+      "description": "draw a rule on each side of the caption"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "ink",
+      "description": "ink: solid 1px ink frames · soft: hairline frames and a muted caption"
+    },
+    {
+      "name": "card",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "wrap the content in a white rounded card (otherwise it sits on the dot grid)"
+    },
+    {
+      "name": "bare",
+      "type": "boolean",
+      "required": false,
+      "description": "drop the inset frame and dot grid: the content fills the plate under the title bar"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the figure's content"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "innerClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the inner card (padding, layout)"
+    }
+  ],
+  "hash": "0babc13ecbcea1e969cdfa4dff279ccc447adf7e3d3d8ca3395cacdf0f19c3bd"
+}

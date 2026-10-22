@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola feature list",
+  "description": "A long, calm feature list on white: a serif eyebrow, a huge two-line serif headline and an ink pill, then rows each opened by a full-width hairline, with a serif title on the left, a paragraph on the right and a wide 4px-cornered picture below (one across the width, or a wide and a narrow side by side). Optional ink pill per row.",
+  "category": "features",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "light",
+    "editorial",
+    "serif",
+    "hairline",
+    "media",
+    "minimal"
+  ],
+  "notes": [
+    "a wider frame than the other blocks (page width + 80px), like the original",
+    "media are slots at 1280:527 (split about 2:1); empty, plain muted or lime-wash surfaces",
+    "static: the original shows no motion here"
+  ],
+  "entry": "granola-features.tsx",
+  "source": "foundry",
+  "name": "granola-features",
+  "files": [
+    {
+      "path": "granola-features.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaButton } from \"@foundry/granola-button\";\nimport { GranolaMedia } from \"@foundry/granola-media\";\n\nexport interface GranolaFeatureRow {\n  /** the serif row title */\n  title: string;\n  /** the paragraph beside it (below it on phones) */\n  body: string;\n  /** an optional ink button under the row header */\n  cta?: { label: string; href: string; icon?: ReactNode };\n  /**\n   * the row's media: one picture across the full width, or two side by side\n   * (a wide one and a narrow one); plain placeholders while empty\n   */\n  media?: { slots: 1 | 2; items?: ReactNode[] };\n  /** with two pictures: which comes first */\n  order?: \"wide-first\" | \"narrow-first\";\n  /** with two pictures: stack them on phones instead of keeping them side by side */\n  stackOnPhone?: boolean;\n}\n\nexport interface GranolaFeaturesProps {\n  /** the small serif line above the headline */\n  eyebrow?: string;\n  /** the huge serif headline */\n  title: string;\n  /** the ink call to action under the headline */\n  cta?: { label: string; href: string };\n  /** the feature rows, each opened by a hairline */\n  rows: GranolaFeatureRow[];\n  className?: string;\n}\n\nconst TONES = [\"glow\", \"muted\", \"muted\", \"glow\"] as const;\n\nfunction RowMedia({ row, index }: { row: GranolaFeatureRow; index: number }) {\n  const slots = row.media?.slots ?? 1;\n  const items = row.media?.items ?? [];\n  if (slots === 1) {\n    return <GranolaMedia tone={TONES[index % 4]} className=\"aspect-[1280/527] w-full rounded-sm\">{items[0]}</GranolaMedia>;\n  }\n  const narrowFirst = row.order === \"narrow-first\";\n  const stack = row.stackOnPhone;\n  return (\n    <div\n      className={cn(\n        \"w-full\",\n        stack ? \"flex flex-col gap-2 lg:grid lg:aspect-[1280/527] lg:gap-2\" : \"grid aspect-[1280/527] gap-1 lg:gap-1\",\n        narrowFirst ? \"grid-cols-[1fr_2fr] lg:grid-cols-[1fr_2fr]\" : \"grid-cols-[2fr_1fr] lg:grid-cols-[2fr_1fr]\",\n      )}\n    >\n      {[0, 1].map((i) => {\n        const narrow = narrowFirst ? i === 0 : i === 1;\n        return (\n          <GranolaMedia\n            key={i}\n            tone={i === 0 ? TONES[index % 4] : TONES[(index + 1) % 4]}\n            className={cn(\"h-full w-full rounded-sm\", stack && (narrow ? \"aspect-[5/6] lg:aspect-auto\" : \"aspect-[1.58] lg:aspect-auto\"))}\n          >\n            {items[i]}\n          </GranolaMedia>\n        );\n      })}\n    </div>\n  );\n}\n\nexport function GranolaFeatures({ eyebrow, title, cta, rows, className }: GranolaFeaturesProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)_+_5rem_+_2*var(--page-gutter))] px-gutter pt-[5.5rem] pb-24 lg:pt-32 lg:pb-32\">\n        {eyebrow && <p className=\"font-display text-base\">{eyebrow}</p>}\n        <h2 className=\"mt-6 max-w-[13ch] font-display text-[3.75rem] leading-[0.97] tracking-[-0.01em] lg:mt-7 lg:max-w-[16ch] lg:text-[min(7.5vw,6.75rem)]\">\n          {title}\n        </h2>\n        {cta && (\n          <GranolaButton href={cta.href} trailingIcon={<ArrowDown />} className=\"mt-8 h-12 w-full text-base lg:mt-10 lg:h-14 lg:w-fit lg:text-sm\">\n            {cta.label}\n          </GranolaButton>\n        )}\n\n        <div className=\"mt-20 flex flex-col gap-20 lg:mt-32 lg:gap-[7.75rem]\">\n          {rows.map((row, i) => (\n            <article key={row.title} className=\"border-t border-foreground/10 pt-6 lg:pt-4\">\n              <div className=\"lg:grid lg:grid-cols-[1fr_28rem] lg:gap-8\">\n                <h3 className=\"font-display text-2xl leading-tight tracking-[-0.01em] lg:text-[2rem]\">{row.title}</h3>\n                <p className=\"mt-4 text-base leading-snug lg:mt-0 lg:text-[1.0625rem] lg:leading-[1.75]\">{row.body}</p>\n              </div>\n              {row.cta && (\n                <GranolaButton href={row.cta.href} icon={row.cta.icon} className=\"mt-8 h-12 w-full text-base lg:mt-6 lg:h-14 lg:w-fit lg:text-sm\">\n                  {row.cta.label}\n                </GranolaButton>\n              )}\n              {row.media && (\n                <div className=\"mt-8\">\n                  <RowMedia row={row} index={i} />\n                </div>\n              )}\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-button",
+    "granola-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small serif line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the huge serif headline"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the ink call to action under the headline"
+    },
+    {
+      "name": "rows",
+      "type": "GranolaFeatureRow[]",
+      "required": true,
+      "description": "the feature rows, each opened by a hairline"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "10aefe419dc2d8a4ff219e9b3323bfddcc05bd778654054066935cae4a9fdb0c"
+}

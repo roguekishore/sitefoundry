@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp platform bento",
+  "description": "A big two-tone statement with an acid-lime and a grey button, then a bento of warm light-grey cards with 12px corners and hairlines: two wide cards over three tall ones. Each card has a two-tone title top-left, a white square arrow chip top-right, and a product frame rising from the bottom that lifts slightly on hover.",
+  "category": "features",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "grid",
+    "light",
+    "minimal",
+    "hover",
+    "two-tone",
+    "fintech"
+  ],
+  "notes": [
+    "five cards fill the 2 + 3 layout; any extra cards continue in rows of three",
+    "each card's media slot fills the frame under its title; empty, it shows a soft grey pane"
+  ],
+  "entry": "ramp-platform.tsx",
+  "source": "foundry",
+  "name": "ramp-platform",
+  "files": [
+    {
+      "path": "ramp-platform.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\n\nexport interface RampPlatformCard {\n  /** the title's first words, in ink */\n  lead: string;\n  /** the rest of the title, in grey */\n  rest?: string;\n  href: string;\n  /** the product art under the title; empty shows a placeholder pane */\n  media?: ReactNode;\n}\n\nexport interface RampPlatformProps {\n  /** the statement's first sentence, in ink */\n  lead: string;\n  /** the second sentence, in grey on its own line */\n  rest?: string;\n  /** the acid-lime button */\n  primary?: { label: string; href: string };\n  /** the grey button */\n  secondary?: { label: string; href: string };\n  /** the first two become the wide cards, the rest the tall ones */\n  cards: RampPlatformCard[];\n  className?: string;\n}\n\nfunction Card({ card, wide }: { card: RampPlatformCard; wide: boolean }) {\n  return (\n    <a\n      href={card.href}\n      className={cn(\n        \"group relative flex flex-col overflow-clip rounded-lg border border-border bg-muted\",\n        wide ? \"aspect-[356/518] sm:aspect-[4/3]\" : \"aspect-[4/5]\",\n      )}\n    >\n      <div className=\"flex items-start justify-between gap-6 p-6 lg:p-8\">\n        <RampHeading as=\"h3\" size=\"card\" lead={card.lead} rest={card.rest} className=\"max-w-[18rem]\" />\n        <span\n          aria-hidden\n          className=\"grid size-[2.125rem] shrink-0 place-items-center rounded-[calc(var(--radius)-6px)] border border-border bg-card text-foreground transition-colors duration-300 group-hover:bg-foreground group-hover:text-background motion-reduce:transition-none\"\n        >\n          <ArrowUpRight className=\"size-3.5 transition-transform duration-300 group-hover:rotate-45 motion-reduce:transition-none\" strokeWidth={1.75} />\n        </span>\n      </div>\n      <div className=\"relative mx-6 mt-2 flex-1 transition-transform duration-[400ms] ease-out group-hover:-translate-y-1 motion-reduce:transition-none lg:mx-8\">\n        {card.media ?? (\n          <div aria-hidden className=\"absolute inset-x-0 top-0 -bottom-px rounded-t-lg border border-b-0 border-border bg-gradient-to-b from-card to-card/40\" />\n        )}\n      </div>\n    </a>\n  );\n}\n\n/** Ramp's platform overview: a statement, two buttons and a 2 + 3 bento of product cards. */\nexport function RampPlatform({ lead, rest, primary, secondary, cards, className }: RampPlatformProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter py-section lg:px-[calc(var(--page-gutter)*4)] lg:py-[calc(var(--section-y)*1.5)]\">\n        <RampHeading lead={lead} rest={rest} breakBeforeRest className=\"max-w-[60rem]\" />\n        {(primary || secondary) && (\n          <div className=\"mt-6 flex flex-wrap gap-3 lg:mt-8\">\n            {primary && <RampButton href={primary.href}>{primary.label}</RampButton>}\n            {secondary && (\n              <RampButton href={secondary.href} variant=\"secondary\">\n                {secondary.label}\n              </RampButton>\n            )}\n          </div>\n        )}\n        <div className=\"mt-10 grid gap-6 lg:mt-16\">\n          <div className=\"grid gap-6 lg:grid-cols-2\">\n            {cards.slice(0, 2).map((c) => (\n              <Card key={c.lead} card={c} wide />\n            ))}\n          </div>\n          <div className=\"grid gap-6 md:grid-cols-2 lg:grid-cols-3\">\n            {cards.slice(2).map((c) => (\n              <Card key={c.lead} card={c} wide={false} />\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button",
+    "ramp-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the statement's first sentence, in ink"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the second sentence, in grey on its own line"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the acid-lime button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the grey button"
+    },
+    {
+      "name": "cards",
+      "type": "RampPlatformCard[]",
+      "required": true,
+      "description": "the first two become the wide cards, the rest the tall ones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c4541d77afcd6b2eb2ed1c2fe9ce26419bfcd58abfd9de3ddfd1993419a086c5"
+}

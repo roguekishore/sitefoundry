@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Meow hero",
+  "description": "A deep ink-blue opening screen: a white pill badge with an orange NEW tag, a three-line 56px title, a short paragraph, a frosted one-field sign-up bar with an orange button and a block of 11px small print in a left column; a large round globe-sized media slot with a soft blue rim on the right; underneath the text, customer names slide by in an endless, edge-faded marquee.",
+  "category": "hero",
+  "site": "meow",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "fintech",
+    "split",
+    "email",
+    "badge",
+    "marquee",
+    "loop",
+    "glow",
+    "globe"
+  ],
+  "notes": [
+    "always dark: it carries the theme's dark tokens (class `dark`) in both modes",
+    "has 65px of top room for the fixed meow-header",
+    "media: the round slot (a globe or 3D scene in the original) is a placeholder disc with a glow rim until filled",
+    "the marquee is CSS only (60s loop) and stops under reduced motion"
+  ],
+  "entry": "meow-hero.tsx",
+  "source": "foundry",
+  "name": "meow-hero",
+  "files": [
+    {
+      "path": "meow-hero.css",
+      "content": "/* The customer names: two copies of the row side by side slide left by one copy's width,\n   so the loop is seamless. 60 s per lap, linear, as in the original. The edges fade out\n   through a mask (only its alpha matters, so the colour is the text token). */\n.meow-hero-marquee {\n  mask-image: linear-gradient(to right, transparent, var(--foreground) 14%, var(--foreground) 86%, transparent);\n}\n.meow-hero-marquee-track {\n  animation: meow-hero-marquee 60s linear infinite;\n}\n\n@keyframes meow-hero-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .meow-hero-marquee-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "meow-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MeowEmailForm, type MeowEmailFormProps } from \"@foundry/meow-email-form\";\nimport \"./meow-hero.css\";\n\nexport interface MeowHeroProps {\n  /** the pill above the title: a short tag (e.g. \"New\") and a line of news */\n  badge?: { tag: string; text: string; href: string };\n  /** the big title (three lines on desktop) */\n  title: ReactNode;\n  /** the paragraph under the title */\n  text: ReactNode;\n  /** the sign-up bar */\n  form: Omit<MeowEmailFormProps, \"surface\">;\n  /** the block of small print under the form */\n  fineprint?: ReactNode;\n  /** customer names (or logos) for the sliding row under the text */\n  logos?: ReactNode[];\n  /** the round media on the right (a globe, a 3D scene); a placeholder disc when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Meow's opening screen: text and sign-up left, a large round media slot right, a marquee below. */\nexport function MeowHero({ badge, title, text, form, fineprint, logos, media, className }: MeowHeroProps) {\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 px-gutter pt-[6.5rem] pb-10 lg:grid-cols-[minmax(0,35.5rem)_1fr] lg:gap-x-12 lg:pt-[7.5rem] lg:pb-9\">\n        <div className=\"min-w-0\">\n          {badge && (\n            <a\n              href={badge.href}\n              className=\"group flex w-full items-center gap-2 rounded-full bg-foreground py-1 pr-3 pl-1 text-background transition-opacity duration-150 hover:opacity-90 motion-reduce:transition-none sm:w-fit\"\n            >\n              <span className=\"shrink-0 rounded-full bg-primary px-2 py-1 text-[0.6875rem]/none font-bold tracking-[0.02em] text-primary-foreground uppercase\">\n                {badge.tag}\n              </span>\n              <span className=\"min-w-0 flex-1 text-sm/5 font-semibold sm:flex-none\">{badge.text}</span>\n              <ArrowRight aria-hidden className=\"size-3 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none\" strokeWidth={2} />\n            </a>\n          )}\n          <h1 className=\"mt-4 font-display text-[2rem]/10 font-semibold tracking-[-0.02em] lg:mt-5 lg:text-[3.5rem]/16 lg:tracking-[-0.03em]\">\n            {title}\n          </h1>\n          <p className=\"mt-5 max-w-[32rem] text-base/6 text-foreground lg:mt-6\">{text}</p>\n          <MeowEmailForm {...form} surface=\"frost\" className=\"mt-10 lg:mt-8 lg:max-w-[30.625rem]\" />\n          {fineprint && <div className=\"mt-8 max-w-[32rem] text-[0.6875rem]/4 text-foreground/90 [&_a]:underline\">{fineprint}</div>}\n        </div>\n\n        <div className=\"mt-12 flex items-start justify-center lg:row-span-2 lg:mt-11 lg:justify-end\">\n          <div className=\"relative aspect-square w-[20rem] max-w-full overflow-clip rounded-full lg:w-[32.5rem]\">\n            {media ?? (\n              <div\n                aria-hidden\n                className=\"size-full rounded-full bg-[radial-gradient(circle_at_50%_45%,color-mix(in_oklab,var(--glow)_14%,transparent),transparent_68%)] shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--glow)_70%,transparent),inset_0_0_40px_color-mix(in_oklab,var(--glow)_35%,transparent)]\"\n              />\n            )}\n          </div>\n        </div>\n\n        {logos?.length ? (\n          <div className=\"meow-hero-marquee mt-8 min-w-0 overflow-clip lg:mt-12\">\n            <div className=\"meow-hero-marquee-track flex w-max\">\n              {[0, 1].map((copy) => (\n                <ul key={copy} aria-hidden={copy === 1 || undefined} className=\"flex shrink-0 items-center gap-16 pr-16 lg:gap-[5.5rem] lg:pr-[5.5rem]\">\n                  {logos.map((logo, i) => (\n                    <li key={i} className=\"flex h-10 shrink-0 items-center font-display text-2xl font-semibold tracking-[-0.02em] whitespace-nowrap text-foreground/45\">\n                      {logo}\n                    </li>\n                  ))}\n                </ul>\n              ))}\n            </div>\n          </div>\n        ) : null}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "meow-email-form"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ tag: string; text: string; href: string; }",
+      "required": false,
+      "description": "the pill above the title: a short tag (e.g. \"New\") and a line of news"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big title (three lines on desktop)"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the paragraph under the title"
+    },
+    {
+      "name": "form",
+      "type": "Omit<MeowEmailFormProps, \"surface\">",
+      "required": true,
+      "description": "the sign-up bar"
+    },
+    {
+      "name": "fineprint",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the block of small print under the form"
+    },
+    {
+      "name": "logos",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "customer names (or logos) for the sliding row under the text"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the round media on the right (a globe, a 3D scene); a placeholder disc when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6dc27c57afd8842fe86897f7ccdca21f7dd4ba27f1bef633ca5c5a03fb18555a"
+}

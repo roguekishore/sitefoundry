@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Rho heading",
+  "description": "A large regular-weight section heading (60px desktop, 36px phones, line-height 1) whose words rise one after another from under their own line as it scrolls into view, later words trailing the scroll.",
+  "category": "text-effect",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "text-effect",
+    "reveal",
+    "scroll",
+    "split-text",
+    "stagger",
+    "minimal"
+  ],
+  "notes": [
+    "CSS scroll-driven (animation-timeline: view()); browsers without it, and reduced motion, show the words in place",
+    "size presets: section (60/36px) and hero (80/48px); override with className"
+  ],
+  "entry": "rho-heading.tsx",
+  "source": "foundry",
+  "name": "rho-heading",
+  "files": [
+    {
+      "path": "rho-heading.css",
+      "content": "/* Each word sits in a clip box one line tall and rises from just under it (1.1em, the\n   original's 66px at 60px type) as the heading crosses the lower half of the window. Word n\n   starts and ends a little later than word n-1, so the last words trail the scroll. */\n.rho-heading-clip {\n  display: inline-block;\n  overflow: clip;\n  vertical-align: top;\n  /* room for descenders under the tight line-height */\n  padding-bottom: 0.14em;\n  margin-bottom: -0.14em;\n}\n.rho-heading-word {\n  display: inline-block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .rho-heading-word {\n      animation: rho-heading-rise linear both;\n      animation-timeline: view();\n      animation-range: cover calc(6% + var(--rho-word, 0) * 1.2%) cover calc(26% + var(--rho-word, 0) * 2%);\n    }\n  }\n}\n\n@keyframes rho-heading-rise {\n  from { transform: translateY(1.1em); }\n  to { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "rho-heading.tsx",
+      "content": "import { Fragment, type CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./rho-heading.css\";\n\nexport interface RhoHeadingProps {\n  /** the heading text; it is split into words for the reveal */\n  text: string;\n  /** which heading element to render */\n  as?: \"h1\" | \"h2\" | \"h3\";\n  /** section: 36px phones / 60px desktop · hero: 48px / 80px */\n  size?: \"section\" | \"hero\";\n  /** words rise into place on scroll (default true) */\n  reveal?: boolean;\n  className?: string;\n}\n\nconst sizes = {\n  section: \"text-[2.25rem] leading-none lg:text-[3.75rem]\",\n  hero: \"text-[3rem] leading-[1.1] lg:text-[5rem]\",\n};\n\nexport function RhoHeading({ text, as: Tag = \"h2\", size = \"section\", reveal = true, className }: RhoHeadingProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <Tag className={cn(\"font-display font-normal tracking-[-0.01em] text-balance text-foreground\", sizes[size], className)}>\n      {reveal ? (\n        <>\n          <span className=\"sr-only\">{text}</span>\n          <span aria-hidden=\"true\">\n            {words.map((word, i) => (\n              <Fragment key={i}>\n                <span className=\"rho-heading-clip\">\n                  <span className=\"rho-heading-word\" style={{ \"--rho-word\": i } as CSSProperties}>\n                    {word}\n                  </span>\n                </span>\n                {i < words.length - 1 && \" \"}\n              </Fragment>\n            ))}\n          </span>\n        </>\n      ) : (\n        text\n      )}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the heading text; it is split into words for the reveal"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "which heading element to render"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "section: 36px phones / 60px desktop · hero: 48px / 80px"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "words rise into place on scroll (default true)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7e2bea1f1e4518ec7007d3494e877979aa24268920359c78d4b7590a294406a2"
+}

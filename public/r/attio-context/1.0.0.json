@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio context band",
+  "description": "The opening of a dark band: a pinstriped field with a small grey kicker and a huge white display title that comes up out of a blur, above a glowing horizon (a vast dark disc whose top rim catches amber, green and blue light) that grows from 84% and brightens as it scrolls up. Below, five hairline cells with an outline icon over a white title and a grey line (stacked and centred on phones).",
+  "category": "features",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "display-type",
+    "glow",
+    "pinstripe",
+    "hairline",
+    "scrubbed",
+    "reveal",
+    "blur",
+    "saas"
+  ],
+  "notes": [
+    "forces the dark palette and marks itself data-header-tone=\"dark\" for the attio header",
+    "the horizon is drawn from the theme's chart and glow colours; pass art to replace it",
+    "CSS only"
+  ],
+  "entry": "attio-context.tsx",
+  "source": "foundry",
+  "name": "attio-context",
+  "files": [
+    {
+      "path": "attio-context.css",
+      "content": "/* The kicker and the big title come up out of a blur as they enter. */\n@supports (animation-timeline: view()) {\n  .attio-context-title {\n    animation: attio-context-unblur linear both;\n    animation-timeline: view();\n    animation-range: entry 0px entry 320px;\n  }\n  /* the horizon disc grows from 84% and brightens while the intro passes the middle of the\n     window (timed on the intro, since the disc itself is mostly cropped) */\n  .attio-context-intro {\n    view-timeline-name: --attio-context;\n  }\n  .attio-context-horizon {\n    animation: attio-context-horizon linear both;\n    animation-timeline: --attio-context;\n    animation-range: cover 15% cover 65%;\n  }\n}\n\n@keyframes attio-context-unblur {\n  from { opacity: 0; filter: blur(8px); }\n  to { opacity: 1; filter: none; }\n}\n@keyframes attio-context-horizon {\n  from { opacity: 0; scale: 0.84; }\n  to { opacity: 1; scale: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-context-title,\n  .attio-context-horizon {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-context.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./attio-context.css\";\n\nexport interface AttioContextFeature {\n  /** a small outline icon (lucide works well) */\n  icon: ReactNode;\n  /** the short white title */\n  title: string;\n  /** one grey line */\n  text: string;\n}\n\nexport interface AttioContextProps {\n  /** the small grey line over the title */\n  kicker?: string;\n  /** the big display title */\n  title: string;\n  /** a small mark after the title, set high (e.g. ™) */\n  mark?: string;\n  /** replaces the glowing horizon disc behind the title */\n  art?: ReactNode;\n  /** five features in a hairline row (stacked on phones) */\n  features: AttioContextFeature[];\n  className?: string;\n}\n\n/**\n * The start of the dark band: a pinstriped field with a huge white display title above a\n * glowing horizon (a vast dark disc whose rim catches coloured light), growing into place\n * as it scrolls up; then five hairline cells, each an outline icon over a white title and\n * a grey line.\n */\nexport function AttioContext({ kicker, title, mark, art, features, className }: AttioContextProps) {\n  return (\n    <section data-header-tone=\"dark\" className={cn(\"dark bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"mx-auto max-w-page lg:border-x lg:border-border\">\n        <div className=\"attio-context-intro relative isolate h-[25.75rem] overflow-clip border-b border-border bg-[repeating-linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_3.5%,transparent)_0_1px,transparent_1px_8px)] lg:h-[51.125rem]\">\n          <div aria-hidden className=\"attio-context-horizon absolute top-[19rem] left-1/2 -z-10 size-[32rem] -translate-x-1/2 lg:top-[29.375rem] lg:size-[108.75rem]\">\n            {art ?? (\n              <>\n                {/* the rim light: a blurred colour wheel peeking out around the disc's top edge */}\n                <div className=\"absolute -inset-[2px] rounded-full bg-[conic-gradient(from_270deg,var(--chart-4),var(--chart-3)_15%,var(--glow)_25%,var(--chart-2)_35%,var(--chart-1)_45%,transparent_55%,transparent_95%,var(--chart-4))] opacity-80 blur-[6px] [mask-image:linear-gradient(to_bottom,black,transparent_24%)] lg:-inset-[3px] lg:blur-[10px]\" />\n                <div className=\"absolute inset-0 rounded-full bg-background shadow-[0_-30px_80px_-20px_color-mix(in_oklab,var(--foreground)_10%,transparent)]\" />\n              </>\n            )}\n          </div>\n          <div className=\"attio-context-title flex flex-col items-center px-gutter pt-[11.5rem] text-center lg:pt-[16.75rem]\">\n            {kicker && <p className=\"text-sm font-medium tracking-[-0.01em] text-muted-foreground lg:text-[0.9375rem]\">{kicker}</p>}\n            <h2 className=\"mt-1.5 font-display text-[2.75rem] leading-[1] font-semibold tracking-[-0.045em] lg:mt-2 lg:text-[6rem]\">\n              {title}\n              {mark && <sup className=\"ml-0.5 align-super text-[0.25em] font-semibold tracking-normal\">{mark}</sup>}\n            </h2>\n          </div>\n        </div>\n\n        <ul className=\"grid border-b border-border lg:grid-cols-5\">\n          {features.map((f, i) => (\n            <li\n              key={f.title}\n              className={cn(\n                \"flex flex-col items-center px-8 py-10 text-center lg:h-[17.5rem] lg:items-start lg:px-7 lg:pt-11 lg:pb-8 lg:text-left\",\n                i > 0 && \"border-t border-border lg:border-t-0 lg:border-l\",\n              )}\n            >\n              <span aria-hidden className=\"text-muted-foreground [&_svg]:size-6 [&_svg]:stroke-[1.5]\">{f.icon}</span>\n              <h3 className=\"mt-4 text-base leading-[1.4] font-semibold tracking-[-0.01em] lg:mt-auto\">{f.title}</h3>\n              <p className=\"mt-1 max-w-[13.5rem] text-sm leading-[1.45] font-medium text-muted-foreground max-lg:max-w-none\">{f.text}</p>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "kicker",
+      "type": "string",
+      "required": false,
+      "description": "the small grey line over the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big display title"
+    },
+    {
+      "name": "mark",
+      "type": "string",
+      "required": false,
+      "description": "a small mark after the title, set high (e.g. ™)"
+    },
+    {
+      "name": "art",
+      "type": "ReactNode",
+      "required": false,
+      "description": "replaces the glowing horizon disc behind the title"
+    },
+    {
+      "name": "features",
+      "type": "AttioContextFeature[]",
+      "required": true,
+      "description": "five features in a hairline row (stacked on phones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ffdf328f5d6a0a34e6e08c2feaade5ccf1bfeb8fd3364c5a83186d68cd6a0b77"
+}

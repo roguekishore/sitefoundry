@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower header",
+  "description": "A sticky white bar with a heavy lowercase wordmark at the left and a near-black pill CTA at the right. On desktop the links sit before the CTA and the wordmark starts large, shrinking to three quarters of its size over the first 450px of scroll. On phones: wordmark, CTA and a 3×3-dot menu button that drops the links down under the bar.",
+  "category": "header",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "minimal",
+    "pill",
+    "scroll-linked"
+  ],
+  "notes": [
+    "sticky: put it at the top level of the page; on phones it overlaps the first section by its own height (72px), on desktop it takes 82px in the flow",
+    "the wordmark shrink is a CSS scroll timeline; without support it simply stays at the smaller size"
+  ],
+  "entry": "superpower-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "superpower-header",
+  "files": [
+    {
+      "path": "superpower-header.css",
+      "content": "/* Desktop: the wordmark starts at full size and shrinks to 75% over the first 450px of page\n   scroll. Without scroll timelines (or with reduced motion) it sits at the smaller size. */\n.superpower-header-logo {\n  transform-origin: left center;\n}\n@media (min-width: 64rem) {\n  .superpower-header-logo {\n    transform: scale(0.75);\n  }\n  @supports (animation-timeline: scroll()) {\n    @media (prefers-reduced-motion: no-preference) {\n      .superpower-header-logo {\n        animation: superpower-header-logo-shrink linear both;\n        animation-timeline: scroll(root);\n        animation-range: 0 450px;\n      }\n    }\n  }\n}\n\n@keyframes superpower-header-logo-shrink {\n  from {\n    transform: scale(1);\n  }\n  to {\n    transform: scale(0.75);\n  }\n}\n"
+    },
+    {
+      "path": "superpower-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Grip, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerButton } from \"@foundry/superpower-button\";\nimport \"./superpower-header.css\";\n\nexport interface SuperpowerHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface SuperpowerHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the wordmark (styled text or an svg); it is shown large and shrinks on scroll on desktop */\n  logo: ReactNode;\n  homeHref?: string;\n  /** links before the CTA on desktop, and in the phone menu */\n  links: SuperpowerHeaderLink[];\n  /** the near-black pill at the right */\n  cta: { label: string; href: string };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  className?: string;\n}\n\nexport function SuperpowerHeader({ brand, logo, homeHref = \"/\", links, cta, menuLabel = \"Menu\", className }: SuperpowerHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"sticky top-0 z-40 -mb-[4.5rem] lg:mb-0\", className)}>\n      <div className=\"border-b border-border bg-background/95 text-foreground backdrop-blur-md lg:border-transparent\">\n        <div className=\"mx-auto flex h-[4.5rem] max-w-page items-center gap-3 px-gutter lg:h-[5.125rem]\">\n          <a href={homeHref} aria-label={brand} className=\"superpower-header-logo mr-auto flex shrink-0 items-center\">\n            {logo}\n          </a>\n          <nav className=\"hidden items-center gap-8 lg:flex\">\n            {links.map((link) => (\n              <a\n                key={link.href}\n                href={link.href}\n                className=\"text-[0.9375rem] tracking-[-0.01em] text-foreground transition-colors duration-200 ease-out hover:text-foreground/70 motion-reduce:transition-none\"\n              >\n                {link.label}\n              </a>\n            ))}\n          </nav>\n          <SuperpowerButton href={cta.href} size=\"sm\" className=\"lg:ml-5\">\n            {cta.label}\n          </SuperpowerButton>\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"-mr-1.5 grid size-10 place-items-center rounded-full transition-colors duration-200 hover:bg-muted lg:hidden\"\n          >\n            {open ? <X className=\"size-6\" strokeWidth={1.75} aria-hidden /> : <Grip className=\"size-7\" strokeWidth={2.25} aria-hidden />}\n          </button>\n        </div>\n      </div>\n      {open && (\n        <nav className=\"border-b border-border bg-background px-gutter pt-2 pb-6 text-foreground lg:hidden\">\n          {links.map((link) => (\n            <a\n              key={link.href}\n              href={link.href}\n              onClick={() => setOpen(false)}\n              className=\"block border-b border-border py-4 text-[1.125rem] tracking-[-0.01em] last:border-0\"\n            >\n              {link.label}\n            </a>\n          ))}\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (styled text or an svg); it is shown large and shrinks on scroll on desktop"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "SuperpowerHeaderLink[]",
+      "required": true,
+      "description": "links before the CTA on desktop, and in the phone menu"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the near-black pill at the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "915704a81844a035bf7a4402fad0aa88d13ffbe3f56e35980979cbcff9e3261a"
+}

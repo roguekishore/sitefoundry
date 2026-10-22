@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power pinned rail",
+  "description": "A pinned product tour: a green heading with a hand-drawn underline, a list of four points along a grey rail, two buttons, and a large rounded photo. While the section is pinned an orange bar grows down the rail; at each quarter the next point turns green, grows and opens its text, and the photo crossfades in from a slight zoom. Rises in as it arrives; phones put the photo on top.",
+  "category": "features",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "pinned",
+    "sticky",
+    "scroll",
+    "scrubbed",
+    "progress",
+    "crossfade",
+    "reveal",
+    "light"
+  ],
+  "notes": [
+    "pinned for 4.2 windows on phones, 3.6 on desktop (the section is 520svh / 460svh tall); four points read best",
+    "CSS scroll timelines only, no JavaScript; without support, or with reduced motion, it is a plain section with every point open and the first photo shown",
+    "keep each point's text to about three lines: the open state is capped at 8rem"
+  ],
+  "entry": "basepowercompany-rail.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-rail",
+  "files": [
+    {
+      "path": "basepowercompany-rail.css",
+      "content": "/* Pinned rail. Only with scroll timelines and motion allowed: the section grows to 5.2 windows\n   (4.6 on desktop), its screen sticks, and everything below runs on the section's own view\n   timeline (--bp-rail). The \"contain\" range is the pinned stretch. Each point's open/close\n   pair is set per item with inline --bp-anim / --bp-range: \"open\" fills backwards (closed\n   before its turn), \"close\" fills forwards (closed after it), and the base style between them\n   is the open look. Without support every point stays open and the first photo shows. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bp-rail {\n      height: 520svh;\n      view-timeline: --bp-rail block;\n    }\n    @media (min-width: 64rem) {\n      .bp-rail {\n        height: 460svh;\n      }\n    }\n    .bp-rail-screen {\n      position: sticky;\n      top: 0;\n      display: flex;\n      align-items: center;\n      height: 100svh;\n      padding-block: 0;\n    }\n\n    /* the heading, list, buttons and photo card rise in as the section arrives */\n    .bp-rail-in {\n      animation-name: bp-rail-in;\n      animation-duration: auto;\n      animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);\n      animation-fill-mode: both;\n      animation-timeline: --bp-rail;\n      animation-range: entry 30% entry 80%;\n    }\n\n    .bp-rail-fill {\n      animation-name: bp-rail-fill;\n      animation-duration: auto;\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --bp-rail;\n      animation-range: contain 0% contain 100%;\n    }\n\n    .bp-rail-desc {\n      max-height: 8rem;\n    }\n    .bp-rail-desc,\n    .bp-rail-title,\n    .bp-rail-title h3,\n    .bp-rail-photo {\n      animation-name: var(--bp-anim);\n      animation-duration: auto;\n      animation-timing-function: linear;\n      animation-fill-mode: backwards, forwards;\n      animation-timeline: --bp-rail;\n      animation-range: var(--bp-range);\n    }\n    .bp-rail-title h3 {\n      animation-name: var(--bp-anim-size);\n    }\n  }\n}\n\n@keyframes bp-rail-in {\n  from { opacity: 0; transform: translateY(18px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes bp-rail-fill {\n  from { transform: scaleY(0.04); }\n  to { transform: scaleY(1); }\n}\n\n@keyframes bp-rail-desc-open {\n  from { max-height: 0; opacity: 0; }\n}\n@keyframes bp-rail-desc-close {\n  to { max-height: 0; opacity: 0; }\n}\n@keyframes bp-rail-title-open {\n  from { color: var(--muted-foreground); }\n}\n@keyframes bp-rail-title-close {\n  to { color: var(--muted-foreground); }\n}\n@keyframes bp-rail-size-open {\n  from { font-size: 1rem; }\n}\n@keyframes bp-rail-size-close {\n  to { font-size: 1rem; }\n}\n@keyframes bp-rail-photo-open {\n  from { opacity: 0; transform: scale(1.05); }\n}\n@keyframes bp-rail-photo-close {\n  to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "basepowercompany-rail.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyButton } from \"@foundry/basepowercompany-button\";\nimport { BasepowercompanyMedia } from \"@foundry/basepowercompany-media\";\nimport \"./basepowercompany-rail.css\";\n\nexport interface BasepowercompanyRailItem {\n  /** a small line icon (lucide) before the title */\n  icon: ReactNode;\n  /** the short title, always shown */\n  title: string;\n  /** the text that opens while this item is the active one (may hold a <strong>) */\n  body: ReactNode;\n  /** the photo shown while this item is active */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n}\n\nexport interface BasepowercompanyRailProps {\n  /** the heading; wrap a phrase in BasepowercompanySwash to underline it */\n  title: ReactNode;\n  /** the points, told one at a time while the section is pinned (four reads best) */\n  items: BasepowercompanyRailItem[];\n  /** the lime button and the outline button under the list */\n  primaryCta?: { label: string; href: string };\n  secondaryCta?: { label: string; href: string };\n  className?: string;\n}\n\n// Where item k opens and closes on the pinned stretch: evenly spaced, each change over 4%.\nfunction ranges(k: number, n: number) {\n  const at = (i: number) => (i * 100) / n;\n  const open = k > 0 ? `contain ${at(k) - 2}% contain ${at(k) + 2}%` : \"contain 0% contain 0%\";\n  const close = k < n - 1 ? `contain ${at(k + 1) - 2}% contain ${at(k + 1) + 2}%` : \"contain 100% contain 100%\";\n  return { open, close, hasOpen: k > 0, hasClose: k < n - 1 };\n}\n\nfunction vars(k: number, n: number, kind: \"desc\" | \"title\" | \"photo\"): CSSProperties {\n  const r = ranges(k, n);\n  const names = (name: string) => `${r.hasOpen ? `bp-rail-${name}-open` : \"none\"}, ${r.hasClose ? `bp-rail-${name}-close` : \"none\"}`;\n  return {\n    [\"--bp-range\" as string]: `${r.open}, ${r.close}`,\n    [\"--bp-anim\" as string]: names(kind),\n    // the title's text size has its own pair (desktop only: phones keep one size)\n    ...(kind === \"title\" ? { [\"--bp-anim-size\" as string]: names(\"size\") } : {}),\n  };\n}\n\n/*\n * Pinned while you scroll through it: a heading and a list of points on the left, a photo on\n * the right. An orange bar grows down the list; at each quarter the next point turns green,\n * grows and opens its text while the photo crossfades. CSS scroll timelines only; without\n * them (or with reduced motion) it is a plain section with every point open.\n */\nexport function BasepowercompanyRail({ title, items, primaryCta, secondaryCta, className }: BasepowercompanyRailProps) {\n  const n = items.length;\n  return (\n    <section className={cn(\"bp-rail relative bg-background text-foreground\", className)}>\n      <div className=\"bp-rail-screen py-section\">\n        <div className=\"mx-auto grid w-full max-w-page gap-5 px-gutter pt-[3.3125rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.225fr)] lg:items-center lg:gap-x-18 lg:px-[calc(var(--page-gutter)+2.375rem)] lg:pt-[4.3125rem]\">\n          {/* photos: stacked, the first on top */}\n          <div className=\"bp-rail-in relative aspect-[1.77] overflow-clip rounded-2xl lg:order-2 lg:aspect-[1.017]\">\n            {items.map((it, k) => (\n              // the first item sits on top; later ones show as it fades\n              <div key={k} className=\"bp-rail-photo absolute inset-0\" style={{ zIndex: n - k, ...vars(k, n, \"photo\") }}>\n                <BasepowercompanyMedia media={it.media} label={it.mediaLabel} className=\"size-full\" />\n              </div>\n            ))}\n          </div>\n\n          <div className=\"lg:order-1\">\n            <h2 className=\"bp-rail-in font-display text-[2rem] leading-[1.2] font-bold tracking-[-0.025em] text-primary lg:text-[2.5rem]\">{title}</h2>\n\n            <ol className=\"bp-rail-in relative mt-4 pl-[3.4375rem] lg:mt-5\">\n              {/* the rail: a grey track and an orange fill that grows down it */}\n              <span aria-hidden className=\"absolute inset-y-0 left-0 w-1.5 rounded-full bg-muted\" />\n              <span aria-hidden className=\"bp-rail-fill absolute inset-y-0 left-0 w-1.5 origin-top rounded-full bg-highlight\" />\n              {items.map((it, k) => (\n                <li key={k} className={cn(\"relative\", k < n - 1 && \"pb-5 lg:pb-[4.75rem]\")}>\n                  <div className=\"bp-rail-title flex items-start text-primary\" style={vars(k, n, \"title\")}>\n                    <span aria-hidden className=\"absolute -left-9 flex h-[1.875rem] items-center [&_svg]:size-6 [&_svg]:stroke-[1.5] lg:h-[1.6875rem]\">\n                      {it.icon}\n                    </span>\n                    <h3 className=\"text-base leading-[1.4] lg:text-xl lg:leading-[1.35] font-bold tracking-normal\">{it.title}</h3>\n                  </div>\n                  <div className=\"bp-rail-desc overflow-clip\" style={vars(k, n, \"desc\")}>\n                    <p className=\"pt-1.5 text-sm leading-[1.5] tracking-[-0.005em] text-foreground lg:text-base lg:leading-[1.4] [&_strong]:font-bold\">{it.body}</p>\n                  </div>\n                </li>\n              ))}\n            </ol>\n\n            {(primaryCta || secondaryCta) && (\n              <div className=\"bp-rail-in mt-4 flex flex-col gap-2.5 lg:mt-14 lg:flex-row lg:gap-8\">\n                {primaryCta && (\n                  <BasepowercompanyButton href={primaryCta.href} className=\"w-full lg:w-auto\">\n                    {primaryCta.label}\n                  </BasepowercompanyButton>\n                )}\n                {secondaryCta && (\n                  <BasepowercompanyButton href={secondaryCta.href} variant=\"outline\" className=\"w-full lg:w-auto\">\n                    {secondaryCta.label}\n                  </BasepowercompanyButton>\n                )}\n              </div>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "basepowercompany-button",
+    "basepowercompany-media",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the heading; wrap a phrase in BasepowercompanySwash to underline it"
+    },
+    {
+      "name": "items",
+      "type": "BasepowercompanyRailItem[]",
+      "required": true,
+      "description": "the points, told one at a time while the section is pinned (four reads best)"
+    },
+    {
+      "name": "primaryCta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the lime button and the outline button under the list"
+    },
+    {
+      "name": "secondaryCta",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "672b2d36ff3677b4ecb2a0348249b3e0642b1fb654b76ae73be51fb2eb42d3ff"
+}

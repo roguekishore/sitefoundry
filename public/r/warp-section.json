@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Warp section frame",
+  "description": "The frame every section sits in: a full-width hairline on top with small ink ticks hanging at six column guides, faint vertical guides, a dotted margin outside a plain centre column, and black tabs at both window edges level with the heading. The heading is a typed '# TAG [STATUS]' line, a large mono title with open leading and a muted lead, with an optional button at the right. The content rises 12px and fades in as it enters the window.",
+  "category": "layout",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "section",
+    "heading",
+    "frame",
+    "grid-lines",
+    "dot-grid",
+    "mono",
+    "technical",
+    "reveal",
+    "typewriter",
+    "scroll",
+    "developer"
+  ],
+  "notes": [
+    "the reveal and the typed tag are CSS scroll-driven animations; browsers without them (and reduced motion) show everything in place",
+    "tone brand turns the whole band brand-coloured with white dots (for a highlighted section)",
+    "also exports WarpGuides, the column guides alone, for blocks that draw their own section",
+    "all warp blocks subtract var(--warp-squeeze) from their letter-spacing: 0.1em in the warp theme (its mono runs wide), 0 under other themes"
+  ],
+  "entry": "warp-section.tsx",
+  "source": "foundry",
+  "name": "warp-section",
+  "files": [
+    {
+      "path": "warp-section.css",
+      "content": "/* The typed tag: the label is clipped to the width of its characters (1ch each in the mono)\n   and opened as the section enters the window; a pending glyph sits in the brackets until the\n   label is typed, then the status replaces it\n   (both clipped to their width, so the brackets close up around whichever shows). The whole content rises 12px and fades in. */\n.warp-section-tag-label {\n  display: inline-block;\n  overflow: clip;\n  white-space: nowrap;\n  vertical-align: bottom;\n}\n.warp-section-tag-status,\n.warp-section-tag-pending {\n  display: inline-block;\n  overflow: clip;\n  white-space: nowrap;\n  vertical-align: bottom;\n}\n.warp-section-tag-pending {\n  display: none;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .warp-section-reveal {\n      view-timeline: --warp-section block;\n      animation: warp-section-rise linear both;\n      animation-timeline: --warp-section;\n      animation-range: entry 0px entry 240px;\n    }\n    .warp-section-tag-label {\n      animation: warp-section-type linear both;\n      animation-timeline: --warp-section;\n      animation-range: entry 80px entry 300px;\n    }\n    .warp-section-tag-pending {\n      display: inline-block;\n      animation: warp-section-pending linear both;\n      animation-timeline: --warp-section;\n      animation-range: entry 80px entry 380px;\n    }\n    .warp-section-tag-status {\n      animation: warp-section-status linear both;\n      animation-timeline: --warp-section;\n      animation-range: entry 80px entry 380px;\n    }\n  }\n}\n\n/* All warp blocks write letter-spacing as \"original spacing - var(--warp-squeeze, 0em)\": the\n   warp theme sets the squeeze to 0.1em because Azeret Mono runs wider than the original's\n   mono; under any other theme it is 0. */\n\n@keyframes warp-section-rise {\n  from { opacity: 0; translate: 0 12px; }\n  to { opacity: 1; translate: 0 0; }\n}\n@keyframes warp-section-type {\n  from { max-width: 0; }\n  to { max-width: calc(var(--warp-tag-chars) * (1ch + 0.2em)); }\n}\n@keyframes warp-section-pending {\n  0%, 79% { max-width: 2ch; }\n  80%, 100% { max-width: 0; }\n}\n@keyframes warp-section-status {\n  0%, 79% { max-width: 0; }\n  80%, 100% { max-width: calc(var(--warp-tag-chars) * (1ch + 0.2em)); }\n}\n"
+    },
+    {
+      "path": "warp-section.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./warp-section.css\";\n\nexport interface WarpSectionProps {\n  /** anchor id, so sub-navigation links can jump here */\n  id?: string;\n  /** the small uppercase label above the title, typed in after a \"#\" */\n  tag?: string;\n  /** a status shown in brackets after the tag once it is typed, e.g. \"online\" */\n  status?: string;\n  /** what the brackets hold while the tag is being typed */\n  pending?: string;\n  /** the section title */\n  title?: ReactNode;\n  /** the line under the title */\n  lead?: ReactNode;\n  /** colour of the lead: muted ink, or the brand colour */\n  leadTone?: \"muted\" | \"brand\";\n  /** a button shown at the right of the heading (under it on phones) */\n  action?: ReactNode;\n  /** page: the page colour with a dotted margin · brand: a brand-coloured band with white dots */\n  tone?: \"page\" | \"brand\";\n  /** draw the black tabs at the window edges level with the heading (on by default with a tag) */\n  marks?: boolean;\n  /** the section's content, under the heading */\n  children?: ReactNode;\n  className?: string;\n  /** classes for the content column (e.g. a different vertical padding) */\n  contentClassName?: string;\n}\n\n/** The six column guides with ticks under the top hairline, drawn over a section. */\nexport function WarpGuides({ tone = \"page\", ticks = true }: { tone?: \"page\" | \"brand\"; ticks?: boolean }) {\n  return (\n    <div aria-hidden className=\"pointer-events-none absolute inset-0\">\n      <div className=\"relative mx-2 h-full max-w-page lg:mx-auto\">\n        {[0, 1, 2, 3, 4, 5, 6].map((i) => (\n          <span key={i} className=\"absolute inset-y-0 w-px\" style={{ left: `calc(${(i / 6) * 100}% - ${i === 6 ? 1 : 0}px)` }}>\n            <span className={cn(\"absolute inset-0\", tone === \"brand\" ? \"bg-primary-foreground/10\" : \"bg-foreground/[0.05]\")} />\n            {ticks && <span className={cn(\"absolute inset-x-0 top-0 h-[5px]\", tone === \"brand\" ? \"bg-primary-foreground/60\" : \"bg-foreground\")} />}\n          </span>\n        ))}\n      </div>\n    </div>\n  );\n}\n\nconst dots = {\n  page: \"bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--foreground)_7%,transparent)_1.2px,transparent_0)]\",\n  brand: \"bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--primary-foreground)_18%,transparent)_1.2px,transparent_0)]\",\n};\n\n/** A Warp-style section: hairline + ticks on top, guides, typed tag, mono title, reveal on entry. */\nexport function WarpSection({\n  id,\n  tag,\n  status,\n  pending = \".\",\n  title,\n  lead,\n  leadTone = \"muted\",\n  action,\n  tone = \"page\",\n  marks,\n  children,\n  className,\n  contentClassName,\n}: WarpSectionProps) {\n  const brand = tone === \"brand\";\n  const showMarks = marks ?? Boolean(tag);\n  const hasHeading = Boolean(tag || title || lead || action);\n  return (\n    <section\n      id={id}\n      className={cn(\n        \"relative scroll-mt-16 overflow-x-clip border-t bg-[size:24px_24px]\",\n        brand ? \"border-primary bg-primary text-primary-foreground\" : \"border-border bg-background text-foreground\",\n        dots[tone],\n        className,\n      )}\n    >\n      {!brand && <div aria-hidden className=\"absolute inset-y-0 right-2 left-2 mx-auto max-w-page bg-background lg:right-0 lg:left-0\" />}\n      <WarpGuides tone={tone} />\n      {showMarks && (\n        <>\n          <span aria-hidden className={cn(\"absolute top-[3.25rem] left-0 h-6 w-3\", brand ? \"bg-primary-foreground\" : \"bg-foreground\")} />\n          <span aria-hidden className={cn(\"absolute top-[3.25rem] right-0 h-6 w-3\", brand ? \"bg-primary-foreground\" : \"bg-foreground\")} />\n        </>\n      )}\n      <div className={cn(\"relative mx-2 max-w-page px-4 py-section lg:mx-auto lg:px-6\", contentClassName)}>\n        <div className=\"warp-section-reveal\">\n          {hasHeading && (\n            <div className=\"mb-9 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-10\">\n              <div className=\"min-w-0\">\n                {tag && (\n                  <p className=\"mb-4 font-mono text-xs leading-none font-semibold tracking-[calc(0.11em_-_var(--warp-squeeze,0em))] uppercase lg:mb-[1.125rem]\">\n                    <span aria-hidden>#</span>{\" \"}\n                    <span className=\"warp-section-tag-label\" style={{ \"--warp-tag-chars\": tag.length } as CSSProperties}>\n                      {tag}\n                    </span>\n                    {status && (\n                      <span className={cn(\"ml-[0.6ch] font-normal\", brand ? \"text-primary-foreground/70\" : \"text-muted-foreground\")}>\n                        [<span aria-hidden className=\"warp-section-tag-pending\">{pending}</span>\n                        <span className=\"warp-section-tag-status\" style={{ \"--warp-tag-chars\": status.length } as CSSProperties}>\n                          {status}\n                        </span>]\n                      </span>\n                    )}\n                  </p>\n                )}\n                {title && (\n                  <h2 className=\"max-w-[20ch] font-mono text-[2rem] leading-[3.5rem] font-[380] tracking-[calc(0.01em_-_var(--warp-squeeze,0em))] text-balance sm:max-w-none\">\n                    {title}\n                  </h2>\n                )}\n                {lead && (\n                  <p\n                    className={cn(\n                      \"mt-2.5 max-w-[42rem] text-sm leading-[1.65] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] lg:max-w-none\",\n                      leadTone === \"brand\" ? \"text-primary\" : brand ? \"text-primary-foreground/80\" : \"text-muted-foreground\",\n                    )}\n                  >\n                    {lead}\n                  </p>\n                )}\n              </div>\n              {action && <div className=\"shrink-0\">{action}</div>}\n            </div>\n          )}\n          {children}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id, so sub-navigation links can jump here"
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the small uppercase label above the title, typed in after a \"#\""
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": false,
+      "description": "a status shown in brackets after the tag once it is typed, e.g. \"online\""
+    },
+    {
+      "name": "pending",
+      "type": "string",
+      "required": false,
+      "default": ".",
+      "description": "what the brackets hold while the tag is being typed"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under the title"
+    },
+    {
+      "name": "leadTone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "colour of the lead: muted ink, or the brand colour"
+    },
+    {
+      "name": "action",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a button shown at the right of the heading (under it on phones)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "page",
+      "description": "page: the page colour with a dotted margin · brand: a brand-coloured band with white dots"
+    },
+    {
+      "name": "marks",
+      "type": "boolean",
+      "required": false,
+      "description": "draw the black tabs at the window edges level with the heading (on by default with a tag)"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the section's content, under the heading"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "contentClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the content column (e.g. a different vertical padding)"
+    }
+  ],
+  "hash": "0bff1521c82b75eee16c5681d17b5d71b2fc4a3813c34fc69b15964540205ae2"
+}

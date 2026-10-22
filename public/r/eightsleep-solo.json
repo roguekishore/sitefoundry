@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep staggered pair",
+  "description": "A light-grey band with a centered heading, a sub-line and a black button, then two tall rounded photo cards side by side with large white captions at the bottom-left. While you scroll (desktop), the left card slides from 209px below the right one to 209px above it, so the pair shears past each other. On phones the cards stack.",
+  "category": "features",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "media",
+    "pair",
+    "parallax",
+    "scrubbed",
+    "light",
+    "reveal"
+  ],
+  "notes": [
+    "two media slots, 652×837 on desktop and 350×450 on phones, radius 20px",
+    "the left card overhangs the next section by up to 209px while it drifts; leave the next section unclipped at the top"
+  ],
+  "entry": "eightsleep-solo.tsx",
+  "source": "foundry",
+  "name": "eightsleep-solo",
+  "files": [
+    {
+      "path": "eightsleep-solo.css",
+      "content": "/* The left card drifts from +209px to -209px across its pass through the window (desktop). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .eightsleep-solo-drift {\n      animation: eightsleep-solo-drift linear both;\n      animation-timeline: --eightsleep-solo-pair;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n.eightsleep-solo-pair {\n  view-timeline: --eightsleep-solo-pair block;\n}\n\n@keyframes eightsleep-solo-drift {\n  from { translate: 0 209px; }\n  to { translate: 0 -209px; }\n}\n"
+    },
+    {
+      "path": "eightsleep-solo.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepButton } from \"@foundry/eightsleep-button\";\nimport { EightsleepHeading } from \"@foundry/eightsleep-heading\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\nimport \"./eightsleep-solo.css\";\n\nexport interface EightsleepSoloCard {\n  /** the big white caption at the bottom-left */\n  caption: ReactNode;\n  /** the photo or video */\n  media?: ReactNode;\n}\n\nexport interface EightsleepSoloProps {\n  title: ReactNode;\n  sub?: ReactNode;\n  /** the black button under the heading */\n  cta?: { label: ReactNode; href: string };\n  /** exactly two cards: the left one drifts */\n  cards: [EightsleepSoloCard, EightsleepSoloCard];\n  className?: string;\n}\n\nexport function EightsleepSolo({ title, sub, cta, cards, className }: EightsleepSoloProps) {\n  return (\n    <section className={cn(\"relative z-10 bg-muted pt-section pb-16 text-foreground lg:pt-[110px] lg:pb-[113px]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-16\">\n        <EightsleepHeading title={title} sub={sub} />\n        {cta && (\n          <div className=\"mt-8 flex justify-center\">\n            <EightsleepButton href={cta.href} size=\"lg\">\n              {cta.label}\n            </EightsleepButton>\n          </div>\n        )}\n        <div className=\"eightsleep-solo-pair mt-8 grid gap-2 lg:mt-12 lg:grid-cols-2\">\n          {cards.map((card, i) => (\n            <div key={i} className={cn(i === 0 && \"eightsleep-solo-drift\")}>\n              <div className=\"dark relative aspect-[350/450] overflow-clip rounded-lg bg-background text-foreground lg:aspect-[652/837] lg:rounded-xl\">\n                <EightsleepMedia media={card.media} className=\"absolute inset-0 bg-muted-foreground/40\" />\n                <div className=\"pointer-events-none absolute inset-0 bg-linear-to-b from-transparent from-60% to-background/40\" />\n                <p className=\"absolute right-6 bottom-6 left-6 max-w-[20ch] text-[20px] leading-[1.1] lg:right-14 lg:bottom-14 lg:left-14 lg:text-[28px]\">{card.caption}</p>\n              </div>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "eightsleep-button",
+    "eightsleep-heading",
+    "eightsleep-media",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "sub",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the black button under the heading"
+    },
+    {
+      "name": "cards",
+      "type": "[EightsleepSoloCard, EightsleepSoloCard]",
+      "required": true,
+      "description": "exactly two cards: the left one drifts"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "94a2290b9ff281abb3eb7ab92a9de413db93df474821a15772527e4c1659d402"
+}

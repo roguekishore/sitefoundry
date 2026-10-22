@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Radiant Nuclear pinned tour",
+  "description": "A pinned, scroll-told programme tour on cream. A bold all-caps heading and a paragraph stay at the top of the window; below them one illustration at a time sits centred, with a short centred caption under it and a thin progress track at the bottom. Scrolling crossfades the illustrations, lifts each new caption 14px into place as the last one sinks away, steps the dark segment along the track, and glides a small teal pointer across it.",
+  "category": "features",
+  "site": "radiantnuclear",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "steps",
+    "pinned",
+    "sticky",
+    "scroll",
+    "scrubbed",
+    "crossfade",
+    "progress",
+    "uppercase",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "(steps × 0.6 + 1) screens tall: 400svh with five steps; the stage is one window high, at most 1100px",
+    "works with 2 to 7 steps; each step's caption is a lead line and a few sentences",
+    "pure CSS scroll-driven; without scroll timelines or with reduced motion it becomes a plain list of illustrated steps"
+  ],
+  "entry": "radiantnuclear-tour.tsx",
+  "source": "foundry",
+  "name": "radiantnuclear-tour",
+  "files": [
+    {
+      "path": "radiantnuclear-tour.css",
+      "content": "/* Plain layout (Tailwind classes in the .tsx): heading, then a list of illustrated steps.\n   Where scroll timelines exist and motion is welcome, the section becomes a pinned stage:\n   it is (steps × 0.6 + 1) screens tall, its stage sticks for the rest, and every change is\n   driven by the section's own view timeline (--radiantnuclear-tour). The `contain` range is\n   the pinned stretch; each step's slice of it comes from custom properties set inline\n   by the component (--rnt-*). Unlayered rules here beat the Tailwind utilities. */\n.radiantnuclear-tour {\n  view-timeline: --radiantnuclear-tour block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .radiantnuclear-tour {\n      height: calc((var(--rnt-n) * 0.6 + 1) * 100svh);\n      padding: 0;\n    }\n    .radiantnuclear-tour-stage {\n      position: sticky;\n      top: 0;\n      height: 100svh;\n      max-height: 68.75rem;\n      display: grid;\n      grid-template-rows: auto 1fr auto auto;\n      grid-template-columns: minmax(0, 1fr);\n      padding-top: 5.25rem;\n      padding-bottom: 2.125rem;\n    }\n    /* the steps' pictures all share row 2, their captions row 3: they overlap and take turns */\n    .radiantnuclear-tour-steps,\n    .radiantnuclear-tour-step {\n      display: contents;\n    }\n    .radiantnuclear-tour-media {\n      grid-row: 2;\n      grid-column: 1;\n      align-self: center;\n      justify-self: center;\n      margin: 0;\n    }\n    .radiantnuclear-tour-caption {\n      grid-row: 3;\n      grid-column: 1;\n      align-self: start;\n      justify-self: center;\n      margin: 0;\n    }\n    .radiantnuclear-tour-progress {\n      grid-row: 4;\n      grid-column: 1;\n      display: block;\n    }\n\n    .radiantnuclear-tour-media,\n    .radiantnuclear-tour-caption,\n    .radiantnuclear-tour-thumb,\n    .radiantnuclear-tour-pointer {\n      animation-timing-function: linear;\n      animation-timeline: --radiantnuclear-tour;\n    }\n    .radiantnuclear-tour-media {\n      animation-name: var(--rnt-media-anim, none);\n      animation-range: var(--rnt-media-range, normal);\n      animation-fill-mode: var(--rnt-media-fill, none);\n    }\n    .radiantnuclear-tour-caption {\n      animation-name: var(--rnt-cap-anim, none);\n      animation-range: var(--rnt-cap-range, normal);\n      animation-fill-mode: var(--rnt-cap-fill, none);\n    }\n    .radiantnuclear-tour-thumb {\n      animation-name: var(--rnt-thumb-anim, none);\n      animation-range: var(--rnt-thumb-range, normal);\n      animation-fill-mode: var(--rnt-thumb-fill, none);\n    }\n    /* the pointer glides from the middle of the first segment to the middle of the last */\n    .radiantnuclear-tour-pointer {\n      animation-name: radiantnuclear-tour-glide;\n      animation-range: contain 0% contain 100%;\n      animation-fill-mode: both;\n    }\n  }\n}\n\n@keyframes radiantnuclear-tour-in {\n  from { opacity: 0; }\n}\n@keyframes radiantnuclear-tour-out {\n  to { opacity: 0; }\n}\n/* captions come up 14px into place, and sink 14px as they leave */\n@keyframes radiantnuclear-tour-rise {\n  from { opacity: 0; transform: translateY(14px); }\n}\n@keyframes radiantnuclear-tour-sink {\n  to { opacity: 0; transform: translateY(14px); }\n}\n@keyframes radiantnuclear-tour-glide {\n  from { left: var(--rnt-from); }\n  to { left: var(--rnt-to); }\n}\n"
+    },
+    {
+      "path": "radiantnuclear-tour.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RadiantnuclearSlot } from \"@foundry/radiantnuclear-slot\";\nimport \"./radiantnuclear-tour.css\";\n\nexport interface RadiantnuclearTourStep {\n  /** the caption's lead line, e.g. \"One design, many units:\" */\n  lead: string;\n  /** a sentence or two under it */\n  body: string;\n  /** the illustration for this step; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface RadiantnuclearTourProps {\n  /** the bold all-caps heading that stays at the top */\n  title: string;\n  /** the paragraph under it */\n  body?: string;\n  /** two to seven steps, told in scroll order */\n  steps: RadiantnuclearTourStep[];\n  id?: string;\n  className?: string;\n}\n\ntype Vars = Record<`--${string}`, string | number | undefined>;\nconst css = (v: Vars) => v as CSSProperties;\n\n/** Where step k's changes sit on the pinned stretch, as `contain` percentages. */\nfunction slices(k: number, n: number) {\n  const at = (x: number) => `${((Math.min(Math.max(x, 0), n) / n) * 100).toFixed(2)}%`;\n  const range = (a: number, b: number) => `contain ${at(a)} contain ${at(b)}`;\n  const first = k === 0;\n  const last = k === n - 1;\n  // one element that may fade in (unless first) and out (unless last)\n  const pair = (inName: string, outName: string, inRange: string, outRange: string) =>\n    first ? { a: outName, r: outRange, f: \"forwards\" } : last ? { a: inName, r: inRange, f: \"backwards\" } : { a: `${inName}, ${outName}`, r: `${inRange}, ${outRange}`, f: \"backwards, forwards\" };\n  // pictures overlap a little as they cross; captions leave, then the next one rises\n  const media = pair(\"radiantnuclear-tour-in\", \"radiantnuclear-tour-out\", range(k - 0.06, k + 0.1), range(k + 0.9, k + 1.06));\n  const cap = pair(\"radiantnuclear-tour-rise\", \"radiantnuclear-tour-sink\", range(k, k + 0.12), range(k + 0.86, k + 0.98));\n  const thumb = pair(\"radiantnuclear-tour-in\", \"radiantnuclear-tour-out\", range(k - 0.01, k), range(k + 1, k + 1.01));\n  return {\n    media: n < 2 ? {} : { \"--rnt-media-anim\": media.a, \"--rnt-media-range\": media.r, \"--rnt-media-fill\": media.f },\n    cap: n < 2 ? {} : { \"--rnt-cap-anim\": cap.a, \"--rnt-cap-range\": cap.r, \"--rnt-cap-fill\": cap.f },\n    thumb: n < 2 ? {} : { \"--rnt-thumb-anim\": thumb.a, \"--rnt-thumb-range\": thumb.r, \"--rnt-thumb-fill\": thumb.f },\n  };\n}\n\nexport function RadiantnuclearTour({ title, body, steps, id, className }: RadiantnuclearTourProps) {\n  const n = steps.length;\n  const s = steps.map((_, k) => slices(k, n));\n  const half = 50 / n; // the middle of the first and last segment, in % of the track\n\n  return (\n    <section\n      id={id}\n      className={cn(\"radiantnuclear-tour relative bg-background py-section font-sans text-foreground\", className)}\n      style={css({ \"--rnt-n\": n })}\n    >\n      <div className=\"radiantnuclear-tour-stage mx-auto flex max-w-page flex-col px-gutter\">\n        <div>\n          <h2 className=\"max-w-[22rem] text-[1.875rem] leading-[1.15] font-bold uppercase sm:max-w-[34rem] lg:max-w-[46rem] lg:text-[2.75rem] lg:leading-[1.1]\">{title}</h2>\n          {body && <p className=\"mt-4 max-w-[36rem] text-base leading-[1.375] lg:mt-6 lg:text-lg lg:leading-[1.45]\">{body}</p>}\n        </div>\n\n        <ol className=\"radiantnuclear-tour-steps mt-14 flex flex-col gap-14\">\n          {steps.map((t, k) => (\n            <li key={t.lead} className=\"radiantnuclear-tour-step flex flex-col items-center gap-6\">\n              <div className=\"radiantnuclear-tour-media w-[68%] max-w-[40rem]\" style={css(s[k].media)}>\n                <RadiantnuclearSlot media={t.media} tone={k % 2 === 0 ? \"paper\" : \"wash\"} className=\"aspect-[2/1] w-full\" />\n              </div>\n              <p className=\"radiantnuclear-tour-caption max-w-[21rem] pt-6 text-center text-base leading-[1.375] lg:max-w-[32rem] lg:text-lg lg:leading-[1.45]\" style={css(s[k].cap)}>\n                <span className=\"block\">{t.lead}</span>\n                <span className=\"block\">{t.body}</span>\n              </p>\n            </li>\n          ))}\n        </ol>\n\n        {/* progress: a thin track, one dark segment per step (the active one shows), and a teal pointer gliding above */}\n        <div aria-hidden className=\"radiantnuclear-tour-progress mx-auto hidden w-[50vw] max-w-[24rem] pt-3\">\n          <div className=\"relative h-3\" style={css({ \"--rnt-from\": `${half}%`, \"--rnt-to\": `${100 - half}%` })}>\n            <span className=\"radiantnuclear-tour-pointer absolute top-0 left-[var(--rnt-from)] block size-0 -translate-x-1/2 border-x-[6px] border-t-[10px] border-x-transparent border-t-primary\" />\n          </div>\n          <div className=\"relative mt-3 h-0.5 bg-border\">\n            {steps.map((t, k) => (\n              <span\n                key={t.lead}\n                className=\"radiantnuclear-tour-thumb absolute -top-px h-1 bg-foreground/60\"\n                style={{ left: `${(k / n) * 100}%`, width: `${100 / n}%`, ...css(s[k].thumb) }}\n              />\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "radiantnuclear-slot"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bold all-caps heading that stays at the top"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "steps",
+      "type": "RadiantnuclearTourStep[]",
+      "required": true,
+      "description": "two to seven steps, told in scroll order"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7296a75007b6452f0b1922b932c2d0e0c16afa9de967675929f8b19aa5c97796"
+}

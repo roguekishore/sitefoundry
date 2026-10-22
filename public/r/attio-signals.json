@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio signals split",
+  "description": "A dark split band: on the left a navy badge, a two-tone 40px heading and a small arrow button over three tabs that take turns on a six-second timer, the active one opening with a grey line and a hairline progress rule that fills left to right; on the right a tall art panel that swaps with a soft blur-fade. On phones it centres, with three rules side by side and the active line beneath.",
+  "category": "features",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "tabs",
+    "autoplay",
+    "progress",
+    "split",
+    "hairline",
+    "blur",
+    "saas"
+  ],
+  "notes": [
+    "forces the dark palette and marks itself data-header-tone=\"dark\" for the attio header",
+    "the art is a media slot (695×808 on desktop, square on phones), per tab or shared; empty, a faint glow placeholder",
+    "with reduced motion the tabs don't advance on their own"
+  ],
+  "entry": "attio-signals.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "attio-signals",
+  "files": [
+    {
+      "path": "attio-signals.css",
+      "content": "/* The active tab's progress line fills from left to right over the tab's time. */\n.attio-signals-fill {\n  transform-origin: left;\n  animation: attio-signals-fill var(--attio-signals-time, 6s) linear both;\n}\n\n@keyframes attio-signals-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n/* the art swaps with a quick soft fade */\n.attio-signals-art {\n  animation: attio-signals-art 0.6s cubic-bezier(0.2, 0, 0, 1) both;\n}\n\n@keyframes attio-signals-art {\n  from { opacity: 0; filter: blur(6px); }\n  to { opacity: 1; filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-signals-fill {\n    animation: none;\n  }\n  .attio-signals-art {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-signals.tsx",
+      "content": "import { useEffect, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioBadge } from \"@foundry/attio-badge\";\nimport { AttioButton } from \"@foundry/attio-button\";\nimport { AttioHeading } from \"@foundry/attio-heading\";\nimport \"./attio-signals.css\";\n\nexport interface AttioSignalsTab {\n  /** the tab's name */\n  title: string;\n  /** the line shown under the active tab */\n  text: string;\n  /** this tab's art; falls back to the block's media */\n  media?: ReactNode;\n}\n\nexport interface AttioSignalsProps {\n  /** the small label over the heading */\n  badge?: string;\n  /** the heading: white lead… */\n  lead: string;\n  /** …and grey rest */\n  rest?: string;\n  /** the small outline button under the heading */\n  action?: { label: string; href: string };\n  /** three tabs that take turns */\n  tabs: AttioSignalsTab[];\n  /** seconds each tab stays before the next one takes over */\n  seconds?: number;\n  /** the big art on the right (695×808); empty shows a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n  className?: string;\n}\n\n/**\n * A dark split band: on the left a badge, a two-tone heading and a small button over a\n * list of three tabs that take turns on a timer, the active one showing its line and a\n * progress rule that fills; on the right a tall art panel. On phones it all centres, the\n * three rules sit side by side and the active line goes under them.\n */\nexport function AttioSignals({ badge, lead, rest, action, tabs, seconds = 6, media, mediaLabel, className }: AttioSignalsProps) {\n  const [active, setActive] = useState(0);\n  const reduce = useReducedMotion();\n\n  // advance to the next tab when the current one's time is up\n  useEffect(() => {\n    if (reduce || tabs.length < 2) return;\n    const id = window.setTimeout(() => setActive((a) => (a + 1) % tabs.length), seconds * 1000);\n    return () => window.clearTimeout(id);\n  }, [active, reduce, seconds, tabs.length]);\n\n  const art = tabs[active]?.media ?? media;\n  const time = { \"--attio-signals-time\": `${seconds}s` } as CSSProperties;\n\n  return (\n    <section data-header-tone=\"dark\" className={cn(\"dark bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"mx-auto grid max-w-page border-b border-border lg:grid-cols-2 lg:border-x\">\n        <div className=\"flex flex-col items-center px-gutter pt-[5.5rem] text-center lg:items-start lg:border-r lg:border-border lg:px-[3.6875rem] lg:pt-[9.5rem] lg:pb-24 lg:text-left\">\n          {badge && <AttioBadge>{badge}</AttioBadge>}\n          <AttioHeading lead={lead} rest={rest} className=\"mt-5 max-w-[29rem] lg:mt-6\" />\n          {action && (\n            <AttioButton href={action.href} size=\"sm\" arrow className=\"mt-8\">\n              {action.label}\n            </AttioButton>\n          )}\n\n          {/* desktop: a vertical list; the active tab opens with its line and rule */}\n          <div role=\"tablist\" className=\"mt-auto hidden w-full max-w-[36.25rem] pt-36 lg:block\">\n            {tabs.map((t, i) => (\n              <button\n                key={t.title}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={active === i}\n                onClick={() => setActive(i)}\n                className={cn(\"block w-full text-left\", i > 0 && \"mt-6\")}\n              >\n                <span className={cn(\"block text-lg font-medium tracking-[-0.01em] transition-colors duration-300\", active === i ? \"text-foreground\" : \"text-foreground/90 hover:text-foreground\")}>\n                  {t.title}\n                </span>\n                {active === i && (\n                  <>\n                    <span className=\"mt-3 block max-w-[15rem] text-base leading-[1.45] font-medium text-muted-foreground\">{t.text}</span>\n                    <span className=\"relative mt-6 mb-2 block h-px w-full overflow-clip bg-border\">\n                      <span key={active} style={time} className=\"attio-signals-fill absolute inset-0 bg-muted-foreground\" />\n                    </span>\n                  </>\n                )}\n              </button>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"relative flex items-center justify-center px-6 pt-14 pb-6 lg:p-0\">\n          <div\n            key={active}\n            role=\"img\"\n            aria-label={mediaLabel}\n            className=\"attio-signals-art aspect-square w-full max-w-[21.375rem] bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_14%,transparent),transparent)] lg:aspect-[695/808] lg:max-w-none [&>*]:size-full [&>img]:object-cover\"\n          >\n            {art}\n          </div>\n        </div>\n\n        {/* phones: three rules side by side, the active line centred under them */}\n        <div className=\"px-gutter pb-24 lg:hidden\">\n          <div role=\"tablist\" className=\"grid grid-cols-3 gap-1.5\">\n            {tabs.map((t, i) => (\n              <button key={t.title} type=\"button\" role=\"tab\" aria-selected={active === i} aria-label={t.title} onClick={() => setActive(i)} className=\"py-2\">\n                <span className=\"relative block h-0.5 overflow-clip rounded-full bg-border\">\n                  {active === i && <span key={active} style={time} className=\"attio-signals-fill absolute inset-0 bg-muted-foreground\" />}\n                </span>\n              </button>\n            ))}\n          </div>\n          <div className=\"mt-6 text-center\">\n            <p className=\"text-lg font-medium tracking-[-0.01em]\">{tabs[active]?.title}</p>\n            <p className=\"mx-auto mt-2 max-w-[15rem] text-base leading-[1.45] font-medium text-muted-foreground\">{tabs[active]?.text}</p>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "attio-badge",
+    "attio-button",
+    "attio-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the heading: white lead…"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "…and grey rest"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the small outline button under the heading"
+    },
+    {
+      "name": "tabs",
+      "type": "AttioSignalsTab[]",
+      "required": true,
+      "description": "three tabs that take turns"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each tab stays before the next one takes over"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the big art on the right (695×808); empty shows a placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "618fa11a1a0befb83fc61cb2fdfc18e796544345c2665cd6fc6cf28f16d57458"
+}

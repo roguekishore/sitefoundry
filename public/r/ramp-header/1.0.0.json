@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp header",
+  "description": "A two-tier top bar that stays pinned: a near-black announcement strip with an underlined link and a close button, then a white 62px nav with a wordmark, chevroned menu links, a quiet sign-in link and an acid-lime and a near-black button. Phones get a square grey menu button that opens a full-width panel.",
+  "category": "header",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "announcement",
+    "light",
+    "minimal",
+    "lime",
+    "fintech"
+  ],
+  "notes": [
+    "sticks to the top of the page (position: sticky), so it pushes the hero down instead of covering it",
+    "the announcement strip forces the theme's dark colours with the dark class",
+    "JavaScript only dismisses the announcement; the phone menu is a native <details>"
+  ],
+  "hydrate": "load",
+  "entry": "ramp-header.tsx",
+  "source": "foundry",
+  "name": "ramp-header",
+  "files": [
+    {
+      "path": "ramp-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown, ChevronRight, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampButton } from \"@foundry/ramp-button\";\n\nexport interface RampHeaderLink {\n  label: string;\n  href: string;\n  /** shows a chevron, as for items that open a menu */\n  menu?: boolean;\n}\n\nexport interface RampHeaderProps {\n  /** the wordmark: a name in the display face, with an optional small icon after it */\n  brand: { name: string; href: string; icon?: ReactNode };\n  /** the dark strip above the nav (leave out to hide it) */\n  announcement?: { text: string; link?: { label: string; href: string } };\n  /** screen-reader label for the announcement's close button */\n  dismissLabel?: string;\n  /** the nav links */\n  links: RampHeaderLink[];\n  /** the quiet text link on the right, e.g. \"Sign in\" */\n  login?: { label: string; href: string };\n  /** the acid-lime button */\n  primary: { label: string; href: string };\n  /** the near-black button */\n  secondary?: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Ramp's pinned header: announcement strip + white nav, sticky at the top. */\nexport function RampHeader({ brand, announcement, dismissLabel, links, login, primary, secondary, menuLabel, className }: RampHeaderProps) {\n  const [open, setOpen] = useState(true);\n  return (\n    <header className={cn(\"sticky top-0 z-40 bg-background text-foreground\", className)}>\n      {announcement && open && (\n        <div className=\"dark bg-background text-foreground\">\n          <div className=\"relative mx-auto flex min-h-10 max-w-page items-center py-2.5 pr-12 pl-gutter text-base/[1.4] sm:justify-center sm:px-12 lg:py-0\">\n            <p className=\"sm:text-center\">\n              {announcement.text}\n              {announcement.link && (\n                <a href={announcement.link.href} className=\"ml-3 text-sm underline underline-offset-2 hover:text-muted-foreground\">\n                  {announcement.link.label}\n                </a>\n              )}\n            </p>\n            <button\n              type=\"button\"\n              aria-label={dismissLabel}\n              onClick={() => setOpen(false)}\n              className=\"absolute top-1/2 right-gutter -translate-y-1/2 rounded-sm p-1 text-foreground hover:bg-foreground/10 lg:right-[calc(var(--page-gutter)*1.5)]\"\n            >\n              <X aria-hidden className=\"size-4\" strokeWidth={2} />\n            </button>\n          </div>\n        </div>\n      )}\n\n      <div className=\"border-b border-border bg-background\">\n        <nav className=\"mx-auto flex h-[3.875rem] max-w-page items-center justify-between px-gutter lg:px-[calc(var(--page-gutter)*4)]\">\n          <div className=\"flex items-center gap-8\">\n            <a href={brand.href} className=\"flex items-center gap-1 font-display text-[1.375rem] leading-none tracking-[-0.02em] [&_svg]:size-5\">\n              {brand.name}\n              {brand.icon}\n            </a>\n            <ul className=\"hidden items-center gap-7 lg:flex\">\n              {links.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className=\"flex items-center gap-1.5 text-base transition-colors duration-150 hover:text-muted-foreground motion-reduce:transition-none\">\n                    {l.label}\n                    {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n\n          <div className=\"hidden items-center gap-4 lg:flex\">\n            {login && (\n              <a href={login.href} className=\"mr-4 text-base transition-colors duration-150 hover:text-muted-foreground motion-reduce:transition-none\">\n                {login.label}\n              </a>\n            )}\n            <RampButton href={primary.href} size=\"sm\">\n              {primary.label}\n            </RampButton>\n            {secondary && (\n              <RampButton href={secondary.href} size=\"sm\" variant=\"solid\">\n                {secondary.label}\n              </RampButton>\n            )}\n          </div>\n\n          <details className=\"group lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"flex size-10 cursor-pointer list-none items-center justify-center rounded-[calc(var(--radius)-6px)] bg-secondary text-secondary-foreground [&::-webkit-details-marker]:hidden\"\n            >\n              <Menu aria-hidden className=\"size-5 group-open:hidden\" strokeWidth={1.75} />\n              <X aria-hidden className=\"hidden size-5 group-open:block\" strokeWidth={1.75} />\n            </summary>\n            <div className=\"absolute inset-x-0 top-full max-h-[calc(100svh-8rem)] overflow-y-auto border-b border-border bg-background px-gutter pt-2 pb-6\">\n              <ul className=\"divide-y divide-border\">\n                {links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"flex items-center justify-between py-4 text-lg\">\n                      {l.label}\n                      {l.menu && <ChevronRight aria-hidden className=\"size-4 text-muted-foreground\" strokeWidth={1.75} />}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n              <div className=\"mt-4 grid gap-2\">\n                <RampButton href={primary.href}>{primary.label}</RampButton>\n                {secondary && (\n                  <RampButton href={secondary.href} variant=\"solid\">\n                    {secondary.label}\n                  </RampButton>\n                )}\n                {login && (\n                  <RampButton href={login.href} variant=\"secondary\">\n                    {login.label}\n                  </RampButton>\n                )}\n              </div>\n            </div>\n          </details>\n        </nav>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the wordmark: a name in the display face, with an optional small icon after it"
+    },
+    {
+      "name": "announcement",
+      "type": "{ text: string; link?: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the dark strip above the nav (leave out to hide it)"
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the announcement's close button"
+    },
+    {
+      "name": "links",
+      "type": "RampHeaderLink[]",
+      "required": true,
+      "description": "the nav links"
+    },
+    {
+      "name": "login",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the quiet text link on the right, e.g. \"Sign in\""
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the acid-lime button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the near-black button"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "320b8c3fc2991de5cd91cea57e417ceb0803bb81e060d80f6ce00c00aebaaed7"
+}

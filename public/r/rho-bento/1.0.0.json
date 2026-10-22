@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Rho product bento",
+  "description": "A 60px heading with a mint button on the right, then a three-column bento of 450px tinted cards (one, two or three columns wide): a mono label with an optional mint NEW chip, a 28px title, a muted line, and a screenshot panel rising from the card's bottom edge. Cards fade up one after another; on phones they become a sideways rail with arrows.",
+  "category": "features",
+  "site": "rho",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "cards",
+    "rail",
+    "reveal",
+    "stagger",
+    "mint",
+    "mono",
+    "light"
+  ],
+  "notes": [
+    "media: one screenshot per card; empty: an inset panel with a hairline, flush to the card's bottom",
+    "size 1/2/3 = columns on desktop; on phones cards of size 2 and 3 are twice as wide in the rail",
+    "needs JavaScript for the phone rail's arrows (hydrate: visible)"
+  ],
+  "entry": "rho-bento.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "rho-bento",
+  "files": [
+    {
+      "path": "rho-bento.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RhoButton } from \"@foundry/rho-button\";\nimport { RhoHeading } from \"@foundry/rho-heading\";\nimport { RhoRail } from \"@foundry/rho-rail\";\nimport { RhoReveal } from \"@foundry/rho-reveal\";\n\nexport interface RhoBentoItem {\n  /** mono label at the top */\n  label: string;\n  /** small mint chip after the label, e.g. \"New\" */\n  badge?: string;\n  /** the card's title */\n  title: string;\n  /** one muted line under the title */\n  body: string;\n  /** how many of the three desktop columns the card spans */\n  size?: 1 | 2 | 3;\n  /** the screenshot; empty: an inset placeholder panel */\n  media?: ReactNode;\n}\n\nexport interface RhoBentoProps {\n  /** the heading */\n  title: string;\n  /** the mint button beside the heading */\n  action?: { label: string; href: string };\n  /** the cards, in reading order */\n  items: RhoBentoItem[];\n  /** screen-reader labels for the phone rail's arrows */\n  prevLabel: string;\n  nextLabel: string;\n  /** dark or light section */\n  tone?: \"dark\" | \"light\";\n  className?: string;\n}\n\nconst spans = { 1: \"lg:col-span-1\", 2: \"lg:col-span-2\", 3: \"lg:col-span-3\" };\n\nfunction BentoCard({ item }: { item: RhoBentoItem }) {\n  return (\n    <article className=\"flex h-full flex-col overflow-clip rounded-lg bg-card px-5 pt-5 text-card-foreground lg:px-6 lg:pt-6\">\n      <p className=\"flex items-center gap-2 font-mono text-[0.75rem] leading-none font-medium tracking-[0.04em] uppercase lg:text-[0.8125rem] dark:text-primary\">\n        {item.label}\n        {item.badge && (\n          <span className=\"rounded-[0.1875rem] bg-primary px-1.5 py-1 text-[0.6875rem] text-primary-foreground\">{item.badge}</span>\n        )}\n      </p>\n      <h3 className=\"mt-3 text-2xl leading-[1.15] tracking-[-0.01em] lg:text-[1.75rem]\">{item.title}</h3>\n      <p className=\"mt-1.5 max-w-[22rem] text-[0.9375rem] leading-[1.3] text-muted-foreground lg:text-base\">{item.body}</p>\n      <div className=\"mt-6 flex min-h-0 flex-1\">\n        {item.media ?? <div className=\"w-full rounded-t-md border border-b-0 border-border bg-background\" />}\n      </div>\n    </article>\n  );\n}\n\nexport function RhoBento({ title, action, items, prevLabel, nextLabel, tone = \"light\", className }: RhoBentoProps) {\n  // a running column count, so each card in a desktop row arrives a step after the one before\n  let col = 0;\n  const steps = items.map((item) => {\n    const step = col;\n    col = (col + (item.size ?? 1)) % 3;\n    return step;\n  });\n  return (\n    <section data-rho-tone={tone} className={cn(tone === \"dark\" && \"dark\", \"bg-background py-14 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-start gap-6 px-gutter lg:flex-row lg:items-center lg:justify-between\">\n        <RhoHeading text={title} className=\"max-w-[22rem] lg:max-w-none\" />\n        {action && (\n          <RhoReveal>\n            <RhoButton href={action.href} size=\"md\" className=\"h-11 px-5 text-[0.9375rem]\">\n              {action.label}\n            </RhoButton>\n          </RhoReveal>\n        )}\n      </div>\n      {/* on phones the whole rail fades in; on desktop each card does instead */}\n      <RhoReveal className=\"mt-10 lg:mt-14 lg:[animation:none]! motion-reduce:[animation:none]!\">\n        <RhoRail\n          items={items.map((item, i) => (\n            <RhoReveal key={item.title} step={steps[i]} className=\"h-full\">\n              <BentoCard item={item} />\n            </RhoReveal>\n          ))}\n          prevLabel={prevLabel}\n          nextLabel={nextLabel}\n          gridOnDesktop\n          itemClassName={(i) =>\n            cn(\"h-[22.8rem] lg:h-[28.125rem] lg:w-auto\", (items[i].size ?? 1) > 1 ? \"w-[40.75rem] max-w-[92%] sm:max-w-none\" : \"w-[20rem] max-w-[85%] sm:max-w-none\", spans[items[i].size ?? 1])\n          }\n          trackClassName=\"lg:mx-auto lg:grid lg:max-w-page lg:grid-cols-3 lg:overflow-visible lg:px-gutter\"\n          arrowsClassName=\"lg:hidden\"\n        />\n      </RhoReveal>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "rho-button",
+    "rho-heading",
+    "rho-rail",
+    "rho-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the mint button beside the heading"
+    },
+    {
+      "name": "items",
+      "type": "RhoBentoItem[]",
+      "required": true,
+      "description": "the cards, in reading order"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the phone rail's arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "dark or light section"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7c61bbb5aed69dbe38e63bf18cf50d3205ae28af8f728509adc7fdf8357733f2"
+}

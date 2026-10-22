@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Anchorage count-up figure",
+  "description": "A figure such as \"5+\", \"1.4B\" or \"$124,786.32\" that counts up from a fraction of its value with a long ease-out the first time it scrolls into view, keeping its prefix, suffix, decimals and thousands commas. Its width is reserved, so nothing around it shifts.",
+  "category": "text-effect",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "counter",
+    "count-up",
+    "stats",
+    "number",
+    "in-view",
+    "motion"
+  ],
+  "notes": [
+    "static HTML and reduced motion show the final value; the count runs only after hydration",
+    "style it from outside (size, gradient text): it renders plain inline text"
+  ],
+  "hydrate": "visible",
+  "entry": "anchorage-count.tsx",
+  "source": "foundry",
+  "name": "anchorage-count",
+  "files": [
+    {
+      "path": "anchorage-count.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { animate, useInView, useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface AnchorageCountProps {\n  /** the final figure as shown, e.g. \"5+\", \"1.4B\", \"$124,786.32\"; the first number in it is counted */\n  value: string;\n  /** where the count starts, as a share of the value (0 = from zero) */\n  from?: number;\n  /** seconds the count takes */\n  duration?: number;\n  className?: string;\n}\n\n// \"$124,786.32\" → prefix \"$\", number 124786.32, suffix \"\", 2 decimals, commas on.\nfunction parse(value: string) {\n  const m = value.match(/^(\\D*)(\\d[\\d,]*(?:\\.\\d+)?)(.*)$/s);\n  if (!m) return null;\n  const digits = m[2];\n  return {\n    prefix: m[1],\n    target: Number(digits.replace(/,/g, \"\")),\n    suffix: m[3],\n    decimals: digits.includes(\".\") ? digits.split(\".\")[1].length : 0,\n    commas: digits.includes(\",\"),\n  };\n}\n\n/** Counts up to its value once, when it first enters the view. */\nexport function AnchorageCount({ value, from = 0, duration = 1.6, className }: AnchorageCountProps) {\n  const ref = useRef<HTMLSpanElement>(null);\n  const inView = useInView(ref, { once: true, margin: \"0px 0px -10% 0px\" });\n  const reduce = useReducedMotion();\n  const [shown, setShown] = useState(value);\n  const parts = parse(value);\n\n  const format = (n: number) =>\n    parts\n      ? parts.prefix +\n        n.toLocaleString(\"en-US\", { minimumFractionDigits: parts.decimals, maximumFractionDigits: parts.decimals, useGrouping: parts.commas }) +\n        parts.suffix\n      : value;\n\n  // Before it is seen: park at the start value (only once JavaScript runs).\n  useEffect(() => {\n    if (!parts || reduce || inView) return;\n    setShown(format(parts.target * from));\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, []);\n\n  useEffect(() => {\n    if (!parts || reduce || !inView) return;\n    const controls = animate(parts.target * from, parts.target, {\n      duration,\n      ease: [0.16, 1, 0.3, 1],\n      onUpdate: (n) => setShown(format(n)),\n    });\n    return () => controls.stop();\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [inView, reduce]);\n\n  return (\n    <span ref={ref} className={cn(\"inline-grid tabular-nums\", className)}>\n      <span className=\"sr-only\">{value}</span>\n      {/* the final value, invisible, holds the width */}\n      <span aria-hidden className=\"invisible col-start-1 row-start-1\">\n        {value}\n      </span>\n      <span aria-hidden className=\"col-start-1 row-start-1\">\n        {shown}\n      </span>\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "the final figure as shown, e.g. \"5+\", \"1.4B\", \"$124,786.32\"; the first number in it is counted"
+    },
+    {
+      "name": "from",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "where the count starts, as a share of the value (0 = from zero)"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "1.6",
+      "description": "seconds the count takes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5b4db70e14b8f2a3c84c04dce533567c0d471c8eec9106bc52031eef73e268d7"
+}

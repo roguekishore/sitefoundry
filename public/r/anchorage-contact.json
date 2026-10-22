@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anchorage contact form",
+  "description": "A long enquiry form on a lifted near-black panel: a centred heading, a three-column grid of flat, square-ish fields whose labels sit inside them (selects with chevrons), two wide textareas beside a column of small square checkboxes for areas of interest, a fine-print consent line and an outlined button that fills lilac on hover. Phones stack everything in one column.",
+  "category": "contact",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "enquiry",
+    "checkboxes",
+    "dark",
+    "minimal",
+    "grid",
+    "fintech"
+  ],
+  "notes": [
+    "plain HTML form: set action (and method) to post it anywhere; no JavaScript",
+    "labels double as placeholders, as in the original; each field still has an accessible label"
+  ],
+  "entry": "anchorage-contact.tsx",
+  "source": "foundry",
+  "name": "anchorage-contact",
+  "files": [
+    {
+      "path": "anchorage-contact.tsx",
+      "content": "import { Check, ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AnchorageButton } from \"@foundry/anchorage-button\";\n\nexport interface AnchorageContactField {\n  /** the label, shown inside the empty field */\n  label: string;\n  /** the form field's name */\n  name: string;\n  type?: \"text\" | \"email\" | \"tel\" | \"select\";\n  /** the choices of a select */\n  options?: string[];\n  required?: boolean;\n}\n\nexport interface AnchorageContactProps {\n  /** the centred heading */\n  title: string;\n  /** the one-line fields, three to a row on desktop */\n  fields: AnchorageContactField[];\n  /** the short textarea under the fields, with an optional link under it */\n  note?: { label: string; name: string; link?: { label: string; href: string } };\n  /** the long message textarea */\n  message: { label: string; name: string };\n  /** the checkbox list beside the textareas */\n  areas?: { title: string; name: string; options: string[] };\n  /** the small line explaining the required mark */\n  requiredNote?: string;\n  /** the consent checkbox's fine print, and an optional second line under it */\n  consent?: { text: string; name: string; small?: string };\n  /** the submit button's label */\n  submit: string;\n  /** where the form posts */\n  action?: string;\n  method?: \"get\" | \"post\";\n  className?: string;\n}\n\nconst control = \"w-full rounded-sm bg-muted px-3 text-base font-semibold text-foreground placeholder:text-foreground transition-colors duration-300 outline-none focus:ring-1 focus:ring-ring motion-reduce:transition-none\";\n\nfunction Box({ name, value, label, small }: { name: string; value?: string; label: string; small?: boolean }) {\n  return (\n    <label className=\"flex cursor-pointer items-start gap-3\">\n      <span className=\"relative mt-[0.1rem] flex size-4 shrink-0\">\n        <input type=\"checkbox\" name={name} value={value} className=\"peer size-4 cursor-pointer appearance-none rounded-xs border-2 border-input transition-colors duration-200 checked:border-primary checked:bg-primary\" />\n        <Check aria-hidden className=\"pointer-events-none absolute inset-0 m-auto hidden size-3 text-primary-foreground peer-checked:block\" strokeWidth={3} />\n      </span>\n      <span className={cn(small ? \"text-[0.6875rem] leading-[1.6] font-semibold\" : \"text-sm leading-[1.4] font-medium\")}>{label}</span>\n    </label>\n  );\n}\n\n/** A long enquiry form: field grid, textareas beside a checkbox column, consent and send. */\nexport function AnchorageContact({ title, fields, note, message, areas, requiredNote, consent, submit, action, method = \"post\", className }: AnchorageContactProps) {\n  return (\n    <section className={cn(\"bg-secondary px-gutter pt-[5.25rem] pb-28 text-secondary-foreground lg:pt-20 lg:pb-[6.5rem]\", className)}>\n      <div className=\"mx-auto max-w-[69.375rem]\">\n        <h2 className=\"text-center font-display text-[2rem] leading-[1.2] font-[550] lg:text-[2.5rem]\">{title}</h2>\n\n        <form action={action} method={method} className=\"mt-12 lg:mt-14\">\n          <div className=\"grid gap-3 lg:grid-cols-3 lg:gap-4\">\n            {fields.map((f) => (\n              <label key={f.name} className=\"relative block\">\n                <span className=\"sr-only\">{f.label}</span>\n                {f.type === \"select\" ? (\n                  <>\n                    <select name={f.name} required={f.required} defaultValue=\"\" className={cn(control, \"h-[2.6rem] cursor-pointer appearance-none pr-10\")}>\n                      <option value=\"\" disabled>\n                        {f.label}\n                      </option>\n                      {f.options?.map((o) => (\n                        <option key={o} value={o}>\n                          {o}\n                        </option>\n                      ))}\n                    </select>\n                    <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-4 size-5 -translate-y-1/2\" strokeWidth={2} />\n                  </>\n                ) : (\n                  <input type={f.type ?? \"text\"} name={f.name} required={f.required} placeholder={f.label} className={cn(control, \"h-10 lg:h-[2.5rem]\")} />\n                )}\n              </label>\n            ))}\n          </div>\n\n          <div className=\"mt-3 grid gap-3 lg:mt-4 lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr] lg:gap-x-4 lg:gap-y-0\">\n            {note && (\n              <div className=\"lg:col-span-2\">\n                <label className=\"block\">\n                  <span className=\"sr-only\">{note.label}</span>\n                  <textarea name={note.name} placeholder={note.label} className={cn(control, \"block h-[3.625rem] resize-y py-3\")} />\n                </label>\n                {note.link && (\n                  <p className=\"mt-2 text-right\">\n                    <a href={note.link.href} className=\"text-sm font-medium text-primary transition-opacity duration-300 hover:opacity-50 motion-reduce:transition-none\">\n                      {note.link.label}\n                    </a>\n                  </p>\n                )}\n              </div>\n            )}\n\n            {areas && (\n              <fieldset className=\"mt-6 lg:col-start-3 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:pt-0 lg:pl-3\">\n                <legend className=\"mb-6 w-full text-center text-base font-semibold lg:mb-2\">{areas.title}</legend>\n                <div className=\"flex flex-col gap-3 px-1 lg:gap-[0.6rem]\">\n                  {areas.options.map((o) => (\n                    <Box key={o} name={areas.name} value={o} label={o} />\n                  ))}\n                </div>\n              </fieldset>\n            )}\n\n            <label className=\"mt-6 block lg:col-span-2 lg:mt-11\">\n              <span className=\"sr-only\">{message.label}</span>\n              <textarea name={message.name} placeholder={message.label} className={cn(control, \"block h-[9.125rem] resize-y py-3 lg:h-[10.5rem]\")} />\n            </label>\n\n            {requiredNote && (\n              <p className=\"hidden self-end pb-8 text-[0.6875rem] font-semibold lg:col-span-2 lg:block\">\n                <span className=\"text-primary\">*</span> {requiredNote}\n              </p>\n            )}\n          </div>\n\n          {consent && (\n            <div className=\"mt-8 lg:mt-9 lg:-ml-2.5\">\n              <Box name={consent.name} label={consent.text} small />\n              {consent.small && <p className=\"mt-3 pl-7 text-[0.6875rem] leading-[1.6] font-semibold\">{consent.small}</p>}\n            </div>\n          )}\n\n          <AnchorageButton type=\"submit\" variant=\"outline\" size=\"md\" className=\"mt-8 w-full lg:w-auto\">\n            {submit}\n          </AnchorageButton>\n        </form>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "anchorage-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred heading"
+    },
+    {
+      "name": "fields",
+      "type": "AnchorageContactField[]",
+      "required": true,
+      "description": "the one-line fields, three to a row on desktop"
+    },
+    {
+      "name": "note",
+      "type": "{ label: string; name: string; link?: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the short textarea under the fields, with an optional link under it"
+    },
+    {
+      "name": "message",
+      "type": "{ label: string; name: string; }",
+      "required": true,
+      "description": "the long message textarea"
+    },
+    {
+      "name": "areas",
+      "type": "{ title: string; name: string; options: string[]; }",
+      "required": false,
+      "description": "the checkbox list beside the textareas"
+    },
+    {
+      "name": "requiredNote",
+      "type": "string",
+      "required": false,
+      "description": "the small line explaining the required mark"
+    },
+    {
+      "name": "consent",
+      "type": "{ text: string; name: string; small?: string; }",
+      "required": false,
+      "description": "the consent checkbox's fine print, and an optional second line under it"
+    },
+    {
+      "name": "submit",
+      "type": "string",
+      "required": true,
+      "description": "the submit button's label"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "method",
+      "type": "enum",
+      "required": false,
+      "default": "post"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d698a62dc29fe773be8e4d14584b8656c71e7f067cd47427fecb08cc4ed98d59"
+}

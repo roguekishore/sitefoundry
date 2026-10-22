@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril footer",
+  "description": "A black footer on a half-and-half grid: the wordmark on the left half; three link columns (grey all-caps labels over 18px white links) from the half-way line; at the bottom the all-caps copyright with small grey legal links on the left and a contact address on the right. Phones fold the columns into + accordion rows. Links grey out on hover.",
+  "category": "footer",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "minimal",
+    "columns",
+    "accordion",
+    "uppercase"
+  ],
+  "notes": [
+    "the phone accordion is native <details>, so it works without JavaScript"
+  ],
+  "entry": "anduril-footer.tsx",
+  "source": "foundry",
+  "name": "anduril-footer",
+  "files": [
+    {
+      "path": "anduril-footer.tsx",
+      "content": "import { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilWordmark, type AndurilWordmarkProps } from \"@foundry/anduril-wordmark\";\n\nexport interface AndurilFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface AndurilFooterColumn {\n  /** the small all-caps label over the links */\n  label: string;\n  links: AndurilFooterLink[];\n}\n\nexport interface AndurilFooterProps {\n  /** the logo, top left */\n  wordmark: AndurilWordmarkProps;\n  /** the link columns (three in the original) */\n  columns: AndurilFooterColumn[];\n  /** the contact block, bottom right: a label and one link (e.g. an email address) */\n  contact: { label: string; link: AndurilFooterLink };\n  /** the all-caps copyright line */\n  copyright: string;\n  /** the small legal links under it */\n  legal: AndurilFooterLink[];\n  className?: string;\n}\n\nconst label = \"text-[0.875rem] leading-none font-medium tracking-[0.02em] text-muted-foreground uppercase md:text-[0.75rem]\";\nconst bigLink = \"text-[1.125rem] leading-[1.53] tracking-[-0.02em] transition-colors duration-300 ease-out hover:text-muted-foreground motion-reduce:transition-none\";\n\n/** Black footer: wordmark, link columns from the half-way line, copyright and contact below. */\nexport function AndurilFooter({ wordmark, columns, contact, copyright, legal, className }: AndurilFooterProps) {\n  const groups = [...columns, { label: contact.label, links: [contact.link] }];\n  return (\n    <footer className={cn(\"bg-background px-gutter pt-12 pb-14 text-foreground md:pt-[3.625rem]\", className)}>\n      <div className=\"grid gap-[1.125rem] md:grid-cols-2\">\n        <AndurilWordmark {...wordmark} className=\"self-start md:hidden\" />\n        <AndurilWordmark {...wordmark} size=\"lg\" className=\"hidden self-start md:inline-flex\" />\n\n        {/* desktop columns */}\n        <div className=\"hidden grid-cols-3 gap-[1.125rem] md:mt-2.5 md:grid\">\n          {columns.map((c) => (\n            <div key={c.label}>\n              <p className={label}>{c.label}</p>\n              <ul className=\"mt-[3.25rem] text-[1.125rem] leading-[1.53]\">\n                {c.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={bigLink}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n\n        {/* phone accordion */}\n        <div className=\"mt-3 md:hidden\">\n          {groups.map((g) => (\n            <details key={g.label} className=\"group\">\n              <summary className=\"flex cursor-pointer list-none items-center justify-between py-[1.875rem] [&::-webkit-details-marker]:hidden\">\n                <span className={label}>{g.label}</span>\n                <Plus aria-hidden className=\"size-5 transition-transform duration-300 group-open:rotate-45 motion-reduce:transition-none\" strokeWidth={1.5} />\n              </summary>\n              <ul className=\"pb-6 text-[1.125rem] leading-[1.53]\">\n                {g.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={bigLink}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </details>\n          ))}\n        </div>\n      </div>\n\n      <div className=\"mt-24 grid gap-[1.125rem] md:mt-[6.25rem] md:grid-cols-2\">\n        <div>\n          <p className=\"text-[0.8125rem] leading-none font-semibold tracking-[0.01em] uppercase md:text-[0.75rem]\">{copyright}</p>\n          <ul className=\"mt-4 text-[0.8125rem] leading-[1.3] md:mt-[1.125rem] md:text-[0.75rem] md:leading-[1.38]\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"font-medium text-muted-foreground transition-colors duration-300 ease-out hover:text-foreground motion-reduce:transition-none\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n        <div className=\"hidden grid-cols-3 gap-[1.125rem] md:grid\">\n          <div className=\"col-start-3 min-w-0\">\n            <p className={label}>{contact.label}</p>\n            <a href={contact.link.href} className={cn(bigLink, \"mt-9 inline-block [overflow-wrap:anywhere]\")}>\n              {contact.link.label}\n            </a>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "anduril-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "AndurilWordmarkProps",
+      "required": true,
+      "description": "the logo, top left"
+    },
+    {
+      "name": "columns",
+      "type": "AndurilFooterColumn[]",
+      "required": true,
+      "description": "the link columns (three in the original)"
+    },
+    {
+      "name": "contact",
+      "type": "{ label: string; link: AndurilFooterLink; }",
+      "required": true,
+      "description": "the contact block, bottom right: a label and one link (e.g. an email address)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the all-caps copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "AndurilFooterLink[]",
+      "required": true,
+      "description": "the small legal links under it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8cb2492ace49db68038283383cea1cbb9b33c084d5aa29dbc9e53fbce0a15470"
+}

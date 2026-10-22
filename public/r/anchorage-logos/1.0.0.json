@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anchorage logo marquee",
+  "description": "A small centred heading over an endless row of big wordmarks gliding slowly to the left, edge to edge. Names are typeset in four looks (plain, spaced caps, heavy italic, stacked) so the row keeps a mixed-logo rhythm; real logo images can replace them.",
+  "category": "logos",
+  "site": "anchorage",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "investors",
+    "clients",
+    "dark",
+    "minimal"
+  ],
+  "notes": [
+    "CSS-only loop (the list is drawn twice); speed in seconds per lap",
+    "reduced motion stops the row; it then scrolls sideways by hand"
+  ],
+  "entry": "anchorage-logos.tsx",
+  "source": "foundry",
+  "name": "anchorage-logos",
+  "files": [
+    {
+      "path": "anchorage-logos.css",
+      "content": "/* The list is drawn twice side by side; sliding the track by half its width loops it. */\n.anchorage-logos-track {\n  animation: anchorage-logos-slide var(--anchorage-logos-speed, 45s) linear infinite;\n}\n\n@keyframes anchorage-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .anchorage-logos-track { animation: none; }\n  .anchorage-logos-viewport { overflow-x: auto; scrollbar-width: none; }\n  .anchorage-logos-copy { display: none; }\n}\n"
+    },
+    {
+      "path": "anchorage-logos.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./anchorage-logos.css\";\n\nexport interface AnchorageLogo {\n  /** the company's name, typeset as a wordmark (and the image's label) */\n  name: string;\n  /** how the name is typeset: plain · spaced (wide caps) · heavy (black italic caps) · stacked (one word per line) */\n  look?: \"plain\" | \"spaced\" | \"heavy\" | \"stacked\";\n  /** a real logo image instead of the typeset name */\n  src?: string;\n}\n\nexport interface AnchorageLogosProps {\n  /** the small heading above the row, e.g. \"Backed by\" */\n  title?: string;\n  /** the logos, in order; they loop */\n  logos: AnchorageLogo[];\n  /** seconds for one full lap of the row */\n  speed?: number;\n  className?: string;\n}\n\nconst looks = {\n  plain: \"font-display text-[2.375rem] font-semibold tracking-[-0.03em]\",\n  spaced: \"font-display text-[2.25rem] font-normal tracking-[0.18em] uppercase\",\n  heavy: \"font-sans text-[2.5rem] font-black tracking-[-0.04em] uppercase italic\",\n  stacked: \"max-w-min font-display text-[1.375rem] leading-[0.9] font-bold tracking-[-0.02em]\",\n};\n\nfunction Row({ logos, copy }: { logos: AnchorageLogo[]; copy?: boolean }) {\n  return (\n    <ul aria-hidden={copy || undefined} className={cn(\"flex shrink-0 items-center\", copy && \"anchorage-logos-copy\")}>\n      {logos.map((logo) => (\n        <li key={logo.name} className=\"flex h-14 shrink-0 items-center px-6 text-foreground lg:px-12\">\n          {logo.src ? (\n            <img src={logo.src} alt={copy ? \"\" : logo.name} className=\"h-10 w-auto\" />\n          ) : (\n            <span className={cn(\"leading-none whitespace-nowrap\", looks[logo.look ?? \"plain\"], logo.look === \"stacked\" && \"whitespace-normal\")}>{logo.name}</span>\n          )}\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/** A heading over an endless, slowly sliding row of wordmarks. */\nexport function AnchorageLogos({ title, logos, speed = 45, className }: AnchorageLogosProps) {\n  return (\n    <section className={cn(\"py-10 text-foreground lg:py-16\", className)}>\n      {title && <h2 className=\"px-gutter text-center text-xl leading-[1.3] font-semibold lg:text-[1.69rem]\">{title}</h2>}\n      <div className=\"anchorage-logos-viewport mt-7 overflow-x-clip lg:mt-10\">\n        <div className=\"anchorage-logos-track flex w-max\" style={{ \"--anchorage-logos-speed\": `${speed}s` } as CSSProperties}>\n          <Row logos={logos} />\n          <Row logos={logos} copy />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": false,
+      "description": "the small heading above the row, e.g. \"Backed by\""
+    },
+    {
+      "name": "logos",
+      "type": "AnchorageLogo[]",
+      "required": true,
+      "description": "the logos, in order; they loop"
+    },
+    {
+      "name": "speed",
+      "type": "number",
+      "required": false,
+      "default": "45",
+      "description": "seconds for one full lap of the row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c5b9b027dd448df21ed3a4f9ab4b220986c838ac94b1f762204198d9d5baeb0f"
+}

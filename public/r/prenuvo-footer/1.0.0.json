@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Prenuvo footer",
+  "description": "A night footer with an arced top, fading from black to deep teal. The thin wordmark, four link columns under small muted uppercase labels (the last with phone and email lines and a row of social icons), and an ocean-teal newsletter card on the right with light fields over a photo slot. A quiet legal row closes it. Links dim on hover.",
+  "category": "footer",
+  "site": "prenuvo",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "arc",
+    "gradient",
+    "newsletter",
+    "columns",
+    "links"
+  ],
+  "notes": [
+    "dark by itself (dark class)",
+    "the newsletter photo slot fills the card's lower half (cover); empty shows a placeholder",
+    "the form only posts to newsletter.action; there is no script"
+  ],
+  "entry": "prenuvo-footer.tsx",
+  "source": "foundry",
+  "name": "prenuvo-footer",
+  "files": [
+    {
+      "path": "prenuvo-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PrenuvoArc } from \"@foundry/prenuvo-arc\";\nimport { PrenuvoWordmark } from \"@foundry/prenuvo-wordmark\";\n\nexport interface PrenuvoFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface PrenuvoFooterProps {\n  /** the company name, shown as the wordmark */\n  brand: string;\n  /** link columns, each under a small uppercase label */\n  columns: { title: string; links: PrenuvoFooterLink[] }[];\n  /** the contact column: its label, a heading line, and lines with an icon (phone, email) */\n  contact?: { title: string; heading?: string; lines: { icon: ReactNode; label: string; href?: string }[] };\n  /** social icons (lucide), each with a screen-reader label */\n  socials?: { icon: ReactNode; label: string; href: string }[];\n  /** the newsletter card */\n  newsletter?: {\n    title: ReactNode;\n    /** placeholders for first name, last name and email */\n    fields: [string, string, string];\n    /** the submit button's screen-reader label */\n    submitLabel: string;\n    /** where the form posts */\n    action?: string;\n    /** the photo under the form (cover); empty shows a placeholder */\n    media?: ReactNode;\n  };\n  /** the copyright line */\n  copyright: string;\n  /** legal links in the bottom row */\n  legal?: PrenuvoFooterLink[];\n  /** a quiet note at the end of the bottom row (e.g. payment partners) */\n  note?: ReactNode;\n  className?: string;\n}\n\nconst link = \"transition-colors duration-200 ease-[ease] hover:text-muted-foreground motion-reduce:transition-none\";\nconst label = \"font-display text-xs font-medium text-muted-foreground/60 uppercase\";\n\nexport function PrenuvoFooter({ brand, columns, contact, socials, newsletter, copyright, legal, note, className }: PrenuvoFooterProps) {\n  return (\n    <PrenuvoArc as=\"footer\" className={cn(\"dark z-10 bg-[linear-gradient(to_bottom,var(--background)_15%,var(--card))] pt-24 pb-20 text-foreground lg:pt-32 lg:pb-20\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-12\">\n        <div className=\"flex flex-col gap-12 xl:flex-row xl:gap-8\">\n          <div className=\"flex flex-1 flex-col gap-12 lg:flex-row lg:gap-0\">\n            <PrenuvoWordmark name={brand} className=\"lg:w-[10.75rem] lg:shrink-0\" />\n            <div className=\"flex flex-col gap-12 lg:flex-row lg:gap-0\">\n              {columns.map((c) => (\n                <nav key={c.title} className=\"lg:w-[10rem] lg:[&:nth-child(2)]:w-[11.25rem]\" aria-label={c.title}>\n                  <p className={label}>{c.title}</p>\n                  <ul className=\"mt-4 flex flex-col gap-2 lg:mt-9\">\n                    {c.links.map((l) => (\n                      <li key={l.href}>\n                        <a href={l.href} className={cn(\"font-display text-base leading-[1.45] font-medium\", link)}>\n                          {l.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </nav>\n              ))}\n              {(contact || socials) && (\n                <div className=\"flex flex-col lg:pl-0\">\n                  {contact && (\n                    <>\n                      <p className={label}>{contact.title}</p>\n                      {contact.heading && <p className=\"mt-4 font-display text-base leading-[1.45] font-medium lg:mt-9\">{contact.heading}</p>}\n                      <ul className=\"mt-2 flex flex-col gap-2\">\n                        {contact.lines.map((l) => (\n                          <li key={l.label} className=\"flex items-center gap-3 font-display text-base leading-[1.45] font-medium [&_svg]:size-5 [&_svg]:shrink-0\">\n                            {l.icon}\n                            {l.href ? (\n                              <a href={l.href} className={link}>\n                                {l.label}\n                              </a>\n                            ) : (\n                              l.label\n                            )}\n                          </li>\n                        ))}\n                      </ul>\n                    </>\n                  )}\n                  {socials && (\n                    <ul className=\"mt-12 flex gap-4 lg:mt-[5.5rem]\">\n                      {socials.map((s) => (\n                        <li key={s.href}>\n                          <a href={s.href} aria-label={s.label} className={cn(\"flex size-5 items-center justify-center [&_svg]:size-5\", link)}>\n                            {s.icon}\n                          </a>\n                        </li>\n                      ))}\n                    </ul>\n                  )}\n                </div>\n              )}\n            </div>\n          </div>\n\n          {newsletter && (\n            <div className=\"flex min-h-[28rem] flex-col overflow-clip rounded-lg bg-[linear-gradient(to_bottom,var(--secondary),color-mix(in_oklab,var(--secondary)_60%,var(--card)))] sm:max-w-md xl:min-h-[30.5rem] xl:w-80 xl:max-w-none xl:shrink-0\">\n              <form action={newsletter.action} className=\"p-5 pb-7\">\n                <p className=\"font-display text-2xl leading-tight font-semibold\">{newsletter.title}</p>\n                <div className=\"mt-6 grid grid-cols-2 gap-2\">\n                  {newsletter.fields.map((f, i) => (\n                    <label key={f} className={cn(\"relative block\", i === 2 && \"col-span-2\")}>\n                      <span className=\"sr-only\">{f}</span>\n                      <input\n                        type={i === 2 ? \"email\" : \"text\"}\n                        required\n                        placeholder={f}\n                        className=\"h-10 w-full rounded-sm bg-foreground/95 px-3 text-sm text-background placeholder:text-background/45 focus:outline-2 focus:outline-ring\"\n                      />\n                      {i === 2 && (\n                        <button type=\"submit\" aria-label={newsletter.submitLabel} className=\"absolute inset-y-0 right-2 flex items-center px-1 text-background/55 transition-colors duration-200 hover:text-background\">\n                          <ArrowRight className=\"size-5\" strokeWidth={1.5} aria-hidden />\n                        </button>\n                      )}\n                    </label>\n                  ))}\n                </div>\n              </form>\n              <div className=\"relative flex-1 [&>*]:absolute [&>*]:inset-0 [&>*]:size-full [&>*]:object-cover\">\n                {newsletter.media ?? <div className=\"bg-[linear-gradient(to_bottom,transparent,color-mix(in_oklab,var(--glow)_30%,transparent))]\" />}\n              </div>\n            </div>\n          )}\n        </div>\n\n        <div className=\"mt-10 flex flex-col gap-6 text-xs lg:flex-row lg:items-center lg:gap-12 xl:mt-0 xl:-translate-y-3 xl:pr-[22rem]\">\n          <p className=\"text-muted-foreground/60\">{copyright}</p>\n          {legal && (\n            <ul className=\"flex flex-wrap justify-between gap-x-12 gap-y-3 lg:justify-start\">\n              {legal.map((l) => (\n                <li key={l.href}>\n                  <a href={l.href} className={cn(\"font-display font-medium\", link)}>\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          {note && <div className=\"text-muted-foreground/60 lg:ml-auto\">{note}</div>}\n        </div>\n      </div>\n    </PrenuvoArc>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "prenuvo-arc",
+    "prenuvo-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, shown as the wordmark"
+    },
+    {
+      "name": "columns",
+      "type": "{ title: string; links: PrenuvoFooterLink[]; }[]",
+      "required": true,
+      "description": "link columns, each under a small uppercase label"
+    },
+    {
+      "name": "contact",
+      "type": "{ title: string; heading?: string; lines: { icon: ReactNode; label: string; href?: string; }[]; } | undefined",
+      "required": false,
+      "description": "the contact column: its label, a heading line, and lines with an icon (phone, email)"
+    },
+    {
+      "name": "socials",
+      "type": "{ icon: ReactNode; label: string; href: string; }[]",
+      "required": false,
+      "description": "social icons (lucide), each with a screen-reader label"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: ReactNode; fields: [string, string, string]; submitLabel: string; action?: string; media?: ReactNode; }",
+      "required": false,
+      "description": "the newsletter card"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "PrenuvoFooterLink[]",
+      "required": false,
+      "description": "legal links in the bottom row"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a quiet note at the end of the bottom row (e.g. payment partners)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b51e1112d68887d9a64c260af1bd509e92da5531676f4c66872bc50b5fe0f98c"
+}

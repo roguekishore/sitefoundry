@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury header",
+  "description": "A white top bar with a soft drop shadow: green capitals wordmark on the left, a centred row of nav items (small chevrons flip on hover over a faint ink tint), and three square buttons on the right — two outlined, one solid ink. Sticks to the top from desktop up; phones get a menu button that opens a full-width panel.",
+  "category": "header",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "shadow",
+    "square",
+    "minimal",
+    "fintech",
+    "hover"
+  ],
+  "notes": [
+    "sticky only from lg up, like the original; on phones it scrolls away",
+    "the phone menu is a native <details> disclosure, so it works without JavaScript"
+  ],
+  "entry": "moderntreasury-header.tsx",
+  "source": "foundry",
+  "name": "moderntreasury-header",
+  "files": [
+    {
+      "path": "moderntreasury-header.tsx",
+      "content": "import { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ModerntreasuryButton } from \"@foundry/moderntreasury-button\";\nimport { ModerntreasuryMark, type ModerntreasuryMarkProps } from \"@foundry/moderntreasury-mark\";\n\nexport interface ModerntreasuryHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron, as for items that open a menu */\n  menu?: boolean;\n}\n\nexport interface ModerntreasuryHeaderProps {\n  /** the logo */\n  mark: ModerntreasuryMarkProps;\n  /** the centred navigation */\n  links: ModerntreasuryHeaderLink[];\n  /** outlined buttons on the right, e.g. sign in and sign up */\n  secondary?: { label: string; href: string }[];\n  /** the solid ink button at the far right */\n  cta: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Modern Treasury's top bar: wordmark, centred nav, square buttons; sticky on desktop. */\nexport function ModerntreasuryHeader({ mark, links, secondary = [], cta, menuLabel, className }: ModerntreasuryHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"relative z-40 bg-background text-foreground shadow-[0_4px_6px_-1px_color-mix(in_oklab,var(--foreground)_10%,transparent),0_2px_4px_-2px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:sticky lg:top-0\",\n        className,\n      )}\n    >\n      <div className=\"flex h-14 items-center justify-between px-gutter lg:h-[4.0625rem] lg:px-8\">\n        <ModerntreasuryMark {...mark} />\n\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 lg:flex\">\n          {links.map((l) => (\n            <a\n              key={l.label}\n              href={l.href}\n              className=\"group flex h-8 items-center gap-1 rounded-[calc(var(--radius)/4)] px-3 text-sm font-medium transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-foreground/5 motion-reduce:transition-none\"\n            >\n              {l.label}\n              {l.menu && (\n                <ChevronDown\n                  aria-hidden\n                  className=\"size-4 text-foreground/70 transition-transform duration-200 group-hover:rotate-180 motion-reduce:transition-none\"\n                  strokeWidth={1.75}\n                />\n              )}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"hidden items-center gap-3 lg:flex\">\n          {secondary.map((s) => (\n            <ModerntreasuryButton key={s.label} href={s.href} variant=\"outline\" size=\"sm\">\n              {s.label}\n            </ModerntreasuryButton>\n          ))}\n          <ModerntreasuryButton href={cta.href} size=\"sm\" className=\"font-semibold\">\n            {cta.label}\n          </ModerntreasuryButton>\n        </div>\n\n        <details className=\"group lg:hidden\">\n          <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n            <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.5} />\n            <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.5} />\n          </summary>\n          <div className=\"absolute inset-x-0 top-full border-t border-border bg-background px-gutter pt-2 pb-6 shadow-[0_12px_16px_-8px_color-mix(in_oklab,var(--foreground)_12%,transparent)]\">\n            <nav className=\"flex flex-col\">\n              {links.map((l) => (\n                <a key={l.label} href={l.href} className=\"flex items-center justify-between border-b border-border py-3.5 text-base font-medium\">\n                  {l.label}\n                  {l.menu && <ChevronDown aria-hidden className=\"size-4 -rotate-90 text-foreground/60\" strokeWidth={1.75} />}\n                </a>\n              ))}\n            </nav>\n            <div className=\"mt-5 flex flex-wrap gap-3\">\n              {secondary.map((s) => (\n                <ModerntreasuryButton key={s.label} href={s.href} variant=\"outline\" size=\"md\" className=\"flex-1\">\n                  {s.label}\n                </ModerntreasuryButton>\n              ))}\n              <ModerntreasuryButton href={cta.href} size=\"md\" className=\"flex-1\">\n                {cta.label}\n              </ModerntreasuryButton>\n            </div>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "moderntreasury-button",
+    "moderntreasury-mark"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ModerntreasuryMarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "links",
+      "type": "ModerntreasuryHeaderLink[]",
+      "required": true,
+      "description": "the centred navigation"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "outlined buttons on the right, e.g. sign in and sign up"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the solid ink button at the far right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3b972a090b393da65409b7953be0d9f4dde4561ea74191627de5a54d4a06de89"
+}

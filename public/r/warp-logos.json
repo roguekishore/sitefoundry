@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp logo marquee",
+  "description": "A slim customer strip under a hairline with column ticks: a small muted mono caption ('trusted by …'), then a row of grey wordmarks gliding slowly left (faster while the page scrolls), fading out at both edges of the column.",
+  "category": "logos",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "marquee",
+    "loop",
+    "scroll",
+    "light",
+    "minimal",
+    "developer",
+    "mono",
+    "reveal"
+  ],
+  "notes": [
+    "one set passes every 38s, plus one set over the whole page scroll; with reduced motion the row stands still",
+    "logos are any nodes; plain-text names in the demo"
+  ],
+  "entry": "warp-logos.tsx",
+  "source": "foundry",
+  "name": "warp-logos",
+  "files": [
+    {
+      "path": "warp-logos.css",
+      "content": "/* The list is drawn three times. The inner track slides left by one set on a 38s loop; the\n   outer wrapper also drifts left by one set over the whole page scroll, so scrolling speeds\n   the strip up, as on the original. Two sets of travel at most leave a full set in view. */\n@media (prefers-reduced-motion: no-preference) {\n  .warp-logos-track {\n    animation: warp-logos-slide 38s linear infinite;\n  }\n}\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .warp-logos-drift {\n      animation: warp-logos-slide linear both;\n      animation-timeline: scroll(root block);\n    }\n  }\n}\n\n@keyframes warp-logos-slide {\n  from { translate: 0 0; }\n  to { translate: calc(-100% / 3) 0; }\n}\n"
+    },
+    {
+      "path": "warp-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { WarpSection } from \"@foundry/warp-section\";\nimport \"./warp-logos.css\";\n\nexport interface WarpLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n}\n\nexport interface WarpLogosProps {\n  /** the small line above the row; wrap a part in <span> to colour it */\n  caption: ReactNode;\n  logos: WarpLogo[];\n  className?: string;\n}\n\n/** A caption and a slow marquee of grey wordmarks, faded at the edges; scrolling speeds it up. */\nexport function WarpLogos({ caption, logos, className }: WarpLogosProps) {\n  const row = (copy: number) =>\n    logos.map((l) => (\n      <li key={`${copy}-${l.name}`} aria-hidden={copy > 0 || undefined} className=\"flex shrink-0 items-center px-6 text-foreground/55 lg:px-[1.875rem]\">\n        <span role=\"img\" aria-label={copy > 0 ? undefined : l.name} className=\"flex items-center [&_svg]:h-6 [&_svg]:w-auto\">\n          {l.logo}\n        </span>\n      </li>\n    ));\n  return (\n    <WarpSection marks={false} className={className} contentClassName=\"pt-7 pb-11 lg:pb-[3.25rem]\">\n      <p className=\"font-mono text-xs tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] text-foreground/40\">{caption}</p>\n      <div className=\"mt-5 overflow-clip mask-x-from-85% mask-x-to-100% lg:mt-6\">\n        <div className=\"warp-logos-drift w-max\">\n          <ul className=\"warp-logos-track flex h-10 w-max items-center\">\n            {row(0)}\n            {row(1)}\n            {row(2)}\n          </ul>\n        </div>\n      </div>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "caption",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small line above the row; wrap a part in <span> to colour it"
+    },
+    {
+      "name": "logos",
+      "type": "WarpLogo[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cc942c135639c1f8b1cf440e092e0e0b146143cbdd6bd16262c006ac218ceaeb"
+}

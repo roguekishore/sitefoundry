@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Neko phone booking bar",
+  "description": "A slim white bar pinned to the bottom of the phone screen with a soft upward shadow: the product's name and a one-line detail on the left, a blue booking button on the right. It stays tucked below the screen and slides up whenever you scroll back up past the first screen, and away again as you scroll on.",
+  "category": "cta",
+  "site": "neko",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "sticky",
+    "fixed",
+    "mobile",
+    "booking",
+    "slide",
+    "scroll",
+    "light"
+  ],
+  "notes": [
+    "phones and tablets only (hidden from 1024px); fixed to the window, so it renders nothing in place",
+    "needs JavaScript to watch the scroll direction; without it the bar stays tucked away"
+  ],
+  "hydrate": "idle",
+  "entry": "neko-book-bar.tsx",
+  "source": "foundry",
+  "name": "neko-book-bar",
+  "files": [
+    {
+      "path": "neko-book-bar.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { NekoButton } from \"@foundry/neko-button\";\n\nexport interface NekoBookBarProps {\n  /** the product's name */\n  title: string;\n  /** one short line under it (duration, price…) */\n  detail: string;\n  /** the blue button */\n  cta: { label: string; href: string };\n  /** always show it (for previews) instead of waiting for an upward scroll */\n  alwaysShown?: boolean;\n  className?: string;\n}\n\nexport function NekoBookBar({ title, detail, cta, alwaysShown, className }: NekoBookBarProps) {\n  const [shown, setShown] = useState(!!alwaysShown);\n\n  // Show while scrolling up once past the first screen; hide while scrolling down.\n  useEffect(() => {\n    if (alwaysShown) return;\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (Math.abs(y - last) < 4) return;\n      setShown(y < last && y > window.innerHeight);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [alwaysShown]);\n\n  return (\n    <div className={cn(\"pointer-events-none fixed inset-x-0 bottom-0 z-40 overflow-clip pt-8 lg:hidden\", className)}>\n      <div\n        className={cn(\n          \"pointer-events-auto flex items-center justify-between gap-4 bg-card px-gutter py-4 font-sans text-card-foreground shadow-[0_-8px_32px_-12px_color-mix(in_oklab,var(--foreground)_8%,transparent)] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n          shown ? \"translate-y-0\" : \"translate-y-full\",\n        )}\n      >\n        <div className=\"min-w-0\">\n          <p className=\"truncate text-base leading-6\">{title}</p>\n          <p className=\"truncate text-base leading-6 font-medium\">{detail}</p>\n        </div>\n        <NekoButton href={cta.href} variant=\"primary\" size=\"sm\" arrow={false} className=\"text-sm\">\n          {cta.label}\n        </NekoButton>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "neko-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the product's name"
+    },
+    {
+      "name": "detail",
+      "type": "string",
+      "required": true,
+      "description": "one short line under it (duration, price…)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the blue button"
+    },
+    {
+      "name": "alwaysShown",
+      "type": "boolean",
+      "required": false,
+      "description": "always show it (for previews) instead of waiting for an upward scroll"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "15dc3c27ac447903a2fc6b3e77036b05774ee27818e99fdb6990e974fc97db0b"
+}

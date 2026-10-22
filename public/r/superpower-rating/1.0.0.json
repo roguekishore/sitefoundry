@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Superpower rating line",
+  "description": "A small review-score line: the score, a green star (or a row of five boxed stars) and the source, with an optional stack of round avatars before it and a member count after a dot.",
+  "category": "testimonials",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "rating",
+    "stars",
+    "social-proof",
+    "avatars",
+    "minimal"
+  ],
+  "notes": [
+    "the star colour is chart-1 (green in the superpower theme)"
+  ],
+  "entry": "superpower-rating.tsx",
+  "source": "foundry",
+  "name": "superpower-rating",
+  "files": [
+    {
+      "path": "superpower-rating.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Star } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\n\nexport interface SuperpowerRatingProps {\n  /** the score text before the star, e.g. \"4.8 out of 5\" */\n  score: string;\n  /** the source after the star, e.g. \"on Verdict\" */\n  source: string;\n  /** after a dot, e.g. \"52,000+ members\" */\n  extra?: string;\n  /** star: one green star between score and source · boxed: five boxed stars first */\n  stars?: \"star\" | \"boxed\";\n  /** round avatars stacked before everything (photos, or empty for placeholders) */\n  avatars?: (ReactNode | undefined)[];\n  className?: string;\n}\n\nexport function SuperpowerRating({ score, source, extra, stars = \"star\", avatars, className }: SuperpowerRatingProps) {\n  const star = <Star className=\"size-5 fill-chart-1 text-chart-1\" strokeWidth={0} aria-hidden />;\n  return (\n    <p className={cn(\"flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.875rem] leading-none\", className)}>\n      {avatars && avatars.length > 0 && (\n        <span className=\"mr-1.5 flex -space-x-2\">\n          {avatars.map((a, i) => (\n            <SuperpowerMedia key={i} media={a} className=\"size-6 rounded-full ring-2 ring-background\" />\n          ))}\n        </span>\n      )}\n      {stars === \"boxed\" && (\n        <span className=\"mr-1.5 flex gap-0.5\" aria-hidden>\n          {Array.from({ length: 5 }, (_, i) => (\n            <span key={i} className=\"grid size-4 place-items-center bg-chart-1\">\n              <Star className=\"size-3 fill-background text-background\" strokeWidth={0} />\n            </span>\n          ))}\n        </span>\n      )}\n      <span>{score}</span>\n      {stars === \"star\" && star}\n      <span>{source}</span>\n      {extra && (\n        <>\n          <span aria-hidden>·</span>\n          <span>{extra}</span>\n        </>\n      )}\n    </p>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "score",
+      "type": "string",
+      "required": true,
+      "description": "the score text before the star, e.g. \"4.8 out of 5\""
+    },
+    {
+      "name": "source",
+      "type": "string",
+      "required": true,
+      "description": "the source after the star, e.g. \"on Verdict\""
+    },
+    {
+      "name": "extra",
+      "type": "string",
+      "required": false,
+      "description": "after a dot, e.g. \"52,000+ members\""
+    },
+    {
+      "name": "stars",
+      "type": "enum",
+      "required": false,
+      "default": "star",
+      "description": "star: one green star between score and source · boxed: five boxed stars first"
+    },
+    {
+      "name": "avatars",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "round avatars stacked before everything (photos, or empty for placeholders)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b69ee2db3025632dd47d5cd8c44804c0931f1d0d33716d685acd9052cffbd905"
+}

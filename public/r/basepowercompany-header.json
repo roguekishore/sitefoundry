@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power header",
+  "description": "A fixed top bar: heavy lowercase wordmark, a row of nav items with chevrons, a hairline log-in button and a lime sign-up button. Clear with light ink over the photo hero, it turns into a solid white bar with dark ink and a forest log-in outline over the first 80px of scrolling. Nav items get a stone pill and a flipping chevron on hover; phones get a burger menu.",
+  "category": "header",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "transparent",
+    "scroll",
+    "light",
+    "lime",
+    "hover"
+  ],
+  "notes": [
+    "fixed and clear at the top: put a dark photo hero under it (the next block should start under the bar)",
+    "the solid look scrubs in with a CSS scroll timeline; without support, or with reduced motion, it is always solid",
+    "chevron items keep the hover look but open no menu; the phone menu is a <details> disclosure (no JavaScript)"
+  ],
+  "entry": "basepowercompany-header.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-header",
+  "files": [
+    {
+      "path": "basepowercompany-header.css",
+      "content": "/* The page's own (outer) tokens are captured on <header> before the inner box switches to dark\n   tokens; the dark box then captures its light ink. Custom properties inherit as resolved\n   values, so the bar can blend between the two. */\n.bp-header {\n  --bp-bar: var(--card);\n  --bp-ink: var(--foreground);\n  --bp-brand: var(--primary);\n  --bp-pill: var(--background);\n  --bp-line: var(--border);\n}\n.bp-header-top {\n  --bp-ink-top: var(--foreground);\n}\n\n/* Without scroll timelines, or with reduced motion: always the solid bar. */\n.bp-header-bar {\n  background-color: var(--bp-bar);\n  color: var(--bp-ink);\n}\n.bp-header-signin {\n  border-color: var(--bp-brand);\n  color: var(--bp-brand);\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bp-header-bar {\n      animation: bp-header-solid linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 80px;\n    }\n    .bp-header-signin {\n      animation: bp-header-signin linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 80px;\n    }\n  }\n}\n\n@keyframes bp-header-solid {\n  from {\n    background-color: color-mix(in oklab, var(--bp-bar) 0%, transparent);\n    color: var(--bp-ink-top);\n  }\n  to {\n    background-color: var(--bp-bar);\n    color: var(--bp-ink);\n  }\n}\n\n@keyframes bp-header-signin {\n  from {\n    border-color: var(--bp-ink-top);\n    color: var(--bp-ink-top);\n  }\n  to {\n    border-color: var(--bp-brand);\n    color: var(--bp-brand);\n  }\n}\n"
+    },
+    {
+      "path": "basepowercompany-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyButton } from \"@foundry/basepowercompany-button\";\nimport { BasepowercompanyWordmark } from \"@foundry/basepowercompany-wordmark\";\nimport \"./basepowercompany-header.css\";\n\nexport interface BasepowercompanyHeaderLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** draw a chevron after it (an item that would open a menu) */\n  hasMenu?: boolean;\n}\n\nexport interface BasepowercompanyHeaderProps {\n  /** the company name, shown as the wordmark */\n  brand: string;\n  /** a small mark before the wordmark (e.g. a lucide icon) */\n  mark?: ReactNode;\n  /** where the wordmark links */\n  homeHref?: string;\n  /** the nav items (desktop row, phone menu) */\n  links: BasepowercompanyHeaderLink[];\n  /** the hairline button before the main one */\n  signIn: { label: string; href: string };\n  /** the lime main button */\n  cta: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\n/*\n * Fixed. At the top of the page it is clear with light ink, for the photo hero under it; over\n * the first 80px of scrolling it turns into a solid bar with dark ink. The light ink is read\n * from a dark-scoped inner box, the solid colours from the page's own tokens.\n */\nexport function BasepowercompanyHeader({ brand, mark, homeHref = \"#\", links, signIn, cta, menuLabel = \"Menu\", className }: BasepowercompanyHeaderProps) {\n  return (\n    <header className={cn(\"bp-header fixed inset-x-0 top-0 z-50\", className)}>\n      <div className=\"dark bp-header-top\">\n        <div className=\"bp-header-bar\">\n          <div className=\"mx-auto flex h-[3.3125rem] max-w-page items-center gap-4 px-gutter lg:h-[4.3125rem] lg:px-[calc(var(--page-gutter)*2)]\">\n            <BasepowercompanyWordmark name={brand} mark={mark} href={homeHref} />\n\n            <nav className=\"ml-8 hidden items-center gap-1 lg:flex\">\n              {links.map((l) => (\n                <a\n                  key={l.href}\n                  href={l.href}\n                  className=\"group/nav flex h-10 items-center gap-1 rounded-lg px-2.5 text-base font-semibold tracking-[-0.005em] transition-colors duration-300 ease-[cubic-bezier(0.3,0.3,0.3,1)] hover:bg-[var(--bp-pill)] hover:text-[var(--bp-ink)] motion-reduce:transition-none\"\n                >\n                  {l.label}\n                  {l.hasMenu && (\n                    <ChevronDown\n                      aria-hidden\n                      className=\"size-4 stroke-[1.75] transition-transform duration-300 ease-[cubic-bezier(0.3,0.3,0.3,1)] group-hover/nav:rotate-180 motion-reduce:transition-none\"\n                    />\n                  )}\n                </a>\n              ))}\n            </nav>\n\n            <div className=\"ml-auto hidden items-center gap-2 lg:flex\">\n              <BasepowercompanyButton href={signIn.href} size=\"sm\" variant=\"ghost\" className=\"bp-header-signin\">\n                {signIn.label}\n              </BasepowercompanyButton>\n              <BasepowercompanyButton href={cta.href} size=\"sm\">\n                {cta.label}\n              </BasepowercompanyButton>\n            </div>\n\n            {/* phone menu: a disclosure, no JavaScript */}\n            <details className=\"group/menu ml-auto lg:hidden\">\n              <summary className=\"-mr-2 flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n                <span className=\"sr-only\">{menuLabel}</span>\n                <Menu aria-hidden className=\"size-6 stroke-[1.5] group-open/menu:hidden\" />\n                <X aria-hidden className=\"hidden size-6 stroke-[1.5] group-open/menu:block\" />\n              </summary>\n              <nav className=\"fixed inset-x-0 top-[3.3125rem] bg-[var(--bp-bar)] px-gutter pt-2 pb-6 text-[var(--bp-ink)]\">\n                <ul className=\"flex flex-col\">\n                  {links.map((l) => (\n                    <li key={l.href} className=\"border-b border-[var(--bp-line)]\">\n                      <a href={l.href} className=\"flex items-center justify-between py-3.5 text-lg font-semibold\">\n                        {l.label}\n                        {l.hasMenu && <ChevronDown aria-hidden className=\"size-5 -rotate-90 stroke-[1.5]\" />}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n                <div className=\"mt-6 flex flex-col gap-3\">\n                  <a\n                    href={signIn.href}\n                    className=\"flex h-[3.125rem] items-center justify-center rounded-lg border border-[var(--bp-brand)] font-bold text-[var(--bp-brand)]\"\n                  >\n                    {signIn.label}\n                  </a>\n                  <BasepowercompanyButton href={cta.href} block>\n                    {cta.label}\n                  </BasepowercompanyButton>\n                </div>\n              </nav>\n            </details>\n          </div>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "basepowercompany-button",
+    "basepowercompany-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, shown as the wordmark"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the wordmark (e.g. a lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "BasepowercompanyHeaderLink[]",
+      "required": true,
+      "description": "the nav items (desktop row, phone menu)"
+    },
+    {
+      "name": "signIn",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the hairline button before the main one"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the lime main button"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "812ab90756b91d1aed957e50f796abeed0e1062f4324105ad2dcbb22ef5cdc11"
+}

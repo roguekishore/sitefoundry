@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Granola steps",
+  "description": "A quiet how-it-works on white: a serif statement in the right half, then steps down the right column, each a small serif title, a short paragraph and a large rounded square picture. On desktop a slim step nav stays pinned top-left; as each step crosses the middle of the window its label turns ink and a line fills beneath it. Phones show each step's name as a serif eyebrow instead.",
+  "category": "features",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "steps",
+    "how-it-works",
+    "light",
+    "editorial",
+    "serif",
+    "sticky",
+    "pinned",
+    "scrubbed",
+    "progress",
+    "minimal"
+  ],
+  "notes": [
+    "step media are square slots (rounded 16px); empty, a soft lime-wash placeholder",
+    "progress uses named view timelines with timeline-scope (Chromium); without support, or with reduced motion, the nav is plain links",
+    "idPrefix sets the step anchors the nav jumps to"
+  ],
+  "entry": "granola-steps.tsx",
+  "source": "foundry",
+  "name": "granola-steps",
+  "files": [
+    {
+      "path": "granola-steps.css",
+      "content": "/* Each step publishes a named view timeline (its name comes in as --granola-step-tl) and the\n   section widens their scope so the pinned nav can follow them. While a step crosses the middle\n   of the window its nav label turns ink and the line under it fills left to right, then clears\n   as the next step takes over. Without scroll timelines, or with reduced motion, the nav is a\n   plain list of links. */\n.granola-steps {\n  timeline-scope: var(--granola-steps-scope);\n}\n\n.granola-steps-fill {\n  transform: scaleX(0);\n}\n\n.granola-steps-step {\n  view-timeline-name: var(--granola-step-tl);\n  view-timeline-axis: block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .granola-steps-label,\n    .granola-steps-fill {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: var(--granola-step-tl);\n      animation-range: cover 25% cover 75%;\n    }\n    .granola-steps-label {\n      animation-name: granola-steps-label;\n    }\n    .granola-steps-fill {\n      animation-name: granola-steps-fill;\n    }\n  }\n}\n\n@keyframes granola-steps-label {\n  0% { color: var(--muted-foreground); }\n  4%, 96% { color: var(--foreground); }\n  100% { color: var(--muted-foreground); }\n}\n\n@keyframes granola-steps-fill {\n  0% { transform: scaleX(0); opacity: 1; }\n  92% { transform: scaleX(1); opacity: 1; }\n  100% { transform: scaleX(1); opacity: 0; }\n}\n"
+    },
+    {
+      "path": "granola-steps.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GranolaMedia } from \"@foundry/granola-media\";\nimport \"./granola-steps.css\";\n\nexport interface GranolaStep {\n  /** the short name in the pinned nav (and the eyebrow above the title on phones) */\n  label: string;\n  /** the serif step title */\n  title: string;\n  /** a short paragraph */\n  body: string;\n  /** the step's square picture or demo; a soft placeholder while empty */\n  media?: ReactNode;\n}\n\nexport interface GranolaStepsProps {\n  /** the statement above the steps, set in the right half on desktop */\n  intro?: string;\n  /** the steps, in order */\n  steps: GranolaStep[];\n  /** prefix for the step anchors the nav links to (keep it unique on the page) */\n  idPrefix?: string;\n  className?: string;\n}\n\nexport function GranolaSteps({ intro, steps, idPrefix = \"step\", className }: GranolaStepsProps) {\n  // Each step publishes a named view timeline; the scope on the section lets the nav (a sibling\n  // column) follow them.\n  const names = steps.map((_, i) => `--granola-step-${i}`);\n  const scope = { \"--granola-steps-scope\": names.join(\", \") } as CSSProperties;\n\n  return (\n    <section className={cn(\"granola-steps bg-background text-foreground\", className)} style={scope}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)_+_2*var(--page-gutter))] px-gutter pb-24 lg:pb-12\">\n        {intro && (\n          <div className=\"py-24 lg:grid lg:grid-cols-2 lg:pt-44 lg:pb-40\">\n            <h2 className=\"font-display text-4xl leading-none tracking-[-0.01em] lg:col-start-2 lg:max-w-[18ch] lg:text-5xl\">{intro}</h2>\n          </div>\n        )}\n\n        <div className=\"lg:grid lg:grid-cols-2\">\n          {/* the pinned step nav (desktop) */}\n          <nav aria-label={intro ?? undefined} className=\"hidden lg:block\">\n            <ul className=\"sticky top-24 flex w-44 flex-col\">\n              {steps.map((step, i) => (\n                <li key={step.label}>\n                  <a\n                    href={`#${idPrefix}-${i}`}\n                    className=\"granola-steps-label relative block border-b border-foreground/10 pt-3 pb-2.5 text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\"\n                    style={{ \"--granola-step-tl\": names[i] } as CSSProperties}\n                  >\n                    {step.label}\n                    <span aria-hidden className=\"granola-steps-fill absolute -bottom-px left-0 h-[3px] w-full origin-left bg-foreground\" />\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n\n          <ol className=\"flex flex-col gap-24 lg:gap-28\">\n            {steps.map((step, i) => (\n              <li\n                key={step.label}\n                id={`${idPrefix}-${i}`}\n                className=\"granola-steps-step scroll-mt-24\"\n                style={{ \"--granola-step-tl\": names[i] } as CSSProperties}\n              >\n                <p className=\"font-display text-base text-muted-foreground lg:hidden\">{step.label}</p>\n                <h3 className=\"mt-1 font-display text-2xl leading-tight tracking-[-0.01em] lg:mt-0\">{step.title}</h3>\n                <p className=\"mt-2 max-w-[29rem] text-base leading-normal lg:mt-1.5 lg:text-sm lg:leading-6\">{step.body}</p>\n                <GranolaMedia tone=\"glow\" className=\"mt-6 aspect-square w-full rounded-2xl lg:mt-7\">\n                  {step.media}\n                </GranolaMedia>\n              </li>\n            ))}\n          </ol>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "granola-media"
+  ],
+  "props": [
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "the statement above the steps, set in the right half on desktop"
+    },
+    {
+      "name": "steps",
+      "type": "GranolaStep[]",
+      "required": true,
+      "description": "the steps, in order"
+    },
+    {
+      "name": "idPrefix",
+      "type": "string",
+      "required": false,
+      "default": "step",
+      "description": "prefix for the step anchors the nav links to (keep it unique on the page)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8b190b43e557bf3e146e1b863587b6e9dd9dfce165257938e73ae2ed6aed0d20"
+}

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Aspen Search city time and clock",
+  "description": "The live time in a city as plain text, and a thin round clock face whose two hairline hands show it; both update every 15 seconds.",
+  "category": "text-effect",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "clock",
+    "time",
+    "live",
+    "minimal",
+    "hairline"
+  ],
+  "notes": [
+    "exports AspensearchCityTime (text) and AspensearchClockFace (svg)",
+    "needs JavaScript for the live time; static HTML shows the fallback time"
+  ],
+  "entry": "aspensearch-city-time.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "aspensearch-city-time",
+  "files": [
+    {
+      "path": "aspensearch-city-time.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\n/** The time in a city, as \"hh:mm AM\", plus the hour and minute for a clock face. */\ninterface ZonedTime {\n  label: string;\n  hours: number;\n  minutes: number;\n}\n\nfunction readTime(timeZone: string): ZonedTime {\n  const parts = new Intl.DateTimeFormat(\"en-US\", { hour: \"2-digit\", minute: \"2-digit\", hour12: true, timeZone }).formatToParts(new Date());\n  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? \"\";\n  return { label: `${get(\"hour\")}:${get(\"minute\")} ${get(\"dayPeriod\")}`, hours: Number(get(\"hour\")) % 12, minutes: Number(get(\"minute\")) };\n}\n\nfunction parseFallback(fallback: string): ZonedTime {\n  const m = /(\\d{1,2}):(\\d{2})/.exec(fallback);\n  return { label: fallback, hours: m ? Number(m[1]) % 12 : 9, minutes: m ? Number(m[2]) : 0 };\n}\n\n/** Live time for a time zone; before the page runs JavaScript it is the fallback. */\nfunction useZonedTime(timeZone: string, fallback: string): ZonedTime {\n  const [time, setTime] = useState<ZonedTime>(() => parseFallback(fallback));\n  useEffect(() => {\n    const tick = () => setTime(readTime(timeZone));\n    tick();\n    const id = window.setInterval(tick, 15_000);\n    return () => window.clearInterval(id);\n  }, [timeZone]);\n  return time;\n}\n\nexport interface AspensearchCityTimeProps {\n  /** IANA time zone, e.g. \"America/Chicago\" */\n  timeZone: string;\n  /** what static HTML shows before the live time takes over, e.g. \"09:00 AM\" */\n  fallback: string;\n  className?: string;\n}\n\n/** The current time in a city as text (\"01:06 PM\"), updated every 15 seconds. */\nexport function AspensearchCityTime({ timeZone, fallback, className }: AspensearchCityTimeProps) {\n  const { label } = useZonedTime(timeZone, fallback);\n  return <time className={cn(\"tabular-nums\", className)}>{label}</time>;\n}\n\nexport interface AspensearchClockFaceProps {\n  /** IANA time zone, e.g. \"Europe/London\" */\n  timeZone: string;\n  /** the time static HTML shows, e.g. \"03:00 PM\" */\n  fallback: string;\n  className?: string;\n}\n\n/** A thin round clock face whose two hands show the city's time (UI, drawn with hairlines). */\nexport function AspensearchClockFace({ timeZone, fallback, className }: AspensearchClockFaceProps) {\n  const { hours, minutes } = useZonedTime(timeZone, fallback);\n  const hourAngle = (hours + minutes / 60) * 30;\n  const minuteAngle = minutes * 6;\n  return (\n    <svg aria-hidden viewBox=\"0 0 40 40\" fill=\"none\" stroke=\"currentColor\" strokeWidth={1} strokeLinecap=\"round\" className={cn(\"size-10 shrink-0\", className)}>\n      <circle cx=\"20\" cy=\"20\" r=\"19\" />\n      <line x1=\"20\" y1=\"20\" x2=\"20\" y2=\"10\" transform={`rotate(${hourAngle} 20 20)`} />\n      <line x1=\"20\" y1=\"20\" x2=\"20\" y2=\"6\" transform={`rotate(${minuteAngle} 20 20)`} />\n    </svg>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "timeZone",
+      "type": "string",
+      "required": true,
+      "description": "IANA time zone, e.g. \"America/Chicago\""
+    },
+    {
+      "name": "fallback",
+      "type": "string",
+      "required": true,
+      "description": "what static HTML shows before the live time takes over, e.g. \"09:00 AM\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "35c540d16fbb6dc8515f7a73f85e2746dc416e9907eeec8823438754d74c403d"
+}

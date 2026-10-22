@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio header",
+  "description": "A dismissible black one-line news bar over a 68px white nav bar, pinned for the whole page: wordmark at the left edge, five medium nav links (two with chevrons) that get a grey pill on hover, an outline 'log in' and a near-black 'start' button. Over sections marked as dark bands the nav bar fades to dark. On phones a two-bar button crosses into an X and opens the links below.",
+  "category": "header",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "announcement",
+    "light",
+    "dark",
+    "minimal",
+    "saas"
+  ],
+  "notes": [
+    "sticky: put it at the top level of the page so it stays for the whole scroll",
+    "turns dark over any element with data-header-tone=\"dark\" (the attio dark bands carry it)",
+    "the bar spans the full window, not the framed page width"
+  ],
+  "entry": "attio-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "attio-header",
+  "files": [
+    {
+      "path": "attio-header.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronDown, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioButton } from \"@foundry/attio-button\";\n\nexport interface AttioHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron, as for a link that opens a menu */\n  menu?: boolean;\n}\n\nexport interface AttioHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** the one-line news in the black bar above the nav; leave out for no bar */\n  announcement?: { label: string; href: string };\n  /** screen-reader label of the bar's close button */\n  dismissLabel?: string;\n  /** the nav links, in a row from lg and in the phone menu below */\n  links: AttioHeaderLink[];\n  /** the outline button at the right end (e.g. sign in) */\n  secondary?: { label: string; href: string };\n  /** the dark button at the right end (e.g. start free) */\n  primary?: { label: string; href: string };\n  /** labels of the phone menu button, for screen readers */\n  menuLabel?: string;\n  closeLabel?: string;\n  className?: string;\n}\n\n/**\n * A black one-line news bar over a 68px white nav bar, both pinned to the top for the whole\n * page. Over any section marked data-header-tone=\"dark\" the nav bar turns dark too.\n */\nexport function AttioHeader({\n  brand,\n  logo,\n  homeHref = \"/\",\n  announcement,\n  dismissLabel = \"Dismiss\",\n  links,\n  secondary,\n  primary,\n  menuLabel = \"Open menu\",\n  closeLabel = \"Close menu\",\n  className,\n}: AttioHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [barShown, setBarShown] = useState(true);\n  const [dark, setDark] = useState(false);\n  const ref = useRef<HTMLElement>(null);\n\n  // Follow the section under the header's bottom edge: dark bands turn the bar dark.\n  useEffect(() => {\n    let frame = 0;\n    const check = () => {\n      frame = 0;\n      const line = (ref.current?.getBoundingClientRect().bottom ?? 0) + 1;\n      const bands = document.querySelectorAll<HTMLElement>('[data-header-tone=\"dark\"]');\n      let over = false;\n      bands.forEach((band) => {\n        const r = band.getBoundingClientRect();\n        if (r.top <= line && r.bottom > line) over = true;\n      });\n      setDark(over);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(check);\n    };\n    check();\n    document.addEventListener(\"scroll\", onScroll, { passive: true, capture: true });\n    window.addEventListener(\"resize\", onScroll);\n    return () => {\n      document.removeEventListener(\"scroll\", onScroll, { capture: true });\n      window.removeEventListener(\"resize\", onScroll);\n      if (frame) cancelAnimationFrame(frame);\n    };\n  }, []);\n\n  return (\n    <header ref={ref} className={cn(\"sticky top-0 z-40\", className)}>\n      {announcement && barShown && (\n        <div className=\"dark relative flex h-12 items-center bg-background px-6 text-foreground\">\n          <a\n            href={announcement.href}\n            className=\"group flex min-w-0 items-center gap-2 pr-10 text-[0.9375rem] font-semibold tracking-[-0.01em] lg:mx-auto lg:pr-0 lg:text-sm\"\n          >\n            <span className=\"truncate\">{announcement.label}</span>\n            <ArrowRight aria-hidden className=\"size-3.5 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5 motion-reduce:transition-none\" />\n          </a>\n          <button\n            type=\"button\"\n            aria-label={dismissLabel}\n            onClick={() => setBarShown(false)}\n            className=\"absolute right-6 grid size-7 place-items-center rounded-md text-foreground/80 transition-colors duration-300 hover:bg-accent hover:text-foreground lg:right-8\"\n          >\n            <X aria-hidden className=\"size-4\" />\n          </button>\n        </div>\n      )}\n\n      <div\n        className={cn(\n          \"border-b border-border bg-background text-foreground transition-[background-color,border-color,color] duration-300 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none\",\n          dark && \"dark\",\n        )}\n      >\n        <div className=\"flex h-[3.25rem] items-center px-6 lg:h-[4.25rem] lg:px-7\">\n          <a href={homeHref} aria-label={brand} className=\"flex items-center text-foreground [&_svg]:h-6 [&_svg]:w-auto\">\n            {logo}\n          </a>\n\n          <nav className=\"ml-11 hidden items-center gap-1 lg:flex\">\n            {links.map((link) => (\n              <AttioButton key={link.href} href={link.href} variant=\"ghost\" className=\"h-9 gap-1 px-3\">\n                {link.label}\n                {link.menu && <ChevronDown aria-hidden className=\"ml-1 inline size-4 opacity-70\" />}\n              </AttioButton>\n            ))}\n          </nav>\n\n          <div className=\"ml-auto flex items-center gap-2.5\">\n            {secondary && (\n              <AttioButton href={secondary.href} className=\"hidden lg:inline-flex\">\n                {secondary.label}\n              </AttioButton>\n            )}\n            {primary && (\n              <AttioButton href={primary.href} variant=\"primary\" className=\"hidden font-semibold lg:inline-flex\">\n                {primary.label}\n              </AttioButton>\n            )}\n            <button\n              type=\"button\"\n              aria-label={open ? closeLabel : menuLabel}\n              aria-expanded={open}\n              onClick={() => setOpen((o) => !o)}\n              className=\"relative -mr-1.5 size-9 rounded-md lg:hidden\"\n            >\n              {/* two bars that cross into an X */}\n              <span\n                className={cn(\n                  \"absolute left-1/2 h-[1.5px] w-[1.125rem] -translate-x-1/2 rounded-full bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n                  open ? \"top-[17px] rotate-45\" : \"top-[13px]\",\n                )}\n              />\n              <span\n                className={cn(\n                  \"absolute left-1/2 h-[1.5px] w-[1.125rem] -translate-x-1/2 rounded-full bg-foreground transition-transform duration-300 motion-reduce:transition-none\",\n                  open ? \"top-[17px] -rotate-45\" : \"top-[21px]\",\n                )}\n              />\n            </button>\n          </div>\n        </div>\n\n        {open && (\n          <nav className=\"border-t border-border px-6 pt-2 pb-6 lg:hidden\">\n            {links.map((link) => (\n              <a\n                key={link.href}\n                href={link.href}\n                onClick={() => setOpen(false)}\n                className=\"flex h-12 items-center justify-between border-b border-border text-base font-medium text-foreground\"\n              >\n                {link.label}\n                {link.menu && <ChevronDown aria-hidden className=\"size-4 -rotate-90 opacity-60\" />}\n              </a>\n            ))}\n            <div className=\"mt-5 grid grid-cols-2 gap-3\">\n              {secondary && (\n                <AttioButton href={secondary.href} size=\"lg\">\n                  {secondary.label}\n                </AttioButton>\n              )}\n              {primary && (\n                <AttioButton href={primary.href} variant=\"primary\" size=\"lg\">\n                  {primary.label}\n                </AttioButton>\n              )}\n            </div>\n          </nav>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "attio-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (an svg, img or styled text)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "announcement",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the one-line news in the black bar above the nav; leave out for no bar"
+    },
+    {
+      "name": "dismissLabel",
+      "type": "string",
+      "required": false,
+      "default": "Dismiss",
+      "description": "screen-reader label of the bar's close button"
+    },
+    {
+      "name": "links",
+      "type": "AttioHeaderLink[]",
+      "required": true,
+      "description": "the nav links, in a row from lg and in the phone menu below"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button at the right end (e.g. sign in)"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the dark button at the right end (e.g. start free)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Open menu",
+      "description": "labels of the phone menu button, for screen readers"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close menu"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "284838fdb1656aaedbb1e796b1c88fbb702825e29548c9db23bcefaaf62852a8"
+}

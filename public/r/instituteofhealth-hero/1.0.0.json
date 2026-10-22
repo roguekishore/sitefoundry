@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health hero",
+  "description": "A full-window video hero under a black scrim. Top right, figures stacked under 2px white rules (small label, big number, three pulsing dots); phones show one figure at a time under a line that fills a third further each time it changes. Bottom left, a large tight headline, a short line of copy and a see-through glass button rise in on load. The numbers count up once, and the hero stays pinned while the next section slides over it.",
+  "category": "hero",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "video",
+    "fullscreen",
+    "dark-overlay",
+    "stats",
+    "counter",
+    "sticky",
+    "pinned",
+    "load-in",
+    "loop",
+    "glass"
+  ],
+  "notes": [
+    "needs JavaScript for the counters and the phone stat cycle (hydrate: load)",
+    "pinned (default): it is sticky to the top of its parent, so wrap everything after it in a `relative z-10` layer with opaque backgrounds, or pass pinned={false}",
+    "text sits on dark media in every theme (highlight-foreground on a black scrim)"
+  ],
+  "entry": "instituteofhealth-hero.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "instituteofhealth-hero",
+  "files": [
+    {
+      "path": "instituteofhealth-hero.css",
+      "content": "/* The headline block rises in once on load. */\n.ioh-hero-rise {\n  animation: instituteofhealth-hero-rise 0.9s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s both;\n}\n\n@keyframes instituteofhealth-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n\n/* The three dots next to each figure: one brightens at a time, forever. */\n.ioh-hero-dot {\n  opacity: 0.4;\n  animation: instituteofhealth-hero-dot 0.9s ease-in-out infinite;\n}\n\n@keyframes instituteofhealth-hero-dot {\n  0%, 100% { opacity: 0.4; }\n  35% { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ioh-hero-rise { animation: none; }\n  .ioh-hero-dot { animation: none; opacity: 1; }\n}\n"
+    },
+    {
+      "path": "instituteofhealth-hero.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { InstituteofhealthButton } from \"@foundry/instituteofhealth-button\";\nimport \"./instituteofhealth-hero.css\";\n\nexport interface InstituteofhealthStat {\n  /** small label above the number */\n  label: string;\n  /** the figure; it counts up from 0 when the page loads */\n  value: number;\n}\n\nexport interface InstituteofhealthHeroProps {\n  /** the big statement at the bottom left */\n  headline: string;\n  /** one or two lines under the headline */\n  subhead?: string;\n  /** the see-through button under the subhead */\n  action?: { label: string; href: string };\n  /** the figures at the top right (phones show one at a time) */\n  stats: InstituteofhealthStat[];\n  /** the full-bleed background (a video or image, cropped like object-fit: cover); empty shows a placeholder */\n  media?: ReactNode;\n  /** stay pinned while the next sections slide over (wrap what follows in a `relative z-10` layer) */\n  pinned?: boolean;\n  className?: string;\n}\n\n/** Counts from 0 to `to` once, after hydration; static HTML and reduced motion show the final figure. */\nfunction useCountUp(to: number, ms = 1800) {\n  const [n, setN] = useState(to);\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let raf = 0;\n    const start = performance.now();\n    const tick = (t: number) => {\n      const p = Math.min(1, (t - start) / ms);\n      setN(Math.round(to * (1 - Math.pow(1 - p, 3))));\n      if (p < 1) raf = requestAnimationFrame(tick);\n    };\n    raf = requestAnimationFrame(tick);\n    return () => cancelAnimationFrame(raf);\n  }, [to, ms]);\n  return n;\n}\n\nfunction StatFigure({ value }: { value: number }) {\n  return <>{useCountUp(value)}</>;\n}\n\n/** Three dots, one brighter at a time (a loop in CSS). */\nfunction Dots() {\n  return (\n    <span aria-hidden className=\"flex gap-1\">\n      {[0, 1, 2].map((i) => (\n        <span key={i} className=\"ioh-hero-dot size-[3px] rounded-full bg-current\" style={{ animationDelay: `${i * 0.3}s` }} />\n      ))}\n    </span>\n  );\n}\n\nexport function InstituteofhealthHero({ headline, subhead, action, stats, media, pinned = true, className }: InstituteofhealthHeroProps) {\n  // Phones show one stat at a time; the line above fills a third more for each.\n  const [active, setActive] = useState(0);\n  useEffect(() => {\n    if (stats.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setInterval(() => setActive((a) => (a + 1) % stats.length), 4500);\n    return () => window.clearInterval(id);\n  }, [stats.length]);\n\n  return (\n    <section\n      className={cn(\n        \"relative isolate h-svh overflow-clip text-highlight-foreground\",\n        pinned && \"sticky top-0 z-0\",\n        className,\n      )}\n    >\n      {/* Background: media or a flat placeholder, under a dark scrim (darker at the top and bottom). */}\n      <div className=\"absolute inset-0 -z-10 [&>*]:size-full [&>*]:object-cover\">{media ?? <div className=\"bg-muted-foreground\" />}</div>\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-[linear-gradient(oklch(0_0_0/0.6),oklch(0_0_0/0.15)_50%,oklch(0_0_0/0.35))]\" /> {/* foundry-allow-colour: the scrim is plain black at 60/15/35%, whatever the theme */}\n\n      <div className=\"flex h-full flex-col justify-between px-gutter pt-[6.8rem] pb-3.5 lg:pt-[7.25rem] lg:pb-[5.75rem]\">\n        {/* Stats. Phones: one at a time under a progress line. Desktop: all, stacked at the right. */}\n        <div className=\"lg:hidden\">\n          <div className=\"relative h-0.5 bg-highlight-foreground/30\">\n            <div\n              className=\"absolute inset-y-0 left-0 bg-highlight-foreground transition-[width] duration-[1500ms] ease-in-out motion-reduce:transition-none\"\n              style={{ width: `${((active + 1) / Math.max(stats.length, 1)) * 100}%` }}\n            />\n          </div>\n          <div className=\"grid\">\n            {stats.map((s, i) => (\n              <div\n                key={s.label}\n                aria-hidden={i !== active}\n                className={cn(\n                  \"col-start-1 row-start-1 transition-opacity duration-[550ms] ease-[ease] motion-reduce:transition-none\",\n                  i === active ? \"opacity-100\" : \"opacity-0\",\n                )}\n              >\n                <p className=\"pt-3.5 text-[0.975rem] leading-none font-medium tracking-[-0.03em] text-highlight-foreground/70\">{s.label}</p>\n                <div className=\"flex items-center justify-between pt-8\">\n                  <p className=\"text-[1.46rem] leading-none font-medium tracking-[-0.02em]\">\n                    <StatFigure value={s.value} />\n                  </p>\n                  <Dots />\n                </div>\n              </div>\n            ))}\n          </div>\n        </div>\n        <dl className=\"ml-auto hidden w-[21.5rem] lg:block\">\n          {stats.map((s) => (\n            <div key={s.label} className=\"border-t-2 border-highlight-foreground/85 pt-[1.05rem] pb-[1.6rem]\">\n              <dt className=\"text-[0.765rem] leading-none font-medium tracking-[-0.03em] text-highlight-foreground/75\">{s.label}</dt>\n              <dd className=\"flex items-center justify-between pt-[1.85rem]\">\n                <span className=\"text-[2.25rem] leading-[0.6] font-medium tracking-[-0.02em]\">\n                  <StatFigure value={s.value} />\n                </span>\n                <Dots />\n              </dd>\n            </div>\n          ))}\n        </dl>\n\n        {/* Headline block, bottom left. */}\n        <div className=\"ioh-hero-rise lg:max-w-[38rem]\">\n          <h1 className=\"font-display text-[2.49rem] leading-[1.05] font-medium tracking-[-0.035em] lg:text-[3.6rem] lg:leading-none\">{headline}</h1>\n          {subhead && (\n            <p className=\"mt-4 max-w-[22.5rem] text-[0.975rem] leading-[1.5] font-medium tracking-[-0.02em] lg:max-w-[26rem] lg:text-[0.945rem]\">{subhead}</p>\n          )}\n          {action && (\n            <InstituteofhealthButton href={action.href} variant=\"glass\" className=\"mt-14 h-[5.35rem] w-full lg:mt-8 lg:h-[4.0625rem] lg:w-[15.25rem]\">\n              {action.label}\n            </InstituteofhealthButton>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "instituteofhealth-button"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "string",
+      "required": true,
+      "description": "the big statement at the bottom left"
+    },
+    {
+      "name": "subhead",
+      "type": "string",
+      "required": false,
+      "description": "one or two lines under the headline"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the see-through button under the subhead"
+    },
+    {
+      "name": "stats",
+      "type": "InstituteofhealthStat[]",
+      "required": true,
+      "description": "the figures at the top right (phones show one at a time)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed background (a video or image, cropped like object-fit: cover); empty shows a placeholder"
+    },
+    {
+      "name": "pinned",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "stay pinned while the next sections slide over (wrap what follows in a `relative z-10` layer)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ae942ca80043daa855d5196325dd3adc2093421619b323ce4e7d2c98cc2a7a5a"
+}

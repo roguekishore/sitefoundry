@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Superpower accordion",
+  "description": "Question-and-answer rows that open in place, built on native details/summary (no JavaScript). Line: hairline-separated FAQ rows with a thin plus that turns into a cross. Soft: zinc-50 boxes with a plus in a small grey square. Tour: soft on phones, dark frosted glass over a photo on desktop.",
+  "category": "faq",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "details",
+    "glass",
+    "minimal",
+    "css-only"
+  ],
+  "notes": [
+    "the tour variant expects a photo behind it on desktop (it turns into dark glass from lg up)"
+  ],
+  "entry": "superpower-accordion.tsx",
+  "source": "foundry",
+  "name": "superpower-accordion",
+  "files": [
+    {
+      "path": "superpower-accordion.css",
+      "content": "/* The answer slides down a little and fades in as its row opens (details renders it only\n   while open, so the animation replays each time). */\n.superpower-accordion-answer {\n  animation: superpower-accordion-open 0.25s ease both;\n}\n\n@keyframes superpower-accordion-open {\n  from {\n    opacity: 0;\n    transform: translateY(-4px);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .superpower-accordion-answer {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "superpower-accordion.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./superpower-accordion.css\";\n\nexport interface SuperpowerAccordionItem {\n  /** the question, always visible */\n  question: string;\n  /** the answer, shown when the row is opened */\n  answer: ReactNode;\n}\n\nexport interface SuperpowerAccordionProps {\n  items: SuperpowerAccordionItem[];\n  /** line: hairline FAQ rows · soft: grey boxes · tour: grey boxes on phones, dark glass on desktop */\n  variant?: \"line\" | \"soft\" | \"tour\";\n  className?: string;\n}\n\nexport function SuperpowerAccordion({ items, variant = \"line\", className }: SuperpowerAccordionProps) {\n  const line = variant === \"line\";\n  return (\n    <div className={cn(!line && \"flex flex-col gap-1.5\", className)}>\n      {items.map((item) => (\n        <details\n          key={item.question}\n          className={cn(\n            \"group\",\n            line && \"border-b border-border\",\n            variant === \"soft\" && \"rounded-lg bg-secondary\",\n            variant === \"tour\" &&\n              \"rounded-lg bg-secondary lg:rounded-[calc(var(--radius)/2)] lg:bg-linear-to-r lg:from-foreground/45 lg:to-foreground/80 lg:text-background lg:backdrop-blur-md\",\n          )}\n        >\n          <summary\n            className={cn(\n              \"flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden\",\n              line && \"py-6 text-[1rem] leading-snug lg:py-7 lg:text-[1.0625rem]\",\n              !line && \"py-3 pr-3 pl-4 text-[0.875rem] leading-snug lg:text-[0.9375rem]\",\n              variant === \"tour\" && \"lg:py-2 lg:pr-2 lg:pl-4\",\n            )}\n          >\n            <span>{item.question}</span>\n            <span\n              className={cn(\n                \"grid shrink-0 place-items-center transition-transform duration-250 ease-out group-open:rotate-45 motion-reduce:transition-none\",\n                line ? \"size-6 text-muted-foreground\" : \"size-9 rounded-sm bg-muted\",\n                variant === \"tour\" && \"lg:size-7 lg:rounded-[calc(var(--radius)/3)] lg:bg-background/15\",\n              )}\n            >\n              <Plus className={line ? \"size-5\" : \"size-4\"} strokeWidth={line ? 1.25 : 2} aria-hidden />\n            </span>\n          </summary>\n          <div\n            className={cn(\n              \"superpower-accordion-answer text-muted-foreground\",\n              line && \"pb-6 text-[0.9375rem] leading-relaxed\",\n              !line && \"px-4 pb-4 text-[0.8125rem] leading-relaxed lg:text-[0.875rem]\",\n              variant === \"tour\" && \"lg:text-background/75\",\n            )}\n          >\n            {item.answer}\n          </div>\n        </details>\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "SuperpowerAccordionItem[]",
+      "required": true
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "line",
+      "description": "line: hairline FAQ rows · soft: grey boxes · tour: grey boxes on phones, dark glass on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3579212d3c9af4e5e94a0072bc9f14c8a9db5ba0ae483a86d09f05e7c72b0208"
+}

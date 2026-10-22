@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril header",
+  "description": "A fixed, 72px near-black bar: bold all-caps wordmark left, six short links centred and two utility links right (one with a +). Link labels roll up on hover with a dip in opacity. The bar slides up out of view while you scroll down and drops back as soon as you scroll up. Phones get a two-line menu button that opens a full-screen black menu with large links.",
+  "category": "header",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "hide-on-scroll",
+    "dark",
+    "minimal",
+    "text-roll",
+    "hover"
+  ],
+  "notes": [
+    "fixed: it takes no room on the page, so the next section should leave 72px at its top (anduril-hero does)",
+    "needs JavaScript (hydrate: load) for hide-on-scroll and the phone menu"
+  ],
+  "entry": "anduril-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "anduril-header",
+  "files": [
+    {
+      "path": "anduril-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilWordmark, type AndurilWordmarkProps } from \"@foundry/anduril-wordmark\";\n\nexport interface AndurilHeaderLink {\n  label: string;\n  href: string;\n  /** show a + after the label (a link that opens more) */\n  more?: boolean;\n}\n\nexport interface AndurilHeaderProps {\n  /** the logo */\n  wordmark: AndurilWordmarkProps;\n  /** the main navigation, centred on desktop */\n  links: AndurilHeaderLink[];\n  /** the utility links on the right, e.g. search and company */\n  utilities: AndurilHeaderLink[];\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n// Label that rolls up on hover: the copy underneath slides into its place.\nfunction RollLabel({ label }: { label: string }) {\n  return (\n    <span className=\"relative inline-flex h-[1.2em] overflow-clip\">\n      <span className=\"flex flex-col transition-transform duration-200 ease-out group-hover/link:-translate-y-1/2 motion-reduce:transition-none\">\n        <span className=\"transition-opacity duration-200 ease-out group-hover/link:opacity-50\">{label}</span>\n        <span aria-hidden>{label}</span>\n      </span>\n    </span>\n  );\n}\n\n/** Fixed black bar that hides on scroll down and returns on scroll up; full-screen menu on phones. */\nexport function AndurilHeader({ wordmark, links, utilities, menuLabel, className }: AndurilHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (Math.abs(y - last) < 4) return;\n      setHidden(y > last && y > 72);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  useEffect(() => {\n    document.documentElement.style.overflow = open ? \"hidden\" : \"\";\n    return () => {\n      document.documentElement.style.overflow = \"\";\n    };\n  }, [open]);\n\n  const linkClass = \"group/link inline-flex items-center gap-1.5 text-[0.9375rem] leading-[1.2] font-medium tracking-[-0.01em]\";\n\n  return (\n    <header\n      data-hidden={hidden && !open}\n      className={cn(\n        \"fixed inset-x-0 top-0 z-50 bg-background text-foreground transition-transform duration-500 ease-[cubic-bezier(0.215,0.61,0.355,1)] data-[hidden=true]:-translate-y-full motion-reduce:transition-none\",\n        className,\n      )}\n    >\n      <div className=\"grid h-[4.5rem] grid-cols-[1fr_auto] items-center px-gutter lg:grid-cols-[1fr_auto_1fr]\">\n        <AndurilWordmark {...wordmark} />\n\n        <nav className=\"hidden items-center gap-[2.625rem] lg:flex\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className={linkClass}>\n              <RollLabel label={l.label} />\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"hidden items-center justify-end gap-[2.625rem] lg:flex\">\n          {utilities.map((l) => (\n            <a key={l.label} href={l.href} className={linkClass}>\n              <RollLabel label={l.label} />\n              {l.more && <Plus aria-hidden className=\"size-4\" strokeWidth={2} />}\n            </a>\n          ))}\n        </div>\n\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((o) => !o)}\n          className=\"flex size-10 -mr-2 flex-col items-center justify-center gap-2 lg:hidden\"\n        >\n          <span className={cn(\"h-0.5 w-[1.625rem] bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"translate-y-[5px] rotate-45\")} />\n          <span className={cn(\"h-0.5 w-[1.625rem] bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"-translate-y-[5px] -rotate-45\")} />\n        </button>\n      </div>\n\n      {open && (\n        <nav className=\"anduril-header-menu fixed inset-x-0 top-[4.5rem] bottom-0 flex flex-col overflow-y-auto bg-background px-gutter pt-8 pb-10 lg:hidden\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className=\"py-1.5 font-display text-[2.25rem] leading-[1.1] font-medium tracking-[-0.02em]\" onClick={() => setOpen(false)}>\n              {l.label}\n            </a>\n          ))}\n          <div className=\"mt-auto flex flex-col gap-3 pt-10\">\n            {utilities.map((l) => (\n              <a key={l.label} href={l.href} className=\"inline-flex items-center gap-1.5 text-[1.125rem] text-muted-foreground\" onClick={() => setOpen(false)}>\n                {l.label}\n                {l.more && <Plus aria-hidden className=\"size-4\" strokeWidth={2} />}\n              </a>\n            ))}\n          </div>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "anduril-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "AndurilWordmarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "links",
+      "type": "AndurilHeaderLink[]",
+      "required": true,
+      "description": "the main navigation, centred on desktop"
+    },
+    {
+      "name": "utilities",
+      "type": "AndurilHeaderLink[]",
+      "required": true,
+      "description": "the utility links on the right, e.g. search and company"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4bb0fc465d00066780e06cfa9ffc372aefe47fe74a4620d771a5db3f4a1bbf55"
+}

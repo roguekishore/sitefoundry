@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Eight Sleep rotating feature",
+  "description": "A white two-column feature that cycles through four short claims: a mono eyebrow, the claims stacked in 44px type with the current one black and the rest pale grey, a small ring that fills while each claim is shown (6s), then that claim's subhead, a muted sentence and a full-width black button; a big rounded photo on the right crossfades with it. On phones the claims become a tab row with an underline and the photo sits under it.",
+  "category": "features",
+  "site": "eightsleep",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "rotating",
+    "autoplay",
+    "progress-ring",
+    "light",
+    "two-column",
+    "crossfade"
+  ],
+  "notes": [
+    "advances by itself every 6s (not under reduced motion); clicking a claim jumps to it",
+    "one media slot per claim, 640×640 r24 on desktop and 350×243 r16 on phones"
+  ],
+  "entry": "eightsleep-hub-tabs.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "eightsleep-hub-tabs",
+  "files": [
+    {
+      "path": "eightsleep-hub-tabs.css",
+      "content": "/* The ring fills once per claim; the block restarts it by re-keying the svg. */\n.eightsleep-hub-tabs-ring {\n  stroke-dasharray: 75.4;\n  stroke-dashoffset: 18;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .eightsleep-hub-tabs-ring {\n    animation: eightsleep-hub-tabs-fill var(--eightsleep-hub-time, 6s) linear both;\n  }\n}\n\n@keyframes eightsleep-hub-tabs-fill {\n  from { stroke-dashoffset: 75.4; }\n  to { stroke-dashoffset: 0; }\n}\n"
+    },
+    {
+      "path": "eightsleep-hub-tabs.tsx",
+      "content": "import { useEffect, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EightsleepButton } from \"@foundry/eightsleep-button\";\nimport { EightsleepMedia } from \"@foundry/eightsleep-media\";\nimport \"./eightsleep-hub-tabs.css\";\n\nexport interface EightsleepHubTab {\n  /** the short claim: a big line on desktop, a tab on phones */\n  label: ReactNode;\n  /** the subhead shown while this claim is current */\n  title: ReactNode;\n  /** one or two sentences under the subhead */\n  text: ReactNode;\n  /** the photo or video for this claim */\n  media?: ReactNode;\n}\n\nexport interface EightsleepHubTabsProps {\n  /** small mono line at the top, set in caps */\n  eyebrow?: ReactNode;\n  /** three to five claims */\n  items: EightsleepHubTab[];\n  /** the full-width black button */\n  cta?: { label: ReactNode; href: string };\n  /** seconds each claim stays before the next */\n  interval?: number;\n  className?: string;\n}\n\nfunction Ring({ active, interval, className }: { active: number; interval: number; className?: string }) {\n  return (\n    <svg key={active} viewBox=\"0 0 28 28\" aria-hidden className={cn(\"size-7 -rotate-90\", className)}>\n      <circle cx=\"14\" cy=\"14\" r=\"12\" fill=\"none\" strokeWidth=\"1.5\" className=\"stroke-foreground/15\" />\n      <circle\n        cx=\"14\"\n        cy=\"14\"\n        r=\"12\"\n        fill=\"none\"\n        strokeWidth=\"2\"\n        strokeLinecap=\"round\"\n        className=\"eightsleep-hub-tabs-ring stroke-foreground\"\n        style={{ \"--eightsleep-hub-time\": `${interval}s` } as CSSProperties}\n      />\n    </svg>\n  );\n}\n\nexport function EightsleepHubTabs({ eyebrow, items, cta, interval = 6, className }: EightsleepHubTabsProps) {\n  const [active, setActive] = useState(0);\n\n  useEffect(() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setTimeout(() => setActive((a) => (a + 1) % items.length), interval * 1000);\n    return () => window.clearTimeout(id);\n  }, [active, interval, items.length]);\n\n  const current = items[active];\n  return (\n    <section className={cn(\"bg-background pt-[60px] pb-[64px] text-foreground lg:py-[80px]\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 px-gutter lg:grid-cols-[minmax(0,426fr)_minmax(0,640fr)] lg:gap-x-[clamp(48px,10.8vw,155px)] lg:pr-[calc(64px+min(91px,6.3vw))] lg:pl-16\">\n        <div className=\"flex items-center justify-between lg:col-start-1 lg:row-start-1 lg:mt-[52px]\">\n          {eyebrow && <span className=\"font-mono text-[13px] tracking-[0.04em] uppercase\">{eyebrow}</span>}\n          <Ring active={active} interval={interval} className=\"lg:hidden\" />\n        </div>\n\n        {/* phones: a tab row */}\n        <div role=\"tablist\" className=\"-mx-gutter mt-6 flex gap-6 overflow-x-auto px-gutter [scrollbar-width:none] lg:hidden\">\n          {items.map((item, i) => (\n            <button\n              key={i}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"shrink-0 border-b pb-2 text-[15px] font-medium whitespace-nowrap transition-colors duration-300\",\n                i === active ? \"border-foreground text-foreground\" : \"border-transparent text-muted-foreground\",\n              )}\n            >\n              {item.label}\n            </button>\n          ))}\n        </div>\n\n        {/* desktop: the claims stacked large */}\n        <ul className=\"mt-5 hidden lg:col-start-1 lg:row-start-2 lg:block\">\n          {items.map((item, i) => (\n            <li key={i}>\n              <button\n                type=\"button\"\n                aria-pressed={i === active}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"text-start text-[44px] leading-[48px] tracking-[-0.01em] transition-colors duration-500\",\n                  i === active ? \"text-foreground\" : \"text-foreground/18 hover:text-foreground/40\",\n                )}\n              >\n                {item.label}\n              </button>\n            </li>\n          ))}\n        </ul>\n        <Ring active={active} interval={interval} className=\"mt-6 hidden lg:col-start-1 lg:row-start-3 lg:block\" />\n\n        <div className=\"relative mt-8 aspect-[350/243] overflow-clip rounded-lg lg:col-start-2 lg:row-span-6 lg:row-start-1 lg:mt-0 lg:aspect-square lg:self-start lg:rounded-lg\">\n          {items.map((item, i) => (\n            <EightsleepMedia\n              key={i}\n              media={item.media}\n              className={cn(\"absolute inset-0 transition-opacity duration-500 motion-reduce:transition-none\", i === active ? \"opacity-100\" : \"opacity-0\")}\n            />\n          ))}\n        </div>\n\n        <h3 className=\"mt-9 max-w-[17em] text-[22px] leading-[1.1] lg:col-start-1 lg:row-start-4 lg:mt-14 lg:text-[28px]\">{current.title}</h3>\n        <p className=\"mt-4 max-w-[25rem] text-[15px] leading-[1.35] text-muted-foreground lg:col-start-1 lg:row-start-5 lg:mt-5 lg:text-[18px] lg:leading-[1.4]\">\n          {current.text}\n        </p>\n        {cta && (\n          <div className=\"mt-10 lg:col-start-1 lg:row-start-6 lg:mt-10\">\n            <EightsleepButton href={cta.href} block size=\"lg\">\n              {cta.label}\n            </EightsleepButton>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "eightsleep-button",
+    "eightsleep-media",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small mono line at the top, set in caps"
+    },
+    {
+      "name": "items",
+      "type": "EightsleepHubTab[]",
+      "required": true,
+      "description": "three to five claims"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the full-width black button"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each claim stays before the next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "65a5063ec96a00cb76af12af0ad6a2f28c6e291726816bfcd17050d99ea2fd46"
+}

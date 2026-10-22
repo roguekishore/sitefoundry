@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio platform tour",
+  "description": "A long product tour on pale grey inside the hairline page frame: a two-tone intro statement, then a sticky left rail of five chapter names (a sideways tab strip under the header on phones) beside the chapters. Each chapter is a 24px two-tone statement, a wide grey well holding a product shot, and two small panels split by a hairline. The chapter in view turns dark in the rail with a blue rule; wells rise out of a blur and panels scale up as they enter.",
+  "category": "features",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tour",
+    "sticky",
+    "scrollspy",
+    "tabs",
+    "hairline",
+    "light",
+    "reveal",
+    "blur",
+    "product-shot",
+    "saas"
+  ],
+  "notes": [
+    "every well and panel is a media slot; empty, wells show a white card placeholder and panels a grey surface",
+    "the rail and the phone strip stick under a 116px / 100px header",
+    "chapter ids become anchors; give them unique ids on the page"
+  ],
+  "entry": "attio-platform.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "attio-platform",
+  "files": [
+    {
+      "path": "attio-platform.css",
+      "content": "/* Media wells rise 16px out of a blur as they come into view; the small panels scale up a\n   touch. Ranges are fixed distances so tall wells finish early. */\n@supports (animation-timeline: view()) {\n  .attio-platform-rise {\n    animation: attio-platform-rise linear both;\n    animation-timeline: view();\n    animation-range: entry 0px entry 260px;\n  }\n  .attio-platform-grow {\n    animation: attio-platform-grow linear both;\n    animation-timeline: view();\n    animation-range: entry 0px entry 260px;\n  }\n}\n\n@keyframes attio-platform-rise {\n  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }\n  to { opacity: 1; transform: none; filter: none; }\n}\n@keyframes attio-platform-grow {\n  from { opacity: 0; scale: 0.94; filter: blur(4px); }\n  to { opacity: 1; scale: 1; filter: none; }\n}\n\n/* the phone tab strip scrolls sideways without a visible scrollbar */\n.attio-platform-strip {\n  scrollbar-width: none;\n}\n.attio-platform-strip::-webkit-scrollbar {\n  display: none;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-platform-rise,\n  .attio-platform-grow {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-platform.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioBadge } from \"@foundry/attio-badge\";\nimport { AttioHeading } from \"@foundry/attio-heading\";\nimport \"./attio-platform.css\";\n\nexport interface AttioPlatformFeature {\n  /** the panel's dark first line */\n  title: string;\n  /** one or two grey lines under it */\n  text: string;\n  /** a small product moment (≈430×280); empty shows a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n}\n\nexport interface AttioPlatformChapter {\n  /** anchor id, also used by the rail's links */\n  id: string;\n  /** the short name in the rail and the phone tab strip */\n  label: string;\n  /** the chapter's statement: dark opening clause… */\n  lead: string;\n  /** …and its grey rest */\n  rest?: string;\n  /** the wide product shot in the grey well; empty shows a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n  /** zero or two small panels under the well */\n  features?: AttioPlatformFeature[];\n}\n\nexport interface AttioPlatformProps {\n  /** the small label over the intro */\n  badge?: string;\n  /** the intro statement: dark lead… */\n  lead: string;\n  /** …and grey rest, on its own line */\n  rest?: string;\n  /** the chapters, in scroll order */\n  chapters: AttioPlatformChapter[];\n  /** screen-reader label of the chapter nav */\n  navLabel?: string;\n  className?: string;\n}\n\nfunction Statement({ lead, rest }: { lead: string; rest?: string }) {\n  return (\n    <div className=\"border-b border-border px-4 pt-16 pb-11 lg:px-[3.6875rem] lg:pt-28 lg:pb-20\">\n      <AttioHeading as=\"h3\" size=\"statement\" lead={lead} rest={rest} className=\"max-w-[26.5rem]\" />\n    </div>\n  );\n}\n\nfunction Well({ media, label }: { media?: ReactNode; label?: string }) {\n  return (\n    <div className=\"flex aspect-[390/330] items-center justify-center overflow-clip border-b border-border bg-secondary sm:aspect-[1044/655]\">\n      {media ? (\n        <div role=\"img\" aria-label={label} className=\"attio-platform-rise size-full [&>*]:size-full [&>img]:object-cover\">\n          {media}\n        </div>\n      ) : (\n        <div\n          role=\"img\"\n          aria-label={label}\n          className=\"attio-platform-rise aspect-[760/460] w-[88%] rounded-lg border border-border bg-card shadow-[0_1px_3px_0_color-mix(in_oklab,var(--foreground)_4%,transparent),0_0_2px_0_color-mix(in_oklab,var(--foreground)_16%,transparent)] sm:w-[72%]\"\n        />\n      )}\n    </div>\n  );\n}\n\nfunction Features({ features }: { features: AttioPlatformFeature[] }) {\n  return (\n    <div className=\"grid border-b border-border sm:grid-cols-2\">\n      {features.map((f, i) => (\n        <div key={f.title} className={cn(\"flex flex-col px-4 pt-6 pb-8 sm:px-[1.8125rem] sm:pt-14 sm:pb-12\", i > 0 && \"border-t border-border sm:border-t-0 sm:border-l\")}>\n          <h4 className=\"text-lg leading-[1.35] font-medium tracking-[-0.01em] text-foreground\">{f.title}</h4>\n          <p className=\"mt-0.5 max-w-[20.5rem] text-base leading-[1.375] font-medium tracking-[-0.01em] text-muted-foreground/85\">{f.text}</p>\n          <div role=\"img\" aria-label={f.mediaLabel} className=\"attio-platform-grow mt-8 aspect-[430/250] w-full overflow-clip rounded-xl bg-secondary/80 sm:mt-10 [&>*]:size-full [&>img]:object-cover\">\n            {f.media}\n          </div>\n        </div>\n      ))}\n    </div>\n  );\n}\n\n/**\n * The long platform tour on pale grey, inside the page frame: an intro statement, then a\n * sticky rail of chapter names (a sideways tab strip on phones) beside the chapters. Each\n * chapter is a two-tone statement, a wide grey product well and two small panels; the rail\n * marks the chapter in view with a blue rule.\n */\nexport function AttioPlatform({ badge, lead, rest, chapters, navLabel = \"Chapters\", className }: AttioPlatformProps) {\n  const [active, setActive] = useState(chapters[0]?.id);\n  const strip = useRef<HTMLUListElement>(null);\n\n  // the chapter crossing the upper middle of the window is the active one\n  useEffect(() => {\n    const els = chapters.map((c) => document.getElementById(c.id)).filter((el): el is HTMLElement => !!el);\n    const io = new IntersectionObserver(\n      (entries) => {\n        for (const e of entries) if (e.isIntersecting) setActive(e.target.id);\n      },\n      { rootMargin: \"-35% 0px -60% 0px\" },\n    );\n    els.forEach((el) => io.observe(el));\n    return () => io.disconnect();\n  }, [chapters]);\n\n  // keep the active tab visible in the phone strip\n  useEffect(() => {\n    const list = strip.current;\n    const tab = list?.querySelector<HTMLElement>(`[data-chapter=\"${active}\"]`);\n    if (!list || !tab || list.scrollWidth <= list.clientWidth) return;\n    list.scrollTo({ left: tab.offsetLeft - 16, behavior: \"smooth\" });\n  }, [active]);\n\n  return (\n    <section className={cn(\"bg-muted text-foreground lg:px-gutter\", className)}>\n      <div className=\"mx-auto max-w-page lg:border-x lg:border-border\">\n        <div className=\"border-b border-border px-8 pt-[5.5rem] pb-16 lg:px-[3.6875rem] lg:pt-section lg:pb-20\">\n          {badge && <AttioBadge>{badge}</AttioBadge>}\n          <AttioHeading lead={lead} rest={rest} restOnNewLine className=\"mt-6 max-w-[52rem]\" />\n        </div>\n\n        <div className=\"lg:grid lg:grid-cols-[21.75rem_minmax(0,1fr)]\">\n          <nav aria-label={navLabel} className=\"sticky top-[6.25rem] z-20 border-b border-border bg-background lg:top-[7.25rem] lg:self-start lg:border-b-0 lg:bg-transparent lg:pt-[7.9rem]\">\n            <ul ref={strip} className=\"attio-platform-strip flex overflow-x-auto lg:flex-col lg:gap-[0.6rem] lg:overflow-visible\">\n              {chapters.map((c) => (\n                <li key={c.id} data-chapter={c.id} className=\"shrink-0\">\n                  <a\n                    href={`#${c.id}`}\n                    aria-current={active === c.id ? \"true\" : undefined}\n                    className={cn(\n                      \"relative flex h-14 items-center border-r border-border px-5 text-base font-medium tracking-[-0.01em] whitespace-nowrap transition-colors duration-300 ease-[cubic-bezier(0.2,0,0,1)] motion-reduce:transition-none\",\n                      \"lg:h-7 lg:border-r-0 lg:px-[3.6875rem] lg:text-lg\",\n                      \"before:absolute before:top-0 before:-left-px before:hidden before:h-full before:w-0.5 before:bg-highlight before:opacity-0 before:transition-opacity before:duration-300 lg:before:block\",\n                      active === c.id\n                        ? \"bg-secondary text-foreground before:opacity-100 lg:bg-transparent\"\n                        : \"text-muted-foreground hover:text-foreground lg:text-muted-foreground/40\",\n                    )}\n                  >\n                    {c.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n\n          <div className=\"lg:border-l lg:border-border\">\n            {chapters.map((c) => (\n              <div key={c.id} id={c.id} className=\"scroll-mt-[9.75rem] lg:scroll-mt-[7.25rem]\">\n                <Statement lead={c.lead} rest={c.rest} />\n                <Well media={c.media} label={c.mediaLabel} />\n                {c.features && c.features.length > 0 && <Features features={c.features} />}\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "attio-badge",
+    "attio-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the intro"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the intro statement: dark lead…"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "…and grey rest, on its own line"
+    },
+    {
+      "name": "chapters",
+      "type": "AttioPlatformChapter[]",
+      "required": true,
+      "description": "the chapters, in scroll order"
+    },
+    {
+      "name": "navLabel",
+      "type": "string",
+      "required": false,
+      "default": "Chapters",
+      "description": "screen-reader label of the chapter nav"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8031a9802fad15941ca8506fee0cb5e0ec35ac21a242507c7cf957345aa324d7"
+}

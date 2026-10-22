@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower voices row",
+  "description": "A two-line headline over a sideways-scrolling row of tall rounded media cards of mixed widths, like a social wall: portrait and landscape photos with a dark fade at the foot carrying a white caption, a bold source name or a creator handle with a follower count, a frosted play button on videos, and stacked pairs of a short photo over a grey press-quote card. Round arrow buttons scroll it on desktop.",
+  "category": "testimonials",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "social",
+    "press",
+    "carousel",
+    "horizontal-scroll",
+    "snap",
+    "video",
+    "cards"
+  ],
+  "notes": [
+    "the caption fade and play button force the dark class on themselves so they stay dark-on-photo in any theme"
+  ],
+  "entry": "superpower-voices.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "superpower-voices",
+  "files": [
+    {
+      "path": "superpower-voices.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { BadgeCheck, ChevronLeft, ChevronRight, Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\n\nexport interface SuperpowerVoiceMedia {\n  /** narrow (portrait) or wide (landscape) */\n  width?: \"narrow\" | \"wide\";\n  /** the photo or video; empty: a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n  /** white caption at the foot */\n  caption?: string;\n  /** the publication's name, in bold under the caption */\n  source?: ReactNode;\n  /** a creator's handle, with a verified mark */\n  handle?: string;\n  /** e.g. \"212k followers\" */\n  followers?: string;\n  /** shows a frosted play button */\n  video?: boolean;\n}\n\nexport interface SuperpowerVoiceQuote {\n  quote: string;\n  /** the publication's name (styled text) */\n  source: ReactNode;\n}\n\nexport type SuperpowerVoice =\n  | ({ kind: \"media\" } & SuperpowerVoiceMedia)\n  /** a short photo stacked over a press quote */\n  | { kind: \"stack\"; top: SuperpowerVoiceMedia; quote: SuperpowerVoiceQuote };\n\nexport interface SuperpowerVoicesProps {\n  title: string;\n  voices: SuperpowerVoice[];\n  /** screen-reader labels of the arrow buttons */\n  prevLabel?: string;\n  nextLabel?: string;\n  id?: string;\n  className?: string;\n}\n\nconst edge = \"px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))]\";\nconst snapEdge = \"scroll-px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))]\";\n\nfunction MediaCard({ v, className }: { v: SuperpowerVoiceMedia; className?: string }) {\n  return (\n    <div className={className}>\n      <SuperpowerMedia media={v.media} label={v.mediaLabel} className=\"size-full rounded-lg\">\n        {(v.caption || v.source || v.handle) && (\n          <div className=\"dark absolute inset-x-0 bottom-0 bg-linear-to-b from-transparent to-background/90 px-5 pt-20 pb-5 text-foreground\">\n            {v.caption && <p className=\"text-[1rem] leading-[1.35] lg:text-[1.0625rem]\">{v.caption}</p>}\n            {v.source && <div className=\"mt-3 text-[1.25rem] leading-none font-bold\">{v.source}</div>}\n            {v.handle && (\n              <p className=\"flex items-center gap-1 text-[0.9375rem]\">\n                {v.handle}\n                <BadgeCheck className=\"size-4 fill-chart-1 text-background\" aria-hidden />\n              </p>\n            )}\n            {v.followers && <p className=\"mt-1 text-[0.8125rem] text-foreground/70\">{v.followers}</p>}\n          </div>\n        )}\n        {v.video && (\n          <span className=\"dark absolute top-1/2 left-1/2 grid size-12 -translate-1/2 place-items-center rounded-full bg-background/30 text-foreground backdrop-blur-md\">\n            <Play className=\"size-5 fill-foreground text-foreground\" aria-hidden />\n          </span>\n        )}\n      </SuperpowerMedia>\n    </div>\n  );\n}\n\nexport function SuperpowerVoices({ title, voices, prevLabel = \"Previous\", nextLabel = \"Next\", id, className }: SuperpowerVoicesProps) {\n  const row = useRef<HTMLDivElement>(null);\n  const nudge = (dir: 1 | -1) => row.current?.scrollBy({ left: dir * 400, behavior: \"smooth\" });\n  const arrow =\n    \"absolute top-1/2 z-10 hidden size-11 -translate-y-1/2 place-items-center rounded-full bg-background/85 text-foreground shadow-[0_4px_16px_-4px_color-mix(in_oklab,var(--foreground)_25%,transparent)] backdrop-blur-md transition-transform duration-200 hover:scale-105 motion-reduce:transition-none lg:grid\";\n\n  return (\n    <section id={id} className={cn(\"bg-background py-12 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <h2 className=\"max-w-[38rem] text-[1.5rem] leading-[1.3] font-normal tracking-[-0.02em] lg:text-[2.8125rem] lg:leading-[1.2]\">{title}</h2>\n      </div>\n      <div className=\"relative mt-8 lg:mt-[5.5rem]\">\n        <button type=\"button\" aria-label={prevLabel} onClick={() => nudge(-1)} className={cn(arrow, \"left-4\")}>\n          <ChevronLeft className=\"size-5\" aria-hidden />\n        </button>\n        <button type=\"button\" aria-label={nextLabel} onClick={() => nudge(1)} className={cn(arrow, \"right-4\")}>\n          <ChevronRight className=\"size-5\" aria-hidden />\n        </button>\n        <div ref={row} className={cn(\"snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden\", edge, snapEdge)}>\n          <ul className=\"flex w-max gap-4 lg:gap-[0.9375rem]\">\n            {voices.map((v, i) => (\n              <li key={i} className=\"h-[22rem] shrink-0 snap-start lg:h-[24.625rem]\">\n                {v.kind === \"media\" ? (\n                  <MediaCard v={v} className={cn(\"h-full\", v.width === \"wide\" ? \"w-[20rem] lg:w-[23.4rem]\" : \"w-[13rem] lg:w-[14.625rem]\")} />\n                ) : (\n                  <div className=\"flex h-full w-[13rem] flex-col gap-4 lg:w-[14.625rem]\">\n                    <MediaCard v={v.top} className=\"h-[10.4rem] shrink-0\" />\n                    <figure className=\"flex flex-1 flex-col items-center justify-center gap-5 rounded-lg bg-secondary px-5 text-center\">\n                      <blockquote className=\"text-[0.9375rem] leading-[1.4]\">{v.quote.quote}</blockquote>\n                      <figcaption className=\"text-muted-foreground\">{v.quote.source}</figcaption>\n                    </figure>\n                  </div>\n                )}\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "voices",
+      "type": "SuperpowerVoice[]",
+      "required": true
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": false,
+      "default": "Previous",
+      "description": "screen-reader labels of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "default": "Next"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e22113a3af9949b49bb46359c408edd2d1e09f1606cb25e9774371f36f9e60e6"
+}

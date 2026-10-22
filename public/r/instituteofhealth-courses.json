@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Institute of Health courses",
+  "description": "A grey band with a large three-line statement and a dark button, then an auto-playing course carousel: square-ish cards in a row with the active one centred, white and fully opaque while the others sit on page-grey at 45%. A white bar above the active card shows its category and unit count; a white overview box under it rises 16px into place each time the track slides one card left (0.8s, every 4s, paused on hover). Phones show one wide card with the neighbours peeking.",
+  "category": "features",
+  "site": "instituteofhealth",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "courses",
+    "carousel",
+    "autoplay",
+    "slider",
+    "cards",
+    "minimal",
+    "greyscale",
+    "flat"
+  ],
+  "notes": [
+    "needs JavaScript for the autoplay and clicks (hydrate: visible)",
+    "autoplay is off under reduced motion; clicking a card centres it"
+  ],
+  "entry": "instituteofhealth-courses.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "instituteofhealth-courses",
+  "files": [
+    {
+      "path": "instituteofhealth-courses.css",
+      "content": "/* When the active card changes, its overview box rises 16px and fades in; the unit count\n   swaps with a short fade. */\n.ioh-courses-rise {\n  animation: instituteofhealth-courses-rise 0.55s ease both;\n}\n.ioh-courses-swap {\n  animation: instituteofhealth-courses-swap 0.55s ease both;\n}\n\n@keyframes instituteofhealth-courses-rise {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes instituteofhealth-courses-swap {\n  from { opacity: 0; filter: blur(3px); }\n  to { opacity: 1; filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ioh-courses-rise,\n  .ioh-courses-swap { animation: none; }\n}\n"
+    },
+    {
+      "path": "instituteofhealth-courses.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { InstituteofhealthButton } from \"@foundry/instituteofhealth-button\";\nimport \"./instituteofhealth-courses.css\";\n\nexport interface InstituteofhealthCourse {\n  /** the course name under the picture */\n  title: string;\n  /** the kind of course, shown in the bar above the active card */\n  category: string;\n  /** how many units; shown next to `unitsLabel` in the bar */\n  units: number;\n  /** the short overview shown under the active card */\n  overview: string;\n  /** where \"explore\" leads */\n  href: string;\n  /** the card picture (cropped like object-fit: cover); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface InstituteofhealthCoursesProps {\n  /** the large statement at the top left */\n  title: string;\n  /** the dark button under it */\n  action?: { label: string; href: string };\n  /** the cards, in order */\n  courses: InstituteofhealthCourse[];\n  /** small grey heading of the overview box */\n  overviewLabel: string;\n  /** the link at the foot of the overview box */\n  exploreLabel: string;\n  /** word after the unit count */\n  unitsLabel: string;\n  /** the card centred first */\n  startIndex?: number;\n  /** milliseconds between slides */\n  interval?: number;\n  className?: string;\n}\n\nexport function InstituteofhealthCourses({\n  title,\n  action,\n  courses,\n  overviewLabel,\n  exploreLabel,\n  unitsLabel,\n  startIndex = 2,\n  interval = 4000,\n  className,\n}: InstituteofhealthCoursesProps) {\n  const [active, setActive] = useState(Math.min(startIndex, courses.length - 1));\n  const [paused, setPaused] = useState(false);\n\n  // Slide one card to the left every few seconds; wrap at the end. Off under reduced motion.\n  useEffect(() => {\n    if (paused || courses.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const id = window.setInterval(() => setActive((a) => (a + 1) % courses.length), interval);\n    return () => window.clearInterval(id);\n  }, [paused, courses.length, interval]);\n\n  const current = courses[active];\n\n  return (\n    <section className={cn(\"relative overflow-x-clip bg-muted pt-[4.5rem] pb-12 text-foreground lg:pt-[3.45rem] lg:pb-[8.9rem]\", className)}>\n      <div className=\"px-gutter\">\n        <h2 className=\"max-w-[22rem] font-display text-[1.46rem] leading-none font-medium tracking-[-0.03em] sm:max-w-[30rem] lg:max-w-[49rem] lg:text-[3.15rem] lg:tracking-[-0.035em]\">\n          {title}\n        </h2>\n        {action && (\n          <InstituteofhealthButton href={action.href} className=\"mt-[1.6rem] lg:mt-[2.2rem]\">\n            {action.label}\n          </InstituteofhealthButton>\n        )}\n      </div>\n\n      {/* --cw: card width, --gap: space between cards. */}\n      <div\n        className=\"mt-[1.6rem] [--cw:calc(100vw-2.5rem)] [--gap:0.75rem] sm:[--cw:19.625rem] lg:mt-[3.75rem] lg:[--gap:2.5rem]\"\n        onMouseEnter={() => setPaused(true)}\n        onMouseLeave={() => setPaused(false)}\n      >\n        {/* Bar above the active card: category and unit count. */}\n        <div className=\"mx-auto flex h-[2.875rem] w-[var(--cw)] items-center justify-between rounded-lg bg-card px-4 text-[0.8775rem] leading-none font-medium tracking-[-0.02em] lg:h-11 lg:text-[0.765rem]\">\n          <span>{current.category}</span>\n          <span key={active} className=\"ioh-courses-swap\">\n            {current.units} {unitsLabel}\n          </span>\n        </div>\n\n        {/* The track: starts at the centre line, then shifts left by whole cards. */}\n        <div className=\"mt-2 ml-[50%]\">\n          <ul\n            className=\"flex w-max gap-[var(--gap)] transition-transform duration-[800ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none\"\n            style={{ transform: `translateX(calc(-1 * (${active} * (var(--cw) + var(--gap)) + var(--cw) / 2)))` }}\n          >\n            {courses.map((c, i) => {\n              const on = i === active;\n              return (\n                <li key={c.title} className=\"w-[var(--cw)]\">\n                  <button\n                    type=\"button\"\n                    onClick={() => setActive(i)}\n                    aria-current={on}\n                    className={cn(\n                      \"block w-full rounded-2xl p-4 text-left transition-colors duration-[550ms] ease-[ease] lg:rounded-xl motion-reduce:transition-none\",\n                      on ? \"bg-card\" : \"bg-background\",\n                    )}\n                  >\n                    <span className={cn(\"block transition-opacity duration-[550ms] ease-[ease] motion-reduce:transition-none\", on ? \"opacity-100\" : \"opacity-45\")}>\n                      <span className=\"block aspect-[319/242] overflow-clip rounded-lg lg:aspect-[282/259] [&>*]:size-full [&>*]:object-cover\">\n                        {c.media ?? <span className=\"block bg-muted\" />}\n                      </span>\n                      <span className=\"block pt-[1.05rem] text-[0.975rem] leading-none font-medium tracking-[-0.03em] lg:pt-[1.1rem] lg:text-[0.945rem]\">{c.title}</span>\n                    </span>\n                  </button>\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n\n        {/* Overview box under the active card. */}\n        <div key={active} className=\"ioh-courses-rise mx-auto mt-2 w-[var(--cw)] rounded-2xl bg-card p-4 lg:rounded-xl lg:pb-[1.1rem]\">\n          <p className=\"text-[0.8775rem] leading-none font-medium tracking-[-0.02em] text-muted-foreground lg:text-[0.765rem]\">{overviewLabel}</p>\n          <p className=\"mt-3 text-[0.8775rem] leading-[1.4] font-medium tracking-[-0.004em] lg:mt-2.5 lg:text-[0.765rem] lg:tracking-[-0.018em]\">{current.overview}</p>\n          <a\n            href={current.href}\n            className=\"mt-5 inline-block text-[0.8775rem] leading-none font-medium tracking-[-0.02em] transition-opacity duration-400 hover:opacity-75 lg:mt-[1.35rem] lg:text-[0.765rem]\"\n          >\n            {exploreLabel}\n          </a>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "instituteofhealth-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the large statement at the top left"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the dark button under it"
+    },
+    {
+      "name": "courses",
+      "type": "InstituteofhealthCourse[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "overviewLabel",
+      "type": "string",
+      "required": true,
+      "description": "small grey heading of the overview box"
+    },
+    {
+      "name": "exploreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link at the foot of the overview box"
+    },
+    {
+      "name": "unitsLabel",
+      "type": "string",
+      "required": true,
+      "description": "word after the unit count"
+    },
+    {
+      "name": "startIndex",
+      "type": "number",
+      "required": false,
+      "default": "2",
+      "description": "the card centred first"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "4000",
+      "description": "milliseconds between slides"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f4bfbf1bf2213531db43f5f0da056f1024ba335139df70169e84758570324486"
+}

@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril product bento",
+  "description": "A black bento of media tiles, 18px apart on desktop: three squares, then a tall tile spanning two rows beside a 2:1 wide tile and two more squares. Phones stack every tile as a square, 6px apart. Each tile fades in as it enters the view; its tagline decodes as it scrolls in (phones) or opens and decodes on hover (desktop).",
+  "category": "features",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "media",
+    "tiles",
+    "dark",
+    "reveal",
+    "hover",
+    "scramble",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the layout comes from each tile's shape: square, tall (two rows) or wide (two columns); the original's order is 3 squares, tall, wide, 2 squares",
+    "best on dark themes",
+    "needs JavaScript (hydrate: visible) only for the tagline decode"
+  ],
+  "entry": "anduril-products.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "anduril-products",
+  "files": [
+    {
+      "path": "anduril-products.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { AndurilProductTile, type AndurilProductTileProps } from \"@foundry/anduril-product-tile\";\n\nexport interface AndurilProductsItem extends AndurilProductTileProps {\n  /** desktop shape: a square, a tall tile over two rows, or a wide tile over two columns (all squares on phones) */\n  shape?: \"square\" | \"tall\" | \"wide\";\n}\n\nexport interface AndurilProductsProps {\n  /** the tiles, in reading order */\n  items: AndurilProductsItem[];\n  className?: string;\n}\n\nconst shapes = {\n  square: \"aspect-square\",\n  tall: \"aspect-square md:row-span-2 md:aspect-auto\",\n  wide: \"aspect-square md:col-span-2 md:aspect-[2/1]\",\n};\n\n/** Three-column bento of product tiles; a single column of squares on phones. */\nexport function AndurilProducts({ items, className }: AndurilProductsProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter pt-1.5 pb-[4.75rem] md:pt-5 md:pb-24\", className)}>\n      <div className=\"grid gap-1.5 md:grid-cols-3 md:gap-[1.125rem]\">\n        {items.map(({ shape = \"square\", ...tile }) => (\n          <AndurilProductTile key={tile.name} {...tile} className={cn(shapes[shape], tile.className)} />\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anduril-product-tile",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "AndurilProductsItem[]",
+      "required": true,
+      "description": "the tiles, in reading order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2fb588cebe40f7563b60cd36acc68b2605335ee91e359bd09133af12b61da5d1"
+}

@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio changelog",
+  "description": "A white framed changelog: a blue badge, a two-tone 40px heading and a small arrow button, four recent releases (date, title, two grey lines) in hairline-ruled columns standing on a strip of fine vertical ticks (a snapping sideways scroller on phones), then a newsletter row: a two-tone 24px line on the left, an email field and a near-black button on the right (stacked and centred on phones).",
+  "category": "blog",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "changelog",
+    "blog",
+    "updates",
+    "newsletter",
+    "form",
+    "light",
+    "hairline",
+    "framed",
+    "scroller",
+    "minimal"
+  ],
+  "notes": [
+    "give four entries",
+    "static: no motion"
+  ],
+  "entry": "attio-changelog.tsx",
+  "source": "foundry",
+  "name": "attio-changelog",
+  "files": [
+    {
+      "path": "attio-changelog.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { AttioBadge } from \"@foundry/attio-badge\";\nimport { AttioButton } from \"@foundry/attio-button\";\nimport { AttioHeading } from \"@foundry/attio-heading\";\n\nexport interface AttioChangelogEntry {\n  /** when it shipped, as text */\n  date: string;\n  title: string;\n  /** one or two grey lines */\n  text: string;\n  href?: string;\n}\n\nexport interface AttioChangelogProps {\n  /** the small label over the heading */\n  badge?: string;\n  /** the heading: dark lead… */\n  lead: string;\n  /** …and grey rest */\n  rest?: string;\n  /** the small outline button under the heading */\n  action?: { label: string; href: string };\n  /** four recent releases */\n  entries: AttioChangelogEntry[];\n  /** the newsletter row under the releases; leave out for none */\n  newsletter?: { lead: string; rest?: string; placeholder: string; submitLabel: string; action?: string };\n  className?: string;\n}\n\n/**\n * A white framed changelog: badge, two-tone heading and a small button, four releases in\n * hairline-ruled columns (a sideways scroller on phones) standing on a strip of fine\n * vertical ticks, then a newsletter row with an email field and a dark button.\n */\nexport function AttioChangelog({ badge, lead, rest, action, entries, newsletter, className }: AttioChangelogProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"mx-auto max-w-page border-b border-border lg:border-x\">\n        <div className=\"px-8 pt-[5.5rem] lg:px-[3.6875rem] lg:pt-section\">\n          {badge && <AttioBadge>{badge}</AttioBadge>}\n          <AttioHeading lead={lead} rest={rest} className=\"mt-5 max-w-[17rem] sm:max-w-[37.5rem] lg:mt-6\" />\n          {action && (\n            <AttioButton href={action.href} size=\"sm\" arrow className=\"mt-7\">\n              {action.label}\n            </AttioButton>\n          )}\n        </div>\n\n        <div className=\"relative mt-10 border-b border-border lg:mt-20\">\n          {/* fine ticks along the foot of the columns */}\n          <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-14 bg-[repeating-linear-gradient(to_right,var(--border)_0_1px,transparent_1px_14.5px)] lg:mx-[0.875rem]\" />\n          <ul className=\"relative flex snap-x snap-mandatory overflow-x-auto px-6 [scrollbar-width:none] lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-[3.6875rem]\">\n            {entries.map((e) => (\n              <li key={e.title} className=\"w-[19.2rem] shrink-0 snap-start border-l border-border lg:w-auto\">\n                <a href={e.href} className=\"group block h-[15rem] px-6 lg:h-[19.5rem]\">\n                  <p className=\"text-[0.8125rem] font-medium tracking-[-0.01em] text-muted-foreground\">{e.date}</p>\n                  <h3 className=\"mt-4 max-w-[17rem] text-lg leading-[1.35] font-medium tracking-[-0.01em] text-foreground lg:mt-5\">{e.title}</h3>\n                  <p className=\"mt-1 line-clamp-2 max-w-[17rem] text-base leading-[1.4] font-medium tracking-[-0.01em] text-muted-foreground\">{e.text}</p>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        {newsletter && (\n          <form\n            action={newsletter.action}\n            className=\"flex flex-col items-center gap-7 px-6 py-[5.5rem] text-center lg:flex-row lg:justify-between lg:gap-10 lg:px-[3.6875rem] lg:py-20 lg:text-left\"\n          >\n            <AttioHeading as=\"h3\" size=\"statement\" lead={newsletter.lead} rest={newsletter.rest} restOnNewLine className=\"leading-[1.25]\" />\n            <div className=\"flex w-full flex-col gap-2 lg:w-auto lg:flex-row\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                required\n                placeholder={newsletter.placeholder}\n                aria-label={newsletter.placeholder}\n                className=\"h-10 rounded-lg border border-input bg-card px-3.5 text-[0.9375rem] text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none lg:w-[15.625rem]\"\n              />\n              <AttioButton type=\"submit\" variant=\"primary\" size=\"lg\" className=\"lg:w-auto lg:rounded-lg\">\n                {newsletter.submitLabel}\n              </AttioButton>\n            </div>\n          </form>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "attio-badge",
+    "attio-button",
+    "attio-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the heading: dark lead…"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "…and grey rest"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the small outline button under the heading"
+    },
+    {
+      "name": "entries",
+      "type": "AttioChangelogEntry[]",
+      "required": true,
+      "description": "four recent releases"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ lead: string; rest?: string; placeholder: string; submitLabel: string; action?: string; } | undefined",
+      "required": false,
+      "description": "the newsletter row under the releases; leave out for none"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "683c85308c7bde47b4ad355ee24d6b789d27caa8a012923514dea9d5a391c745"
+}

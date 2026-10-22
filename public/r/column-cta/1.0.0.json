@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column closing call to action",
+  "description": "A soft grey panel inset from the page edges, open at the bottom so the footer can continue it: a heavy 52px navy line, a muted sentence, then three quiet link cards, each with a small dotted icon tile in blue, a bold title and a muted note. The panel fades up from 20% as it scrolls into view; cards brighten on hover.",
+  "category": "cta",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "cards",
+    "light",
+    "grey",
+    "panel",
+    "links",
+    "reveal",
+    "fade",
+    "minimal"
+  ],
+  "notes": [
+    "made to sit directly above column-footer (they share the inset grey panel); set closed to round its bottom when used alone",
+    "the fade is a CSS view timeline, off under reduced motion"
+  ],
+  "entry": "column-cta.tsx",
+  "source": "foundry",
+  "name": "column-cta",
+  "files": [
+    {
+      "path": "column-cta.css",
+      "content": "/* The panel's content fades up from 20% while it scrolls into view. */\n@supports (animation-timeline: view()) {\n  .column-cta-fade {\n    animation: column-cta-fade linear both;\n    animation-timeline: view();\n    animation-range: entry 0% cover 30%;\n  }\n}\n\n@keyframes column-cta-fade {\n  from { opacity: 0.2; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-cta-fade { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { toneStyle, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-cta.css\";\n\nexport interface ColumnCtaCard {\n  /** a line icon drawn on a small dotted tile (lucide works well) */\n  icon?: ReactNode;\n  title: string;\n  /** a short note under the title */\n  note: string;\n  href: string;\n}\n\nexport interface ColumnCtaProps {\n  /** the big line */\n  title: string;\n  /** a sentence under it */\n  lead?: string;\n  /** the link cards (three fill the row) */\n  cards: ColumnCtaCard[];\n  /** colour of the card icons */\n  tone?: ColumnTone;\n  /** round the panel's bottom too (when no footer follows) */\n  closed?: boolean;\n  className?: string;\n}\n\nexport function ColumnCta({ title, lead, cards, tone = \"chart-1\", closed, className }: ColumnCtaProps) {\n  return (\n    <section className={cn(\"bg-background px-3\", closed && \"pb-3\", className)}>\n      <div\n        className={cn(\n          \"border border-border bg-muted px-[1.3125rem] pt-[4.5rem] text-foreground lg:pt-24\",\n          closed ? \"rounded-xl pb-[4.5rem] lg:pb-24\" : \"rounded-t-xl border-b-0 pb-4\",\n        )}\n      >\n        <div className=\"column-cta-fade mx-auto max-w-page\">\n          <h2 className=\"font-display text-[2.5rem]/none font-semibold tracking-[-0.04em] lg:text-[3.25rem]/[1.08]\">{title}</h2>\n          {lead && <p className=\"mt-3 max-w-[42rem] text-lg/[1.35] text-muted-foreground lg:mt-4\">{lead}</p>}\n          <ul className=\"mt-14 grid gap-5 lg:mt-[3.25rem] lg:grid-cols-3\">\n            {cards.map((c) => (\n              <li key={c.title}>\n                <a\n                  href={c.href}\n                  style={toneStyle(tone)}\n                  className=\"flex h-[13rem] flex-col rounded-lg border border-border bg-[color-mix(in_oklab,var(--background)_55%,var(--muted))] px-8 pt-[1.625rem] pb-8 shadow-[inset_0_1px_0_var(--secondary)] transition-[background-color,box-shadow] duration-200 ease-[ease] hover:bg-background hover:shadow-[inset_0_1px_0_var(--secondary),0_2px_6px_color-mix(in_oklab,var(--foreground)_6%,transparent)]\"\n                >\n                  <span className=\"flex size-16 items-center justify-center bg-[radial-gradient(circle,color-mix(in_oklab,var(--tone)_22%,transparent)_0.8px,transparent_1.2px)] bg-size-[6px_6px] text-[var(--tone)] [&_svg]:size-8\">\n                    {c.icon}\n                  </span>\n                  <span className=\"mt-auto font-display text-base font-semibold tracking-[-0.01em]\">{c.title}</span>\n                  <span className=\"mt-0.5 text-sm text-muted-foreground\">{c.note}</span>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big line"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "a sentence under it"
+    },
+    {
+      "name": "cards",
+      "type": "ColumnCtaCard[]",
+      "required": true,
+      "description": "the link cards (three fill the row)"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "chart-1",
+      "description": "colour of the card icons"
+    },
+    {
+      "name": "closed",
+      "type": "boolean",
+      "required": false,
+      "description": "round the panel's bottom too (when no footer follows)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1db9c8f988c6d9c7890572c51e272ee25952f7bf07a65a96083113fae4352400"
+}

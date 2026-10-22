@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Meow footer",
+  "description": "A tall ink-dark footer: four columns of small links under bold group names (two-column lists on phones), a row with the orange-icon wordmark and the copyright line, a full-width hairline, then long paragraphs of disclosures in comfortable 16/24 white text with underlined links.",
+  "category": "footer",
+  "site": "meow",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "legal",
+    "fintech",
+    "minimal"
+  ],
+  "notes": [
+    "always dark: it carries the theme's dark tokens (class `dark`) in both modes",
+    "`legal` takes any number of paragraphs; bold and italic inside are kept"
+  ],
+  "entry": "meow-footer.tsx",
+  "source": "foundry",
+  "name": "meow-footer",
+  "files": [
+    {
+      "path": "meow-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MeowMark, type MeowMarkProps } from \"@foundry/meow-mark\";\n\nexport interface MeowFooterGroup {\n  /** the group's name, e.g. \"Products\" */\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface MeowFooterProps {\n  /** up to four link groups */\n  groups: MeowFooterGroup[];\n  /** the logo */\n  mark: MeowMarkProps;\n  /** the copyright line */\n  copyright: ReactNode;\n  /** disclosure paragraphs under the rule */\n  legal?: ReactNode[];\n  className?: string;\n}\n\n/** Link columns, the mark and copyright, a rule, then the disclosures. */\nexport function MeowFooter({ groups, mark, copyright, legal, className }: MeowFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-12 pb-16 lg:pt-[4.7rem] lg:pb-20\">\n        <div className=\"px-1 lg:px-6\">\n          <div className=\"grid gap-y-10 lg:grid-cols-4 lg:gap-x-5\">\n            {groups.map((g) => (\n              <nav key={g.title} aria-label={g.title}>\n                <h2 className=\"text-base/6 font-semibold\">{g.title}</h2>\n                <ul className=\"mt-5 grid grid-cols-2 gap-x-5 gap-y-4 lg:mt-6 lg:grid-cols-1\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"block text-sm/5 tracking-[0.01em] text-foreground transition-opacity duration-150 hover:opacity-70 motion-reduce:transition-none\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </nav>\n            ))}\n          </div>\n\n          <div className=\"mt-[4.5rem] flex flex-col gap-5 lg:mt-[5.5rem] lg:flex-row lg:items-center lg:justify-between\">\n            <MeowMark {...mark} size=\"lg\" />\n            <p className=\"text-sm/5\">{copyright}</p>\n          </div>\n\n          <hr className=\"mt-12 border-foreground/90 lg:mt-14\" />\n\n          {legal?.length ? (\n            <div className=\"mt-11 flex flex-col gap-4 text-base/6 lg:mt-12 [&_a]:underline [&_strong]:font-semibold\">\n              {legal.map((para, i) => (\n                <p key={i}>{para}</p>\n              ))}\n            </div>\n          ) : null}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "meow-mark"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "MeowFooterGroup[]",
+      "required": true,
+      "description": "up to four link groups"
+    },
+    {
+      "name": "mark",
+      "type": "MeowMarkProps",
+      "required": true,
+      "description": "the logo"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "disclosure paragraphs under the rule"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f4588b9092d85f85d0f4ed7144a3d02bff6343272a39155fc9f52b36b600e1d9"
+}

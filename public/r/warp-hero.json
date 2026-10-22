@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp hero",
+  "description": "A window-tall developer hero on a dot grid that fades up from white: a big two-line monospace headline, a muted mono lead, an ink button and an outline button, then a technical figure plate filling the width: a captioned frame around a white card holding an 8 × 28 matrix of tiny status squares (hatched queued, solid blue working, striped waiting, hollow done) with a legend and running totals. Everything rises in on load; the working squares pulse.",
+  "category": "hero",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "mono",
+    "developer",
+    "dot-grid",
+    "figure",
+    "matrix",
+    "status",
+    "blue",
+    "pulse",
+    "load-in",
+    "window-height",
+    "technical"
+  ],
+  "notes": [
+    "the section is as tall as the window and crops the figure at the bottom on short screens, like the original",
+    "cell states come from the cells prop or a fixed default pattern; CSS only (no JavaScript)"
+  ],
+  "entry": "warp-hero.tsx",
+  "source": "foundry",
+  "name": "warp-hero",
+  "files": [
+    {
+      "path": "warp-hero.css",
+      "content": "/* Load-in: each piece rises 12px and fades in, staggered by --warp-hero-i. Working cells\n   pulse on their own offsets. */\n@media (prefers-reduced-motion: no-preference) {\n  .warp-hero-in {\n    animation: warp-hero-rise 600ms cubic-bezier(0.4, 0, 0.2, 1) both;\n    animation-delay: calc(var(--warp-hero-i, 0) * 80ms);\n  }\n  .warp-hero-cell-working {\n    animation: warp-hero-pulse 1800ms ease-in-out infinite;\n  }\n}\n\n@keyframes warp-hero-rise {\n  from { opacity: 0; translate: 0 12px; }\n  to { opacity: 1; translate: 0 0; }\n}\n@keyframes warp-hero-pulse {\n  0%, 100% { opacity: 1; }\n  50% { opacity: 0.35; }\n}\n"
+    },
+    {
+      "path": "warp-hero.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpButton } from \"@foundry/warp-button\";\nimport { WarpGuides } from \"@foundry/warp-section\";\nimport { WarpPlate } from \"@foundry/warp-plate\";\nimport \"./warp-hero.css\";\n\nexport type WarpHeroCellState = \"queued\" | \"working\" | \"waiting\" | \"done\";\n\nexport interface WarpHeroProps {\n  /** the big monospace headline (wraps at about 25 characters on desktop) */\n  title: string;\n  /** the line under the headline */\n  lead: string;\n  /** the solid ink button */\n  primary: { label: string; href: string };\n  /** the outline button (brand-blue outline on phones) */\n  secondary?: { label: string; href: string };\n  /** caption of the figure frame, e.g. \"fig. 1 — the floor\" */\n  caption: string;\n  /** small label at the top left of the figure card */\n  figureLabel: string;\n  /** small label at the top right of the figure card, e.g. \"8 × 28 · live\" */\n  figureMeta?: string;\n  /** legend labels for the four cell states */\n  legend: Record<WarpHeroCellState, string>;\n  /** the running totals at the bottom right, e.g. [\"224 jobs\", \"41 running\"] */\n  totals?: string[];\n  /** rows and columns of the matrix */\n  rows?: number;\n  columns?: number;\n  /** each cell's state, row by row; a fixed pattern is used when not given */\n  cells?: WarpHeroCellState[];\n  className?: string;\n}\n\n/** A stable, varied pattern: about one cell in five is active. */\nfunction defaultState(i: number): WarpHeroCellState {\n  const h = (i * 7919 + 31) % 101;\n  if (h < 15) return \"working\";\n  if (h < 19) return \"waiting\";\n  if (h < 23) return \"done\";\n  return \"queued\";\n}\n\nconst cellLook: Record<WarpHeroCellState, string> = {\n  queued:\n    \"border border-foreground/25 bg-[repeating-linear-gradient(45deg,color-mix(in_oklab,var(--foreground)_22%,transparent)_0_1px,transparent_1px_3px)]\",\n  working: \"warp-hero-cell-working bg-primary\",\n  waiting: \"border border-primary/70 bg-[repeating-linear-gradient(-45deg,var(--primary)_0_1px,transparent_1px_3px)] opacity-80\",\n  done: \"border border-primary bg-card\",\n};\n\nconst states: WarpHeroCellState[] = [\"queued\", \"working\", \"waiting\", \"done\"];\n\n/** Warp's hero: mono headline, two buttons, and the status-matrix figure, window tall. */\nexport function WarpHero({\n  title,\n  lead,\n  primary,\n  secondary,\n  caption,\n  figureLabel,\n  figureMeta,\n  legend,\n  totals = [],\n  rows = 8,\n  columns = 28,\n  cells,\n  className,\n}: WarpHeroProps) {\n  const count = rows * columns;\n  const grid = Array.from({ length: count }, (_, i) => cells?.[i] ?? defaultState(i));\n  const step = (i: number) => ({ \"--warp-hero-i\": i }) as CSSProperties;\n\n  return (\n    <section\n      className={cn(\n        \"relative isolate h-svh min-h-[40rem] overflow-clip bg-background text-foreground\",\n        \"bg-[radial-gradient(circle_at_1px_1px,color-mix(in_oklab,var(--foreground)_7%,transparent)_1.2px,transparent_0)] bg-[size:24px_24px]\",\n        className,\n      )}\n    >\n      <div aria-hidden className=\"absolute inset-y-0 right-2 left-2 -z-10 mx-auto max-w-page bg-background/70 lg:right-0 lg:left-0\" />\n      <WarpGuides ticks={false} />\n      <div aria-hidden className=\"absolute inset-x-0 top-0 -z-10 h-[26rem] bg-linear-to-b from-card to-transparent\" />\n\n      <div className=\"relative mx-2 max-w-page px-4 pt-[3.25rem] lg:mx-auto lg:px-6 lg:pt-[5.25rem]\">\n        <h1\n          className=\"warp-hero-in max-w-[25ch] font-mono text-[2rem] leading-[1.08] font-[380] tracking-[calc(0.02em_-_var(--warp-squeeze,0em))] lg:text-[3.25rem] lg:leading-[1.1] lg:tracking-[calc(0.03em_-_var(--warp-squeeze,0em))]\"\n          style={step(0)}\n        >\n          {title}\n        </h1>\n        <p\n          className=\"warp-hero-in mt-5 max-w-[17.5rem] text-base leading-[1.65] tracking-[calc(0.05em_-_var(--warp-squeeze,0em))] text-muted-foreground sm:max-w-none lg:mt-6\"\n          style={step(1)}\n        >\n          {lead}\n        </p>\n        <div className=\"warp-hero-in mt-7 grid grid-cols-2 gap-4 sm:flex sm:flex-wrap\" style={step(2)}>\n          <WarpButton href={primary.href} className=\"min-h-[3.375rem] sm:min-h-[2.125rem]\">\n            {primary.label}\n          </WarpButton>\n          {secondary && (\n            <WarpButton\n              href={secondary.href}\n              variant=\"blue\"\n              className=\"min-h-[3.375rem] sm:min-h-[2.125rem] lg:border-border lg:text-foreground lg:hover:border-primary lg:hover:bg-card lg:hover:text-primary\"\n            >\n              {secondary.label}\n            </WarpButton>\n          )}\n        </div>\n\n        <div className=\"warp-hero-in mt-7 lg:mt-10\" style={step(3)}>\n          <WarpPlate caption={caption} rules innerClassName=\"px-6 py-6 lg:px-8 lg:pt-8 lg:pb-0\">\n            <div className=\"flex items-start justify-between gap-4 font-mono text-[0.5625rem] leading-[1.65] tracking-[calc(0.12em_-_var(--warp-squeeze,0em))] text-muted-foreground uppercase lg:text-[0.625rem]\">\n              <span>[ {figureLabel} ]</span>\n              {figureMeta && <span className=\"shrink-0\">{figureMeta}</span>}\n            </div>\n\n            <div\n              role=\"img\"\n              aria-label={states.map((s) => `${grid.filter((c) => c === s).length} ${legend[s]}`).join(\", \")}\n              className=\"mt-6 grid lg:mt-7\"\n              style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}\n            >\n              {grid.map((s, i) => (\n                <span key={i} className=\"flex aspect-square items-center justify-center\">\n                  <span\n                    className={cn(\"size-full lg:size-2.5\", cellLook[s])}\n                    style={s === \"working\" ? { animationDelay: `${-((i * 337) % 1800)}ms` } : undefined}\n                  />\n                </span>\n              ))}\n            </div>\n\n            <div className=\"mt-6 flex flex-col gap-4 border-t border-border py-4 font-mono text-[0.5625rem] tracking-[calc(0.12em_-_var(--warp-squeeze,0em))] uppercase lg:mt-6 lg:flex-row lg:items-center lg:justify-between lg:py-5 lg:text-[0.625rem]\">\n              <ul className=\"flex flex-wrap gap-x-5 gap-y-3 text-muted-foreground\">\n                {states.map((s) => (\n                  <li key={s} className=\"flex items-center gap-2\">\n                    <span aria-hidden className={cn(\"size-2\", cellLook[s])} />\n                    {legend[s]}\n                  </li>\n                ))}\n              </ul>\n              {totals.length > 0 && <p className=\"leading-[1.8] text-foreground/78\">{totals.join(\" · \")}</p>}\n            </div>\n          </WarpPlate>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-button",
+    "warp-plate",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big monospace headline (wraps at about 25 characters on desktop)"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the line under the headline"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the solid ink button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button (brand-blue outline on phones)"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "caption of the figure frame, e.g. \"fig. 1 — the floor\""
+    },
+    {
+      "name": "figureLabel",
+      "type": "string",
+      "required": true,
+      "description": "small label at the top left of the figure card"
+    },
+    {
+      "name": "figureMeta",
+      "type": "string",
+      "required": false,
+      "description": "small label at the top right of the figure card, e.g. \"8 × 28 · live\""
+    },
+    {
+      "name": "legend",
+      "type": "Record<WarpHeroCellState, string>",
+      "required": true,
+      "description": "legend labels for the four cell states"
+    },
+    {
+      "name": "totals",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "the running totals at the bottom right, e.g. [\"224 jobs\", \"41 running\"]"
+    },
+    {
+      "name": "rows",
+      "type": "number",
+      "required": false,
+      "default": "8",
+      "description": "rows and columns of the matrix"
+    },
+    {
+      "name": "columns",
+      "type": "number",
+      "required": false,
+      "default": "28"
+    },
+    {
+      "name": "cells",
+      "type": "WarpHeroCellState[]",
+      "required": false,
+      "description": "each cell's state, row by row; a fixed pattern is used when not given"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8e67d200dcb760c10348fdfbc830a751227407cad3a95b75dc7852bfa701f606"
+}

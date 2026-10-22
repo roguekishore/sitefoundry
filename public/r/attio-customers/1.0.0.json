@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Attio customer stories",
+  "description": "A white framed customer-stories section: a blue badge, a two-tone 40px heading and a small arrow button, then a hairline row of four logo tabs (the picked one greyed; just the marks on phones) over a split of the story's uppercase eyebrow and two-tone headline at the bottom left and a desaturated photo on the right. Picking a tab fades the story in; the photo comes into focus as it scrolls in.",
+  "category": "testimonials",
+  "site": "attio",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-study",
+    "tabs",
+    "light",
+    "hairline",
+    "framed",
+    "split",
+    "photo",
+    "reveal",
+    "blur",
+    "saas"
+  ],
+  "notes": [
+    "each story's photo is a media slot (695×429, 390×240 on phones), shown at 55% saturation; empty, a grey placeholder"
+  ],
+  "entry": "attio-customers.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "attio-customers",
+  "files": [
+    {
+      "path": "attio-customers.css",
+      "content": "/* A newly picked story fades in with a short soft blur. */\n.attio-customers-swap {\n  animation: attio-customers-swap 0.45s cubic-bezier(0.2, 0, 0, 1) both;\n}\n\n@keyframes attio-customers-swap {\n  from { opacity: 0; filter: blur(4px); }\n  to { opacity: 1; filter: none; }\n}\n\n/* the photo comes into focus as it enters the window */\n@supports (animation-timeline: view()) {\n  .attio-customers-photo {\n    animation: attio-customers-focus linear both;\n    animation-timeline: view();\n    animation-range: entry 0px entry 320px;\n  }\n}\n\n@keyframes attio-customers-focus {\n  from { filter: blur(10px); }\n  to { filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .attio-customers-swap,\n  .attio-customers-photo {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "attio-customers.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AttioBadge } from \"@foundry/attio-badge\";\nimport { AttioButton } from \"@foundry/attio-button\";\nimport { AttioHeading } from \"@foundry/attio-heading\";\nimport \"./attio-customers.css\";\n\nexport interface AttioCustomerStory {\n  /** the company's name, for the tab's label */\n  name: string;\n  /** its full wordmark, for the desktop tab */\n  logo: ReactNode;\n  /** just its mark, for the narrow phone tab */\n  mark: ReactNode;\n  /** the small uppercase line over the story (e.g. the industry) */\n  eyebrow?: string;\n  /** the story's headline: dark result… */\n  lead: string;\n  /** …and grey explanation */\n  rest?: string;\n  /** a link to the full story */\n  href?: string;\n  /** the story's photo (≈695×429); empty shows a placeholder */\n  media?: ReactNode;\n  mediaLabel?: string;\n}\n\nexport interface AttioCustomersProps {\n  /** the small label over the heading */\n  badge?: string;\n  /** the heading: dark lead… */\n  lead: string;\n  /** …and grey rest */\n  rest?: string;\n  /** the small outline button under the heading */\n  action?: { label: string; href: string };\n  /** four stories, one per tab */\n  stories: AttioCustomerStory[];\n  className?: string;\n}\n\n/**\n * A white framed customer-stories section: badge, two-tone heading and a small button, then\n * a row of four logo tabs (the picked one greyed) over a split of the story's headline,\n * bottom-left, and a muted photo on the right that comes into focus as it scrolls in.\n */\nexport function AttioCustomers({ badge, lead, rest, action, stories, className }: AttioCustomersProps) {\n  const [active, setActive] = useState(0);\n  const story = stories[active];\n\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <div className=\"mx-auto max-w-page border-b border-border lg:border-x\">\n        <div className=\"px-8 pt-[5.5rem] pb-16 lg:px-[3.6875rem] lg:pt-section lg:pb-20\">\n          {badge && <AttioBadge>{badge}</AttioBadge>}\n          <AttioHeading lead={lead} rest={rest} className=\"mt-5 max-w-[19rem] sm:max-w-[38rem] lg:mt-6\" />\n          {action && (\n            <AttioButton href={action.href} size=\"sm\" arrow className=\"mt-7\">\n              {action.label}\n            </AttioButton>\n          )}\n        </div>\n\n        <div role=\"tablist\" className=\"grid grid-cols-4 border-y border-border\">\n          {stories.map((s, i) => (\n            <button\n              key={s.name}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={active === i}\n              aria-label={s.name}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"flex h-14 items-center justify-center transition-colors duration-200 ease-[cubic-bezier(0,0,0,1)] motion-reduce:transition-none lg:h-20\",\n                i > 0 && \"border-l border-border\",\n                active === i ? \"bg-secondary\" : \"bg-background hover:bg-muted\",\n              )}\n            >\n              <span className=\"text-foreground lg:hidden [&_svg]:size-6\">{s.mark}</span>\n              <span className=\"hidden text-foreground lg:flex [&_svg]:h-6 [&_svg]:w-auto\">{s.logo}</span>\n            </button>\n          ))}\n        </div>\n\n        {story && (\n          <div key={active} role=\"tabpanel\" className=\"attio-customers-swap grid lg:grid-cols-2\">\n            <div className=\"order-2 flex flex-col justify-end px-8 pt-6 pb-10 lg:order-1 lg:px-[3.6875rem] lg:pb-9\">\n              {story.eyebrow && <p className=\"text-[0.8125rem] font-semibold tracking-[0.02em] text-muted-foreground uppercase\">{story.eyebrow}</p>}\n              <a href={story.href} className=\"group mt-2 block\">\n                <AttioHeading as=\"h3\" lead={story.lead} rest={story.rest} className=\"max-w-[24rem] text-[1.75rem] leading-[1.15] lg:text-[1.75rem] lg:leading-[1.33]\" />\n              </a>\n            </div>\n            <div\n              role=\"img\"\n              aria-label={story.mediaLabel}\n              className=\"attio-customers-photo order-1 aspect-[390/240] overflow-clip bg-secondary lg:order-2 lg:aspect-[695/429] lg:border-l lg:border-border [&>*]:size-full [&>*]:saturate-[0.55] [&>img]:object-cover\"\n            >\n              {story.media}\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "attio-badge",
+    "attio-button",
+    "attio-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small label over the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the heading: dark lead…"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "…and grey rest"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the small outline button under the heading"
+    },
+    {
+      "name": "stories",
+      "type": "AttioCustomerStory[]",
+      "required": true,
+      "description": "four stories, one per tab"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d4cba6a1299da5a3243398a76a837a30df894bfd065f126fa7f9c8b729f315df"
+}

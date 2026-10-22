@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Increase product bento",
+  "description": "A two-tone lead statement over a framed bento of pale grey 16px-radius panels: one full-width panel with a two-column list of payment rails (32px icon tiles, the first filled mint; others fill on hover) beside a product picture, then two rows that alternate 7:5 and 5:7. Each panel's picture is a white card that runs off its bottom and side edges. Stacked on phones.",
+  "category": "features",
+  "site": "increase",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "light",
+    "framed",
+    "hairline",
+    "fintech",
+    "product",
+    "hover"
+  ],
+  "notes": [
+    "media per panel: pass a screenshot, mock-up or video; empty it is a plain white card at the original's size and position",
+    "five panels fill the layout exactly (1 + 2 + 2); more continue the alternating pairs",
+    "the product mock-ups' own motion (number rolls, sheen, live dot) is not rebuilt"
+  ],
+  "entry": "increase-products.tsx",
+  "source": "foundry",
+  "name": "increase-products",
+  "files": [
+    {
+      "path": "increase-products.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { IncreaseHeading } from \"@foundry/increase-heading\";\n\nexport interface IncreaseRail {\n  /** the rail's name */\n  label: string;\n  /** a small icon (lucide) shown in a 32px tile */\n  icon: ReactNode;\n  href?: string;\n  /** the tile is filled with the primary colour */\n  active?: boolean;\n}\n\nexport interface IncreaseBentoPanel {\n  /** the panel's title, top left */\n  title: string;\n  /** the product picture: a screenshot, mock-up or video. Empty: a white placeholder card */\n  media?: ReactNode;\n  /**\n   * where the picture runs off the panel: inset (inside the padding), bottom, bottom-right\n   * (off the right and bottom edges) or bottom-left\n   */\n  bleed?: \"inset\" | \"bottom\" | \"bottom-right\" | \"bottom-left\";\n  /** a 2-column list of rails under the title (used by the first, full-width panel) */\n  rails?: IncreaseRail[];\n}\n\nexport interface IncreaseProductsProps {\n  /** the lead statement's dark opening clause */\n  lead: string;\n  /** the rest of it, in grey */\n  rest?: string;\n  /**\n   * the panels, in reading order. Desktop: the first spans the row (list left, picture right),\n   * then pairs alternate 7:5 and 5:7 columns. Phones: stacked.\n   */\n  panels: IncreaseBentoPanel[];\n  className?: string;\n}\n\nconst bleeds = {\n  inset: \"\",\n  bottom: \"-mb-8\",\n  \"bottom-right\": \"-mr-8 -mb-8\",\n  \"bottom-left\": \"-ml-8 -mb-8\",\n};\n\nfunction Media({ media, bleed = \"inset\", className }: { media?: ReactNode; bleed?: IncreaseBentoPanel[\"bleed\"]; className?: string }) {\n  return (\n    <div\n      aria-hidden={media ? undefined : true}\n      className={cn(\n        \"relative overflow-clip rounded-xl border border-border bg-card shadow-[0_1px_2px_color-mix(in_oklab,var(--foreground)_5%,transparent)] [&>img]:size-full [&>img]:object-cover\",\n        bleeds[bleed],\n        className,\n      )}\n    >\n      {media}\n    </div>\n  );\n}\n\nfunction Rails({ rails }: { rails: IncreaseRail[] }) {\n  return (\n    <ul className=\"mt-6 grid grid-cols-[auto_1fr] gap-x-7 gap-y-4 sm:gap-x-12 lg:mt-14 lg:ml-6 lg:grid-cols-[9.5rem_1fr] lg:gap-x-8 lg:gap-y-8\">\n      {rails.map((rail) => {\n        const Tag = rail.href ? \"a\" : \"span\";\n        return (\n          <li key={rail.label}>\n            <Tag href={rail.href} className=\"group flex items-center gap-3 text-base whitespace-nowrap text-foreground lg:gap-4 lg:text-lg\">\n              <span\n                className={cn(\n                  \"grid size-8 shrink-0 place-items-center rounded-md border transition-colors duration-150 motion-reduce:transition-none [&_svg]:size-4\",\n                  rail.active\n                    ? \"border-primary bg-primary text-primary-foreground\"\n                    : \"border-input bg-card text-foreground group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground\",\n                )}\n              >\n                {rail.icon}\n              </span>\n              {rail.label}\n            </Tag>\n          </li>\n        );\n      })}\n    </ul>\n  );\n}\n\n/**\n * Increase's product bento: a two-tone lead statement over grey 16px-radius panels on a\n * 12-column grid. Each panel has a plain title and a product picture that runs off one or\n * two of its edges; the first panel adds a two-column list of rails with icon tiles.\n */\nexport function IncreaseProducts({ lead, rest, panels, className }: IncreaseProductsProps) {\n  const [first, ...others] = panels;\n  return (\n    <section className={cn(\"border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-x border-border px-gutter pt-9 pb-6 lg:pt-section\">\n        <IncreaseHeading lead={lead} rest={rest} />\n\n        <div className=\"mt-8 grid grid-cols-1 gap-4 lg:mt-16 lg:grid-cols-12 lg:gap-6\">\n          {first && (\n            <article className=\"overflow-clip rounded-2xl border border-border bg-muted p-4 pb-0 sm:p-6 sm:pb-0 lg:col-span-12 lg:grid lg:h-[26.25rem] lg:grid-cols-[1fr_33.75rem] lg:gap-6\">\n              <div>\n                <h3 className=\"text-xl leading-6 tracking-[-0.01em] lg:text-2xl lg:leading-[1.2]\">{first.title}</h3>\n                {first.rails && <Rails rails={first.rails} />}\n              </div>\n              <Media\n                media={first.media}\n                bleed={first.bleed ?? \"bottom-right\"}\n                className=\"mt-8 h-[14.5rem] lg:mt-4 lg:mr-14 lg:h-auto\"\n              />\n            </article>\n          )}\n          {others.map((panel, i) => {\n            // pairs alternate wide-narrow, narrow-wide\n            const wide = Math.floor(i / 2) % 2 === 0 ? i % 2 === 0 : i % 2 === 1;\n            const row = Math.floor(i / 2);\n            return (\n              <article\n                key={panel.title}\n                className={cn(\n                  \"flex h-[25rem] flex-col overflow-clip rounded-2xl border border-border bg-muted p-4 sm:p-6\",\n                  wide ? \"lg:col-span-7\" : \"lg:col-span-5\",\n                  row % 2 === 0 ? \"lg:h-[23.5rem]\" : \"lg:h-[26rem]\",\n                )}\n              >\n                <h3 className=\"text-xl leading-6 tracking-[-0.01em] lg:text-2xl lg:leading-[1.2]\">{panel.title}</h3>\n                <Media media={panel.media} bleed={panel.bleed} className=\"mt-6 min-h-0 flex-1 lg:mt-7\" />\n              </article>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "increase-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the lead statement's dark opening clause"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": false,
+      "description": "the rest of it, in grey"
+    },
+    {
+      "name": "panels",
+      "type": "IncreaseBentoPanel[]",
+      "required": true,
+      "description": "the panels, in reading order. Desktop: the first spans the row (list left, picture right),\nthen pairs alternate 7:5 and 5:7 columns. Phones: stacked."
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d0aa70823628ab99a055c046bff2375c52e7b15de10c020deb77bfeb430ffba5"
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Base Power steps",
+  "description": "A centred white tag, a two-line heading and a lime button, then a column of rounded step cards beside a wide rounded photo. The open step is a forest-green card with a small number, a title and its text; the others are white with just number and title. Choosing a step opens it smoothly and crossfades the photo; on phones the open card carries the photo inside.",
+  "category": "features",
+  "site": "basepowercompany",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "steps",
+    "how-it-works",
+    "accordion",
+    "tabs",
+    "crossfade",
+    "light",
+    "green"
+  ],
+  "notes": [
+    "needs JavaScript to switch steps; the static HTML shows the first step open",
+    "three steps fit beside the photo on desktop"
+  ],
+  "hydrate": "visible",
+  "entry": "basepowercompany-steps.tsx",
+  "source": "foundry",
+  "name": "basepowercompany-steps",
+  "files": [
+    {
+      "path": "basepowercompany-steps.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BasepowercompanyButton } from \"@foundry/basepowercompany-button\";\nimport { BasepowercompanyMedia } from \"@foundry/basepowercompany-media\";\nimport { BasepowercompanyTag } from \"@foundry/basepowercompany-tag\";\n\nexport interface BasepowercompanyStep {\n  /** the small number above the title, e.g. \"01\" */\n  number: string;\n  /** the step's title */\n  title: string;\n  /** the text shown when the step is open */\n  body: string;\n  /** the photo for this step */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n}\n\nexport interface BasepowercompanyStepsProps {\n  /** the white tag above the heading */\n  tag?: string;\n  /** the centred heading */\n  title: string;\n  /** the lime button under it */\n  cta?: { label: string; href: string };\n  /** the steps; the first starts open */\n  steps: BasepowercompanyStep[];\n  className?: string;\n}\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\";\n\n/*\n * \"How to switch\": a centred tag, heading and button, then a column of step cards beside a\n * photo. Choosing a step turns its card forest green, opens its text and swaps the photo;\n * on phones the open card holds the photo itself.\n */\nexport function BasepowercompanySteps({ tag, title, cta, steps, className }: BasepowercompanyStepsProps) {\n  const [open, setOpen] = useState(0);\n  return (\n    <section className={cn(\"bg-background px-gutter pt-16 pb-12 text-foreground lg:pb-[7.75rem]\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <div className=\"flex flex-col items-center text-center\">\n          {tag && <BasepowercompanyTag>{tag}</BasepowercompanyTag>}\n          <h2 className=\"mt-2.5 max-w-[17rem] font-display text-[2rem] leading-[1.2] font-bold tracking-[-0.025em] sm:max-w-[30rem] lg:mt-3 lg:text-[2.5rem] lg:leading-[1.1]\">\n            {title}\n          </h2>\n          {cta && (\n            <BasepowercompanyButton href={cta.href} trailingIcon={<ChevronRight />} className=\"mt-6\">\n              {cta.label}\n            </BasepowercompanyButton>\n          )}\n        </div>\n\n        <div className=\"mt-12 grid items-start gap-8 lg:grid-cols-2\">\n          <ol className=\"flex flex-col gap-3\">\n            {steps.map((s, i) => {\n              const isOpen = i === open;\n              return (\n                <li key={s.number}>\n                  <button\n                    type=\"button\"\n                    aria-expanded={isOpen}\n                    onClick={() => setOpen(i)}\n                    className={cn(\n                      \"block w-full rounded-[calc(var(--radius)*2.5)] p-6 text-left transition-colors\",\n                      ease,\n                      isOpen ? \"bg-primary text-primary-foreground\" : \"bg-card text-card-foreground hover:bg-card/70\",\n                    )}\n                  >\n                    <span className={cn(\"block text-xs leading-[1.5] font-bold\", !isOpen && \"text-muted-foreground\")}>{s.number}</span>\n                    <span className=\"mt-2 block font-display text-xl leading-[1.35] font-bold tracking-[-0.025em]\">{s.title}</span>\n                    <span className={cn(\"grid transition-[grid-template-rows]\", ease, isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}>\n                      <span className=\"min-h-0 overflow-hidden\">\n                        <span className=\"block pt-3 text-base leading-6 font-semibold tracking-[-0.005em]\">{s.body}</span>\n                        <BasepowercompanyMedia\n                          media={s.media}\n                          label={s.mediaLabel}\n                          className=\"mt-6 aspect-[1.33] rounded-[calc(var(--radius)*2.5)] lg:hidden\"\n                        />\n                      </span>\n                    </span>\n                  </button>\n                </li>\n              );\n            })}\n          </ol>\n\n          <div className=\"relative hidden aspect-[1.63] overflow-clip rounded-[calc(var(--radius)*2.5)] lg:block\">\n            {steps.map((s, i) => (\n              <BasepowercompanyMedia\n                key={s.number}\n                media={s.media}\n                label={s.mediaLabel}\n                className={cn(\"absolute inset-0 transition-opacity\", ease, i === open ? \"opacity-100\" : \"opacity-0\")}\n              />\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "basepowercompany-button",
+    "basepowercompany-media",
+    "basepowercompany-tag",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the white tag above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred heading"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the lime button under it"
+    },
+    {
+      "name": "steps",
+      "type": "BasepowercompanyStep[]",
+      "required": true,
+      "description": "the steps; the first starts open"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "13723a1b26ef7791f8ef48910e1ab3b9cfd1bcddf79bfe140a04648bfad39348"
+}

@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search header",
+  "description": "A sticky 60px bar split on the page's middle line: an ink logo square and the live time of two cities (flipping between them as you scroll) on the left; section links, a tiny light/dark switch and a 200px ink Contact button on the right. Link text rolls up over a rising ink fill on hover; Contact gets a mint sweep. On phones the right half is a mint Menu button.",
+  "category": "header",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "light",
+    "swiss",
+    "grid",
+    "mint",
+    "clock",
+    "hover",
+    "roll",
+    "scroll-driven"
+  ],
+  "notes": [
+    "needs JavaScript for the phone menu and the live clocks; the city flip is a CSS scroll(root) animation",
+    "the switch toggles .dark on <html>; leave themeToggleLabel out to hide it"
+  ],
+  "entry": "aspensearch-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "aspensearch-header",
+  "files": [
+    {
+      "path": "aspensearch-header.css",
+      "content": "/* Two city times stacked in a one-line window; the stack flips between them as the whole page\n   scrolls (scrubbed by the root scroller), resting on each for a while. */\n@supports (animation-timeline: scroll()) {\n  .aspensearch-header-flip {\n    animation: aspensearch-header-flip linear both;\n    animation-timeline: scroll(root);\n  }\n}\n\n@keyframes aspensearch-header-flip {\n  0%, 18% { transform: translateY(0); }\n  22%, 43% { transform: translateY(-1.25em); }\n  47%, 68% { transform: translateY(0); }\n  72%, 93% { transform: translateY(-1.25em); }\n  97%, 100% { transform: translateY(0); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .aspensearch-header-flip { animation: none; }\n}\n"
+    },
+    {
+      "path": "aspensearch-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowRight, Asterisk } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchCityTime } from \"@foundry/aspensearch-city-time\";\nimport \"./aspensearch-header.css\";\n\nexport interface AspensearchHeaderCity {\n  /** short city tag shown after the time, e.g. \"CHI\" */\n  name: string;\n  /** IANA time zone, e.g. \"America/Chicago\" */\n  timeZone: string;\n  /** the time static HTML shows before the live clock runs, e.g. \"09:00 AM\" */\n  fallback: string;\n}\n\nexport interface AspensearchHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface AspensearchHeaderProps {\n  /** the firm's name, for screen readers on the logo square */\n  brand: string;\n  /** the mark in the ink square on the left; empty: a plain asterisk icon */\n  logo?: ReactNode;\n  /** where the logo links to */\n  homeHref?: string;\n  /** one or two cities whose live time shows next to the logo; with two, they flip as the page scrolls */\n  cities: AspensearchHeaderCity[];\n  /** the section links (desktop row, phone menu) */\n  links: AspensearchHeaderLink[];\n  /** the ink button on the right */\n  contact: AspensearchHeaderLink;\n  /** label of the phone menu button, e.g. \"Menu\" */\n  menuLabel: string;\n  /** shows the little light/dark switch, which toggles `.dark` on <html>; its value is its screen-reader name */\n  themeToggleLabel?: string;\n  className?: string;\n}\n\nconst ease = \"duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none\";\n\n/**\n * The original's sticky 60px bar: an ink logo square, the live time of two cities that flip\n * as you scroll, then from the middle line the section links (their text rolls up on hover\n * over a rising ink fill), a light/dark switch and a 200px ink Contact button. On phones the\n * right half is a mint Menu button that opens a link panel.\n */\nexport function AspensearchHeader({ brand, logo, homeHref = \"#\", cities, links, contact, menuLabel, themeToggleLabel, className }: AspensearchHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const toggleTheme = () => document.documentElement.classList.toggle(\"dark\");\n\n  return (\n    <header className={cn(\"sticky top-0 z-50 border-b border-border bg-background font-sans tracking-[-0.04em] text-foreground\", className)}>\n      <div className=\"flex h-[3.75rem]\">\n        <a href={homeHref} aria-label={brand} className=\"flex size-[3.75rem] shrink-0 items-center justify-center bg-foreground text-background\">\n          {logo ?? <Asterisk aria-hidden className=\"size-8\" strokeWidth={1.5} />}\n        </a>\n\n        {/* City times: a one-line window; with two cities the stack slides as the page scrolls. */}\n        <div className=\"flex min-w-0 flex-1 items-center justify-center text-sm/none lg:w-[calc(50%-3.75rem)] lg:flex-none lg:justify-start lg:pl-20\">\n          <div className=\"h-[1.25em] overflow-clip leading-[1.25em]\">\n            <div className={cn(cities.length > 1 && \"aspensearch-header-flip\")}>\n              {cities.slice(0, 2).map((city) => (\n                <p key={city.name} className=\"whitespace-nowrap\">\n                  <AspensearchCityTime timeZone={city.timeZone} fallback={city.fallback} /> {city.name}\n                </p>\n              ))}\n            </div>\n          </div>\n        </div>\n\n        {/* Desktop: links, switch and contact from the middle line. */}\n        <nav className=\"hidden w-1/2 items-center border-l border-border lg:flex\">\n          <ul className=\"flex items-center gap-1 pl-5\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className={cn(\"group relative isolate flex h-7 items-start overflow-clip px-1 text-base/none transition-colors hover:text-background\", ease)}>\n                  <span aria-hidden className={cn(\"absolute inset-0 -z-10 origin-bottom scale-y-0 bg-foreground transition-transform group-hover:scale-y-100\", ease)} />\n                  {/* The label and a copy under it; hovering slides the pair up one line. */}\n                  <span className={cn(\"flex flex-col transition-transform group-hover:-translate-y-1/2\", ease)}>\n                    <span className=\"flex h-7 items-center\">{link.label}</span>\n                    <span aria-hidden className=\"flex h-7 items-center\">\n                      {link.label}\n                    </span>\n                  </span>\n                </a>\n              </li>\n            ))}\n          </ul>\n          {themeToggleLabel && (\n            <button type=\"button\" onClick={toggleTheme} aria-label={themeToggleLabel} className=\"ml-auto mr-5 flex items-center p-1\">\n              <span aria-hidden className=\"size-2.5 rounded-full border border-foreground\" />\n              <span aria-hidden className=\"-ml-px size-2.5 rounded-full bg-foreground\" />\n            </button>\n          )}\n          <a\n            href={contact.href}\n            className={cn(\n              \"group relative isolate flex h-full w-[12.5rem] items-center justify-between overflow-clip bg-primary px-5 text-base/none text-primary-foreground transition-colors hover:text-highlight-foreground\",\n              !themeToggleLabel && \"ml-auto\",\n              \"duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none\",\n            )}\n          >\n            <span aria-hidden className=\"absolute inset-0 -z-10 origin-left scale-x-0 bg-highlight transition-transform duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100 motion-reduce:transition-none\" />\n            {contact.label}\n            <ArrowRight aria-hidden className=\"size-5\" strokeWidth={1.25} />\n          </a>\n        </nav>\n\n        {/* Phone: the mint menu button fills the right half. */}\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          onClick={() => setOpen((v) => !v)}\n          className=\"flex w-1/2 shrink-0 items-center justify-between bg-highlight px-3 text-base/none text-highlight-foreground lg:hidden\"\n        >\n          {menuLabel}\n          <span aria-hidden className=\"flex w-4 flex-col gap-1\">\n            <span className={cn(\"h-px bg-current transition-transform\", ease, open && \"translate-y-[2.5px] rotate-45\")} />\n            <span className={cn(\"h-px bg-current transition-transform\", ease, open && \"-translate-y-[2.5px] -rotate-45\")} />\n          </span>\n        </button>\n      </div>\n\n      {open && (\n        <nav className=\"border-t border-border bg-background lg:hidden\">\n          <ul>\n            {links.map((link) => (\n              <li key={link.href} className=\"border-b border-border\">\n                <a href={link.href} onClick={() => setOpen(false)} className=\"flex h-[3.75rem] items-center px-3 text-2xl/none\">\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <a href={contact.href} className=\"flex h-[3.75rem] items-center justify-between bg-primary px-3 text-base/none text-primary-foreground\">\n            {contact.label}\n            <ArrowRight aria-hidden className=\"size-5\" strokeWidth={1.25} />\n          </a>\n        </nav>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "aspensearch-city-time",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the firm's name, for screen readers on the logo square"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the mark in the ink square on the left; empty: a plain asterisk icon"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the logo links to"
+    },
+    {
+      "name": "cities",
+      "type": "AspensearchHeaderCity[]",
+      "required": true,
+      "description": "one or two cities whose live time shows next to the logo; with two, they flip as the page scrolls"
+    },
+    {
+      "name": "links",
+      "type": "AspensearchHeaderLink[]",
+      "required": true,
+      "description": "the section links (desktop row, phone menu)"
+    },
+    {
+      "name": "contact",
+      "type": "AspensearchHeaderLink",
+      "required": true,
+      "description": "the ink button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the phone menu button, e.g. \"Menu\""
+    },
+    {
+      "name": "themeToggleLabel",
+      "type": "string",
+      "required": false,
+      "description": "shows the little light/dark switch, which toggles `.dark` on <html>; its value is its screen-reader name"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "09573a6c7c21de4c1099b0672a35d4d2dde7341c4b6acd2a8f93c59d796cd793"
+}

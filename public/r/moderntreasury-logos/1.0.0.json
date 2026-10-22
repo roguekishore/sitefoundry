@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury logo marquee",
+  "description": "A customer-logo strip between two hairlines, inside the page width: wordmarks slide slowly and endlessly to the left, fading out at both edges.",
+  "category": "logos",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "hairline",
+    "light",
+    "minimal",
+    "fintech"
+  ],
+  "notes": [
+    "CSS only: the list is drawn twice and slides by one copy per loop",
+    "with reduced motion the strip stands still and can be scrolled sideways"
+  ],
+  "entry": "moderntreasury-logos.tsx",
+  "source": "foundry",
+  "name": "moderntreasury-logos",
+  "files": [
+    {
+      "path": "moderntreasury-logos.css",
+      "content": "/* The track holds the list twice; sliding it by half its width loops seamlessly. */\n.moderntreasury-logos-track {\n  animation: moderntreasury-logos-slide var(--moderntreasury-logos-duration, 45s) linear infinite;\n}\n\n@keyframes moderntreasury-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n.moderntreasury-logos-fade {\n  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .moderntreasury-logos-track { animation: none; }\n  .moderntreasury-logos-fade { overflow-x: auto; }\n  .moderntreasury-logos-copy { display: none; }\n}\n"
+    },
+    {
+      "path": "moderntreasury-logos.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./moderntreasury-logos.css\";\n\nexport interface ModerntreasuryLogo {\n  /** the company's name, for screen readers (and shown when there is no logo) */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo?: ReactNode;\n}\n\nexport interface ModerntreasuryLogosProps {\n  /** the logos, in order; six or more keep the loop full on wide screens */\n  logos: ModerntreasuryLogo[];\n  /** seconds for one full pass of the list */\n  duration?: number;\n  className?: string;\n}\n\n/** A hairline-bound logo strip that slides endlessly to the left. */\nexport function ModerntreasuryLogos({ logos, duration = 45, className }: ModerntreasuryLogosProps) {\n  const row = (copy: boolean) => (\n    <ul aria-hidden={copy || undefined} className={cn(\"flex shrink-0 items-center gap-16 pr-16\", copy && \"moderntreasury-logos-copy\")}>\n      {logos.map((l) => (\n        <li key={l.name} className=\"flex shrink-0 items-center text-foreground/85 [&_svg]:h-7 [&_svg]:w-auto\" aria-label={copy ? undefined : l.name}>\n          {l.logo ?? <span className=\"text-2xl font-semibold tracking-[-0.02em]\">{l.name}</span>}\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex h-[10.375rem] items-center border-y border-foreground/20\">\n          <div className=\"moderntreasury-logos-fade w-full overflow-clip\">\n            <div className=\"moderntreasury-logos-track flex w-max\" style={{ \"--moderntreasury-logos-duration\": `${duration}s` } as CSSProperties}>\n              {row(false)}\n              {row(true)}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "ModerntreasuryLogo[]",
+      "required": true,
+      "description": "the logos, in order; six or more keep the loop full on wide screens"
+    },
+    {
+      "name": "duration",
+      "type": "number",
+      "required": false,
+      "default": "45",
+      "description": "seconds for one full pass of the list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c1af1bccdb978382a35707b31cdbfa4b3d486d78d546bde41e29d912ad166c0c"
+}

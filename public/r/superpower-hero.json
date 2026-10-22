@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower hero",
+  "description": "A full-window photo or video hero: edge to edge on phones, inset 8px with 12px corners under the header on desktop. A dark fade rises from the bottom, where a short rating line, a two-line regular-weight headline, a lead, a vermillion and a frosted pill button and a row of small facts sit at the left. Everything fades and rises in on load, one after another.",
+  "category": "hero",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "video",
+    "photo",
+    "dark",
+    "overlay",
+    "load-in",
+    "minimal"
+  ],
+  "notes": [
+    "forces the dark class on itself so its text stays light over the media in any theme",
+    "height follows the window: 100svh on phones, 100svh minus the 82px header on desktop",
+    "the original's hero was hidden behind a popup in every capture: its layout is inferred"
+  ],
+  "entry": "superpower-hero.tsx",
+  "source": "foundry",
+  "name": "superpower-hero",
+  "files": [
+    {
+      "path": "superpower-hero.css",
+      "content": "/* Load-in: each part fades in and rises 16px, 0.12s after the one before. */\n.superpower-hero-in {\n  animation: superpower-hero-rise 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) both;\n  animation-delay: calc(0.25s + var(--superpower-hero-step, 0) * 0.12s);\n}\n\n@keyframes superpower-hero-rise {\n  from {\n    opacity: 0;\n    transform: translateY(16px);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .superpower-hero-in {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "superpower-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerButton } from \"@foundry/superpower-button\";\nimport { SuperpowerFacts, type SuperpowerFact } from \"@foundry/superpower-facts\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\nimport \"./superpower-hero.css\";\n\nexport interface SuperpowerHeroProps {\n  /** a small line above the headline (e.g. a rating), optional */\n  eyebrow?: ReactNode;\n  /** the headline, two short lines */\n  title: string;\n  /** one or two sentences under it */\n  lead?: string;\n  /** the vermillion button */\n  primary: { label: string; href: string };\n  /** the frosted button next to it */\n  secondary?: { label: string; href: string };\n  /** small facts under the buttons */\n  facts?: SuperpowerFact[];\n  /** the full-window video or photo; empty: a warm placeholder */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n  className?: string;\n}\n\nconst step = (n: number) => ({ \"--superpower-hero-step\": n }) as CSSProperties;\n\nexport function SuperpowerHero({ eyebrow, title, lead, primary, secondary, facts, media, mediaLabel, className }: SuperpowerHeroProps) {\n  return (\n    <section className={cn(\"h-svh bg-background lg:h-[calc(100svh-5.125rem)] lg:px-2 lg:pb-2\", className)}>\n      <div className=\"dark relative flex h-full flex-col justify-end overflow-clip bg-background text-foreground lg:rounded-lg\">\n        <SuperpowerMedia media={media} tone=\"warm\" label={mediaLabel} className=\"absolute inset-0\" />\n        <div className=\"absolute inset-0 bg-linear-to-b from-transparent from-35% to-background/90\" aria-hidden />\n        <div className=\"relative mx-auto w-full max-w-page px-gutter pb-12 lg:pb-16\">\n          {eyebrow && (\n            <div className=\"superpower-hero-in mb-4 text-[0.8125rem]\" style={step(0)}>\n              {eyebrow}\n            </div>\n          )}\n          <h1\n            className=\"superpower-hero-in max-w-[13ch] text-[2rem] leading-[1.12] font-normal tracking-[-0.025em] lg:text-[2.8125rem] lg:leading-[1.2]\"\n            style={step(1)}\n          >\n            {title}\n          </h1>\n          {lead && (\n            <p className=\"superpower-hero-in mt-4 max-w-[26rem] text-[1rem] leading-[1.5] text-foreground/80 lg:text-[1.0625rem]\" style={step(2)}>\n              {lead}\n            </p>\n          )}\n          <div className=\"superpower-hero-in mt-7 flex flex-wrap gap-3\" style={step(3)}>\n            <SuperpowerButton href={primary.href} variant=\"brand\">\n              {primary.label}\n            </SuperpowerButton>\n            {secondary && (\n              <SuperpowerButton href={secondary.href} variant=\"glass\">\n                {secondary.label}\n              </SuperpowerButton>\n            )}\n          </div>\n          {facts && facts.length > 0 && (\n            <div className=\"superpower-hero-in mt-7\" style={step(4)}>\n              <SuperpowerFacts items={facts} />\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-button",
+    "superpower-facts",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small line above the headline (e.g. a rating), optional"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline, two short lines"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "one or two sentences under it"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the vermillion button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the frosted button next to it"
+    },
+    {
+      "name": "facts",
+      "type": "SuperpowerFact[]",
+      "required": false,
+      "description": "small facts under the buttons"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-window video or photo; empty: a warm placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1b7ff76e0c06f077c568d85a755083d27f2e761f167418a1069f9e96451b646f"
+}

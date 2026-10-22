@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Radiant Nuclear intro statements",
+  "description": "A cream section of four short, bold statements stacked top-left, with a very wide picture cropped along the section's bottom edge. As the section scrolls in, the statements change colour word by word from teal to charcoal in reading order, and the picture rises 384px into place from below.",
+  "category": "features",
+  "site": "radiantnuclear",
+  "license": "proprietary",
+  "tags": [
+    "intro",
+    "statement",
+    "text",
+    "bold",
+    "scroll",
+    "scrubbed",
+    "split-text",
+    "colour-scrub",
+    "parallax",
+    "rise",
+    "light"
+  ],
+  "notes": [
+    "a statement may hold \"\\n\" for a deliberate line break",
+    "the picture is wider than the window and cropped by the section (988x480 on phones)",
+    "pure CSS scroll-driven; without scroll timelines or with reduced motion the text is charcoal and the picture sits in place"
+  ],
+  "entry": "radiantnuclear-intro.tsx",
+  "source": "foundry",
+  "name": "radiantnuclear-intro",
+  "files": [
+    {
+      "path": "radiantnuclear-intro.css",
+      "content": "/* Both effects follow the section's own view timeline (--radiantnuclear-intro).\n   The words go from teal to charcoal one after another (each word's slice of the range comes\n   from --rni-at, its place in the text from 0 to 1). The picture rises 384px into place over\n   cover 25%–50% (on the original: page scroll 422–844px at 390). */\n.radiantnuclear-intro {\n  view-timeline: --radiantnuclear-intro block;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .radiantnuclear-intro-word {\n      animation: radiantnuclear-intro-ink linear both;\n      animation-timeline: --radiantnuclear-intro;\n      animation-range: cover calc(6% + var(--rni-at) * 30%) cover calc(10% + var(--rni-at) * 30%);\n    }\n    .radiantnuclear-intro-media {\n      animation: radiantnuclear-intro-rise linear both;\n      animation-timeline: --radiantnuclear-intro;\n      animation-range: cover 25% cover 50%;\n    }\n  }\n}\n\n@keyframes radiantnuclear-intro-ink {\n  from { color: var(--primary); }\n  to { color: var(--foreground); }\n}\n@keyframes radiantnuclear-intro-rise {\n  from { transform: translateY(384px); }\n  to { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "radiantnuclear-intro.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RadiantnuclearSlot } from \"@foundry/radiantnuclear-slot\";\nimport \"./radiantnuclear-intro.css\";\n\nexport interface RadiantnuclearIntroProps {\n  /** short bold statements, one paragraph each; \"\\n\" makes a deliberate line break */\n  statements: string[];\n  /** the very wide picture along the bottom edge; empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function RadiantnuclearIntro({ statements, media, className }: RadiantnuclearIntroProps) {\n  // number every word across all statements, so the colour runs through them in reading order\n  const total = statements.reduce((n, s) => n + s.split(/\\s+/).filter(Boolean).length, 0);\n  let index = 0;\n\n  return (\n    <section className={cn(\"radiantnuclear-intro relative overflow-clip bg-background pt-section font-sans text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex max-w-[22rem] flex-col gap-[1.4375rem] text-xl leading-[1.15] font-bold sm:max-w-[34rem] lg:max-w-[46rem] lg:gap-8 lg:text-[2rem] lg:leading-[1.15]\">\n          {statements.map((s, i) => (\n            <p key={i}>\n              {s.split(\"\\n\").map((line, l) => (\n                <span key={l}>\n                  {l > 0 && <br />}\n                  {line\n                    .split(/\\s+/)\n                    .filter(Boolean)\n                    .map((w, j) => {\n                      const at = total > 1 ? index++ / (total - 1) : 0;\n                      return (\n                        <span key={j}>\n                          {j > 0 && \" \"}\n                          <span className=\"radiantnuclear-intro-word\" style={{ \"--rni-at\": at.toFixed(3) } as CSSProperties}>\n                            {w}\n                          </span>\n                        </span>\n                      );\n                    })}\n                </span>\n              ))}\n            </p>\n          ))}\n        </div>\n      </div>\n\n      {/* the picture is wider than the window and cropped by this frame, like the original's 988x480 map */}\n      <div className=\"relative mt-10 h-[21rem] overflow-clip lg:mt-16 lg:h-[34rem]\">\n        <RadiantnuclearSlot\n          media={media}\n          tone=\"wash\"\n          className=\"radiantnuclear-intro-media absolute top-0 left-1/2 h-[30rem] w-[61.75rem] -translate-x-1/2 lg:h-[42rem] lg:w-[max(100%,86rem)]\"\n        />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "radiantnuclear-slot"
+  ],
+  "props": [
+    {
+      "name": "statements",
+      "type": "string[]",
+      "required": true,
+      "description": "short bold statements, one paragraph each; \"\\n\" makes a deliberate line break"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the very wide picture along the bottom edge; empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a44d64f14d2456ca8a5f18cbf3a2ca755b5fca331bb42bac02f595f9dd20cc56"
+}

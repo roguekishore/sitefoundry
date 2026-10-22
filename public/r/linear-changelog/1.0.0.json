@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear changelog strip",
+  "description": "A 48px 'Changelog' title over a horizontal timeline: four entries, each starting at a small ringed dot on a thin rule (the newest dot glows coral), with a medium-weight title, two clipped grey lines and a monospace capital date, then a grey 'View all →' link. Hidden on phones by default, as on the original.",
+  "category": "features",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "changelog",
+    "timeline",
+    "updates",
+    "dark",
+    "minimal",
+    "hairline",
+    "mono"
+  ],
+  "notes": [
+    "four entries fill the row; the first is marked as the newest (chart-1 colour)",
+    "showOnPhones stacks the entries in a column below lg instead of hiding the block"
+  ],
+  "entry": "linear-changelog.tsx",
+  "source": "foundry",
+  "name": "linear-changelog",
+  "files": [
+    {
+      "path": "linear-changelog.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LinearArrowLink } from \"@foundry/linear-arrow-link\";\n\nexport interface LinearChangelogEntry {\n  /** the release title */\n  title: ReactNode;\n  /** a sentence or two; clipped to two lines */\n  text: ReactNode;\n  /** the date as shown, e.g. \"Oct 8, 2026\" */\n  date: string;\n  href: string;\n}\n\nexport interface LinearChangelogProps {\n  /** the section title */\n  title: ReactNode;\n  /** four entries, newest first */\n  entries: LinearChangelogEntry[];\n  /** the link under the row (e.g. view all) */\n  link?: { label: string; href: string };\n  /** show the block on phones (stacked) instead of hiding it below lg */\n  showOnPhones?: boolean;\n  className?: string;\n}\n\n/** A timeline row of the latest releases. */\nexport function LinearChangelog({ title, entries, link, showOnPhones = false, className }: LinearChangelogProps) {\n  return (\n    <section\n      className={cn(\n        \"border-t border-border bg-background pt-section pb-section text-foreground lg:pt-40 lg:pb-40\",\n        !showOnPhones && \"hidden lg:block\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter\">\n        <h2 className=\"font-display text-[2rem] leading-none font-[510] tracking-[-0.022em] lg:text-5xl\">{title}</h2>\n        <ol className=\"mt-12 grid gap-10 lg:mt-20 lg:grid-cols-4 lg:gap-0 xl:grid-cols-[repeat(3,21rem)_minmax(0,1fr)]\">\n          {entries.map((e, i) => (\n            <li key={i}>\n              <a href={e.href} className=\"group block\">\n                <span aria-hidden className=\"flex items-center\">\n                  <span\n                    className={cn(\n                      \"grid size-4 shrink-0 place-items-center rounded-full\",\n                      i === 0 ? \"bg-chart-1/15\" : \"bg-foreground/10\",\n                    )}\n                  >\n                    <span className={cn(\"size-[5px] rounded-full\", i === 0 ? \"bg-chart-1\" : \"bg-muted-foreground\")} />\n                  </span>\n                  <span className=\"ml-1 h-px flex-1 bg-border\" />\n                </span>\n                <h3 className=\"mt-6 text-[0.9375rem] leading-6 font-[510] text-foreground/90 transition-colors duration-100 group-hover:text-foreground motion-reduce:transition-none lg:mt-[3.75rem]\">\n                  {e.title}\n                </h3>\n                <p className=\"mt-2 line-clamp-2 max-w-[17.5rem] text-[0.9375rem] leading-6 text-muted-foreground\">{e.text}</p>\n                <p className=\"mt-6 font-mono text-xs tracking-[0.04em] text-muted-foreground/70 uppercase\">{e.date}</p>\n              </a>\n            </li>\n          ))}\n        </ol>\n        {link && (\n          <LinearArrowLink href={link.href} className=\"mt-12 lg:mt-[5.5rem]\">\n            {link.label}\n          </LinearArrowLink>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "linear-arrow-link"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "entries",
+      "type": "LinearChangelogEntry[]",
+      "required": true,
+      "description": "four entries, newest first"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the link under the row (e.g. view all)"
+    },
+    {
+      "name": "showOnPhones",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "show the block on phones (stacked) instead of hiding it below lg"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aa41a299df79c3da94d4df0e2c47b6dc748d5544659a291be881ecc3dd0b40cd"
+}

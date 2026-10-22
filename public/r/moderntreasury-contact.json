@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury contact form",
+  "description": "A centred heading and one-line lead over a wide pale-paper card holding a plain sales form: bold muted labels with a faint asterisk, square white inputs with a thin grey border, borderless white selects with an up-down chevron, and a solid ink submit button with an arrow.",
+  "category": "contact",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "lead",
+    "sales",
+    "card",
+    "light",
+    "square",
+    "minimal",
+    "fintech"
+  ],
+  "notes": [
+    "plain HTML form: set action (and method) to post it anywhere; no JavaScript",
+    "fields marked half sit side by side, also on phones"
+  ],
+  "entry": "moderntreasury-contact.tsx",
+  "source": "foundry",
+  "name": "moderntreasury-contact",
+  "files": [
+    {
+      "path": "moderntreasury-contact.tsx",
+      "content": "import { ChevronsUpDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ModerntreasuryButton } from \"@foundry/moderntreasury-button\";\nimport { ModerntreasuryHeading } from \"@foundry/moderntreasury-heading\";\n\nexport interface ModerntreasuryField {\n  /** the visible label */\n  label: string;\n  /** the form field's name */\n  name: string;\n  /** text-like input, or a select */\n  type?: \"text\" | \"email\" | \"tel\" | \"select\";\n  /** the select's choices */\n  options?: string[];\n  /** the select's empty first line, e.g. \"Select an option\" */\n  placeholder?: string;\n  /** marks the label with an asterisk */\n  required?: boolean;\n  /** half width: two half fields share a row */\n  half?: boolean;\n}\n\nexport interface ModerntreasuryContactProps {\n  /** the section title */\n  title: string | string[];\n  /** the line under it */\n  lead?: string;\n  /** the form's fields, in order */\n  fields: ModerntreasuryField[];\n  /** the submit button's label */\n  submitLabel: string;\n  /** where the form posts to */\n  action?: string;\n  className?: string;\n}\n\n/** A centred title over a pale card with a plain, square-cornered sales form. */\nexport function ModerntreasuryContact({ title, lead, fields, submitLabel, action, className }: ModerntreasuryContactProps) {\n  return (\n    <section className={cn(\"bg-background pt-[calc(var(--section-y)*0.66)] pb-[calc(var(--section-y)*1.1)] text-foreground lg:pt-section lg:pb-[calc(var(--section-y)*1.5)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ModerntreasuryHeading title={title} lead={lead} />\n        <form action={action} method=\"post\" className=\"mt-12 rounded-lg bg-muted px-6 pt-7 pb-10 lg:mt-[3.25rem]\">\n          <div className=\"grid grid-cols-2 gap-x-4 gap-y-4\">\n            {fields.map((f) => {\n              const id = `moderntreasury-contact-${f.name}`;\n              return (\n                <div key={f.name} className={cn(f.half ? \"col-span-1\" : \"col-span-2\")}>\n                  <label htmlFor={id} className=\"block text-base leading-6 font-semibold text-foreground/75\">\n                    {f.label}\n                    {f.required && <span className=\"text-foreground/40\">*</span>}\n                  </label>\n                  {f.type === \"select\" ? (\n                    <div className=\"relative mt-1\">\n                      <select\n                        id={id}\n                        name={f.name}\n                        required={f.required}\n                        defaultValue=\"\"\n                        className=\"h-11 w-full appearance-none bg-background px-3 pr-10 text-base text-foreground outline-offset-0 focus-visible:outline-2 focus-visible:outline-ring\"\n                      >\n                        <option value=\"\" disabled>\n                          {f.placeholder}\n                        </option>\n                        {f.options?.map((o) => (\n                          <option key={o}>{o}</option>\n                        ))}\n                      </select>\n                      <ChevronsUpDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2\" strokeWidth={1.75} />\n                    </div>\n                  ) : (\n                    <input\n                      id={id}\n                      name={f.name}\n                      type={f.type ?? \"text\"}\n                      required={f.required}\n                      className=\"mt-0.5 h-[2.625rem] w-full border border-input bg-background px-3 text-base text-foreground focus-visible:border-ring focus-visible:outline-none\"\n                    />\n                  )}\n                </div>\n              );\n            })}\n          </div>\n          <ModerntreasuryButton type=\"submit\" arrow className=\"mt-10 h-[2.625rem] px-4\">\n            {submitLabel}\n          </ModerntreasuryButton>\n        </form>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "moderntreasury-button",
+    "moderntreasury-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "fields",
+      "type": "ModerntreasuryField[]",
+      "required": true,
+      "description": "the form's fields, in order"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the submit button's label"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts to"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "14e61e51515f6f4c514a7b7ddb8bec9ece25e8a2096c5b0ab0d1c91a34be6c71"
+}

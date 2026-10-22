@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Aspen Search two-row footer",
+  "description": "A footer on the hairline grid. Top row: a 38px tagline, stacked links, thin live clock faces for two cities, and email / outbound cells where an ink fill rises on hover. Bottom row: an ink panel with a big plain wordmark and a mono legal line, beside a mint call-to-action panel with a huge hairline arrow. On desktop the bottom row stays pinned to the window's foot while the top row slides up over it.",
+  "category": "footer",
+  "site": "aspensearch",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "swiss",
+    "grid",
+    "mint",
+    "clock",
+    "sticky",
+    "reveal",
+    "hover",
+    "mono"
+  ],
+  "notes": [
+    "needs JavaScript only for the live clocks (static HTML shows the fallback times)",
+    "the sticky reveal is CSS position: sticky, desktop only",
+    "the wordmark is plain text in the display face; pass a logo to sit above it"
+  ],
+  "entry": "aspensearch-footer.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "aspensearch-footer",
+  "files": [
+    {
+      "path": "aspensearch-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AspensearchCityTime, AspensearchClockFace } from \"@foundry/aspensearch-city-time\";\n\nexport interface AspensearchFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface AspensearchFooterClock {\n  /** city name, e.g. \"CHI\" */\n  city: string;\n  /** IANA time zone, e.g. \"America/Chicago\" */\n  timeZone: string;\n  /** what static HTML shows before the live clock runs, e.g. \"09:00 AM\" */\n  fallback: string;\n}\n\nexport interface AspensearchFooterProps {\n  /** the line top left; \"\\n\" breaks it */\n  tagline: string;\n  /** the stacked section links */\n  links: AspensearchFooterLink[];\n  /** cities with a live clock face */\n  clocks: AspensearchFooterClock[];\n  /** the email cell under the links */\n  email: AspensearchFooterLink;\n  /** the outbound link cell beside it (gets a ↗) */\n  social: AspensearchFooterLink;\n  /** the big wordmark on the ink panel (plain text in the display face) */\n  wordmark: string;\n  /** a mark above the wordmark; optional */\n  logo?: ReactNode;\n  /** the mono line bottom left of the ink panel, e.g. \"© 2026 Corvo Talent\" */\n  legal: string;\n  /** small link after it, e.g. privacy */\n  legalLink?: AspensearchFooterLink;\n  /** the mono credit bottom right: text, then an underlined link */\n  credit?: { text: string; link: AspensearchFooterLink };\n  /** the mint panel: a 38px line top left and a small link bottom left, with a big thin arrow */\n  cta: { title: string; label: string; href: string };\n  /** anchor id */\n  id?: string;\n  className?: string;\n}\n\nconst fill =\n  \"relative isolate overflow-clip transition-colors duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:bg-foreground before:transition-transform before:duration-800 before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:text-background hover:before:scale-y-100 motion-reduce:transition-none motion-reduce:before:transition-none\";\n\n/**\n * A two-row footer on the hairline grid. Top row: a tagline in the left half; links, live\n * clock faces, and email / outbound cells (an ink fill rises on hover) in the right half.\n * Bottom row: an ink panel with a large plain wordmark and mono legal line, and a mint panel\n * with a call to action and a big thin arrow. On desktop the bottom row stays pinned to the\n * bottom of the window while the top row slides up over it. Phones stack every cell.\n */\nexport function AspensearchFooter({ tagline, links, clocks, email, social, wordmark, logo, legal, legalLink, credit, cta, id, className }: AspensearchFooterProps) {\n  return (\n    <footer id={id} className={cn(\"relative isolate grid border-t border-border bg-background font-sans tracking-[-0.04em] text-foreground lg:grid-cols-4\", className)}>\n      {/* Top row, above the pinned bottom row. */}\n      <div className=\"relative z-10 grid bg-background lg:col-span-4 lg:h-[29.2vw] lg:grid-cols-4 lg:border-b lg:border-border\">\n        <p className=\"h-[51vw] border-b border-border px-3 pt-5 text-2xl/[1.1] whitespace-pre-line lg:col-span-2 lg:h-auto lg:border-r lg:border-b-0 lg:px-5 lg:text-[2.63vw]/[1.1]\">\n          {tagline}\n        </p>\n        <div className=\"flex flex-col lg:col-span-2 lg:grid lg:grid-cols-2 lg:grid-rows-[1fr_3.75rem]\">\n          <ul className=\"flex flex-col gap-5 border-b border-border px-4 pt-8 pb-7 text-base/none lg:border-b-0 lg:px-6 lg:pt-8\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a href={l.href} className=\"hover:underline\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <ul className=\"flex flex-col gap-5 border-b border-border px-4 pt-6 pb-6 lg:border-b-0 lg:border-l lg:px-6\">\n            {clocks.map((c) => (\n              <li key={c.city} className=\"flex items-center gap-4\">\n                <AspensearchClockFace timeZone={c.timeZone} fallback={c.fallback} />\n                <div>\n                  <p className=\"text-base/tight font-medium\">{c.city}</p>\n                  <AspensearchCityTime timeZone={c.timeZone} fallback={c.fallback} className=\"font-mono text-xs/none tracking-normal text-muted-foreground\" />\n                </div>\n              </li>\n            ))}\n          </ul>\n          <a href={email.href} className={cn(fill, \"flex h-[3.75rem] items-center border-b border-border px-3 text-base/none lg:border-t lg:border-b-0 lg:px-5\")}>\n            {email.label}\n          </a>\n          <a href={social.href} className={cn(fill, \"flex h-[3.75rem] items-center justify-between border-b border-border px-3 text-base/none lg:border-t lg:border-b-0 lg:border-l lg:px-5\")}>\n            {social.label}\n            <ArrowUpRight aria-hidden className=\"size-4\" strokeWidth={1.25} />\n          </a>\n        </div>\n      </div>\n\n      {/* Bottom row: pinned under the top row on desktop. */}\n      <div className=\"grid lg:sticky lg:bottom-0 lg:col-span-4 lg:h-[29.2vw] lg:grid-cols-2\">\n        <a href={cta.href} className=\"group relative order-1 flex min-h-[100vw] flex-col justify-between bg-highlight px-3 pt-4 pb-5 text-highlight-foreground lg:order-2 lg:min-h-0\">\n          <span className=\"text-2xl/[1.1] whitespace-pre-line lg:text-[2.63vw]/[1.1]\">{cta.title}</span>\n          <span className=\"text-base/none\">{cta.label}</span>\n          <ArrowUpRight\n            aria-hidden\n            className=\"absolute right-3 bottom-5 size-28 transition-transform duration-800 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1 group-hover:-translate-y-1 motion-reduce:transition-none\"\n            strokeWidth={1}\n            absoluteStrokeWidth\n          />\n        </a>\n        <div className=\"order-2 flex flex-col items-center justify-between gap-10 bg-foreground px-5 pt-12 pb-6 text-background lg:order-1 lg:pt-[3.5vw]\">\n          <div className=\"flex flex-col items-center gap-3\">\n            {logo}\n            <p className=\"font-display text-[19vw]/none font-medium tracking-[-0.05em] lg:text-[9vw]/none\">{wordmark}</p>\n          </div>\n          <div className=\"flex w-full flex-col items-center gap-2 font-mono text-xs/none tracking-normal uppercase lg:flex-row lg:justify-between\">\n            <p>\n              {legal}\n              {legalLink && (\n                <>\n                  {\" • \"}\n                  <a href={legalLink.href} className=\"normal-case hover:underline\">\n                    {legalLink.label}\n                  </a>\n                </>\n              )}\n            </p>\n            {credit && (\n              <p>\n                {credit.text}{\" \"}\n                <a href={credit.link.href} className=\"underline underline-offset-2\">\n                  {credit.link.label}\n                </a>\n              </p>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "aspensearch-city-time",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "the line top left; \"\\n\" breaks it"
+    },
+    {
+      "name": "links",
+      "type": "AspensearchFooterLink[]",
+      "required": true,
+      "description": "the stacked section links"
+    },
+    {
+      "name": "clocks",
+      "type": "AspensearchFooterClock[]",
+      "required": true,
+      "description": "cities with a live clock face"
+    },
+    {
+      "name": "email",
+      "type": "AspensearchFooterLink",
+      "required": true,
+      "description": "the email cell under the links"
+    },
+    {
+      "name": "social",
+      "type": "AspensearchFooterLink",
+      "required": true,
+      "description": "the outbound link cell beside it (gets a ↗)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the big wordmark on the ink panel (plain text in the display face)"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a mark above the wordmark; optional"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": true,
+      "description": "the mono line bottom left of the ink panel, e.g. \"© 2026 Corvo Talent\""
+    },
+    {
+      "name": "legalLink",
+      "type": "AspensearchFooterLink",
+      "required": false,
+      "description": "small link after it, e.g. privacy"
+    },
+    {
+      "name": "credit",
+      "type": "{ text: string; link: AspensearchFooterLink; }",
+      "required": false,
+      "description": "the mono credit bottom right: text, then an underlined link"
+    },
+    {
+      "name": "cta",
+      "type": "{ title: string; label: string; href: string; }",
+      "required": true,
+      "description": "the mint panel: a 38px line top left and a small link bottom left, with a big thin arrow"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a7ce9f849f6a09e5400343adfe7d50c39b534735ae1f19e8495e44e887aa9587"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Linear customer quotes",
+  "description": "Two tall quote cards side by side in a faint rounded frame: a wide one in a pale blue-to-lavender glow and a narrow one in electric lime, each with a large hanging-quote line at the top and the speaker, role and company at the bottom behind a thin divider. A grey line with a bold figure and a 'Customer stories →' link sit underneath. The row comes into focus out of a blur as it scrolls into view; cards brighten slightly on hover. On phones the cards swipe sideways.",
+  "category": "testimonials",
+  "site": "linear",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "cards",
+    "dark",
+    "pastel",
+    "lime",
+    "gradient",
+    "reveal",
+    "blur",
+    "scroll",
+    "swipe"
+  ],
+  "notes": [
+    "two quotes read best (wide + narrow); more add further narrow cards",
+    "card colours: glow → chart-5 gradient and highlight, with highlight-foreground text; works on any theme where those are light",
+    "the blur-in is a CSS scroll-driven animation; browsers without it, and reduced motion, show the cards in focus"
+  ],
+  "entry": "linear-customers.tsx",
+  "source": "foundry",
+  "name": "linear-customers",
+  "files": [
+    {
+      "path": "linear-customers.css",
+      "content": "/* The card row comes into focus out of a blur over its first 260px of entering the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .linear-customers-row {\n      animation: linear-customers-focus linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 260px;\n    }\n  }\n}\n\n@keyframes linear-customers-focus {\n  from { filter: blur(12px); opacity: 0.4; }\n  to { filter: blur(0); opacity: 1; }\n}\n"
+    },
+    {
+      "path": "linear-customers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LinearArrowLink } from \"@foundry/linear-arrow-link\";\nimport \"./linear-customers.css\";\n\nexport interface LinearCustomerQuote {\n  /** the quote, without quotation marks */\n  quote: ReactNode;\n  /** the speaker */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** the company's mark or wordmark, left of the divider */\n  logo?: ReactNode;\n  /** glow: pale blue-to-lavender · highlight: the lime card */\n  tone?: \"glow\" | \"highlight\";\n  href?: string;\n}\n\nexport interface LinearCustomersProps {\n  /** the first is the wide card */\n  quotes: LinearCustomerQuote[];\n  /** the grey line under the cards (bold a figure with <strong>) */\n  summary?: ReactNode;\n  /** the link at the right of that line */\n  link?: { label: string; href: string };\n  className?: string;\n}\n\nconst tones = {\n  glow: \"bg-linear-to-b from-glow to-chart-5\",\n  highlight: \"bg-highlight\",\n};\n\n/** Two big colour quote cards with a summary line under them. */\nexport function LinearCustomers({ quotes, summary, link, className }: LinearCustomersProps) {\n  return (\n    <section className={cn(\"bg-background pt-10 pb-24 text-foreground lg:pt-0 lg:pb-56\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] lg:px-gutter\">\n        <div className=\"lg:-mx-3 lg:rounded-2xl xl:-mx-8 lg:border lg:border-border/60 lg:p-3\">\n          <ul className=\"linear-customers-row flex snap-x snap-mandatory scroll-px-2 gap-2 overflow-x-auto px-2 [scrollbar-width:none] lg:grid lg:grid-cols-[minmax(0,880fr)_minmax(0,432fr)] lg:overflow-visible lg:px-0\">\n            {quotes.map((q, i) => {\n              const Card = q.href ? \"a\" : \"div\";\n              return (\n                <li key={i} className=\"w-[82vw] max-w-[21rem] shrink-0 snap-start lg:w-auto lg:max-w-none\">\n                  <Card\n                    href={q.href}\n                    className={cn(\n                      \"flex h-[22.875rem] flex-col justify-between rounded-lg p-5 pt-6 text-highlight-foreground transition-[filter] duration-150 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:brightness-110 motion-reduce:transition-none lg:h-[30rem] lg:pt-8\",\n                      tones[q.tone ?? (i === 0 ? \"glow\" : \"highlight\")],\n                    )}\n                  >\n                    <blockquote className=\"max-w-[16em] pl-[0.4em] -indent-[0.4em] text-2xl leading-8 tracking-[-0.012em] lg:text-[2rem] lg:leading-9 lg:tracking-[-0.02em]\">\n                      <span aria-hidden>“</span>\n                      {q.quote}\n                      <span aria-hidden>”</span>\n                    </blockquote>\n                    <div className=\"flex items-center gap-4 pl-2\">\n                      {q.logo && <span className=\"flex h-10 items-center border-r border-highlight-foreground/15 pr-4 [&_svg]:size-8\">{q.logo}</span>}\n                      <span className=\"text-sm leading-5\">\n                        <span className=\"block font-[510]\">{q.name}</span>\n                        <span className=\"block text-highlight-foreground/60\">{q.role}</span>\n                      </span>\n                    </div>\n                  </Card>\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n\n        {(summary || link) && (\n          <div className=\"mt-8 flex flex-col gap-4 px-gutter sm:flex-row sm:items-baseline sm:justify-between lg:mt-[3.25rem] lg:px-0\">\n            {summary && <p className=\"text-[0.9375rem] leading-6 text-muted-foreground [&_strong]:font-[590] [&_strong]:text-foreground\">{summary}</p>}\n            {link && <LinearArrowLink href={link.href}>{link.label}</LinearArrowLink>}\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "linear-arrow-link"
+  ],
+  "props": [
+    {
+      "name": "quotes",
+      "type": "LinearCustomerQuote[]",
+      "required": true,
+      "description": "the first is the wide card"
+    },
+    {
+      "name": "summary",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the grey line under the cards (bold a figure with <strong>)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the link at the right of that line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4a5c684c660283d3789ab4bd80a56be3c445cd6617d1a2b3aa882e42349de470"
+}

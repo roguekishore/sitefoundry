@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Granola media slot",
+  "description": "A frame for an image, video or screenshot that crops it like object-fit: cover, and shows a plain token-coloured placeholder (warm grey, oat card, soft lime wash, ink or a two-tone art field) while it's empty.",
+  "category": "media",
+  "site": "granola",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "minimal"
+  ],
+  "notes": [
+    "size, aspect ratio and radius come from className"
+  ],
+  "entry": "granola-media.tsx",
+  "source": "foundry",
+  "name": "granola-media",
+  "files": [
+    {
+      "path": "granola-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GranolaMediaProps {\n  /** the real image, video or screenshot; it is cropped to the frame like object-fit: cover */\n  children?: ReactNode;\n  /**\n   * the placeholder surface while no media is given: muted (warm grey) · oat (the card surface,\n   * with a hairline) · glow (a soft wash from highlight to glow) · ink (dark) · field (a wide\n   * two-tone highlight and lilac field for full-bleed art)\n   */\n  tone?: \"muted\" | \"oat\" | \"glow\" | \"ink\" | \"field\";\n  /** size, aspect ratio, radius and shadow of the frame */\n  className?: string;\n}\n\nconst tones = {\n  muted: \"bg-muted\",\n  oat: \"border border-border bg-card\",\n  glow: \"bg-[linear-gradient(150deg,color-mix(in_oklab,var(--highlight)_45%,var(--muted)),var(--muted)_55%,color-mix(in_oklab,var(--glow)_30%,var(--muted)))]\",\n  ink: \"bg-foreground/85\",\n  field: \"bg-[linear-gradient(90deg,var(--highlight)_0%,var(--highlight)_23%,color-mix(in_oklab,var(--chart-2)_70%,var(--chart-3))_23%,var(--chart-3)_100%)]\",\n};\n\n/** A media slot: the given media cropped to the frame, or a token-coloured placeholder of the same size. */\nexport function GranolaMedia({ children, tone = \"muted\", className }: GranolaMediaProps) {\n  if (children) {\n    return <div className={cn(\"relative overflow-hidden [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\", className)}>{children}</div>;\n  }\n  return <div aria-hidden className={cn(\"relative\", tones[tone], className)} />;\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the real image, video or screenshot; it is cropped to the frame like object-fit: cover"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "the placeholder surface while no media is given: muted (warm grey) · oat (the card surface,\nwith a hairline) · glow (a soft wash from highlight to glow) · ink (dark) · field (a wide\ntwo-tone highlight and lilac field for full-bleed art)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, aspect ratio, radius and shadow of the frame"
+    }
+  ],
+  "hash": "5c330fc9811ff4375dfe3e47387ef0433074450b069357bbcfd87cc51461fa06"
+}

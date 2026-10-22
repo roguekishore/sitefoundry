@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Warp numbered feature list",
+  "description": "Typed tag, mono title and lead over a bordered two-column panel: on the left a stack of numbered rows (small grey number, geometric semibold title, muted mono line), on the right a tall product shot. A soft grey highlight steps down the rows one at a time, on a loop. Phones show the rows alone.",
+  "category": "features",
+  "site": "warp",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "numbered",
+    "split",
+    "light",
+    "mono",
+    "developer",
+    "loop",
+    "highlight",
+    "reveal",
+    "typewriter"
+  ],
+  "notes": [
+    "the stepping highlight is CSS only (2 to 8 rows); with reduced motion the first row stays highlighted",
+    "the product shot is a media slot (hidden on phones, like the original)"
+  ],
+  "entry": "warp-sdlc.tsx",
+  "source": "foundry",
+  "name": "warp-sdlc",
+  "files": [
+    {
+      "path": "warp-sdlc.css",
+      "content": "/* The highlight steps down the rows: each row is lit for 1/n of an n × 3.5s loop, starting\n   at its own offset. One keyframes rule per row count (2–8). */\n.warp-sdlc-row { background-color: transparent; }\n.warp-sdlc-row:first-child { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n\n@media (prefers-reduced-motion: no-preference) {\n  .warp-sdlc-row,\n  .warp-sdlc-row:first-child {\n    background-color: transparent;\n    animation-duration: calc(var(--warp-sdlc-n) * 3.5s);\n    animation-delay: calc((var(--warp-sdlc-i) - var(--warp-sdlc-n)) * 3.5s);\n    animation-iteration-count: infinite;\n    animation-timing-function: linear;\n    animation-fill-mode: both;\n  }\n}\n\n@keyframes warp-sdlc-lit-2 {\n  0%, 49.50% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  50.00%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-3 {\n  0%, 32.83% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  33.33%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-4 {\n  0%, 24.50% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  25.00%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-5 {\n  0%, 19.50% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  20.00%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-6 {\n  0%, 16.17% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  16.67%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-7 {\n  0%, 13.79% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  14.29%, 100% { background-color: transparent; }\n}\n@keyframes warp-sdlc-lit-8 {\n  0%, 12.00% { background-color: color-mix(in oklab, var(--foreground) 7%, transparent); }\n  12.50%, 100% { background-color: transparent; }\n}\n"
+    },
+    {
+      "path": "warp-sdlc.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WarpMedia } from \"@foundry/warp-media\";\nimport { WarpSection } from \"@foundry/warp-section\";\nimport \"./warp-sdlc.css\";\n\nexport interface WarpSdlcItem {\n  title: string;\n  text: string;\n}\n\nexport interface WarpSdlcProps {\n  id?: string;\n  /** the typed label above the title */\n  tag?: string;\n  /** shown in brackets after the tag */\n  status?: string;\n  title: string;\n  lead?: string;\n  /** the numbered rows (2 to 8 for the stepping highlight) */\n  items: WarpSdlcItem[];\n  /** the tall product shot at the right (desktop); a placeholder when empty */\n  media?: ReactNode;\n  /** what the product shot shows, for screen readers */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Numbered rows beside a tall product shot; a highlight steps down the rows. */\nexport function WarpSdlc({ id, tag, status, title, lead, items, media, mediaLabel, className }: WarpSdlcProps) {\n  const n = Math.min(Math.max(items.length, 2), 8);\n  return (\n    <WarpSection id={id} tag={tag} status={status} title={title} lead={lead} className={className}>\n      <div className=\"grid grid-cols-1 border border-border bg-card lg:grid-cols-2\">\n        <ol className=\"flex flex-col\">\n          {items.map((item, i) => (\n            <li\n              key={item.title}\n              className=\"warp-sdlc-row flex min-h-[7.375rem] gap-4 border-b border-border px-5 pt-6 pb-7 last:border-b-0 lg:min-h-32 lg:gap-3.5 lg:pt-[1.625rem]\"\n              style={{ \"--warp-sdlc-n\": n, \"--warp-sdlc-i\": i, animationName: i < 8 ? `warp-sdlc-lit-${n}` : undefined } as CSSProperties}\n            >\n              <span className=\"w-[1.125rem] shrink-0 pt-1 font-mono text-[0.6875rem] text-muted-foreground\">{String(i + 1).padStart(2, \"0\")}</span>\n              <div className=\"min-w-0\">\n                <h3 className=\"font-display text-[1.1875rem] leading-[1.5] font-bold tracking-[-0.02em]\">{item.title}</h3>\n                <p className=\"mt-1.5 text-[0.8125rem] leading-[1.6] tracking-[calc(0.03em_-_var(--warp-squeeze,0em))] text-muted-foreground\">{item.text}</p>\n              </div>\n            </li>\n          ))}\n        </ol>\n        <WarpMedia label={mediaLabel} className={cn(\"hidden min-h-full border-l border-border lg:block\")}>\n          {media}\n        </WarpMedia>\n      </div>\n    </WarpSection>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "warp-media",
+    "warp-section"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": false,
+      "description": "the typed label above the title"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": false,
+      "description": "shown in brackets after the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "items",
+      "type": "WarpSdlcItem[]",
+      "required": true,
+      "description": "the numbered rows (2 to 8 for the stepping highlight)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall product shot at the right (desktop); a placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the product shot shows, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e788990b37fd7d4ca0310e4222e1db1e5024d4e444e02ed5ad676178c97737ca"
+}

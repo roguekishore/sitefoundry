@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Sharplink hero",
+  "description": "A dark first screen exactly the window's height: a full-bleed media slot over a black-to-blue sky, a huge two-line headline top left with two stacked square buttons under it, and a bottom row on a 12-column grid: a listing line with an exchange mark, a lead paragraph, and a glass news card. As you scroll away it shrinks to 85%, drifts down and fades out.",
+  "category": "hero",
+  "site": "sharplink",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "fullscreen",
+    "video",
+    "gradient",
+    "blue",
+    "glass",
+    "scrubbed",
+    "scroll",
+    "parallax"
+  ],
+  "notes": [
+    "always dark: it carries the .dark class, so it uses the theme's dark colours on a light page",
+    "media fills the window like object-fit: cover; empty, it shows a black-to-glow gradient placeholder",
+    "the exit (scale, drift, fade) is a CSS view timeline; off without support and under reduced motion"
+  ],
+  "entry": "sharplink-hero.tsx",
+  "source": "foundry",
+  "name": "sharplink-hero",
+  "files": [
+    {
+      "path": "sharplink-hero.css",
+      "content": "/* While the hero leaves the window it shrinks to 85%, drifts down half its height (so it seems\n   to stay behind) and fades out, scrubbed with the scroll. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .sharplink-hero {\n      view-timeline-name: --sharplink-hero;\n    }\n    .sharplink-hero-stage {\n      transform-origin: 50% 100%;\n      animation: sharplink-hero-out linear both;\n      animation-timeline: --sharplink-hero;\n      animation-range: exit 0% exit 100%;\n    }\n  }\n}\n\n@keyframes sharplink-hero-out {\n  to {\n    transform: translateY(45%) scale(0.85);\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "sharplink-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SharplinkButton } from \"@foundry/sharplink-button\";\nimport { SharplinkLabel } from \"@foundry/sharplink-label\";\nimport \"./sharplink-hero.css\";\n\nexport interface SharplinkHeroLink {\n  /** the button text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface SharplinkHeroNews {\n  /** small label, e.g. the kind of news */\n  label: string;\n  /** the date, as shown */\n  date: string;\n  /** the headline */\n  title: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface SharplinkHeroProps {\n  /** the headline; \"\\n\" breaks the line */\n  title: string;\n  /** the main button (solid, with the sliding arrow) */\n  primary: SharplinkHeroLink;\n  /** the second, tinted button under it */\n  secondary?: SharplinkHeroLink;\n  /** the small label before the exchange mark, e.g. \"Listed on\" */\n  listedLabel?: string;\n  /** the exchange's mark or name */\n  exchange?: ReactNode;\n  /** the lead paragraph in the bottom row */\n  lead: string;\n  /** a news card at the bottom right (below the first screen on phones) */\n  news?: SharplinkHeroNews;\n  /** full-bleed background: a video or image filling the window; a gradient placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Dark, window-tall first screen with a headline, stacked buttons and a news card. */\nexport function SharplinkHero({ title, primary, secondary, listedLabel, exchange, lead, news, media, className }: SharplinkHeroProps) {\n  return (\n    <section\n      data-sharplink-tone=\"dark\"\n      className={cn(\"sharplink-hero dark relative isolate overflow-clip text-foreground\", className)}\n    >\n      <div className=\"sharplink-hero-stage relative isolate flex min-h-svh flex-col bg-background\">\n        <div className=\"absolute inset-0 -z-10 [&>*]:h-full [&>*]:w-full [&>*]:object-cover\">\n          {media ?? (\n            <div className=\"bg-[linear-gradient(to_bottom,var(--background)_8%,color-mix(in_oklab,var(--glow)_40%,var(--background))_42%,var(--glow)_72%,color-mix(in_oklab,var(--glow)_70%,var(--foreground))_100%)]\" />\n          )}\n        </div>\n\n        <div className=\"mx-auto w-full max-w-page px-gutter pt-[6.5rem]\">\n          <h1 className=\"font-display text-[3.25rem] leading-[1.04] font-medium tracking-[-0.025em] whitespace-pre-line lg:text-[5.5rem] lg:leading-[0.96] lg:tracking-[-0.03em]\">\n            {title}\n          </h1>\n          <div className=\"mt-8 inline-flex flex-col gap-1\">\n            <SharplinkButton href={primary.href} fullWidth>\n              {primary.label}\n            </SharplinkButton>\n            {secondary && (\n              <SharplinkButton href={secondary.href} variant=\"tint\" fullWidth>\n                {secondary.label}\n              </SharplinkButton>\n            )}\n          </div>\n        </div>\n\n        <div className=\"mx-auto mt-auto grid w-full max-w-page gap-5 px-gutter pt-16 pb-8 lg:grid-cols-12 lg:items-end lg:gap-x-gutter lg:pb-6\">\n          {(listedLabel || exchange) && (\n            <div className=\"flex items-center gap-3 lg:col-span-3\">\n              {listedLabel && <SharplinkLabel>{listedLabel}</SharplinkLabel>}\n              {exchange && <span className=\"flex items-center text-foreground [&_svg]:h-6 [&_svg]:w-auto\">{exchange}</span>}\n            </div>\n          )}\n          <p className=\"max-w-[24rem] text-[1.1875rem] leading-[1.35] font-medium tracking-[-0.01em] lg:col-span-5 lg:col-start-4\">\n            {lead}\n          </p>\n          {news && (\n            <div className=\"hidden lg:col-span-4 lg:col-start-9 lg:block\">\n              <NewsCard {...news} />\n            </div>\n          )}\n        </div>\n      </div>\n\n      {news && (\n        <div className=\"bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--glow)_70%,var(--foreground))_0%,color-mix(in_oklab,var(--glow)_70%,var(--foreground))_35%,transparent_100%)] px-gutter pt-2 pb-28 lg:hidden\">\n          <NewsCard {...news} />\n        </div>\n      )}\n    </section>\n  );\n}\n\nfunction NewsCard({ label, date, title, href }: SharplinkHeroNews) {\n  return (\n    <a href={href} className=\"group relative block bg-background/40 p-5 backdrop-blur-md\">\n      <span aria-hidden className=\"absolute top-0 left-0 size-1 bg-highlight\" />\n      <span className=\"flex items-center justify-between gap-4\">\n        <SharplinkLabel>{label}</SharplinkLabel>\n        <SharplinkLabel tone=\"muted\">{date}</SharplinkLabel>\n      </span>\n      <span className=\"mt-4 flex items-center justify-between gap-6\">\n        <span className=\"line-clamp-2 max-w-[17rem] text-base leading-[1.35] font-medium tracking-[-0.01em]\">{title}</span>\n        <span\n          aria-hidden\n          className=\"grid size-8 shrink-0 place-items-center bg-foreground/10 transition-colors duration-[250ms] group-hover:bg-primary group-hover:text-primary-foreground motion-reduce:transition-none\"\n        >\n          <ArrowRight className=\"size-4\" strokeWidth={1.5} />\n        </span>\n      </span>\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "sharplink-button",
+    "sharplink-label"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; \"\\n\" breaks the line"
+    },
+    {
+      "name": "primary",
+      "type": "SharplinkHeroLink",
+      "required": true,
+      "description": "the main button (solid, with the sliding arrow)"
+    },
+    {
+      "name": "secondary",
+      "type": "SharplinkHeroLink",
+      "required": false,
+      "description": "the second, tinted button under it"
+    },
+    {
+      "name": "listedLabel",
+      "type": "string",
+      "required": false,
+      "description": "the small label before the exchange mark, e.g. \"Listed on\""
+    },
+    {
+      "name": "exchange",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the exchange's mark or name"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the lead paragraph in the bottom row"
+    },
+    {
+      "name": "news",
+      "type": "SharplinkHeroNews",
+      "required": false,
+      "description": "a news card at the bottom right (below the first screen on phones)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "full-bleed background: a video or image filling the window; a gradient placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "06e56f80a15c47f3030876e4db92355913f0f09814ceb77fe2365d20b39ad896"
+}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp hero",
+  "description": "A left-aligned light hero over a faint dot grid: a small uppercase eyebrow with a live, ticking mono counter in a grey chip, a huge single-weight headline, a grey subline, an email bar with an acid-lime button, and a wide 12px-rounded product frame below. Everything rises in on load in a quick stagger.",
+  "category": "hero",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "minimal",
+    "dot-grid",
+    "email",
+    "counter",
+    "load-in",
+    "stagger",
+    "fintech",
+    "lime"
+  ],
+  "notes": [
+    "media fills the product frame (square on phones, 1310×584 on desktop); empty, it shows a plain grey placeholder",
+    "load-in is CSS; JavaScript only ticks the eyebrow counter"
+  ],
+  "hydrate": "load",
+  "entry": "ramp-hero.tsx",
+  "source": "foundry",
+  "name": "ramp-hero",
+  "files": [
+    {
+      "path": "ramp-hero.css",
+      "content": "/* Load: each piece fades and rises 16px, staggered by inline animation-delay. */\n@media (prefers-reduced-motion: no-preference) {\n  .ramp-hero-rise {\n    animation: ramp-hero-rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;\n  }\n}\n\n@keyframes ramp-hero-rise {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: none; }\n}\n\n/* The faint dot field behind the hero, fading out towards the bottom. */\n.ramp-hero-dots {\n  background-image: radial-gradient(circle, color-mix(in oklab, var(--foreground) 22%, transparent) 1px, transparent 1.4px);\n  background-size: 14px 14px;\n  mask-image: linear-gradient(to bottom, black 30%, transparent 85%);\n}\n"
+    },
+    {
+      "path": "ramp-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampEmailForm, type RampEmailFormProps } from \"@foundry/ramp-email-form\";\nimport { RampHeading } from \"@foundry/ramp-heading\";\nimport { RampLiveNumber, type RampLiveNumberProps } from \"@foundry/ramp-live-number\";\nimport \"./ramp-hero.css\";\n\nexport interface RampHeroProps {\n  /** the small uppercase line above the headline */\n  eyebrow?: string;\n  /** the live figure in a grey chip after the eyebrow (optional) */\n  counter?: RampLiveNumberProps;\n  /** the big headline */\n  title: string;\n  /** the grey line under it */\n  subtitle?: string;\n  /** the email sign-up bar */\n  form: RampEmailFormProps;\n  /** the product shot (image or video); empty shows a placeholder of the same frame */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Ramp's opening screen: left-aligned headline and sign-up over a dot grid, a wide product frame below. */\nexport function RampHero({ eyebrow, counter, title, subtitle, form, media, className }: RampHeroProps) {\n  return (\n    <section className={cn(\"relative isolate bg-background text-foreground\", className)}>\n      <div aria-hidden className=\"ramp-hero-dots absolute inset-0 -z-10\" />\n      <div className=\"mx-auto max-w-page px-gutter pt-12 pb-16 lg:px-[calc(var(--page-gutter)*4)] lg:pt-[5.25rem]\">\n        {eyebrow && (\n          <p className=\"ramp-hero-rise flex flex-wrap items-center gap-2 text-xs text-muted-foreground uppercase\">\n            {eyebrow}\n            {counter && (\n              <span className=\"rounded-[calc(var(--radius)-9px)] bg-muted px-1.5 py-0.5 text-xs text-foreground normal-case\">\n                <RampLiveNumber {...counter} />\n              </span>\n            )}\n          </p>\n        )}\n        <RampHeading as=\"h1\" size=\"display\" lead={title} className=\"ramp-hero-rise mt-6 lg:mt-7\" />\n        {subtitle && (\n          <p className=\"ramp-hero-rise mt-3 text-lg/6 text-muted-foreground lg:text-xl/7\" style={{ animationDelay: \"80ms\" }}>\n            {subtitle}\n          </p>\n        )}\n        <div className=\"ramp-hero-rise mt-6 lg:mt-8\" style={{ animationDelay: \"160ms\" }}>\n          <RampEmailForm {...form} />\n        </div>\n        <div\n          className=\"ramp-hero-rise relative mt-10 aspect-square overflow-clip rounded-lg border border-border bg-muted sm:aspect-[16/9] lg:mt-12 lg:aspect-[1310/584]\"\n          style={{ animationDelay: \"260ms\" }}\n        >\n          {media ?? <div aria-hidden className=\"absolute inset-0 bg-gradient-to-b from-muted to-accent\" />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-email-form",
+    "ramp-heading",
+    "ramp-live-number"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small uppercase line above the headline"
+    },
+    {
+      "name": "counter",
+      "type": "any",
+      "required": false,
+      "description": "the live figure in a grey chip after the eyebrow (optional)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big headline"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "form",
+      "type": "RampEmailFormProps",
+      "required": true,
+      "description": "the email sign-up bar"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product shot (image or video); empty shows a placeholder of the same frame"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9be7029c7f896d5934827774cadc2845552297055d9144e11f683edf9bbd9728"
+}

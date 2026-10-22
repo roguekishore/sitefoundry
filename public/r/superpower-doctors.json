@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superpower doctors row",
+  "description": "A large left-aligned headline over a sideways-scrolling row of clinicians. On desktop each is a wide card: a tall rounded portrait beside an institution mark, name, grey role, a two-line bio and an underlined link, with hairlines between cards. On phones the row becomes two-high columns of small square portraits with name and role, a strip of institution marks above.",
+  "category": "testimonials",
+  "site": "superpower",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "doctors",
+    "experts",
+    "carousel",
+    "horizontal-scroll",
+    "snap",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "native horizontal scroll with snap points; no JavaScript"
+  ],
+  "entry": "superpower-doctors.tsx",
+  "source": "foundry",
+  "name": "superpower-doctors",
+  "files": [
+    {
+      "path": "superpower-doctors.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperpowerMedia } from \"@foundry/superpower-media\";\n\nexport interface SuperpowerDoctor {\n  name: string;\n  role: string;\n  /** one or two sentences (desktop only) */\n  bio?: string;\n  /** the institution's wordmark above the name (desktop only) */\n  institution?: ReactNode;\n  /** the portrait; empty: a placeholder */\n  photo?: ReactNode;\n  link?: { label: string; href: string };\n}\n\nexport interface SuperpowerDoctorsProps {\n  title: string;\n  /** a strip of institution marks under the title (phones only) */\n  institutions?: { name: string; mark: ReactNode }[];\n  doctors: SuperpowerDoctor[];\n  id?: string;\n  className?: string;\n}\n\n// lines the first card up with the page content while the row runs to the window edges\nconst edge = \"px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))]\";\nconst snapEdge = \"scroll-px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))]\";\n\nexport function SuperpowerDoctors({ title, institutions, doctors, id, className }: SuperpowerDoctorsProps) {\n  return (\n    <section id={id} className={cn(\"bg-background py-12 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <h2 className=\"max-w-[46rem] text-[1.5rem] leading-[1.3] font-normal tracking-[-0.02em] lg:text-[3.5rem] lg:leading-[1.12] lg:tracking-[-0.03em]\">\n          {title}\n        </h2>\n        {institutions && institutions.length > 0 && (\n          <ul className=\"mt-8 flex items-center justify-between gap-3 text-muted-foreground/70 lg:hidden\">\n            {institutions.map((inst) => (\n              <li key={inst.name} aria-label={inst.name} role=\"img\" className=\"flex h-6 items-center [&>*]:[zoom:0.56]\">\n                {inst.mark}\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n      <div\n        className={cn(\n          \"mt-6 snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] lg:mt-16 [&::-webkit-scrollbar]:hidden\",\n          edge,\n          snapEdge,\n        )}\n      >\n        <ul className=\"grid w-max auto-cols-[18rem] grid-flow-col grid-rows-2 gap-x-10 lg:auto-cols-[33.5rem] lg:grid-rows-1 lg:gap-x-[3.75rem]\">\n          {doctors.map((d) => (\n            <li\n              key={d.name}\n              className=\"relative flex snap-start gap-4 border-b border-border py-4 lg:gap-8 lg:border-b-0 lg:py-0 lg:after:absolute lg:after:inset-y-0 lg:after:-right-[1.875rem] lg:after:w-px lg:after:bg-border\"\n            >\n              <SuperpowerMedia media={d.photo} className=\"size-[4.25rem] shrink-0 rounded-sm lg:h-[15.5rem] lg:w-[12.875rem] lg:rounded-lg\" />\n              <div className=\"min-w-0 lg:pt-1.5\">\n                {d.institution && <div className=\"hidden h-12 items-start text-muted-foreground/70 lg:flex\">{d.institution}</div>}\n                <h3 className=\"text-[1.125rem] leading-[1.3] font-normal tracking-[-0.01em] lg:mt-8\">{d.name}</h3>\n                <p className=\"mt-2 text-[0.8125rem] leading-[1.45] text-muted-foreground lg:mt-1.5\">{d.role}</p>\n                {d.bio && <p className=\"mt-5 hidden text-[0.8125rem] leading-[1.5] lg:block\">{d.bio}</p>}\n                {d.link && (\n                  <a\n                    href={d.link.href}\n                    className=\"mt-3 hidden text-[0.8125rem] underline underline-offset-[3px] transition-opacity duration-200 hover:opacity-80 lg:inline-block\"\n                  >\n                    {d.link.label}\n                  </a>\n                )}\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "superpower-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "institutions",
+      "type": "{ name: string; mark: ReactNode; }[]",
+      "required": false,
+      "description": "a strip of institution marks under the title (phones only)"
+    },
+    {
+      "name": "doctors",
+      "type": "SuperpowerDoctor[]",
+      "required": true
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "22a0481b85383e4d6884df063d83c0ad9822b98b169c18f8710f7809f2cd2712"
+}

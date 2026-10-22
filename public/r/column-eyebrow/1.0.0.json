@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Column eyebrow",
+  "description": "A small uppercase monospaced tag on a faint tinted chip with a hairline edge, in the section's accent colour, optionally followed by a blinking block cursor like a terminal prompt.",
+  "category": "text-effect",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "eyebrow",
+    "label",
+    "mono",
+    "terminal",
+    "cursor",
+    "blink",
+    "developer",
+    "minimal"
+  ],
+  "notes": [
+    "tone picks the accent token (primary, highlight, chart-1…5); also exports ColumnTone and toneVar() for the site's other blocks",
+    "the cursor blink is CSS; it stays solid under reduced motion"
+  ],
+  "entry": "column-eyebrow.tsx",
+  "source": "foundry",
+  "name": "column-eyebrow",
+  "files": [
+    {
+      "path": "column-eyebrow.css",
+      "content": "/* A terminal-style block cursor: on for half a second, off for half. */\n.column-eyebrow-cursor {\n  animation: column-eyebrow-blink 1s steps(1, end) infinite;\n}\n\n@keyframes column-eyebrow-blink {\n  0% { opacity: 1; }\n  50% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-eyebrow-cursor { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-eyebrow.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./column-eyebrow.css\";\n\n/** The accent colours a section can wear: theme tokens only. */\nexport type ColumnTone = \"primary\" | \"highlight\" | \"chart-1\" | \"chart-2\" | \"chart-3\" | \"chart-4\" | \"chart-5\";\n\n/** CSS value for a tone, e.g. `var(--chart-2)`. */\nexport function toneVar(tone: ColumnTone) {\n  return `var(--${tone})`;\n}\n\n/** Inline style that sets `--tone`, so classes like `text-[var(--tone)]` pick the accent up. */\nexport function toneStyle(tone: ColumnTone): CSSProperties {\n  return { \"--tone\": toneVar(tone) } as CSSProperties;\n}\n\nexport interface ColumnEyebrowProps {\n  /** the label; shown in uppercase */\n  children: ReactNode;\n  /** accent colour of the text and the tinted chip */\n  tone?: ColumnTone;\n  /** show a blinking block cursor after the label */\n  cursor?: boolean;\n  className?: string;\n}\n\nexport function ColumnEyebrow({ children, tone = \"highlight\", cursor, className }: ColumnEyebrowProps) {\n  return (\n    <p\n      style={toneStyle(tone)}\n      className={cn(\n        \"inline-flex h-[1.625rem] items-center gap-1.5 rounded-sm border border-[color-mix(in_oklab,var(--tone)_14%,transparent)] bg-[color-mix(in_oklab,var(--tone)_9%,transparent)] px-2 font-mono text-xs/none font-medium tracking-[0.06em] text-[color-mix(in_oklab,var(--tone)_85%,var(--foreground))] uppercase\",\n        className,\n      )}\n    >\n      <span>{children}</span>\n      {cursor && <span aria-hidden className=\"column-eyebrow-cursor h-3 w-1.5 rounded-[1px] bg-[color-mix(in_oklab,var(--tone)_35%,transparent)]\" />}\n    </p>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label; shown in uppercase"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "highlight",
+      "description": "accent colour of the text and the tinted chip"
+    },
+    {
+      "name": "cursor",
+      "type": "boolean",
+      "required": false,
+      "description": "show a blinking block cursor after the label"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7faf969f9218a1e3109bf165ab0801b587dd35f1d27ed52f916d9cfb20d07c6f"
+}

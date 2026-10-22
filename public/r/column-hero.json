@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column hero",
+  "description": "A bank hero on a cool near-white page: a small ringed regulator badge, a heavy navy 60px two-line headline with tight tracking, a lead line and a navy + white button pair on the left, over a wide art canvas that spreads behind everything on desktop and sits on top on phones. A row of customer names closes it. The badge rises in on load; the art drifts up and fades as you scroll past.",
+  "category": "hero",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "fintech",
+    "navy",
+    "badge",
+    "logos",
+    "parallax",
+    "fade",
+    "load-in"
+  ],
+  "notes": [
+    "media fills the art area (cover); empty, it's a soft glow wash with a faint dot grid and a card-coloured frame where the original floats a transfer card",
+    "motion is CSS only (load keyframes and a view timeline), off under reduced motion"
+  ],
+  "entry": "column-hero.tsx",
+  "source": "foundry",
+  "name": "column-hero",
+  "files": [
+    {
+      "path": "column-hero.css",
+      "content": "/* The badge rises in once on load. */\n.column-hero-badge {\n  animation: column-hero-badge-in 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n\n@keyframes column-hero-badge-in {\n  from { opacity: 0; transform: translateY(14px) scale(0.97); }\n  to { opacity: 1; transform: none; }\n}\n\n/* As the hero leaves the window, the art drifts up ~140px and fades out, tied to the scroll. */\n@supports (animation-timeline: view()) {\n  .column-hero-art {\n    animation: column-hero-art-drift linear both;\n    animation-timeline: view();\n    animation-range: exit 0% exit 100%;\n  }\n}\n\n@keyframes column-hero-art-drift {\n  from { opacity: 1; transform: translateY(0); }\n  to { opacity: 0; transform: translateY(-140px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-hero-badge,\n  .column-hero-art { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ColumnButton } from \"@foundry/column-button\";\nimport \"./column-hero.css\";\n\nexport interface ColumnHeroLogo {\n  /** a customer's name, shown as a plain wordmark */\n  name: string;\n  /** optional small mark before the name (a lucide icon works) */\n  icon?: ReactNode;\n}\n\nexport interface ColumnHeroProps {\n  /** the small ringed badge above the headline */\n  badge?: { mark: string; label: string };\n  /** the big headline */\n  title: ReactNode;\n  /** one or two lines under it */\n  lead: ReactNode;\n  /** the navy button */\n  primary: { label: string; href: string };\n  /** the white button beside it */\n  secondary?: { label: string; href: string };\n  /** customer names along the bottom (six fill the row) */\n  logos?: ColumnHeroLogo[];\n  /** the art canvas; fills the area like object-fit: cover. Empty: a placeholder */\n  media?: ReactNode;\n  /** slide up under a sticky header so the art runs behind the nav (as on the original page) */\n  underHeader?: boolean;\n  className?: string;\n}\n\n/** Placeholder art: a soft glow wash with a faint dot grid, and a frame where the floating card sits. */\nfunction ArtPlaceholder() {\n  return (\n    <div className=\"absolute inset-0\">\n      <div className=\"absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_62%_50%,color-mix(in_oklab,var(--glow)_30%,transparent),transparent_75%),radial-gradient(ellipse_35%_30%_at_40%_30%,color-mix(in_oklab,var(--highlight)_16%,transparent),transparent_80%)]\" />\n      <div className=\"absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_14%,transparent)_1px,transparent_1.5px)] bg-size-[7px_7px] [mask-image:radial-gradient(ellipse_60%_60%_at_60%_50%,black,transparent_80%)]\" />\n      <div className=\"absolute top-[38%] left-1/2 aspect-[1.27] w-[46%] -translate-x-1/2 -translate-y-1/2 rounded-md bg-card shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_12px_32px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:top-[44%] lg:left-[70.5%] lg:w-[22.5%]\" />\n    </div>\n  );\n}\n\nexport function ColumnHero({ badge, title, lead, primary, secondary, logos = [], media, underHeader, className }: ColumnHeroProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-background text-foreground\", underHeader && \"-mt-[2.8125rem] lg:-mt-[3.875rem]\", className)}>\n      {/* Art: on top on phones, a full-bleed backdrop on desktop. */}\n      <div className=\"column-hero-art relative h-[24rem] lg:absolute lg:inset-x-0 lg:top-0 lg:h-[54rem]\">\n        {media ? <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">{media}</div> : <ArtPlaceholder />}\n      </div>\n\n      <div className={cn(\"relative mx-auto max-w-[calc(var(--page-width)+var(--page-gutter)*2)] px-gutter pb-12 lg:pb-9\", underHeader ? \"lg:pt-[12.625rem]\" : \"lg:pt-[8.75rem]\")}>\n        {badge && (\n          <p className=\"column-hero-badge -mt-1 inline-flex h-[1.875rem] items-center gap-2 rounded-md bg-secondary/80 px-3 text-sm text-muted-foreground shadow-[0_0_0_1px_var(--border),0_6px_16px_color-mix(in_oklab,var(--foreground)_6%,transparent)] backdrop-blur-sm lg:h-8\">\n            <span className=\"font-display font-bold tracking-[-0.06em] text-muted-foreground\">{badge.mark}</span>\n            <span>{badge.label}</span>\n          </p>\n        )}\n        <h1 className=\"mt-6 max-w-[30rem] font-display lg:max-w-[38rem] text-[2.125rem]/[1.08] font-semibold tracking-[-0.035em] text-balance lg:mt-16 lg:text-[3.75rem]/[0.96]\">\n          {title}\n        </h1>\n        <p className=\"mt-3 max-w-[27.5rem] text-base/[1.4] lg:max-w-[30rem] text-foreground lg:mt-4 lg:text-xl/[1.4]\">{lead}</p>\n        <div className=\"mt-6 flex flex-col gap-3 lg:mt-7 lg:flex-row\">\n          <ColumnButton href={primary.href} fullOnMobile>\n            {primary.label}\n          </ColumnButton>\n          {secondary && (\n            <ColumnButton href={secondary.href} variant=\"secondary\" icon=\"none\" fullOnMobile className=\"lg:px-4\">\n              {secondary.label}\n            </ColumnButton>\n          )}\n        </div>\n\n        {logos.length > 0 && (\n          <ul className=\"mt-24 grid grid-cols-3 gap-x-4 gap-y-9 lg:mt-[16.5rem] lg:flex lg:justify-between lg:pl-[24rem]\">\n            {logos.map((l) => (\n              <li key={l.name} className=\"flex items-center justify-center gap-1.5 font-display text-[1.1875rem] font-semibold tracking-[-0.03em] whitespace-nowrap text-foreground/90 [&_svg]:size-[1.125rem] [&_svg]:shrink-0\">\n                {l.icon}\n                {l.name}\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "column-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ mark: string; label: string; }",
+      "required": false,
+      "description": "the small ringed badge above the headline"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one or two lines under it"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the navy button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white button beside it"
+    },
+    {
+      "name": "logos",
+      "type": "ColumnHeroLogo[]",
+      "required": false,
+      "default": "[]",
+      "description": "customer names along the bottom (six fill the row)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the art canvas; fills the area like object-fit: cover. Empty: a placeholder"
+    },
+    {
+      "name": "underHeader",
+      "type": "boolean",
+      "required": false,
+      "description": "slide up under a sticky header so the art runs behind the nav (as on the original page)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dd39387d0d15151754f656aee62574f4198a14cb094975829d75265b740408e6"
+}

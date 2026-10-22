@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Modern Treasury testimonial carousel",
+  "description": "One customer story at a time in a wide pale-blush card: a bold wordmark on the left, the quote with a hanging open-quote, the person's name and role, and a small solid ink button on the right. Two round ink arrow buttons above the card's top-right corner step through the stories. Stacked and centred-logo on phones.",
+  "category": "testimonials",
+  "site": "moderntreasury",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "carousel",
+    "card",
+    "light",
+    "soft",
+    "minimal",
+    "fintech"
+  ],
+  "notes": [
+    "arrows need JavaScript; without it the first story shows",
+    "the wordmark is text (or a logo node) in place of the customer's logo image"
+  ],
+  "entry": "moderntreasury-quote.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "moderntreasury-quote",
+  "files": [
+    {
+      "path": "moderntreasury-quote.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ModerntreasuryButton } from \"@foundry/moderntreasury-button\";\n\nexport interface ModerntreasuryStory {\n  /** the customer's name, shown as a bold wordmark when there is no logo */\n  company: string;\n  /** the customer's logo, replacing the wordmark */\n  logo?: ReactNode;\n  /** the quote, without quotation marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** the button to the full story */\n  link?: { label: string; href: string };\n}\n\nexport interface ModerntreasuryQuoteProps {\n  /** the stories; the arrows step through them */\n  stories: ModerntreasuryStory[];\n  /** screen-reader labels for the arrows */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** A one-at-a-time customer story card with round arrow buttons. */\nexport function ModerntreasuryQuote({ stories, prevLabel, nextLabel, className }: ModerntreasuryQuoteProps) {\n  const [index, setIndex] = useState(0);\n  const story = stories[index];\n  const step = (d: number) => setIndex((i) => (i + d + stories.length) % stories.length);\n  const arrow = \"flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground transition-colors duration-150 hover:bg-primary/80 motion-reduce:transition-none\";\n  if (!story) return null;\n\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        {stories.length > 1 && (\n          <div className=\"flex justify-end gap-4\">\n            <button type=\"button\" onClick={() => step(-1)} aria-label={prevLabel} className={arrow}>\n              <ArrowLeft aria-hidden className=\"size-4\" strokeWidth={1.75} />\n            </button>\n            <button type=\"button\" onClick={() => step(1)} aria-label={nextLabel} className={arrow}>\n              <ArrowRight aria-hidden className=\"size-4\" strokeWidth={1.75} />\n            </button>\n          </div>\n        )}\n        <figure aria-live=\"polite\" className=\"mt-6 grid rounded-lg bg-popover px-6 pt-6 pb-14 text-popover-foreground lg:min-h-[15rem] lg:grid-cols-[18rem_1fr] lg:items-center lg:py-14 lg:pr-12 lg:pl-0\">\n          <div className=\"flex h-[10.5rem] items-center justify-center lg:h-auto\">\n            {story.logo ?? <span className=\"font-display text-[2rem] leading-none font-bold tracking-[-0.03em]\">{story.company}</span>}\n          </div>\n          <div className=\"mt-6 lg:mt-0\">\n            <blockquote className=\"max-w-[50rem] -indent-[0.4em] text-base leading-6 text-foreground/70\">\n              {\"“\"}\n              {story.quote}\n              {\"”\"}\n            </blockquote>\n            <figcaption className=\"mt-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between\">\n              <p className=\"text-base leading-6\">\n                <span className=\"block\">{story.name}</span>\n                <span className=\"block\">{story.role}</span>\n              </p>\n              {story.link && (\n                <ModerntreasuryButton href={story.link.href} size=\"xs\" arrow className=\"self-start lg:self-auto\">\n                  {story.link.label}\n                </ModerntreasuryButton>\n              )}\n            </figcaption>\n          </div>\n        </figure>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "moderntreasury-button"
+  ],
+  "props": [
+    {
+      "name": "stories",
+      "type": "ModerntreasuryStory[]",
+      "required": true,
+      "description": "the stories; the arrows step through them"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ddd1afa6542ef7ac4954322dce8e0e88bc5703b75a374dd9dac9ab5d41fd2e5e"
+}

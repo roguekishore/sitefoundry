@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Column developer section",
+  "description": "Developer pitch on a faint dot grid: a blue mono eyebrow with a blinking cursor, a hairline, a 28px navy heading, a muted lead, a white button and two short feature notes side by side. On the right a grey framed panel holds a white card slot over a numbered, syntax-coloured API response that runs off the bottom edge. The panel rises 200px and fades in as it scrolls into view.",
+  "category": "features",
+  "site": "column",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "developer",
+    "api",
+    "code",
+    "light",
+    "dot-grid",
+    "reveal",
+    "rise",
+    "split"
+  ],
+  "notes": [
+    "media fills the white card slot at the top of the panel; empty, it stays a plain white card",
+    "the panel reveal is a CSS view timeline; without support or with reduced motion it simply shows"
+  ],
+  "entry": "column-developers.tsx",
+  "source": "foundry",
+  "name": "column-developers",
+  "files": [
+    {
+      "path": "column-developers.css",
+      "content": "/* The code panel rises 200px and fades in while it scrolls into view. */\n@supports (animation-timeline: view()) {\n  .column-developers-panel {\n    animation: column-developers-rise linear both;\n    animation-timeline: view();\n    animation-range: entry 0% cover 40%;\n  }\n}\n\n@keyframes column-developers-rise {\n  from { opacity: 0; transform: translateY(200px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .column-developers-panel { animation: none; }\n}\n"
+    },
+    {
+      "path": "column-developers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ColumnButton } from \"@foundry/column-button\";\nimport { ColumnCode } from \"@foundry/column-code\";\nimport { ColumnEyebrow, type ColumnTone } from \"@foundry/column-eyebrow\";\nimport \"./column-developers.css\";\n\nexport interface ColumnDeveloperNote {\n  title: string;\n  body: string;\n}\n\nexport interface ColumnDevelopersProps {\n  /** the small mono tag (shown with a blinking cursor) */\n  eyebrow: string;\n  /** accent of the tag */\n  tone?: ColumnTone;\n  /** the heading */\n  title: string;\n  /** a muted line under it */\n  lead: ReactNode;\n  /** the white button */\n  action?: { label: string; href: string };\n  /** short feature notes; two sit side by side on desktop */\n  notes: ColumnDeveloperNote[];\n  /** the code under the card, e.g. an API response */\n  code: string;\n  /** small label above the code */\n  codeLabel?: string;\n  /** what fills the white card at the top of the panel; empty: a plain card */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function ColumnDevelopers({ eyebrow, tone = \"chart-1\", title, lead, action, notes, code, codeLabel, media, className }: ColumnDevelopersProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-background pt-[4.5rem] pb-[4.5rem] text-foreground lg:pt-36 lg:pb-36\", className)}>\n      <div className=\"mx-auto grid max-w-[calc(var(--page-width)+var(--page-gutter)*2)] gap-12 px-gutter lg:grid-cols-[1fr_27.125rem] lg:gap-[6.75rem]\">\n        <div className=\"relative\">\n          {/* faint dot grid behind the copy */}\n          <div aria-hidden className=\"pointer-events-none absolute -inset-x-8 -inset-y-6 bg-[radial-gradient(circle,color-mix(in_oklab,var(--foreground)_9%,transparent)_0.8px,transparent_1.2px)] bg-size-[8px_8px] [mask-image:radial-gradient(ellipse_70%_65%_at_45%_55%,black,transparent_90%)]\" />\n          <div className=\"relative\">\n            <ColumnEyebrow tone={tone} cursor>\n              {eyebrow}\n            </ColumnEyebrow>\n            <hr className=\"mt-6 border-border\" />\n            <h2 className=\"mt-11 max-w-[24rem] font-display text-[1.75rem]/[1.15] font-medium tracking-[-0.02em] lg:mt-[2.875rem]\">{title}</h2>\n            <p className=\"mt-4 max-w-[24rem] text-base/[1.4] text-muted-foreground lg:text-lg/[1.3]\">{lead}</p>\n            {action && (\n              <ColumnButton href={action.href} variant=\"secondary\" className=\"mt-6 lg:mt-7\">\n                {action.label}\n              </ColumnButton>\n            )}\n            <div className=\"mt-11 grid gap-9 sm:grid-cols-2 sm:gap-6 lg:mt-[4.25rem]\">\n              {notes.map((n) => (\n                <div key={n.title}>\n                  <h3 className=\"font-display text-base font-medium tracking-[-0.01em]\">{n.title}</h3>\n                  <p className=\"mt-3 text-[0.9375rem]/[1.45] text-muted-foreground lg:text-sm/[1.45]\">{n.body}</p>\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n\n        <div className=\"column-developers-panel h-[32rem] overflow-clip rounded-lg border border-border bg-muted\">\n          <div className=\"relative m-4 h-[11.0625rem] overflow-clip rounded-md bg-secondary shadow-[0_0_0_1px_color-mix(in_oklab,var(--foreground)_5%,transparent),0_1px_3px_color-mix(in_oklab,var(--foreground)_8%,transparent)]\">\n            {media && <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">{media}</div>}\n          </div>\n          <div className=\"mt-6 border-t border-border px-4 pt-6\">\n            <ColumnCode code={code} label={codeLabel} lineNumbers framed={false} />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "column-button",
+    "column-code",
+    "column-eyebrow",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small mono tag (shown with a blinking cursor)"
+    },
+    {
+      "name": "tone",
+      "type": "any",
+      "required": false,
+      "default": "chart-1",
+      "description": "accent of the tag"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "a muted line under it"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white button"
+    },
+    {
+      "name": "notes",
+      "type": "ColumnDeveloperNote[]",
+      "required": true,
+      "description": "short feature notes; two sit side by side on desktop"
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "description": "the code under the card, e.g. an API response"
+    },
+    {
+      "name": "codeLabel",
+      "type": "string",
+      "required": false,
+      "description": "small label above the code"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what fills the white card at the top of the panel; empty: a plain card"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "41a7c1d8acbe8d9df9092af92ec7a6d8fc3d23e05fede2146f1d8c71fdc06175"
+}

@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Anduril editorial pair",
+  "description": "Two flat colour bands side by side (stacked on phones), olive then stone grey: a 32px heading with a small ↗ link at the right, a hairline, a 1.8:1 image with 2px corners, and a big light \"part\" label (\"Pt — 01 / 02\") hanging over the image's bottom-right edge. As each band scrolls in, the heading and link slide in from the left, the hairline draws from the left, the image slides in further and the label follows.",
+  "category": "blog",
+  "site": "anduril",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "editorial",
+    "series",
+    "two-up",
+    "olive",
+    "grey",
+    "hairline",
+    "slide-in",
+    "reveal",
+    "scroll-driven"
+  ],
+  "notes": [
+    "each band's colour is a tone: accent (olive, light text) or secondary (grey, dark text)"
+  ],
+  "entry": "anduril-editorial.tsx",
+  "source": "foundry",
+  "name": "anduril-editorial",
+  "files": [
+    {
+      "path": "anduril-editorial.css",
+      "content": "/* Each band slides in from the left as it scrolls in: text 35px, the image 65px, the big label\n   last; the hairline draws from the left edge. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .anduril-editorial-text,\n    .anduril-editorial-media,\n    .anduril-editorial-label,\n    .anduril-editorial-rule {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: view();\n    }\n    .anduril-editorial-text {\n      animation-name: anduril-editorial-slide;\n      animation-range: entry 0px entry 260px;\n    }\n    .anduril-editorial-rule {\n      animation-name: anduril-editorial-draw;\n      animation-range: entry 0px entry 300px;\n    }\n    .anduril-editorial-media {\n      animation-name: anduril-editorial-slide-far;\n      animation-range: entry 0px entry 300px;\n    }\n    .anduril-editorial-label {\n      animation-name: anduril-editorial-slide;\n      animation-range: entry 0px entry 220px;\n    }\n  }\n}\n\n@keyframes anduril-editorial-slide {\n  from { opacity: 0; transform: translateX(-35px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes anduril-editorial-slide-far {\n  from { opacity: 0; transform: translateX(-65px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes anduril-editorial-draw {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n"
+    },
+    {
+      "path": "anduril-editorial.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AndurilLink } from \"@foundry/anduril-link\";\nimport \"./anduril-editorial.css\";\n\nexport interface AndurilEditorialPart {\n  /** the band's heading */\n  heading: string;\n  /** the small link at the right of the heading */\n  linkLabel: string;\n  href: string;\n  /** the big label over the image's bottom edge, e.g. \"Pt — 01 / 02\" */\n  label: string;\n  /** band colour: accent (olive, light text) or secondary (grey, dark text) */\n  tone?: \"accent\" | \"secondary\";\n  /** the image (1.8:1); empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface AndurilEditorialProps {\n  /** the bands, left to right (two in the original) */\n  parts: AndurilEditorialPart[];\n  className?: string;\n}\n\nconst tones = {\n  accent: \"bg-accent text-accent-foreground\",\n  secondary: \"bg-secondary text-secondary-foreground\",\n};\n\n/** Side-by-side colour bands for a two-part series, each sliding in from the left. */\nexport function AndurilEditorial({ parts, className }: AndurilEditorialProps) {\n  return (\n    <section className={cn(\"grid md:grid-cols-2\", className)}>\n      {parts.map((p) => (\n        <article key={p.heading} className={cn(\"overflow-x-clip px-gutter pt-[3.75rem] pb-14 md:pt-[4.75rem] md:pb-28\", tones[p.tone ?? \"accent\"])}>\n          <div className=\"anduril-editorial-text flex items-end justify-between gap-6\">\n            <h2 className=\"max-w-[8em] font-display text-[1.5rem] leading-[1.25] tracking-[-0.02em] lg:max-w-none lg:text-[2rem] lg:leading-[1.15]\">{p.heading}</h2>\n            <AndurilLink label={p.linkLabel} href={p.href} className=\"mb-0.5 shrink-0 text-[0.875rem] opacity-70 transition-opacity duration-300 ease-out hover:opacity-100 motion-reduce:transition-none\" />\n          </div>\n          <div aria-hidden className=\"anduril-editorial-rule mt-[1.125rem] h-px origin-left bg-current/70 lg:mt-7\" />\n          <div className=\"relative mt-7 lg:mt-8\">\n            <div className=\"anduril-editorial-media aspect-[1.8] overflow-clip rounded-lg bg-current/15 [&>img]:size-full [&>img]:object-cover\">{p.media}</div>\n            <p className=\"anduril-editorial-label absolute right-3.5 bottom-0 translate-y-[45%] font-display text-[2.125rem] leading-none font-light tracking-[-0.03em] whitespace-nowrap lg:right-8 lg:text-[4rem]\">\n              {p.label}\n            </p>\n          </div>\n        </article>\n      ))}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anduril-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "parts",
+      "type": "AndurilEditorialPart[]",
+      "required": true,
+      "description": "the bands, left to right (two in the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8112bf1b247ba7384a15f3b26959dd0551c56c38fce4320f0a0361a6c70443e0"
+}

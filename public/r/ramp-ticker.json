@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ramp agent ticker",
+  "description": "A thin frosted bar of live counters: an uppercase label with a small icon, then a row of 'LABEL: number' pairs in grey mono chips that slides left forever while the numbers keep ticking up. It sticks to the bottom of the window until the page scrolls it into its own place.",
+  "category": "stats",
+  "site": "ramp",
+  "license": "proprietary",
+  "tags": [
+    "ticker",
+    "marquee",
+    "counter",
+    "live",
+    "sticky",
+    "frosted",
+    "light",
+    "minimal",
+    "loop"
+  ],
+  "notes": [
+    "place it straight after a hero taller than the window: it rides the window's bottom edge, then settles under the hero",
+    "marquee is CSS; JavaScript only ticks the numbers; with reduced motion both stop"
+  ],
+  "hydrate": "load",
+  "entry": "ramp-ticker.tsx",
+  "source": "foundry",
+  "name": "ramp-ticker",
+  "files": [
+    {
+      "path": "ramp-ticker.css",
+      "content": "/* The counter row is drawn twice side by side; sliding by half its width loops seamlessly. */\n@media (prefers-reduced-motion: no-preference) {\n  .ramp-ticker-track {\n    animation: ramp-ticker-slide 48s linear infinite;\n  }\n}\n\n@keyframes ramp-ticker-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n.ramp-ticker-fade {\n  mask-image: linear-gradient(to right, transparent, black 4%, black 92%, transparent);\n}\n"
+    },
+    {
+      "path": "ramp-ticker.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RampLiveNumber, type RampLiveNumberProps } from \"@foundry/ramp-live-number\";\nimport \"./ramp-ticker.css\";\n\nexport interface RampTickerItem {\n  /** uppercase label, e.g. \"Invoices matched\" */\n  label: string;\n  /** the live figure */\n  number: RampLiveNumberProps;\n}\n\nexport interface RampTickerProps {\n  /** the fixed label at the start, e.g. \"Agents on shift today\" */\n  label: string;\n  /** a small icon before the label (optional) */\n  icon?: ReactNode;\n  /** the counters that slide by */\n  items: RampTickerItem[];\n  /** stick to the window's bottom edge until it reaches its place (default on) */\n  sticky?: boolean;\n  className?: string;\n}\n\nfunction Row({ items, hidden }: { items: RampTickerItem[]; hidden?: boolean }) {\n  return (\n    <ul aria-hidden={hidden || undefined} className=\"flex shrink-0 items-center\">\n      {items.map((item) => (\n        <li key={item.label} className=\"flex items-center gap-2 border-l border-foreground/12 px-4 text-xs whitespace-nowrap text-muted-foreground uppercase lg:text-[0.8125rem]\">\n          {item.label}:\n          <span className=\"rounded-[calc(var(--radius)-9px)] bg-foreground/[0.06] px-1.5 py-0.5 text-foreground\">\n            <RampLiveNumber {...item.number} />\n          </span>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/** Ramp's live agent counters: a frosted bar riding the bottom of the first screen. */\nexport function RampTicker({ label, icon, items, sticky = true, className }: RampTickerProps) {\n  return (\n    <div\n      className={cn(\n        \"z-30 border-t border-foreground/[0.06] bg-background/60 text-foreground backdrop-blur-md\",\n        sticky && \"sticky bottom-0\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto flex max-w-page flex-col items-center gap-1 py-2 lg:h-10 lg:flex-row lg:gap-0 lg:px-[calc(var(--page-gutter)*4)] lg:py-0\">\n        <p className=\"flex shrink-0 items-center gap-2 pr-5 text-xs uppercase lg:text-[0.8125rem] [&_svg]:size-4\">\n          {icon}\n          {label}\n        </p>\n        <div className=\"ramp-ticker-fade w-full min-w-0 overflow-clip\">\n          <div className=\"ramp-ticker-track flex w-max\">\n            <Row items={items} />\n            <Row items={items} hidden />\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ramp-live-number"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the fixed label at the start, e.g. \"Agents on shift today\""
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon before the label (optional)"
+    },
+    {
+      "name": "items",
+      "type": "RampTickerItem[]",
+      "required": true,
+      "description": "the counters that slide by"
+    },
+    {
+      "name": "sticky",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "stick to the window's bottom edge until it reaches its place (default on)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "464d95f9893956c2e6dac72a491c70ad74436d7df155ffe5d8a33691df07b3d2"
+}
