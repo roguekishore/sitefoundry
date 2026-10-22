@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel records",
+  "description": "A full-width pale card with a teal wash: a phone on the left running off the bottom edge, a big three-line title and grey paragraph on the right, and between them small white icon tiles sitting on two faint concentric rings. The rings turn from -6° to 6° and two small floating cards drift up as the card scrolls through the window. On phones the text sits on top and the rings arc over the phone.",
+  "category": "features",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "integrations",
+    "card",
+    "orbit",
+    "rings",
+    "parallax",
+    "scroll",
+    "light",
+    "soft"
+  ],
+  "notes": [
+    "phone and floating cards are media slots; the tiles hold lucide icons",
+    "the turn and drift are CSS scroll-driven animations; off under reduced motion"
+  ],
+  "entry": "bevel-records.tsx",
+  "source": "foundry",
+  "name": "bevel-records",
+  "files": [
+    {
+      "path": "bevel-records.css",
+      "content": "/* While the card crosses the window the ring of tiles turns from -6° to 6°, and the small\n   floating cards drift up 36px (18px → -18px), both scrubbed with the scroll. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bevel-records-ring {\n      animation: bevel-records-turn linear both;\n      animation-timeline: view();\n      animation-range: entry 0% exit 100%;\n    }\n    .bevel-records-float {\n      animation: bevel-records-drift linear both;\n      animation-timeline: view();\n      animation-range: entry 0% exit 100%;\n    }\n  }\n}\n\n@keyframes bevel-records-turn {\n  from { rotate: -6deg; }\n  to { rotate: 6deg; }\n}\n\n@keyframes bevel-records-drift {\n  from { translate: 0 18px; }\n  to { translate: 0 -18px; }\n}\n"
+    },
+    {
+      "path": "bevel-records.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelCard, type BevelTint } from \"@foundry/bevel-card\";\nimport { bevelLead, bevelTitle } from \"@foundry/bevel-heading\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-records.css\";\n\nexport interface BevelRecordsProps {\n  /** the big title (three lines on desktop) */\n  title: ReactNode;\n  /** the grey paragraph under it */\n  text: ReactNode;\n  /** the icons on the white tiles around the ring (lucide icons; up to ten) */\n  tiles: ReactNode[];\n  /** the phone screenshot; a phone-shaped placeholder when empty */\n  media?: ReactNode;\n  /** up to two small cards floating by the phone (images); white placeholders when empty */\n  floaters?: ReactNode[];\n  /** the colour rising from the card's foot */\n  tint?: BevelTint;\n  className?: string;\n}\n\n/**\n * Tile spots: angle in degrees (0 = towards the text on desktop, upwards on phones) and the\n * ring's radius as a share of the ring box (inner 30%, outer 45%).\n */\nconst spots: [number, number][] = [\n  [-36, 30], [-15, 30], [2, 30], [24, 30], [42, 30],\n  [-26, 45], [-4, 45], [12, 45], [29, 45], [-48, 45],\n];\n\n/**\n * A full-width pale card with a teal wash: a phone on the left running off the bottom, a big\n * title and paragraph on the right, and between them white tiles on two faint concentric\n * rings that turn a few degrees as the card scrolls through the window. On phones the text\n * sits on top, the rings arc above the phone.\n */\nexport function BevelRecords({ title, text, tiles, media, floaters = [], tint = \"teal\", className }: BevelRecordsProps) {\n  return (\n    <section className={cn(\"bg-background pt-2 pb-section text-foreground lg:pt-4 lg:pb-[calc(var(--section-y)*2)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2)]\">\n        <BevelCard tint={tint} className=\"h-[44rem] lg:h-[41.125rem]\">\n          {/* the ring box, centred on a point: below the text on phones (turned to arc upwards), left of centre on desktop */}\n          <div aria-hidden className=\"absolute top-[40rem] left-1/2 size-[52rem] -translate-1/2 -rotate-90 lg:top-[52%] lg:left-[16.5%] lg:size-[88rem] lg:rotate-0\">\n            <div className=\"bevel-records-ring absolute inset-0\">\n              <div className=\"absolute inset-[20%] rounded-full border-2 border-background/60\" />\n              <div className=\"absolute inset-[5%] rounded-full border-2 border-background/50\" />\n              {tiles.slice(0, 10).map((icon, i) => (\n                <div\n                  key={i}\n                  className=\"absolute top-1/2 left-1/2 h-0 origin-left\"\n                  style={{ width: `${spots[i][1]}%`, transform: `rotate(${spots[i][0]}deg)` }}\n                >\n                  <div\n                    className=\"absolute top-0 right-0 flex size-14 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg bg-background text-foreground/75 shadow-[0_4px_16px_0_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:size-20 [&_svg]:size-6 lg:[&_svg]:size-8\"\n                    style={{ transform: `rotate(${-spots[i][0] + (i % 2 ? 10 : -12)}deg)` }}\n                  >\n                    <span className=\"flex rotate-90 lg:rotate-0\">{icon}</span>\n                  </div>\n                </div>\n              ))}\n            </div>\n          </div>\n\n          <div className=\"relative px-10 pt-10 lg:absolute lg:top-1/2 lg:left-[68.6%] lg:w-[28%] lg:-translate-y-1/2 lg:p-0\">\n            <h2 className={cn(bevelTitle.lg, \"max-w-[12ch]\")}>{title}</h2>\n            <p className={cn(bevelLead, \"mt-4 max-w-[17rem] lg:max-w-[22rem]\")}>{text}</p>\n          </div>\n\n          <div className=\"absolute top-[26.5rem] left-1/2 aspect-[338/689] w-[16rem] -translate-x-1/2 lg:top-[7.25rem] lg:left-[4.65%] lg:w-[22.75rem] lg:translate-x-0\">\n            {media ?? <BevelPlaceholder tone=\"phone\" className=\"size-full rounded-[2.75rem]\" />}\n            <div className=\"bevel-records-float absolute top-[3%] -right-[22%] w-[30%] rotate-[4deg]\">\n              {floaters[0] ?? <BevelPlaceholder tone=\"tile\" className=\"aspect-[108/135] w-full rounded-lg\" />}\n            </div>\n            <div className=\"bevel-records-float absolute top-[52%] -left-[16%] hidden w-[24%] -rotate-[8deg] lg:block\">\n              {floaters[1] ?? <BevelPlaceholder tone=\"tile\" className=\"aspect-[108/150] w-full rounded-lg\" />}\n            </div>\n          </div>\n        </BevelCard>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "bevel-card",
+    "bevel-heading",
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big title (three lines on desktop)"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the grey paragraph under it"
+    },
+    {
+      "name": "tiles",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the icons on the white tiles around the ring (lucide icons; up to ten)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the phone screenshot; a phone-shaped placeholder when empty"
+    },
+    {
+      "name": "floaters",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to two small cards floating by the phone (images); white placeholders when empty"
+    },
+    {
+      "name": "tint",
+      "type": "any",
+      "required": false,
+      "default": "teal",
+      "description": "the colour rising from the card's foot"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aeca61fdd3b01217f1b6216481df0ce0727c0063b2f9a452b45405dd2b7b4c45"
+}

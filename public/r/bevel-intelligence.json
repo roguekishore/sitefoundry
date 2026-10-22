@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel intelligence",
+  "description": "A charcoal band for an AI coach: three glowing round persona avatars with name pills (the middle one lit under a soft lavender spotlight, the others dimmed), a two-tone title (grey first line, white second), then tall pale cards with a coloured bloom low on the right. On desktop a phone seems pinned in the middle of the window while the cards scroll past, each card revealing its own screen through it, with a small floating image drifting by it; on phones each card holds its phone below the text.",
+  "category": "features",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "ai",
+    "dark",
+    "cards",
+    "sticky",
+    "pinned",
+    "parallax",
+    "scroll",
+    "glow",
+    "phone"
+  ],
+  "notes": [
+    "an inverted band (foreground colour behind, background colour text): charcoal under light themes, pale under dark ones; the cards keep the card surface",
+    "the pinned phone is CSS sticky inside per-card tracks clipped by each card (no JavaScript); every card must keep the same height",
+    "personas, phones and floating images are media slots; empty they are token placeholders"
+  ],
+  "entry": "bevel-intelligence.tsx",
+  "source": "foundry",
+  "name": "bevel-intelligence",
+  "files": [
+    {
+      "path": "bevel-intelligence.css",
+      "content": "/* The small floating image by each phone drifts up ~60px as its card crosses the window\n   (scrubbed). It is tied to the card's view timeline, because on desktop the phone itself\n   is sticky and barely moves in the window. */\n.bevel-intel-card {\n  view-timeline-name: --bevel-intel-card;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bevel-intel-float {\n      animation: bevel-intelligence-drift linear both;\n      animation-timeline: --bevel-intel-card;\n      animation-range: entry 0% exit 100%;\n    }\n  }\n}\n\n@keyframes bevel-intelligence-drift {\n  from { translate: 0 30px; }\n  to { translate: 0 -30px; }\n}\n"
+    },
+    {
+      "path": "bevel-intelligence.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelCard, type BevelTint } from \"@foundry/bevel-card\";\nimport { bevelLead, bevelTitle } from \"@foundry/bevel-heading\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-intelligence.css\";\n\nexport interface BevelPersona {\n  /** the persona's name, shown in a small pill under it */\n  name: ReactNode;\n  /** its avatar (image or video); a glowing round placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface BevelIntelligenceCard {\n  /** the big title (two lines) */\n  title: ReactNode;\n  /** the grey paragraph under it */\n  text: ReactNode;\n  /** the phone screenshot for this card; a phone-shaped placeholder when empty */\n  media?: ReactNode;\n  /** a small image floating beside the phone (a chat bubble…); a white tile when empty */\n  float?: ReactNode;\n  /** the glow blooming low on the right of the card */\n  tint?: BevelTint;\n}\n\nexport interface BevelIntelligenceProps {\n  /** three personas; the one at activePersona is lit, the others dimmed */\n  personas?: BevelPersona[];\n  /** which persona is lit (0-based) */\n  activePersona?: number;\n  /** the section title; wrap the first line in a span with text-background/60 for the two-tone look */\n  title: ReactNode;\n  /** the line under it */\n  lead?: ReactNode;\n  /** the feature cards, each with its own phone screen */\n  cards: BevelIntelligenceCard[];\n  className?: string;\n}\n\n/**\n * A charcoal band: three glowing persona avatars (the middle one under a soft spotlight), a\n * two-tone title, then tall pale cards with a coloured bloom. On desktop one phone seems to\n * stay pinned in the middle of the window while the cards scroll past, and each card shows\n * its own screen through it; on phones each card holds its phone below the text.\n */\nexport function BevelIntelligence({ personas = [], activePersona = 1, title, lead, cards, className }: BevelIntelligenceProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-foreground pt-section pb-32 text-background lg:pt-[calc(var(--section-y)*2)] lg:pb-[12.5rem]\", className)}>\n      {personas.length > 0 && (\n        <div className=\"relative mx-auto flex w-max justify-center gap-6 lg:gap-[3.75rem]\">\n          <div aria-hidden className=\"pointer-events-none absolute -top-[5rem] left-1/2 h-[14rem] w-[12rem] -translate-x-1/2 blur-lg lg:-top-[10rem] lg:h-[17rem]\">\n            <div className=\"size-full bg-linear-to-b from-transparent via-glow/15 to-glow/35 [clip-path:polygon(40%_0,60%_0,100%_100%,0_100%)]\" />\n          </div>\n          {personas.map((persona, i) => (\n            <div key={i} className={cn(\"relative flex w-[8.75rem] flex-col items-center\", i !== activePersona && \"opacity-55\")}>\n              <div className=\"size-[8.25rem] overflow-clip rounded-full lg:size-[8.75rem]\">\n                {persona.media ?? <BevelPlaceholder tone=\"glow\" className={cn(\"size-full rounded-full\", i !== activePersona && \"blur-[3px]\")} />}\n              </div>\n              <span\n                className={cn(\n                  \"mt-1 flex h-9 items-center rounded-full px-6 text-base font-semibold ring-1\",\n                  i === activePersona ? \"bg-background/10 text-background ring-background/25\" : \"text-background/60 ring-background/12\",\n                )}\n              >\n                {persona.name}\n              </span>\n            </div>\n          ))}\n        </div>\n      )}\n\n      <div className=\"mx-auto mt-14 max-w-[40rem] px-gutter text-center\">\n        <h2 className={cn(bevelTitle.lg, \"text-balance\")}>{title}</h2>\n        {lead && <p className={cn(bevelLead, \"mt-4 text-balance text-background/60\")}>{lead}</p>}\n      </div>\n\n      <ul\n        className=\"mx-auto mt-14 grid max-w-page gap-4 px-gutter lg:mt-20 lg:gap-8 lg:px-[calc(var(--page-gutter)*2)]\"\n        style={{ \"--bevel-n\": cards.length, \"--bevel-stride\": \"40.75rem\" } as CSSProperties}\n      >\n        {cards.map((card, i) => (\n          <li key={i} style={{ \"--bevel-i\": i } as CSSProperties}>\n            <BevelCard tint={card.tint ?? \"lavender\"} wash=\"bloom\" className=\"bevel-intel-card flex h-[44rem] flex-col lg:h-[38.75rem] lg:justify-center\">\n              <div className=\"px-10 pt-10 lg:w-[42%] lg:p-0 lg:pl-20\">\n                <h3 className={cn(bevelTitle.lg, \"max-w-[12ch]\")}>{card.title}</h3>\n                <p className={cn(bevelLead, \"mt-4 max-w-[17rem] lg:max-w-[29rem]\")}>{card.text}</p>\n              </div>\n              {/* desktop: a tall track spanning the whole list (plus a screen either side), aligned the same in every card,\n                  so the sticky phone sits at the same spot in the window in all of them and each card clips its own */}\n              <div className=\"relative mx-auto mt-12 w-[14.75rem] lg:absolute lg:top-[calc(-1*var(--bevel-i)*var(--bevel-stride)-100svh)] lg:left-[62.7%] lg:mt-0 lg:h-[calc(var(--bevel-n)*var(--bevel-stride)+200svh)] lg:w-[21.25rem]\">\n                <div className=\"relative aspect-[1/2] lg:sticky lg:top-[calc(50svh-20rem)]\">\n                  {card.media ?? <BevelPlaceholder tone=\"phone\" className=\"size-full rounded-[3rem]\" />}\n                  <div className=\"bevel-intel-float absolute top-[9%] -right-[14%] w-[72%] lg:-right-[19%] lg:w-[84%]\">\n                    {card.float ?? <BevelPlaceholder tone=\"tile\" className=\"h-12 w-full rounded-2xl lg:h-16\" />}\n                  </div>\n                </div>\n              </div>\n            </BevelCard>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "bevel-card",
+    "bevel-heading",
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "personas",
+      "type": "BevelPersona[]",
+      "required": false,
+      "default": "[]",
+      "description": "three personas; the one at activePersona is lit, the others dimmed"
+    },
+    {
+      "name": "activePersona",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "which persona is lit (0-based)"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title; wrap the first line in a span with text-background/60 for the two-tone look"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "cards",
+      "type": "BevelIntelligenceCard[]",
+      "required": true,
+      "description": "the feature cards, each with its own phone screen"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4c349f8f6470e08aceeeb0b4f21dc6149d18c13bd5997394c2b3a8f33349640f"
+}

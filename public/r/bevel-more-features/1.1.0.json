@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.1.0",
+  "type": "block",
+  "title": "Bevel more features",
+  "description": "A left-aligned title and lead over a stack of pale 24px-rounded tabs, with a phone (and a soft shadow under it) on the right. The active tab is full size and a thin ring beside it fills while the section is in view before handing over to the next; the others sit shrunk to 93% and half faded, brightening on hover. The stack fades out at its foot. On phones the tabs turn into a sideways-scrolling row above the phone.",
+  "category": "features",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "autoplay",
+    "progress",
+    "phone",
+    "light",
+    "soft",
+    "interactive"
+  ],
+  "notes": [
+    "needs JavaScript for the tab switching (hydrate: visible)",
+    "under reduced motion the tabs don't advance on their own"
+  ],
+  "entry": "bevel-more-features.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "bevel-more-features",
+  "files": [
+    {
+      "path": "bevel-more-features.css",
+      "content": "/* The active tab's ring fills over the interval, then the next tab takes over (the React\n   side listens for the end of this animation). Under reduced motion the ring shows full and\n   the tabs only change on click. */\n.bevel-features-ring {\n  stroke-dashoffset: 100;\n  animation: bevel-more-features-fill linear both;\n}\n\n@keyframes bevel-more-features-fill {\n  to { stroke-dashoffset: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .bevel-features-ring {\n    animation: none;\n    stroke-dashoffset: 0;\n  }\n}\n\n/* desktop: the stack fades out towards its foot */\n@media (min-width: 64rem) {\n  .bevel-features-list {\n    mask-image: linear-gradient(to bottom, black 78%, transparent);\n  }\n}\n"
+    },
+    {
+      "path": "bevel-more-features.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelHeading } from \"@foundry/bevel-heading\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-more-features.css\";\n\nexport interface BevelFeatureTab {\n  /** the feature's name */\n  title: ReactNode;\n  /** one line about it */\n  text: ReactNode;\n  /** the phone screenshot shown while this tab is active; a phone-shaped placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface BevelMoreFeaturesProps {\n  /** the section title */\n  title: ReactNode;\n  /** the line under it */\n  lead?: ReactNode;\n  /** four or five features */\n  tabs: BevelFeatureTab[];\n  /** seconds each tab stays before the next one takes over */\n  interval?: number;\n  className?: string;\n}\n\n/**\n * A left-aligned title over a stack of pale rounded tabs, a phone on the right. The active\n * tab is full size with a ring that fills as it plays, then hands over to the next; the\n * others sit shrunk to 93% and faded. On phones the tabs become a sideways-scrolling row\n * above the phone.\n */\nexport function BevelMoreFeatures({ title, lead, tabs, interval = 6, className }: BevelMoreFeaturesProps) {\n  const [active, setActive] = useState(0);\n  // the ring only runs while the section is in view, so visitors arrive on the first tab\n  const [inView, setInView] = useState(false);\n  const ref = useRef<HTMLElement>(null);\n  useEffect(() => {\n    const el = ref.current;\n    if (!el) return;\n    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.3 });\n    io.observe(el);\n    return () => io.disconnect();\n  }, []);\n  const next = () => setActive((a) => (a + 1) % tabs.length);\n  return (\n    <section ref={ref} className={cn(\"bg-background pt-section pb-section text-foreground lg:pt-[calc(var(--section-y)*2)] lg:pb-[calc(var(--section-y)*2)]\", className)}>\n      <div className=\"mx-auto grid max-w-[71.25rem] gap-12 lg:grid-cols-[34.75rem_1fr] lg:items-center lg:gap-8 lg:px-gutter\">\n        <div className=\"min-w-0\">\n          <BevelHeading title={title} lead={lead} align=\"left\" className=\"px-gutter lg:px-0\" />\n          <ul className=\"bevel-features-list mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto px-gutter [scrollbar-width:none] lg:mt-20 lg:flex-col lg:gap-3 lg:overflow-visible lg:px-0\">\n            {tabs.map((tab, i) => {\n              const on = i === active;\n              return (\n                <li key={i} className=\"shrink-0 snap-start lg:shrink\">\n                  <button\n                    type=\"button\"\n                    aria-pressed={on}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"group flex w-[18.75rem] items-center gap-4 rounded-2xl bg-card px-6 py-6 text-left transition-[transform,opacity] duration-250 ease-out lg:w-full motion-reduce:transition-none\",\n                      on ? \"scale-100\" : \"opacity-50 hover:opacity-80 lg:scale-[0.93]\",\n                    )}\n                  >\n                    <span className=\"min-w-0 flex-1\">\n                      <span className=\"block text-2xl leading-[1.3] font-semibold tracking-[-0.01em]\">{tab.title}</span>\n                      <span className=\"mt-1 block text-[1.125rem] leading-[1.3] font-medium text-muted-foreground\">{tab.text}</span>\n                    </span>\n                    <span aria-hidden className=\"relative flex size-10 shrink-0 items-center justify-center\">\n                      {on ? (\n                        <svg viewBox=\"0 0 40 40\" className=\"size-10 -rotate-90\">\n                          <circle cx=\"20\" cy=\"20\" r=\"18\" fill=\"none\" strokeWidth=\"2\" className=\"stroke-foreground/20\" />\n                          <circle\n                            key={active}\n                            cx=\"20\"\n                            cy=\"20\"\n                            r=\"18\"\n                            fill=\"none\"\n                            strokeWidth=\"2\"\n                            pathLength={100}\n                            strokeDasharray=\"100\"\n                            className=\"bevel-features-ring stroke-foreground/70\"\n                            style={{ animationDuration: `${interval}s`, animationPlayState: inView ? \"running\" : \"paused\" }}\n                            onAnimationEnd={next}\n                          />\n                        </svg>\n                      ) : (\n                        <span className=\"flex size-9 items-center justify-center rounded-full ring-2 ring-foreground/40\">\n                          <ArrowRight className=\"size-4\" strokeWidth={2.5} />\n                        </span>\n                      )}\n                    </span>\n                  </button>\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n        <div className=\"relative mx-auto w-[14.75rem] lg:w-[19.0625rem]\">\n          <div className=\"grid aspect-[305/640] [&>*]:[grid-area:1/1]\">\n            {tabs.map((tab, i) => (\n              <div key={i} aria-hidden={i !== active} className={cn(\"transition-opacity duration-300 ease-out motion-reduce:transition-none\", i === active ? \"opacity-100\" : \"opacity-0\")}>\n                {tab.media ?? <BevelPlaceholder tone=\"phone\" className=\"size-full rounded-[2.75rem]\" />}\n              </div>\n            ))}\n          </div>\n          <div aria-hidden className=\"mx-auto -mt-4 h-8 w-[115%] -translate-x-[6.5%] rounded-[50%] bg-foreground/25 blur-xl\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "bevel-heading",
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "tabs",
+      "type": "BevelFeatureTab[]",
+      "required": true,
+      "description": "four or five features"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each tab stays before the next one takes over"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "974d1bc23947e21705c97e4b1ff5e97592d793cfa63d9b3f6439fff4dba33a2a"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel privacy",
+  "description": "One wide charcoal card with 32px corners, lit by a deep green glow along both sides and in its lower corners: a big faint emblem rises from the bottom edge behind a centered white one-line title and a grey paragraph, and a fine dot grid fades in over the emblem as the card enters the window.",
+  "category": "cta",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "security",
+    "privacy",
+    "dark",
+    "card",
+    "glow",
+    "green",
+    "dots",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "an inverted card (foreground colour behind, background colour text): charcoal under light themes, pale under dark ones; the glow mixes chart-2 and chart-5",
+    "the emblem is a media slot; empty it is a faint rounded shape",
+    "the dot fade is a CSS scroll-driven animation; off under reduced motion"
+  ],
+  "entry": "bevel-privacy.tsx",
+  "source": "foundry",
+  "name": "bevel-privacy",
+  "files": [
+    {
+      "path": "bevel-privacy.css",
+      "content": "/* The dot grid fades in (opacity 0 → 1) as the card enters the window, as in the original. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bevel-privacy-dots {\n      animation: bevel-privacy-dots linear both;\n      animation-timeline: view();\n      animation-range: entry 20% cover 45%;\n    }\n  }\n}\n\n@keyframes bevel-privacy-dots {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n/* Deep green light along both sides and the lower corners (a mix of chart-2 and chart-5). */\n.bevel-privacy-glow {\n  --bevel-privacy-glow: color-mix(in oklab, color-mix(in oklab, var(--chart-2) 50%, var(--chart-5)) 32%, transparent);\n  background:\n    radial-gradient(ellipse 32% 75% at 0% 45%, var(--bevel-privacy-glow), transparent),\n    radial-gradient(ellipse 32% 75% at 100% 45%, var(--bevel-privacy-glow), transparent),\n    radial-gradient(ellipse 60% 22% at 50% 100%, var(--bevel-privacy-glow), transparent);\n}\n@media (min-width: 64rem) {\n  .bevel-privacy-glow {\n    background:\n      radial-gradient(ellipse 22% 90% at 0% 45%, var(--bevel-privacy-glow), transparent),\n      radial-gradient(ellipse 22% 90% at 100% 45%, var(--bevel-privacy-glow), transparent),\n      radial-gradient(circle at 0% 100%, var(--bevel-privacy-glow), transparent 18%),\n      radial-gradient(circle at 100% 100%, var(--bevel-privacy-glow), transparent 18%);\n  }\n}\n"
+    },
+    {
+      "path": "bevel-privacy.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { bevelLead, bevelTitle } from \"@foundry/bevel-heading\";\nimport \"./bevel-privacy.css\";\n\nexport interface BevelPrivacyProps {\n  /** the title, one line on desktop */\n  title: ReactNode;\n  /** the paragraph under it */\n  text: ReactNode;\n  /** the big emblem behind the text (an illustration); a faint rounded shape when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A single wide charcoal card with 32px corners, lit by a deep green glow along its sides and\n * lower corners: a big emblem rises from the bottom edge behind a centered white title and a\n * grey paragraph, and a fine dot grid fades in over it as the card comes into view.\n */\nexport function BevelPrivacy({ title, text, media, className }: BevelPrivacyProps) {\n  return (\n    <section className={cn(\"bg-background py-10 lg:py-[calc(var(--section-y)*2)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"relative isolate flex h-[33.5rem] flex-col items-center justify-center overflow-clip rounded-[calc(var(--radius)*2)] bg-foreground px-8 text-center text-background lg:h-[40.625rem]\">\n          <div aria-hidden className=\"bevel-privacy-glow absolute inset-0 -z-20\" />\n          <div aria-hidden className=\"absolute top-[8%] left-1/2 -z-10 h-[105%] w-[82%] -translate-x-1/2 lg:top-0 lg:w-[34rem]\">\n            {media ?? <div className=\"size-full rounded-[3rem] bg-background/4 ring-2 ring-background/10 lg:rounded-[4.5rem]\" />}\n            <div className=\"bevel-privacy-dots absolute inset-[12%] bg-[radial-gradient(circle,color-mix(in_oklab,var(--background)_22%,transparent)_1px,transparent_1.5px)] bg-size-[14px_14px] [mask-image:radial-gradient(ellipse_at_50%_55%,black,transparent_70%)]\" />\n          </div>\n          <h2 className={cn(bevelTitle.lg, \"max-w-[11ch] text-balance lg:max-w-none\")}>{title}</h2>\n          <p className={cn(bevelLead, \"mt-4 max-w-[19rem] text-balance text-background/60 lg:max-w-[34rem]\")}>{text}</p>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "bevel-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the title, one line on desktop"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the big emblem behind the text (an illustration); a faint rounded shape when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0ac75a0e667524e4caf028557ce6a6cdb243487811a53d424082f41bb07ba443"
+}
