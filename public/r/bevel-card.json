@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Bevel card",
+  "description": "The site's one surface: a pale blue-grey panel with 32px corners that clips its contents, tinted from the foot with a soft colour wash (peach, green, blue, pink, teal or lavender) rising straight up or blooming low on the right.",
+  "category": "card",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "surface",
+    "soft",
+    "pastel",
+    "gradient",
+    "rounded",
+    "light"
+  ],
+  "notes": [
+    "tints read the chart-1…5 and glow tokens, so other themes re-colour them"
+  ],
+  "entry": "bevel-card.tsx",
+  "source": "foundry",
+  "name": "bevel-card",
+  "files": [
+    {
+      "path": "bevel-card.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\n/** The soft colour that rises from the card's foot (the original: 40% clear, then 20% → 40% tint). */\nconst tints = {\n  none: \"\",\n  peach: \"bg-linear-to-b from-transparent from-40% via-chart-1/20 via-90% to-chart-1/40\",\n  green: \"bg-linear-to-b from-transparent from-40% via-chart-2/20 via-90% to-chart-2/40\",\n  blue: \"bg-linear-to-b from-transparent from-40% via-chart-3/20 via-90% to-chart-3/40\",\n  pink: \"bg-linear-to-b from-transparent from-40% via-chart-4/20 via-90% to-chart-4/40\",\n  teal: \"bg-linear-to-b from-transparent via-chart-5/20 via-90% to-chart-5/40\",\n  lavender: \"bg-linear-to-b from-transparent via-glow/40 via-90% to-glow/40\",\n} as const;\n\n/** A glow that blooms from low on the right, as on the AI cards. */\nconst blooms = {\n  none: \"\",\n  peach: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--chart-1)_45%,transparent),color-mix(in_oklab,var(--chart-1)_20%,transparent)_12%,transparent_64%)]\",\n  green: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--chart-2)_40%,transparent),color-mix(in_oklab,var(--chart-2)_15%,transparent)_12%,transparent_64%)]\",\n  blue: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--chart-3)_35%,transparent),color-mix(in_oklab,var(--chart-3)_12%,transparent)_12%,transparent_64%)]\",\n  pink: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--chart-4)_55%,transparent),color-mix(in_oklab,var(--chart-4)_22%,transparent)_12%,transparent_64%)]\",\n  teal: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--chart-5)_55%,transparent),color-mix(in_oklab,var(--chart-5)_22%,transparent)_12%,transparent_64%)]\",\n  lavender: \"bg-[radial-gradient(circle_at_75%_100%,color-mix(in_oklab,var(--glow)_50%,transparent),color-mix(in_oklab,var(--glow)_30%,transparent)_14%,transparent_64%)]\",\n} as const;\n\nexport type BevelTint = keyof typeof tints;\n\nexport interface BevelCardProps {\n  /** the soft colour rising from the foot of the card */\n  tint?: BevelTint;\n  /** rise: a straight wash up from the bottom edge; bloom: a round glow low on the right */\n  wash?: \"rise\" | \"bloom\";\n  /** the card's contents (it is a positioning context and clips them) */\n  children?: ReactNode;\n  /** size and padding */\n  className?: string;\n}\n\n/**\n * The site's one surface: a pale blue-grey card with 32px corners that clips what it holds\n * (phones run off its edges), tinted softly from the foot.\n */\nexport function BevelCard({ tint = \"none\", wash = \"rise\", children, className }: BevelCardProps) {\n  return (\n    <div className={cn(\"relative isolate overflow-clip rounded-[calc(var(--radius)*2)] bg-card text-card-foreground\", className)}>\n      {tint !== \"none\" && <div aria-hidden className={cn(\"absolute inset-0 -z-10\", wash === \"rise\" ? tints[tint] : blooms[tint])} />}\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tint",
+      "type": "enum",
+      "required": false,
+      "default": "none",
+      "description": "the soft colour rising from the foot of the card"
+    },
+    {
+      "name": "wash",
+      "type": "enum",
+      "required": false,
+      "default": "rise",
+      "description": "rise: a straight wash up from the bottom edge; bloom: a round glow low on the right"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the card's contents (it is a positioning context and clips them)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size and padding"
+    }
+  ],
+  "hash": "d2527035266bfc79308762c90a09dac6d69658a8c6df68948ba4e3941beb6daa"
+}

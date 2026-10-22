@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel testimonials",
+  "description": "Reviews on white: an arched collage of sixteen photos with 24px corners in eight mirrored columns (short tiles at the sides, long ones in the middle), a big two-line centered title tucked into its foot and a grey paragraph, then a row of pale 32px-rounded review cards with orange stars, a semibold headline, a grey byline and the quote, drifting slowly left. Phones show the four middle columns, cropped at the edges.",
+  "category": "testimonials",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "reviews",
+    "collage",
+    "photos",
+    "marquee",
+    "loop",
+    "light",
+    "soft"
+  ],
+  "notes": [
+    "photos are media slots (16, column by column); empty they are muted placeholders",
+    "CSS-only marquee; stops under reduced motion"
+  ],
+  "entry": "bevel-testimonials.tsx",
+  "source": "foundry",
+  "name": "bevel-testimonials",
+  "files": [
+    {
+      "path": "bevel-testimonials.css",
+      "content": "/* The review row drifts left forever (two copies; the padding is the gap between them so\n   the loop is seamless). */\n.bevel-reviews-track {\n  padding-right: 1rem;\n}\n@media (min-width: 64rem) {\n  .bevel-reviews-track { padding-right: 2rem; }\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .bevel-reviews-track {\n    animation: bevel-testimonials-drift 110s linear infinite;\n  }\n}\n\n@keyframes bevel-testimonials-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "bevel-testimonials.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Star } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelHeading } from \"@foundry/bevel-heading\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-testimonials.css\";\n\nexport interface BevelReview {\n  /** the review's headline */\n  title: ReactNode;\n  /** who wrote it and when */\n  byline: ReactNode;\n  /** the review itself */\n  quote: ReactNode;\n  /** stars out of five */\n  stars?: number;\n}\n\nexport interface BevelTestimonialsProps {\n  /** the title (two lines), set into the foot of the photo collage */\n  title: ReactNode;\n  /** the paragraph under it */\n  lead?: ReactNode;\n  /** the sixteen collage photos, column by column; muted placeholders when empty */\n  photos?: ReactNode[];\n  /** the review cards in the drifting row */\n  reviews: BevelReview[];\n  className?: string;\n}\n\n/**\n * The collage: eight columns of photos (outer → centre: two tall, three short, one long\n * dropped, one long), mirrored, so the middle forms an arch the title tucks into. Each\n * entry is [top offset, tile heights] in rem. Phones show only the four middle columns.\n */\nconst columns: [number, number[]][] = [\n  [1.6875, [14.375, 14.375]],\n  [0, [10.3125, 10.3125, 10.3125]],\n  [5.4375, [22.1875]],\n  [0, [22.1875]],\n  [0, [22.1875]],\n  [5.4375, [22.1875]],\n  [0, [10.3125, 10.3125, 10.3125]],\n  [1.6875, [14.375, 14.375]],\n];\n\n/**\n * Reviews on white: an arched collage of rounded photos with a big two-line title tucked\n * into its foot, a grey paragraph, then a row of pale review cards (orange stars, a\n * headline, a byline and the quote) drifting slowly left.\n */\nexport function BevelTestimonials({ title, lead, photos = [], reviews, className }: BevelTestimonialsProps) {\n  let n = 0;\n  const row = (copy: number) =>\n    reviews.map((review, i) => (\n      <li\n        key={`${copy}-${i}`}\n        aria-hidden={copy > 0 || undefined}\n        className=\"h-[22.3rem] w-[21.25rem] shrink-0 rounded-[calc(var(--radius)*2)] bg-card px-8 py-8 text-card-foreground lg:w-[24rem]\"\n      >\n        <span className=\"flex gap-0.5 text-highlight [&_svg]:size-6 [&_svg]:fill-current\">\n          {Array.from({ length: review.stars ?? 5 }, (_, s) => (\n            <Star key={s} strokeWidth={0} />\n          ))}\n        </span>\n        <p className=\"mt-3 text-[1.125rem] leading-[1.3] font-semibold\">{review.title}</p>\n        <p className=\"mt-2 text-[1.125rem] leading-[1.3] font-semibold text-muted-foreground\">{review.byline}</p>\n        <p className=\"mt-5 text-[1.125rem] leading-[1.3] font-medium\">{review.quote}</p>\n      </li>\n    ));\n  return (\n    <section className={cn(\"bg-background pt-[9rem] pb-section text-foreground lg:pt-[13.5rem] lg:pb-[calc(var(--section-y)*2)]\", className)}>\n      <div className=\"flex h-[27.625rem] justify-center gap-4 overflow-clip lg:h-[33.125rem]\">\n        {columns.map(([top, tiles], c) => (\n          <div key={c} className={cn(\"flex w-[5.8rem] shrink-0 flex-col gap-4 lg:w-[8.9375rem]\", (c < 2 || c > 5) && \"hidden lg:flex\")} style={{ paddingTop: `${top}rem` }}>\n            {tiles.map((h) => {\n              const photo = photos[n++];\n              return (\n                <div key={n} className=\"shrink-0 overflow-clip rounded-[1.5rem]\" style={{ height: `${h}rem` }}>\n                  {photo ?? <BevelPlaceholder tone=\"muted\" className=\"size-full\" />}\n                </div>\n              );\n            })}\n          </div>\n        ))}\n      </div>\n      <BevelHeading title={title} lead={lead} className=\"relative mt-[1.875rem] max-w-[42rem] px-gutter lg:-mt-[3.625rem]\" />\n      <div className=\"mt-14 overflow-clip lg:mt-20\">\n        <ul className=\"bevel-reviews-track flex w-max gap-4 lg:gap-8\">\n          {row(0)}\n          {row(1)}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "bevel-heading",
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the title (two lines), set into the foot of the photo collage"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "photos",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "the sixteen collage photos, column by column; muted placeholders when empty"
+    },
+    {
+      "name": "reviews",
+      "type": "BevelReview[]",
+      "required": true,
+      "description": "the review cards in the drifting row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "13fc0b1a92689c5ca42b6d7f07f612ce564d9ef5beab69fd5e8faafb5f02e57d"
+}

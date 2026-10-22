@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel works-with strip",
+  "description": "A small semibold \"works with\" heading over a single row of partner wordmarks in ink: still and centered on desktop, a slow left-drifting marquee on phones.",
+  "category": "logos",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "integrations",
+    "partners",
+    "light",
+    "minimal",
+    "marquee",
+    "loop"
+  ],
+  "notes": [
+    "no bottom padding: the original's next section carries the space",
+    "CSS only; the phone marquee stops under reduced motion"
+  ],
+  "entry": "bevel-works-with.tsx",
+  "source": "foundry",
+  "name": "bevel-works-with",
+  "files": [
+    {
+      "path": "bevel-works-with.css",
+      "content": "/* Phones: the logo row (two copies) drifts left forever; desktop: a still, centered row. */\n@media (max-width: 63.99rem) and (prefers-reduced-motion: no-preference) {\n  .bevel-works-track {\n    padding-right: 2.5rem; /* the gap between the copies, so the loop is seamless */\n    animation: bevel-works-with-drift 28s linear infinite;\n  }\n}\n\n@keyframes bevel-works-with-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "bevel-works-with.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./bevel-works-with.css\";\n\nexport interface BevelWorksWithProps {\n  /** the small heading above the logos */\n  title: ReactNode;\n  /** the partner wordmarks (svg, img or styled text), five or so */\n  logos: ReactNode[];\n  className?: string;\n}\n\n/**\n * A small centered heading over a row of partner wordmarks: one still row on desktop, a\n * slowly drifting marquee on phones (where the row is too wide to fit).\n */\nexport function BevelWorksWith({ title, logos, className }: BevelWorksWithProps) {\n  const row = (copy: number) =>\n    logos.map((logo, i) => (\n      <li key={`${copy}-${i}`} aria-hidden={copy > 0 || undefined} className={cn(\"flex h-8 shrink-0 items-center text-foreground\", copy > 0 && \"lg:hidden\")}>\n        {logo}\n      </li>\n    ));\n  return (\n    <section className={cn(\"bg-background pt-[5.5rem] text-foreground lg:pt-[5.75rem]\", className)}>\n      <h2 className=\"text-center text-[1.25rem] leading-[0.9] font-semibold tracking-[-0.01em] lg:text-2xl\">{title}</h2>\n      <div className=\"mt-4 overflow-clip lg:mt-5\">\n        <ul className=\"bevel-works-track flex w-max items-center gap-10 lg:mx-auto lg:w-auto lg:justify-center\">\n          {row(0)}\n          {row(1)}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small heading above the logos"
+    },
+    {
+      "name": "logos",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the partner wordmarks (svg, img or styled text), five or so"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c62fc64aaf1d75667800442fdf1f052b47ee93ea0871ec75dfec5fa7c45d0f3a"
+}

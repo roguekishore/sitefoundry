@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Bevel heading",
+  "description": "A centered (or left) semibold heading with tight -0.03em tracking and line-height 1, fluid from 41px to 64px (or 50px to 80px for a page title), over a 20–24px medium lead in 60% ink.",
+  "category": "text",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "title",
+    "lead",
+    "minimal",
+    "centered"
+  ],
+  "notes": [
+    "pass a span with text-muted-foreground inside the title for the two-tone headings"
+  ],
+  "entry": "bevel-heading.tsx",
+  "source": "foundry",
+  "name": "bevel-heading",
+  "files": [
+    {
+      "path": "bevel-heading.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\n/** The original's fluid heading sizes (same clamp() formulas): xl 50→80px, lg 41.5→64px, md 32.5→40px. Size comes first: tailwind-merge drops a line-height written before a font-size. */\nexport const bevelTitle = {\n  xl: \"text-[clamp(3rem,2.857vw+2.429rem,5rem)] font-display font-semibold leading-none tracking-[-0.03em]\",\n  lg: \"text-[clamp(2.5rem,2.143vw+2.071rem,4rem)] font-display font-semibold leading-none tracking-[-0.03em]\",\n  md: \"text-[clamp(2rem,0.714vw+1.857rem,2.5rem)] font-display font-semibold leading-none tracking-[-0.03em]\",\n} as const;\n\n/** The lead under headings: 20→24px, between medium and semibold (SF Pro medium reads heavier than Inter medium), 60% ink. */\nexport const bevelLead = \"text-[clamp(1.25rem,0.357vw+1.179rem,1.5rem)] leading-[1.3] font-[550] text-muted-foreground\";\n\nexport interface BevelHeadingProps {\n  /** the heading; may hold a muted span for a two-tone title */\n  title: ReactNode;\n  /** the line under it */\n  lead?: ReactNode;\n  /** xl = page title (h1), lg = section title, md = card title */\n  size?: keyof typeof bevelTitle;\n  /** the heading level */\n  as?: \"h1\" | \"h2\" | \"h3\";\n  /** centered (most sections) or left */\n  align?: \"center\" | \"left\";\n  className?: string;\n}\n\nexport function BevelHeading({ title, lead, size = \"lg\", as: Tag = \"h2\", align = \"center\", className }: BevelHeadingProps) {\n  return (\n    <div className={cn(align === \"center\" ? \"mx-auto text-center\" : \"text-left\", className)}>\n      <Tag className={cn(bevelTitle[size], \"text-balance\")}>{title}</Tag>\n      {lead && <p className={cn(bevelLead, \"mt-4 text-balance\", align === \"center\" && \"mx-auto\")}>{lead}</p>}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the heading; may hold a muted span for a two-tone title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "xl = page title (h1), lg = section title, md = card title"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the heading level"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "centered (most sections) or left"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5dbe224ca3d2151d64cca6217d490a8031bed1edca86a2b7e8203de464dee20a"
+}

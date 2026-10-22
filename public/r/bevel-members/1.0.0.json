@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel members",
+  "description": "Airy social proof on white: two small grey laurel-framed awards, a big tightly tracked two-line centered title, then a row of tall 9:16 posts with 16px corners drifting slowly to the left, faded out at both edges.",
+  "category": "testimonials",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "social-proof",
+    "testimonials",
+    "ugc",
+    "marquee",
+    "loop",
+    "light",
+    "minimal",
+    "awards"
+  ],
+  "notes": [
+    "posts are media slots (images or videos); empty they are muted placeholders",
+    "CSS-only marquee; stops under reduced motion"
+  ],
+  "entry": "bevel-members.tsx",
+  "source": "foundry",
+  "name": "bevel-members",
+  "files": [
+    {
+      "path": "bevel-members.css",
+      "content": "/* The post row fades out at both edges and drifts left forever (two copies; the padding is\n   the gap between them so the loop is seamless). */\n.bevel-members-fade {\n  mask-image: linear-gradient(90deg, transparent 1%, black 9%, black 91%, transparent 99%);\n}\n\n.bevel-members-track {\n  padding-right: 1rem;\n}\n@media (min-width: 64rem) {\n  .bevel-members-track { padding-right: 2rem; }\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .bevel-members-track {\n    animation: bevel-members-drift 90s linear infinite;\n  }\n}\n\n@keyframes bevel-members-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "bevel-members.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Wheat } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { bevelTitle } from \"@foundry/bevel-heading\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-members.css\";\n\nexport interface BevelAward {\n  /** a tiny mark above the label (lucide icon) */\n  icon?: ReactNode;\n  /** the award's name, two short lines */\n  label: ReactNode;\n}\n\nexport interface BevelMembersProps {\n  /** two laurel-framed awards above the title */\n  awards?: BevelAward[];\n  /** the big centered title */\n  title: ReactNode;\n  /** the tall 9:16 social posts in the drifting row (images or videos) */\n  posts?: ReactNode[];\n  /** how many placeholder posts to show when posts is empty */\n  placeholderCount?: number;\n  className?: string;\n}\n\n/**\n * Social proof: two small laurel awards, a big two-line centered title, then a row of tall\n * 9:16 posts with 16px corners drifting slowly left, faded out at both edges.\n */\nexport function BevelMembers({ awards = [], title, posts, placeholderCount = 12, className }: BevelMembersProps) {\n  const items: ReactNode[] = posts?.length ? posts : Array.from({ length: placeholderCount }, () => null);\n  const row = (copy: number) =>\n    items.map((post, i) => (\n      <li key={`${copy}-${i}`} aria-hidden={copy > 0 || undefined} className=\"h-[15.8rem] w-[8.875rem] shrink-0 overflow-clip rounded-lg lg:h-[26.25rem] lg:w-[14.75rem]\">\n        {post ?? <BevelPlaceholder tone=\"muted\" className=\"size-full\" />}\n      </li>\n    ));\n  return (\n    <section className={cn(\"bg-background pt-section pb-10 text-foreground lg:pt-[calc(var(--section-y)*2)] lg:pb-section\", className)}>\n      {awards.length > 0 && (\n        <ul className=\"flex justify-center gap-8 px-gutter lg:gap-10\">\n          {awards.map((award, i) => (\n            <li key={i} className=\"flex items-center gap-2 text-muted-foreground\">\n              <Wheat aria-hidden className=\"size-9 -scale-x-100 -rotate-12 lg:size-10\" strokeWidth={1.75} />\n              <span className=\"flex flex-col items-center text-center text-[0.9375rem] leading-[1.1] font-medium [&_svg]:mb-1 [&_svg]:size-3.5\">\n                {award.icon}\n                {award.label}\n              </span>\n              <Wheat aria-hidden className=\"size-9 rotate-12 lg:size-10\" strokeWidth={1.75} />\n            </li>\n          ))}\n        </ul>\n      )}\n      <h2 className={cn(bevelTitle.lg, \"mx-auto mt-10 max-w-[22rem] px-gutter text-center text-balance lg:max-w-[56rem]\")}>{title}</h2>\n      <div className=\"bevel-members-fade mt-12 overflow-clip lg:mt-20\">\n        <ul className=\"bevel-members-track flex w-max gap-4 lg:gap-8\">\n          {row(0)}\n          {row(1)}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "bevel-heading",
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "awards",
+      "type": "BevelAward[]",
+      "required": false,
+      "default": "[]",
+      "description": "two laurel-framed awards above the title"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big centered title"
+    },
+    {
+      "name": "posts",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "the tall 9:16 social posts in the drifting row (images or videos)"
+    },
+    {
+      "name": "placeholderCount",
+      "type": "number",
+      "required": false,
+      "default": "12",
+      "description": "how many placeholder posts to show when posts is empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "797f085d0c8c8adb664d0db839871602e75613fca4b6b99466122154bd50a9d5"
+}

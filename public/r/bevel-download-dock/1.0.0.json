@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel download dock",
+  "description": "A floating get-the-app prompt. On desktop a small dark card with a QR code and two lines sits in the bottom-right corner and fades out over the first screen of scrolling. On phones a white rounded banner (app icon, name, tagline, stars and a dark pill) slides up from the bottom while the visitor scrolls back up.",
+  "category": "cta",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "download",
+    "app",
+    "fixed",
+    "floating",
+    "qr",
+    "banner",
+    "scroll",
+    "fade"
+  ],
+  "notes": [
+    "fixed: place it once on a page, anywhere",
+    "the desktop fade is a CSS scroll timeline (no JavaScript); the phone banner's show-on-scroll-up needs JavaScript"
+  ],
+  "entry": "bevel-download-dock.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "bevel-download-dock",
+  "files": [
+    {
+      "path": "bevel-download-dock.css",
+      "content": "/* The desktop QR card fades away over the first ~900px of scroll, like the original\n   (opacity 1 → 0 between 424 and 1325px). Browsers without scroll timelines keep it. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .bevel-dock-qr {\n      animation: bevel-download-dock-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 424px 1325px;\n    }\n  }\n}\n\n@keyframes bevel-download-dock-fade {\n  from { opacity: 1; }\n  to { opacity: 0; visibility: hidden; }\n}\n"
+    },
+    {
+      "path": "bevel-download-dock.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Star, StarHalf } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\nimport \"./bevel-download-dock.css\";\n\nexport interface BevelDownloadDockProps {\n  /** desktop card: the QR code image (a placeholder square when empty) */\n  qr?: ReactNode;\n  /** desktop card: its title */\n  qrTitle: ReactNode;\n  /** desktop card: the small line under the title */\n  qrText: ReactNode;\n  /** phone banner: the app icon (a placeholder tile when empty) */\n  appIcon?: ReactNode;\n  /** phone banner: the app's name */\n  appName: ReactNode;\n  /** phone banner: the line under the name */\n  appTagline: ReactNode;\n  /** phone banner: star rating out of five (halves allowed) */\n  rating?: number;\n  /** phone banner: the text after the stars (e.g. a count of ratings) */\n  ratingLabel?: ReactNode;\n  /** phone banner: the button */\n  cta: { label: ReactNode; href: string };\n  className?: string;\n}\n\n/**\n * The floating \"get the app\" prompt. Desktop: a small dark QR card in the bottom-right corner\n * that fades out over the first ~900px of scroll (CSS scroll timeline). Phones: a white\n * banner at the bottom that slides up while the visitor scrolls up and away when they scroll down.\n */\nexport function BevelDownloadDock({ qr, qrTitle, qrText, appIcon, appName, appTagline, rating = 5, ratingLabel, cta, className }: BevelDownloadDockProps) {\n  const [shown, setShown] = useState(false);\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (Math.abs(y - last) < 6) return;\n      setShown(y < last && y > 400);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  return (\n    <div className={className}>\n      <aside className=\"bevel-dock-qr fixed right-4 bottom-4 z-40 hidden w-[14rem] items-center gap-2.5 rounded-lg bg-primary p-2 text-primary-foreground lg:flex\">\n        <div className=\"size-16 shrink-0 overflow-clip rounded-md bg-primary-foreground p-1\">{qr ?? <BevelPlaceholder tone=\"muted\" className=\"size-full rounded-sm\" />}</div>\n        <div className=\"min-w-0\">\n          <p className=\"text-base leading-tight font-semibold\">{qrTitle}</p>\n          <p className=\"mt-1 text-xs leading-[1.1] font-semibold text-primary-foreground/60\">{qrText}</p>\n        </div>\n      </aside>\n\n      <aside\n        className={cn(\n          \"fixed inset-x-4 bottom-3 z-40 flex items-center gap-3 rounded-2xl bg-background p-2.5 text-foreground shadow-[0_4px_16px_0_color-mix(in_oklab,var(--foreground)_15%,transparent)] transition-transform duration-300 ease-out motion-reduce:transition-none lg:hidden\",\n          shown ? \"translate-y-0\" : \"translate-y-[calc(100%+1.5rem)]\",\n        )}\n      >\n        <div className=\"size-[4.5rem] shrink-0 overflow-clip rounded-2xl\">{appIcon ?? <BevelPlaceholder tone=\"muted\" className=\"size-full\" />}</div>\n        <div className=\"min-w-0 flex-1\">\n          <p className=\"text-[1.125rem] leading-tight font-semibold\">{appName}</p>\n          <p className=\"text-base leading-tight font-medium text-muted-foreground\">{appTagline}</p>\n          <p className=\"mt-1 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground\">\n            <span className=\"flex text-highlight [&_svg]:size-3.5 [&_svg]:fill-current\">\n              {Array.from({ length: Math.floor(rating) }, (_, i) => (\n                <Star key={i} strokeWidth={0} />\n              ))}\n              {rating % 1 >= 0.5 && <StarHalf strokeWidth={0} />}\n            </span>\n            {ratingLabel}\n          </p>\n        </div>\n        <a href={cta.href} className=\"flex h-10 shrink-0 items-center rounded-full bg-primary px-4 text-base font-semibold text-primary-foreground\">\n          {cta.label}\n        </a>\n      </aside>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "qr",
+      "type": "ReactNode",
+      "required": false,
+      "description": "desktop card: the QR code image (a placeholder square when empty)"
+    },
+    {
+      "name": "qrTitle",
+      "type": "ReactNode",
+      "required": true,
+      "description": "desktop card: its title"
+    },
+    {
+      "name": "qrText",
+      "type": "ReactNode",
+      "required": true,
+      "description": "desktop card: the small line under the title"
+    },
+    {
+      "name": "appIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "phone banner: the app icon (a placeholder tile when empty)"
+    },
+    {
+      "name": "appName",
+      "type": "ReactNode",
+      "required": true,
+      "description": "phone banner: the app's name"
+    },
+    {
+      "name": "appTagline",
+      "type": "ReactNode",
+      "required": true,
+      "description": "phone banner: the line under the name"
+    },
+    {
+      "name": "rating",
+      "type": "number",
+      "required": false,
+      "default": "5",
+      "description": "phone banner: star rating out of five (halves allowed)"
+    },
+    {
+      "name": "ratingLabel",
+      "type": "ReactNode",
+      "required": false,
+      "description": "phone banner: the text after the stars (e.g. a count of ratings)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "phone banner: the button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5ffcb1cd0e45e8419e489268a25eb86a765808bf0e090fb4281d2f98e64e9f5e"
+}

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel header",
+  "description": "A frosted white pill fixed at the top centre of the page: a wordmark, two quiet 60%-grey links that darken on hover, and a dark pill download button that swells slightly on hover. On phones it becomes a full-width rounded bar with a menu icon that opens a frosted dropdown.",
+  "category": "header",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "pill",
+    "frosted",
+    "glass",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "fixed: it floats over the top of the page; the first section should leave ~90px of room (the bevel hero does)",
+    "the phone menu toggle needs JavaScript"
+  ],
+  "entry": "bevel-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "bevel-header",
+  "files": [
+    {
+      "path": "bevel-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelButton } from \"@foundry/bevel-button\";\n\nexport interface BevelNavLink {\n  label: ReactNode;\n  href: string;\n}\n\nexport interface BevelHeaderProps {\n  /** the wordmark (a small mark + name) */\n  brand: ReactNode;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** two or three quiet links */\n  links: BevelNavLink[];\n  /** the dark pill button at the right */\n  cta: BevelNavLink & { icon?: ReactNode };\n  /** screen-reader label of the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\n/**\n * A frosted white pill fixed at the top centre: wordmark, quiet links and a dark download\n * pill on desktop; a full-width pill with a menu icon (opening a frosted dropdown) on phones.\n */\nexport function BevelHeader({ brand, brandHref = \"/\", links, cta, menuLabel, className }: BevelHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 px-gutter pt-4\", className)}>\n      <nav\n        className={cn(\n          \"mx-auto flex h-[3.25rem] max-w-page items-center rounded-2xl bg-background/60 pr-3 pl-4 text-foreground ring-1 ring-background/70 backdrop-blur-xl\",\n          \"shadow-[0_2px_16px_0_color-mix(in_oklab,var(--foreground)_6%,transparent)]\",\n          \"lg:h-[3.375rem] lg:w-[31.25rem] lg:rounded-full lg:pr-[0.4375rem] lg:pl-6\",\n        )}\n      >\n        <a\n          href={brandHref}\n          className=\"flex items-center gap-2 text-[1.25rem] font-medium tracking-[-0.01em] transition-colors duration-150 hover:text-muted-foreground [&_svg]:size-6\"\n        >\n          {brand}\n        </a>\n        <ul className=\"ml-[3.375rem] hidden items-center gap-6 lg:flex\">\n          {links.map((link, i) => (\n            <li key={i}>\n              <a href={link.href} className=\"text-base font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground\">\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n        <BevelButton label={cta.label} href={cta.href} icon={cta.icon} size=\"sm\" className=\"ml-auto hidden lg:inline-flex\" />\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen(!open)}\n          className=\"ml-auto flex size-9 items-center justify-center lg:hidden\"\n        >\n          {open ? <X className=\"size-6\" strokeWidth={1.75} /> : <Menu className=\"size-7\" strokeWidth={1.75} />}\n        </button>\n      </nav>\n      {open && (\n        <div className=\"mx-auto mt-2 flex max-w-page flex-col gap-1 rounded-2xl bg-background/85 p-4 ring-1 ring-background/70 backdrop-blur-xl lg:hidden\">\n          {links.map((link, i) => (\n            <a key={i} href={link.href} onClick={() => setOpen(false)} className=\"py-2 text-[1.125rem] font-medium text-muted-foreground transition-colors duration-150 hover:text-foreground\">\n              {link.label}\n            </a>\n          ))}\n          <BevelButton label={cta.label} href={cta.href} icon={cta.icon} className=\"mt-2\" />\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "bevel-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (a small mark + name)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "BevelNavLink[]",
+      "required": true,
+      "description": "two or three quiet links"
+    },
+    {
+      "name": "cta",
+      "type": "BevelNavLink & { icon?: ReactNode; }",
+      "required": true,
+      "description": "the dark pill button at the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b76faf931cf34707ca2816e0b8e803b7d8bba91ead2ec0ab7d87613de58666fb"
+}

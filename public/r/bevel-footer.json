@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bevel footer",
+  "description": "A quiet, airy white footer: the wordmark and a tiny copyright line on the left, four link columns (grey headings, medium ink links) running to the right edge, then a row of social icons and two small round compliance badges. On phones everything stacks into one column.",
+  "category": "footer",
+  "site": "bevel",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "light",
+    "minimal",
+    "columns"
+  ],
+  "notes": [
+    "badges are image slots; empty they are round placeholders"
+  ],
+  "entry": "bevel-footer.tsx",
+  "source": "foundry",
+  "name": "bevel-footer",
+  "files": [
+    {
+      "path": "bevel-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BevelPlaceholder } from \"@foundry/bevel-placeholder\";\n\nexport interface BevelFooterLink {\n  label: ReactNode;\n  href: string;\n}\n\nexport interface BevelFooterColumn {\n  /** the small grey heading */\n  title: ReactNode;\n  /** its links */\n  links: BevelFooterLink[];\n}\n\nexport interface BevelFooterProps {\n  /** the wordmark (a small mark + name) */\n  brand: ReactNode;\n  /** the copyright line under it */\n  legal: ReactNode;\n  /** up to four link columns */\n  columns: BevelFooterColumn[];\n  /** social links: an icon and a screen-reader label each */\n  socials?: { icon: ReactNode; label: string; href: string }[];\n  /** compliance badges at the bottom right (images); round placeholders when empty */\n  badges?: ReactNode[];\n  /** how many badge placeholders to show when badges is empty */\n  badgeCount?: number;\n  className?: string;\n}\n\n/**\n * A quiet white footer: the wordmark and copyright on the left, four link columns (grey\n * headings, ink links) running to the right edge, then a row of social icons and small\n * round compliance badges. On phones everything stacks.\n */\nexport function BevelFooter({ brand, legal, columns, socials = [], badges, badgeCount = 2, className }: BevelFooterProps) {\n  const badgeItems: ReactNode[] = badges?.length ? badges : Array.from({ length: badgeCount }, () => null);\n  const badgeRow = (\n    <div className=\"flex items-center gap-6\">\n      {badgeItems.map((badge, i) => (\n        <div key={i} className=\"size-10 overflow-clip rounded-full\">\n          {badge ?? <BevelPlaceholder tone=\"muted\" className=\"size-full bg-foreground/80\" />}\n        </div>\n      ))}\n    </div>\n  );\n  const socialRow = (\n    <ul className=\"flex items-center gap-8\">\n      {socials.map((s, i) => (\n        <li key={i}>\n          <a href={s.href} aria-label={s.label} className=\"flex text-foreground transition-opacity duration-150 hover:opacity-60 [&_svg]:size-6\">\n            {s.icon}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <footer className={cn(\"bg-background pt-[5.5rem] pb-16 text-foreground lg:pt-[calc(var(--section-y)*2)] lg:pb-36\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2)]\">\n        <div className=\"flex flex-col lg:flex-row lg:justify-between\">\n          <div>\n            <div className=\"flex items-center gap-2.5 text-2xl leading-none font-medium tracking-[-0.01em] [&_svg]:size-8\">{brand}</div>\n            <p className=\"mt-2 text-xs font-semibold text-muted-foreground\">{legal}</p>\n            <div className=\"mt-10 lg:hidden\">{socialRow}</div>\n          </div>\n          <div className=\"mt-10 flex flex-col gap-10 lg:mt-0 lg:flex-row lg:gap-[7.6rem]\">\n            {columns.map((col, i) => (\n              <div key={i}>\n                <p className=\"text-[1.125rem] leading-none font-medium text-muted-foreground\">{col.title}</p>\n                <ul className=\"mt-6 flex flex-col gap-[0.6rem]\">\n                  {col.links.map((link, j) => (\n                    <li key={j}>\n                      <a href={link.href} className=\"text-[1.125rem] leading-[1.3] font-medium transition-colors duration-150 hover:text-muted-foreground\">\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n        <div className=\"mt-14 flex items-center justify-between lg:mt-24\">\n          <div className=\"hidden lg:block\">{socialRow}</div>\n          {badgeRow}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "bevel-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (a small mark + name)"
+    },
+    {
+      "name": "legal",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the copyright line under it"
+    },
+    {
+      "name": "columns",
+      "type": "BevelFooterColumn[]",
+      "required": true,
+      "description": "up to four link columns"
+    },
+    {
+      "name": "socials",
+      "type": "{ icon: ReactNode; label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "social links: an icon and a screen-reader label each"
+    },
+    {
+      "name": "badges",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "compliance badges at the bottom right (images); round placeholders when empty"
+    },
+    {
+      "name": "badgeCount",
+      "type": "number",
+      "required": false,
+      "default": "2",
+      "description": "how many badge placeholders to show when badges is empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a995fdd3c61c3aa2e823259a5726bbcfefae7ba6dc00b2621154dbee20794486"
+}
