@@ -1,0 +1,59 @@
+/* Without scroll-driven animations the two scenes simply follow each other. */
+.ramp-pinned-stage {
+  display: grid;
+  gap: 4rem;
+}
+.ramp-pinned-media {
+  aspect-ratio: 16 / 10;
+}
+
+/* Pinned: the wrapper is several windows tall and names a view timeline; the stage sticks
+   under the header; scene A fades out and scene B rises in around the middle. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ramp-pinned {
+      height: 200svh;
+      view-timeline-name: --ramp-pinned;
+    }
+    .ramp-pinned-stage {
+      position: sticky;
+      top: var(--ramp-pinned-top, 0px);
+      height: calc(100svh - var(--ramp-pinned-top, 0px));
+      gap: 0;
+    }
+    .ramp-pinned-scene {
+      grid-area: 1 / 1;
+      min-height: 0;
+    }
+    .ramp-pinned-media {
+      aspect-ratio: auto;
+      flex: 1;
+      min-height: 0;
+    }
+    .ramp-pinned-a {
+      animation: ramp-pinned-out linear both;
+      animation-timeline: --ramp-pinned;
+      animation-range: contain 38% contain 52%;
+    }
+    .ramp-pinned-b {
+      animation: ramp-pinned-in linear both;
+      animation-timeline: --ramp-pinned;
+      animation-range: contain 50% contain 66%;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .ramp-pinned {
+      height: 300svh;
+    }
+  }
+}
+
+@keyframes ramp-pinned-out {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to { opacity: 0; transform: translateY(-24px); filter: blur(4px); visibility: hidden; }
+}
+
+@keyframes ramp-pinned-in {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: none; }
+}
