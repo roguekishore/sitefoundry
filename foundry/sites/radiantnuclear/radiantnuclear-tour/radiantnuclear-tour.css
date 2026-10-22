@@ -1,0 +1,100 @@
+/* Plain layout (Tailwind classes in the .tsx): heading, then a list of illustrated steps.
+   Where scroll timelines exist and motion is welcome, the section becomes a pinned stage:
+   it is (steps × 0.6 + 1) screens tall, its stage sticks for the rest, and every change is
+   driven by the section's own view timeline (--radiantnuclear-tour). The `contain` range is
+   the pinned stretch; each step's slice of it comes from custom properties set inline
+   by the component (--rnt-*). Unlayered rules here beat the Tailwind utilities. */
+.radiantnuclear-tour {
+  view-timeline: --radiantnuclear-tour block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .radiantnuclear-tour {
+      height: calc((var(--rnt-n) * 0.6 + 1) * 100svh);
+      padding: 0;
+    }
+    .radiantnuclear-tour-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      max-height: 68.75rem;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      grid-template-columns: minmax(0, 1fr);
+      padding-top: 5.25rem;
+      padding-bottom: 2.125rem;
+    }
+    /* the steps' pictures all share row 2, their captions row 3: they overlap and take turns */
+    .radiantnuclear-tour-steps,
+    .radiantnuclear-tour-step {
+      display: contents;
+    }
+    .radiantnuclear-tour-media {
+      grid-row: 2;
+      grid-column: 1;
+      align-self: center;
+      justify-self: center;
+      margin: 0;
+    }
+    .radiantnuclear-tour-caption {
+      grid-row: 3;
+      grid-column: 1;
+      align-self: start;
+      justify-self: center;
+      margin: 0;
+    }
+    .radiantnuclear-tour-progress {
+      grid-row: 4;
+      grid-column: 1;
+      display: block;
+    }
+
+    .radiantnuclear-tour-media,
+    .radiantnuclear-tour-caption,
+    .radiantnuclear-tour-thumb,
+    .radiantnuclear-tour-pointer {
+      animation-timing-function: linear;
+      animation-timeline: --radiantnuclear-tour;
+    }
+    .radiantnuclear-tour-media {
+      animation-name: var(--rnt-media-anim, none);
+      animation-range: var(--rnt-media-range, normal);
+      animation-fill-mode: var(--rnt-media-fill, none);
+    }
+    .radiantnuclear-tour-caption {
+      animation-name: var(--rnt-cap-anim, none);
+      animation-range: var(--rnt-cap-range, normal);
+      animation-fill-mode: var(--rnt-cap-fill, none);
+    }
+    .radiantnuclear-tour-thumb {
+      animation-name: var(--rnt-thumb-anim, none);
+      animation-range: var(--rnt-thumb-range, normal);
+      animation-fill-mode: var(--rnt-thumb-fill, none);
+    }
+    /* the pointer glides from the middle of the first segment to the middle of the last */
+    .radiantnuclear-tour-pointer {
+      animation-name: radiantnuclear-tour-glide;
+      animation-range: contain 0% contain 100%;
+      animation-fill-mode: both;
+    }
+  }
+}
+
+@keyframes radiantnuclear-tour-in {
+  from { opacity: 0; }
+}
+@keyframes radiantnuclear-tour-out {
+  to { opacity: 0; }
+}
+/* captions come up 14px into place, and sink 14px as they leave */
+@keyframes radiantnuclear-tour-rise {
+  from { opacity: 0; transform: translateY(14px); }
+}
+@keyframes radiantnuclear-tour-sink {
+  to { opacity: 0; transform: translateY(14px); }
+}
+@keyframes radiantnuclear-tour-glide {
+  from { left: var(--rnt-from); }
+  to { left: var(--rnt-to); }
+}
