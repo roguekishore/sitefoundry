@@ -1,0 +1,35 @@
+/* Desktop: over the first 160px of page scroll the full-width bar draws in to the page
+   width, drops 24px and rounds its corners: a floating box. Phones are always the box. */
+@supports (animation-timeline: scroll()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .anchorage-header-shift {
+      animation: anchorage-header-drop linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+    .anchorage-header-bg {
+      animation: anchorage-header-float linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+  }
+}
+
+@keyframes anchorage-header-drop {
+  from { transform: translateY(0); }
+  to { transform: translateY(1.5rem); }
+}
+
+@keyframes anchorage-header-float {
+  from {
+    inset-inline: 0;
+    border-radius: 0;
+    border-color: transparent;
+    border-bottom-color: color-mix(in oklab, var(--foreground) 12%, transparent);
+  }
+  to {
+    inset-inline: max(0.625rem, calc(50% - var(--page-width) / 2));
+    border-radius: var(--radius);
+    border-color: color-mix(in oklab, var(--foreground) 12%, transparent);
+  }
+}
