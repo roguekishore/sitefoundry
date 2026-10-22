@@ -1,0 +1,46 @@
+/* Desktop: the hero is 175svh tall and its inner screen sticks. While it is pinned
+   (the wrapper's `contain` range) the card shrinks from full bleed to an inset card with a
+   rounded foot, the second picture fades in over the first and the headline rises in.
+   The plain styles are the settled state, so without scroll timelines it just shows that. */
+.neko-hero {
+  view-timeline: --neko-hero block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .neko-hero-card,
+    .neko-hero-second,
+    .neko-hero-title {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --neko-hero;
+    }
+    .neko-hero-card {
+      animation-name: neko-hero-shrink;
+      animation-range: contain 0% contain 95%;
+    }
+    .neko-hero-second {
+      animation-name: neko-hero-fade;
+      animation-range: contain 5% contain 55%;
+    }
+    .neko-hero-title {
+      animation-name: neko-hero-rise;
+      animation-range: contain 30% contain 85%;
+    }
+  }
+}
+
+@keyframes neko-hero-shrink {
+  from {
+    inset: 0;
+    border-radius: 0;
+  }
+}
+
+@keyframes neko-hero-fade {
+  from { opacity: 0; }
+}
+
+@keyframes neko-hero-rise {
+  from { opacity: 0; transform: translateY(40px); }
+}
