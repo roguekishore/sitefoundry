@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "ON.energy scroll reveal",
+  "description": "A wrapper whose content fades in, optionally rising a set distance, as it scrolls into view; siblings can be staggered with a delay.",
+  "category": "text-effect",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "fade",
+    "rise",
+    "scroll-driven",
+    "stagger"
+  ],
+  "notes": [
+    "CSS only (view timeline); static HTML and older browsers show the content in place",
+    "off under reduced motion"
+  ],
+  "entry": "on-energy-reveal.tsx",
+  "source": "foundry",
+  "name": "on-energy-reveal",
+  "files": [
+    {
+      "path": "on-energy-reveal.css",
+      "content": "/* Content fades in and rises into place as it scrolls into view. --on-energy-rise sets the\n   distance, --on-energy-reveal-delay pushes the start later (staggers siblings). */\n@supports (animation-timeline: view()) {\n  .on-energy-reveal {\n    animation: on-energy-reveal-in linear both;\n    animation-timeline: view();\n    animation-range:\n      entry calc(var(--on-energy-reveal-delay, 0) * 1%)\n      cover calc(25% + var(--on-energy-reveal-delay, 0) * 1%);\n  }\n}\n\n@keyframes on-energy-reveal-in {\n  from { opacity: 0; transform: translateY(var(--on-energy-rise, 0px)); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-reveal { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "on-energy-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./on-energy-reveal.css\";\n\nexport interface OnEnergyRevealProps {\n  /** what fades in */\n  children: ReactNode;\n  /** the element to render (default \"div\") */\n  as?: ElementType;\n  /** how far it rises while fading in, in px (0 = fade only) */\n  rise?: number;\n  /** pushes the start later, in % of the scroll range: staggers siblings */\n  delay?: number;\n  className?: string;\n}\n\n/**\n * Wraps content that fades in (and optionally rises) as it scrolls into view, scrubbed with\n * the scroll by a CSS view timeline. Static HTML shows the content in place.\n */\nexport function OnEnergyReveal({ children, as: Tag = \"div\", rise = 0, delay = 0, className }: OnEnergyRevealProps) {\n  return (\n    <Tag\n      className={cn(\"on-energy-reveal\", className)}\n      style={{ \"--on-energy-rise\": `${rise}px`, \"--on-energy-reveal-delay\": delay } as CSSProperties}\n    >\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "what fades in"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (default \"div\")"
+    },
+    {
+      "name": "rise",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "how far it rises while fading in, in px (0 = fade only)"
+    },
+    {
+      "name": "delay",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "pushes the start later, in % of the scroll range: staggers siblings"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0544bbe61a9af3749b0aeb3e1e25ed191d350e77d280650af7273ef150889d46"
+}

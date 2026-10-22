@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "ON.energy scramble eyebrow",
+  "description": "A small mono capital label after a round dot. When it first scrolls into view its letters flicker through random glyphs and settle left to right in about 0.7s.",
+  "category": "text-effect",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "label",
+    "eyebrow",
+    "mono",
+    "scramble",
+    "text-effect",
+    "reveal"
+  ],
+  "notes": [
+    "needs JavaScript for the scramble (hydrate: visible); static HTML shows the final label",
+    "off under reduced motion"
+  ],
+  "entry": "on-energy-eyebrow.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "on-energy-eyebrow",
+  "files": [
+    {
+      "path": "on-energy-eyebrow.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OnEnergyEyebrowProps {\n  /** the label, shown in mono capitals after a small dot */\n  label: string;\n  /** scramble the label through random glyphs when it first scrolls into view */\n  scramble?: boolean;\n  className?: string;\n}\n\nconst GLYPHS = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*%&/\";\nconst DURATION = 700;\n\n/**\n * A small mono section label with a dot before it. When it first enters the window its\n * letters run through random glyphs and settle left to right. Static HTML shows the final\n * label; the effect is skipped under reduced motion.\n */\nexport function OnEnergyEyebrow({ label, scramble = true, className }: OnEnergyEyebrowProps) {\n  const ref = useRef<HTMLParagraphElement>(null);\n  const [shown, setShown] = useState(label);\n\n  useEffect(() => {\n    setShown(label);\n    const el = ref.current;\n    if (!scramble || !el || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let frame = 0;\n    const run = () => {\n      const start = performance.now();\n      const tick = (now: number) => {\n        const t = Math.min(1, (now - start) / DURATION);\n        const settled = Math.floor(t * label.length);\n        setShown(\n          [...label]\n            .map((ch, i) => (i < settled || ch === \" \" ? ch : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]))\n            .join(\"\"),\n        );\n        if (t < 1) frame = requestAnimationFrame(tick);\n      };\n      frame = requestAnimationFrame(tick);\n    };\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          observer.disconnect();\n          run();\n        }\n      },\n      { threshold: 1 },\n    );\n    observer.observe(el);\n    return () => {\n      observer.disconnect();\n      cancelAnimationFrame(frame);\n    };\n  }, [label, scramble]);\n\n  return (\n    <p ref={ref} aria-label={label} className={cn(\"flex items-center gap-2 font-mono text-xs uppercase\", className)}>\n      <span aria-hidden className=\"size-1 rounded-full bg-current\" />\n      <span aria-hidden>{shown}</span>\n    </p>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the label, shown in mono capitals after a small dot"
+    },
+    {
+      "name": "scramble",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "scramble the label through random glyphs when it first scrolls into view"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b11401da1b2a8b3019fe4c792af73fcf68d348e67de0c790ea8527bc1947522d"
+}

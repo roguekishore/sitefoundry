@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy yellow footer card",
+  "description": "A yellow footer card floating over a dark pattern of hairline circles and grid lines: a two-line tagline and black button at the top-left, a column of big weight-300 links with hairline rules and small dotted chevrons on the right, small icon links, a giant bold wordmark in the bottom-left and a dotted legal line. On phones the card runs full width with only its bottom corners rounded.",
+  "category": "footer",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "yellow",
+    "bold-colour",
+    "card",
+    "pattern",
+    "grid",
+    "circles",
+    "wordmark",
+    "big-links",
+    "dark"
+  ],
+  "notes": [
+    "the pattern is drawn with CSS gradients in the border colour on the card colour",
+    "the wordmark is plain text in the display face; swap in your own mark if you have one"
+  ],
+  "entry": "on-energy-footer.tsx",
+  "source": "foundry",
+  "name": "on-energy-footer",
+  "files": [
+    {
+      "path": "on-energy-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OnEnergyButton } from \"@foundry/on-energy-button\";\n\nexport interface OnEnergyFooterProps {\n  /** two short lines at the top-left */\n  tagline: string;\n  /** the black button under the tagline */\n  cta?: { label: string; href: string };\n  /** the big links on the right; `more` adds a small chevron (a section with sub-pages) */\n  links: { label: string; href: string; more?: boolean }[];\n  /** small icon links under the big links */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the giant wordmark in the bottom-left corner (plain text) */\n  wordmark: string;\n  /** the copyright line */\n  copyright: string;\n  /** small legal links, separated by dots */\n  legal?: { label: string; href: string }[];\n  className?: string;\n}\n\n/**\n * A yellow footer card floating over a dark pattern of hairline circles and grid lines:\n * tagline and black button top-left, a column of big light links with hairline rules on the\n * right, small icon links, a giant wordmark in the bottom-left and the legal line at the\n * bottom. On phones the card runs full width with only its bottom corners rounded.\n */\nexport function OnEnergyFooter({ tagline, cta, links, socials = [], wordmark, copyright, legal = [], className }: OnEnergyFooterProps) {\n  return (\n    <footer\n      className={cn(\n        \"bg-card bg-[radial-gradient(circle,transparent_47px,var(--border)_47px,var(--border)_48px,transparent_48px),linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-size-[96px_96px] pb-[5.5rem] lg:p-4 lg:pt-5 lg:pb-40\",\n        className,\n      )}\n    >\n      <div data-on-energy-tone=\"primary\" className=\"mx-auto grid max-w-page rounded-b-[1.56rem] bg-primary px-gutter pt-16 pb-14 text-primary-foreground lg:grid-cols-2 lg:gap-x-[1.6vw] lg:min-h-[43.3rem] lg:rounded-[1.5rem] lg:px-5 lg:pt-[2.6rem] lg:pb-5\">\n        <div className=\"flex flex-col\">\n          <p className=\"max-w-[26rem] text-[1.17rem]/[1.25] font-light tracking-[-0.03em] whitespace-pre-line lg:text-2xl/[1.167]\">{tagline}</p>\n          {cta && (\n            <div className=\"mt-8\">\n              <OnEnergyButton variant=\"ink\" href={cta.href}>\n                {cta.label}\n              </OnEnergyButton>\n            </div>\n          )}\n          <p\n            aria-hidden\n            className=\"order-last mt-auto hidden pt-32 font-display text-[11rem]/[0.78] font-bold tracking-[-0.07em] lg:block\"\n          >\n            {wordmark}\n          </p>\n        </div>\n\n        <div className=\"mt-20 flex flex-col lg:mt-0\">\n          <ul>\n            {links.map((link) => (\n              <li key={link.label} className=\"border-b border-primary-foreground/40\">\n                <a href={link.href} className=\"group/link flex items-center justify-between py-1.5 lg:py-1\">\n                  <span className=\"text-[1.82rem]/[1.2] font-light tracking-[-0.02em] transition-transform duration-200 group-hover/link:translate-x-2 motion-reduce:transition-none lg:text-4xl/[1.25]\">\n                    {link.label}\n                  </span>\n                  {link.more && <ChevronDown aria-hidden className=\"size-3 [stroke-dasharray:0.01_2.5] [stroke-linecap:round]\" strokeWidth={2.5} />}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {socials.length > 0 && (\n            <ul className=\"mt-9 flex gap-7 lg:mt-10\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a href={s.href} aria-label={s.label} className=\"block transition-opacity duration-200 hover:opacity-60 [&_svg]:size-[1.125rem]\">\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n\n          <div className=\"mt-auto flex flex-col gap-y-6 pt-10 lg:flex-row lg:items-end lg:justify-between lg:gap-x-10 lg:pt-24\">\n            <p className=\"order-last text-center text-[0.91rem] font-light lg:order-first lg:text-left lg:text-base\">{copyright}</p>\n            <p aria-hidden className=\"font-display text-[9.4rem]/[0.78] font-bold tracking-[-0.07em] max-lg:mt-48 lg:hidden\">\n              {wordmark}\n            </p>\n            {legal.length > 0 && (\n              <ul className=\"-order-1 flex flex-wrap items-center gap-x-2 text-[0.91rem] font-light lg:order-none lg:pr-10 lg:text-[0.8125rem]\">\n                {legal.map((l, i) => (\n                  <li key={l.label} className=\"flex items-center gap-2\">\n                    {i > 0 && <span aria-hidden className=\"size-1 rounded-full bg-current\" />}\n                    <a href={l.href} className=\"hover:underline\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "on-energy-button"
+  ],
+  "props": [
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "two short lines at the top-left"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the black button under the tagline"
+    },
+    {
+      "name": "links",
+      "type": "{ label: string; href: string; more?: boolean | undefined; }[]",
+      "required": true,
+      "description": "the big links on the right; `more` adds a small chevron (a section with sub-pages)"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small icon links under the big links"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant wordmark in the bottom-left corner (plain text)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small legal links, separated by dots"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7c21cc59aea87bfe28d68283fe8e0767d1c7b0c9a0f8227a4ae11db4a7554059"
+}

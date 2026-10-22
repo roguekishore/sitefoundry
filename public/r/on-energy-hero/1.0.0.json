@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy full-window hero",
+  "description": "A full-window hero over full-bleed media: a big weight-300 headline at mid-height on the left, a small lede in the bottom-left corner and a yellow promo card with a square thumbnail in the bottom-right (full width at the bottom on phones). As it scrolls away the media drifts down 300px and a veil of the page colour fades in.",
+  "category": "hero",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-screen",
+    "media",
+    "dark",
+    "yellow",
+    "light-weight",
+    "parallax",
+    "scroll-driven",
+    "card"
+  ],
+  "notes": [
+    "media slot: a video or image that covers the window; empty, a muted gradient stands in",
+    "made for a dark backdrop: the headline uses the foreground colour over the media",
+    "CSS only (view timeline); off under reduced motion"
+  ],
+  "entry": "on-energy-hero.tsx",
+  "source": "foundry",
+  "name": "on-energy-hero",
+  "files": [
+    {
+      "path": "on-energy-hero.css",
+      "content": "/* While the hero scrolls away (its exit range), the media drifts down 300px, slower than the\n   page, and a veil of the page colour fades over it. */\n.on-energy-hero {\n  view-timeline: --on-energy-hero block;\n}\n\n@supports (animation-timeline: view()) {\n  .on-energy-hero-media {\n    animation: on-energy-hero-drift linear both;\n    animation-timeline: --on-energy-hero;\n    animation-range: exit 0% exit 100%;\n  }\n  .on-energy-hero-veil {\n    animation: on-energy-hero-veil linear both;\n    animation-timeline: --on-energy-hero;\n    animation-range: exit 30% exit 100%;\n  }\n}\n\n@keyframes on-energy-hero-drift {\n  from { transform: translateY(0); }\n  to { transform: translateY(300px); }\n}\n@keyframes on-energy-hero-veil {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-hero-media,\n  .on-energy-hero-veil { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "on-energy-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./on-energy-hero.css\";\n\nexport interface OnEnergyHeroProps {\n  /** the headline; a \"\\n\" breaks the line */\n  title: string;\n  /** a short line of copy in the bottom-left corner (desktop only, as on the original) */\n  lede?: string;\n  /** the yellow promo card in the bottom-right corner (full width at the bottom on phones) */\n  promo?: {\n    /** small mono label after a dot */\n    label: string;\n    /** two or three lines of copy */\n    text: string;\n    href: string;\n    /** a small square image of the product; a placeholder square when empty */\n    media?: ReactNode;\n  };\n  /** the full-bleed background (video or image, cover); a placeholder surface when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A full-window hero: full-bleed media, a big light headline at mid-height on the left, a\n * small lede in the bottom-left corner and a yellow promo card in the bottom-right. As the\n * hero scrolls away the media drifts down (parallax) and a veil of the page colour fades in.\n */\nexport function OnEnergyHero({ title, lede, promo, media, className }: OnEnergyHeroProps) {\n  return (\n    <section className={cn(\"on-energy-hero relative h-svh overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"on-energy-hero-media absolute inset-0\">\n        {media ?? <div className=\"size-full bg-linear-to-b from-muted via-muted/70 to-background\" />}\n      </div>\n      <div aria-hidden className=\"on-energy-hero-veil absolute inset-0 bg-background opacity-0\" />\n\n      <div className=\"relative flex h-full flex-col justify-center px-gutter\">\n        <h1 className=\"font-display text-[2.34rem]/[1.167] font-light tracking-[-0.02em] whitespace-pre-line lg:text-[4rem]/[1.125] lg:tracking-[-0.04em]\">\n          {title}\n        </h1>\n      </div>\n\n      {lede && (\n        <p className=\"absolute bottom-10 left-gutter hidden max-w-[22rem] text-base/[1.375] font-light tracking-[-0.02em] lg:block\">{lede}</p>\n      )}\n\n      {promo && (\n        <a\n          href={promo.href}\n          className=\"absolute inset-x-4 bottom-4 flex h-[7.375rem] gap-4 rounded-[1rem] bg-primary p-1.5 pl-4 text-primary-foreground transition-[filter] duration-200 hover:brightness-95 lg:left-auto lg:w-[21.625rem]\"\n        >\n          <span className=\"flex flex-1 flex-col justify-start gap-2.5 py-2.5\">\n            <span className=\"flex items-center gap-2 font-mono text-xs uppercase\">\n              <span aria-hidden className=\"size-1.5 rounded-full bg-current\" />\n              {promo.label}\n            </span>\n            <span className=\"text-[0.875rem]/[1.375] font-light lg:text-base/[1.375]\">{promo.text}</span>\n          </span>\n          <span className=\"aspect-square h-full shrink-0 overflow-clip rounded-[0.5625rem]\">\n            {promo.media ?? <span className=\"block size-full bg-primary-foreground/15\" />}\n          </span>\n        </a>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; a \"\\n\" breaks the line"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "a short line of copy in the bottom-left corner (desktop only, as on the original)"
+    },
+    {
+      "name": "promo",
+      "type": "{ label: string; text: string; href: string; media?: ReactNode; }",
+      "required": false,
+      "description": "the yellow promo card in the bottom-right corner (full width at the bottom on phones)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed background (video or image, cover); a placeholder surface when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "831c498aed4f80e14f1c5a45291b0498dfb7e9fb836072601069754259754cad"
+}

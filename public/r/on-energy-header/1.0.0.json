@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy floating header",
+  "description": "A fixed header that floats over the page: a yellow wordmark badge, five equal translucent glass pills with dropdown chevrons and a yellow mono CTA, 4px apart across the full width. Pills fill off-white on hover and open a glass dropdown. On phones it shrinks to one yellow pill in the top-right corner with a grid menu button that opens a full-screen yellow menu. The badge, pills and CTA retint to match the section underneath: black-and-yellow over yellow sections, dark over light ones.",
+  "category": "header",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "floating",
+    "glass",
+    "pills",
+    "dropdown",
+    "yellow",
+    "dark",
+    "hover"
+  ],
+  "notes": [
+    "fixed to the top of the window: put it first on the page; the hero runs underneath it",
+    "the glass pills are made for dark or media backdrops",
+    "needs JavaScript for the phone menu (hydrate: load); dropdowns are CSS hover/focus",
+    "sections can set data-on-energy-tone=\"primary\" (yellow) or \"inverse\" (light) on their root; the header follows the one under it while scrolling (the on-energy manifesto, testimonials, news and footer already do)"
+  ],
+  "entry": "on-energy-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "on-energy-header",
+  "files": [
+    {
+      "path": "on-energy-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ChevronDown, Grip, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OnEnergyNavLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** links shown in a dropdown under this one (desktop) or indented under it (phone menu) */\n  children?: { label: string; href: string }[];\n}\n\nexport interface OnEnergyHeaderProps {\n  /** the wordmark, set as plain text in the yellow badge */\n  brand: string;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** the main links; on desktop each gets an equal-width glass pill */\n  links: OnEnergyNavLink[];\n  /** the yellow call to action at the right end */\n  cta: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\ntype Tone = \"default\" | \"primary\" | \"inverse\";\n\n/** Colours per tone: the header follows the section under it (sections mark themselves with\n *  data-on-energy-tone=\"primary\" for yellow, \"inverse\" for light-on-dark-theme). */\nconst TONES: Record<Tone, { badge: string; pill: string; cta: string }> = {\n  default: {\n    badge: \"bg-primary text-primary-foreground\",\n    pill: \"bg-foreground/20 text-foreground\",\n    cta: \"bg-primary text-primary-foreground hover:bg-primary-foreground hover:text-primary\",\n  },\n  primary: {\n    badge: \"bg-primary-foreground text-primary\",\n    pill: \"bg-primary-foreground/15 text-primary-foreground\",\n    cta: \"bg-primary-foreground text-primary hover:bg-foreground hover:text-background\",\n  },\n  inverse: {\n    badge: \"bg-background text-primary\",\n    pill: \"bg-background/20 text-background\",\n    cta: \"bg-background text-primary hover:bg-primary hover:text-primary-foreground\",\n  },\n};\n\n/**\n * A fixed, floating header. Desktop: a yellow wordmark badge, a row of equal glass pills\n * (dropdowns open on hover) and a yellow mono CTA, 4px apart across the full width.\n * Phone: one yellow pill in the top-right corner with the wordmark and a grid menu button\n * that opens a full-screen yellow menu.\n */\nexport function OnEnergyHeader({ brand, brandHref = \"#\", links, cta, menuLabel = \"Menu\", className }: OnEnergyHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [tone, setTone] = useState<Tone>(\"default\");\n\n  // Find the section under the header's line and take its tone.\n  useEffect(() => {\n    let frame = 0;\n    const update = () => {\n      frame = 0;\n      let next: Tone = \"default\";\n      for (const el of document.querySelectorAll<HTMLElement>(\"[data-on-energy-tone]\")) {\n        const r = el.getBoundingClientRect();\n        if (r.top <= 30 && r.bottom > 30) next = (el.dataset.onEnergyTone as Tone) ?? \"default\";\n      }\n      setTone(next);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(update);\n    };\n    update();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    window.addEventListener(\"resize\", onScroll);\n    return () => {\n      window.removeEventListener(\"scroll\", onScroll);\n      window.removeEventListener(\"resize\", onScroll);\n      cancelAnimationFrame(frame);\n    };\n  }, []);\n  const t = TONES[tone];\n  return (\n    <header className={cn(\"pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-4 lg:px-4\", className)}>\n      {/* desktop row */}\n      <nav className=\"pointer-events-auto hidden h-7 items-stretch gap-1 lg:flex\">\n        <a href={brandHref} className={cn(\"flex w-14 shrink-0 items-center justify-center rounded-lg font-display text-[0.9375rem] font-bold tracking-[-0.06em] transition-colors duration-300\", t.badge)}>\n          {brand}\n        </a>\n        {links.map((link) => (\n          <div key={link.label} className=\"group/nav relative flex-1\">\n            <a\n              href={link.href}\n              className={cn(\n                \"flex h-full items-center justify-between rounded-lg px-3.5 font-sans text-[0.8125rem] backdrop-blur-md transition-colors duration-200 group-hover/nav:bg-foreground group-hover/nav:text-background motion-reduce:transition-none\",\n                t.pill,\n              )}\n            >\n              <span>{link.label}</span>\n              {link.children?.length ? <ChevronDown aria-hidden className=\"size-3 opacity-70\" strokeWidth={1.5} /> : null}\n            </a>\n            {link.children?.length ? (\n              <ul className=\"invisible absolute inset-x-0 top-full mt-1 flex flex-col gap-px overflow-clip rounded-lg bg-card/90 p-1 opacity-0 backdrop-blur-md transition-opacity duration-200 group-focus-within/nav:visible group-focus-within/nav:opacity-100 group-hover/nav:visible group-hover/nav:opacity-100\">\n                {link.children.map((child) => (\n                  <li key={child.label}>\n                    <a href={child.href} className=\"block rounded-md px-3 py-2 text-[0.8125rem] text-card-foreground transition-colors duration-200 hover:bg-foreground hover:text-background\">\n                      {child.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ) : null}\n          </div>\n        ))}\n        <a\n          href={cta.href}\n          className={cn(\"flex shrink-0 items-center rounded-lg px-4 font-mono text-xs font-medium transition-colors duration-300 motion-reduce:transition-none\", t.cta)}\n        >\n          {cta.label}\n        </a>\n      </nav>\n\n      {/* phone pill */}\n      <div\n        className={cn(\n          \"pointer-events-auto ml-auto flex h-[2.875rem] w-[10.875rem] items-stretch overflow-clip rounded-lg transition-colors duration-300 lg:hidden\",\n          tone === \"primary\" ? \"bg-primary-foreground text-primary\" : \"bg-primary text-primary-foreground\",\n        )}\n      >\n        <a href={brandHref} className=\"flex flex-1 items-center justify-center font-display text-xl font-bold tracking-[-0.06em]\">\n          {brand}\n        </a>\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((v) => !v)}\n          className=\"flex w-[2.875rem] items-center justify-center border-l border-current transition-colors duration-200 hover:bg-primary-foreground hover:text-foreground\"\n        >\n          {open ? <X aria-hidden className=\"size-5\" /> : <Grip aria-hidden className=\"size-5\" strokeWidth={2.5} />}\n        </button>\n      </div>\n\n      {/* phone menu */}\n      {open && (\n        <div className=\"pointer-events-auto fixed inset-x-0 top-[4.5rem] bottom-0 overflow-y-auto bg-primary px-gutter pt-4 pb-10 text-primary-foreground lg:hidden\">\n          <ul className=\"flex flex-col\">\n            {links.map((link) => (\n              <li key={link.label} className=\"border-b border-primary-foreground/40 py-2\">\n                <a href={link.href} className=\"block text-[1.8rem] font-light tracking-[-0.04em]\">\n                  {link.label}\n                </a>\n                {link.children?.length ? (\n                  <ul className=\"flex flex-wrap gap-x-4 gap-y-1 pb-1\">\n                    {link.children.map((child) => (\n                      <li key={child.label}>\n                        <a href={child.href} className=\"text-sm\">\n                          {child.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                ) : null}\n              </li>\n            ))}\n          </ul>\n          <a href={cta.href} className=\"mt-8 inline-flex h-10 items-center rounded-md bg-primary-foreground px-6 font-mono text-xs text-primary\">\n            {cta.label}\n          </a>\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set as plain text in the yellow badge"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "OnEnergyNavLink[]",
+      "required": true,
+      "description": "the main links; on desktop each gets an equal-width glass pill"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the yellow call to action at the right end"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a9fec9b02fc3732652259ef7ca0a509effb29466842bbc63d7ea4f21c697b5ce"
+}

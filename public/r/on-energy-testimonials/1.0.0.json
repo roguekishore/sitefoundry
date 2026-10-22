@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy split testimonial",
+  "description": "A light band split in two: a big weight-300 heading on the left whose letters blur in as it scrolls into view, and in the right half a light quote in soft grey quotation marks, the customer's bold wordmark, name and role, and a black button. Two small dark arrow tiles with dotted arrows step through the quotes, each fading in.",
+  "category": "testimonials",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "light",
+    "inverted",
+    "split",
+    "carousel",
+    "minimal",
+    "blur",
+    "reveal",
+    "light-weight"
+  ],
+  "notes": [
+    "inverted on purpose: bg-foreground with text-background, so it is light on the dark theme and dark on the light one",
+    "needs JavaScript for the arrows (hydrate: visible); static HTML shows the first quote"
+  ],
+  "entry": "on-energy-testimonials.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "on-energy-testimonials",
+  "files": [
+    {
+      "path": "on-energy-testimonials.css",
+      "content": "/* A new quote fades in when the arrows change it. */\n.on-energy-testimonials-slide {\n  animation: on-energy-testimonials-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n\n@keyframes on-energy-testimonials-in {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-testimonials-slide { animation: none; }\n}\n"
+    },
+    {
+      "path": "on-energy-testimonials.tsx",
+      "content": "import { useState } from \"react\";\nimport { ArrowDown, ArrowUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OnEnergyBlurText } from \"@foundry/on-energy-blur-text\";\nimport { OnEnergyButton } from \"@foundry/on-energy-button\";\nimport \"./on-energy-testimonials.css\";\n\nexport interface OnEnergyTestimonial {\n  /** the quote, without quotation marks (the block adds them) */\n  quote: string;\n  /** the customer's name, set as a bold wordmark */\n  company: string;\n  /** who said it */\n  name: string;\n  /** their role */\n  role: string;\n  /** optional button under the person, e.g. a case study */\n  cta?: { label: string; href: string };\n}\n\nexport interface OnEnergyTestimonialsProps {\n  /** the section heading on the left; its letters blur in as it scrolls into view */\n  title: string;\n  /** one or more quotes; the arrows step through them */\n  items: OnEnergyTestimonial[];\n  /** screen-reader labels for the two arrow buttons */\n  previousLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\n/**\n * A light testimonial band: a big light heading on the left, and in the right half a\n * weight-300 quote in soft quotation marks, the customer's wordmark, the person's name and\n * role, and a black button. Two small dark arrow tiles on the far right step through quotes.\n */\nexport function OnEnergyTestimonials({ title, items, previousLabel = \"Previous\", nextLabel = \"Next\", className }: OnEnergyTestimonialsProps) {\n  const [index, setIndex] = useState(0);\n  const item = items[index] ?? items[0];\n  const step = (by: number) => setIndex((i) => (i + by + items.length) % items.length);\n  if (!item) return null;\n\n  return (\n    <section data-on-energy-tone=\"inverse\" className={cn(\"bg-foreground text-background\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-y-10 px-gutter pt-[7.75rem] pb-56 lg:grid-cols-2 lg:gap-x-[1.6vw] lg:pt-[7.5rem] lg:pb-44\">\n        <OnEnergyBlurText text={title} className=\"font-display text-[2.34rem]/[1.167] font-light tracking-[-0.02em] lg:text-5xl/[1.167] lg:tracking-[-0.04em]\" />\n\n        <div>\n          <div key={index} className=\"on-energy-testimonials-slide\">\n            <blockquote className=\"text-xl/[1.25] font-light tracking-[-0.02em] lg:text-2xl/[1.167]\">\n              <span className=\"before:mr-2 before:inline-block before:align-top before:text-[1.5em]/[0.8] before:text-background/40 before:italic before:content-['\\201C'] after:ml-2 after:inline-block after:align-top after:text-[1.5em]/[0.8] after:text-background/40 after:italic after:content-['\\201D']\">\n                {item.quote}\n              </span>\n            </blockquote>\n\n            <div className=\"mt-16 flex items-start justify-between gap-6 lg:mt-[5.5rem]\">\n              <div>\n                <p className=\"font-display text-[1.6rem]/none font-semibold tracking-[-0.05em] lg:text-[1.75rem]\">{item.company}</p>\n                <p className=\"mt-5 text-xs/[1.5]\">{item.name}</p>\n                <p className=\"text-xs/[1.5] text-background/55\">{item.role}</p>\n              </div>\n              {items.length > 1 && (\n                <div className=\"flex flex-col gap-3 pt-1\">\n                  {[\n                    { label: previousLabel, icon: <ArrowUp aria-hidden />, by: -1 },\n                    { label: nextLabel, icon: <ArrowDown aria-hidden />, by: 1 },\n                  ].map((b) => (\n                    <button\n                      key={b.label}\n                      type=\"button\"\n                      aria-label={b.label}\n                      onClick={() => step(b.by)}\n                      className=\"flex size-7 items-center justify-center rounded-lg bg-background text-foreground transition-colors duration-200 hover:bg-primary hover:text-primary-foreground [&_svg]:size-4 [&_svg]:[stroke-dasharray:0.01_2.5] [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-width:2]\"\n                    >\n                      {b.icon}\n                    </button>\n                  ))}\n                </div>\n              )}\n            </div>\n\n            {item.cta && (\n              <div className=\"mt-10\">\n                <OnEnergyButton variant=\"solid\" href={item.cta.href} className=\"font-sans font-semibold\">\n                  {item.cta.label}\n                </OnEnergyButton>\n              </div>\n            )}\n          </div>\n\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "on-energy-blur-text",
+    "on-energy-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading on the left; its letters blur in as it scrolls into view"
+    },
+    {
+      "name": "items",
+      "type": "OnEnergyTestimonial[]",
+      "required": true,
+      "description": "one or more quotes; the arrows step through them"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": false,
+      "default": "Previous",
+      "description": "screen-reader labels for the two arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "default": "Next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b12e80062a1548f919f3923fea73e1c66ce2735e2a5fb535ca2775e08d868277"
+}

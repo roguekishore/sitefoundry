@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy big-number cards",
+  "description": "Big, very rounded dark-grey cards on black, two per row (stacked on phones): a huge hairline-thin figure with a small raised unit in the top-right corner and a light title with grey copy at the bottom-left; one card can hold an illustration instead. Cards rise 60px and fade in as they scroll into view.",
+  "category": "stats",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "cards",
+    "bento",
+    "dark",
+    "rounded",
+    "thin",
+    "light-weight",
+    "reveal",
+    "scroll-driven"
+  ],
+  "notes": [
+    "media slot: an illustration (e.g. a dotted map) in a card with showMedia; empty, a muted panel of the same size stands in",
+    "the section has no top padding (it sits right under the section before); add pt-section when it stands alone",
+    "CSS only (view timeline); off under reduced motion"
+  ],
+  "entry": "on-energy-stats.tsx",
+  "source": "foundry",
+  "name": "on-energy-stats",
+  "files": [
+    {
+      "path": "on-energy-stats.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OnEnergyReveal } from \"@foundry/on-energy-reveal\";\n\nexport interface OnEnergyStat {\n  /** the big thin figure in the top-right corner, e.g. \"4\" */\n  value?: string;\n  /** the small raised unit after it, e.g. \"GW\" or \"+\" */\n  unit?: string;\n  /** an illustration in place of the figure (e.g. a map); used when there is no value */\n  media?: ReactNode;\n  /** reserve an illustration slot (a placeholder when `media` is empty) instead of a figure */\n  showMedia?: boolean;\n  /** the card's title */\n  title: string;\n  /** one or two lines of copy */\n  text: string;\n}\n\nexport interface OnEnergyStatsProps {\n  /** the cards, two per row on desktop */\n  items: OnEnergyStat[];\n  className?: string;\n}\n\n/**\n * Big rounded dark cards on black, two per row: a huge hairline-thin figure with a raised\n * unit in the top-right corner, and a light title with grey copy at the bottom-left. A card\n * can hold an illustration instead of the figure. Cards rise and fade in as they scroll in.\n */\nexport function OnEnergyStats({ items, className }: OnEnergyStatsProps) {\n  return (\n    <section className={cn(\"bg-background text-card-foreground\", className)}>\n      <ul className=\"mx-auto grid max-w-page gap-[1.2rem] px-gutter pb-48 lg:grid-cols-2 lg:gap-x-4 lg:gap-y-[1.125rem] lg:pb-9\">\n        {items.map((item, i) => (\n          <OnEnergyReveal\n            as=\"li\"\n            key={item.title}\n            rise={60}\n            delay={(i % 2) * 5}\n            className=\"relative flex min-h-[22.25rem] flex-col justify-end rounded-[1.56rem] bg-card p-[1.06rem] lg:h-[28.125rem] lg:rounded-[3.5rem] lg:px-12 lg:pb-12\"\n          >\n            {item.value ? (\n              <p className=\"absolute top-2 right-4 flex items-start font-display font-thin text-card-foreground/70 lg:top-[2.4rem] lg:right-12\">\n                <span className=\"text-[6.24rem]/none tracking-[-0.04em] lg:text-[7.5rem]/none\">{item.value}</span>\n                {item.unit && <span className=\"mt-1 ml-1 text-[1.82rem]/none font-light lg:mt-0 lg:ml-2 lg:text-4xl/none\">{item.unit}</span>}\n              </p>\n            ) : item.media || item.showMedia ? (\n              <div className=\"absolute top-20 right-8 h-[12rem] w-[7.5rem] overflow-clip rounded-[1rem] lg:top-12 lg:right-[3.75rem] lg:h-[22rem] lg:w-[14.25rem]\">\n                {item.media ?? <div className=\"size-full bg-muted/50\" />}\n              </div>\n            ) : null}\n            <h3 className=\"relative max-w-[20rem] text-[1.17rem]/[1.22] font-light tracking-[-0.03em] lg:max-w-[22rem] lg:text-xl/[1.2]\">{item.title}</h3>\n            <p className=\"relative mt-2 max-w-[16rem] text-[0.91rem]/[1.375] font-light tracking-[-0.02em] text-card-foreground/70 lg:mt-4 lg:max-w-[19rem] lg:text-base/[1.375]\">\n              {item.text}\n            </p>\n          </OnEnergyReveal>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "on-energy-reveal"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "OnEnergyStat[]",
+      "required": true,
+      "description": "the cards, two per row on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8ea64fdf90a50d9882419796eafdf1a0737c81f27f1bb5348d1061d3ff3c069e"
+}

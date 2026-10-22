@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "ON.energy blur-in heading",
+  "description": "Heading text whose letters sharpen out of a blur and fade in one after another, left to right, as it scrolls into view.",
+  "category": "text-effect",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "blur",
+    "reveal",
+    "split-letters",
+    "scroll-driven",
+    "stagger"
+  ],
+  "notes": [
+    "CSS only: each letter is on its own view timeline with a staggered range",
+    "static HTML shows the text; off under reduced motion",
+    "use \n in the text for line breaks"
+  ],
+  "entry": "on-energy-blur-text.tsx",
+  "source": "foundry",
+  "name": "on-energy-blur-text",
+  "files": [
+    {
+      "path": "on-energy-blur-text.css",
+      "content": "/* Letters come out of a blur one after another as the text scrolls into view, left to right.\n   Every letter has its own view timeline; the stagger is an offset on its animation range\n   (--on-energy-blur-i is the letter's index). */\n.on-energy-blur-text-word {\n  display: inline-block;\n  white-space: nowrap;\n}\n.on-energy-blur-text-letter {\n  display: inline-block;\n}\n\n@supports (animation-timeline: view()) {\n  .on-energy-blur-text-letter {\n    animation: on-energy-blur-text-in linear both;\n    animation-timeline: view();\n    animation-range:\n      cover calc(2% + var(--on-energy-blur-i, 0) * 0.25%)\n      cover calc(10% + var(--on-energy-blur-i, 0) * 0.25%);\n  }\n}\n\n@keyframes on-energy-blur-text-in {\n  from { opacity: 0; filter: blur(10px); }\n  to { opacity: 1; filter: blur(0); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-blur-text-letter { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "on-energy-blur-text.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./on-energy-blur-text.css\";\n\nexport interface OnEnergyBlurTextProps {\n  /** the text; a \"\\n\" starts a new line */\n  text: string;\n  /** the element to render, e.g. \"h2\", \"h3\", \"p\" (default \"h2\") */\n  as?: ElementType;\n  className?: string;\n}\n\n/**\n * Heading text whose letters sharpen out of a blur one by one, left to right, as it scrolls\n * into view (CSS scroll-driven, no JavaScript). Static HTML and browsers without\n * scroll-driven animations show the text as is.\n */\nexport function OnEnergyBlurText({ text, as: Tag = \"h2\", className }: OnEnergyBlurTextProps) {\n  let index = 0;\n  const lines = text.split(\"\\n\");\n  return (\n    <Tag className={cn(className)} aria-label={text.replace(/\\n/g, \" \")}>\n      {lines.map((line, l) => (\n        <Fragment key={l}>\n          {l > 0 && <br />}\n          {line.split(\" \").map((word, w) => (\n            <Fragment key={w}>\n              {w > 0 && \" \"}\n              <span aria-hidden className=\"on-energy-blur-text-word\">\n                {[...word].map((ch, c) => (\n                  <span key={c} className=\"on-energy-blur-text-letter\" style={{ \"--on-energy-blur-i\": index++ } as CSSProperties}>\n                    {ch}\n                  </span>\n                ))}\n              </span>\n            </Fragment>\n          ))}\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the text; a \"\\n\" starts a new line"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render, e.g. \"h2\", \"h3\", \"p\" (default \"h2\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eb39c65058ac940179b39673d50dd4cf8d9a433469ff7beeb25f06c0dff6cfde"
+}
