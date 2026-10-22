@@ -63,6 +63,7 @@ const dryRun = args.includes("--dry-run");
 const MAX_RESUMES = 2; // after failures other than the usage limit
 const MAX_LIMIT_WAIT_H = 30; // per site, in total
 const FINISHED = ["done", "needs-you"]; // run again only with --again
+const CUT_OFF = ["failed", "stopped", "waiting-for-limit"]; // with a saved session: resumed where it stopped
 // Every model Claude Code would pick by itself is this one too: subagents, and its helper calls.
 const CLAUDE_ENV = {
   ...process.env,
@@ -166,7 +167,7 @@ function next() {
     if (!site) return null;
     attempted.add(site.slug);
     const ref = referenceDir(REPO, site.slug);
-    if (readdirSync(dirname(ref)).some((f) => f !== "_reference") && !site.pages.length && !FINISHED.includes(site.status)) {
+    if (readdirSync(dirname(ref)).some((f) => f !== "_reference") && !site.pages.length && !FINISHED.includes(site.status) && !(CUT_OFF.includes(site.status) && site.sessionId)) {
       // The skill would stop and ask whether to continue that recreation or use another slug.
       updateSite(listFile, site.slug, { status: "needs-you", note: `foundry/sites/${site.slug}/ is already built and no pages are named: continue it, or give this site another slug` });
       say(`${site.slug}: needs-you (already built, no pages named)`);
@@ -259,7 +260,7 @@ async function runSite(site) {
   const log = join(RUNS, `${site.slug}-${stamp}.jsonl`);
   const total = { turns: 0, ms: 0 };
   const deadline = Date.now() + maxHours * 3600_000;
-  let sessionId;
+  let sessionId = CUT_OFF.includes(site.status) ? site.sessionId : undefined; // cut off in an earlier batch
   let resumes = 0;
   let waitedMs = 0;
   let last;
@@ -280,7 +281,7 @@ async function runSite(site) {
     if (last.result && last.result.subtype === "success" && !last.result.is_error) break;
 
     const said = `${last.result?.result ?? ""}\n${last.stderrTail}`;
-    if (/usage limit|limit reached|hit your (usage )?limit|rate.?limit|\b429\b|overloaded/i.test(said) && waitedMs < MAX_LIMIT_WAIT_H * 3600_000) {
+    if (/usage limit|session limit|weekly limit|limit reached|hit your [\w ]*limit|rate.?limit|\b429\b|overloaded/i.test(said) && waitedMs < MAX_LIMIT_WAIT_H * 3600_000) {
       const reset = said.match(/\|(\d{10})\b/); // "…usage limit reached|<unix time of the reset>"
       const wait = reset ? Math.max(60_000, Number(reset[1]) * 1000 - Date.now() + 120_000) : limitWaitMin * 60_000;
       say(`${site.slug}: usage limit; waiting ${Math.round(wait / 60_000)} min, then resuming`);
