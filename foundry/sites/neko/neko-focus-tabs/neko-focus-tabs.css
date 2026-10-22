@@ -1,0 +1,166 @@
+/* Plain layout (Tailwind classes in the .tsx): a stack of cards, one per tab.
+   Where scroll timelines exist and motion is welcome, the section becomes a pinned stage:
+   it is (tabs + 1.7) screens tall (+1.25 on desktop), its inner stage sticks, and every
+   change below is driven by the section's own view timeline (--neko-tabs). The `contain`
+   range is the pinned stretch; each panel's slice of it comes from custom properties set
+   inline by the component (--nft-*). */
+.neko-tabs {
+  view-timeline: --neko-tabs block;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .neko-tabs {
+      --nft-media-h: 38svh;
+      --nft-inset: inset(1.5rem var(--page-gutter) round 1.25rem);
+      height: calc((var(--nft-n) + 1.7) * 100svh);
+      padding: 0;
+    }
+    .neko-tabs-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+    }
+    .neko-tabs-frame {
+      position: absolute;
+      inset: 0;
+      display: block;
+      clip-path: inset(0 round 0);
+      animation: neko-focus-tabs-open linear both;
+      animation-timeline: --neko-tabs;
+      animation-range: entry 40% entry 100%;
+    }
+    .neko-tabs-backdrop {
+      display: block;
+    }
+    .neko-tabs-panel {
+      position: absolute;
+      inset: 0;
+      display: block;
+      background: transparent;
+      border-radius: 0;
+      overflow: visible;
+    }
+    .neko-tabs-media {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nft-media-h);
+      aspect-ratio: auto;
+      min-height: 0;
+      border-radius: 0 0 1.25rem 1.25rem;
+    }
+    .neko-tabs-text {
+      position: absolute;
+      top: calc(var(--nft-media-h) + 3.25rem);
+      left: var(--page-gutter);
+      right: var(--page-gutter);
+      padding: 0;
+    }
+    .neko-tabs-eyebrow {
+      display: none;
+    }
+    .neko-tabs-row {
+      position: absolute;
+      top: calc(var(--nft-media-h) + 0.75rem);
+      left: var(--page-gutter);
+      right: var(--page-gutter);
+      display: flex;
+    }
+
+    /* the per-panel motion, all on the section's timeline */
+    .neko-tabs-media-inner,
+    .neko-tabs-copy,
+    .neko-tabs-word,
+    .neko-tabs-tab,
+    .neko-tabs-line {
+      animation-timing-function: linear;
+      animation-timeline: --neko-tabs;
+    }
+    .neko-tabs-media-inner {
+      animation-name: var(--nft-media-anim, none);
+      animation-range: var(--nft-media-range, normal);
+      animation-fill-mode: backwards;
+    }
+    .neko-tabs-copy {
+      animation-name: var(--nft-copy-anim, none);
+      animation-range: var(--nft-copy-range, normal);
+      animation-fill-mode: var(--nft-copy-fill, none);
+    }
+    .neko-tabs-word {
+      animation-name: var(--nft-word-anim, none);
+      animation-range: var(--nft-in-range, normal);
+      animation-fill-mode: backwards;
+    }
+    .neko-tabs-tab {
+      animation-name: var(--nft-tab-anim, none);
+      animation-range: var(--nft-tab-range, normal);
+      animation-fill-mode: var(--nft-tab-fill, none);
+    }
+    .neko-tabs-line {
+      display: block;
+      transform-origin: left center;
+      animation-name: var(--nft-line-anim, none);
+      animation-range: var(--nft-line-range, normal);
+      animation-fill-mode: var(--nft-line-fill, none);
+    }
+
+    @media (min-width: 64rem) {
+      .neko-tabs {
+        --nft-inset: inset(0 var(--page-gutter) round 1.8rem);
+        height: calc((var(--nft-n) + 1.25) * 100svh);
+      }
+      .neko-tabs-media {
+        right: auto;
+        bottom: 0;
+        width: 41.67%;
+        height: auto;
+        border-radius: 0 1.8rem 1.8rem 0;
+      }
+      .neko-tabs-text {
+        top: calc(23.5% + 3.6rem);
+        left: 50.4%;
+        max-width: 37rem;
+      }
+      .neko-tabs-row {
+        top: 23.5%;
+        left: 50.4%;
+        right: auto;
+        gap: 3rem;
+        border: 0;
+      }
+      .neko-tabs-line {
+        display: none;
+      }
+    }
+  }
+}
+
+/* the card grows from an inset card to full bleed while the section arrives */
+@keyframes neko-focus-tabs-open {
+  from { clip-path: var(--nft-inset); }
+}
+/* the next picture slides up from below, inside its frame */
+@keyframes neko-focus-tabs-slide {
+  from { transform: translateY(100%); }
+}
+@keyframes neko-focus-tabs-in {
+  from { opacity: 0; }
+}
+@keyframes neko-focus-tabs-out {
+  to { opacity: 0; }
+}
+/* each word starts lower the further along the headline it is */
+@keyframes neko-focus-tabs-word {
+  from { transform: translateY(var(--nft-rise, 0px)); }
+}
+@keyframes neko-focus-tabs-dim {
+  from, to { color: color-mix(in oklab, var(--foreground) 50%, transparent); }
+}
+@keyframes neko-focus-tabs-grow {
+  from { transform: scaleX(0); }
+}
+@keyframes neko-focus-tabs-gone {
+  from, to { opacity: 0; }
+}
