@@ -1,0 +1,60 @@
+/* The page's own (outer) tokens are captured on <header> before the inner box switches to dark
+   tokens; the dark box then captures its light ink. Custom properties inherit as resolved
+   values, so the bar can blend between the two. */
+.bp-header {
+  --bp-bar: var(--card);
+  --bp-ink: var(--foreground);
+  --bp-brand: var(--primary);
+  --bp-pill: var(--background);
+  --bp-line: var(--border);
+}
+.bp-header-top {
+  --bp-ink-top: var(--foreground);
+}
+
+/* Without scroll timelines, or with reduced motion: always the solid bar. */
+.bp-header-bar {
+  background-color: var(--bp-bar);
+  color: var(--bp-ink);
+}
+.bp-header-signin {
+  border-color: var(--bp-brand);
+  color: var(--bp-brand);
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bp-header-bar {
+      animation: bp-header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 80px;
+    }
+    .bp-header-signin {
+      animation: bp-header-signin linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 80px;
+    }
+  }
+}
+
+@keyframes bp-header-solid {
+  from {
+    background-color: color-mix(in oklab, var(--bp-bar) 0%, transparent);
+    color: var(--bp-ink-top);
+  }
+  to {
+    background-color: var(--bp-bar);
+    color: var(--bp-ink);
+  }
+}
+
+@keyframes bp-header-signin {
+  from {
+    border-color: var(--bp-ink-top);
+    color: var(--bp-ink-top);
+  }
+  to {
+    border-color: var(--bp-brand);
+    color: var(--bp-brand);
+  }
+}
