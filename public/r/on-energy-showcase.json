@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy pinned scroll scene",
+  "description": "A pinned, several-windows-tall scroll scene: a full-window dark stage sticks while you scroll, with a light two-line title and a glass button on the left at mid-height and a short two-tone copy at the bottom. As you scroll the title's letters blur and fade away one by one, the button fades and the media slowly pulls back from 1.2× to 1×.",
+  "category": "features",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "pinned",
+    "sticky",
+    "scroll-driven",
+    "scroll-scene",
+    "blur",
+    "split-letters",
+    "dark",
+    "full-screen",
+    "media",
+    "cinematic"
+  ],
+  "notes": [
+    "media slot: a full-window video, image sequence or 3D canvas; empty, a dark stage with a soft floor light stands in",
+    "the section is `screens` windows tall (8 on the original); everything scrubs with one CSS view timeline",
+    "made for a dark backdrop; off under reduced motion"
+  ],
+  "entry": "on-energy-showcase.tsx",
+  "source": "foundry",
+  "name": "on-energy-showcase",
+  "files": [
+    {
+      "path": "on-energy-showcase.css",
+      "content": "/* All motion follows one timeline: the tall section passing through the window.\n   - entering (entry): the scene fades up from black and the title slides down 90px into place;\n   - pinned (contain 0–100%): the media slowly pulls back from 1.2× to 1×;\n   - the title's letters blur and fade away one after another over the first ~45% of the pin\n     (each letter's range is offset by its index), and the button fades out with them. */\n.on-energy-showcase {\n  view-timeline: --on-energy-showcase block;\n}\n\n@supports (animation-timeline: view()) {\n  .on-energy-showcase-media {\n    animation: on-energy-showcase-reveal linear both, on-energy-showcase-pull linear both;\n    animation-timeline: --on-energy-showcase, --on-energy-showcase;\n    animation-range: entry 40% entry 100%, contain 0% contain 100%;\n  }\n  .on-energy-showcase-title {\n    animation: on-energy-showcase-settle linear both;\n    animation-timeline: --on-energy-showcase;\n    animation-range: entry 0% entry 100%;\n  }\n  .on-energy-showcase-letter {\n    animation: on-energy-showcase-letter linear both;\n    animation-timeline: --on-energy-showcase;\n    animation-range:\n      contain calc(4% + var(--on-energy-showcase-i, 0) * 1%)\n      contain calc(12% + var(--on-energy-showcase-i, 0) * 1%);\n  }\n  .on-energy-showcase-cta {\n    animation: on-energy-showcase-fade linear both;\n    animation-timeline: --on-energy-showcase;\n    animation-range: contain 14% contain 30%;\n  }\n}\n\n@keyframes on-energy-showcase-reveal {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes on-energy-showcase-pull {\n  from { transform: scale(1.2); }\n  to { transform: scale(1); }\n}\n@keyframes on-energy-showcase-settle {\n  from { transform: translateY(-90px); }\n  to { transform: none; }\n}\n@keyframes on-energy-showcase-letter {\n  from { opacity: 1; filter: blur(0); }\n  to { opacity: 0; filter: blur(12px); }\n}\n@keyframes on-energy-showcase-fade {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-showcase-media,\n  .on-energy-showcase-title,\n  .on-energy-showcase-letter,\n  .on-energy-showcase-cta { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "on-energy-showcase.tsx",
+      "content": "import { Fragment, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OnEnergyButton } from \"@foundry/on-energy-button\";\nimport \"./on-energy-showcase.css\";\n\nexport interface OnEnergyShowcaseProps {\n  /** the title over the scene; a \"\\n\" breaks the line. Its letters blur away one by one as you scroll */\n  title: string;\n  /** the glass button under the title (fades out with it) */\n  cta?: { label: string; href: string };\n  /** the first words of the bottom copy, in full foreground */\n  lead?: string;\n  /** the rest of the bottom copy, in the quieter grey */\n  copy?: string;\n  /** the full-window scene (video, image sequence or 3D canvas); a placeholder surface when empty */\n  media?: ReactNode;\n  /** how long the scene stays pinned, in window heights (the original: 8) */\n  screens?: number;\n  className?: string;\n}\n\n/**\n * A pinned scroll scene: the section is several windows tall and its full-window stage\n * sticks while you scroll through it. Over the stage, a title and button sit on the left at\n * mid-height and a short copy at the bottom. As you scroll, the title's letters blur and fade\n * away one after another, the button fades, and the media slowly pulls back.\n */\nexport function OnEnergyShowcase({ title, cta, lead, copy, media, screens = 8, className }: OnEnergyShowcaseProps) {\n  let index = 0;\n  return (\n    <section\n      className={cn(\"on-energy-showcase relative bg-background text-foreground\", className)}\n      style={{ height: `${screens * 100}svh` }}\n    >\n      <div className=\"sticky top-0 h-svh overflow-clip\">\n        <div className=\"on-energy-showcase-media absolute inset-0\">\n          {media ?? (\n            <div className=\"size-full bg-background bg-[radial-gradient(70%_45%_at_50%_62%,color-mix(in_oklab,var(--foreground)_28%,transparent),transparent)]\" />\n          )}\n        </div>\n\n        <div className=\"on-energy-showcase-title relative flex h-full flex-col justify-center px-gutter pb-[6vh]\">\n          <h2\n            aria-label={title.replace(/\\n/g, \" \")}\n            className=\"font-display text-[1.82rem]/[1.142] font-light tracking-[-0.02em] lg:text-5xl/[1.167] lg:tracking-[-0.04em]\"\n          >\n            {title.split(\"\\n\").map((line, l) => (\n              <Fragment key={l}>\n                {l > 0 && <br />}\n                {line.split(\" \").map((word, w) => (\n                  <Fragment key={w}>\n                    {w > 0 && \" \"}\n                    <span aria-hidden className=\"inline-block whitespace-nowrap\">\n                      {[...word].map((ch, c) => (\n                        <span key={c} className=\"on-energy-showcase-letter inline-block\" style={{ \"--on-energy-showcase-i\": index++ } as CSSProperties}>\n                          {ch}\n                        </span>\n                      ))}\n                    </span>\n                  </Fragment>\n                ))}\n              </Fragment>\n            ))}\n          </h2>\n          {cta && (\n            <div className=\"on-energy-showcase-cta mt-7\">\n              <OnEnergyButton href={cta.href}>{cta.label}</OnEnergyButton>\n            </div>\n          )}\n        </div>\n\n        {(lead || copy) && (\n          <p className=\"absolute right-gutter bottom-6 left-gutter max-w-[24rem] text-[0.91rem]/[1.375] font-light tracking-[-0.02em] lg:bottom-10 lg:text-base/[1.375]\">\n            {lead && <span className=\"text-foreground\">{lead} </span>}\n            {copy && <span className=\"text-muted-foreground\">{copy}</span>}\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "on-energy-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title over the scene; a \"\\n\" breaks the line. Its letters blur away one by one as you scroll"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the glass button under the title (fades out with it)"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the first words of the bottom copy, in full foreground"
+    },
+    {
+      "name": "copy",
+      "type": "string",
+      "required": false,
+      "description": "the rest of the bottom copy, in the quieter grey"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-window scene (video, image sequence or 3D canvas); a placeholder surface when empty"
+    },
+    {
+      "name": "screens",
+      "type": "number",
+      "required": false,
+      "default": "8",
+      "description": "how long the scene stays pinned, in window heights (the original: 8)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9bd1c3f164fd2059c0bfa461cef8f999120493365005c5f436a0c85d83f48e56"
+}

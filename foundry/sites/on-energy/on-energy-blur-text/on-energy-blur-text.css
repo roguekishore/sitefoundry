@@ -1,0 +1,29 @@
+/* Letters come out of a blur one after another as the text scrolls into view, left to right.
+   Every letter has its own view timeline; the stagger is an offset on its animation range
+   (--on-energy-blur-i is the letter's index). */
+.on-energy-blur-text-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.on-energy-blur-text-letter {
+  display: inline-block;
+}
+
+@supports (animation-timeline: view()) {
+  .on-energy-blur-text-letter {
+    animation: on-energy-blur-text-in linear both;
+    animation-timeline: view();
+    animation-range:
+      cover calc(2% + var(--on-energy-blur-i, 0) * 0.25%)
+      cover calc(10% + var(--on-energy-blur-i, 0) * 0.25%);
+  }
+}
+
+@keyframes on-energy-blur-text-in {
+  from { opacity: 0; filter: blur(10px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on-energy-blur-text-letter { animation: none !important; }
+}

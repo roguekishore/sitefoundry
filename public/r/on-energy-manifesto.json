@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy yellow manifesto",
+  "description": "A tall, flat yellow panel with one large weight-300 statement in black. While it scrolls in, the panel opens from an inset rounded frame to full bleed and the statement's lines darken from faint to full, one line after another.",
+  "category": "text-effect",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "manifesto",
+    "yellow",
+    "bold-colour",
+    "light-weight",
+    "reveal",
+    "scroll-driven",
+    "clip",
+    "line-reveal"
+  ],
+  "notes": [
+    "the inset frame shows the page colour behind it: best after a dark section",
+    "CSS only (view timelines); static HTML shows the panel full bleed and the text dark; off under reduced motion"
+  ],
+  "entry": "on-energy-manifesto.tsx",
+  "source": "foundry",
+  "name": "on-energy-manifesto",
+  "files": [
+    {
+      "path": "on-energy-manifesto.css",
+      "content": "/* The panel opens from an inset rounded frame to full bleed as it scrolls up to fill the window.\n   Each word has its own view timeline, so the words of one line darken together and lines\n   lower down follow: a line-by-line reveal, scrubbed with the scroll. */\n@supports (animation-timeline: view()) {\n  .on-energy-manifesto {\n    animation: on-energy-manifesto-open linear both;\n    animation-timeline: view();\n    animation-range: cover 0% cover 75%;\n  }\n  .on-energy-manifesto-word {\n    animation: on-energy-manifesto-word linear both;\n    animation-timeline: view();\n    animation-range: cover 8% cover 48%;\n  }\n}\n\n@keyframes on-energy-manifesto-open {\n  from { clip-path: inset(1.5rem round 1.5rem); }\n  to { clip-path: inset(0 round 0); }\n}\n@keyframes on-energy-manifesto-word {\n  from { opacity: 0.15; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .on-energy-manifesto,\n  .on-energy-manifesto-word { animation: none !important; }\n}\n"
+    },
+    {
+      "path": "on-energy-manifesto.tsx",
+      "content": "import { Fragment } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./on-energy-manifesto.css\";\n\nexport interface OnEnergyManifestoProps {\n  /** the statement: one long paragraph, set large and light */\n  text: string;\n  className?: string;\n}\n\n/**\n * A tall yellow panel holding one large, light statement. As it scrolls in, the panel opens\n * from an inset rounded frame to full bleed, and the statement's lines darken from faint to\n * full, top to bottom, with the scroll.\n */\nexport function OnEnergyManifesto({ text, className }: OnEnergyManifestoProps) {\n  const words = text.split(/\\s+/).filter(Boolean);\n  return (\n    <section data-on-energy-tone=\"primary\" className={cn(\"on-energy-manifesto bg-primary text-primary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter py-60 lg:py-[17.25rem]\">\n        <p className=\"max-w-[77rem] font-display text-[1.82rem]/[1.142] font-light tracking-[-0.02em] lg:text-5xl/[1.167] lg:tracking-[-0.04em]\">\n          {words.map((word, i) => (\n            <Fragment key={i}>\n              {i > 0 && \" \"}\n              <span className=\"on-energy-manifesto-word\">{word}</span>\n            </Fragment>\n          ))}\n        </p>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the statement: one long paragraph, set large and light"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "15f4db42f43f014f1c07e06ef33ce8b6c79fb294453a90a714c6cc9c018f511b"
+}

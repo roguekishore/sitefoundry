@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "ON.energy news and rows",
+  "description": "A light news section: a big weight-300 heading whose letters blur in, a short intro far below it, two featured stories side by side with large 32px-rounded 3:2 images and a mono kind/date column beside the title and excerpt, then a ruled list of more stories (title, date, read more). Rows fill grey on hover while the title slides right and the link slides left; cards and rows rise in on scroll.",
+  "category": "blog",
+  "site": "on-energy",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "news",
+    "press",
+    "list",
+    "cards",
+    "light",
+    "inverted",
+    "minimal",
+    "hover",
+    "blur",
+    "reveal"
+  ],
+  "notes": [
+    "inverted on purpose: bg-foreground with text-background, so it is light on the dark theme and dark on the light one",
+    "media slot per featured story: a 3:2 image; empty, a tinted panel stands in",
+    "CSS only; off under reduced motion"
+  ],
+  "entry": "on-energy-news.tsx",
+  "source": "foundry",
+  "name": "on-energy-news",
+  "files": [
+    {
+      "path": "on-energy-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OnEnergyBlurText } from \"@foundry/on-energy-blur-text\";\nimport { OnEnergyReveal } from \"@foundry/on-energy-reveal\";\n\nexport interface OnEnergyNewsStory {\n  /** small mono kind label, e.g. \"Announcement\" */\n  kind: string;\n  /** the date, as shown */\n  date: string;\n  title: string;\n  /** a short excerpt */\n  excerpt: string;\n  href: string;\n  /** a 3:2 image; a placeholder panel when empty */\n  media?: ReactNode;\n}\n\nexport interface OnEnergyNewsRow {\n  title: string;\n  /** the date, as shown */\n  date: string;\n  href: string;\n}\n\nexport interface OnEnergyNewsProps {\n  /** the section heading; its letters blur in */\n  title: string;\n  /** one or two lines under the heading */\n  intro?: string;\n  /** two featured stories with images */\n  featured: OnEnergyNewsStory[];\n  /** more stories as plain rows: title, date, link */\n  rows?: OnEnergyNewsRow[];\n  /** the link text at the end of each row */\n  readMoreLabel?: string;\n  className?: string;\n}\n\n/**\n * A light news section: a big light heading, a short intro, two featured stories side by side\n * (a large rounded 3:2 image, then a mono kind/date column beside the title and excerpt), and\n * a ruled list of more stories with title, date and \"read more\". On hover a row fills grey,\n * its title slides right and its link slides left.\n */\nexport function OnEnergyNews({ title, intro, featured, rows = [], readMoreLabel = \"Read more\", className }: OnEnergyNewsProps) {\n  return (\n    <section data-on-energy-tone=\"inverse\" className={cn(\"bg-foreground text-background\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[7.75rem] pb-52 lg:pt-[7.5rem] lg:pb-60\">\n        <OnEnergyBlurText text={title} className=\"font-display text-[2.34rem]/[1.167] font-light tracking-[-0.02em] lg:text-5xl/[1.167] lg:tracking-[-0.04em]\" />\n        {intro && (\n          <OnEnergyReveal as=\"p\" className=\"mt-48 max-w-[22rem] text-[0.91rem]/[1.375] font-light tracking-[-0.02em] lg:mt-[12.5rem] lg:max-w-[22.5rem] lg:text-base/[1.375]\">\n            {intro}\n          </OnEnergyReveal>\n        )}\n\n        <ul className=\"mt-16 grid gap-y-20 lg:mt-10 lg:grid-cols-2 lg:gap-x-4\">\n          {featured.map((story, i) => (\n            <OnEnergyReveal as=\"li\" key={story.title} rise={40} delay={i * 5}>\n              <a href={story.href} className=\"group/story block\">\n                <div className=\"aspect-[3/2] overflow-clip rounded-[1rem] transition-[filter] duration-200 group-hover/story:brightness-95 lg:rounded-[2rem]\">\n                  {story.media ?? <div className=\"size-full bg-background/15\" />}\n                </div>\n                <div className=\"mt-8 grid gap-y-8 lg:mt-10 lg:grid-cols-[10.8rem_1fr]\">\n                  <p className=\"font-mono text-[0.6875rem]/[1.6] text-background/55 uppercase\">\n                    {story.kind}\n                    <br />\n                    {story.date}\n                  </p>\n                  <div className=\"lg:pr-12\">\n                    <h3 className=\"text-[1.3rem]/[1.2] font-light tracking-[-0.03em] lg:text-2xl/[1.167]\">{story.title}</h3>\n                    <p className=\"mt-3 text-[0.91rem]/[1.375] font-light tracking-[-0.02em] text-background/60 lg:text-base/[1.375]\">{story.excerpt}</p>\n                  </div>\n                </div>\n              </a>\n            </OnEnergyReveal>\n          ))}\n        </ul>\n\n        {rows.length > 0 && (\n          <ul className=\"mt-36 lg:mt-[8.5rem]\">\n            {rows.map((row) => (\n              <OnEnergyReveal as=\"li\" key={row.title} rise={30}>\n                <a\n                  href={row.href}\n                  className=\"group/row grid border-b border-background py-6 transition-colors duration-200 hover:bg-background/10 lg:grid-cols-2 lg:items-center lg:gap-x-[1.6vw] lg:py-[1.6rem]\"\n                >\n                  <span className=\"text-[0.91rem]/[1.375] font-light tracking-[-0.02em] transition-transform duration-200 group-hover/row:translate-x-[0.8rem] motion-reduce:transition-none lg:pr-8 lg:text-base/[1.375]\">\n                    {row.title}\n                  </span>\n                  <span className=\"flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between\">\n                    <span className=\"text-[0.91rem]/[1.375] font-light text-background/60 lg:text-base/[1.375]\">{row.date}</span>\n                    <span className=\"inline-flex items-center gap-1.5 text-[0.91rem] font-light transition-transform duration-200 group-hover/row:-translate-x-[0.8rem] motion-reduce:transition-none lg:text-base [&_svg]:size-4 [&_svg]:[stroke-dasharray:0.01_2.5] [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-width:2]\">\n                      {readMoreLabel}\n                      <ArrowUpRight aria-hidden />\n                    </span>\n                  </span>\n                </a>\n              </OnEnergyReveal>\n            ))}\n          </ul>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "on-energy-blur-text",
+    "on-energy-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading; its letters blur in"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "one or two lines under the heading"
+    },
+    {
+      "name": "featured",
+      "type": "OnEnergyNewsStory[]",
+      "required": true,
+      "description": "two featured stories with images"
+    },
+    {
+      "name": "rows",
+      "type": "OnEnergyNewsRow[]",
+      "required": false,
+      "default": "[]",
+      "description": "more stories as plain rows: title, date, link"
+    },
+    {
+      "name": "readMoreLabel",
+      "type": "string",
+      "required": false,
+      "default": "Read more",
+      "description": "the link text at the end of each row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ee969677d3e16331988037e4572960fb2492c315a5f3aff956ef46216325738d"
+}
