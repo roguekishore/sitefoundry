@@ -1,0 +1,62 @@
+/* The hero is two screens tall and its scroll position drives everything (a view timeline on the
+   section; ranges in window heights, so phones and desktops settle at the same scroll). While the
+   second half of the first screen scrolls away, the pinned app window
+   settles: on desktop it shrinks from 1.2× and slides in from up-right; on phones it shrinks to
+   0.8×. The art cards behind it drift towards it, shrink to 0.75× and fade. The call strip on
+   the window's edge rises 130px a little more slowly (parallax). Without scroll timelines, or
+   with reduced motion, everything sits at its settled place and the art stays visible. */
+.granola-hero {
+  view-timeline: --granola-hero block;
+}
+
+.granola-hero-dash {
+  background-image: repeating-linear-gradient(to bottom, var(--border) 0 8px, transparent 8px 22px);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .granola-hero-window,
+    .granola-hero-art {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --granola-hero;
+      animation-range: contain 50vh contain 100vh;
+    }
+    .granola-hero-window {
+      animation-name: granola-hero-window-sm;
+    }
+    .granola-hero-art {
+      animation-name: granola-hero-art;
+    }
+    .granola-hero-strip {
+      animation: granola-hero-strip linear both;
+      animation-timeline: --granola-hero;
+      animation-range: contain 50vh contain 150vh;
+    }
+    @media (min-width: 64rem) {
+      .granola-hero-window {
+        animation-name: granola-hero-window-lg;
+      }
+    }
+  }
+}
+
+@keyframes granola-hero-window-sm {
+  from { transform: none; }
+  to { transform: scale(0.8); }
+}
+
+@keyframes granola-hero-window-lg {
+  from { transform: translate(25%, -9.4%) scale(1.2); }
+  to { transform: none; }
+}
+
+@keyframes granola-hero-art {
+  from { transform: none; opacity: 1; }
+  to { transform: translate(var(--gx, 0), var(--gy, 0)) scale(0.75); opacity: 0; }
+}
+
+@keyframes granola-hero-strip {
+  from { transform: translateY(27px); }
+  to { transform: translateY(-103px); }
+}
