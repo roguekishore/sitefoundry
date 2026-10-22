@@ -1,0 +1,68 @@
+/* The typed tag: the label is clipped to the width of its characters (1ch each in the mono)
+   and opened as the section enters the window; a pending glyph sits in the brackets until the
+   label is typed, then the status replaces it
+   (both clipped to their width, so the brackets close up around whichever shows). The whole content rises 12px and fades in. */
+.warp-section-tag-label {
+  display: inline-block;
+  overflow: clip;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.warp-section-tag-status,
+.warp-section-tag-pending {
+  display: inline-block;
+  overflow: clip;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.warp-section-tag-pending {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .warp-section-reveal {
+      view-timeline: --warp-section block;
+      animation: warp-section-rise linear both;
+      animation-timeline: --warp-section;
+      animation-range: entry 0px entry 240px;
+    }
+    .warp-section-tag-label {
+      animation: warp-section-type linear both;
+      animation-timeline: --warp-section;
+      animation-range: entry 80px entry 300px;
+    }
+    .warp-section-tag-pending {
+      display: inline-block;
+      animation: warp-section-pending linear both;
+      animation-timeline: --warp-section;
+      animation-range: entry 80px entry 380px;
+    }
+    .warp-section-tag-status {
+      animation: warp-section-status linear both;
+      animation-timeline: --warp-section;
+      animation-range: entry 80px entry 380px;
+    }
+  }
+}
+
+/* All warp blocks write letter-spacing as "original spacing - var(--warp-squeeze, 0em)": the
+   warp theme sets the squeeze to 0.1em because Azeret Mono runs wider than the original's
+   mono; under any other theme it is 0. */
+
+@keyframes warp-section-rise {
+  from { opacity: 0; translate: 0 12px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes warp-section-type {
+  from { max-width: 0; }
+  to { max-width: calc(var(--warp-tag-chars) * (1ch + 0.2em)); }
+}
+@keyframes warp-section-pending {
+  0%, 79% { max-width: 2ch; }
+  80%, 100% { max-width: 0; }
+}
+@keyframes warp-section-status {
+  0%, 79% { max-width: 0; }
+  80%, 100% { max-width: calc(var(--warp-tag-chars) * (1ch + 0.2em)); }
+}

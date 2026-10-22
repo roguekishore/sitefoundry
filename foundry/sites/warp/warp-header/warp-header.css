@@ -1,0 +1,43 @@
+/* Desktop: after the first screen the menu slides up out of the bar and the jump bar slides
+   down into it (scrubbed over the last 64px of the first screen). The progress line grows
+   with the page scroll. Both follow the page's own scroll position. */
+.warp-header-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .warp-header-progress {
+      display: block;
+      transform-origin: 0 50%;
+      animation: warp-header-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .warp-header-main {
+      animation: warp-header-out linear both;
+      animation-timeline: scroll(root block);
+      animation-range: calc(100svh - 128px) calc(100svh - 64px);
+    }
+    .warp-header-jumps {
+      display: flex;
+      animation: warp-header-in linear both;
+      animation-timeline: scroll(root block);
+      animation-range: calc(100svh - 128px) calc(100svh - 64px);
+    }
+  }
+}
+
+@keyframes warp-header-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes warp-header-out {
+  from { translate: 0 0; }
+  to { translate: 0 -100%; }
+}
+@keyframes warp-header-in {
+  from { translate: 0 -100%; }
+  to { translate: 0 0; }
+}
