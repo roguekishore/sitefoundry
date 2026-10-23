@@ -133,3 +133,26 @@ four short fictional disclaimers instead of the original's pages of legal text (
 | principles | photo slot placeholder (#313131) much lighter than the original's black band on desktop | same | accordion widen, text fade | yes: placeholder one step darker |
 | Nexus / insights / closing / footer | match the inferred layouts | match | reveals fire (fade up 40px) | — |
 | overflow | 360 overflowed (stats) | 1024 overflowed (stats) | — | yes |
+
+## Round 2
+
+Overflow at 360 / 768 / 1024: none. 125svh hero still marked "sized by the window". Every
+inventory row appears in ours' Motion list: header open + items slide (load), hero shrink /
+words out / sentence rise / hint fade (load), news ring + slide-in (timer), heading reveals
+(view, 40px), products pinned 3 half-screens + 0.4s fade-ups, stats digit strips scrubbed with
+view, beliefs cross-fade, principles text fade, Nexus / insights / closing reveals, closing
+photo scale 1.1 → 1 (scrubbed).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | stage sat ~70px low: the original centres it in the first window, not the 125svh band | same (frame centre 562 vs 450) | — | yes: first-window column (stage centred, sentence at its foot); now frame centre ≈ 450 at 1440, ≈ 430 at 390 |
+| footer | — | six fixed 180px columns overflowed at 1024 | — | yes: equal columns at lg, fixed widths from xl |
+| stats | digit windows were as wide as the widest digit ("1 40") | same | roll unchanged | yes: each window sized by its own final digit |
+| products, news, testimonials, beliefs, principles, Nexus, insights, closing | match | match | match | — |
+
+Re-theme check: `ondo-news`, `ondo-principles` and `ondo-stats` under `sample-ember` take its
+cream page, brown dark bands and serif display face without anything left in Ondo's greys.
+
+Left as is: footer shorter than the original (short fictional fine print); the hidden
+sections' layouts (beliefs, insights, closing text, Nexus visual) are inferred, since the
+capture never showed them.

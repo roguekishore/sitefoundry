@@ -28,8 +28,10 @@ function Figure({ value }: { value: string }) {
     <span aria-hidden className="flex">
       {[...value].map((ch, i) =>
         /\d/.test(ch) ? (
-          <span key={i} className="inline-block h-[1em] overflow-clip">
-            <span className="ondo-stats-strip flex flex-col" style={{ ["--ondo-stats-digit" as string]: ch }}>
+          <span key={i} className="relative inline-block h-[1em] overflow-clip">
+            {/* the final digit, invisible, sizes the window; the strip rolls inside it */}
+            <span className="invisible">{ch}</span>
+            <span className="ondo-stats-strip absolute inset-x-0 top-0 flex flex-col items-center" style={{ ["--ondo-stats-digit" as string]: ch }}>
               {digits.map((d) => (
                 <span key={d} className="block h-[1em]">
                   {d}
