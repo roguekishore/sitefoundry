@@ -128,3 +128,26 @@ scroll-driven reveals at their start state (blank signals band), so those were j
 | header | — | links start 8px left of the original | — | yes |
 | hero / app copy | body wrapped to a 2nd line (copy longer than original) | app body orphan | — | yes: shorter sample copy |
 | hero media | grey placeholder vs the original's beige photo | same | — | no: placeholder (token grey) by design |
+
+## Comparison round 2
+
+The round-1 fixes held: the phone product bar stays pinned at the bottom and the light band's
+bar takes over from the dark one as it scrolls in; the promo offer sets in two lines at 390;
+the footer wordmark spans the full 1280px. Targeted mid-scroll shots (playwright in /tmp)
+confirmed the battery handover (title gone, "UP TO — 12 DAYS — PER CHARGE" in place, glow arc
+swept in) and the science tiles landing as the section fills the window. Dark mode and
+`sample-ember` re-theme cleanly (product band and hero checked); the signals band inverts to
+white under a dark theme, as noted in its meta.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | — | 910px tall (the 10px gap above it lived inside the section): marked 101% of the window | — | yes: the gap is now the promo's bottom padding; hero reads 100% / 95% like the original |
+| light product stat | "2.6" at 80px vs the original's ~64px | — | — | yes: 68px on phones |
+| footer wordmark | — | italic slant ran 40px past the right margin | — | yes: textLength 1244, x −8 |
+| partners | names paler than the original's grey logos | same | — | yes: ink at 45% |
+| light product media | the original's render sits on white; our soft placeholder reads as a pale card | same | — | no: a placeholder has to show its frame |
+| globe | — | the original's lit globe; ours a plain dark disc fading at the bottom | — | no: media placeholder |
+
+Checks: window-sized sections match (390: 90/95/100%, 1440: 100/100/100%); no overflow at
+360/768/1024; every motion row present in ours' Motion list; hover changes match (opacity .92 /
+.85, glass → ink fill, outline faint fill, tab white/60 → white at 220ms).

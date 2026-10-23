@@ -26,7 +26,7 @@ export interface UltrahumanHeroProps {
  *  the bottom. Copy sits left-middle on desktop, centred at the top on phones, and rises in on load. */
 export function UltrahumanHero({ eyebrow, title, body, primary, secondary, media, mediaLabel, className }: UltrahumanHeroProps) {
   return (
-    <section className={cn("bg-background px-2.5 pt-2.5", className)}>
+    <section className={cn("bg-background px-2.5", className)}>
       <div className="relative isolate flex h-[95svh] flex-col items-center overflow-clip rounded-t-lg text-center text-foreground lg:h-svh lg:items-start lg:justify-center lg:text-left">
         <div className="absolute inset-0 -z-10">{media ?? <UltrahumanPlaceholder tone="warm" label={mediaLabel} />}</div>
         <div aria-hidden className="absolute inset-x-0 bottom-0 -z-10 h-[24%] bg-[linear-gradient(transparent,color-mix(in_oklab,var(--background)_45%,transparent)_55%,var(--background))]" />

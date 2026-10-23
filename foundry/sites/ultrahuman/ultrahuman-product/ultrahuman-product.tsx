@@ -117,7 +117,7 @@ export function UltrahumanProduct({
                   as="p"
                   className={cn(
                     "leading-none whitespace-nowrap",
-                    xl ? "mt-3 text-[5rem] tracking-[-0.04em] lg:text-[9.5rem] lg:tracking-[-0.05em]" : "mt-5 text-5xl tracking-[-0.03em] lg:mt-7 lg:text-[5.5rem]",
+                    xl ? "mt-3 text-[4.25rem] tracking-[-0.04em] lg:text-[9.5rem] lg:tracking-[-0.05em]" : "mt-5 text-5xl tracking-[-0.03em] lg:mt-7 lg:text-[5.5rem]",
                   )}
                 >
                   {stat.value}

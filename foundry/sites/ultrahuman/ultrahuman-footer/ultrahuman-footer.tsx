@@ -185,12 +185,13 @@ export function UltrahumanFooter({ columns, contact, follow, apps, legal, pills 
         </div>
 
         <div className="mt-5 border-t border-foreground/10 pt-10 lg:mt-5 lg:pt-11">
-          {/* the name stretched to the full width: SVG text fitted with textLength */}
+          {/* the name stretched to the full width: SVG text fitted with textLength (a little short of
+              1280, leaving room for the slant of the italic's top-right corner) */}
           <svg aria-hidden viewBox="0 0 1280 124" className="block h-auto w-full overflow-visible text-muted">
             <text
-              x="0"
+              x="-8"
               y="118"
-              textLength="1280"
+              textLength="1244"
               lengthAdjust="spacingAndGlyphs"
               fill="currentColor"
               className="font-display font-black uppercase italic"
