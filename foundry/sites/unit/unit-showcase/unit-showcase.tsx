@@ -75,7 +75,7 @@ export function UnitShowcase({ heading, cards, previousLabel, nextLabel, classNa
                 <span className="text-[1.375rem] leading-none font-bold tracking-[-0.03em] lg:text-[1.5rem]">{c.company}</span>
                 <UnitArrowCircle />
               </div>
-              <p className="mt-6 max-w-[17rem] text-[1.09375rem] leading-[1.25] tracking-[-0.01em] lg:mt-7 lg:text-[1.375rem] lg:leading-[1.23]">{c.description}</p>
+              <p className="mt-6 text-[1.09375rem] leading-[1.25] tracking-[-0.01em] lg:mt-7 lg:text-[1.375rem] lg:leading-[1.23]">{c.description}</p>
               <div className="mt-auto pt-12 lg:pt-14">
                 <div className="aspect-[295/199] overflow-clip rounded-lg">
                   {c.media ?? <UnitPlaceholder tone={tiles[i % tiles.length]} className="size-full transition-transform duration-[1025ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] group-hover/card:scale-[1.03] motion-reduce:transition-none" />}

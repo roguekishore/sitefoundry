@@ -25,7 +25,7 @@ const sizes = {
 /** The pill button: a chevron at rest that hands over to an arrow sliding in from the left on hover. */
 export function UnitButton({ children, href, variant = "solid", size = "md", type = "button", className }: UnitButtonProps) {
   const classes = cn(
-    "group/btn inline-flex shrink-0 items-center justify-center rounded-full leading-none tracking-[0.01em] whitespace-nowrap",
+    "group/btn inline-flex shrink-0 items-center justify-center rounded-full leading-none whitespace-nowrap",
     "transition-[background-color,border-color]",
     ease,
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",

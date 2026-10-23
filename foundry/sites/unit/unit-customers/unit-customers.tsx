@@ -40,7 +40,7 @@ export function UnitCustomers({ heading, stories, seconds = 8, className }: Unit
     const el = row.current;
     const tab = el?.children[active] as HTMLElement | undefined;
     if (el && tab && el.scrollWidth > el.clientWidth) {
-      el.scrollTo({ left: Math.max(0, tab.offsetLeft - el.offsetLeft), behavior: "smooth" });
+      el.scrollTo({ left: Math.max(0, el.scrollLeft + tab.getBoundingClientRect().left - el.getBoundingClientRect().left), behavior: "smooth" });
     }
   }, [active]);
 
@@ -79,19 +79,19 @@ export function UnitCustomers({ heading, stories, seconds = 8, className }: Unit
           ))}
         </div>
 
-        <div className="mt-8 grid rounded-lg bg-background p-3 lg:mt-8">
+        <div className="mt-8 grid grid-cols-1 rounded-lg bg-background p-3 lg:mt-8">
           {stories.map((s, i) => (
             <article
               key={s.company}
               role="tabpanel"
               aria-hidden={i !== active}
               className={cn(
-                "col-start-1 row-start-1 grid gap-6 transition-opacity lg:grid-cols-[minmax(0,32.625rem)_1fr] lg:gap-12",
+                "col-start-1 row-start-1 grid min-w-0 grid-cols-1 content-start gap-6 transition-[opacity,visibility] lg:grid-cols-[minmax(0,32.625rem)_1fr] lg:content-stretch lg:gap-12",
                 ease,
                 i === active ? "opacity-100" : "pointer-events-none invisible opacity-0",
               )}
             >
-              <div className="aspect-[326/300] overflow-clip rounded-[0.25rem] lg:aspect-[522/480]">{s.media ?? <UnitPlaceholder tone="accent" className="size-full" />}</div>
+              <div className="aspect-[326/300] w-full overflow-clip rounded-[0.25rem] lg:aspect-[522/480] lg:self-start">{s.media ?? <UnitPlaceholder tone="accent" className="size-full" />}</div>
               <div className="flex flex-col px-1 pb-4 lg:px-0 lg:pt-8 lg:pr-10 lg:pb-10">
                 <p className="max-w-[31rem] text-[1.203rem] leading-[1.25] tracking-[-0.01em] lg:text-[1.625rem] lg:leading-[1.2]">{s.statement}</p>
                 <div className="mt-5 flex max-w-[31rem] flex-wrap gap-2 lg:mt-5">
@@ -99,10 +99,10 @@ export function UnitCustomers({ heading, stories, seconds = 8, className }: Unit
                     <UnitChip key={c}>{c}</UnitChip>
                   ))}
                 </div>
-                <blockquote className="mt-10 max-w-[28rem] text-[0.984rem] leading-[1.4] tracking-[0.01em] lg:mt-auto lg:text-lg lg:leading-[1.3]">{s.quote}</blockquote>
+                <blockquote className="mt-10 max-w-[28rem] text-[0.984rem] leading-[1.4] lg:mt-auto lg:text-lg lg:leading-[1.3]">{s.quote}</blockquote>
                 <div className="mt-5 flex items-center gap-3">
                   <div className="size-10 shrink-0 overflow-clip rounded-[0.25rem]">{s.person.avatar ?? <UnitPlaceholder tone="muted" className="size-full" />}</div>
-                  <div className="text-sm leading-[1.5] tracking-[0.01em]">
+                  <div className="text-sm leading-[1.5]">
                     <p>{s.person.name}</p>
                     <p className="text-muted-foreground">{s.person.role}</p>
                   </div>

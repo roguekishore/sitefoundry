@@ -36,7 +36,7 @@ export function UnitHero({ badge, title, subtitle, cta, media, className }: Unit
         {badge && (
           <a
             href={badge.href}
-            className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/60 px-5 py-2.5 text-[0.875rem] leading-[1.35] tracking-[0.01em] transition-[border-color] duration-[425ms] ease-[cubic-bezier(0.625,0.05,0,1)] hover:border-foreground motion-reduce:transition-none sm:w-auto lg:px-3 lg:py-1.5 lg:text-sm"
+            className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/60 px-5 py-2.5 text-[0.875rem] leading-[1.35] transition-[border-color] duration-[425ms] ease-[cubic-bezier(0.625,0.05,0,1)] hover:border-foreground motion-reduce:transition-none sm:w-auto lg:px-3 lg:py-1.5 lg:text-sm"
           >
             <span className="lg:pl-0.5">{badge.label}</span>
             <ArrowUpRight aria-hidden className="size-3.5 shrink-0" strokeWidth={1.75} />
@@ -45,8 +45,8 @@ export function UnitHero({ badge, title, subtitle, cta, media, className }: Unit
         <h1 className="mt-4 max-w-[22rem] font-display text-[2.1875rem] leading-none tracking-[-0.02em] lg:mt-5 lg:max-w-[31rem] lg:text-[4rem] lg:leading-[1.02]">
           {title}
         </h1>
-        <p className="mt-6 max-w-[22rem] text-[1.1875rem] leading-[1.35] tracking-[-0.01em] text-muted-foreground lg:mt-9 lg:max-w-none lg:text-[1.375rem]">{subtitle}</p>
-        <UnitButton href={cta.href} className="mt-9 lg:mt-11">
+        <p className="mt-6 max-w-[22rem] text-[1.1875rem] leading-[1.35] tracking-[-0.01em] text-muted-foreground lg:mt-7 lg:max-w-none lg:text-[1.375rem]">{subtitle}</p>
+        <UnitButton href={cta.href} className="mt-9 lg:mt-8">
           {cta.label}
         </UnitButton>
       </div>

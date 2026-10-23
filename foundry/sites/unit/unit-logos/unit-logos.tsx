@@ -39,7 +39,7 @@ export function UnitLogos({ logos, label, className }: UnitLogosProps) {
     <section aria-label={label} className={cn("bg-background font-sans text-foreground", className)}>
       <ul className="mx-auto grid max-w-page grid-cols-3 gap-y-2.5 px-[calc(var(--page-gutter)-0.5rem)] pt-11 pb-6 lg:grid-cols-6 lg:gap-y-6 lg:px-[calc(var(--page-gutter)-1.25rem)] lg:pt-[3.25rem] lg:pb-10">
         {logos.map((logo, i) => {
-          const set = cn("block text-[0.8125rem] leading-none whitespace-nowrap lg:text-[1.375rem]", styles[logo.style ?? "bold"]);
+          const set = cn("block text-[0.8125rem] leading-none whitespace-nowrap lg:text-[1.25rem]", styles[logo.style ?? "bold"]);
           const Cell = logo.href ? "a" : "div";
           return (
             <li key={`${logo.name}-${i}`}>

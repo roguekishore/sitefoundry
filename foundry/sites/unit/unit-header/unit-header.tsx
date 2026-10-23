@@ -36,7 +36,7 @@ export function UnitHeader({ brand, brandHref = "#", links, secondary, cta, menu
 
         <nav className="ml-[4.75rem] hidden items-center gap-8 lg:flex">
           {links.map((l) => (
-            <a key={l.label} href={l.href} className={cn("text-sm tracking-[0.01em]", linkClass)}>
+            <a key={l.label} href={l.href} className={cn("text-sm", linkClass)}>
               {l.label}
             </a>
           ))}
@@ -44,7 +44,7 @@ export function UnitHeader({ brand, brandHref = "#", links, secondary, cta, menu
 
         <div className="ml-auto hidden items-center gap-6 lg:flex">
           {secondary && (
-            <a href={secondary.href} className={cn("text-sm tracking-[0.01em]", linkClass)}>
+            <a href={secondary.href} className={cn("text-sm", linkClass)}>
               {secondary.label}
             </a>
           )}

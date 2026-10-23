@@ -100,3 +100,50 @@ snippets that scroll inside the product illustrations (`ui-code` translateY).
 - Platform pin built with motion's `useScroll` rather than the CSS-only recipe: the same
   block has to run on a timer on phones, so one React state drives both.
 - Insights uses a slightly narrower container (1228px) like the original.
+
+## Verify
+
+Captures of ours were taken with a /tmp copy of `capture.mjs` that stubs Vite's live-reload
+socket (other sessions' edits kept reloading the shared gallery and killing the stock script).
+
+### Round 1
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| whole page | page 397px wide at 360 (and 771 at 768): the customer card's stacked tab panels stretched their picture box, whose aspect ratio then widened it; the emulated phone zoomed out, so the sticky header looked missing in every frame | fits | — | yes: one-column grids with `content-start`, picture `w-full` |
+| type | Host Grotesk with the original's +0.01em tracking read loose and wide | same | — | yes: positive tracking removed everywhere |
+| hero | matches | 560 vs 532 tall: subtitle and button gaps ~12px too big each | badge/button hovers match | yes |
+| logos | matches (3×4, dots, swap loop) | wordmarks a touch big (22px) | blur/scale swap loop ✓, cell hover ✓ | yes: 20px |
+| stats | matches | statement wrapped to 3 lines | uptime hover ✓ | yes: wider measure |
+| products | matches | card 627 vs 615 tall | hover tints ✓ (0.6s) | yes |
+| customers | matches after the overflow fix | matches (996 vs 998) | autoplay underline + crossfade ✓ | — |
+| platform | tab row didn't follow the timed tab | matches; pin and panel crossfades at the same scroll positions as the original (4500–5400px) | pinned ✓ | yes (round 2) |
+| embed | matches | screenshot frame 476 wide vs 412 | — | yes |
+| showcase | matches | descriptions wrapped to 3 lines (narrow measure) | arrows ✓, prev at half opacity ✓ | yes |
+| insights | matches | list items ~15px taller each, so the cards stretched (518 vs 488) | — | yes |
+| cta | matches | matches (416 vs 418) | hover ✓ | — |
+| footer | doubled hairline above the wordmark bar | link pitch 36 vs 31px | — | yes |
+
+### Round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| whole page | fits at 360/768/1024; sticky header shows in every frame | fits | — | — |
+| hero | matches | 540 vs 532 | — | accepted (our headline wraps differently) |
+| products | matches | 1682 vs 1729 (narrower stand-in font wraps less) | — | accepted |
+| platform | panel caught blank mid-switch (outgoing panel hid instantly); tab row scrolled to the wrong offset | matches | timer ✓ | yes: visibility transitions with opacity; scroll offset from bounding boxes; re-shot alone at 390 after 6s: tab 2 aligned, its line filling, its card shown |
+| customers | same tab-row offset fix | matches | ✓ | yes |
+| all others | match | match | ✓ | — |
+
+Re-theme check: `unit-products` and `unit-platform` under `sample-ember` (serif display,
+warm palette) and `unit-customers` in the unit dark mode all read correctly; the platform
+panel stays a dark island.
+
+### What still differs
+
+- Content (fictional Corbel copy) wraps differently from the original's lines, so some
+  headings have two lines where the original has three.
+- Logos and tab names are typeset wordmarks; product illustrations, story pictures, the hero
+  video, the embed screenshot/canvas, brand tiles, article images, network marks and seals are
+  placeholders of the same size and place.
+- Host Grotesk is a little rounder and wider than Suisse International.
