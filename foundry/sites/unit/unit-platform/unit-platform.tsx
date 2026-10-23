@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { cn } from "@foundry/foundry-utils";
@@ -65,6 +65,7 @@ export function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, classN
   const n = tabs.length;
   const [active, setActive] = useState(0);
   const section = useRef<HTMLElement>(null);
+  const row = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: section, offset: ["start 64px", "end end"] });
 
@@ -74,6 +75,15 @@ export function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, classN
     const k = Math.min(n - 1, Math.max(0, Math.floor(p * n)));
     setActive((a) => (a === k ? a : k));
   });
+
+  // phones: keep the active tab in view in the sideways row (without scrolling the page)
+  useEffect(() => {
+    const el = row.current;
+    const tab = el?.children[active] as HTMLElement | undefined;
+    if (el && tab && el.scrollWidth > el.clientWidth) {
+      el.scrollTo({ left: Math.max(0, el.scrollLeft + tab.getBoundingClientRect().left - el.getBoundingClientRect().left), behavior: reduced ? "auto" : "smooth" });
+    }
+  }, [active, reduced]);
 
   const pick = (k: number) => {
     const el = section.current;
@@ -104,7 +114,7 @@ export function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, classN
             )}
           </div>
 
-          <div role="tablist" className="order-3 -mr-gutter flex snap-x gap-6 overflow-x-auto pt-2 [scrollbar-width:none] lg:mt-20 lg:mr-0 lg:flex-col lg:gap-6 lg:overflow-visible lg:pt-0">
+          <div ref={row} role="tablist" className="order-3 -mr-gutter flex snap-x gap-6 overflow-x-auto pt-2 [scrollbar-width:none] lg:mt-20 lg:mr-0 lg:flex-col lg:gap-6 lg:overflow-visible lg:pt-0">
             {tabs.map((t, k) => (
               <button
                 key={t.title}
@@ -124,7 +134,7 @@ export function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, classN
                   />
                 )}
                 <span className="block text-[1.09375rem] leading-[1.25] tracking-[-0.01em] lg:text-lg">{t.title}</span>
-                <span className="mt-1.5 block text-[0.875rem] leading-[1.45] tracking-[0.01em] text-muted-foreground lg:mt-2 lg:text-base lg:leading-[1.4]">{t.body}</span>
+                <span className="mt-1.5 block text-[0.875rem] leading-[1.45] text-muted-foreground lg:mt-2 lg:text-base lg:leading-[1.4]">{t.body}</span>
               </button>
             ))}
           </div>
@@ -143,13 +153,13 @@ export function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, classN
               role="tabpanel"
               aria-hidden={k !== active}
               className={cn(
-                "col-start-1 row-start-1 w-full self-center rounded-lg bg-foreground/20 px-[1.125rem] backdrop-blur-sm transition-opacity lg:max-w-[25rem] lg:px-5",
+                "col-start-1 row-start-1 w-full self-center rounded-lg bg-foreground/20 px-[1.125rem] backdrop-blur-sm transition-[opacity,visibility] lg:max-w-[25rem] lg:px-5",
                 ease,
                 k === active ? "opacity-100" : "pointer-events-none invisible opacity-0",
               )}
             >
               {t.options.map((o) => (
-                <li key={o.label} className="flex h-12 items-center justify-between gap-4 border-b border-foreground/10 text-[0.8125rem] tracking-[0.01em] last:border-0 lg:h-[3.4375rem] lg:text-sm">
+                <li key={o.label} className="flex h-12 items-center justify-between gap-4 border-b border-foreground/10 text-[0.8125rem] last:border-0 lg:h-[3.4375rem] lg:text-sm">
                   {o.label}
                   <Control on={o.on} control={o.control} />
                 </li>

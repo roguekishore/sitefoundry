@@ -29,7 +29,7 @@ export interface UnitFooterProps {
 }
 
 const rowClass = "flex items-center justify-between gap-4 border-t border-border py-5 lg:py-[1.3rem]";
-const smallClass = "text-[0.875rem] leading-[1.3] tracking-[0.01em] text-muted-foreground/80";
+const smallClass = "text-[0.875rem] leading-[1.3] text-muted-foreground/80";
 
 /** A white footer: link columns, a right column with newsletter, social and seals, then a wordmark bar and grey fine print. */
 export function UnitFooter({ groups, newsletter, social, certified, brand, legal, notes, copyright, className }: UnitFooterProps) {
@@ -42,12 +42,12 @@ export function UnitFooter({ groups, newsletter, social, certified, brand, legal
             {groups.map((g) => (
               <div key={g.title}>
                 <p className={smallClass}>{g.title}</p>
-                <ul className="mt-5 flex flex-col gap-2.5 lg:mt-6 lg:gap-3">
+                <ul className="mt-4 flex flex-col gap-2 leading-[1.25] lg:mt-5 lg:gap-[0.6875rem]">
                   {g.links.map((l) => (
                     <li key={l.label}>
                       <a
                         href={l.href}
-                        className="text-[0.9375rem] leading-[1.25] tracking-[0.01em] transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none lg:text-base"
+                        className="text-[0.9375rem] leading-[1.25] transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none lg:text-base"
                       >
                         {l.label}
                       </a>
@@ -66,7 +66,7 @@ export function UnitFooter({ groups, newsletter, social, certified, brand, legal
                 name="email"
                 aria-label={newsletter.placeholder}
                 placeholder={newsletter.placeholder}
-                className="min-w-0 flex-1 bg-transparent text-[0.9375rem] tracking-[0.01em] text-foreground placeholder:text-muted-foreground focus:outline-none lg:text-sm"
+                className="min-w-0 flex-1 bg-transparent text-[0.9375rem] text-foreground placeholder:text-muted-foreground focus:outline-none lg:text-sm"
               />
               <button
                 type="submit"
@@ -109,12 +109,12 @@ export function UnitFooter({ groups, newsletter, social, certified, brand, legal
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center gap-6 border-y border-border py-8 lg:mt-[5.5rem] lg:flex-row lg:justify-between lg:py-7">
+        <div className="mt-4 flex flex-col items-center gap-6 border-b border-border py-8 lg:border-t lg:mt-[5.5rem] lg:flex-row lg:justify-between lg:py-7">
           <p className="font-display text-[2.75rem] leading-[0.85] font-bold tracking-[-0.05em] lg:text-[3rem]">{brand}</p>
           <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2 lg:gap-x-5">
             {legal.map((l) => (
               <li key={l.label}>
-                <a href={l.href} className="text-[0.9375rem] tracking-[0.01em] text-muted-foreground transition-colors duration-300 hover:text-foreground motion-reduce:transition-none lg:text-base">
+                <a href={l.href} className="text-[0.9375rem] text-muted-foreground transition-colors duration-300 hover:text-foreground motion-reduce:transition-none lg:text-base">
                   {l.label}
                 </a>
               </li>

@@ -26,13 +26,13 @@ export function UnitEmbed({ heading, body, cta, media, className }: UnitEmbedPro
 
           <div className="relative px-6 pt-8 lg:max-w-[33rem] lg:px-0 lg:pt-16 lg:pb-[4.5rem] lg:pl-[4.5rem]">
             <h2 className="font-display text-[1.640625rem] leading-[1.05] tracking-[-0.02em] lg:text-[2.5rem] lg:leading-none">{heading}</h2>
-            <p className="mt-4 max-w-[28rem] text-[0.984rem] leading-[1.45] tracking-[0.01em] text-muted-foreground lg:mt-5 lg:text-lg">{body}</p>
+            <p className="mt-4 max-w-[28rem] text-[0.984rem] leading-[1.45] text-muted-foreground lg:mt-5 lg:text-lg">{body}</p>
             <UnitButton href={cta.href} className="mt-5 lg:mt-6">
               {cta.label}
             </UnitButton>
           </div>
 
-          <div className="relative mt-14 ml-[5.375rem] h-[12.5rem] overflow-clip rounded-tl-lg border-t border-l border-glow/60 bg-card lg:absolute lg:top-10 lg:right-0 lg:mt-0 lg:ml-0 lg:h-auto lg:w-[29.75rem] lg:bottom-0">
+          <div className="relative mt-14 ml-[5.375rem] h-[12.5rem] overflow-clip rounded-tl-lg border-t border-l border-glow/60 bg-card lg:absolute lg:top-10 lg:right-0 lg:mt-0 lg:ml-0 lg:h-auto lg:w-[25.75rem] lg:bottom-0">
             {media && <div className="absolute inset-0">{media}</div>}
           </div>
         </div>

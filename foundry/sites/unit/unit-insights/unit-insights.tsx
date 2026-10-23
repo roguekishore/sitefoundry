@@ -34,7 +34,7 @@ export interface UnitInsightsProps {
 
 function Meta({ kind, time }: Pick<UnitInsight, "kind" | "time">) {
   return (
-    <p className="flex items-center gap-1.5 text-[0.8125rem] leading-none tracking-[0.01em] text-muted-foreground">
+    <p className="flex items-center gap-1.5 text-[0.8125rem] leading-none text-muted-foreground">
       <BookOpen aria-hidden className="size-3" strokeWidth={1.75} />
       {kind}
       <span aria-hidden>·</span>
@@ -53,9 +53,9 @@ export function UnitInsights({ heading, posts, featured, cta, className }: UnitI
           <ul className="mt-6 lg:mt-12">
             {posts.map((p) => (
               <li key={p.title} className="border-t border-foreground/10">
-                <a href={p.href} className="block py-7 transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] hover:opacity-60 motion-reduce:transition-none lg:pt-10 lg:pb-8">
+                <a href={p.href} className="block py-7 transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] hover:opacity-60 motion-reduce:transition-none lg:pt-9 lg:pb-7">
                   <Meta kind={p.kind} time={p.time} />
-                  <h3 className="mt-5 max-w-[20rem] text-[1.09375rem] leading-[1.35] tracking-[-0.01em] lg:mt-6 lg:text-[1.375rem] lg:leading-[1.3]">{p.title}</h3>
+                  <h3 className="mt-5 max-w-[20rem] text-[1.09375rem] leading-[1.35] tracking-[-0.01em] lg:mt-5 lg:text-[1.375rem] lg:leading-[1.3]">{p.title}</h3>
                 </a>
               </li>
             ))}

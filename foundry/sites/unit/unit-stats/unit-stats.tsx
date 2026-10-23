@@ -41,7 +41,7 @@ export function UnitStats({ heading, stats, statement, marks, markCount = 3, bad
           <dl className="mt-8 grid grid-cols-2 gap-x-5 gap-y-7 lg:mt-10 lg:grid-cols-4 lg:gap-x-6">
             {stats.map((s) => (
               <div key={s.label} className="flex flex-col-reverse lg:pl-0.5">
-                <dd className="mt-1.5 text-[1.09375rem] leading-[1.3] tracking-[0.01em] text-muted-foreground lg:mt-3 lg:text-lg">
+                <dd className="mt-1.5 text-[1.09375rem] leading-[1.3] text-muted-foreground lg:mt-3 lg:text-lg">
                   {s.href ? (
                     <a href={s.href} className="inline-flex items-center gap-3 text-foreground transition-opacity duration-[325ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] hover:opacity-50 motion-reduce:transition-none">
                       <span aria-hidden className="size-2 rounded-full bg-highlight" />
@@ -70,7 +70,7 @@ export function UnitStats({ heading, stats, statement, marks, markCount = 3, bad
                       </div>
                     ))}
                   </div>
-                  <p className="max-w-[22rem] text-[0.875rem] leading-[1.45] tracking-[0.01em] text-muted-foreground lg:text-base lg:leading-[1.4]">
+                  <p className="max-w-[23.5rem] text-[0.875rem] leading-[1.45] text-muted-foreground lg:text-base lg:leading-[1.4]">
                     <span className="text-foreground">{statement.lead}</span> {statement.rest}
                   </p>
                 </div>

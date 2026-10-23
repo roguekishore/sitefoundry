@@ -49,14 +49,14 @@ export function UnitProducts({ heading, products, className }: UnitProductsProps
                     <h3 className="pt-1 text-[1.203rem] leading-[1.2] tracking-[-0.01em] lg:text-[1.625rem]">{p.title}</h3>
                     <UnitArrowCircle />
                   </div>
-                  <p className="mt-3 max-w-[28rem] text-[0.984rem] leading-[1.4] tracking-[0.01em] text-muted-foreground lg:mt-3.5 lg:text-lg lg:leading-[1.45]">{p.description}</p>
+                  <p className="mt-3 max-w-[28rem] text-[0.984rem] leading-[1.4] text-muted-foreground lg:mt-3.5 lg:text-lg lg:leading-[1.45]">{p.description}</p>
                   <div className="mt-4 flex flex-wrap gap-2 lg:mt-5">
                     {p.chips.map((c) => (
                       <UnitChip key={c}>{c}</UnitChip>
                     ))}
                   </div>
                 </div>
-                <div className="mt-auto pt-8 lg:pt-6">
+                <div className="mt-auto pt-8 lg:pt-3">
                   <div className="aspect-[626/398] w-full overflow-clip">{p.media ?? <UnitPlaceholder tone="fade" className="size-full" />}</div>
                 </div>
               </a>
