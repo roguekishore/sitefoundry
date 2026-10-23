@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Brex header",
+  "description": "A 60px white bar with a hairline under it that stays pinned: wordmark and chevroned menu links on the left, a plain sign-in link, a demo link and an orange button on the right. On phones a menu icon and wordmark sit left and the orange button right; the menu opens a full-width panel.",
+  "category": "header",
+  "site": "brex",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "minimal",
+    "orange",
+    "fintech"
+  ],
+  "notes": [
+    "sticks to the top of the page (position: sticky), so it needs to sit directly in the page container",
+    "the phone menu is a native <details>; no JavaScript"
+  ],
+  "entry": "brex-header.tsx",
+  "source": "foundry",
+  "name": "brex-header",
+  "files": [
+    {
+      "path": "brex-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, ChevronRight, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BrexButton } from \"@foundry/brex-button\";\n\nexport interface BrexHeaderLink {\n  label: string;\n  href: string;\n  /** shows a chevron, as for items that open a menu */\n  menu?: boolean;\n}\n\nexport interface BrexHeaderProps {\n  /** the wordmark: a name in the display face with an optional small icon before it */\n  brand: { name: string; href: string; icon?: ReactNode };\n  /** the nav links */\n  links: BrexHeaderLink[];\n  /** the two plain links on the right, e.g. \"Sign in\" and \"See a demo\" */\n  secondary: { label: string; href: string }[];\n  /** the orange button */\n  primary: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Brex's pinned white header. */\nexport function BrexHeader({ brand, links, secondary, primary, menuLabel, className }: BrexHeaderProps) {\n  const wordmark = (\n    <a href={brand.href} className=\"flex items-center gap-1.5 font-display text-2xl/none font-semibold tracking-[-0.04em] [&_svg]:size-5\">\n      {brand.icon}\n      {brand.name}\n    </a>\n  );\n  return (\n    <header className={cn(\"sticky top-0 z-40 border-b border-border bg-background text-foreground\", className)}>\n      <nav className=\"mx-auto flex h-[3.75rem] max-w-page items-center justify-between px-gutter\">\n        <div className=\"flex items-center gap-4 lg:gap-3\">\n          <details className=\"group lg:hidden\">\n            <summary aria-label={menuLabel} className=\"flex size-8 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n              <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.75} />\n              <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.75} />\n            </summary>\n            <div className=\"absolute inset-x-0 top-full max-h-[calc(100svh-4rem)] overflow-y-auto border-b border-border bg-background px-gutter pt-2 pb-6\">\n              <ul className=\"divide-y divide-border\">\n                {links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"flex items-center justify-between py-4 text-lg font-medium\">\n                      {l.label}\n                      {l.menu && <ChevronRight aria-hidden className=\"size-4 text-muted-foreground\" strokeWidth={1.75} />}\n                    </a>\n                  </li>\n                ))}\n                {secondary.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"block py-4 text-lg font-medium\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          </details>\n          {wordmark}\n          <ul className=\"hidden items-center lg:flex\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a\n                  href={l.href}\n                  className=\"flex items-center gap-1.5 px-[1.1875rem] py-2 text-sm font-medium tracking-[-0.02em] transition-opacity duration-150 ease-linear hover:opacity-70 motion-reduce:transition-none\"\n                >\n                  {l.label}\n                  {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={2} />}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"flex items-center gap-1 lg:gap-0\">\n          <ul className=\"hidden items-center lg:flex\">\n            {secondary.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"px-[1.1875rem] py-2 text-sm font-medium tracking-[-0.02em] transition-opacity duration-150 ease-linear hover:opacity-70 motion-reduce:transition-none\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <BrexButton href={primary.href} size=\"sm\" className=\"lg:ml-2.5\">\n            {primary.label}\n          </BrexButton>\n        </div>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "brex-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the wordmark: a name in the display face with an optional small icon before it"
+    },
+    {
+      "name": "links",
+      "type": "BrexHeaderLink[]",
+      "required": true,
+      "description": "the nav links"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the two plain links on the right, e.g. \"Sign in\" and \"See a demo\""
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the orange button"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6207753527764c3ef38264c2e74c3ec6471811445d1dedb48c1b5a34a39118dd"
+}

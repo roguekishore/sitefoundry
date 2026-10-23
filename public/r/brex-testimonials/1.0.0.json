@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Brex customer stories",
+  "description": "A cool-grey band that cycles through customer quotes. Desktop: three centred tab names on top (the active one underlined), a rounded photo on the left and the customer's name, a large serif quote, attribution and an orange link on the right. Phones: an accordion where the open row shows its photo and quote under an orange progress line. The story advances by itself every 8 seconds and crossfades over 400ms.",
+  "category": "testimonials",
+  "site": "brex",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "tabs",
+    "accordion",
+    "autoplay",
+    "crossfade",
+    "serif",
+    "grey",
+    "fintech"
+  ],
+  "notes": [
+    "media slot: a 648×482 customer photo or video frame",
+    "autoplay and the progress line are CSS; they are off under reduced motion (you can still click)",
+    "hovering the block pauses the timer",
+    "the quote uses var(--typeface-serif) and falls back to Georgia in themes without it"
+  ],
+  "hydrate": "visible",
+  "entry": "brex-testimonials.tsx",
+  "source": "foundry",
+  "name": "brex-testimonials",
+  "files": [
+    {
+      "path": "brex-testimonials.css",
+      "content": "/* The progress line fills over the story's time; when it finishes the next story opens.\n   Hovering the block pauses it. Nothing runs under reduced motion. */\n.brex-testimonials-fill {\n  transform-origin: left center;\n  animation: brex-testimonials-fill var(--brex-testimonials-time, 8s) linear forwards;\n}\n@media (hover: hover) {\n  .brex-testimonials:hover .brex-testimonials-fill {\n    animation-play-state: paused;\n  }\n}\n.brex-testimonials-panel {\n  animation: brex-testimonials-fade 400ms ease both;\n}\n\n@keyframes brex-testimonials-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n@keyframes brex-testimonials-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .brex-testimonials-fill,\n  .brex-testimonials-panel {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "brex-testimonials.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BrexButton } from \"@foundry/brex-button\";\nimport { BrexPlaceholder } from \"@foundry/brex-placeholder\";\nimport \"./brex-testimonials.css\";\n\nexport interface BrexStory {\n  /** the customer's name on the tab / accordion row */\n  tab: string;\n  /** the customer's mark in orange above the quote: a name or a logo node */\n  logo: ReactNode;\n  /** the quote, without quotation marks */\n  quote: string;\n  /** who said it */\n  person: string;\n  /** their role and company, after the name */\n  role: string;\n  /** the orange link under the attribution */\n  link: { label: string; href: string };\n  /** the photo or video frame. A placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface BrexTestimonialsProps {\n  /** two or three customer stories */\n  stories: BrexStory[];\n  /** seconds each story stays before the next opens */\n  seconds?: number;\n  className?: string;\n}\n\n/** Customer stories: tabs on desktop, an accordion on phones, with autoplay. */\nexport function BrexTestimonials({ stories, seconds = 8, className }: BrexTestimonialsProps) {\n  const [active, setActive] = useState(0);\n  const next = () => setActive((i) => (i + 1) % stories.length);\n  return (\n    <section\n      className={cn(\"brex-testimonials bg-muted px-gutter pt-12 pb-12 lg:px-[calc(var(--page-gutter)*3)] lg:pt-[5.5rem]\", className)}\n      style={{ \"--brex-testimonials-time\": `${seconds}s` } as CSSProperties}\n    >\n      <div className=\"mx-auto max-w-page\">\n        <div role=\"tablist\" className=\"mx-auto hidden max-w-[65.5rem] grid-cols-3 lg:grid\">\n          {stories.map((s, i) => (\n            <div key={s.tab} className=\"relative flex justify-center\">\n              <button\n                type=\"button\"\n                role=\"tab\"\n                id={`brex-story-tab-${i}`}\n                aria-selected={i === active}\n                aria-controls={`brex-story-panel-${i}`}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"relative px-0 pb-3 text-sm transition-colors duration-150 ease-linear motion-reduce:transition-none\",\n                  i === active ? \"text-foreground\" : \"text-muted-foreground hover:text-foreground\",\n                )}\n              >\n                {s.tab}\n                <span aria-hidden className={cn(\"absolute inset-x-0 bottom-0 h-0.5 bg-foreground\", i !== active && \"hidden\")} />\n              </button>\n              {i === active && (\n                <span aria-hidden className=\"pointer-events-none absolute inset-x-0 bottom-0 h-0.5 opacity-0\">\n                  <span key={active} onAnimationEnd={next} className=\"brex-testimonials-fill block size-full bg-foreground\" />\n                </span>\n              )}\n            </div>\n          ))}\n        </div>\n\n        <div className=\"lg:mt-12\">\n          {stories.map((s, i) => {\n            const open = i === active;\n            return (\n              <div key={s.tab} className={cn(\"relative border-t border-border lg:border-0\", i === stories.length - 1 && \"border-b lg:border-b-0\")}>\n                <button\n                  type=\"button\"\n                  aria-expanded={open}\n                  aria-controls={`brex-story-panel-${i}`}\n                  onClick={() => setActive(i)}\n                  className=\"relative flex w-full items-center justify-between py-5 text-left text-sm font-medium text-foreground lg:hidden\"\n                >\n                  {s.tab}\n                  <ChevronDown aria-hidden className={cn(\"size-4 text-muted-foreground transition-transform duration-200\", open && \"rotate-180\")} strokeWidth={1.75} />\n                  {open && (\n                    <span aria-hidden className=\"pointer-events-none absolute -top-px inset-x-0 h-0.5 bg-glow\">\n                      <span key={active} onAnimationEnd={next} className=\"brex-testimonials-fill block size-full bg-primary\" />\n                    </span>\n                  )}\n                </button>\n                <div\n                  role=\"tabpanel\"\n                  id={`brex-story-panel-${i}`}\n                  aria-labelledby={`brex-story-tab-${i}`}\n                  className={cn(\"brex-testimonials-panel\", open ? \"block lg:grid\" : \"hidden\", \"gap-12 pb-10 lg:grid-cols-[1fr_0.93fr] lg:items-center lg:pb-0\")}\n                >\n                  <div className=\"lg:max-w-[40.5rem]\">\n                    {s.media ?? <BrexPlaceholder tone=\"panel\" className=\"aspect-[648/482] w-full rounded-xl\" />}\n                  </div>\n                  <div className=\"mt-10 lg:mt-0\">\n                    <div className=\"font-display text-2xl/7 font-bold tracking-[0.04em] text-primary uppercase\">{s.logo}</div>\n                    <blockquote className=\"mt-10 font-[family-name:var(--typeface-serif,Georgia)] text-2xl/[1.625rem] text-foreground lg:mt-14 lg:text-[2rem]/10\">\n                      {/* foundry-allow-text: typographic quotation marks around the quote prop */}\n                      <p>&ldquo;{s.quote}&rdquo;</p>\n                    </blockquote>\n                    <p className=\"mt-6 text-base/6 text-muted-foreground lg:mt-8\">\n                      {/* foundry-allow-text: dash before the attribution */}\n                      &mdash; <span className=\"underline underline-offset-2\">{s.person}</span>, {s.role}\n                    </p>\n                    <BrexButton href={s.link.href} variant=\"link\" className=\"mt-8\">\n                      {s.link.label}\n                    </BrexButton>\n                  </div>\n                </div>\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "brex-button",
+    "brex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "stories",
+      "type": "BrexStory[]",
+      "required": true,
+      "description": "two or three customer stories"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "8",
+      "description": "seconds each story stays before the next opens"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7930fd363851794184043c49050a9c0b2e113b72db20c92e197499072cfd96fc"
+}
