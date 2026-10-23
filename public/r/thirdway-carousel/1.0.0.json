@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Thirdway carousel",
+  "description": "A horizontal scroll-snap track with two round outlined arrow buttons (the prev one dims at the start, the next at the end). The controls sit under the track on phones and above it, next to a label, from tablet up.",
+  "category": "gallery",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "slider",
+    "scroll-snap",
+    "arrows",
+    "minimal"
+  ],
+  "notes": [
+    "place it full width: the track pads its own sides with the page gutter and bleeds to the right edge",
+    "slide widths come from itemClassName",
+    "buttons need JavaScript; the track itself scrolls and snaps without it"
+  ],
+  "entry": "thirdway-carousel.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "thirdway-carousel",
+  "files": [
+    {
+      "path": "thirdway-carousel.tsx",
+      "content": "import { Children, useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ThirdwayCarouselProps {\n  /** the slides; each is wrapped in a snapping list item */\n  children: ReactNode;\n  /** content at the left of the controls row on tablets and up (a count pill and a word) */\n  label?: ReactNode;\n  /** accessible names of the two round buttons */\n  prevLabel: string;\n  nextLabel: string;\n  /** classes for each slide's list item (a width, usually); a function gets the slide's index */\n  itemClassName?: string | ((index: number) => string);\n  /** extra classes for the scrolling track, e.g. to turn it into a grid from `lg:` up */\n  trackClassName?: string;\n  /** extra classes for the controls row, e.g. `lg:hidden` */\n  controlsClassName?: string;\n  className?: string;\n}\n\nconst button =\n  \"flex h-5 w-[1.875rem] items-center justify-center rounded-full border-2 border-foreground text-foreground transition-opacity duration-150 disabled:opacity-40 motion-reduce:transition-none\";\n\n/**\n * A horizontal scroll-snap track with a pair of round arrow buttons. The controls sit under the\n * track on phones and above it from `md:` up. Place it full width: it pads its own sides.\n */\nexport function ThirdwayCarousel({ children, label, prevLabel, nextLabel, itemClassName, trackClassName, controlsClassName, className }: ThirdwayCarouselProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [edge, setEdge] = useState({ start: true, end: false });\n\n  const measure = useCallback(() => {\n    const el = track.current;\n    if (!el) return;\n    setEdge({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 });\n  }, []);\n\n  useEffect(() => {\n    measure();\n    window.addEventListener(\"resize\", measure);\n    return () => window.removeEventListener(\"resize\", measure);\n  }, [measure]);\n\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const first = el?.firstElementChild as HTMLElement | null;\n    if (!el || !first) return;\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (first.offsetWidth + gap), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <div className={cn(\"flex flex-col-reverse gap-6 md:flex-col md:gap-4\", className)}>\n      <div className={cn(\"flex items-center justify-between px-gutter md:px-[calc(var(--page-gutter)*2)]\", controlsClassName)}>\n        <div className=\"hidden items-center gap-2 text-sm font-[560] tracking-[-0.02em] md:flex\">{label}</div>\n        <div className=\"flex items-center gap-3\">\n          <button type=\"button\" aria-label={prevLabel} disabled={edge.start} onClick={() => step(-1)} className={button}>\n            <ArrowLeft className=\"size-3\" strokeWidth={2.5} />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} disabled={edge.end} onClick={() => step(1)} className={button}>\n            <ArrowRight className=\"size-3\" strokeWidth={2.5} />\n          </button>\n        </div>\n      </div>\n      <ul\n        ref={track}\n        onScroll={measure}\n        className={cn(\n          \"flex snap-x snap-mandatory gap-3 overflow-x-auto px-gutter [scrollbar-width:none] md:gap-4 md:px-[calc(var(--page-gutter)*2)] [&::-webkit-scrollbar]:hidden\",\n          \"scroll-px-4 md:scroll-px-8\",\n          trackClassName,\n        )}\n      >\n        {Children.toArray(children).map((child, i) => (\n          <li key={i} className={cn(\"shrink-0 snap-start\", typeof itemClassName === \"function\" ? itemClassName(i) : itemClassName)}>\n            {child}\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the slides; each is wrapped in a snapping list item"
+    },
+    {
+      "name": "label",
+      "type": "ReactNode",
+      "required": false,
+      "description": "content at the left of the controls row on tablets and up (a count pill and a word)"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the two round buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "itemClassName",
+      "type": "string | ((index: number) => string)",
+      "required": false,
+      "description": "classes for each slide's list item (a width, usually); a function gets the slide's index"
+    },
+    {
+      "name": "trackClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the scrolling track, e.g. to turn it into a grid from `lg:` up"
+    },
+    {
+      "name": "controlsClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the controls row, e.g. `lg:hidden`"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "63891f7de5e1d7a9cd3b65a2b8f6f2c0abc1b613012affb6bbde7d43f1074485"
+}

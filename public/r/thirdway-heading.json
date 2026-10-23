@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Thirdway heading",
+  "description": "A big medium-weight grotesk heading, 40px on phones to 72px on desktop, tracked tight (-0.06em). Each line rises about 60px and fades in, one after the other, as the heading scrolls into view.",
+  "category": "text-effect",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "big-type",
+    "reveal",
+    "scroll",
+    "rise",
+    "css-only",
+    "minimal"
+  ],
+  "notes": [
+    "needs a tight neo-grotesk display font at weight 500",
+    "scroll-driven CSS: browsers without it show the heading in place",
+    "off under reduced motion"
+  ],
+  "entry": "thirdway-heading.tsx",
+  "source": "foundry",
+  "name": "thirdway-heading",
+  "files": [
+    {
+      "path": "thirdway-heading.css",
+      "content": "/* Each line lifts 60px and fades in while the heading enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .thirdway-heading-line {\n      animation: thirdway-heading-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--i) * 6%) cover calc(24% + var(--i) * 6%);\n    }\n  }\n}\n\n@keyframes thirdway-heading-rise {\n  from { opacity: 0; transform: translateY(60px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "thirdway-heading.tsx",
+      "content": "import { Fragment, type CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./thirdway-heading.css\";\n\nexport interface ThirdwayHeadingProps {\n  /** the heading; \"\\n\" starts a new line, and each line rises into place in turn */\n  text: string;\n  /** the heading element (default h2) */\n  as?: \"h1\" | \"h2\" | \"h3\" | \"p\";\n  className?: string;\n}\n\n/** A large neo-grotesk heading (40px phones, 72px desktop) whose lines lift and fade in as it scrolls into view. */\nexport function ThirdwayHeading({ text, as: Tag = \"h2\", className }: ThirdwayHeadingProps) {\n  const lines = text.split(\"\\n\");\n  return (\n    <Tag className={cn(\"text-[clamp(2.5rem,5vw,4.5rem)] leading-[0.98] font-[560] tracking-[-0.06em] [word-spacing:-0.07em] text-balance\", className)}>\n      {lines.map((line, i) => (\n        <Fragment key={i}>\n          {i > 0 && <br />}\n          <span className=\"thirdway-heading-line inline-block\" style={{ \"--i\": i } as CSSProperties}>\n            {line}\n          </span>\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \"\\n\" starts a new line, and each line rises into place in turn"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the heading element (default h2)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7ffb57c80a7e58fd0efbc43bb7bb20acf9800695da0f277b398626a20e050dc0"
+}

@@ -1,0 +1,37 @@
+/* Without scroll-driven animation (or with reduced motion) the projects simply stack, one window tall each.
+   With it, they are pinned in one sticky stage and each photo after the first wipes up over the one before. */
+.thirdway-projects-item {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .thirdway-projects {
+      height: calc(var(--n) * 100svh);
+      view-timeline: --thirdway-projects block;
+    }
+    .thirdway-projects-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: clip;
+    }
+    .thirdway-projects-item {
+      position: absolute;
+      inset: 0;
+      height: auto;
+    }
+    .thirdway-projects-wipe {
+      animation: thirdway-projects-wipe linear both;
+      animation-timeline: --thirdway-projects;
+      animation-range: cover var(--from) cover var(--to);
+    }
+  }
+}
+
+@keyframes thirdway-projects-wipe {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}

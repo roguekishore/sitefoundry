@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway hero",
+  "description": "A 155svh opener: a full-window media layer pinned behind a gigantic two-line headline (56px phones, 120px desktop, weight 500, -0.06em) with a looping scroll cue. As you scroll, the media stays pinned, a statement on the right brightens character by character from 30% to 100% over a ground-darkening gradient, and the next section slides up over it.",
+  "category": "hero",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "sticky",
+    "pinned",
+    "video",
+    "big-type",
+    "scroll-fill",
+    "reveal",
+    "photo-led",
+    "loop"
+  ],
+  "notes": [
+    "forces the dark colour scope: cream type over the photo, and the gradient fades to the theme's background",
+    "window-sized: 155svh, of which the first 100svh is the pinned media",
+    "the media slot should be a full-bleed video or photo (the original loops a video)",
+    "scroll-driven CSS: browsers without it show the statement fully lit",
+    "the sections that follow need an opaque background so they cover the pinned media"
+  ],
+  "entry": "thirdway-hero.tsx",
+  "source": "foundry",
+  "name": "thirdway-hero",
+  "files": [
+    {
+      "path": "thirdway-hero.css",
+      "content": "/* The scroll cue's arrow runs down the capsule on a loop. */\n@keyframes thirdway-hero-arrow {\n  0% { transform: translateY(-6px); opacity: 0; }\n  30% { opacity: 1; }\n  100% { transform: translateY(12px); opacity: 0; }\n}\n\n.thirdway-hero-arrow {\n  animation: thirdway-hero-arrow 2800ms ease-in-out infinite;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .thirdway-hero-arrow { animation: none; }\n}\n\n/* The statement brightens character by character (0.3 -> 1) while the paragraph crosses the window;\n   every character shares the paragraph's own view timeline and starts a little later than the last. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .thirdway-hero-fill {\n      view-timeline: --thirdway-hero-fill block;\n    }\n    .thirdway-hero-char {\n      animation: thirdway-hero-char linear both;\n      animation-timeline: --thirdway-hero-fill;\n      animation-range:\n        cover calc(14% + 24% * var(--i) / var(--n))\n        cover calc(28% + 24% * var(--i) / var(--n));\n    }\n    /* the scroll cue fades out as soon as the page moves */\n    .thirdway-hero-scroll {\n      animation: thirdway-hero-scroll-out linear both;\n      animation-timeline: scroll(root block);\n      animation-range: 0px 30svh;\n    }\n  }\n}\n\n@keyframes thirdway-hero-char {\n  from { opacity: 0.3; }\n  to { opacity: 1; }\n}\n\n@keyframes thirdway-hero-scroll-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "thirdway-hero.tsx",
+      "content": "import { Fragment, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayArrowLink } from \"@foundry/thirdway-arrow-link\";\nimport { ThirdwayPlaceholder } from \"@foundry/thirdway-placeholder\";\nimport \"./thirdway-hero.css\";\n\nexport interface ThirdwayHeroProps {\n  /** the big headline; \"\\n\" starts a new line */\n  headline: string;\n  /** the statement that fills in character by character as you scroll */\n  statement: string;\n  /** the link under the statement */\n  link: { label: string; href: string };\n  /** the word beside the scroll cue */\n  scrollLabel: string;\n  /** the full-window background video or image; a placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** The statement, split into words and characters so each character can brighten on its own. */\nfunction Chars({ text }: { text: string }) {\n  const total = [...text].filter((c) => c !== \" \").length;\n  let n = 0;\n  return (\n    <>\n      {text.split(\" \").map((word, wi) => (\n        <Fragment key={wi}>\n          {wi > 0 && \" \"}\n          <span className=\"inline-block whitespace-nowrap\">\n            {[...word].map((ch, ci) => (\n              <span key={ci} className=\"thirdway-hero-char\" style={{ \"--i\": n++, \"--n\": total } as CSSProperties}>\n                {ch}\n              </span>\n            ))}\n          </span>\n        </Fragment>\n      ))}\n    </>\n  );\n}\n\n/**\n * 155svh tall. A full-bleed media layer is pinned to the window for the whole section. The first\n * window height holds a huge headline that scrolls away over it; in the remaining 55svh the\n * statement brightens character by character, and the cream page then slides up over the media.\n */\nexport function ThirdwayHero({ headline, statement, link, scrollLabel, media, className }: ThirdwayHeroProps) {\n  const lines = headline.split(\"\\n\");\n  return (\n    <section className={cn(\"dark relative h-[155svh]\", className)}>\n      {/* the media layer: pinned to the window for the whole section, out of the flow */}\n      <div className=\"sticky top-0 z-0 -mb-[100svh] h-svh overflow-clip\">\n        <div className=\"absolute inset-0\">{media ?? <ThirdwayPlaceholder className=\"size-full rounded-none\" />}</div>\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-background/35 to-transparent\" />\n      </div>\n      {/* first window: the headline sits at the bottom and scrolls away over the pinned media */}\n      <div className=\"relative z-10 flex h-svh flex-col justify-end px-gutter pb-[4.5rem] md:px-[calc(var(--page-gutter)*2)] md:pb-[5.5rem]\">\n        <h1 className=\"text-[clamp(3.5rem,8.4vw,7.5rem)] leading-[0.92] font-[560] tracking-[-0.06em] [word-spacing:-0.07em] text-foreground md:leading-[0.9]\">\n          {lines.map((l, i) => (\n            <span key={i} className={cn(\"block\", i > 0 && \"mt-1.5 md:mt-0\")}>\n              {l}\n            </span>\n          ))}\n        </h1>\n        <div className=\"thirdway-hero-scroll mt-8 flex items-center justify-end gap-2 text-sm font-[560] tracking-[-0.04em] text-foreground md:absolute md:right-8 md:bottom-8 md:mt-0\">\n          <span>{scrollLabel}</span>\n          <span aria-hidden className=\"relative flex h-[1.875rem] w-5 justify-center overflow-clip rounded-full border-2 border-foreground\">\n            <span className=\"thirdway-hero-arrow mt-1 block h-2 w-0.5 rounded-full bg-foreground\" />\n          </span>\n        </div>\n      </div>\n      {/* the rest: the statement over a darkening gradient while the media stays put */}\n      <div className=\"relative z-10 h-[55svh] px-gutter pt-[15svh] md:px-[calc(var(--page-gutter)*2)]\">\n        <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-b from-transparent to-background/50\" />\n        <div className=\"md:ml-[50%] md:max-w-[calc(50%-1rem)]\">\n          <p className=\"text-2xl leading-[1.1] font-[560] tracking-[-0.04em] [word-spacing:-0.06em] text-foreground md:text-[2rem] md:tracking-[-0.06em]\">\n            <span className=\"sr-only\">{statement}</span>\n            <span aria-hidden className=\"thirdway-hero-fill block\">\n              <Chars text={statement} />\n            </span>\n          </p>\n          <div className=\"mt-8 md:mt-10\">\n            <ThirdwayArrowLink label={link.label} href={link.href} />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-arrow-link",
+    "thirdway-placeholder"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "string",
+      "required": true,
+      "description": "the big headline; \"\\n\" starts a new line"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the statement that fills in character by character as you scroll"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the link under the statement"
+    },
+    {
+      "name": "scrollLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word beside the scroll cue"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-window background video or image; a placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "20376c5f2cce2a7bd3fc3d4a4e3013b701e9649fff3df5044e1a60f5b7555fe0"
+}

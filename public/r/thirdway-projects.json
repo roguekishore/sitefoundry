@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway projects",
+  "description": "A pinned, full-window project showcase, one window-height of scroll per project. Each photo wipes up from the bottom over the previous one (clip-path, scrubbed with the scroll), carrying a hairline, a circled 01 / 04 counter, a 72px project name with its location, scope and serif team name, and a client quote at the right. On hover a centred 'View project' link appears; on phones the link sits at the bottom.",
+  "category": "gallery",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "projects",
+    "case-studies",
+    "sticky",
+    "pinned",
+    "wipe",
+    "clip-path",
+    "scroll",
+    "photo-led",
+    "big-type"
+  ],
+  "notes": [
+    "forces the dark colour scope: cream type over photos, with a bottom fade from the theme's background",
+    "window-sized: n × 100svh (400svh for four projects), pinned with position: sticky; the wipes are CSS view-timeline animations",
+    "without scroll-driven animation or under reduced motion the projects stack one after another, one window tall each",
+    "photos are slots (placeholder until filled); the original's slow inner parallax on each photo is not rebuilt",
+    "the sections after it need an opaque background"
+  ],
+  "entry": "thirdway-projects.tsx",
+  "source": "foundry",
+  "name": "thirdway-projects",
+  "files": [
+    {
+      "path": "thirdway-projects.css",
+      "content": "/* Without scroll-driven animation (or with reduced motion) the projects simply stack, one window tall each.\n   With it, they are pinned in one sticky stage and each photo after the first wipes up over the one before. */\n.thirdway-projects-item {\n  position: relative;\n  height: 100svh;\n  overflow: clip;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .thirdway-projects {\n      height: calc(var(--n) * 100svh);\n      view-timeline: --thirdway-projects block;\n    }\n    .thirdway-projects-stage {\n      position: sticky;\n      top: 0;\n      height: 100svh;\n      overflow: clip;\n    }\n    .thirdway-projects-item {\n      position: absolute;\n      inset: 0;\n      height: auto;\n    }\n    .thirdway-projects-wipe {\n      animation: thirdway-projects-wipe linear both;\n      animation-timeline: --thirdway-projects;\n      animation-range: cover var(--from) cover var(--to);\n    }\n  }\n}\n\n@keyframes thirdway-projects-wipe {\n  from { clip-path: inset(100% 0 0 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n"
+    },
+    {
+      "path": "thirdway-projects.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayArrowLink } from \"@foundry/thirdway-arrow-link\";\nimport { ThirdwayCountPill } from \"@foundry/thirdway-count-pill\";\nimport { ThirdwayPlaceholder } from \"@foundry/thirdway-placeholder\";\nimport \"./thirdway-projects.css\";\n\nexport interface ThirdwayProject {\n  /** the client or project name, set very large */\n  name: string;\n  /** where it is */\n  location: string;\n  /** the kind of work, e.g. \"CAT B\" */\n  scope: string;\n  /** the team that delivered it, set in the serif */\n  team: string;\n  /** a client quote (desktop only) */\n  quote: string;\n  /** who said it */\n  author: string;\n  /** their role */\n  role: string;\n  /** link to the project page */\n  href: string;\n  /** full-bleed photo; a placeholder when empty */\n  image?: ReactNode;\n}\n\nexport interface ThirdwayProjectsProps {\n  /** the projects: the section is one window tall per project */\n  projects: ThirdwayProject[];\n  /** the link text (\"View project\"): centred on hover on desktop, at the bottom on phones */\n  viewLabel: string;\n  className?: string;\n}\n\n/**\n * A pinned showcase, one window-height per project (so 400svh for four). The first project fills\n * the window; as you scroll, each next photo wipes up from the bottom over the previous one,\n * carrying its own counter, name, details and quote.\n */\nexport function ThirdwayProjects({ projects, viewLabel, className }: ThirdwayProjectsProps) {\n  const n = projects.length;\n  const wipes = Math.max(n - 1, 1);\n  const total = String(n).padStart(2, \"0\");\n  // pinned phase of the section's view timeline (cover range = n + 1 window heights): from 1/(n+1) to n/(n+1)\n  const pinFrom = 100 / (n + 1);\n  const pinSpan = ((100 * n) / (n + 1) - pinFrom) / wipes;\n  return (\n    <section className={cn(\"thirdway-projects dark relative\", className)} style={{ \"--n\": n } as CSSProperties}>\n      <div className=\"thirdway-projects-stage\">\n        {projects.map((p, i) => (\n          <article\n            key={p.href + p.name}\n            className={cn(\"thirdway-projects-item group\", i > 0 && \"thirdway-projects-wipe\")}\n            style={{ \"--from\": `${pinFrom + pinSpan * (i - 1)}%`, \"--to\": `${pinFrom + pinSpan * i}%` } as CSSProperties}\n          >\n            <div className=\"absolute inset-0\">{p.image ?? <ThirdwayPlaceholder className=\"size-full rounded-none\" />}</div>\n            <div aria-hidden className=\"absolute inset-0 bg-linear-to-t from-background/70 via-background/30 via-30% to-transparent\" />\n            <a\n              href={p.href}\n              className=\"absolute inset-0 hidden items-center justify-center opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.66,0.01,0.12,0.98)] group-hover:opacity-100 focus-visible:opacity-100 md:flex motion-reduce:transition-none\"\n            >\n              <span className=\"sr-only\">{`${viewLabel}: ${p.name}`}</span>\n              <span aria-hidden className=\"pointer-events-none\">\n                <ThirdwayArrowLink label={viewLabel} href={p.href} chip={false} />\n              </span>\n            </a>\n            <div className=\"pointer-events-none absolute inset-x-0 bottom-0 flex h-[40svh] flex-col px-gutter text-foreground md:h-[38svh] md:px-[calc(var(--page-gutter)*2)]\">\n              <div className=\"border-t border-foreground/40\" />\n              <div className=\"flex flex-1 flex-col justify-between pt-4 pb-20 md:grid md:grid-cols-12 md:gap-x-4 md:pt-5 md:pb-0\">\n                <div className=\"md:contents\">\n                  <div className=\"flex items-center gap-1 text-sm font-[560] md:col-span-1 md:mt-1 md:self-start\">\n                    <ThirdwayCountPill value={String(i + 1).padStart(2, \"0\")} />\n                    <span>/</span>\n                    <ThirdwayCountPill value={total} />\n                  </div>\n                  <div className=\"mt-3 md:col-span-6 md:mt-0\">\n                    <h3 className=\"[word-spacing:-0.07em] text-[2.5rem] leading-[1] font-[560] tracking-[-0.06em] md:text-[clamp(2.75rem,5vw,4.5rem)] md:leading-[0.98]\">{p.name}</h3>\n                    <div className=\"mt-2 flex flex-wrap items-center gap-x-3 gap-y-0 text-base leading-[1.3] font-[560] tracking-[-0.04em] md:mt-8 md:flex-col md:items-start md:text-base md:leading-[1.3]\">\n                      <span>{p.location}</span>\n                      <span aria-hidden className=\"size-1 rounded-full bg-current md:hidden\" />\n                      <span>{p.scope}</span>\n                      <span aria-hidden className=\"size-1 rounded-full bg-current md:hidden\" />\n                      <span className=\"font-[family-name:var(--typeface-serif,Georgia,serif)] text-sm font-[350] tracking-[-0.01em] md:mt-5\">{p.team}</span>\n                    </div>\n                  </div>\n                </div>\n                <figure className=\"hidden md:col-span-5 md:col-start-8 md:block md:pl-14\">\n                  <blockquote className=\"text-lg leading-[1.2] font-[560] tracking-[-0.04em]\">{p.quote}</blockquote>\n                  <figcaption className=\"mt-4\">\n                    <span className=\"block text-sm leading-[1.2] font-[560] tracking-[-0.02em]\">{p.author}</span>\n                    <span className=\"block font-[family-name:var(--typeface-serif,Georgia,serif)] text-lg leading-[1.1] font-[350] tracking-[-0.02em] text-foreground/70\">{p.role}</span>\n                  </figcaption>\n                </figure>\n                <div className=\"pointer-events-auto md:hidden\">\n                  <ThirdwayArrowLink label={viewLabel} href={p.href} size=\"md\" />\n                </div>\n              </div>\n            </div>\n          </article>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-arrow-link",
+    "thirdway-count-pill",
+    "thirdway-placeholder"
+  ],
+  "props": [
+    {
+      "name": "projects",
+      "type": "ThirdwayProject[]",
+      "required": true,
+      "description": "the projects: the section is one window tall per project"
+    },
+    {
+      "name": "viewLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link text (\"View project\"): centred on hover on desktop, at the bottom on phones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3bf74710076db824f46b162981cba3f742dcb0075636bba4612c5ad620eabf9b"
+}

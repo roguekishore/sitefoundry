@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway teams",
+  "description": "A big two-line heading with an intro paragraph in the right half, then a snap carousel of team cards. On phones each card is a sand panel with a small portrait, serif-plus-sans name, signature and description; from lg up it is a tall 328×437 photo with the name over a dark fade, and the description opens upwards on hover. A count pill and round arrows sit above the track.",
+  "category": "gallery",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "carousel",
+    "cards",
+    "photo-led",
+    "reveal",
+    "hover",
+    "cream",
+    "serif"
+  ],
+  "notes": [
+    "uses the theme's --typeface-serif for the team name (falls back to Georgia)",
+    "the portrait and signature slots are placeholders until filled",
+    "the carousel arrows need JavaScript (hydrate: visible); the track scrolls without it"
+  ],
+  "entry": "thirdway-teams.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "thirdway-teams",
+  "files": [
+    {
+      "path": "thirdway-teams.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayArrowLink } from \"@foundry/thirdway-arrow-link\";\nimport { ThirdwayCarousel } from \"@foundry/thirdway-carousel\";\nimport { ThirdwayCountPill } from \"@foundry/thirdway-count-pill\";\nimport { ThirdwayHeading } from \"@foundry/thirdway-heading\";\nimport { ThirdwayPlaceholder } from \"@foundry/thirdway-placeholder\";\nimport { ThirdwayReveal } from \"@foundry/thirdway-reveal\";\n\nexport interface ThirdwayTeam {\n  /** the team's name, set in the serif (\"Studio\") */\n  name: string;\n  /** the person who leads it */\n  lead: string;\n  /** a short description: always shown on phones, slides up on hover on desktop */\n  description: string;\n  /** link to the team's page */\n  href: string;\n  /** portrait photo; a placeholder when empty */\n  image?: ReactNode;\n  /** the lead's signature; a placeholder when empty */\n  signature?: ReactNode;\n}\n\nexport interface ThirdwayTeamsProps {\n  /** the heading; \"\\n\" starts a new line */\n  heading: string;\n  /** the paragraph beside the heading */\n  text: string;\n  /** link under the paragraph */\n  link: { label: string; href: string };\n  /** the count shown in the pill above the carousel, e.g. \"06\" */\n  count: string;\n  /** the word after the count, e.g. \"Teams\" */\n  countLabel: string;\n  /** the small word between a team's name and its lead (\"by\") */\n  byLabel: string;\n  teams: ThirdwayTeam[];\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nfunction TeamTitle({ team, byLabel }: { team: ThirdwayTeam; byLabel: string }) {\n  return (\n    <h3 className=\"text-xl leading-[1.1] font-[560] tracking-[-0.04em] lg:text-2xl\">\n      <span className=\"font-[family-name:var(--typeface-serif,Georgia,serif)] font-[350] tracking-[-0.02em]\">{team.name}</span> {byLabel}\n      <br />\n      {team.lead}\n    </h3>\n  );\n}\n\nfunction TeamCard({ team, byLabel }: { team: ThirdwayTeam; byLabel: string }) {\n  const signature = team.signature ?? <ThirdwayPlaceholder tone=\"veil\" className=\"size-full\" />;\n  return (\n    <article className=\"group/image-card relative flex flex-col rounded-[2px] bg-secondary/60 p-4 text-foreground lg:h-[27.3rem] lg:overflow-clip lg:bg-transparent lg:p-0\">\n      <a href={team.href} className=\"absolute inset-0 z-10\" aria-label={`${team.name} ${byLabel} ${team.lead}`} />\n      <div className=\"flex gap-4 lg:contents\">\n        <div className=\"h-[8.1rem] w-[5.25rem] shrink-0 overflow-clip rounded-[2px] lg:absolute lg:inset-0 lg:h-full lg:w-full lg:rounded-none\">\n          {team.image ?? <ThirdwayPlaceholder className=\"size-full rounded-none\" />}\n        </div>\n        {/* phones: title, arrow and signature beside the portrait */}\n        <div className=\"min-w-0 flex-1 lg:hidden\">\n          <div className=\"flex items-start justify-between gap-2\">\n            <TeamTitle team={team} byLabel={byLabel} />\n            <ArrowUpRight aria-hidden className=\"mt-1 size-3.5 shrink-0\" />\n          </div>\n          <div className=\"mt-3 h-12 w-24\">{signature}</div>\n        </div>\n        {/* desktop: cream title and signature over a dark fade; the description opens upwards on hover */}\n        <div className=\"dark absolute inset-x-0 bottom-0 hidden flex-col bg-linear-to-t from-background/80 via-background/40 via-60% to-transparent p-6 pt-16 text-foreground lg:flex\">\n          <TeamTitle team={team} byLabel={byLabel} />\n          <div className=\"mt-4 h-12 w-24\">{signature}</div>\n          <div className=\"grid grid-rows-[0fr] transition-[grid-template-rows] duration-400 ease-[cubic-bezier(0.66,0.01,0.12,0.98)] group-hover/image-card:grid-rows-[1fr] motion-reduce:transition-none\">\n            <p className=\"min-h-0 overflow-hidden text-sm leading-[1.3] font-[560] tracking-[-0.02em]\">\n              <span className=\"block pt-3\">{team.description}</span>\n            </p>\n          </div>\n        </div>\n      </div>\n      <p className=\"mt-4 border-t border-border pt-4 text-sm leading-[1.3] font-[560] tracking-[-0.02em] lg:hidden\">{team.description}</p>\n    </article>\n  );\n}\n\n/**\n * Heading and paragraph in two columns, then a carousel of team cards. On phones a card is a\n * sand panel with a small portrait; from lg up it is a 328×437 photo with the name over a dark\n * fade, and the description opens upwards on hover.\n */\nexport function ThirdwayTeams({ heading, text, link, count, countLabel, byLabel, teams, prevLabel, nextLabel, className }: ThirdwayTeamsProps) {\n  return (\n    <section className={cn(\"relative bg-background py-[5.5rem] text-foreground md:py-[8.5rem]\", className)}>\n      <div className=\"grid gap-6 px-gutter md:grid-cols-2 md:gap-x-4 md:px-[calc(var(--page-gutter)*2)]\">\n        <ThirdwayHeading text={heading} />\n        <ThirdwayReveal className=\"max-w-[31.25rem] md:pl-0 lg:ml-[10.8rem] lg:max-w-none\">\n          <p className=\"text-base leading-[1.3] font-[560] tracking-[-0.04em] md:text-lg md:leading-[1.3]\">{text}</p>\n          <div className=\"mt-3\">\n            <ThirdwayArrowLink label={link.label} href={link.href} />\n          </div>\n        </ThirdwayReveal>\n      </div>\n      <ThirdwayCarousel\n        className=\"mt-10 md:mt-[4rem]\"\n        prevLabel={prevLabel}\n        nextLabel={nextLabel}\n        label={\n          <>\n            <ThirdwayCountPill value={count} />\n            <span>{countLabel}</span>\n          </>\n        }\n        itemClassName=\"w-[19.5rem] lg:w-[20.5rem]\"\n      >\n        {teams.map((t) => (\n          <TeamCard key={t.href + t.lead} team={t} byLabel={byLabel} />\n        ))}\n      </ThirdwayCarousel>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-arrow-link",
+    "thirdway-carousel",
+    "thirdway-count-pill",
+    "thirdway-heading",
+    "thirdway-placeholder",
+    "thirdway-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \"\\n\" starts a new line"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside the heading"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "link under the paragraph"
+    },
+    {
+      "name": "count",
+      "type": "string",
+      "required": true,
+      "description": "the count shown in the pill above the carousel, e.g. \"06\""
+    },
+    {
+      "name": "countLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word after the count, e.g. \"Teams\""
+    },
+    {
+      "name": "byLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small word between a team's name and its lead (\"by\")"
+    },
+    {
+      "name": "teams",
+      "type": "ThirdwayTeam[]",
+      "required": true
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "112c876edf9a37ccd9c8ba35ab9f491198386b70206bdd0510669459f7ed9f96"
+}

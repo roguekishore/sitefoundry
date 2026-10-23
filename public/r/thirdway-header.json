@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway header",
+  "description": "A fixed header floating over the page: a cream wordmark box with a sand menu square (on phones a full-width cream bar that also holds the call to action), a live circled-digit clock at the left and an arrow call to action at the right from tablet up. The menu square opens a cream panel of large links.",
+  "category": "header",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "fixed",
+    "clock",
+    "menu",
+    "cream",
+    "blend",
+    "minimal"
+  ],
+  "notes": [
+    "fixed to the window and floats over photos: the clock and the call to action use mix-blend-difference so they stay legible on cream and on photography",
+    "the clock needs JavaScript (shows 00:00 until it hydrates)",
+    "the original's menu overlay content is not rebuilt: a simple panel of links stands in"
+  ],
+  "entry": "thirdway-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "thirdway-header",
+  "files": [
+    {
+      "path": "thirdway-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayArrowLink } from \"@foundry/thirdway-arrow-link\";\nimport { ThirdwayCountPill } from \"@foundry/thirdway-count-pill\";\n\nexport interface ThirdwayHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface ThirdwayHeaderProps {\n  /** the wordmark text */\n  brand: string;\n  /** a tiny superscript after the wordmark (e.g. a trade mark glyph) */\n  mark?: string;\n  /** home link of the wordmark */\n  homeHref?: string;\n  /** the pages listed in the menu panel */\n  links: ThirdwayHeaderLink[];\n  /** the \"let's talk\" call to action */\n  cta: ThirdwayHeaderLink;\n  /** accessible name of the menu button */\n  menuLabel: string;\n  /** IANA time zone of the clock at the left (desktop) */\n  timeZone?: string;\n  /** the zone abbreviation shown beside the clock */\n  zoneLabel: string;\n  className?: string;\n}\n\nfunction useClock(timeZone: string) {\n  const [time, setTime] = useState<[string, string]>([\"00\", \"00\"]);\n  useEffect(() => {\n    const tick = () => {\n      const parts = new Intl.DateTimeFormat(\"en-GB\", { timeZone, hour: \"2-digit\", minute: \"2-digit\", hour12: false }).formatToParts(new Date());\n      setTime([parts.find((p) => p.type === \"hour\")?.value ?? \"00\", parts.find((p) => p.type === \"minute\")?.value ?? \"00\"]);\n    };\n    tick();\n    const id = window.setInterval(tick, 15000);\n    return () => window.clearInterval(id);\n  }, [timeZone]);\n  return time;\n}\n\n/**\n * Fixed top bar: on phones one cream bar (wordmark, call to action, menu square); from md up a\n * cream wordmark box with the menu square in the centre, a live clock at the left and the call\n * to action at the right. The clock and the call to action invert against whatever is behind them.\n */\nexport function ThirdwayHeader({ brand, mark, homeHref = \"#\", links, cta, menuLabel, timeZone = \"Europe/London\", zoneLabel, className }: ThirdwayHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const [hh, mm] = useClock(timeZone);\n\n  return (\n    <header className={cn(\"pointer-events-none fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-5\", className)}>\n      <div className=\"relative flex items-start justify-center\">\n        <div className=\"pointer-events-auto absolute top-2.5 left-0 hidden items-center gap-1.5 text-background mix-blend-difference md:flex\">\n          <ThirdwayCountPill value={hh} />\n          <span className=\"text-sm font-[560]\">:</span>\n          <ThirdwayCountPill value={mm} />\n          <span className=\"ml-1 text-base font-[560] tracking-[-0.04em]\">{zoneLabel}</span>\n        </div>\n\n        <div className=\"pointer-events-auto relative w-full md:w-auto\">\n          <div className=\"flex items-center justify-between gap-6 rounded-[2px] bg-background p-1.5 pl-3 text-foreground md:justify-center md:gap-4\">\n            <a href={homeHref} className=\"text-[1.65rem] leading-none font-[560] tracking-[-0.06em]\">\n              {brand}\n              {mark && <sup className=\"ml-0.5 align-super text-[0.4em] tracking-normal\">{mark}</sup>}\n            </a>\n            <div className=\"flex items-center gap-4\">\n              <a href={cta.href} className=\"text-sm leading-none font-[560] tracking-[-0.04em] underline underline-offset-4 md:hidden\">\n                {cta.label}\n              </a>\n              <button\n                type=\"button\"\n                aria-label={menuLabel}\n                aria-expanded={open}\n                onClick={() => setOpen((v) => !v)}\n                className=\"flex size-8 flex-col items-center justify-center gap-[5px] rounded-[2px] bg-secondary transition-colors duration-150 hover:bg-accent motion-reduce:transition-none\"\n              >\n                <span className={cn(\"block h-0.5 w-3.5 bg-foreground transition-transform duration-300 ease-[cubic-bezier(0.66,0.01,0.12,0.98)] motion-reduce:transition-none\", open && \"translate-y-[3.5px] rotate-45\")} />\n                <span className={cn(\"block h-0.5 w-3.5 bg-foreground transition-transform duration-300 ease-[cubic-bezier(0.66,0.01,0.12,0.98)] motion-reduce:transition-none\", open && \"-translate-y-[3.5px] -rotate-45\")} />\n              </button>\n            </div>\n          </div>\n          {open && (\n            <nav className=\"absolute top-full left-0 mt-2 w-full rounded-[2px] bg-background p-4 text-foreground md:left-1/2 md:w-80 md:-translate-x-1/2\">\n              <ul className=\"grid gap-1\">\n                {links.map((l) => (\n                  <li key={l.href + l.label}>\n                    <a href={l.href} className=\"block text-[2rem] leading-[1.1] font-[560] tracking-[-0.06em] transition-opacity duration-150 hover:opacity-60 motion-reduce:transition-none\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </nav>\n          )}\n        </div>\n\n        <div className=\"pointer-events-auto absolute top-2.5 right-0 hidden text-background mix-blend-difference md:block\">\n          <ThirdwayArrowLink label={cta.label} href={cta.href} size=\"md\" className=\"text-background [&>span:last-child]:bg-background [&>span:last-child]:text-foreground\" />\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-arrow-link",
+    "thirdway-count-pill"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark text"
+    },
+    {
+      "name": "mark",
+      "type": "string",
+      "required": false,
+      "description": "a tiny superscript after the wordmark (e.g. a trade mark glyph)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "home link of the wordmark"
+    },
+    {
+      "name": "links",
+      "type": "ThirdwayHeaderLink[]",
+      "required": true,
+      "description": "the pages listed in the menu panel"
+    },
+    {
+      "name": "cta",
+      "type": "ThirdwayHeaderLink",
+      "required": true,
+      "description": "the \"let's talk\" call to action"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the menu button"
+    },
+    {
+      "name": "timeZone",
+      "type": "string",
+      "required": false,
+      "default": "Europe/London",
+      "description": "IANA time zone of the clock at the left (desktop)"
+    },
+    {
+      "name": "zoneLabel",
+      "type": "string",
+      "required": true,
+      "description": "the zone abbreviation shown beside the clock"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cbc21b7010928e6f1acf4bc279f44c11e3be83f2d71d9eaa10c37eb5f9a1d8a7"
+}
