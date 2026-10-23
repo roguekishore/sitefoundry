@@ -25,7 +25,7 @@ const variants = {
 /** Lithic's pill: 32px tall, 14px medium type, fully rounded, an arrow after the label. */
 export function LithicButton({ children, href, variant = "primary", arrow = true, type = "button", className }: LithicButtonProps) {
   const classes = cn(
-    "inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium whitespace-nowrap",
+    "inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold whitespace-nowrap",
     "transition-colors duration-200 ease-out motion-reduce:transition-none",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     variants[variant],

@@ -13,7 +13,7 @@ export const trustSample: LithicTrustProps = {
     },
     {
       title: "Audited and certified, every year",
-      text: "Independent security audits, card-data standards and a certified information-security program",
+      text: "Yearly SOC audits, card-data standards and a certified security program",
       badge: true,
     },
     {

@@ -45,12 +45,12 @@ function Card({ service, step }: { service: LithicService; step: number }) {
       )}
       style={{ "--lithic-services-step": step } as CSSProperties}
     >
-      <h3 className="flex items-center gap-3 font-display text-base/[1.2] font-medium tracking-[-0.01em] lg:text-xl/[1.2]">
+      <h3 className="flex items-center gap-3 font-display text-base/[1.2] font-semibold tracking-[-0.01em] lg:text-xl/[1.2]">
         {service.icon && <span className="shrink-0 text-highlight [&>svg]:size-5">{service.icon}</span>}
         {service.title}
       </h3>
       <p className="mt-6 text-sm/[1.6] tracking-[0.01em] text-muted-foreground">
-        {service.lead && <strong className="font-medium text-foreground">{service.lead} </strong>}
+        {service.lead && <strong className="font-semibold text-foreground">{service.lead} </strong>}
         {service.text}
       </p>
       {service.link && (
@@ -68,18 +68,18 @@ export function LithicServices({ title, lead, text, cardsTitle, primary, seconda
     <section className={cn("px-gutter lg:px-6", className)}>
       <div className="dark relative isolate overflow-clip rounded-lg bg-background pt-14 pb-14 text-foreground lg:pt-[7.4rem] lg:pb-[7.5rem]">
         <LithicContours at="45% 30%" gap={40} className="-z-10 text-highlight/25" />
-        <div className="mx-auto max-w-[78rem] px-8 lg:px-gutter">
+        <div className="mx-auto max-w-page px-8 lg:px-gutter">
           <div className="grid lg:grid-cols-2">
             <div className="text-center lg:text-left">
-              <h2 className="mx-auto max-w-[16rem] font-display text-2xl/[1.2] font-medium tracking-[-0.02em] lg:mx-0 lg:max-w-[25rem] lg:text-[2rem]/[1.2]">{title}</h2>
-              <p className="mx-auto mt-5 max-w-[15rem] text-sm/[1.6] font-medium tracking-[0.02em] lg:mx-0 lg:mt-12 lg:max-w-[26rem] lg:text-base/[1.75]">{lead}</p>
+              <h2 className="mx-auto max-w-[16rem] font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:mx-0 lg:max-w-[25rem] lg:text-[2rem]/[1.2]">{title}</h2>
+              <p className="mx-auto mt-5 max-w-[15rem] text-sm/[1.6] font-semibold tracking-[0.01em] lg:mx-0 lg:mt-12 lg:max-w-[26rem] lg:text-base/[1.75]">{lead}</p>
               <p className="mx-auto mt-4 max-w-[17rem] text-sm/[1.4] tracking-[0.01em] text-muted-foreground lg:mx-0 lg:mt-10 lg:max-w-[30rem] lg:text-sm/[1.6]">{text}</p>
             </div>
           </div>
-          <div className="-mr-8 mt-10 ml-auto aspect-[736/524] w-[95%] lg:absolute lg:top-16 lg:right-0 lg:m-0 lg:w-[40%] lg:max-w-[46rem]">
+          <div className="-mr-8 mt-12 ml-auto aspect-[736/524] w-[110%] lg:absolute lg:top-16 lg:right-0 lg:m-0 lg:w-[40%] lg:max-w-[46rem]">
             {media ?? <LithicPlaceholder tone="dim" className="size-full rounded-l-[2.5rem]" />}
           </div>
-          <h2 className="mx-auto mt-14 max-w-[16rem] text-center font-display text-2xl/[1.2] font-medium tracking-[-0.02em] lg:mt-[10.25rem] lg:max-w-[22rem] lg:text-[2rem]/[1.2]">
+          <h2 className="mx-auto mt-16 max-w-[16rem] text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:mt-[10.25rem] lg:max-w-[22rem] lg:text-[2rem]/[1.2]">
             {cardsTitle}
           </h2>
           <div className="mt-8 grid gap-4 lg:mt-11 lg:gap-8">

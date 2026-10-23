@@ -36,7 +36,7 @@ function Row({ logos, hidden }: { logos: LithicLogo[]; hidden?: boolean }) {
 export function LithicLogos({ title, logos, className }: LithicLogosProps) {
   return (
     <section className={cn("overflow-clip bg-background pt-12 pb-16 text-foreground lg:pt-[4.5rem] lg:pb-24", className)}>
-      <h2 className="px-gutter text-center font-display text-2xl/[1.2] font-medium tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
+      <h2 className="px-gutter text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
       <div className="lithic-logos-window mx-auto mt-10 max-w-[82.5rem] overflow-clip lg:mt-14">
         <div className="lithic-logos-track flex w-max">
           <Row logos={logos} />

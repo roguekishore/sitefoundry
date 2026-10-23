@@ -62,7 +62,7 @@ export function LithicTestimonials({ title, text, testimonials, previousLabel, n
     <section className={cn("overflow-clip bg-background pt-20 pb-24 text-foreground lg:pt-40 lg:pb-[9.25rem]", className)} style={{ paddingLeft: edge }}>
       <div className="flex items-start">
         <div className="w-[11.9rem] shrink-0 pt-[3.4rem] lg:w-[17.6rem] lg:pt-14">
-          <h2 className="font-display text-2xl/[1.2] font-medium tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
+          <h2 className="font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
           <p className="mt-6 text-sm/[1.4] tracking-[0.01em] lg:mt-8">{text}</p>
         </div>
         <div className="ml-[6.1rem] min-w-0 flex-1 lg:ml-[9.4rem]">
@@ -81,7 +81,7 @@ export function LithicTestimonials({ title, text, testimonials, previousLabel, n
                 <div className="mt-auto flex items-center gap-6">
                   <div className="size-12 shrink-0 overflow-clip rounded-full">{t.avatar ?? <LithicPlaceholder tone="dim" className="size-full rounded-full" />}</div>
                   <div className="text-sm/[1.6]">
-                    <p className="font-medium tracking-[0.01em]">{t.name}</p>
+                    <p className="font-semibold tracking-[0.01em]">{t.name}</p>
                     <p>{t.role}</p>
                   </div>
                 </div>

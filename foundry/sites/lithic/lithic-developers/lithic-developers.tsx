@@ -21,10 +21,10 @@ export function LithicDevelopers({ title, text, links, media, className }: Lithi
   return (
     <section className={cn("px-gutter lg:px-6", className)}>
       <div className="relative isolate overflow-clip rounded-lg bg-secondary text-secondary-foreground lg:min-h-[32.125rem]">
-        <LithicContours at="0% 10%" gap={9} className="-z-10 text-chart-2/45 lg:right-[55%]" />
+        <LithicContours at="0% 10%" gap={10} className="-z-10 text-chart-2/30 lg:right-[55%]" />
         <div className="mx-auto max-w-page px-6 pt-8 lg:flex lg:min-h-[32.125rem] lg:items-center lg:px-gutter lg:py-24">
           <div className="lg:max-w-[28rem] lg:pt-2">
-            <h2 className="font-display text-2xl/[1.2] font-medium tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
+            <h2 className="font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.2]">{title}</h2>
             <p className="mt-6 text-sm/[1.6] tracking-[0.01em] lg:text-base/[1.4] lg:tracking-normal [&_strong]:font-semibold">{text}</p>
             <ul className="mt-10 flex flex-col gap-6 lg:mt-8 lg:flex-row lg:gap-7">
               {links.map((link) => (

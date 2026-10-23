@@ -31,8 +31,8 @@ export function LithicFooter({ columns, wordmark, mark, legal, socials, classNam
             <div key={i} className="flex flex-col gap-6 lg:gap-[1.6rem]">
               {groups.map((group) => (
                 <div key={group.title}>
-                  <h2 className="text-sm/[1.4] font-medium">{group.title}</h2>
-                  <ul className="mt-4 flex flex-col gap-2 lg:mt-[0.85rem] lg:gap-2">
+                  <h2 className="text-sm/[1.4] font-semibold">{group.title}</h2>
+                  <ul className="mt-4 flex flex-col gap-2 text-sm/[1.4] lg:mt-3">
                     {group.links.map((link) => (
                       <li key={link.label}>
                         <a href={link.href} className="text-sm/[1.4] tracking-[0.01em] text-muted-foreground transition-colors duration-200 hover:text-foreground motion-reduce:transition-none">
@@ -46,12 +46,12 @@ export function LithicFooter({ columns, wordmark, mark, legal, socials, classNam
             </div>
           ))}
         </div>
-        <div className="mt-16 grid gap-8 lg:mt-[3.4rem] lg:grid-cols-6 lg:items-start lg:gap-x-8">
+        <div className="mt-14 grid gap-8 lg:mt-14 lg:grid-cols-6 lg:items-start lg:gap-x-8">
           <p className="flex items-center gap-1.5 text-[1.1rem]/[1] font-extrabold tracking-[-0.02em] uppercase">
             {mark}
             {wordmark}
           </p>
-          <div className="flex flex-col gap-5 text-sm/[1.4] font-medium text-muted-foreground lg:col-span-4 lg:gap-4 lg:text-center">
+          <div className="flex flex-col gap-5 text-sm/[1.4] font-semibold text-muted-foreground lg:col-span-4 lg:gap-4 lg:text-center">
             {legal.map((line) => (
               <p key={line}>{line}</p>
             ))}

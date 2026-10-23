@@ -59,7 +59,7 @@ export function LithicPlatform({ title, tabs, interval = 6000, tabsLabel, classN
           aria-selected={i === active}
           onClick={() => setActive(i)}
           className={cn(
-            "w-fit text-left text-sm/[1.2] font-medium tracking-[-0.01em] transition-colors duration-200 lg:text-right lg:text-2xl/[1.2] lg:tracking-[-0.02em] motion-reduce:transition-none",
+            "w-fit text-left text-sm/[1.2] font-semibold tracking-[-0.01em] transition-colors duration-200 lg:text-right lg:text-2xl/[1.2] lg:tracking-[-0.02em] motion-reduce:transition-none",
             i === active ? "text-accent-foreground" : "text-accent-foreground/45 hover:text-accent-foreground/70",
           )}
         >
@@ -71,7 +71,7 @@ export function LithicPlatform({ title, tabs, interval = 6000, tabsLabel, classN
 
   return (
     <section className={cn("bg-background px-gutter pt-12 pb-[4.5rem] text-foreground lg:pt-[4.6rem] lg:pb-[7.4rem]", className)}>
-      <h2 className="mx-auto max-w-[20rem] text-center font-display text-2xl/[1.2] font-medium tracking-[-0.02em] sm:max-w-none lg:text-[2rem]/[1.2]">{title}</h2>
+      <h2 className="mx-auto max-w-[20rem] text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] sm:max-w-none lg:text-[2rem]/[1.2]">{title}</h2>
       <div
         className="relative isolate mx-auto mt-6 grid max-w-[74rem] overflow-clip rounded-lg bg-accent px-6 pt-8 pb-14 lg:mt-[2.35rem] lg:h-[31.25rem] lg:grid-cols-[22rem_1fr_auto] lg:items-center lg:gap-10 lg:px-16 lg:py-0"
         style={{ "--lithic-platform-interval": `${interval}ms` } as CSSProperties}
@@ -79,11 +79,11 @@ export function LithicPlatform({ title, tabs, interval = 6000, tabsLabel, classN
         <LithicContours shape="ellipse" gap={14} at="50% 50%" className="-z-10 text-accent-foreground/15 max-lg:top-[45%] max-lg:left-[60%] lg:inset-x-[28%] lg:-inset-y-[10%]" />
         <div className="lg:order-3">{tabList}</div>
         <div key={`text-${active}`} role="tabpanel" className="lithic-platform-pane mt-10 lg:order-1 lg:mt-0">
-          <h3 className="font-display text-xl/[1.2] font-medium tracking-[-0.02em] lg:text-2xl/[1.2]">{tab.title}</h3>
+          <h3 className="font-display text-xl/[1.2] font-semibold tracking-[-0.02em] lg:text-2xl/[1.2]">{tab.title}</h3>
           <p className="mt-6 max-w-[22rem] text-sm/[1.45] lg:mt-[1.4rem] lg:text-base/[1.4]">{tab.text}</p>
           <ul className="mt-8 flex flex-col gap-3 lg:mt-[1.9rem] lg:gap-[0.6rem]">
             {tab.bullets.map((b) => (
-              <li key={b} className="flex items-center gap-2.5 text-base font-medium text-accent-foreground lg:text-sm">
+              <li key={b} className="flex items-center gap-2.5 text-base font-semibold text-accent-foreground lg:text-sm">
                 <CircleCheck aria-hidden className="size-5 shrink-0 fill-accent-foreground stroke-accent lg:size-[1.125rem]" strokeWidth={2} />
                 {b}
               </li>

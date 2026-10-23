@@ -16,7 +16,7 @@ export function LithicArrowLink({ children, href, tone = "inherit", className }:
     <a
       href={href}
       className={cn(
-        "inline-flex w-fit items-center gap-2 font-medium transition-colors duration-200 ease-out hover:text-primary motion-reduce:transition-none",
+        "inline-flex w-fit items-center gap-2 font-semibold transition-colors duration-200 ease-out hover:text-primary motion-reduce:transition-none",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         tone === "highlight" && "text-highlight",
         className,
