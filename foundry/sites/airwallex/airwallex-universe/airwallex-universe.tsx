@@ -117,7 +117,7 @@ export function AirwallexUniverse({ title, intro, tabs, moreLabel, className }: 
             {rest.map((card) => (
               <a key={card.eyebrow} href={card.href} className="group flex h-[29.875rem] flex-col rounded-[1rem] bg-card">
                 <div className="px-8 pt-12">{card.media ?? <AirwallexPlaceholder tone="dim" className="aspect-[506/242] w-full rounded-lg" />}</div>
-                <div className="mt-auto px-8 pb-[5.25rem]">
+                <div className="mt-10 px-8 pb-12">
                   <CardText card={card} moreLabel={moreLabel} />
                 </div>
               </a>

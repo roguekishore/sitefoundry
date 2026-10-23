@@ -47,7 +47,7 @@ export function AirwallexHero({
   const emailId = useId();
   return (
     <section className={cn("overflow-clip bg-background text-foreground", className)}>
-      <div className="mx-auto grid max-w-page gap-9 px-gutter pt-[3.75rem] pb-9 lg:grid-cols-[minmax(0,31.5rem)_minmax(0,1fr)] lg:items-center lg:gap-12 lg:px-12 lg:pt-12 lg:pb-7">
+      <div className="mx-auto grid max-w-page gap-9 px-gutter pt-[3.75rem] pb-9 lg:grid-cols-[minmax(0,31.5rem)_minmax(0,1fr)] lg:items-center lg:gap-12 lg:px-12 lg:pt-12 lg:pb-4">
         <div className="lg:pb-6">
           <h1 className="font-display text-2xl leading-[1.3] font-bold tracking-[-0.01em] lg:text-5xl lg:leading-[1.25]">
             {title.map((part, i) => (
@@ -56,7 +56,7 @@ export function AirwallexHero({
               </span>
             ))}
           </h1>
-          <p className="mt-6 text-base leading-6 text-foreground/80 lg:mt-12 lg:text-xl lg:leading-[1.5]">{lede}</p>
+          <p className="mt-6 text-base leading-6 text-foreground/80 lg:mt-10 lg:text-xl lg:leading-[1.5]">{lede}</p>
           {tour && (
             <a href={tour.href} className="group mt-10 hidden items-center gap-1.5 text-base font-semibold text-primary lg:inline-flex">
               {tour.label}
@@ -72,7 +72,7 @@ export function AirwallexHero({
               type="email"
               name="email"
               placeholder={emailPlaceholder}
-              className="h-12 min-w-0 flex-1 rounded-md border border-border bg-muted/60 px-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-2 focus:outline-ring lg:h-10 lg:border-0 lg:bg-transparent lg:focus:outline-none"
+              className="h-12 min-w-0 rounded-md border border-border bg-muted/60 px-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-2 focus:outline-ring lg:h-10 lg:flex-1 lg:border-0 lg:bg-transparent lg:focus:outline-none"
             />
             <AirwallexButton type="submit" size="lg" className="h-10 w-full lg:w-auto">
               {submitLabel}

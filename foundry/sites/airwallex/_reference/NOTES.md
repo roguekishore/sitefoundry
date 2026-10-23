@@ -100,3 +100,26 @@ the cookie banner (not part of the design).
   phone layout shows it above the photo). Rows pause on hover so the quote can be read
   (a choice of ours).
 - The app-store badges become plain dark pills with text (no store logos).
+
+## Comparison round 1
+
+Heights (original → ours), 1440: hero 597 → 633, logos 191 → 197, solutions 838 → 850,
+universe 1359 → 1366, statement 312 → 324, rows 494 → 475, network 734 → 766, customers
+994 → 954, CTA 430 → 416, footer 912 → 1005. 390: hero 686 → 691, solutions 2188 → 2053,
+universe 1072 → 1097, rows 677/642/642 → 666/642/642, network 1034 → 1038, customers 742 →
+764, CTA 409 → 374, footer 1609 → 1822. All window-independent in both (no section is
+"sized by the window" in the original).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | – | at 1024 the row overflowed (page 1059px): links, language chip, Log in and two buttons don't fit | sticky ✓, hover colours ✓ | yes: tighter gaps at lg, language and Log in from xl |
+| hero | email field collapsed to ~20px (flex-1 in a column) | lede 22px too low (48px gap vs 40), section 36px taller | crossfade + dot loop ✓ | yes: flex-1 only at lg, lede gap 40px, less bottom padding |
+| logos | ✓ | ✓ | marquee 30s ✓ | – |
+| solutions | ✓ (cards ~10px shorter each) | ✓ | rise on entering view ✓ (shows as reveal 0→1, 32px), hover scale 1.01 + shadow ✓ | – |
+| universe | ✓ | lower cards' captions sat at different heights (bottom-aligned); original starts them 300px down | panel fade ✓, Learn more grow ✓ | yes: captions start after the shot |
+| statement | ✓ | ✓ | – | – |
+| feature rows | ✓ | ✓ | – | – |
+| network | ✓ | globe slot smaller and higher than the original's (which runs past the band's bottom); caption 7px too far below the figure | – | yes: 800px slot from the top edge; 12px gap |
+| customers | ✓ | ✓ | two drifting rows ✓ (loop 96.8s), hover zoom + quote ✓ | – |
+| CTA | 35px shorter | ✓ | – | – |
+| footer | 213px taller | 93px taller: links spaced 38px vs 31.5px (inherited 24px line) | hover violet ✓ | yes: links set at 14px/1.3 |

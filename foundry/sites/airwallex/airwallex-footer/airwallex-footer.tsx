@@ -47,7 +47,7 @@ function Group({ group }: { group: AirwallexFooterGroup }) {
   return (
     <div>
       <p className="text-sm leading-[1.3] font-bold text-foreground">{group.title}</p>
-      <ul className="mt-3.5 flex flex-col gap-3.5">
+      <ul className="mt-3.5 flex flex-col gap-3.5 text-sm leading-[1.3]">
         {group.links.map((l) => (
           <li key={l.label}>
             <a href={l.href} className={linkClass}>
