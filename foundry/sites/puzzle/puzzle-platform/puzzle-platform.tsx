@@ -34,7 +34,7 @@ export function PuzzlePlatform({ cards, className }: PuzzlePlatformProps) {
             )}
           >
             {c.eyebrow && <p className="font-mono text-sm/5 tracking-[0.06em] text-muted-foreground uppercase">{c.eyebrow}</p>}
-            <h2 className="mt-4 font-display text-[1.625rem]/[1.15] font-normal lg:mt-6 lg:text-[1.75rem]/[1.3]">{c.title}</h2>
+            <h2 className="mt-4 font-display text-[1.625rem]/[1.15] font-medium lg:mt-6 lg:text-[1.75rem]/[1.3]">{c.title}</h2>
             <p className="mt-6 max-w-[29rem] text-base/[1.6] text-muted-foreground lg:mt-6 lg:text-[1.0125rem]/[1.65]">{c.text}</p>
             {c.pills && (
               <ul className="mt-4 flex flex-wrap gap-2 lg:mt-6">

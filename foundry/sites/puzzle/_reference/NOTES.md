@@ -99,3 +99,47 @@ Skipped: the cookie banner and chat launcher (third-party overlays, not the desi
   column); the 1200px column is `max-w-[78.5rem]` with the same gutter.
 - Dark mode is a sibling: an ink-violet night page with violet-tinted panels; the deep violet
   bands stay violet.
+
+## Comparison round 1
+
+Heights 1440 (original → ours): header 119→120, hero 576→602, stats 263→264, two ways 663→704,
+AI suite 2116→2095, services 1176→1228, chooser 469→495, platform 505→518, guarantee 342→391,
+stories 733→801, migrate 998→1027, firms 293→296, CTA 624→650, FAQ 1206→1243, footer 652→651.
+390 within ±60px everywhere except two ways (1330→1461). No horizontal overflow at 360/768/1024.
+Motion: sticky header ✓; stat-card reveal (opacity 0→1, rise 21→0) ✓; hover colours and timings
+on links and every button variant match the original's list ✓; story card hover zoom ✓.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all display titles | Figtree at 400 reads lighter than Haskoy | same | — | yes: card/section titles to 500 (stat figures and feature titles stay 400) |
+| header | announcement truncates (longer copy) | ✓ | ✓ | yes: optional `shortText` for phones |
+| hero | ✓ | 26px taller (bottom padding) | ✓ | yes: pb 100→80px |
+| two ways | eyebrow wraps, lists wrap (longer copy); card 40px taller | price line wraps to 3 lines; list pitch 37 vs 34px | ✓ | yes: shorter demo copy, list gap 12→10px |
+| AI suite | ✓ | ✓ (heading 3 lines vs 2: longer copy) | — | — |
+| services | ✓ | plan cards 30px taller | — | yes: tighter inner spacing |
+| chooser | ✓ | heading row 14px lower than original (aligned to bottom) | — | yes: align top |
+| guarantee | ✓ | title wraps to 3 lines | — | yes: shorter demo title |
+| stories | heading 3 lines vs 2 | heading 2 lines vs 1 | ✓ | yes: wider heading measure |
+| firms callout | ✓ | button label left-aligned when wrapped | — | yes: centred |
+| CTA | ✓ | pixel squares brighter than the original's; 26px taller | — | yes: dimmer squares, pb 160→144px |
+| FAQ | ✓ | 37px taller | — | yes: pb 96→80px |
+
+## Comparison round 2
+
+Heights 1440 (original → ours): header 119→120, hero 576→582, stats 263→264, two ways 663→677,
+AI suite 2116→2095, services 1176→1208, chooser 469→470, platform 505→518, guarantee 342→346,
+stories 733→758, migrate 998→1027, firms 293→296, CTA 624→634, FAQ 1206→1227, footer 652→651.
+390: all within ±60px of the original (two ways 1330→1363, AI suite 2836→2733). No overflow at
+360/768/1024. Motion list unchanged: sticky header, stat-card reveal (0→1, 21px), hovers.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| two ways | ✓ | price line wrapped to 3 lines in the violet card | ✓ | yes: shorter demo price line |
+| stories | ✓ | heading on 2 lines vs 1 | ✓ | yes: no max width from desktop |
+| dark mode | icons and the "Software" tag on the green tiles were light-on-green | same | — | yes: `dark:text-background` on green/violet tiles |
+| AI suite | answer card 100px shorter (shorter demo copy) | ✓ | — | no: content length only |
+| stories cards | tag set in mono, the original uses a serif fallback | same | — | no: kept mono (the original's serif looks like a missing font) |
+
+Re-theme check: `puzzle-paths` under sample-ember (light) and `puzzle-ai-suite` under
+sample-midnight (dark) both re-colour cleanly; the AI band takes the other theme's brand
+colour, as its notes say.

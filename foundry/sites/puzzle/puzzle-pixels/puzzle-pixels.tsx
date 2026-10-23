@@ -16,7 +16,7 @@ const patterns = {
   ],
 } as const;
 
-const brightness = ["", "bg-primary-foreground/[0.035]", "bg-primary-foreground/[0.06]", "bg-highlight/20"];
+const brightness = ["", "bg-primary-foreground/[0.03]", "bg-primary-foreground/[0.045]", "bg-highlight/12"];
 
 export interface PuzzlePixelsProps {
   /** which cluster */

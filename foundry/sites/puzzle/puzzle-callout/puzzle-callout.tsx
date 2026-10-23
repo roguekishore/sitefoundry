@@ -24,7 +24,7 @@ export function PuzzleCallout({ eyebrow, title, text, cta, size = "lg", classNam
             {eyebrow && <p className="mb-2 font-mono text-sm/5 tracking-[0.06em] text-muted-foreground uppercase lg:mb-1">{eyebrow}</p>}
             <h2
               className={cn(
-                "font-display font-normal text-balance",
+                "font-display font-medium text-balance",
                 size === "lg" ? "text-[1.875rem]/[1.1] lg:max-w-[33rem] lg:text-4xl/[1.25]" : "text-2xl/[1.25] lg:text-[1.75rem]/[1.3]",
               )}
             >
@@ -36,7 +36,7 @@ export function PuzzleCallout({ eyebrow, title, text, cta, size = "lg", classNam
             href={cta.href}
             variant="card"
             size="lg"
-            className={cn("h-11 w-full text-[0.9375rem] lg:w-auto lg:text-lg", size === "md" ? "lg:h-[5.125rem] lg:max-w-[18rem] lg:px-16 lg:whitespace-normal" : "lg:h-14")}
+            className={cn("h-11 w-full text-[0.9375rem] lg:w-auto lg:text-lg", size === "md" ? "lg:h-[5.125rem] lg:max-w-[18rem] lg:px-16 lg:text-center lg:whitespace-normal" : "lg:h-14")}
           >
             {cta.label}
           </PuzzleButton>

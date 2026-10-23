@@ -30,13 +30,13 @@ export interface PuzzleHeroProps {
 export function PuzzleHero({ badge, title, text, primary, secondary, link, note, media, playLabel, className }: PuzzleHeroProps) {
   return (
     <section className={cn("bg-background text-foreground", className)}>
-      <div className="mx-auto grid max-w-page gap-12 px-gutter pt-10 pb-16 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-9 lg:pt-20 lg:pb-[6.25rem]">
+      <div className="mx-auto grid max-w-page gap-12 px-gutter pt-10 pb-16 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-9 lg:pt-20 lg:pb-[5rem]">
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <p className="flex items-center gap-3 rounded-[1.25rem] border border-glow/80 bg-glow/20 px-3 py-1.5 font-mono text-[0.75rem]/[1.35] tracking-[0.04em] uppercase lg:px-4 lg:text-[0.8125rem]/[1.35]">
             <span aria-hidden className="hidden size-2.5 shrink-0 rounded-full bg-glow lg:block" />
             {badge}
           </p>
-          <h1 className="mt-4 font-display text-[2.75rem]/[1.15] font-normal tracking-[-0.015em] text-balance lg:mt-5 lg:text-[3.25rem]/[1.25]">
+          <h1 className="mt-4 font-display text-[2.75rem]/[1.15] font-medium tracking-[-0.015em] text-balance lg:mt-5 lg:text-[3.25rem]/[1.25]">
             {title}
           </h1>
           <p className="mt-4 max-w-[36rem] text-base/[1.55] text-foreground/70 lg:mt-5 lg:text-lg/[1.5]">{text}</p>

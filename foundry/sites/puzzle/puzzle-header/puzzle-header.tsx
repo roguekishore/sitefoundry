@@ -17,6 +17,8 @@ export interface PuzzleHeaderProps {
     lead: string;
     /** the sentence after it */
     text: string;
+    /** a shorter sentence for phones; the long one is used when left out */
+    shortText?: string;
     /** the bold link at the end (shown from tablet up) */
     link: { label: string; href: string };
   };
@@ -47,7 +49,15 @@ export function PuzzleHeader({ announcement, closeLabel, brand, links, demo, tri
           <div className="relative flex h-[2.625rem] items-center bg-secondary/55 pr-12 pl-8 text-sm lg:h-[2.875rem] lg:justify-center lg:px-14 lg:text-[0.9375rem]">
             <input id={id} type="checkbox" className="peer sr-only" />
             <a href={announcement.link.href} className="truncate">
-              <strong className="font-semibold">{announcement.lead}</strong> {announcement.text}{" "}
+              <strong className="font-semibold">{announcement.lead}</strong>{" "}
+              {announcement.shortText ? (
+                <>
+                  <span className="sm:hidden">{announcement.shortText}</span>
+                  <span className="hidden sm:inline">{announcement.text}</span>
+                </>
+              ) : (
+                announcement.text
+              )}{" "}
               <span className="hidden font-semibold sm:inline">{announcement.link.label}</span>
               <ArrowRight aria-hidden className="ml-0.5 inline size-4 align-[-0.15em]" strokeWidth={2} />
             </a>
@@ -66,7 +76,7 @@ export function PuzzleHeader({ announcement, closeLabel, brand, links, demo, tri
         <div className="mx-auto flex h-[4.3rem] max-w-page items-center justify-between gap-6 px-4 lg:h-[4.5625rem] lg:px-[3.25rem]">
           <a href={brand.href} className="flex shrink-0 items-center gap-2.5 font-display text-lg/none font-semibold tracking-[-0.01em] lg:gap-3 lg:text-2xl/none">
             {brand.icon && (
-              <span className="flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.6)] bg-glow text-foreground lg:size-10 [&_svg]:size-4 lg:[&_svg]:size-5">
+              <span className="flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.6)] bg-glow text-foreground lg:size-10 dark:text-background [&_svg]:size-4 lg:[&_svg]:size-5">
                 {brand.icon}
               </span>
             )}

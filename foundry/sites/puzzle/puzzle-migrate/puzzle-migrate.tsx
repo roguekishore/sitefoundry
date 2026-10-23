@@ -66,7 +66,7 @@ export function PuzzleMigrate({ title, text, actions, steps, activeStep = 1, car
           {cards.map((c) => (
             <li key={c.title} className="flex flex-col overflow-clip rounded-lg border border-border lg:min-h-[26.5rem]">
               <div className="px-6 pt-6 pb-6 lg:px-8 lg:pt-8 lg:pb-9">
-                <h3 className="font-display text-2xl/[1.3] font-normal lg:text-[1.75rem]/[1.3]">{c.title}</h3>
+                <h3 className="font-display text-2xl/[1.3] font-medium lg:text-[1.75rem]/[1.3]">{c.title}</h3>
                 <ul className="mt-4 list-disc pl-5 text-[0.9375rem]/[1.55] marker:text-foreground lg:mt-6 lg:text-[0.9375rem]/[1.6]">
                   {c.points.map((p) => (
                     <li key={p}>{p}</li>
