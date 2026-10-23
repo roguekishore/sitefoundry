@@ -18,7 +18,7 @@ export function EzraStat({ statement, mark, source, className }: EzraStatProps) 
         <p className="mx-auto max-w-[66rem] font-display text-[2.25rem] leading-[1.45] font-light tracking-[-0.03em] lg:text-[3.125rem] lg:leading-[1.1]">
           {statement}
         </p>
-        {mark && <p className="mt-10 font-display text-2xl leading-none lg:mt-11">{mark}</p>}
+        {mark && <p className="mt-10 text-2xl leading-none font-medium lg:mt-11">{mark}</p>}
         {source && <p className="mt-4 font-display text-sm leading-[1.3] whitespace-pre-line">{source}</p>}
       </div>
     </section>

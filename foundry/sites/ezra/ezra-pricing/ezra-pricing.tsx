@@ -75,7 +75,7 @@ function PlanDetails({ plan }: { plan: EzraPlan }) {
   return (
     <>
       {plan.time && (
-        <p className="mt-6 text-sm lg:mt-11">
+        <p className="mt-6 text-sm lg:mt-9">
           <strong className="font-semibold">{plan.time.label}</strong> {plan.time.value}
         </p>
       )}

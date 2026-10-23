@@ -1,7 +1,7 @@
 import { EzraStat, type EzraStatProps } from "./ezra-stat";
 
 export const statSample: EzraStatProps = {
-  statement: "Found early, most cancers are survivable; found late, the odds of the same diagnosis can drop below one in five.",
+  statement: "Found early, 8 in 10 cancers are survivable; found late, under 2 in 10.",
   mark: "*",
   source: "Figures from the National\nRegistry of Oncology",
 };

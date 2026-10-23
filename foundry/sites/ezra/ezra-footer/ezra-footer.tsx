@@ -37,7 +37,7 @@ export function EzraFooter({ logo, logoLabel, homeHref = "#", columns, copyright
   return (
     <footer className={cn("dark bg-background pt-8 text-foreground lg:pt-16", className)}>
       <div className="border-t border-border lg:flex lg:border-b">
-        <div className="flex justify-center pt-8.5 pb-8.5 lg:w-65 lg:shrink-0 lg:justify-start lg:border-x lg:border-border lg:px-7.5 lg:pt-8.5">
+        <div className="flex justify-center pt-8.5 pb-8.5 lg:w-48 lg:shrink-0 xl:w-65 lg:justify-start lg:border-x lg:border-border lg:px-6 lg:pt-8.5 xl:px-7.5">
           <a href={homeHref} aria-label={logoLabel} className="text-[1.6rem] lg:text-[1.5rem]">
             {logo}
           </a>
@@ -46,9 +46,9 @@ export function EzraFooter({ logo, logoLabel, homeHref = "#", columns, copyright
           {columns.map((column) => (
             <li
               key={column.title}
-              className="-mt-px border border-border px-4.5 pt-6 pb-9 first:mt-0 lg:mt-0 lg:flex-auto lg:border-y-0 lg:border-l-0 lg:px-6 lg:pt-9 lg:pb-16"
+              className="-mt-px border border-border px-4.5 pt-6 pb-9 first:mt-0 lg:mt-0 lg:min-w-0 lg:flex-auto lg:border-y-0 lg:border-l-0 lg:px-4 lg:pt-9 lg:pb-16 xl:px-6"
             >
-              <h2 className="font-display text-[1.8rem] leading-[1.1] font-light tracking-[-0.01em] lg:text-[2.15rem]">{column.title}</h2>
+              <h2 className="font-display text-[1.8rem] leading-[1.1] font-[350] tracking-[-0.01em] lg:text-[1.7rem] xl:text-[2.15rem]">{column.title}</h2>
               <ul className="mt-2.5 flex flex-col lg:mt-3.5">
                 {column.links.map((link) => (
                   <li key={link.label}>
@@ -68,7 +68,7 @@ export function EzraFooter({ logo, logoLabel, homeHref = "#", columns, copyright
           ))}
         </ul>
       </div>
-      <p className="mt-5 border-t border-border py-8 text-center text-xs lg:mt-0 lg:border-t-0 lg:pt-7.5 lg:pb-7.5">{copyright}</p>
+      <p className="mt-5 border-t border-border py-8 text-center text-xs lg:mt-0 lg:border-t-0 lg:pt-6.5 lg:pb-7">{copyright}</p>
     </footer>
   );
 }
