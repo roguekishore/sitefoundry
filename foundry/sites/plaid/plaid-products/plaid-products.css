@@ -1,0 +1,58 @@
+/* The rim: a rainbow square much larger than the card, spinning slowly behind the surface. The
+   surface covers it completely at rest; on hover the surface shrinks in by 4px, so the spin
+   shows as a moving rainbow border. */
+.plaid-products-rim {
+  animation: plaid-products-spin 10s linear infinite;
+  animation-play-state: paused;
+}
+.plaid-products-card:hover .plaid-products-rim,
+.plaid-products-card:focus-within .plaid-products-rim {
+  animation-play-state: running;
+}
+
+@keyframes plaid-products-spin {
+  to { rotate: 360deg; }
+}
+
+/* Touch screens have no hover: the card near the middle of the view lights up instead. */
+@media (hover: none) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .plaid-products-card {
+      view-timeline: --plaid-products-card block;
+    }
+    .plaid-products-rim {
+      animation:
+        plaid-products-spin 10s linear infinite,
+        plaid-products-show linear both;
+      animation-timeline: auto, --plaid-products-card;
+      animation-range: normal, contain 0% contain 100%;
+    }
+    .plaid-products-surface {
+      animation: plaid-products-inset linear both;
+      animation-timeline: --plaid-products-card;
+      animation-range: contain 0% contain 100%;
+    }
+    .plaid-products-arrow {
+      animation: plaid-products-arrow linear both;
+      animation-timeline: --plaid-products-card;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+
+@keyframes plaid-products-show {
+  0%, 100% { opacity: 0; }
+  12%, 88% { opacity: 1; }
+}
+@keyframes plaid-products-inset {
+  0%, 100% { inset: 0; border-radius: var(--radius); }
+  12%, 88% { inset: 4px; border-radius: calc(var(--radius) - 4px); }
+}
+@keyframes plaid-products-arrow {
+  0%, 100% { background-color: transparent; color: var(--foreground); border-color: var(--chart-3); }
+  12%, 88% { background-color: var(--foreground); color: var(--background); border-color: transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plaid-products-rim { animation: none; }
+}
