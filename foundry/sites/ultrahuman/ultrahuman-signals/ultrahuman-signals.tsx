@@ -117,7 +117,7 @@ export function UltrahumanSignals({ title, body, items, interval = 6, className 
                   <div className="aspect-[290/392] overflow-clip rounded-lg bg-current/10 lg:aspect-[769/432] lg:rounded-xl">
                     {item.media ?? <UltrahumanPlaceholder tone="photo" label={home ? item.mediaLabel : undefined} />}
                   </div>
-                  <h3 className="mt-6 text-base leading-tight tracking-[-0.02em] lg:mt-9 lg:text-[1.375rem]">{item.title}</h3>
+                  <h3 className="mt-6 text-base leading-tight font-medium tracking-[-0.03em] lg:mt-9 lg:text-[1.375rem] lg:tracking-[-0.04em]">{item.title}</h3>
                   <p className="mt-2 max-w-[31.25rem] text-[0.8125rem] leading-[1.0625rem] tracking-[-0.005em] text-current/60 lg:mt-4 lg:text-[0.9375rem] lg:leading-[1.3125rem]">
                     {item.body}
                   </p>

@@ -57,7 +57,7 @@ export function UltrahumanPromo({ eyebrow, title, body, action, media, mediaLabe
 
         <div className="px-5 pb-10 lg:px-24 lg:pb-0">
           <p className="text-base leading-none font-light tracking-[-0.01em] uppercase lg:text-2xl">{eyebrow}</p>
-          <h2 className="mt-5 font-[family-name:var(--ultrahuman-condensed,var(--typeface-display))] text-[3.75rem] leading-[0.92] font-medium tracking-[-0.01em] uppercase italic [font-stretch:50%] lg:mt-6 lg:text-[6rem] lg:leading-[0.97]">
+          <h2 className="mt-5 font-[family-name:var(--ultrahuman-condensed,var(--typeface-display))] text-[3.75rem] leading-[0.92] font-medium tracking-[calc(-0.01em-var(--ultrahuman-squeeze,0em))] uppercase italic [font-stretch:50%] lg:mt-6 lg:text-[6rem] lg:leading-[0.97]">
             {title.map((line) => (
               <span key={line} className="block">
                 {line}

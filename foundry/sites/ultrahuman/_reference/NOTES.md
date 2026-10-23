@@ -109,3 +109,22 @@ number is static), the green arc and dotted-ring canvases themselves.
 - The giant footer wordmark is our name in Geist at weight 900 italic, pale (#f0f0f0).
 - Lenis: the 1440 capture lists Lenis smooth scroll, so the page mounts a small
   `ultrahuman-smooth-scroll` component (lenis, `hydrate: load`, off under reduced motion).
+
+## Comparison round 1
+
+Section heights already matched (390: 77 / 762 / 812 / 844 / 520 / 825 / 1850×2 / 919 / 844 / 254 / 1422 vs
+original 77 / 758 / 800 / 844 / 530 / ~850 / ~1900 / 949 / 844 / 240 / 1403; 1440: promo 503, hero/science/
+battery window-tall, app 1023 vs 1032, globe 820, partners 345 vs 337). No overflow at 360/768/1024. Every
+motion row shows up in ours' Motion list (header scroll morph, hero load-in, science fly-out, battery
+crossfade/slide/roll/arc, reveals, sticky, globe cards, partners drift + loop). Section crops show
+scroll-driven reveals at their start state (blank signals band), so those were judged on scroll frames.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| product phone bar | sat at the band's top and scrolled away; original stays pinned to the window bottom for the whole band | — | sticky bottom only holds an element whose natural spot is below the fold | yes: bar moved to the band's last child, bottom padding reduced by its height |
+| product feature titles, carousel captions | regular weight, looser | same | — | yes: weight 500, −0.04em; descriptions +0.01em |
+| promo headline | 3 lines: Saira at 50% still ~15% wider than Dharma Gothic | slightly wide | — | yes: theme-only `--ultrahuman-squeeze` 0.03em subtracted from tracking; shorter sample line |
+| footer | — | link pitch 44 vs 42px; contact row 158 vs 139px; wordmark centred and too tall (190 vs 118px) | — | yes: links are block flex (22px line), row padding 36/28, wordmark is SVG text stretched to the full width |
+| header | — | links start 8px left of the original | — | yes |
+| hero / app copy | body wrapped to a 2nd line (copy longer than original) | app body orphan | — | yes: shorter sample copy |
+| hero media | grey placeholder vs the original's beige photo | same | — | no: placeholder (token grey) by design |

@@ -4,7 +4,7 @@ import { UltrahumanHero, type UltrahumanHeroProps } from "./ultrahuman-hero";
 export const heroSample: UltrahumanHeroProps = {
   eyebrow: "Halo Max",
   title: "Quiet Force.",
-  body: "Our strongest sensor and longest charge, in one band.",
+  body: "Our strongest sensor and longest charge yet.",
   primary: { label: "Buy now", href: "#" },
   secondary: { label: "See more", href: "#" },
   mediaLabel: "Video of the band hovering over its charging case",

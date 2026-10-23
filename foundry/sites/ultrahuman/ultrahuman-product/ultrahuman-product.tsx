@@ -55,7 +55,8 @@ export interface UltrahumanProductProps {
 /**
  * A product band: name and grey tagline, then on desktop a sticky left column (media, name, two
  * buttons) beside a stack of cards (statement, big figure, feature list). On phones everything
- * stacks and the name with its buttons rides along as a bar pinned to the bottom of the window.
+ * stacks and the name with its buttons rides along as a bar pinned to the bottom of the window
+ * (the bar is the band's last child, so sticky bottom-0 holds it there while the band is on screen).
  */
 export function UltrahumanProduct({
   tone = "dark",
@@ -75,17 +76,7 @@ export function UltrahumanProduct({
   const xl = stat.scale === "xl";
   return (
     <section className={cn(tone === "dark" && "dark", "bg-background text-foreground", className)}>
-      <div className="sticky bottom-0 z-10 flex h-[4.1875rem] items-center gap-2 border-t border-foreground/10 bg-background px-4 lg:hidden">
-        <p className="min-w-0 flex-1 truncate text-sm tracking-[-0.01em]">{name}</p>
-        <UltrahumanButton href={primary.href} className="h-10 w-32 min-w-0 px-0">
-          {primary.label}
-        </UltrahumanButton>
-        <UltrahumanButton href={secondary.href} variant="outline" className="h-10 w-32 min-w-0 px-0">
-          {secondary.label}
-        </UltrahumanButton>
-      </div>
-
-      <div className="px-gutter pt-[6.25rem] pb-[10.5rem] lg:pt-[5.5rem] lg:pb-36">
+      <div className="px-gutter pt-[6.25rem] pb-[6.5rem] lg:pt-[5.5rem] lg:pb-36">
         <div className="mx-auto max-w-page">
           <UltrahumanReveal as="h2" className="text-[1.625rem] leading-[2rem] tracking-[-0.03em] lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]">
             {name}
@@ -153,8 +144,8 @@ export function UltrahumanProduct({
                         {feature.icon}
                       </span>
                       <span>
-                        <span className="block text-lg leading-tight tracking-[-0.03em] lg:text-[1.375rem]">{feature.title}</span>
-                        <span className="mt-2 block text-[0.8125rem] leading-[1.125rem] tracking-[-0.005em] text-foreground/60 lg:mt-3 lg:text-sm lg:leading-[1.1875rem]">
+                        <span className="block text-lg leading-tight font-medium tracking-[-0.04em] lg:text-[1.375rem]">{feature.title}</span>
+                        <span className="mt-2 block text-[0.8125rem] leading-[1.125rem] tracking-[0.005em] text-foreground/60 lg:mt-3 lg:text-sm lg:leading-[1.1875rem] lg:tracking-[0.01em]">
                           {feature.body}
                         </span>
                       </span>
@@ -165,6 +156,16 @@ export function UltrahumanProduct({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="sticky bottom-0 z-10 flex h-[4.1875rem] items-center gap-2 border-t border-foreground/10 bg-background px-4 lg:hidden">
+        <p className="min-w-0 flex-1 truncate text-sm tracking-[-0.01em]">{name}</p>
+        <UltrahumanButton href={primary.href} className="h-10 w-32 min-w-0 px-0">
+          {primary.label}
+        </UltrahumanButton>
+        <UltrahumanButton href={secondary.href} variant="outline" className="h-10 w-32 min-w-0 px-0">
+          {secondary.label}
+        </UltrahumanButton>
       </div>
     </section>
   );

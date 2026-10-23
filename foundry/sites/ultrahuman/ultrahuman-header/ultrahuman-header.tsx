@@ -92,7 +92,7 @@ export function UltrahumanHeader({
           </nav>
         </details>
 
-        <nav className="ml-9 hidden items-center gap-10 lg:flex">
+        <nav className="ml-11 hidden items-center gap-10 lg:flex">
           {links.map((link) => (
             <a
               key={link.label}

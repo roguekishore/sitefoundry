@@ -3,8 +3,8 @@ import { UltrahumanPromo, type UltrahumanPromoProps } from "./ultrahuman-promo";
 
 export const promoSample: UltrahumanPromoProps = {
   eyebrow: "Halo Lite",
-  title: ["40% off.", "At your door tonight."],
-  body: "In selected cities, for orders placed before 6PM.",
+  title: ["40% off.", "Here by 9 tonight."],
+  body: "In selected cities, for orders before 6PM.",
   action: { label: "Shop now", href: "#" },
   mediaLabel: "Photo of a hand wearing the band, resting on linen",
   readouts: [
