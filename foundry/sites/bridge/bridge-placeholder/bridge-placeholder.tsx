@@ -2,7 +2,7 @@ import { cn } from "@foundry/foundry-utils";
 
 const tones = {
   /** a soft wash of the glow and highlight colours: blurred photographic backdrops */
-  sky: "bg-linear-to-b from-glow/45 via-highlight/35 to-glow/30",
+  sky: "bg-linear-to-b from-glow/60 via-highlight/45 to-glow/50",
   /** a flat quiet surface: diagrams, embeds, screenshots */
   flat: "bg-muted",
 } as const;

@@ -24,11 +24,11 @@ export function BridgeHero({ title, subtitle, action, backdrop, diagram, underHe
   const [line1, line2] = subtitle.split("\n");
   return (
     <section className={cn("relative isolate overflow-clip bg-background text-foreground", underHeader && "-mt-[5.5rem] lg:-mt-[4.375rem]", className)}>
-      <div className="absolute inset-x-0 top-0 -z-10 h-40 mask-b-from-55% mask-b-to-100% lg:h-[18.75rem] lg:mask-b-from-35% [&>*]:size-full [&>*]:object-cover">
+      <div className="absolute inset-x-0 top-0 -z-10 h-48 mask-b-from-60% mask-b-to-100% lg:h-[18.75rem] lg:mask-b-from-35% [&>*]:size-full [&>*]:object-cover">
         {backdrop ?? <BridgePlaceholder tone="sky" />}
       </div>
 
-      <div className="mx-auto flex max-w-page flex-col items-center px-gutter pt-[14.5rem] text-center lg:pt-[14.25rem]">
+      <div className="mx-auto flex max-w-page flex-col items-center px-gutter pt-[16rem] text-center lg:pt-[14.25rem]">
         <h1 className="font-display text-[3.5625rem]/none font-normal tracking-[-0.05em] text-balance lg:text-[5.2rem]/none lg:tracking-[-0.0346em]">
           {title}
         </h1>
@@ -47,7 +47,7 @@ export function BridgeHero({ title, subtitle, action, backdrop, diagram, underHe
         </BridgeButton>
       </div>
 
-      <div className="mx-auto mt-9 max-w-page px-gutter pb-[3.25rem] lg:mt-4 lg:px-[8.5rem] lg:pb-[6.5rem] [&>*]:h-[30rem] [&>*]:w-full [&>*]:object-cover lg:[&>*]:h-72">
+      <div className="mx-auto mt-16 max-w-page px-gutter pb-[8.5rem] lg:mt-4 lg:px-[12.25rem] lg:pb-[6.5rem] [&>*]:h-[36rem] [&>*]:w-full [&>*]:object-cover lg:[&>*]:h-72">
         {diagram ?? <BridgePlaceholder tone="flat" className="rounded-sm" />}
       </div>
     </section>

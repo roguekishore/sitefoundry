@@ -22,7 +22,7 @@ export interface BridgeFooterProps {
 }
 
 const linkClass =
-  "text-[0.9375rem]/[1] tracking-[-0.02em] transition-colors duration-250 hover:text-muted-foreground motion-reduce:transition-none";
+  "text-[0.9375rem]/[1.4] tracking-[-0.02em] transition-colors duration-250 hover:text-muted-foreground motion-reduce:transition-none";
 
 /** Bridge's sparse footer with link columns and small print. */
 export function BridgeFooter({ brand, columns, finePrint, legal, className }: BridgeFooterProps) {
@@ -32,13 +32,13 @@ export function BridgeFooter({ brand, columns, finePrint, legal, className }: Br
         <div className="grid grid-cols-[8.875rem_6.8rem_1fr] lg:grid-cols-[16.8rem_17.75rem_1fr]">
           <BridgeWordmark {...brand} layout="stacked" className="self-start" />
           {columns.map((col, i) => (
-            <ul key={i} className="flex flex-col gap-7">
+            <ul key={i} className="flex flex-col items-start gap-[1.375rem]">
               {col.map((l) => (
-                <li key={l.label}>
+                <li key={l.label} className="flex">
                   <a
                     href={l.href}
                     aria-current={l.current ? "page" : undefined}
-                    className={cn(linkClass, "inline-block", l.current && "border-b border-foreground pb-2")}
+                    className={cn(linkClass, l.current && "border-b border-foreground pb-0.5")}
                   >
                     {l.label}
                   </a>
@@ -48,7 +48,7 @@ export function BridgeFooter({ brand, columns, finePrint, legal, className }: Br
           ))}
         </div>
 
-        <div className="mt-36 flex flex-col gap-14 lg:mt-[13.375rem] lg:flex-row lg:items-end lg:justify-between">
+        <div className="mt-[8.5rem] flex flex-col gap-14 lg:mt-[12.25rem] lg:flex-row lg:items-end lg:justify-between">
           <div className="flex max-w-[35rem] flex-col gap-4 text-[0.8125rem]/[1.15] tracking-[-0.02em] [&_a]:underline [&_a]:underline-offset-2">
             {finePrint.map((p, i) => (
               <p key={i}>{p}</p>
