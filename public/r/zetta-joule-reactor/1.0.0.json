@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule reactor stage",
+  "description": "A pale-blue section: label and statement in navy, then a pinned stage with a boxed tag top-left, a right-aligned spec list top-right and a tall product model in the middle. While pinned the model rises into place and four notes (title, hairline, text) fade up around it one by one. On phones everything stacks: tag, specs, the four notes, then the model cropped at the bottom.",
+  "category": "features",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "pinned",
+    "sticky",
+    "scrub",
+    "reveal",
+    "product",
+    "specs",
+    "pale-blue",
+    "navy"
+  ],
+  "notes": [
+    "the pinned stage is desktop only (lg+) and needs CSS scroll-driven animation; otherwise the stage is one static screen with everything visible",
+    "the original shows a three.js model here: pass a transparent render as media",
+    "exactly four features (two per side)"
+  ],
+  "entry": "zetta-joule-reactor.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-reactor",
+  "files": [
+    {
+      "path": "zetta-joule-reactor.css",
+      "content": "/* Desktop, with scroll-driven animation and motion allowed: the stage (tag, specs, reactor) is\n   pinned for one extra screen. The reactor rises into place first, then the four feature notes fade\n   up around it one after another. Otherwise everything is simply laid out and visible. */\n@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n  @supports (animation-timeline: view()) {\n    .zetta-joule-reactor-pin {\n      height: 200svh;\n      view-timeline: --zetta-joule-reactor block;\n    }\n    .zetta-joule-reactor-model {\n      animation: zetta-joule-reactor-rise linear both;\n      animation-timeline: --zetta-joule-reactor;\n      animation-range: cover 34% cover 46%;\n    }\n    .zetta-joule-reactor-feature {\n      animation: zetta-joule-reactor-feature linear both;\n      animation-timeline: --zetta-joule-reactor;\n      animation-range: cover calc(48% + var(--i) * 4%) cover calc(56% + var(--i) * 4%);\n    }\n  }\n}\n\n@keyframes zetta-joule-reactor-rise {\n  from { transform: translateY(35svh); }\n  to { transform: none; }\n}\n\n@keyframes zetta-joule-reactor-feature {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "zetta-joule-reactor.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJoulePlaceholder } from \"@foundry/zetta-joule-placeholder\";\nimport { ZettaJouleStatement } from \"@foundry/zetta-joule-statement\";\nimport \"./zetta-joule-reactor.css\";\n\nexport interface ZettaJouleReactorProps {\n  /** small label, top-left */\n  label: string;\n  /** the statement */\n  statement: string;\n  /** the boxed tag (e.g. the product name in capitals) */\n  tag: string;\n  /** the spec lines: label and value, shown in capitals */\n  specs: { label: string; value: string }[];\n  /** exactly four notes shown around the model: title and text */\n  features: { title: string; text: string }[];\n  /** the model (a transparent render, taller than wide); empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function ZettaJouleReactor({ label, statement, tag, specs, features, media, className }: ZettaJouleReactorProps) {\n  return (\n    <section className={cn(\"bg-secondary text-highlight\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter pt-20 lg:px-10 lg:pt-section lg:pb-40\">\n        <ZettaJouleStatement tone=\"accent\" label={label} statement={statement} />\n      </div>\n      <div className=\"zetta-joule-reactor-pin\">\n        <div className=\"relative px-gutter lg:sticky lg:top-0 lg:h-svh lg:min-h-[44rem] lg:overflow-clip lg:px-[6.8vw]\">\n          <p className=\"mt-12 w-fit rounded-sm border border-highlight/25 px-4 py-2 text-xs leading-none font-medium tracking-[-0.01em] uppercase lg:absolute lg:top-[2.8rem] lg:mt-0\">{tag}</p>\n          <dl className=\"mt-8 grid w-fit grid-cols-[auto_auto] gap-x-3 gap-y-1 text-xs leading-none tracking-[-0.01em] uppercase lg:absolute lg:top-[2.8rem] lg:right-[6.8vw] lg:mt-0 lg:gap-x-4 lg:gap-y-2\">\n            {specs.map((s) => (\n              <div key={s.label} className=\"contents\">\n                <dt className=\"font-medium lg:text-right\">{s.label}</dt>\n                <dd className=\"text-highlight/70\">{s.value}</dd>\n              </div>\n            ))}\n          </dl>\n          <div className=\"mt-12 grid gap-12 lg:absolute lg:inset-x-[6.8vw] lg:top-[30svh] lg:mt-0 lg:grid-cols-[minmax(0,385fr)_minmax(0,474fr)_minmax(0,385fr)] lg:gap-y-[8rem]\">\n            {features.slice(0, 4).map((f, i) => (\n              <div key={f.title} className={cn(\"zetta-joule-reactor-feature\", i % 2 === 0 ? \"lg:col-start-1\" : \"lg:col-start-3\")} style={{ \"--i\": i } as CSSProperties}>\n                <h3 className=\"border-b border-highlight/25 pb-3 text-xl leading-[1.2] tracking-[-0.01em] lg:pb-6\">{f.title}</h3>\n                <p className=\"mt-3 max-w-[24rem] text-base leading-[1.3] tracking-[-0.01em] lg:mt-6 lg:max-w-[22rem]\">{f.text}</p>\n              </div>\n            ))}\n          </div>\n          <div className=\"zetta-joule-reactor-model mt-12 flex h-[22rem] justify-center overflow-clip lg:absolute lg:inset-x-0 lg:top-[19svh] lg:bottom-0 lg:mt-0 lg:h-auto [&>*]:h-full\">\n            {media ?? <ZettaJoulePlaceholder tone=\"wash\" className=\"h-full w-[16.25rem]\" />}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-placeholder",
+    "zetta-joule-statement"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "small label, top-left"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the statement"
+    },
+    {
+      "name": "tag",
+      "type": "string",
+      "required": true,
+      "description": "the boxed tag (e.g. the product name in capitals)"
+    },
+    {
+      "name": "specs",
+      "type": "{ label: string; value: string; }[]",
+      "required": true,
+      "description": "the spec lines: label and value, shown in capitals"
+    },
+    {
+      "name": "features",
+      "type": "{ title: string; text: string; }[]",
+      "required": true,
+      "description": "exactly four notes shown around the model: title and text"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the model (a transparent render, taller than wide); empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2050d38188e997848f592248820b5ca65d6c997615d12cfb3e67ce36c730c303"
+}

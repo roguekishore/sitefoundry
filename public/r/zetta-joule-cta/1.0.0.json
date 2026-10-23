@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule closing call to action",
+  "description": "A near-black band with rounded bottom corners: a small mark, a light statement (first sentence bright, the rest grey) and the split button on the left, two tall photos on the right (wide and narrow). Each photo drifts inside its frame as you scroll. Phones: text and button first, the two photos side by side below.",
+  "category": "cta",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "dark",
+    "photos",
+    "parallax",
+    "reveal",
+    "rounded"
+  ],
+  "notes": [
+    "forces the dark colour scope",
+    "photos are 443×595 and 328×595 on desktop",
+    "put it directly above the footer"
+  ],
+  "entry": "zetta-joule-cta.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-cta",
+  "files": [
+    {
+      "path": "zetta-joule-cta.css",
+      "content": "/* Each photo drifts inside its frame (-30px to +28px) while the section scrolls through. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-cta-drift {\n      animation: zetta-joule-cta-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes zetta-joule-cta-drift {\n  from { transform: translateY(-30px); }\n  to { transform: translateY(28px); }\n}\n"
+    },
+    {
+      "path": "zetta-joule-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Flame } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleButton } from \"@foundry/zetta-joule-button\";\nimport { ZettaJoulePlaceholder } from \"@foundry/zetta-joule-placeholder\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\nimport \"./zetta-joule-cta.css\";\n\nexport interface ZettaJouleCtaProps {\n  /** the bright first sentence */\n  lead: string;\n  /** the rest of the text, in muted grey */\n  text: string;\n  /** the button */\n  cta: { label: string; href: string };\n  /** two photos on the right: the first is wider; each is cropped like object-fit: cover; empty shows a placeholder */\n  images?: [ReactNode?, ReactNode?];\n  className?: string;\n}\n\nexport function ZettaJouleCta({ lead, text, cta, images, className }: ZettaJouleCtaProps) {\n  const frame = \"relative overflow-clip rounded-sm aspect-[175/289] lg:aspect-auto lg:h-[37.1875rem]\";\n  return (\n    <section className={cn(\"dark relative z-10 rounded-b-sm bg-background pt-20 pb-20 text-foreground lg:py-40\", className)}>\n      <div className=\"mx-auto grid w-full max-w-[calc(var(--page-width)+5rem)] grid-cols-2 gap-x-4 px-gutter lg:grid-cols-12 lg:px-10\">\n        <div className=\"col-span-2 flex flex-col justify-between lg:col-span-5\">\n          <Flame aria-hidden className=\"size-6\" strokeWidth={1.25} />\n          <ZettaJouleReveal variant=\"lines\" as=\"p\" className=\"mt-10 font-display text-xl leading-[1.2] font-light tracking-[-0.02em] lg:mt-0 lg:max-w-[26rem] lg:text-[2rem]\">\n            <span>{lead}</span> <span className=\"text-muted-foreground\">{text}</span>\n          </ZettaJouleReveal>\n          <ZettaJouleReveal className=\"mt-8 lg:mt-0\">\n            <ZettaJouleButton label={cta.label} href={cta.href} />\n          </ZettaJouleReveal>\n        </div>\n        {[0, 1].map((i) => (\n          <div key={i} className={cn(frame, \"mt-10 lg:mt-0\", i === 0 ? \"lg:col-span-4\" : \"lg:col-span-3\")}>\n            <div className=\"zetta-joule-cta-drift absolute inset-x-0 -inset-y-8 [&>*]:size-full [&>*]:object-cover\">\n              {images?.[i] ?? <ZettaJoulePlaceholder tone=\"deep\" className=\"size-full\" />}\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-button",
+    "zetta-joule-placeholder",
+    "zetta-joule-reveal"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the bright first sentence"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the rest of the text, in muted grey"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button"
+    },
+    {
+      "name": "images",
+      "type": "[ReactNode?, ReactNode?]",
+      "required": false,
+      "description": "two photos on the right: the first is wider; each is cropped like object-fit: cover; empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aed5e64a51f0cdcc5a5775765eaad07cb59ad21052f4d2d91ad0c75de15282f1"
+}

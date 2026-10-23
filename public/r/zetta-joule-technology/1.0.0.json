@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule technology",
+  "description": "A pale-blue section with a featherlight heading left and a paragraph plus button on the right, then a huge 4px-radius photo that drifts inside its frame as you scroll, with a black note box over its lower-left corner (under the photo, full width, on phones).",
+  "category": "features",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "image",
+    "parallax",
+    "callout",
+    "reveal",
+    "light",
+    "pale-blue",
+    "split"
+  ],
+  "notes": [
+    "the photo is full-bleed on phones (390×488) and 1360×890 on desktop",
+    "the note box forces the dark colour scope (black)",
+    "CSS only; the drift and reveals are off under reduced motion"
+  ],
+  "entry": "zetta-joule-technology.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-technology",
+  "files": [
+    {
+      "path": "zetta-joule-technology.css",
+      "content": "/* The photo moves slower than the page: its taller copy slides from -64px to +64px while the frame scrolls through. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-technology-drift {\n      animation: zetta-joule-technology-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes zetta-joule-technology-drift {\n  from { transform: translateY(-64px); }\n  to { transform: translateY(64px); }\n}\n"
+    },
+    {
+      "path": "zetta-joule-technology.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleButton } from \"@foundry/zetta-joule-button\";\nimport { ZettaJoulePlaceholder } from \"@foundry/zetta-joule-placeholder\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\nimport { ZettaJouleSplitHeading } from \"@foundry/zetta-joule-split-heading\";\nimport \"./zetta-joule-technology.css\";\n\nexport interface ZettaJouleTechnologyProps {\n  /** the heading (\"\\n\" breaks the line on desktop) */\n  heading: string;\n  /** the paragraph beside it */\n  body: string;\n  /** the button under the paragraph */\n  cta: { label: string; href: string };\n  /** the large photo (aerial view of a site); empty shows a placeholder. It is cropped like object-fit: cover */\n  media?: ReactNode;\n  /** the black note: over the photo on desktop, under it on phones */\n  callout: { title: string; text: string };\n  className?: string;\n}\n\nexport function ZettaJouleTechnology({ heading, body, cta, media, callout, className }: ZettaJouleTechnologyProps) {\n  return (\n    <section className={cn(\"bg-secondary text-foreground\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter pt-20 lg:px-10 lg:pt-40\">\n        <ZettaJouleSplitHeading heading={heading} body={body}>\n          <ZettaJouleReveal>\n            <ZettaJouleButton label={cta.label} href={cta.href} />\n          </ZettaJouleReveal>\n        </ZettaJouleSplitHeading>\n        <div className=\"relative -mx-gutter mt-20 lg:mx-0 lg:mt-24\">\n          <div className=\"relative aspect-[390/488] overflow-clip lg:aspect-[1360/890] lg:rounded-sm\">\n            <div className=\"zetta-joule-technology-drift absolute inset-x-0 -inset-y-16 [&>*]:size-full [&>*]:object-cover\">\n              {media ?? <ZettaJoulePlaceholder tone=\"wash\" className=\"size-full rounded-none\" />}\n            </div>\n          </div>\n          <div className=\"dark bg-popover px-gutter pt-[4.5rem] pb-16 text-foreground lg:absolute lg:bottom-12 lg:left-8 lg:w-[28rem] lg:rounded-sm lg:p-6\">\n            <p className=\"flex items-center gap-3 font-display text-base leading-none font-light lg:text-lg\">\n              <span aria-hidden className=\"size-3 rounded-full bg-primary\" />\n              {callout.title}\n            </p>\n            <p className=\"mt-4 text-base leading-[1.3] tracking-[-0.01em] lg:text-sm lg:leading-normal\">{callout.text}</p>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-button",
+    "zetta-joule-placeholder",
+    "zetta-joule-reveal",
+    "zetta-joule-split-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading (\"\\n\" breaks the line on desktop)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button under the paragraph"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large photo (aerial view of a site); empty shows a placeholder. It is cropped like object-fit: cover"
+    },
+    {
+      "name": "callout",
+      "type": "{ title: string; text: string; }",
+      "required": true,
+      "description": "the black note: over the photo on desktop, under it on phones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d7badae4a6163f638a8f2f71adc445fd3dfe3664fb840499692ddb5515fdccda"
+}

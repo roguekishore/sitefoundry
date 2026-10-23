@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Zetta-Joule scroll reveal",
+  "description": "A wrapper that fades its content in while it scrolls into view. 'rise' lifts 16px; 'lines' lifts 30px and uncovers a block of text from top to bottom with a soft edge. Scrubbed by the scroll, not timed.",
+  "category": "text-effect",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "scrub",
+    "fade",
+    "rise",
+    "mask",
+    "css-only"
+  ],
+  "notes": [
+    "CSS scroll-driven animation: browsers without it show the content in place",
+    "do not put it inside a horizontally scrolling box: its timeline would follow that box"
+  ],
+  "entry": "zetta-joule-reveal.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-reveal",
+  "files": [
+    {
+      "path": "zetta-joule-reveal.css",
+      "content": "/* Scroll reveals driven by the view timeline of the element itself. Without support for\n   animation-timeline (or with reduced motion) the content simply sits in place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-rise {\n      animation: zetta-joule-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 70%;\n    }\n    /* a block of text: rises 30px and uncovers top to bottom, standing in for per-line staggering */\n    .zetta-joule-lines {\n      animation: zetta-joule-reveal-lines linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 38%;\n      -webkit-mask-image: linear-gradient(to bottom, var(--foreground) 0%, var(--foreground) 33%, transparent 66%, transparent 100%);\n      mask-image: linear-gradient(to bottom, var(--foreground) 0%, var(--foreground) 33%, transparent 66%, transparent 100%);\n      -webkit-mask-size: 100% 300%;\n      mask-size: 100% 300%;\n      -webkit-mask-repeat: no-repeat;\n      mask-repeat: no-repeat;\n    }\n  }\n}\n\n@keyframes zetta-joule-reveal-rise {\n  from { opacity: 0; transform: translateY(var(--zetta-joule-rise, 16px)); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes zetta-joule-reveal-lines {\n  from {\n    opacity: 0;\n    transform: translateY(var(--zetta-joule-rise, 30px));\n    -webkit-mask-position: 0 100%;\n    mask-position: 0 100%;\n  }\n  to {\n    opacity: 1;\n    transform: none;\n    -webkit-mask-position: 0 0;\n    mask-position: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "zetta-joule-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./zetta-joule-reveal.css\";\n\nexport interface ZettaJouleRevealProps {\n  /** rise: fade in and lift 16px (buttons, cards); lines: a text block that lifts 30px and uncovers top to bottom */\n  variant?: \"rise\" | \"lines\";\n  /** how far it lifts, in px (default 16 for rise, 30 for lines) */\n  distance?: number;\n  /** the tag to render */\n  as?: ElementType;\n  children: ReactNode;\n  className?: string;\n}\n\n/** Wraps content so it reveals while it scrolls into view (CSS scroll-driven animation, no JavaScript). */\nexport function ZettaJouleReveal({ variant = \"rise\", distance, as: Tag = \"div\", children, className }: ZettaJouleRevealProps) {\n  const style = distance ? ({ \"--zetta-joule-rise\": `${distance}px` } as CSSProperties) : undefined;\n  return (\n    <Tag className={cn(variant === \"lines\" ? \"zetta-joule-lines\" : \"zetta-joule-rise\", className)} style={style}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "rise",
+      "description": "rise: fade in and lift 16px (buttons, cards); lines: a text block that lifts 30px and uncovers top to bottom"
+    },
+    {
+      "name": "distance",
+      "type": "number",
+      "required": false,
+      "description": "how far it lifts, in px (default 16 for rise, 30 for lines)"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the tag to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7b6bb1eaefd432040d989846ca0800b7c74d26e3062f5d7c1b7ad1f65b970612"
+}

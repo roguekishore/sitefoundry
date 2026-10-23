@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule footer",
+  "description": "A pure-black footer: a light heading, three link groups in small white medium type (two columns on phones, three on desktop), a faint dotted band, grey legal links, the company name set huge and a copyright line. The whole footer slides up 105px as it scrolls into view.",
+  "category": "footer",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "black",
+    "big-type",
+    "links",
+    "reveal"
+  ],
+  "notes": [
+    "forces the dark colour scope (popover = black)",
+    "the desktop arrangement is inferred from the phone capture: the footer was not revealed in the desktop capture",
+    "CSS only; the slide-up is off under reduced motion"
+  ],
+  "entry": "zetta-joule-footer.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-footer",
+  "files": [
+    {
+      "path": "zetta-joule-footer.css",
+      "content": "/* The footer slides up 105px into place as it comes into view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-footer-rise {\n      animation: zetta-joule-footer-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes zetta-joule-footer-rise {\n  from { transform: translateY(105px); }\n  to { transform: none; }\n}\n"
+    },
+    {
+      "path": "zetta-joule-footer.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleMark } from \"@foundry/zetta-joule-mark\";\nimport \"./zetta-joule-footer.css\";\n\nexport interface ZettaJouleFooterLink {\n  /** link text */\n  label: string;\n  /** link target */\n  href: string;\n}\n\nexport interface ZettaJouleFooterProps {\n  /** the light heading (\"\\n\" starts a new line) */\n  heading: string;\n  /** three groups of white links: pages (two columns on phones), then social */\n  groups: ZettaJouleFooterLink[][];\n  /** the small grey legal links */\n  legal: ZettaJouleFooterLink[];\n  /** the company name, set huge at the bottom */\n  brand: string;\n  /** the copyright line */\n  copyright: string;\n  className?: string;\n}\n\nconst link = \"block py-[0.4rem] text-sm leading-none font-medium tracking-[-0.01em] text-foreground transition-colors duration-200 hover:text-primary\";\n\nexport function ZettaJouleFooter({ heading, groups, legal, brand, copyright, className }: ZettaJouleFooterProps) {\n  return (\n    <footer className={cn(\"dark relative bg-popover pt-14 text-foreground\", className)}>\n      <div className=\"zetta-joule-footer-rise mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter pb-10 lg:px-10 lg:pb-10\">\n        <div className=\"lg:grid lg:grid-cols-12 lg:gap-x-4\">\n          <p className=\"whitespace-pre-line font-display text-2xl leading-none font-light tracking-[-0.03em] lg:col-span-5\">{heading}</p>\n          <div className=\"mt-10 grid grid-cols-2 gap-x-4 gap-y-11 lg:col-span-6 lg:col-start-7 lg:mt-0 lg:grid-cols-3\">\n            {groups.map((g, i) => (\n              <ul key={i} className={cn(i === groups.length - 1 && \"col-span-2 lg:col-span-1\")}>\n                {g.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={link}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ))}\n          </div>\n        </div>\n        <div aria-hidden className=\"mt-24 h-20 lg:mt-20 lg:h-24 bg-[radial-gradient(var(--foreground)_1px,transparent_1.6px)] bg-[length:16px_16px] opacity-25 [mask-image:linear-gradient(to_right,var(--foreground),transparent)] \" />\n        <ul className=\"mt-8 flex gap-6 text-sm leading-none tracking-[-0.01em] text-muted-foreground\">\n          {legal.map((l) => (\n            <li key={l.label}>\n              <a href={l.href} className=\"transition-colors duration-200 hover:text-foreground\">\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n        <ZettaJouleMark name={brand} className=\"mt-10 text-[2.6rem] lg:mt-10 lg:text-[min(8vw,7rem)]\" />\n        <p className=\"mt-10 text-sm leading-none tracking-[-0.01em] text-muted-foreground lg:mt-8\">{copyright}</p>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-mark"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the light heading (\"\\n\" starts a new line)"
+    },
+    {
+      "name": "groups",
+      "type": "ZettaJouleFooterLink[][]",
+      "required": true,
+      "description": "three groups of white links: pages (two columns on phones), then social"
+    },
+    {
+      "name": "legal",
+      "type": "ZettaJouleFooterLink[]",
+      "required": true,
+      "description": "the small grey legal links"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set huge at the bottom"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "42328f5b0e60afba39fd56eacc21e4e81022b0e737c4555c11f3c821f7100431"
+}

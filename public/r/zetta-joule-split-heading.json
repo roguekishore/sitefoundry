@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Zetta-Joule split heading",
+  "description": "A featherlight 48px heading in the left half and a paragraph (with an optional button) in the right four columns; stacked on phones with a 24px heading. Both lift and uncover as they scroll into view.",
+  "category": "text-effect",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "two-column",
+    "reveal",
+    "scroll",
+    "light",
+    "minimal",
+    "css-only"
+  ],
+  "notes": [
+    "needs a display font with a light weight",
+    "bodyTone strong is for dark bands"
+  ],
+  "entry": "zetta-joule-split-heading.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-split-heading",
+  "files": [
+    {
+      "path": "zetta-joule-split-heading.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\n\nexport interface ZettaJouleSplitHeadingProps {\n  /** the heading (48px on desktop, 24px on phones); \"\\n\" is a line break from lg up, a space below */\n  heading: string;\n  /** the paragraph in the right-hand columns */\n  body: ReactNode;\n  /** keep the \"\\n\" line break on phones too */\n  keepBreaks?: boolean;\n  /** muted: grey text (light bands); strong: white medium text (dark bands) */\n  bodyTone?: \"muted\" | \"strong\";\n  /** a button under the paragraph */\n  children?: ReactNode;\n  className?: string;\n}\n\nexport function ZettaJouleSplitHeading({ heading, body, bodyTone = \"muted\", keepBreaks = false, children, className }: ZettaJouleSplitHeadingProps) {\n  const lines = heading.split(\"\\n\");\n  return (\n    <div className={cn(\"grid gap-x-4 gap-y-4 lg:grid-cols-12\", className)}>\n      <ZettaJouleReveal variant=\"lines\" as=\"h2\" className=\"font-display text-2xl leading-none font-[250] tracking-[-0.03em] text-foreground lg:col-span-6 lg:text-5xl\">\n        {lines.map((line, i) => (\n          <Fragment key={i}>\n            {i > 0 && (\n              <>\n                {!keepBreaks && <span className=\"lg:hidden\"> </span>}\n                <br className={keepBreaks ? undefined : \"max-lg:hidden\"} />\n              </>\n            )}\n            {line}\n          </Fragment>\n        ))}\n      </ZettaJouleReveal>\n      <div className=\"lg:col-span-4 lg:col-start-9\">\n        <ZettaJouleReveal\n          variant=\"lines\"\n          as=\"div\"\n          className={cn(\"text-base leading-[1.3] tracking-[-0.01em] lg:leading-normal\", bodyTone === \"strong\" ? \"font-medium text-foreground\" : \"text-muted-foreground\")}\n        >\n          {body}\n        </ZettaJouleReveal>\n        {children && <div className=\"mt-10 lg:mt-12\">{children}</div>}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading (48px on desktop, 24px on phones); \"\\n\" is a line break from lg up, a space below"
+    },
+    {
+      "name": "body",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the paragraph in the right-hand columns"
+    },
+    {
+      "name": "keepBreaks",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "keep the \"\\n\" line break on phones too"
+    },
+    {
+      "name": "bodyTone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "muted: grey text (light bands); strong: white medium text (dark bands)"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a button under the paragraph"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bd55afde2bafa9c6a00ca5a389d6e7564500bf9d28889d4aad6d87ebc45de743"
+}

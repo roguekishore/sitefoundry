@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule mission + pinned video",
+  "description": "A statement row (letter-by-letter label, big light statement, button), then a small paragraph beside a 6px-radius video frame. On desktop the frame is pinned and grows to fill the whole window while you scroll, and a dictionary-style definition fades up over it. On phones the video is a full-bleed 390×488 block with the definition over its lower half.",
+  "category": "hero",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "video",
+    "pinned",
+    "sticky",
+    "scrub",
+    "expand",
+    "clip-path",
+    "reveal",
+    "light"
+  ],
+  "notes": [
+    "the expanding video part is desktop only (lg+); it needs CSS scroll-driven animation, otherwise (and with reduced motion) the video stays a framed block",
+    "the media slot fills the frame: pass an img or video; with nothing passed, a placeholder shows",
+    "the video area forces the dark colour scope so the overlay text stays white"
+  ],
+  "entry": "zetta-joule-mission.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-mission",
+  "files": [
+    {
+      "path": "zetta-joule-mission.css",
+      "content": "/* Desktop, with scroll-driven animation and motion allowed: the video frame sits in the right\n   columns, then (while its stage is pinned for one screen and a half) grows to fill the whole\n   window, and the dictionary line fades up over it. Everywhere else it stays a framed video. */\n@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n  @supports (animation-timeline: view()) {\n    .zetta-joule-mission-pin {\n      height: 210svh;\n      view-timeline: --zetta-joule-mission block;\n    }\n    .zetta-joule-mission-stage {\n      position: sticky;\n      top: 0;\n      display: block;\n      height: 100svh;\n      max-width: none;\n      margin: 0;\n      padding: 0;\n      overflow: clip;\n    }\n    .zetta-joule-mission-text {\n      position: absolute;\n      top: 14svh;\n      left: 2.5rem;\n      width: 20.5rem;\n    }\n    .zetta-joule-mission-media {\n      position: absolute;\n      inset: 0;\n      aspect-ratio: auto;\n      border-radius: 0;\n      clip-path: inset(14% 2.8% 28% 34.7% round 0.375rem);\n      animation: zetta-joule-mission-expand linear both;\n      animation-timeline: --zetta-joule-mission;\n      animation-range: cover 33% cover 57%;\n    }\n    .zetta-joule-mission-overlay {\n      animation: zetta-joule-mission-overlay linear both;\n      animation-timeline: --zetta-joule-mission;\n      animation-range: cover 55% cover 66%;\n    }\n  }\n}\n\n@keyframes zetta-joule-mission-expand {\n  from { clip-path: inset(14% 2.8% 28% 34.7% round 0.375rem); }\n  to { clip-path: inset(0 0 0 0 round 0); }\n}\n\n@keyframes zetta-joule-mission-overlay {\n  from { opacity: 0; transform: translateY(28px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "zetta-joule-mission.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleButton } from \"@foundry/zetta-joule-button\";\nimport { ZettaJoulePlaceholder } from \"@foundry/zetta-joule-placeholder\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\nimport { ZettaJouleStatement } from \"@foundry/zetta-joule-statement\";\nimport \"./zetta-joule-mission.css\";\n\nexport interface ZettaJouleMissionProps {\n  /** small label, top-left */\n  label: string;\n  /** the large statement */\n  statement: string;\n  /** the button under the statement */\n  cta: { label: string; href: string };\n  /** the smaller paragraph left of the video */\n  paragraph: string;\n  /** the video (or any media); empty shows a placeholder. It fills its frame and is cropped like object-fit: cover */\n  media?: ReactNode;\n  /** the dictionary-style line over the video once it is full window */\n  overlay: {\n    /** the word */\n    term: string;\n    /** how it is pronounced */\n    pronunciation: string;\n    /** its meaning */\n    definition: string;\n  };\n  className?: string;\n}\n\nconst wrap = \"mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter lg:px-10\";\n\nexport function ZettaJouleMission({ label, statement, cta, paragraph, media, overlay, className }: ZettaJouleMissionProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className={cn(wrap, \"pt-20 lg:pt-section\")}>\n        <ZettaJouleStatement label={label} statement={statement}>\n          <ZettaJouleReveal>\n            <ZettaJouleButton label={cta.label} href={cta.href} />\n          </ZettaJouleReveal>\n        </ZettaJouleStatement>\n      </div>\n      <div className=\"zetta-joule-mission-pin\">\n        <div className=\"zetta-joule-mission-stage mx-auto w-full max-w-[calc(var(--page-width)+5rem)] pt-20 lg:grid lg:grid-cols-12 lg:gap-x-4 lg:px-10 lg:pt-[7.5rem] lg:pb-section\">\n          <ZettaJouleReveal variant=\"lines\" distance={40} as=\"div\" className=\"zetta-joule-mission-text px-gutter lg:col-span-3 lg:px-0\">\n            <p className=\"font-display text-xl leading-[1.3] tracking-[-0.01em] text-muted-foreground\">{paragraph}</p>\n          </ZettaJouleReveal>\n          <div className=\"zetta-joule-mission-media dark relative mt-20 aspect-[390/488] overflow-clip text-foreground lg:col-span-8 lg:col-start-5 lg:mt-0 lg:aspect-[901/498] lg:rounded-sm\">\n            {media ? <div className=\"absolute inset-0 [&>*]:size-full [&>*]:object-cover\">{media}</div> : <ZettaJoulePlaceholder tone=\"deep\" className=\"absolute inset-0 rounded-none\" />}\n            <div className=\"zetta-joule-mission-overlay absolute inset-x-4 top-[36%] border-t border-foreground/60 pt-5 lg:inset-x-8 lg:top-[43%] lg:flex lg:justify-between lg:pt-4\">\n              <p className=\"text-xl leading-[1.15] font-medium tracking-[-0.01em] lg:text-lg\">\n                {overlay.term}\n                <span className=\"block font-normal\">{overlay.pronunciation}</span>\n              </p>\n              <p className=\"mt-8 font-display text-xl leading-[1.3] font-light tracking-[-0.02em] lg:mt-0 lg:max-w-[35rem] lg:text-2xl lg:leading-[1.2]\">{overlay.definition}</p>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-button",
+    "zetta-joule-placeholder",
+    "zetta-joule-reveal",
+    "zetta-joule-statement"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "small label, top-left"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the large statement"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button under the statement"
+    },
+    {
+      "name": "paragraph",
+      "type": "string",
+      "required": true,
+      "description": "the smaller paragraph left of the video"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the video (or any media); empty shows a placeholder. It fills its frame and is cropped like object-fit: cover"
+    },
+    {
+      "name": "overlay",
+      "type": "{ term: string; pronunciation: string; definition: string; }",
+      "required": true,
+      "description": "the dictionary-style line over the video once it is full window"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "41fb86ecbf799909f8b4f344fcb4ded76875d56d333f3d32be556d8916cca3d3"
+}
