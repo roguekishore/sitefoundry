@@ -123,3 +123,9 @@ captures checked.
 | accounts under sample-ember | — | the sand card used `bg-highlight` and turned saturated green there, with poor text contrast | — | yes: `bg-highlight/30`, and arc-theme's highlight is now a mid sand (#b9aa82) that gives the same #ebe6d9 at 30% |
 | links (nav, footer) | — | Tailwind's default easing, original `ease` | hover | yes: `ease-[ease]` |
 | disclosures | still shorter than the original | ~1120 vs ~1500 px | — | left: the original's legal text is longer; ours keeps the structure and density |
+
+## Round 3
+
+Accounts (sand card now `highlight/30`), testimonial and CTA re-captured at 390 and 1440: the
+section pairs read alike apart from copy and placeholders; motion list and hover list unchanged
+from round 2. Stopped here.
