@@ -16,13 +16,14 @@ export interface UltrahumanHeadingProps {
   className?: string;
 }
 
-/** Centred section intro: a tight 40px title, quiet body line, optional pill buttons; rises into view. */
+/** Centred section intro: a tight 40px title, quiet body line, optional pill buttons; rises into view.
+ *  Takes its ink colour from the section around it. */
 export function UltrahumanHeading({ title, body, actions, level = "h2", bodyWidth = "md", className }: UltrahumanHeadingProps) {
   return (
     <div className={cn("flex flex-col items-center px-gutter text-center", className)}>
       <UltrahumanReveal
         as={level}
-        className="max-w-[16ch] text-[1.75rem] leading-[1.18] font-normal tracking-[-0.035em] text-balance text-foreground sm:max-w-none lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]"
+        className="max-w-[16ch] text-[1.75rem] leading-[1.18] font-normal tracking-[-0.035em] text-balance sm:max-w-none lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]"
       >
         {title}
       </UltrahumanReveal>
@@ -31,8 +32,8 @@ export function UltrahumanHeading({ title, body, actions, level = "h2", bodyWidt
           as="p"
           rise="sm"
           className={cn(
-            "mt-3 text-base leading-[1.375rem] tracking-[-0.0175em] text-pretty text-foreground/60 lg:mt-4",
-            bodyWidth === "sm" ? "max-w-[34ch]" : "max-w-[33rem]",
+            "mt-3 text-base leading-[1.375rem] tracking-[-0.0175em] text-pretty text-current/60 lg:mt-4",
+            bodyWidth === "sm" ? "max-w-[16.5rem] lg:max-w-[40rem]" : "max-w-[33rem]",
           )}
         >
           {body}
