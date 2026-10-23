@@ -4,6 +4,7 @@ import { useReducedMotion } from "motion/react";
 import { cn } from "@foundry/foundry-utils";
 import { PilotBrushNote } from "@foundry/pilot-brush-note";
 import { PilotButton } from "@foundry/pilot-button";
+import { PilotLines } from "@foundry/pilot-heading";
 import { PilotPlaceholder } from "@foundry/pilot-placeholder";
 
 export interface PilotCaseStep {
@@ -80,7 +81,9 @@ export function PilotCases({ eyebrow, title, cases, note, prevLabel = "Previous"
         <div className="flex items-end justify-between gap-8 px-gutter lg:px-[1.5625rem] lg:pr-20">
           <div>
             {eyebrow && <p className="mb-4 text-xs leading-[1.5] font-bold tracking-[0.1em] uppercase">{eyebrow}</p>}
-            <h2 className="font-display text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] whitespace-pre-line lg:text-[2.5rem]">{title}</h2>
+            <h2 className="font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]">
+              <PilotLines text={title} />
+            </h2>
           </div>
           <div className="hidden shrink-0 lg:block">{arrows}</div>
         </div>
@@ -93,7 +96,7 @@ export function PilotCases({ eyebrow, title, cases, note, prevLabel = "Previous"
             <li key={c.title} className="flex w-[calc(100vw-3.75rem)] max-w-[22rem] shrink-0 snap-start lg:w-[66.5rem] lg:max-w-none">
               <div className="relative flex flex-1 flex-col bg-card px-6 pt-6 pb-6 text-card-foreground lg:min-h-[44.75rem] lg:px-14 lg:pt-14 lg:pb-14">
                 <span aria-hidden className="absolute top-[8rem] bottom-0 left-[1.875rem] w-px bg-card-foreground lg:top-[8.5rem] lg:left-[3.875rem]" />
-                <h3 className="font-display text-[1.75rem] leading-[1.05] font-medium lg:max-w-[24rem] lg:text-[2rem]">{c.title}</h3>
+                <h3 className="font-display text-[1.75rem] leading-[1.05] font-medium lg:max-w-[32rem] lg:text-[2rem]">{c.title}</h3>
                 <ol className="mt-10 grid gap-7 pl-[1.875rem] lg:max-w-[28.5rem]">
                   {[...c.steps, c.result].map((s, i, all) => {
                     const last = i === all.length - 1;
@@ -124,7 +127,7 @@ export function PilotCases({ eyebrow, title, cases, note, prevLabel = "Previous"
                 </div>
               </div>
               <div className="relative hidden w-[22.5rem] shrink-0 items-center justify-center lg:flex">
-                {c.media ?? <PilotPlaceholder tone="photo" className="absolute inset-0" />}
+                {c.media ?? <PilotPlaceholder tone="photo" className="absolute inset-0 bg-secondary from-primary/45 via-secondary/60 to-glow/25" />}
                 <div aria-hidden className="absolute inset-0 bg-primary/35 mix-blend-multiply" />
                 <p className="relative font-display text-[2rem] font-semibold tracking-[-0.02em] text-primary-foreground">{c.customer}</p>
               </div>

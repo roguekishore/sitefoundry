@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Sparkle } from "lucide-react";
 import { cn } from "@foundry/foundry-utils";
 import { PilotBrushNote } from "@foundry/pilot-brush-note";
+import { PilotLines } from "@foundry/pilot-heading";
 import { PilotPlaceholder } from "@foundry/pilot-placeholder";
 import "./pilot-ask.css";
 
@@ -27,7 +28,7 @@ export interface PilotAskProps {
 export function PilotAsk({ title, questions, answer, note, callout, media, frames, className }: PilotAskProps) {
   return (
     <section className={cn("overflow-x-clip bg-background text-foreground", className)}>
-      <div className="relative isolate mx-auto grid max-w-page border-border px-gutter pt-16 pb-20 lg:grid-cols-[minmax(0,33rem)_minmax(0,1fr)] lg:gap-[7.5rem] lg:border-x lg:pt-[7.5rem] lg:pr-0 lg:pb-[7.5rem] lg:pl-[1.5625rem]">
+      <div className="relative isolate mx-auto grid max-w-page border-border px-gutter pt-16 pb-20 lg:grid-cols-[minmax(0,33rem)_minmax(0,1fr)] lg:gap-[7.5rem] lg:overflow-x-clip lg:border-x lg:pt-[7.5rem] lg:pr-0 lg:pb-[7.5rem] lg:pl-[1.5625rem]">
         {/* the pale pink wash on the right */}
         <div
           aria-hidden
@@ -35,7 +36,9 @@ export function PilotAsk({ title, questions, answer, note, callout, media, frame
         />
 
         <div>
-          <h2 className="font-display text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] whitespace-pre-line lg:text-[2.5rem]">{title}</h2>
+          <h2 className="font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]">
+            <PilotLines text={title} />
+          </h2>
           <div className="mt-8 text-lg leading-normal lg:mt-11 lg:text-xl">
             {questions.map((q) => (
               <p key={q}>{q}</p>
