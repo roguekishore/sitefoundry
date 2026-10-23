@@ -136,3 +136,9 @@ outline border #464853 → #9194a1, "read" arrow nudge 4px).
 Remaining differences: media are placeholders (render, videos, card art, avatars, thumbs);
 the customer tiles grow on hover instead of rotating on a timer; logos are plain-text names;
 the original's fixed legal pop-up isn't rebuilt; IvyPresto → Newsreader (slightly rounder).
+
+## Round 3 (check)
+
+Pricing now 954 tall (original 928), heading breaks "Clear pricing, with plans / that fit how you
+work", list pitch 34.5px, columns at 240 and 816 as the original. Still fits at 360/768/1024.
+Stopping here: each section pair reads as the same design apart from content and placeholders.
