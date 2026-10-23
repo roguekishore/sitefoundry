@@ -108,8 +108,10 @@ mirror: see its README.
 
 ## Recreating sites in a batch
 
-`/recreate-site` for a list of sites, unattended, in two phases. The list is a JSON file that
-also holds each site's status, which both phases keep up to date
+`/recreate-site` for a list of sites, unattended. `run.mjs` captures the sites that have no
+capture yet (all of them, before the first session starts) and then recreates them; the capture
+step can also be run alone, ahead of time, on a network that reaches the sites. The list is a
+JSON file that also holds each site's status, which both scripts keep up to date
 (see `tools/claude-batch/sites.example.json`):
 
 ```json
@@ -120,15 +122,17 @@ also holds each site's status, which both phases keep up to date
 ```
 
 ```bash
-# A: on a network that reaches the sites: capture the new ones
-node tools/claude-batch/precapture.mjs sites.json
-#    on another machine than B? commit and push the captures, then git pull there
-#    (crops and frames are committed on purpose; delete them once the site is recreated)
+# As a normal user, with claude logged in to your account, after pnpm install and
+# pnpm exec playwright install --with-deps chromium
+node tools/claude-batch/run.mjs sites.json --dry-run    # what it would do ("capture, then run" = no capture yet)
+node tools/claude-batch/run.mjs sites.json --jobs 6     # captures what's missing, then one `claude -p` session per site, 6 at a time
+node tools/claude-batch/run.mjs sites.json --jobs 3 --limit 10   # 3 at a time, 10 sites in all, then it stops (run again for the next 10)
 
-# B: on any machine (Linux), as a normal user, with claude logged in to your account,
-#    after pnpm install and pnpm exec playwright install --with-deps chromium
-node tools/claude-batch/run.mjs sites.json --dry-run    # what it would do
-node tools/claude-batch/run.mjs sites.json --jobs 6     # one `claude -p` session per site, 6 at a time
+# Optional, to capture ahead of time on a network that reaches the sites (then the run needs no
+# network to them): the same capture step on its own.
+node tools/claude-batch/precapture.mjs sites.json
+#    to run on another machine? commit and push the captures, then git pull there
+#    (crops and frames are committed on purpose; delete them once the site is recreated)
 ```
 
 Every session runs `claude-opus-5-5` at effort `high`, subagents included (`--model`,

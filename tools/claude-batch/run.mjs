@@ -1,19 +1,23 @@
-// Phase B of a batch: runs /recreate-site for the sites in a list, one `claude -p` session per
-// site, up to --jobs at a time, unattended, on sites captured in advance by precapture.mjs (this
-// machine needn't reach them). Uses the account claude is logged in with (run `claude` once and
-// log in).
+// A batch: runs /recreate-site for the sites in a list, one `claude -p` session per site, up to
+// --jobs at a time, unattended. Sites with no capture yet are captured first (precapture.mjs, run
+// from here, all of them before the first session starts), so this machine must reach those sites;
+// sites captured in advance need no network. Uses the account claude is logged in with (run
+// `claude` once and log in).
 //
 //   node tools/claude-batch/run.mjs <sites.json> [--jobs 6] [--only huly,linear] [--model claude-opus-5-5]
-//                                   [--effort high] [--max-hours 5] [--limit-wait 30] [--again] [--dry-run]
+//                                   [--limit 10] [--effort high] [--max-hours 5] [--limit-wait 30] [--again] [--dry-run]
 //
 // In order:
 //  1. Checks claude (and that it's logged in), Playwright's Chromium (the skill's verify step
 //     captures our pages) and that this isn't root (claude refuses --dangerously-skip-permissions
 //     as root).
 //  2. Starts one gallery on port 4400 for all sessions, unless one already answers there.
-//  3. Keeps --jobs sessions going. Each takes the next site from the list, in order (read again
-//     each time, so sites added meanwhile are picked up): captured, and not done, needs-you or
-//     skip (--again: done and needs-you too). It runs
+//  3. Captures the sites that will run and have no capture yet (not done, needs-you or skip),
+//     (the first --limit of them) all together, before any session starts. A site whose capture fails is left out.
+//  4. Keeps --jobs sessions going, and starts no more than --limit sites in all (default: no
+//     limit; a site left out or stopped at "needs-you" before it ran doesn't count). Each takes the next site from the list, in order (read again
+//     each time, so sites added meanwhile are picked up, and captured when their turn comes):
+//     not done, needs-you or skip (--again: done and needs-you too). It runs
 //     `claude -p "/recreate-site <url> <slug> <pages>" --dangerously-skip-permissions` with
 //     --model and --effort (subagents and Claude Code's own helper calls get the same model), and
 //     an added system prompt: nobody is there to answer; pnpm add and git commits go through
@@ -21,9 +25,9 @@
 //     time when claude gives one, else --limit-wait minutes) and resumes. Other failures resume it
 //     up to twice. --max-hours caps each site. Two sites in a row failing for other reasons
 //     stops new sites from starting.
-//  4. Writes each site's status into the list as it goes: running, waiting-for-limit, then done,
+//  5. Writes each site's status into the list as it goes: running, waiting-for-limit, then done,
 //     needs-you (read its report), failed, timed-out or stopped.
-//  5. When every session has finished, builds the registry once and commits it. (While sites are
+//  6. When every session has finished, builds the registry once and commits it. (While sites are
 //     half-built, `pnpm build:registry` fails on their items, so sessions don't run it.)
 // Logs and each site's final report go to tools/claude-batch/runs/.
 import { spawn, spawnSync } from "node:child_process";
@@ -39,7 +43,7 @@ const GALLERY = "http://localhost:4400/preview.html";
 const [CLAUDE, ...CLAUDE_ARGS] = (process.env.CLAUDE_BIN ?? "claude").split(" "); // another install: CLAUDE_BIN=/path/to/claude
 
 const args = process.argv.slice(2);
-const valued = ["jobs", "only", "model", "effort", "max-hours", "limit-wait"];
+const valued = ["jobs", "limit", "only", "model", "effort", "max-hours", "limit-wait"];
 const flag = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i === -1 ? fallback : args[i + 1];
@@ -47,7 +51,7 @@ const flag = (name, fallback) => {
 const listFile = args.find((a, i) => !a.startsWith("--") && !valued.includes(args[i - 1]?.slice(2)));
 if (!listFile) {
   console.error(
-    "usage: node tools/claude-batch/run.mjs <sites.json> [--jobs 6] [--only slug,slug] [--model claude-opus-5-5] [--effort high] [--max-hours 5] [--limit-wait 30] [--again] [--dry-run]",
+    "usage: node tools/claude-batch/run.mjs <sites.json> [--jobs 6] [--limit 10] [--only slug,slug] [--model claude-opus-5-5] [--effort high] [--max-hours 5] [--limit-wait 30] [--again] [--dry-run]",
   );
   process.exit(1);
 }
@@ -56,6 +60,7 @@ const only = flag("only")?.split(",");
 const model = flag("model", "claude-opus-5-5");
 const effort = flag("effort", "high");
 const maxHours = Number(flag("max-hours", 5));
+const limit = flag("limit") === undefined ? Infinity : Math.max(1, Number(flag("limit")));
 const limitWaitMin = Number(flag("limit-wait", 30));
 const again = args.includes("--again");
 const dryRun = args.includes("--dry-run");
@@ -98,9 +103,9 @@ mkdirSync(RUNS, { recursive: true });
 const initial = readSites(listFile).filter((s) => !only || only.includes(s.slug));
 for (const site of initial) {
   const skip = skipReason(site);
-  say(`${site.slug.padEnd(20)} ${site.status.padEnd(16)} ${skip ? `skip: ${skip}` : `run: ${prompt(site)}`}`);
+  say(`${site.slug.padEnd(20)} ${site.status.padEnd(16)} ${skip ? `skip: ${skip}` : `${needsCapture(site) ? "capture, then " : ""}run: ${prompt(site)}`}`);
 }
-say(`${jobs} at a time · ${model} · effort ${effort}`);
+say(`${jobs} at a time${limit === Infinity ? "" : `, ${limit} sites at most`} · ${model} · effort ${effort}`);
 if (process.getuid?.() === 0) fail("running as root: claude refuses --dangerously-skip-permissions as root. Run as a normal user.");
 const version = spawnSync([CLAUDE, ...CLAUDE_ARGS, "--version"].join(" "), { encoding: "utf8", shell: true });
 if (version.status !== 0) fail(`"${CLAUDE} --version" failed: is Claude Code installed?`);
@@ -112,6 +117,13 @@ try {
   fail("Playwright's Chromium is missing (the skill's verify step needs it): pnpm exec playwright install --with-deps chromium");
 }
 if (dryRun || !initial.some((s) => !skipReason(s))) process.exit(0);
+
+// Captures first: the sites that will run (at most --limit) and have none yet, together, before any session starts.
+const toCapture = initial.filter((s) => !skipReason(s)).slice(0, limit).filter(needsCapture).map((s) => s.slug);
+if (toCapture.length) {
+  say(`capturing ${toCapture.join(", ")} before the recreation starts`);
+  await captureSites(toCapture);
+}
 
 // A one-turn session: is claude logged in, can it use the model, is the usage limit not reached?
 const ping = spawnSync(CLAUDE, [...CLAUDE_ARGS, "-p", "Reply with the word OK and nothing else.", "--max-turns", "1", "--model", model], {
@@ -159,18 +171,22 @@ else {
 const attempted = new Set();
 const outcomes = [];
 let failuresInARow = 0;
+let started = 0; // sites taken so far, against --limit
 
 /** The next site to run, in list order. Read again every time: sites added meanwhile are picked up. */
 function next() {
   while (true) {
+    if (started >= limit) return null;
     const site = readSites(listFile).find((s) => (!only || only.includes(s.slug)) && !attempted.has(s.slug) && !skipReason(s));
     if (!site) return null;
     attempted.add(site.slug);
+    started++;
     const ref = referenceDir(REPO, site.slug);
     if (readdirSync(dirname(ref)).some((f) => f !== "_reference") && !site.pages.length && !FINISHED.includes(site.status) && !(CUT_OFF.includes(site.status) && site.sessionId)) {
       // The skill would stop and ask whether to continue that recreation or use another slug.
       updateSite(listFile, site.slug, { status: "needs-you", note: `foundry/sites/${site.slug}/ is already built and no pages are named: continue it, or give this site another slug` });
       say(`${site.slug}: needs-you (already built, no pages named)`);
+      started--; // not recreated: doesn't count against --limit
       continue;
     }
     return site;
@@ -179,6 +195,16 @@ function next() {
 
 async function worker() {
   for (let site; !stopping && (site = next()); ) {
+    if (needsCapture(site)) {
+      // Added to the list after the batch started.
+      say(`${site.slug}: capturing first`);
+      await captureSites([site.slug]);
+      if (needsCapture(site)) {
+        say(`${site.slug}: capture failed, left out (its status in the list says so)`);
+        started--;
+        continue;
+      }
+    }
     running.add(site.slug);
     const outcome = await runSite(site);
     running.delete(site.slug);
@@ -218,9 +244,22 @@ function prompt(site) {
 function skipReason(site) {
   if (site.status === "skip") return 'status "skip"';
   if (FINISHED.includes(site.status) && !again) return `already ${site.status} (--again to redo)`;
-  if (!existsSync(join(referenceDir(REPO, site.slug), "precapture.json")))
-    return site.status === "capture-failed" ? "its capture failed: run precapture.mjs again" : "not captured: run precapture.mjs first (and git pull the captures here)";
   return null;
+}
+
+function needsCapture(site) {
+  return !existsSync(join(referenceDir(REPO, site.slug), "precapture.json"));
+}
+
+/** precapture.mjs for these sites (and their pages), its output on ours. A failed capture sets "capture-failed" in the list. */
+function captureSites(slugs) {
+  return new Promise((done) => {
+    const child = spawn(process.execPath, [join(REPO, "tools/claude-batch/precapture.mjs"), listFile, "--only", slugs.join(",")], { cwd: REPO, stdio: "inherit" });
+    children.add(child);
+    const end = () => (children.delete(child), done());
+    child.on("error", end);
+    child.on("close", end);
+  });
 }
 
 async function answers(url) {
