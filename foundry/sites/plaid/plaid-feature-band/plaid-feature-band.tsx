@@ -19,7 +19,7 @@ export function PlaidFeatureBand({ title, action, media, className }: PlaidFeatu
     <section className={cn("bg-background pb-24 lg:pt-24 lg:pb-[6.75rem]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <div className="relative isolate flex h-[37.5rem] flex-col justify-end overflow-clip rounded-lg bg-foreground bg-linear-to-br from-foreground via-foreground to-glow text-background dark:bg-card dark:from-card dark:via-card dark:text-foreground lg:h-[44.1875rem] lg:justify-center">
-          <div className="absolute inset-x-0 top-0 -z-10 h-[62%] lg:inset-y-0 lg:right-0 lg:left-auto lg:h-full lg:w-[62%]">
+          <div className="absolute inset-0 -z-10">
             {media ?? <PlaidPlaceholder tone="deep" className="size-full" />}
           </div>
           <div className="px-6 pb-8 text-center lg:max-w-[45rem] lg:px-[4.625rem] lg:pb-0 lg:text-left">

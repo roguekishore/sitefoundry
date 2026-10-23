@@ -40,7 +40,7 @@ export function PlaidHero({ title, subtitle, primary, secondary, logos, announce
       </div>
 
       <div className="mx-auto w-full max-w-page px-gutter text-center lg:pt-[17.75rem] lg:text-left">
-        <h1 className="mx-auto max-w-[22rem] bg-linear-to-r from-chart-4 via-highlight to-background bg-clip-text pb-1 font-display text-[2.5rem]/[0.94] font-medium tracking-[-0.05em] text-transparent dark:to-foreground lg:mx-0 lg:max-w-[56rem] lg:text-[4.75rem]/[1.12] lg:tracking-[-0.046em]">
+        <h1 className="mx-auto max-w-[22rem] bg-linear-to-r from-chart-4 via-highlight via-40% to-background to-75% bg-clip-text pb-1 font-display text-[2.5rem]/[0.94] font-medium tracking-[-0.05em] text-transparent dark:to-foreground lg:mx-0 lg:max-w-[56rem] lg:text-[4.75rem]/[1.12] lg:tracking-[-0.046em]">
           {title}
         </h1>
         <p className="mx-auto mt-3 max-w-[22rem] text-lg/[1.3] text-background dark:text-foreground lg:mx-0 lg:mt-6 lg:max-w-[37rem] lg:text-[1.625rem]/[1.4] lg:tracking-[-0.01em]">

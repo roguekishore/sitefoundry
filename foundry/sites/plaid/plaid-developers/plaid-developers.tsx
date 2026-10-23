@@ -31,7 +31,7 @@ export function PlaidDevelopers({ title, subtitle, primary, secondary, endpoint,
   return (
     <section className={cn("bg-background pt-16 pb-14 lg:pt-[12rem] lg:pb-[12.5rem]", className)}>
       <div className="mx-auto max-w-page px-gutter">
-        <div className="relative isolate overflow-clip rounded-[calc(var(--radius)+1rem)] bg-foreground bg-linear-to-b from-chart-1/30 via-chart-1/20 to-chart-3/45 text-center text-background shadow-[0_0_70px] shadow-chart-3/70 dark:bg-card dark:text-foreground">
+        <div className="relative isolate overflow-clip rounded-[calc(var(--radius)+1rem)] bg-[color-mix(in_oklab,var(--foreground)_40%,var(--primary))] bg-linear-to-b from-chart-1/20 via-chart-1/25 to-chart-3/50 text-center text-background shadow-[0_0_70px] shadow-chart-3/70 dark:bg-card dark:text-foreground">
           <div className="px-6 pt-10 lg:pt-[4.75rem]">
             <h2 className="mx-auto max-w-[16rem] font-display text-[1.875rem]/[1.12] font-medium tracking-[-0.05em] lg:max-w-[50rem] lg:text-[4.375rem]/[1.12] lg:tracking-[-0.045em]">
               {title}

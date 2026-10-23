@@ -83,3 +83,18 @@ Fictional stand-in: **Halyard**, a financial-data network with an API (own names
 - The cookie banner is not part of the design.
 - Stats reuse `@foundry/anchorage-count` instead of another counter.
 - Logos and partner names in the feed are plain-text fictional names with lucide icons.
+
+## Round 1 (first capture of ours)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | matches (pill, mark, menu) | matches (pill 1130px, evenly spaced links, two pills) | hides on scroll down: opacity 1→0, −40px at 422px, same as the original | — |
+| hero | 883px vs 864 (announcement card is extra on phones) | 928 vs 929 ✓; h1 gradient stayed teal to the right edge, original turns white by "revolutionary"; subtitle wrapped to 3 lines (longer copy) | marquee loops 40s | gradient stops moved (via 40%, white by 75%); copy shortened ✓ |
+| buttons | — | rainbow rim read too thin (1.5px) | glow on hover | rim 2px ✓ |
+| products | heights 417 ✓ | grid 611/399 ✓; card tops mint instead of cyan; titles ran wide (original wraps at ~400px / ~270px) | rim spin + inset on hover; touch: scroll-driven active state shows in the 390 capture | cyan top; title max-widths ✓ |
+| feature band | — | picture slot covered only the right 62% and drew a hard seam | — | slot covers the panel ✓ |
+| network | **heading and body overflowed 390** (grid column grew to the feed row's width) | stats not top-aligned (long label); heading ran wider than the original's 3 lines | count-up runs | `grid-cols-[minmax(0,1fr)]`; `justify-end`; heading max-w; shorter label ✓ |
+| developers | ✓ | panel too blue (navy + purple); original is deep indigo | — | foreground mixed with primary, purple overlay ✓ |
+| stories | ✓ | cards start at the gutter (original 50px with a sliver of the previous card) | arrows slide | kept (decision) |
+| contact | gap to the footer 80px vs 30 | ✓ | — | phone padding ✓ |
+| footer | ✓ | mark vertically centred instead of top; navy a shade light | — | `self-start`; deeper navy ✓ |
