@@ -47,7 +47,7 @@ export function PlaidDevelopers({ title, subtitle, primary, secondary, endpoint,
             </div>
           </div>
 
-          <div className="mx-auto mt-9 w-[calc(100%-4rem)] max-w-[55.625rem] rounded-t-[1rem] bg-primary text-left font-mono text-primary-foreground/85 dark:bg-background lg:mt-10 lg:w-[calc(100%-6rem)] lg:rounded-t-lg">
+          <div className="mx-auto mt-9 w-[calc(100%-4rem)] max-w-[55.625rem] rounded-t-[1rem] bg-primary text-left font-mono text-primary-foreground/85 dark:bg-background dark:text-foreground/85 lg:mt-10 lg:w-[calc(100%-6rem)] lg:rounded-t-lg">
             <div className="border-b border-glow/40 px-4 py-4 text-[0.6875rem] lg:px-11 lg:py-6 lg:text-2xl">{endpoint}</div>
             <div className="grid grid-cols-[2.25rem_1fr] lg:grid-cols-[6.5rem_1fr]">
               <ol aria-hidden className="border-r border-glow/40 py-4 pl-4 text-[0.625rem]/[1.875rem] lg:py-6 lg:pl-11 lg:text-2xl/[3.25rem]">

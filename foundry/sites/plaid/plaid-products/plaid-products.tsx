@@ -65,8 +65,10 @@ export function PlaidProducts({ title, action, products, linkLabel, className }:
                 />
 
                 <span className="flex items-start gap-4 p-4 pt-6 lg:p-6 lg:pt-6">
-                  <span className={cn("flex-1 font-display text-xl/[1.4] font-medium tracking-[-0.02em] text-muted-foreground lg:text-[1.625rem]/[1.4]", i < 2 ? "lg:max-w-[25rem]" : "lg:max-w-[17rem]")}>
-                    <span className="font-semibold text-foreground">{p.lead}</span> {p.rest}
+                  <span className="flex-1 font-display text-xl/[1.4] font-medium tracking-[-0.02em] text-muted-foreground lg:text-[1.625rem]/[1.4]">
+                    <span className={cn("block", i < 2 ? "lg:max-w-[25rem]" : "lg:max-w-[17rem]")}>
+                      <span className="font-semibold text-foreground">{p.lead}</span> {p.rest}
+                    </span>
                     <span className="sr-only"> · {linkLabel}</span>
                   </span>
                   <span

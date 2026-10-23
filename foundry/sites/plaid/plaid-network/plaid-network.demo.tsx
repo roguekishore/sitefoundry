@@ -2,7 +2,7 @@ import { BadgeCheck, CarFront, Landmark, PiggyBank } from "lucide-react";
 import { PlaidNetwork, type PlaidNetworkProps } from "./plaid-network";
 
 export const networkSample: PlaidNetworkProps = {
-  title: "Every connection makes your product smarter",
+  title: "Each new link makes your product sharper",
   body: "Build on the widest web of linked accounts and each new link teaches your product something: more approvals, more people reached, and growth that compounds.",
   stats: [
     { value: "3 in 5", label: "linked adults rely on Halyard" },

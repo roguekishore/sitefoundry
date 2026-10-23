@@ -98,3 +98,26 @@ Fictional stand-in: **Halyard**, a financial-data network with an API (own names
 | stories | ✓ | cards start at the gutter (original 50px with a sliver of the previous card) | arrows slide | kept (decision) |
 | contact | gap to the footer 80px vs 30 | ✓ | — | phone padding ✓ |
 | footer | ✓ | mark vertically centred instead of top; navy a shade light | — | `self-start`; deeper navy ✓ |
+
+## Round 2
+
+Capture of the shared gallery kept dying from other sessions' reloads; captured with a /tmp copy
+of capture.mjs that stubs the live-reload socket.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | ✓ | gradient type now turns white after the first words; subtitle 2 lines like the original | marquee ✓, header hide ✓ | — |
+| products | ✓ | the title max-width pulled the arrow circle in from the corner | hover rim/inset/arrow/lift ✓ (hover list), touch state ✓ | max-width moved to an inner span ✓ |
+| feature band | ✓ | seam gone; navy → electric blue like the original | — | — |
+| network | no sideways overflow now; heading/body inside 334px ✓ | heading ran to 4 lines with "Every" alone (longer copy) | count-up ✓ | shorter heading copy (3 lines) ✓ |
+| developers | ✓ | deep indigo now; glow ✓ | — | dark mode: code text was invisible (primary-foreground on a dark window) → `dark:text-foreground/85` ✓ |
+| footer | ✓ | mark top-left; deeper navy ✓ | — | — |
+| overflow | 360/768/1024 fit | | | |
+
+Re-theme: `plaid-products` and `plaid-contact` under `sample-ember` take its cream, terracotta
+and serif cleanly (the gradient band becomes brown→orange→green, the rims follow its chart
+colours). The plaid dark sibling renders the whole page coherently.
+
+Left as is: the stories row starts at the gutter (no sliver of a previous card); wave-line
+canvases (hero, feed, API band, under the stories) are not rebuilt; the original's line numbers
+in the code window are spaced wider than the code lines, kept that way.
