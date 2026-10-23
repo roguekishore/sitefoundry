@@ -36,15 +36,15 @@ export function ArcFooter({ brand, columns, newsletter, copyright, legal, social
     <footer className={cn("bg-background text-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter pt-[3.25rem] pb-12 lg:pt-[4.5rem] lg:pb-[7.5rem]">
         <div className="grid grid-cols-2 gap-x-6 gap-y-14 lg:grid-cols-5 lg:gap-x-[3.875rem]">
-          <a href={brand.href} className="col-span-2 font-display text-[2.375rem]/none font-bold tracking-[-0.05em] lg:col-span-1 lg:text-[2.625rem]">
+          <a href={brand.href} className="col-span-2 font-display text-[2rem]/none font-bold tracking-[-0.05em] lg:col-span-1 lg:text-[2.625rem]">
             {brand.name}
           </a>
           {columns.map((column, i) => (
             <div key={i} className={cn("space-y-11", i === columns.length - 1 && columns.length % 2 === 1 && "col-span-2 lg:col-span-1")}>
               {column.map((group) => (
                 <div key={group.title}>
-                  <h3 className="text-[0.875rem] font-bold lg:text-[0.9375rem]">{group.title}</h3>
-                  <ul className="mt-4 space-y-2 text-[0.875rem]/[1.5] text-muted-foreground lg:mt-6 lg:text-[0.9375rem]">
+                  <h3 className="text-xs font-bold lg:text-[0.9375rem]">{group.title}</h3>
+                  <ul className="mt-4 space-y-2 text-xs/[1.5] text-muted-foreground lg:mt-6 lg:text-[0.9375rem]/[1.5]">
                     {group.links.map((l) => (
                       <li key={l.label}>
                         <a href={l.href} className={linkClass}>

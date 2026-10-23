@@ -28,10 +28,10 @@ export function ArcButton({ children, href, variant = "solid", size = "md", chev
   const showChevron = chevron ?? (variant === "solid" && size !== "full");
   const classes = cn(
     "inline-flex shrink-0 items-center justify-center gap-2 rounded-sm border-2 font-medium whitespace-nowrap",
-    "transition-colors duration-200 ease-[ease] motion-reduce:transition-none",
+    "transition-[color,background-color,border-color,filter] duration-200 ease-[ease] motion-reduce:transition-none",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     variant === "solid"
-      ? "border-primary bg-primary text-primary-foreground hover:border-primary/90 hover:bg-primary/90"
+      ? "border-primary bg-primary text-primary-foreground hover:brightness-[0.92]"
       : "border-foreground/15 bg-transparent text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground",
     sizes[size],
     className,

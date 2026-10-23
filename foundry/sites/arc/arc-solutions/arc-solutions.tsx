@@ -52,7 +52,7 @@ export function ArcSolutions({ heading, solutions, className }: ArcSolutionsProp
                     title={s.title}
                     body={s.body}
                     linkLabel={s.linkLabel}
-                    className="px-6 pt-1 pb-[2.125rem] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none lg:px-0 lg:py-0 lg:[&>span]:pt-8"
+                    className="px-6 pt-1 pb-[2.125rem] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none lg:px-0 lg:py-0"
                   />
                 </a>
               </ArcReveal>

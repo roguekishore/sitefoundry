@@ -87,3 +87,21 @@ inside `@supports (animation-timeline: view())`.
   disclosures with the same structure (bold leads, a rule, numbered footnotes) and density.
 - The header's grey → white change is built with a scroll timeline rather than JS, so the
   header needs no hydration.
+
+## Round 1 (first capture of ours)
+
+Heights: main (hero → CTA) 5242 vs 5226 at 1440 and 6572 vs 6549 at 390; header 100/72 and
+announcement 56/74 exact. Motion list shows the sticky header, its scroll-linked grey→white
+change, the hero load-in and the reveals (opacity 0→1, rise 15px) as in the original. Fits at
+360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | matches (4-line headline, buttons side by side, slightly bleeding screenshot) | matches | load-in ok | — |
+| solid buttons | — | hover lightened the teal (`primary/90` over grey); the original keeps it | hover | yes: `brightness(0.92)` instead |
+| section headings | full width ok | measure ~1100px gave an orphan ("…finance / team"); original lines run 650–865px | reveal ok | yes: `lg:max-w-[56rem]` |
+| solutions | badge ok | badge label pushed out of its pill (an `[&>span]` padding override also hit the badge) | reveal ok | yes: override removed, link gap `pt-6 lg:pt-8` in the copy stack |
+| testimonial | portrait placeholder see-through (grid lines showed) | same; also much darker than the original's pale portrait | reveal ok | yes: opaque frame, glow→ink wash |
+| CTA | — | heading on two lines, original three | reveal ok | yes: demo copy |
+| disclosures | shorter than the original (legal copy is ours) | 931 vs ~1500 px | — | partly: three more paragraphs |
+| footer | wordmark and links a size large at 390 (original 12px links) | matches | — | yes |

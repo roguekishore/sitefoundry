@@ -19,7 +19,7 @@ export function ArcHeading({ title, as: Tag = "h2", align = "left", reveal = tru
     <Tag
       className={cn(
         "font-display text-[2.625rem]/[1.1] font-normal tracking-[-0.015em] text-pretty lg:text-[4rem]/[1.1]",
-        align === "center" ? "mx-auto text-center text-balance" : "max-w-[15ch] lg:max-w-[28ch]",
+        align === "center" ? "mx-auto text-center text-balance" : "lg:max-w-[56rem]",
         className,
       )}
     >
