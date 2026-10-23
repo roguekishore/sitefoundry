@@ -1,0 +1,46 @@
+/* The track starts at the page's content edge and runs to the window's right edge. */
+.ouraring-reel-track {
+  --ouraring-reel-inset: max(var(--page-gutter), calc((100vw - var(--page-width)) / 2 + var(--page-gutter)));
+  padding-inline: var(--ouraring-reel-inset);
+  scroll-padding-inline: var(--ouraring-reel-inset);
+}
+
+/* Scrubbed parallax: the photo inside each card drifts from -78px to +39px (phones) and from
+   -138px to +69px (desktop) while the section crosses the window. The track is a horizontal
+   scroll container, so an anonymous view() would follow it and freeze; the timeline is named
+   on the section instead (its scroller is the page) and read by every photo. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ouraring-reel {
+      view-timeline-name: --ouraring-reel;
+    }
+    .ouraring-reel-drift {
+      --ouraring-reel-from: -78px;
+      --ouraring-reel-to: 39px;
+      animation: ouraring-reel-drift linear both;
+      animation-timeline: --ouraring-reel;
+      animation-range: cover 0% cover 100%;
+    }
+    /* each card's line fades in as the reel enters (same named timeline) */
+    .ouraring-reel-fade {
+      animation: ouraring-reel-fade linear both;
+      animation-timeline: --ouraring-reel;
+      animation-range: entry 120px entry 420px;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .ouraring-reel-drift {
+      --ouraring-reel-from: -138px;
+      --ouraring-reel-to: 69px;
+    }
+  }
+}
+
+@keyframes ouraring-reel-drift {
+  from { translate: 0 var(--ouraring-reel-from); }
+  to { translate: 0 var(--ouraring-reel-to); }
+}
+@keyframes ouraring-reel-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
