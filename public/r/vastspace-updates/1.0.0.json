@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast updates grid",
+  "description": "A warm-grey band with a 48px title and a dark 'More updates' button on the same line, then a grid of news cards: a square photo, a small mono line (category, an orange square, the date in capitals) and a 20px headline. One column on phones, three on desktop with 60px gaps. Each photo eases from slightly zoomed to full size as it scrolls into view.",
+  "category": "gallery",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "updates",
+    "cards",
+    "grid",
+    "photos",
+    "mono",
+    "light",
+    "scroll",
+    "zoom"
+  ],
+  "notes": [
+    "photos are slots (square); empty they show flat moon-rock placeholders",
+    "the zoom-in uses CSS scroll-driven animation; without support the photos just sit at full size",
+    "uses the theme's card colour as the band, so it contrasts with a warm-white page"
+  ],
+  "entry": "vastspace-updates.tsx",
+  "source": "foundry",
+  "name": "vastspace-updates",
+  "files": [
+    {
+      "path": "vastspace-updates.css",
+      "content": "/* Photos start slightly zoomed and settle to full size as the card enters the window. */\n@supports (animation-timeline: view()) {\n  .vastspace-updates-zoom {\n    animation: vastspace-updates-zoom linear both;\n    animation-timeline: view();\n    animation-range: entry 0% cover 40%;\n  }\n}\n\n@keyframes vastspace-updates-zoom {\n  from { transform: scale(1.08); }\n  to { transform: scale(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vastspace-updates-zoom {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "vastspace-updates.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspaceButton } from \"@foundry/vastspace-button\";\nimport { VastspacePlaceholder } from \"@foundry/vastspace-placeholder\";\nimport { VastspaceSectionHeading } from \"@foundry/vastspace-section-heading\";\nimport \"./vastspace-updates.css\";\n\nexport interface VastspaceUpdate {\n  /** small mono label, e.g. \"Press release\" */\n  category: string;\n  /** the date, shown as written (capitalised by the style) */\n  date: string;\n  /** the headline */\n  title: string;\n  /** where the card links */\n  href: string;\n  /** the square photo (an <img> or any node that fills its box); empty shows a placeholder */\n  image?: ReactNode;\n}\n\nexport interface VastspaceUpdatesProps {\n  /** the section title */\n  title: string;\n  /** the button at the right of the title */\n  action: { label: string; href: string };\n  /** the cards, six fill two rows on desktop */\n  items: VastspaceUpdate[];\n  className?: string;\n}\n\nexport function VastspaceUpdates({ title, action, items, className }: VastspaceUpdatesProps) {\n  return (\n    <section className={cn(\"border-t border-border bg-card pt-section pb-[12.25rem] text-card-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <VastspaceSectionHeading title={title} action={<VastspaceButton label={action.label} href={action.href} />} />\n        <ul className=\"mt-12 grid gap-y-[3.75rem] md:mt-[4.8rem] md:grid-cols-2 md:gap-x-[3.75rem] lg:grid-cols-3\">\n          {items.map((u) => (\n            <li key={u.title}>\n              <a href={u.href} className=\"block\">\n                <div className=\"aspect-square overflow-clip\">\n                  <div className=\"vastspace-updates-zoom size-full [&>*]:size-full [&>*]:object-cover\">{u.image ?? <VastspacePlaceholder className=\"size-full\" />}</div>\n                </div>\n                <p className=\"mt-7 flex items-center gap-3 font-mono text-xs/3 tracking-[0.02em] uppercase md:mt-10\">\n                  {u.category}\n                  <span aria-hidden className=\"size-3 bg-highlight\" />\n                  {u.date}\n                </p>\n                <h3 className=\"mt-6 text-lg/[1.12] font-medium md:text-xl/[1.12]\">{u.title}</h3>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-button",
+    "vastspace-placeholder",
+    "vastspace-section-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button at the right of the title"
+    },
+    {
+      "name": "items",
+      "type": "VastspaceUpdate[]",
+      "required": true,
+      "description": "the cards, six fill two rows on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "563d766b2c90a8101e1b2bc7dc6972c301c1c20946b72b2b7428c6f8a628a62e"
+}

@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast header",
+  "description": "A fixed 80px navigation: over the opening photo it is transparent with white text (logo, four links, a quiet link and a white button); once you scroll it becomes a white bar inset 28px from the window edges with dark text and a dark button, slides up out of view while you scroll down past the first screen and comes back when you scroll up. Link hover fills a pill behind the text over 0.5s. On phones it is a full-width bar with a two-line menu button that opens a panel of links.",
+  "category": "header",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "transparent",
+    "overlay",
+    "hide-on-scroll",
+    "flat",
+    "hover"
+  ],
+  "notes": [
+    "made for sitting over a full-bleed photo: the transparent state uses white text (highlight-foreground)",
+    "position fixed: it overlays the first block, so give that block its own top room (the hero does)",
+    "scroll behaviour needs JavaScript; with reduced motion the bar still changes state but doesn't animate"
+  ],
+  "hydrate": "load",
+  "entry": "vastspace-header.tsx",
+  "source": "foundry",
+  "name": "vastspace-header",
+  "files": [
+    {
+      "path": "vastspace-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspaceButton } from \"@foundry/vastspace-button\";\n\nexport interface VastspaceNavLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface VastspaceHeaderProps {\n  /** the logo at the left (a VastspaceWordmark) */\n  brand: ReactNode;\n  /** where the logo links */\n  brandHref?: string;\n  /** the main links, shown from 1280px up */\n  links: VastspaceNavLink[];\n  /** the quiet link before the button */\n  extra: VastspaceNavLink;\n  /** the button at the right */\n  cta: VastspaceNavLink;\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst ease = \"ease-[cubic-bezier(0.62,0.05,0.01,0.99)]\";\n\nexport function VastspaceHeader({ brand, brandHref = \"/\", links, extra, cta, menuLabel, className }: VastspaceHeaderProps) {\n  const [scrolled, setScrolled] = useState(false);\n  const [hidden, setHidden] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      setScrolled(y > 24);\n      if (Math.abs(y - last) > 4) {\n        setHidden(y > last && y > window.innerHeight);\n        last = y;\n      }\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  const bar = scrolled || open;\n  const linkClass = cn(\n    \"relative isolate inline-flex h-11 items-center px-5 text-base transition-colors duration-500 min-[90rem]:px-9 motion-reduce:transition-none\",\n    ease,\n    \"before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-500 hover:before:scale-y-100 motion-reduce:before:transition-none\",\n    \"before:ease-[cubic-bezier(0.62,0.05,0.01,0.99)]\",\n    bar ? \"before:bg-primary hover:text-primary-foreground\" : \"before:bg-popover hover:text-popover-foreground\",\n  );\n\n  return (\n    <header\n      className={cn(\n        \"fixed inset-x-0 top-0 z-50 transition-transform duration-[650ms] motion-reduce:transition-none\",\n        ease,\n        hidden && !open ? \"-translate-y-[108px]\" : \"translate-y-0\",\n        className,\n      )}\n    >\n      <div\n        className={cn(\n          \"relative flex h-20 items-center px-gutter transition-[margin,padding,background-color,box-shadow,color] duration-[650ms] motion-reduce:transition-none xl:mt-7\",\n          ease,\n          bar ? \"bg-popover text-popover-foreground shadow-[0_0_10px_0] shadow-foreground/20 xl:mx-7 xl:px-6\" : \"text-highlight-foreground\",\n        )}\n      >\n        <a href={brandHref} className=\"shrink-0\">\n          {brand}\n        </a>\n        <nav aria-label=\"Main\" className=\"ml-16 hidden items-center xl:flex min-[90rem]:ml-24\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className={linkClass}>\n              {l.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto hidden items-center xl:flex\">\n          <a href={extra.href} className={linkClass}>\n            {extra.label}\n          </a>\n          <VastspaceButton label={cta.label} href={cta.href} variant={bar ? \"dark\" : \"light\"} className=\"ml-3 min-[90rem]:ml-11\" />\n        </div>\n        <button type=\"button\" aria-label={menuLabel} aria-expanded={open} onClick={() => setOpen(!open)} className=\"ml-auto flex h-10 w-8 flex-col items-stretch justify-center gap-[0.4rem] xl:hidden\">\n          <span className={cn(\"h-0.5 bg-current transition-transform duration-500 motion-reduce:transition-none\", ease, open && \"translate-y-[0.3rem] rotate-12\")} />\n          <span className={cn(\"h-0.5 bg-current transition-transform duration-500 motion-reduce:transition-none\", ease, open && \"-translate-y-[0.3rem] -rotate-12\")} />\n        </button>\n      </div>\n      {open && (\n        <div className=\"border-t border-border bg-popover px-gutter pb-6 text-popover-foreground xl:hidden\">\n          {[...links, extra].map((l) => (\n            <a key={l.label} href={l.href} className=\"block py-3 text-2xl/none font-medium tracking-[-0.01em]\">\n              {l.label}\n            </a>\n          ))}\n          <VastspaceButton label={cta.label} href={cta.href} className=\"mt-4 w-full\" />\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the logo at the left (a VastspaceWordmark)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the logo links"
+    },
+    {
+      "name": "links",
+      "type": "VastspaceNavLink[]",
+      "required": true,
+      "description": "the main links, shown from 1280px up"
+    },
+    {
+      "name": "extra",
+      "type": "VastspaceNavLink",
+      "required": true,
+      "description": "the quiet link before the button"
+    },
+    {
+      "name": "cta",
+      "type": "VastspaceNavLink",
+      "required": true,
+      "description": "the button at the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c6a799aec347b2b339dfb34f3f9d34f24b31a09037f3eebe257127276e722c2a"
+}

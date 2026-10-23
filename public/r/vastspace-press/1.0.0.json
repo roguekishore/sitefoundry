@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast press quotes",
+  "description": "A warm-grey band with a 48px title and two square arrow buttons, a horizontal strip of quote cards separated by thin vertical hairlines (outlet name on top, a 20px quote under it; three and a bit across on desktop, one with the next peeking on phones), and below it a long row of outlet names that drifts left forever and also slides sideways as you scroll past.",
+  "category": "testimonials",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "press",
+    "quotes",
+    "marquee",
+    "carousel",
+    "hairline",
+    "logos",
+    "scroll",
+    "loop",
+    "light"
+  ],
+  "notes": [
+    "outlet names are plain text in four styles (heavy, mono, italic, light); swap in real logo images through the `mark` field",
+    "the strip scrolls by one card per arrow press and snaps; the marquee loop is CSS only and stops under reduced motion",
+    "uses the theme's card colour as the band"
+  ],
+  "hydrate": "visible",
+  "entry": "vastspace-press.tsx",
+  "source": "foundry",
+  "name": "vastspace-press",
+  "files": [
+    {
+      "path": "vastspace-press.css",
+      "content": "/* The outlet row loops forever; its wrapper also slides sideways with the scroll position. */\n.vastspace-press-track {\n  animation: vastspace-press-loop 60s linear infinite;\n}\n\n@keyframes vastspace-press-loop {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@supports (animation-timeline: view()) {\n  .vastspace-press-shift {\n    --shift: 39px;\n    animation: vastspace-press-shift linear both;\n    animation-timeline: view();\n    animation-range: cover 0% cover 100%;\n  }\n}\n\n@media (min-width: 768px) {\n  .vastspace-press-shift {\n    --shift: 144px;\n  }\n}\n\n@keyframes vastspace-press-shift {\n  from { transform: translateX(var(--shift)); }\n  to { transform: translateX(calc(var(--shift) * -1)); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vastspace-press-track,\n  .vastspace-press-shift {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "vastspace-press.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspaceArrows } from \"@foundry/vastspace-arrows\";\nimport { VastspaceSectionHeading } from \"@foundry/vastspace-section-heading\";\nimport \"./vastspace-press.css\";\n\nexport type VastspaceOutletStyle = \"heavy\" | \"mono\" | \"italic\" | \"light\";\n\nexport interface VastspaceOutlet {\n  /** the outlet's name, shown as a plain-text wordmark */\n  name: string;\n  /** which text treatment stands in for its logo */\n  style?: VastspaceOutletStyle;\n  /** a real logo (an <img>) to use instead of the text */\n  mark?: ReactNode;\n}\n\nexport interface VastspaceQuote {\n  /** the outlet that said it */\n  outlet: VastspaceOutlet;\n  /** the quote */\n  quote: string;\n}\n\nexport interface VastspacePressProps {\n  /** the section title */\n  title: string;\n  /** the quote cards */\n  quotes: VastspaceQuote[];\n  /** the outlets in the looping row under the cards */\n  outlets: VastspaceOutlet[];\n  /** screen-reader label of the previous arrow */\n  prevLabel: string;\n  /** screen-reader label of the next arrow */\n  nextLabel: string;\n  className?: string;\n}\n\nconst styles: Record<VastspaceOutletStyle, string> = {\n  heavy: \"font-display font-bold tracking-[-0.03em] uppercase\",\n  mono: \"font-mono font-medium tracking-[-0.02em] uppercase\",\n  italic: \"font-display font-medium italic tracking-[-0.01em]\",\n  light: \"font-display font-normal tracking-[0.2em] uppercase\",\n};\n\nfunction Outlet({ outlet, className }: { outlet: VastspaceOutlet; className?: string }) {\n  return <span className={cn(\"inline-block leading-none\", styles[outlet.style ?? \"heavy\"], className)}>{outlet.mark ?? outlet.name}</span>;\n}\n\nexport function VastspacePress({ title, quotes, outlets, prevLabel, nextLabel, className }: VastspacePressProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const scrollBy = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.children[0] as HTMLElement | undefined;\n    if (el && card) el.scrollBy({ left: dir * card.offsetWidth, behavior: \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"bg-card pt-16 pb-section text-card-foreground md:pt-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <VastspaceSectionHeading title={title} action={<VastspaceArrows prevLabel={prevLabel} nextLabel={nextLabel} onPrev={() => scrollBy(-1)} onNext={() => scrollBy(1)} />} />\n      </div>\n      <ul\n        ref={track}\n        className=\"mx-auto mt-12 flex max-w-page snap-x snap-mandatory overflow-x-auto px-gutter [scrollbar-width:none] md:mt-[6.1rem] [&::-webkit-scrollbar]:hidden\"\n        style={{ scrollPaddingInline: \"var(--page-gutter)\" }}\n      >\n        {quotes.map((q) => (\n          <li key={q.quote} className=\"w-[18.75rem] shrink-0 snap-start border-l border-border pr-6 pb-8 pl-4 md:w-[31.25vw] md:max-w-[28.125rem] md:pr-[4.5rem] md:pl-[3.75rem]\">\n            <Outlet outlet={q.outlet} className=\"h-5 text-xl\" />\n            <p className=\"mt-4 text-lg/[1.12] font-[450] md:text-xl/[1.12]\">{q.quote}</p>\n          </li>\n        ))}\n        <li aria-hidden className=\"w-px shrink-0 border-l border-border\" />\n      </ul>\n      <div className=\"mt-28 overflow-clip md:mt-36\">\n        <div className=\"vastspace-press-shift\">\n          <ul className=\"vastspace-press-track flex w-max items-center\">\n            {[...outlets, ...outlets].map((o, i) => (\n              <li key={i} aria-hidden={i >= outlets.length} className=\"shrink-0 pr-[6.5rem]\">\n                <Outlet outlet={o} className=\"text-2xl\" />\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-arrows",
+    "vastspace-section-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "quotes",
+      "type": "VastspaceQuote[]",
+      "required": true,
+      "description": "the quote cards"
+    },
+    {
+      "name": "outlets",
+      "type": "VastspaceOutlet[]",
+      "required": true,
+      "description": "the outlets in the looping row under the cards"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the previous arrow"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the next arrow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b846782a2ea034a8a0aee842e7de2d1890ec7674775366cc26dcc5dc0ba4052c"
+}
