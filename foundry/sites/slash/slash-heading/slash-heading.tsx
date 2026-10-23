@@ -46,7 +46,7 @@ export function SlashHeading({ parts, sub, size = "lg", align = "center", as: Ta
       <Tag
         className={cn(
           sizes[size],
-          "font-display font-normal tracking-[-0.01em] text-balance text-foreground",
+          "font-display font-normal tracking-[-0.02em] text-foreground",
           align === "center" && "mx-auto",
           headingClassName,
         )}

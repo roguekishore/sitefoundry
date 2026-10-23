@@ -26,7 +26,7 @@ export interface SlashFaqProps {
 export function SlashFaq({ heading, sub, link, items, className }: SlashFaqProps) {
   const [open, setOpen] = useState(-1);
   return (
-    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2)]", className)}>
+    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]", className)}>
       <div className="mx-auto grid max-w-page gap-10 px-gutter lg:grid-cols-[1fr_40rem] lg:gap-12">
         <div>
           <h2 className="max-w-[20rem] font-display text-[2.25rem] leading-[1.03] font-normal tracking-[-0.01em] lg:max-w-[27rem] lg:text-[4rem]">

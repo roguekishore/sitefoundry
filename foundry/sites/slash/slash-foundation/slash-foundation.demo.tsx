@@ -6,7 +6,7 @@ export const foundationSample: SlashFoundationProps = {
   cards: [
     {
       title: "Accounts and Treasury",
-      body: "Free domestic transfers on Plus, a yield on idle cash of up to 3.9%, and deposit cover spread across partner banks.",
+      body: "Free domestic transfers on Plus, up to 3.9% yield on idle cash, and cover spread across partner banks.",
       note: "2",
     },
     {
