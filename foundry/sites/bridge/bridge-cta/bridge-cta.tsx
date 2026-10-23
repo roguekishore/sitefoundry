@@ -18,7 +18,7 @@ export interface BridgeCtaProps {
 /** Bridge's white closing card on a fading colour band. */
 export function BridgeCta({ title, text, link, backdrop, className }: BridgeCtaProps) {
   return (
-    <section className={cn("relative isolate overflow-clip bg-background pt-[6.25rem] pb-[6.25rem] text-card-foreground lg:pt-[5.9375rem] lg:pb-[11.125rem]", className)}>
+    <section className={cn("relative isolate overflow-clip bg-background pt-[7.75rem] pb-[6.25rem] text-card-foreground lg:pt-[8.375rem] lg:pb-[11.125rem]", className)}>
       <div className="absolute inset-x-0 inset-y-0 -z-10 mask-y-from-60% mask-y-to-95% lg:top-6 lg:bottom-20 lg:mask-y-from-65% [&>*]:size-full [&>*]:object-cover">
         {backdrop ?? <BridgePlaceholder tone="sky" />}
       </div>

@@ -28,7 +28,7 @@ export interface BridgeHeaderProps {
 /** Bridge's sticky, translucent, blurred header. */
 export function BridgeHeader({ brand, links, action, menuLabel, className }: BridgeHeaderProps) {
   return (
-    <header className={cn("sticky top-0 z-40 bg-background/50 text-foreground backdrop-blur-lg", className)}>
+    <header className={cn("sticky top-0 z-40 bg-background/25 text-foreground backdrop-blur-lg", className)}>
       <nav className="mx-auto flex h-[5.5rem] max-w-page items-center justify-between gap-6 px-gutter lg:h-[4.375rem]">
         <BridgeWordmark {...brand} layout="responsive" />
 
@@ -38,7 +38,7 @@ export function BridgeHeader({ brand, links, action, menuLabel, className }: Bri
               {l.dividerBefore && <span aria-hidden className="h-3.5 w-px bg-muted-foreground/60" />}
               <a
                 href={l.href}
-                className="flex items-center gap-2 text-[0.9375rem]/none tracking-[-0.02em] transition-colors duration-250 hover:text-muted-foreground motion-reduce:transition-none"
+                className="flex items-center gap-2 text-[0.9375rem]/none tracking-[-0.02em]"
               >
                 {l.label}
                 {l.menu && <ChevronDown aria-hidden className="size-3" strokeWidth={1.5} />}
