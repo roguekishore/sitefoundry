@@ -34,7 +34,7 @@ export interface SlashToolsProps {
 /** A big centred serif heading over rows of dark tool cards of uneven widths. */
 export function SlashTools({ heading, sub, rows, className }: SlashToolsProps) {
   return (
-    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2)]", className)}>
+    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <SlashHeading parts={heading} sub={sub} size="xl" headingClassName="max-w-[18rem] lg:max-w-[36rem]" />
         <div className="mt-12 flex flex-col gap-4 lg:mt-12 lg:gap-3">

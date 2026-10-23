@@ -38,13 +38,13 @@ export interface SlashPricingProps {
 /** A left-aligned serif heading over a hairline, then plans in open columns: name, big price, line, pill button and a ticked list. */
 export function SlashPricing({ heading, plans, className }: SlashPricingProps) {
   return (
-    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2)]", className)}>
+    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]", className)}>
       <div className="mx-auto max-w-[calc(60rem+2*var(--page-gutter))] px-gutter">
-        <SlashHeading parts={heading} size="md" align="left" headingClassName="max-w-[22rem] lg:max-w-[45rem]" />
+        <SlashHeading parts={heading} size="md" align="left" headingClassName="max-w-[22rem] lg:max-w-[38rem]" />
         <hr className="mt-8 border-border lg:mt-10" />
-        <div className="mt-12 grid gap-20 lg:mt-16 lg:grid-cols-2 lg:gap-0">
+        <div className="mt-12 flex flex-col gap-20 lg:mt-16 lg:flex-row lg:justify-between lg:gap-12">
           {plans.map((plan) => (
-            <div key={plan.name} className="lg:max-w-[24rem]">
+            <div key={plan.name} className="lg:w-[24rem]">
               <h3 className="text-lg tracking-[-0.02em] lg:text-xl">{plan.name}</h3>
               <p className="mt-3 flex items-baseline gap-1.5">
                 <span className="text-[2.75rem] leading-none tracking-[-0.03em] lg:text-5xl">{plan.price}</span>
@@ -54,7 +54,7 @@ export function SlashPricing({ heading, plans, className }: SlashPricingProps) {
               <SlashButton href={plan.cta.href} variant={plan.featured ? "solid" : "outline"} className="mt-6 w-full">
                 {plan.cta.label}
               </SlashButton>
-              <ul className="mt-7 space-y-3.5 lg:mt-8">
+              <ul className="mt-7 space-y-3 lg:mt-8">
                 {plan.lines.map((line) => (
                   <li key={line.label} className="flex items-center gap-2.5 text-[0.9375rem] tracking-[-0.02em]">
                     <Check aria-hidden strokeWidth={1.75} className={cn("size-3.5 shrink-0", plan.featured ? "text-highlight" : "text-foreground")} />

@@ -24,7 +24,7 @@ const styles = {
 /** A quiet label over centred rows of backers' names in silvered type; on phones the rows run past both edges. */
 export function SlashInvestors({ label, rows, className }: SlashInvestorsProps) {
   return (
-    <section className={cn("overflow-x-clip bg-background pt-section pb-4 text-foreground lg:pt-[13.25rem] lg:pb-6", className)}>
+    <section className={cn("overflow-x-clip bg-background pt-section pb-4 text-foreground lg:pt-[14rem] lg:pb-6", className)}>
       <p className="px-gutter text-center text-[0.6875rem] font-semibold tracking-[-0.01em] text-muted-foreground lg:text-[0.9375rem]">{label}</p>
       <div className="mt-6 flex flex-col items-center gap-6 lg:mt-12 lg:gap-14">
         {rows.map((row, r) => (

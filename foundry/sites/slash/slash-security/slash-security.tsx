@@ -35,7 +35,7 @@ function Art({ media, className }: { media?: ReactNode; className?: string }) {
 export function SlashSecurity({ heading, sub, items, className }: SlashSecurityProps) {
   const [open, setOpen] = useState(0);
   return (
-    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2)]", className)}>
+    <section className={cn("bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]", className)}>
       <div className="mx-auto max-w-[calc(76rem+2*var(--page-gutter))] px-gutter">
         <SlashHeading parts={heading} sub={sub} size="md" />
         <div className="mt-12 grid gap-10 lg:mt-[4.5rem] lg:grid-cols-[30rem_1fr] lg:gap-[5.4rem]">

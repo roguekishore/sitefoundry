@@ -95,3 +95,44 @@ legal pop-up that fades out after one screen (site chrome, not design).
   italic run + sub), `slash-button` (white / outline pills), `slash-email-field` (box and
   pill variants), `slash-feature-card` (card with art slot and copy).
 - Section top padding: `pt-section` on phones, `2 × --section-y` at `lg`.
+
+## Comparison round 1
+
+Section heights at 1440, original → ours: hero 900 (window) → 900 (window) · customers 760 → 764 ·
+foundation 1502 → 1507 · capabilities 930 → 875 · quotes 584 → 591 · stats 199 → 199 · tools 1326 → 1262 ·
+security 929 → 902 · pricing 928 → 938 · investors 456 → 459 · FAQ 609 → 596 · insights 935 → 949 ·
+CTA 602 → 602 · footer 1442 → 965. Fits at 360/768/1024 (both).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | the render's top fade painted over the email field (flex `order` changes paint order); caption overlapped the render by 104px, so the hero was 740 tall vs ~850 | matches: 64px headline at the same y, field 400 wide, caption + marquee at the bottom | word roll and 45s marquee both listed as loops | yes: content/caption `z-10`; caption `-mt-4 pb-10` (now 844) |
+| customers | matches (one 350×197 tile, swipe row) | section crop shows tiles squeezed: the capture resizes the window and the 700ms `flex` transition was mid-way (basis auto→0); scroll frame is right (578/263/263) | hover grow present | yes: transition only `flex-grow` |
+| all product sections | — | headings ~28px higher than the original (top padding 208 vs ~236 to the glyphs) | — | yes: `lg:pt` = 2×section-y + 1.75rem |
+| foundation | heading broke "A steady / financial footing" (text-balance); original long-first-line | same; cards 468 tall vs 443; first card copy 3 lines so titles misaligned; tier chips rendered as blank boxes in the crop (backdrop blur) | — | yes: no text-balance, media 19.5rem, 2-line copy, chips without blur |
+| capabilities / tools | — | cards 400/368/386 tall vs 418/376/418 | — | yes: art heights raised |
+| quotes | — | crop caught the gap between two quotes (blank); motion list shows the same in/out pattern as the original (1→0 with drop 16px, 0→1 with rise 16px) | loop present | no change needed |
+| pricing | — | second plan started at 720 (equal halves) vs 816 (two 384px columns pushed apart) | — | yes: flex justify-between, 24rem columns |
+| CTA | — | bottom of the gradient greyish; original a warm umber | — | yes: more glow in the mix |
+| footer | much shorter than the original (fewer tool links, shorter small print) | 965 vs 1442 for the same reason | link hovers present | yes: more tool links and two more footnotes in the demo |
+| type | Newsreader reads ~5% wider than IvyPresto on similar words | same | — | yes: display tracking -0.02em |
+
+## Comparison round 2
+
+1440 heights now: 900 · 764 · 1488 · 919 · 591 · 199 · 1330 · 930 · 966 · 471 · 624 · 949 · 602 · footer 1152
+(original 900 · 760 · 1502 · 930 · 584 · 199 · 1326 · 929 · 928 · 456 · 609 · 935 · 602 · 1442).
+390: hero 844 (original ~850). Fits at 360/768/1024. Motion list (ours-design.md) has every
+inventory row: fixed header, to-top rise 16→0 after one screen, rolling words and marquee
+loops, quote in/out with 16px rise/drop, and the hover changes (white → grey #9194a1 at 150ms,
+outline border #464853 → #9194a1, "read" arrow nudge 4px).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | form clear of the render, height matches | matches | ok | — |
+| customers | ok | scroll frame matches the original's proportions and stat row | ok | — |
+| pricing | ok | heading broke after "fit" (one line too long); list pitch 36.5 vs 34.5 | — | yes: heading 38rem, `space-y-3` |
+| footer | still shorter (the original's small print is ~3× longer) | 1152 vs 1442, same reason | — | no: content length, not design |
+| re-theme | `slash-foundation` (sample-ember light) and `slash-pricing` (sample-ember dark) read correctly: cards, washes, pills and ticks all follow the theme | | | — |
+
+Remaining differences: media are placeholders (render, videos, card art, avatars, thumbs);
+the customer tiles grow on hover instead of rotating on a timer; logos are plain-text names;
+the original's fixed legal pop-up isn't rebuilt; IvyPresto → Newsreader (slightly rounder).

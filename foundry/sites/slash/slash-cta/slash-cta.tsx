@@ -17,7 +17,7 @@ export function SlashCta({ heading, sub, email, className }: SlashCtaProps) {
   return (
     <section
       className={cn(
-        "bg-linear-to-b from-background from-5% to-[color-mix(in_oklab,color-mix(in_oklab,var(--glow)_28%,var(--foreground))_16%,var(--background))] py-36 text-center text-foreground lg:py-0",
+        "bg-linear-to-b from-background from-5% to-[color-mix(in_oklab,color-mix(in_oklab,var(--glow)_40%,var(--foreground))_17%,var(--background))] py-36 text-center text-foreground lg:py-0",
         className,
       )}
     >

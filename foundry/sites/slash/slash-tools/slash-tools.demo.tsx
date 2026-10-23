@@ -5,7 +5,7 @@ export const toolsSample: SlashToolsProps = {
   sub: "Handle any money task in a handful of clicks.",
   rows: [
     {
-      mediaHeight: "16.75rem",
+      mediaHeight: "17.25rem",
       cards: [
         { title: "Sub-accounts.", body: "Split cash into named pots so every budget keeps its own balance.", weight: 323 },
         { title: "Spend insight.", body: "See where money goes, live, broken down by card, vendor and team.", weight: 482 },
@@ -13,7 +13,7 @@ export const toolsSample: SlashToolsProps = {
       ],
     },
     {
-      mediaHeight: "19.5rem",
+      mediaHeight: "21.5rem",
       cards: [
         { title: "Pull approvals.", body: "Cap what each vendor may draw from your account and hear about anything unexpected." },
         { title: "Team permissions.", body: "Give each person their own limits, card groups and sign-in rules." },

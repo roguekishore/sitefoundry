@@ -45,7 +45,7 @@ export function SlashHero({ rating, title, words, sub, subNote, email, media, ca
         <div aria-hidden className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background to-transparent lg:hidden" />
       </div>
 
-      <div className="relative order-1 mx-auto w-full max-w-page px-gutter pt-[6.75rem] lg:pt-[12.25rem]">
+      <div className="relative z-10 order-1 mx-auto w-full max-w-page px-gutter pt-[6.75rem] lg:pt-[12.25rem]">
         {rating && (
           <p className="inline-flex h-7 items-center gap-1.5 rounded-full border border-foreground/12 bg-background/50 px-3 text-[0.8125rem] font-semibold tracking-[-0.02em]">
             <Star aria-hidden className="size-3.5 fill-current" strokeWidth={0} />
@@ -74,7 +74,7 @@ export function SlashHero({ rating, title, words, sub, subNote, email, media, ca
         <SlashEmailField {...email} className="mt-5 max-w-[25rem] lg:mt-7" />
       </div>
 
-      <div className="relative order-3 -mt-[6.5rem] pb-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0 lg:pb-9">
+      <div className="relative z-10 order-3 -mt-4 pb-10 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0 lg:pb-9">
         <p className="mx-auto max-w-[15rem] px-gutter text-center text-sm leading-[1.3] tracking-[-0.02em] text-foreground/80 sm:max-w-none lg:text-[0.9375rem]">
           {caption}
         </p>
