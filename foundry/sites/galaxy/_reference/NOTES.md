@@ -120,3 +120,20 @@ cursor blink both show up in ours' Motion list; every hover row shows up too.
 | join | ok | rule sat at the half-way line with 80px before the second text; original: rule on the first panel's edge, 48px gap, 32px inset | — | yes |
 | footer / footnote | legal, copyright and footnote are 12px on phones, ours 14px | ok | — | yes: `text-xs lg:text-sm` |
 | money (digital assets) | ok | 21px taller: our art tile is 9:10 and the text centres on it | — | no: within the art slot's ratio |
+
+## Round 2
+
+Heights at 1440 now: rails 621/641 (3-line heading like the original), news 544/576, join
+392/372 → trimmed bottom padding to 96px. Hover easing reads `ease-in-out` (0.42,0,0.58,1).
+Overflow fits at 360/768/1024; sticky header and cursor blink in the Motion list.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| join | ok | 20px taller than the original | — | yes: `lg:pb-24` |
+| rails | ok | ok (heading 3 lines, card centred in the right half) | blink ok | — |
+| hero | 3-line headline on phones (copy) | ok | — | no: copy |
+| stats | stacked, ok | four across (inferred; the original's desktop band was under its cookie banner) | — | no: can't verify |
+
+Section pairs now read alike apart from content and placeholders. Re-theme check:
+galaxy-split (sample-ember light) and galaxy-hero (sample-ember dark) pick up the other
+theme's fonts, colours and radius with no galaxy colours left over.

@@ -18,7 +18,7 @@ export interface GalaxyJoinProps {
 export function GalaxyJoin({ panels, className }: GalaxyJoinProps) {
   // the rule sits on the first panel's right edge; the 48px column gap keeps it off the second
   return (
-    <section className={cn("bg-background py-section text-foreground lg:pt-16 lg:pb-28", className)}>
+    <section className={cn("bg-background py-section text-foreground lg:pt-16 lg:pb-24", className)}>
       <div className="mx-auto grid max-w-page gap-12 px-gutter lg:grid-cols-2">
         {panels.map((panel, i) => (
           <div key={panel.title} className={cn("px-4 lg:px-8 lg:py-9", i < panels.length - 1 && "lg:border-r lg:border-border")}>
