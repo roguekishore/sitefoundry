@@ -49,7 +49,7 @@ export function GalaxyPostCard({ title, href, media, mediaLabel, category, date,
         <h3 className="mt-2 text-xl leading-7 tracking-[-0.01em] text-foreground lg:text-2xl lg:leading-8">
           <a
             href={href}
-            className="transition-colors duration-300 ease-in-out after:absolute after:inset-0 group-hover:text-muted-foreground motion-reduce:transition-none"
+            className="transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] after:absolute after:inset-0 group-hover:text-muted-foreground motion-reduce:transition-none"
           >
             {title}
           </a>

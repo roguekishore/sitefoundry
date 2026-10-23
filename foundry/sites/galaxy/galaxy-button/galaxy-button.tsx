@@ -29,7 +29,7 @@ const outlineTones: Record<GalaxyTone, string> = {
 export function GalaxyButton({ children, href, variant = "solid", tone = "chart-2", arrow = true, onClick, className }: GalaxyButtonProps) {
   const classes = cn(
     "group inline-flex h-10 shrink-0 items-center justify-center gap-4 rounded-full px-6 font-sans text-base leading-none whitespace-nowrap",
-    "transition-[background-color,color,opacity] duration-300 ease-in-out motion-reduce:transition-none",
+    "transition-[background-color,color,opacity] duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] motion-reduce:transition-none",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     variant === "solid" ? "bg-primary text-primary-foreground hover:bg-primary/85" : cn("border text-foreground", outlineTones[tone]),
     className,
@@ -40,7 +40,7 @@ export function GalaxyButton({ children, href, variant = "solid", tone = "chart-
       {variant === "solid" && arrow && (
         <ArrowRight
           aria-hidden
-          className="-mr-0.5 size-[1.125rem] transition-transform duration-300 ease-in-out group-hover:translate-x-1/2 motion-reduce:transition-none"
+          className="-mr-0.5 size-[1.125rem] transition-transform duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] group-hover:translate-x-1/2 motion-reduce:transition-none"
           strokeWidth={2}
         />
       )}
