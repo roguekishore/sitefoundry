@@ -38,7 +38,7 @@ export function OndoPrinciples({ lead, trail, items, media, labels, className }:
   return (
     <section className={cn("dark relative overflow-x-clip bg-background text-foreground", className)}>
       <div className="absolute inset-x-0 top-0 h-[50rem] lg:h-[38rem]">
-        {media ?? <OndoPlaceholder tone="deep" />}
+        {media ?? <OndoPlaceholder tone="muted" />}
         <div aria-hidden className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/30 to-background" />
       </div>
       <div className="relative mx-auto max-w-page px-gutter pt-24 pb-section lg:px-[calc(var(--page-gutter)*2.75)] lg:pt-[8.75rem] lg:pb-[10rem]">

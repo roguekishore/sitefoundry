@@ -12,7 +12,7 @@ const tones = {
   muted: "bg-muted",
   deep: "bg-accent",
   photo: "bg-foreground/45",
-  faint: "bg-muted/70",
+  faint: "bg-muted/50",
 };
 
 /** Stands in for media: a flat surface in the theme's colours, no drawing. */

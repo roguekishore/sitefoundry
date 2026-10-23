@@ -41,7 +41,7 @@ export function OndoFooter({ columns, legal, notes, copyright, bottomLinks, soci
   return (
     <footer className={cn("bg-background pt-12 lg:pt-14", className)}>
       <div className="mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2.75)]">
-        <nav className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-[repeat(6,11.25rem)] lg:gap-0">
+        <nav className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-6 lg:gap-x-4 xl:grid-cols-[repeat(6,11.25rem)] xl:gap-0">
           {columns.map((column) => (
             <div key={column.title}>
               <h2 className="text-base leading-6 font-medium text-foreground">{column.title}</h2>
