@@ -1,0 +1,66 @@
+/* Everything here follows the page's own scroll position (scroll(root)) over the first 100px:
+   no JavaScript. Phones: the bar turns translucent. Desktop: the notice slides up out of view
+   and the bar shrinks into a 1280px pill 13px from the top, keeping only the brand mark. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ultrahuman-header-bar {
+      animation: ultrahuman-header-glass linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0px 100px;
+    }
+
+    @media (min-width: 64rem) {
+      .ultrahuman-header-notice {
+        animation: ultrahuman-header-notice linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 100px;
+      }
+      .ultrahuman-header-bar {
+        animation-name: ultrahuman-header-pill;
+      }
+      .ultrahuman-header-word {
+        animation: ultrahuman-header-word linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 60px;
+      }
+    }
+  }
+}
+
+@keyframes ultrahuman-header-glass {
+  to {
+    background-color: color-mix(in oklab, var(--background) 72%, transparent);
+    backdrop-filter: blur(16px);
+  }
+}
+
+@keyframes ultrahuman-header-notice {
+  to { transform: translateY(-100%); }
+}
+
+@keyframes ultrahuman-header-pill {
+  from {
+    max-width: 100%;
+    border-radius: 0;
+  }
+  to {
+    max-width: var(--page-width);
+    border-radius: 999px;
+    padding-inline: 1.5rem 0.75rem;
+    transform: translateY(-1.1875rem);
+    background-color: color-mix(in oklab, var(--background) 80%, transparent);
+    backdrop-filter: blur(16px);
+    box-shadow:
+      0 2px 10px color-mix(in oklab, var(--foreground) 5%, transparent),
+      0 1px 2px color-mix(in oklab, var(--foreground) 4%, transparent);
+  }
+}
+
+@keyframes ultrahuman-header-word {
+  from { max-width: 14rem; }
+  to {
+    opacity: 0;
+    max-width: 0;
+    margin-left: -0.625rem;
+  }
+}
