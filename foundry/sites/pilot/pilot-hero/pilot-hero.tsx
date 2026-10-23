@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ArrowRight, Star } from "lucide-react";
 import { cn } from "@foundry/foundry-utils";
 import { PilotButton } from "@foundry/pilot-button";
+import { PilotLines } from "@foundry/pilot-heading";
 import { PilotPlaceholder } from "@foundry/pilot-placeholder";
 
 export interface PilotHeroLogo {
@@ -71,17 +72,17 @@ export function PilotHero({ rating, title, lede, cta, link, media, logosLabel, l
               </span>
             </p>
           )}
-          <h1 className="font-display text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] whitespace-pre-line lg:text-[3.5rem] lg:leading-[1.12] lg:tracking-[-0.01em]">
-            {title}
+          <h1 className="font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[3.5rem] lg:leading-[1.12] lg:tracking-[-0.01em]">
+            <PilotLines text={title} />
           </h1>
           {lede && <p className="mt-5 max-w-[42rem] text-base leading-[1.6] text-secondary-foreground/90 lg:mx-auto lg:text-xl lg:leading-normal">{lede}</p>}
         </div>
 
-        <div className="mx-auto mt-10 max-w-[50rem] lg:mt-16">
+        <div className="mx-auto mt-10 max-w-[50rem] lg:mt-12">
           {media ?? <PilotPlaceholder tone="on-dark" className="aspect-[342/324] w-full rounded-2xl lg:aspect-[800/389]" />}
         </div>
 
-        <div className="mt-10 flex flex-col items-start gap-6 lg:mt-14 lg:flex-row lg:items-center lg:justify-center lg:gap-8">
+        <div className="mt-10 flex flex-col items-start gap-6 lg:mt-12 lg:flex-row lg:items-center lg:justify-center lg:gap-8">
           <PilotButton href={cta.href} variant="sun" size="lg">
             {cta.label}
           </PilotButton>
@@ -97,10 +98,10 @@ export function PilotHero({ rating, title, lede, cta, link, media, logosLabel, l
         </div>
 
         <div className="mt-16 lg:mt-24">
-          <p className="text-center font-mono text-xs leading-[1.5] tracking-[0.06em] text-secondary-foreground/80 uppercase lg:px-[1.5625rem] lg:text-left">
+          <p className="text-center font-mono text-xs leading-[1.5] tracking-[0.06em] text-secondary-foreground/80 uppercase lg:text-left">
             {logosLabel}
           </p>
-          <ul className="mt-6 flex flex-wrap items-start justify-center gap-x-9 gap-y-5 lg:mt-7 lg:flex-nowrap lg:justify-between lg:px-[1.5625rem]">
+          <ul className="mt-6 flex flex-wrap items-start justify-center gap-x-9 gap-y-5 lg:mt-7 lg:flex-nowrap lg:justify-between">
             {logos.map((l) => {
               const name = <span className={cn("block text-[1.375rem] leading-none whitespace-nowrap", faces[l.face ?? "sans"])}>{l.name}</span>;
               const tag = l.tag && (

@@ -45,7 +45,7 @@ export function PilotFeatures({ title, lede, items, note, className }: PilotFeat
                   flip ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,43rem)]" : "lg:grid-cols-[minmax(0,43rem)_minmax(0,1fr)]",
                 )}
               >
-                <div className={cn("relative aspect-[342/210] overflow-clip rounded-2xl bg-accent lg:aspect-[688/422]", flip && "lg:order-2")}>
+                <div className={cn("relative order-2 aspect-[342/210] overflow-clip rounded-2xl bg-accent lg:aspect-[688/422]", !flip && "lg:order-1")}>
                   <div
                     aria-hidden
                     className="absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-foreground)_28%,transparent)_1px,transparent_1.6px)] bg-[size:1.5625rem_1.5625rem] bg-[position:0.75rem_0.75rem]"
@@ -54,7 +54,7 @@ export function PilotFeatures({ title, lede, items, note, className }: PilotFeat
                     {it.media ?? <PilotPlaceholder tone="screen" className="size-full rounded-sm" />}
                   </div>
                 </div>
-                <div className={cn("text-center lg:max-w-[20rem] lg:text-left", flip && "lg:order-1")}>
+                <div className={cn("order-1 text-center lg:max-w-[20rem] lg:text-left", !flip && "lg:order-2")}>
                   {it.icon && (
                     <div className="mx-auto flex size-20 items-center justify-center text-foreground lg:mx-0 lg:size-32 [&_svg]:size-14 lg:[&_svg]:size-24">
                       {it.icon}

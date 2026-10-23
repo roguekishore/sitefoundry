@@ -91,3 +91,25 @@ No scroll reveals, parallax or smooth scroll in the capture.
   get their own pastel versions. Gold labels and the lime tag use `chart-5` / `chart-4`.
 - **Frame lines** (`lg:border-x`) on every band's page column, as on the original.
 - **Light is the faithful mode**; the dark sibling is a deep aubergine page with the same accents.
+
+## Round 1 (ours vs original)
+
+Motion check: header sticky ✓ (pinned 23 half-screens at 1440, same as original); hover rows
+match (pills, insight rows, logo tags); no reveals in either. Overflow: fits at 360/768/1024 ✓.
+Heights (1440 / 390): header 137/179 vs 137/175 · hero 1124/1225 vs 986/1293 · features
+1975/2060 vs 1955/2044 · ask 768/952 vs 768/1024 · advisors 1405/2313 vs 1349/2469 ·
+scenarios 1480/1988 vs 1505/2251 · cases 1362/1478 vs 1329/1654 · insights 824/1196 vs
+881/1299 · paths 1177/1426 vs 1190/1465 · footer 856/1849 vs 854/2021.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all headings | `\n` desktop breaks also broke phone lines ("advice / for") | Figtree 600 reads a step lighter than Euclid 600 | — | yes: `PilotLines` (desktop-only `<br>`), headings 600→700 |
+| hero | ok (lede kept; A/B variant) | 138px taller: the optional lede; logo row inset 25px too far | — | margins tightened, logo row on the 104px line; lede kept (decision) |
+| features | card came before the copy; original puts icon+title+copy first | ok | — | yes: order swapped on phones |
+| ask | ok | chat window ran past the frame line | crossfade only with frames | yes: frame clips it |
+| advisors | ok | ok | — | — |
+| scenarios | a little shorter (shorter copy) | ok | — | — |
+| cases | ok | card title wrapped (24rem cap); photo placeholder too light vs violet-washed photo | arrows step one card ✓ | yes |
+| insights | ok | rows 146px vs 155–175 | row hover ✓ | yes: py-7, link mt-6 |
+| paths | explore art a hard-edged rectangle | same | — | yes: radial wash |
+| footer | shorter (fewer long links) | column at x=180 vs 156; titles lighter | — | yes |

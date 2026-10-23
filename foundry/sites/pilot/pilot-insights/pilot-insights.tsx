@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { cn } from "@foundry/foundry-utils";
+import { PilotLines } from "@foundry/pilot-heading";
 
 export interface PilotInsight {
   /** a line icon or small illustration (about 60px) */
@@ -33,7 +34,9 @@ export function PilotInsights({ title, lede, items, className }: PilotInsightsPr
     <section className={cn("bg-background text-foreground", className)}>
       <div className="mx-auto grid max-w-page border-border pt-16 pb-16 lg:grid-cols-2 lg:border-x lg:py-0">
         <div className="px-gutter lg:px-[1.5625rem] lg:pt-[7.5rem] lg:pb-[7.5rem]">
-          <h2 className="font-display text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] whitespace-pre-line lg:text-[2.5rem]">{title}</h2>
+          <h2 className="font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]">
+            <PilotLines text={title} />
+          </h2>
           {lede && <p className="mt-5 max-w-[28rem] text-base leading-[1.6] lg:mt-8 lg:text-xl lg:leading-normal">{lede}</p>}
         </div>
 
@@ -44,13 +47,13 @@ export function PilotInsights({ title, lede, items, className }: PilotInsightsPr
               <li key={it.title}>
                 <a
                   href={it.href}
-                  className="group flex gap-6 px-5 py-6 transition-colors duration-200 ease-in-out hover:bg-muted motion-reduce:transition-none lg:gap-8 lg:px-8"
+                  className="group flex gap-6 px-5 py-7 transition-colors duration-200 ease-in-out hover:bg-muted motion-reduce:transition-none lg:gap-8 lg:px-8"
                 >
                   {it.icon && <span className="flex size-16 shrink-0 items-start justify-center pt-1 text-foreground [&_svg]:size-14">{it.icon}</span>}
                   <span className="block min-w-0">
                     <span className="block font-display text-2xl leading-[1.2] font-medium">{it.title}</span>
                     <span className="mt-1.5 block max-w-[28rem] text-sm leading-[1.5] tracking-[0.01em] text-muted-foreground">{it.text}</span>
-                    <span className="mt-5 inline-block font-mono text-base leading-none text-primary uppercase underline underline-offset-[3px]">{it.cta}</span>
+                    <span className="mt-6 inline-block font-mono text-base leading-none text-primary uppercase underline underline-offset-[3px]">{it.cta}</span>
                   </span>
                 </a>
               </li>

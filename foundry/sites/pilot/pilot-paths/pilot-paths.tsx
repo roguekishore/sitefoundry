@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@foundry/foundry-utils";
 import { PilotBrushNote } from "@foundry/pilot-brush-note";
 import { PilotButton } from "@foundry/pilot-button";
+import { PilotLines } from "@foundry/pilot-heading";
 import { PilotPlaceholder } from "@foundry/pilot-placeholder";
 
 /** a run of text, or an inline link */
@@ -29,8 +30,8 @@ export function PilotPaths({ title, main, explore, begin, note, className }: Pil
   return (
     <section className={cn("bg-primary text-primary-foreground", className)}>
       <div className="mx-auto max-w-page border-primary-foreground/15 pt-16 pb-16 lg:border-x lg:pt-[7.5rem] lg:pb-28">
-        <h2 className="mx-auto max-w-[40rem] px-gutter text-center font-display text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] whitespace-pre-line lg:text-[2.5rem]">
-          {title}
+        <h2 className="mx-auto max-w-[40rem] px-gutter text-center font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]">
+          <PilotLines text={title} />
         </h2>
 
         <div className="mx-gutter mt-14 grid lg:mx-0 lg:mt-20 lg:grid-cols-2">
@@ -53,7 +54,7 @@ export function PilotPaths({ title, main, explore, begin, note, className }: Pil
           <div className="flex flex-col">
             <div className="relative flex-1 overflow-clip bg-secondary p-6 text-secondary-foreground lg:min-h-[23.125rem] lg:p-10">
               <div className="absolute right-0 bottom-0 aspect-[345/190] w-[70%] lg:w-[54%]">
-                {explore.art ?? <div aria-hidden className="size-full bg-linear-to-tl from-glow/50 via-glow/15 to-transparent" />}
+                {explore.art ?? <div aria-hidden className="size-full bg-radial-[at_100%_100%] from-glow/45 via-glow/10 via-55% to-transparent to-75%" />}
               </div>
               <div className="relative">
                 <h3 className="font-display text-2xl leading-[1.2] font-medium lg:text-[2rem]">{explore.title}</h3>

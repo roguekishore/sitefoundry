@@ -48,7 +48,7 @@ function LinkList({ links }: { links: PilotFooterLink[] }) {
 export function PilotFooter({ brand, email, groups, copyright, legal, disclaimer, className }: PilotFooterProps) {
   return (
     <footer className={cn("bg-background text-foreground", className)}>
-      <div className="mx-auto max-w-[70.5rem] px-5 pt-14 pb-12 lg:px-gutter lg:pt-20">
+      <div className="mx-auto max-w-[73.5rem] px-5 pt-14 pb-12 lg:px-gutter lg:pt-20">
         <div className="flex items-center justify-between gap-6">
           <a href={brand.href} className="font-display text-[1.875rem] leading-none font-medium tracking-[-0.04em] text-foreground/90 lowercase">
             {brand.name}
@@ -64,7 +64,7 @@ export function PilotFooter({ brand, email, groups, copyright, legal, disclaimer
             return g.columns === 2 ? (
               <div key={g.title} className="col-span-2 grid grid-cols-2 gap-x-6 lg:gap-x-10">
                 <div>
-                  <h3 className="text-xl leading-[1.3] font-semibold text-foreground/90">{g.title}</h3>
+                  <h3 className="text-xl leading-[1.3] font-bold text-foreground/90">{g.title}</h3>
                   <LinkList links={g.links.slice(0, half)} />
                 </div>
                 <div className="pt-[1.625rem]">
@@ -73,7 +73,7 @@ export function PilotFooter({ brand, email, groups, copyright, legal, disclaimer
               </div>
             ) : (
               <div key={g.title}>
-                <h3 className="text-xl leading-[1.3] font-semibold text-foreground/90">{g.title}</h3>
+                <h3 className="text-xl leading-[1.3] font-bold text-foreground/90">{g.title}</h3>
                 <LinkList links={g.links} />
               </div>
             );
