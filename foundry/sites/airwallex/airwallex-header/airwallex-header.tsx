@@ -93,9 +93,9 @@ export function AirwallexHeader({
         </>
       )}
       <div className="relative bg-background">
-        <div className="mx-auto flex h-14 max-w-page items-center gap-12 px-gutter lg:h-20 lg:px-12">
+        <div className="mx-auto flex h-14 max-w-page items-center gap-12 px-gutter lg:h-20 lg:gap-10 lg:px-12 xl:gap-12">
           <AirwallexWordmark name={wordmark} mark={mark} href={homeHref} />
-          <nav className="hidden items-center gap-12 lg:flex">
+          <nav className="hidden items-center gap-8 lg:flex xl:gap-12">
             {links.map((link) => (
               <a key={link.label} href={link.href} className={linkClass}>
                 {link.label}
@@ -104,7 +104,7 @@ export function AirwallexHeader({
           </nav>
           <div className="ml-auto flex items-center gap-4 lg:gap-2">
             {language && (
-              <span className="mr-6 hidden items-center gap-2 text-base font-semibold text-foreground/75 lg:flex">
+              <span className="mr-6 hidden items-center gap-2 text-base font-semibold text-foreground/75 xl:flex">
                 <span className="grid h-5 w-7 place-items-center rounded-sm bg-chart-5 text-card">
                   <Globe aria-hidden className="size-3.5" strokeWidth={2.25} />
                 </span>
@@ -112,7 +112,7 @@ export function AirwallexHeader({
               </span>
             )}
             {login && (
-              <AirwallexButton href={login.href} variant="text" className="mr-4 hidden lg:inline-flex">
+              <AirwallexButton href={login.href} variant="text" className="mr-4 hidden xl:inline-flex">
                 {login.label}
               </AirwallexButton>
             )}

@@ -28,7 +28,7 @@ export interface AirwallexNetworkProps {
 export function AirwallexNetwork({ title, body, stats, media, className }: AirwallexNetworkProps) {
   return (
     <section className={cn("relative overflow-clip bg-background text-foreground", className)}>
-      <div aria-hidden className="absolute top-[-6rem] left-[calc(50%+11rem)] hidden w-[44rem] lg:block">
+      <div aria-hidden className="absolute top-0 left-[calc(50%+11.5rem)] hidden w-[50rem] lg:block">
         {media ?? <AirwallexPlaceholder className="aspect-square w-full rounded-full" />}
       </div>
       <div className="relative mx-auto max-w-[76rem] px-gutter pt-[5.5rem] pb-20 lg:px-12 lg:pt-[7.5rem] lg:pb-32">
@@ -40,7 +40,7 @@ export function AirwallexNetwork({ title, body, stats, media, className }: Airwa
           {stats.map((s) => (
             <li key={s.label}>
               <p className={cn("w-fit font-display text-2xl leading-[1.25] font-bold lg:text-[2.5rem]", gradientTextClass(s.tone))}>{s.value}</p>
-              <p className="mt-3 max-w-[15rem] text-sm leading-6 font-semibold text-foreground/80 lg:mt-4 lg:text-base">{s.label}</p>
+              <p className="mt-3 max-w-[15rem] text-sm leading-6 font-semibold text-foreground/80 lg:text-[0.9375rem]">{s.label}</p>
             </li>
           ))}
         </ul>

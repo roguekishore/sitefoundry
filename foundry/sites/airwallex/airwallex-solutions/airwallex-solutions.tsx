@@ -48,7 +48,7 @@ export function AirwallexSolutions({ eyebrow, title, intro, items, className }: 
                 href={item.href}
                 aria-label={item.linkLabel}
                 className={cn(
-                  "group flex h-[19.5rem] flex-col items-center overflow-clip rounded-[1rem] px-6 pt-11 text-center text-primary-foreground lg:h-[22.25rem] lg:px-4 lg:pt-10",
+                  "group flex h-[21rem] flex-col items-center overflow-clip rounded-[1rem] px-6 pt-11 text-center text-primary-foreground lg:h-[22.25rem] lg:px-4 lg:pt-10",
                   "transition-[scale,box-shadow] duration-300 ease-out hover:scale-[1.01] hover:shadow-[0_2px_12px_0_color-mix(in_oklab,var(--foreground)_12%,transparent)] motion-reduce:transition-none",
                   gradientClass(item.tone),
                 )}
