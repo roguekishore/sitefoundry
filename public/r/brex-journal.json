@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Brex journal carousel",
+  "description": "A centred 48px headline over a horizontal carousel of article cards that bleeds off the right edge: a small-radius image, a 24px title and a short description per card. Two round grey arrow buttons below scroll one card at a time; the previous arrow fades at the start.",
+  "category": "gallery",
+  "site": "brex",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "articles",
+    "blog",
+    "scroll-snap",
+    "light",
+    "fintech"
+  ],
+  "notes": [
+    "media slots: one 316×178 image per article",
+    "cards are 316px wide (246px on phones) with an 80px gap (24px on phones)",
+    "scrolling is native with scroll-snap; the arrows call scrollBy"
+  ],
+  "hydrate": "visible",
+  "entry": "brex-journal.tsx",
+  "source": "foundry",
+  "name": "brex-journal",
+  "files": [
+    {
+      "path": "brex-journal.tsx",
+      "content": "import { useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BrexHeading } from \"@foundry/brex-heading\";\nimport { BrexPlaceholder } from \"@foundry/brex-placeholder\";\n\nexport interface BrexArticle {\n  title: string;\n  /** one to three short lines */\n  text: string;\n  href: string;\n  /** the picture. A placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface BrexJournalProps {\n  title: string;\n  articles: BrexArticle[];\n  /** screen-reader labels for the two arrow buttons */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** Article carousel with native scroll-snap and two arrow buttons. */\nexport function BrexJournal({ title, articles, prevLabel, nextLabel, className }: BrexJournalProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [edge, setEdge] = useState({ start: true, end: false });\n\n  const measure = useCallback(() => {\n    const el = track.current;\n    if (!el) return;\n    setEdge({ start: el.scrollLeft <= 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 });\n  }, []);\n\n  useEffect(() => {\n    measure();\n    window.addEventListener(\"resize\", measure);\n    return () => window.removeEventListener(\"resize\", measure);\n  }, [measure]);\n\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.querySelector(\"li\");\n    if (!el || !card) return;\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const calm = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: calm ? \"auto\" : \"smooth\" });\n  };\n\n  const arrow =\n    \"flex size-[3.125rem] items-center justify-center rounded-full bg-muted text-foreground transition-opacity duration-150 ease-linear hover:bg-accent disabled:pointer-events-none disabled:text-muted-foreground disabled:opacity-60 motion-reduce:transition-none\";\n\n  return (\n    <section className={cn(\"bg-background pt-16 pb-14 lg:pt-20 lg:pb-20\", className)}>\n      <BrexHeading title={title} className=\"max-w-[40rem] px-gutter lg:max-w-[56rem]\" />\n      <ul\n        ref={track}\n        onScroll={measure}\n        className=\"mt-16 flex snap-x snap-mandatory scroll-px-gutter gap-6 overflow-x-auto px-gutter [scrollbar-width:none] lg:mt-20 lg:scroll-px-[calc(var(--page-gutter)*3)] lg:gap-20 lg:px-[calc(var(--page-gutter)*3)] [&::-webkit-scrollbar]:hidden\"\n      >\n        {articles.map((a) => (\n          <li key={a.title} className=\"w-[15.375rem] shrink-0 snap-start lg:w-[19.75rem]\">\n            <a href={a.href} className=\"group block\">\n              {a.media ?? <BrexPlaceholder tone=\"photo\" className=\"aspect-[316/178] w-full rounded-[calc(var(--radius)-6px)]\" />}\n              <h3 className=\"mt-6 font-display text-2xl/[1.8125rem] font-medium tracking-[-0.02em] text-foreground\">{a.title}</h3>\n              <p className=\"mt-3 text-sm/[1.3125rem] text-foreground\">{a.text}</p>\n            </a>\n          </li>\n        ))}\n      </ul>\n      <div className=\"mt-14 flex justify-center gap-6 px-gutter lg:mt-20 lg:justify-start lg:px-[calc(var(--page-gutter)*3)]\">\n        <button type=\"button\" aria-label={prevLabel} disabled={edge.start} onClick={() => step(-1)} className={arrow}>\n          <ArrowLeft aria-hidden className=\"size-4\" strokeWidth={1.75} />\n        </button>\n        <button type=\"button\" aria-label={nextLabel} disabled={edge.end} onClick={() => step(1)} className={arrow}>\n          <ArrowRight aria-hidden className=\"size-4\" strokeWidth={1.75} />\n        </button>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "brex-heading",
+    "brex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "articles",
+      "type": "BrexArticle[]",
+      "required": true
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the two arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e940b433ebb3fc1afe8a6c9e951b245a6d59d65875051ec8f162b5d297384d38"
+}

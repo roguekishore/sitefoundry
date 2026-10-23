@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Brex footer",
+  "description": "A near-black footer: wordmark and four link columns (a five-column grid on desktop, 2×2 on phones) with white 14px headings and grey 16px links, a row of social icons beside two store pills, then long 12px legal text with a hanging footnote marker.",
+  "category": "footer",
+  "site": "brex",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "legal",
+    "fintech"
+  ],
+  "notes": [
+    "forces the theme's dark colours with the dark class, so it stays dark in a light theme",
+    "social icons are nodes you pass in",
+    "store badges become outlined text pills"
+  ],
+  "entry": "brex-footer.tsx",
+  "source": "foundry",
+  "name": "brex-footer",
+  "files": [
+    {
+      "path": "brex-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface BrexFooterColumn {\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface BrexFooterProps {\n  /** the wordmark: a name with an optional small icon before it */\n  brand: { name: string; href: string; icon?: ReactNode };\n  /** four link columns */\n  columns: BrexFooterColumn[];\n  /** social links: an icon node plus the accessible name */\n  social: { label: string; href: string; icon: ReactNode }[];\n  /** app store pills, as text */\n  stores: { label: string; href: string }[];\n  /** the dagger footnote paragraphs (the first gets the marker) */\n  footnotes: string[];\n  /** the marker for the footnotes, e.g. a dagger */\n  footnoteMarker: string;\n  /** the remaining legal paragraphs */\n  legal: string[];\n  className?: string;\n}\n\n/** Brex's dark link footer with long legal text. */\nexport function BrexFooter({ brand, columns, social, stores, footnotes, footnoteMarker, legal, className }: BrexFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-20 pb-20 lg:px-[calc(var(--page-gutter)*3)] lg:pt-40 lg:pb-40\">\n        <div className=\"grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-5 lg:gap-x-0 lg:gap-y-0\">\n          <a href={brand.href} className=\"col-span-2 mb-0 flex items-center gap-1.5 self-start font-display text-2xl/none font-semibold tracking-[-0.04em] lg:col-span-1 [&_svg]:size-5\">\n            {brand.icon}\n            {brand.name}\n          </a>\n          {columns.map((c) => (\n            <nav key={c.title} aria-label={c.title}>\n              <h2 className=\"text-sm/5 font-semibold text-foreground\">{c.title}</h2>\n              <ul className=\"mt-2.5 space-y-2\">\n                {c.links.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className=\"text-base/6 text-muted-foreground transition-opacity duration-150 ease-linear hover:opacity-80 motion-reduce:transition-none\">\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </nav>\n          ))}\n        </div>\n\n        <div className=\"mt-20 grid grid-cols-2 gap-x-6 gap-y-3 lg:mt-28 lg:flex lg:items-center lg:gap-x-36\">\n          <ul className=\"flex items-center gap-3 self-start text-muted-foreground lg:gap-5 lg:self-auto [&_svg]:size-5\">\n            {social.map((s) => (\n              <li key={s.label}>\n                <a href={s.href} aria-label={s.label} className=\"block transition-opacity duration-150 ease-linear hover:opacity-80 motion-reduce:transition-none\">\n                  {s.icon}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <ul className=\"flex flex-col items-start gap-3 lg:flex-row lg:gap-6\">\n            {stores.map((s) => (\n              <li key={s.label}>\n                <a href={s.href} className=\"flex h-6 items-center rounded-[5px] border border-foreground/60 px-3 text-[0.625rem] leading-none font-medium text-foreground transition-opacity duration-150 ease-linear hover:opacity-80 motion-reduce:transition-none\">\n                  {s.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"mt-36 space-y-2 text-xs/4 text-foreground/85 lg:mt-60\">\n          <div className=\"space-y-2 pl-3.5\">\n            {footnotes.map((p, i) => (\n              <p key={i} className=\"relative\">\n                {i === 0 && <span aria-hidden className=\"absolute -left-3.5 text-[0.5rem]\">{footnoteMarker}</span>}\n                {p}\n              </p>\n            ))}\n          </div>\n          {legal.map((p, i) => (\n            <p key={i} className=\"lg:py-0.5\">\n              {p}\n            </p>\n          ))}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the wordmark: a name with an optional small icon before it"
+    },
+    {
+      "name": "columns",
+      "type": "BrexFooterColumn[]",
+      "required": true,
+      "description": "four link columns"
+    },
+    {
+      "name": "social",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links: an icon node plus the accessible name"
+    },
+    {
+      "name": "stores",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "app store pills, as text"
+    },
+    {
+      "name": "footnotes",
+      "type": "string[]",
+      "required": true,
+      "description": "the dagger footnote paragraphs (the first gets the marker)"
+    },
+    {
+      "name": "footnoteMarker",
+      "type": "string",
+      "required": true,
+      "description": "the marker for the footnotes, e.g. a dagger"
+    },
+    {
+      "name": "legal",
+      "type": "string[]",
+      "required": true,
+      "description": "the remaining legal paragraphs"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dd9c18dec643f666f18058d5bd6e5b8701a5d72caa38b461ae2b06f77702d232"
+}
