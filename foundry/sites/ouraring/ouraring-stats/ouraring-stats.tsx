@@ -26,7 +26,7 @@ export function OuraringStats({ title, footnote, lede, note, cta, media, classNa
     <section className={cn("overflow-x-clip bg-background text-foreground", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter pt-[60px] pb-[60px] text-center lg:pt-[72px] lg:pb-[80px]">
         <OuraringReveal>
-          <h2 className="font-display text-[56px] leading-[1.1] font-normal tracking-[-0.03em] lg:text-[68px]">
+          <h2 className="font-display text-[56px] leading-[1.1] font-normal tracking-[-0.005em] lg:text-[68px]">
             {lines.map((line, i) => (
               <span key={i}>
                 {i > 0 && <br className="max-lg:hidden" />}
@@ -37,7 +37,7 @@ export function OuraringStats({ title, footnote, lede, note, cta, media, classNa
             {footnote && <sup className="ml-1 align-super font-sans text-[14px] tracking-normal">{footnote}</sup>}
           </h2>
         </OuraringReveal>
-        <OuraringReveal step={1} as="p" className="mt-8 max-w-[46rem] text-[24px] leading-[1.25] tracking-[-0.025em] lg:mt-[34px]">
+        <OuraringReveal step={1} as="p" className="mt-8 max-w-[46rem] text-[24px] leading-[1.25] tracking-[-0.045em] lg:mt-[34px]">
           {lede}
         </OuraringReveal>
         {note && (

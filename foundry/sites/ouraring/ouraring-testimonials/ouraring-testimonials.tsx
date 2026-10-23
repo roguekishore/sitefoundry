@@ -32,7 +32,7 @@ export function OuraringTestimonials({ stories, className }: OuraringTestimonial
             <span aria-hidden className="mt-6 font-display text-[14px] leading-none lg:mt-11">
               “
             </span>
-            <blockquote className="mt-3 font-display text-[18px] leading-[1.25] tracking-[-0.01em] lg:text-[24px]">{s.quote}</blockquote>
+            <blockquote className="mt-3 font-display text-[19px] leading-[1.2] lg:text-[25px]">{s.quote}</blockquote>
             <div className="mt-6 flex items-center gap-4 lg:mt-auto lg:pt-6">
               <OuraringMedia media={s.avatar} className="size-8 shrink-0 overflow-clip rounded-full lg:size-[60px]" />
               <span className="text-[16px] font-semibold lg:text-[20px]">{s.name}</span>

@@ -103,7 +103,7 @@ export function OuraringNews({ eyebrow, featured, items, footnotes, className }:
 
       {footnotes && footnotes.length > 0 && (
         <div className="mx-auto max-w-page px-gutter pb-14">
-          <div className="flex flex-col gap-1.5 border-t border-border pt-7 text-[14px] leading-[1.5] tracking-[0.01em] [&_sup]:mr-1">
+          <div className="mt-0 flex flex-col gap-1.5 border-t border-border pt-7 lg:mt-16 text-[14px] leading-[1.5] tracking-[0.01em] [&_sup]:mr-1">
             {footnotes.map((f, i) => (
               <p key={i}>{f}</p>
             ))}

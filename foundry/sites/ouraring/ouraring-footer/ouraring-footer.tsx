@@ -68,7 +68,7 @@ export function OuraringFooter({ logo, payments, newsletter, columns, legal, cop
     >
       <div className="mx-auto max-w-page px-gutter pb-16 lg:pb-[70px]">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
-          <span className="text-[56px] leading-[0.85] font-light tracking-[0.04em] text-muted-foreground uppercase">{logo}</span>
+          <span className="text-[46px] leading-[0.85] font-light tracking-[0.04em] text-muted-foreground uppercase">{logo}</span>
           {payments && (
             <div className={cn("grid lg:flex lg:gap-2", rotate && "ouraring-footer-pay")}>
               {payments.map((group, g) => (
@@ -92,7 +92,7 @@ export function OuraringFooter({ logo, payments, newsletter, columns, legal, cop
 
         <div className="mt-11 flex flex-col gap-14 lg:mt-[70px] lg:grid lg:grid-cols-[432px_1fr] lg:gap-0">
           <div className="order-2 lg:order-1">
-            <p className="max-w-[22rem] font-display text-[32px] leading-[1.15] tracking-[-0.02em] text-muted-foreground lg:text-[40px] lg:leading-[1.25]">
+            <p className="max-w-[22rem] font-display text-[32px] leading-[1.15] text-muted-foreground lg:text-[40px] lg:leading-[1.25]">
               {newsletter.title}
             </p>
             <form action={newsletter.action} className="mt-14 flex h-10 w-full items-center rounded-md bg-secondary/70 pr-3 pl-5 lg:mt-[60px] lg:w-[320px]">
@@ -131,7 +131,7 @@ export function OuraringFooter({ logo, payments, newsletter, columns, legal, cop
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-border pt-7 lg:mt-[90px] lg:flex-row lg:items-start lg:justify-between">
+        <div className="mt-14 flex flex-col gap-6 border-t border-border pt-7 lg:mt-[56px] lg:flex-row lg:items-start lg:justify-between">
           <div>
             <ul className="flex flex-wrap gap-x-4 gap-y-2 text-[12px] leading-[1.5] tracking-[0.02em] text-muted-foreground">
               {legal.map((link, i) => (

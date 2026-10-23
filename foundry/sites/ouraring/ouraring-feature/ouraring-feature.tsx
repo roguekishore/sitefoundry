@@ -27,8 +27,8 @@ export function OuraringFeature({ eyebrow, title, body, cta, media, className }:
         </OuraringReveal>
         <OuraringReveal className="mt-16 px-gutter lg:mt-0 lg:flex-1 lg:pr-[60px] lg:pl-[max(var(--page-gutter),calc((100vw-var(--page-width))/2+var(--page-gutter)))]">
           {eyebrow && <p className="text-[16px] leading-[1.5] font-bold tracking-[0.08em] uppercase">{eyebrow}</p>}
-          <h2 className="mt-5 font-display text-[40px] leading-[1.1] font-normal tracking-[-0.02em] lg:mt-8 lg:text-[56px]">{title}</h2>
-          <p className="mt-3 max-w-[30rem] text-[19px] leading-[30px] tracking-[0.02em] hyphens-auto lg:text-[20px] lg:hyphens-none">{body}</p>
+          <h2 className="mt-5 font-display text-[40px] leading-[1.1] font-normal lg:mt-8 lg:text-[56px]">{title}</h2>
+          <p className="mt-3 max-w-[30rem] text-[19px] leading-[30px] tracking-[0.005em] hyphens-auto lg:text-[20px] lg:hyphens-none">{body}</p>
           {cta && (
             <OuraringButton href={cta.href} className="mt-8 lg:mt-11">
               {cta.label}

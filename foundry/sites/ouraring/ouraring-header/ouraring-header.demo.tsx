@@ -4,7 +4,7 @@ import { OuraringHeader, type OuraringHeaderProps } from "./ouraring-header";
 export const headerSample: OuraringHeaderProps = {
   announcement: (
     <>
-      Tessel Loop now ships to Portugal from <a href="#">Lisbon Supply</a> and <a href="#">Northmart</a>.
+      Find Tessel Loop at <a href="#">Lisbon Supply</a> and <a href="#">Northmart</a>.
     </>
   ),
   logo: "Tessel",
