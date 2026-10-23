@@ -1,0 +1,35 @@
+/* Two rows of names slide sideways as the section passes through the window: the first to the
+   left, the second to the right. Browsers without scroll-driven animation leave them in place. */
+.functionhealth-conditions-track {
+  --shift: 600px;
+}
+@media (min-width: 1024px) {
+  .functionhealth-conditions-track {
+    --shift: 1100px;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .functionhealth-conditions-track {
+      animation: functionhealth-conditions-left linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+    .functionhealth-conditions-track[data-dir="right"] {
+      animation-name: functionhealth-conditions-right;
+    }
+    [data-paused="true"] .functionhealth-conditions-track {
+      animation-play-state: paused;
+    }
+  }
+}
+
+@keyframes functionhealth-conditions-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(var(--shift) * -1)); }
+}
+@keyframes functionhealth-conditions-right {
+  from { transform: translateX(calc(var(--shift) * -1)); }
+  to { transform: translateX(0); }
+}

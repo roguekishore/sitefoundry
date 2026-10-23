@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Function Health pause-motion control",
+  "description": "A tiny mono-caps control with two pause bars and a label, which switches an animation off and on. Comes with a hook that holds the paused state and the data attribute that the CSS reads.",
+  "category": "button",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "pause",
+    "accessibility",
+    "mono",
+    "minimal"
+  ],
+  "notes": [
+    "blocks put data-paused on their root from usePauseMotion(); their CSS pauses on [data-paused=true]"
+  ],
+  "entry": "functionhealth-pause-motion.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "functionhealth-pause-motion",
+  "files": [
+    {
+      "path": "functionhealth-pause-motion.tsx",
+      "content": "import { useState } from \"react\";\nimport { Pause, Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\n/** Holds the paused state; spread `rootProps` on the element that contains the animation. */\nexport function usePauseMotion() {\n  const [paused, setPaused] = useState(false);\n  return { paused, toggle: () => setPaused((p) => !p), rootProps: { \"data-paused\": paused } as const };\n}\n\nexport interface FunctionhealthPauseMotionProps {\n  paused: boolean;\n  onToggle: () => void;\n  /** label while moving, e.g. \"Pause motion\" */\n  pauseLabel: string;\n  /** label while paused, e.g. \"Play motion\" */\n  playLabel: string;\n  className?: string;\n}\n\nexport function FunctionhealthPauseMotion({ paused, onToggle, pauseLabel, playLabel, className }: FunctionhealthPauseMotionProps) {\n  const Icon = paused ? Play : Pause;\n  return (\n    <button\n      type=\"button\"\n      onClick={onToggle}\n      aria-pressed={paused}\n      className={cn(\n        \"inline-flex items-center gap-2 font-mono text-[0.725rem] leading-none tracking-[0.1em] text-foreground uppercase\",\n        \"transition-colors duration-150 hover:text-primary motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring\",\n        className,\n      )}\n    >\n      <Icon className=\"size-3 fill-current\" aria-hidden />\n      {paused ? playLabel : pauseLabel}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "paused",
+      "type": "boolean",
+      "required": true
+    },
+    {
+      "name": "onToggle",
+      "type": "() => void",
+      "required": true
+    },
+    {
+      "name": "pauseLabel",
+      "type": "string",
+      "required": true,
+      "description": "label while moving, e.g. \"Pause motion\""
+    },
+    {
+      "name": "playLabel",
+      "type": "string",
+      "required": true,
+      "description": "label while paused, e.g. \"Play motion\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ae0659b178eb801056bdecff32b2babdaba4da6bed3a356a659295916387788a"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health biomarker grid",
+  "description": "A serif heading, a small expert quote with a round avatar, then a hairline-divided grid of test categories (big light serif name, terracotta tube-icon count, a list of tests fading out at the end) with a cream 'more' tile as the last cell. Under it a rule and a 'take your results anywhere' row: serif line on the left, a hub tile and four soft destination tiles on the right.",
+  "category": "features",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "grid",
+    "hairline",
+    "list",
+    "quote",
+    "editorial",
+    "warm",
+    "serif",
+    "fade"
+  ],
+  "notes": [
+    "3 columns on desktop, 2 on phones; the last list item of each cell fades out",
+    "the hub tile and avatar are media slots"
+  ],
+  "entry": "functionhealth-biomarkers.tsx",
+  "source": "foundry",
+  "name": "functionhealth-biomarkers",
+  "files": [
+    {
+      "path": "functionhealth-biomarkers.css",
+      "content": "/* The tail of every list melts away; only transparency matters in a mask. */\n.functionhealth-biomarkers-list {\n  mask-image: linear-gradient(to bottom, var(--foreground) 62%, transparent 100%);\n}\n"
+    },
+    {
+      "path": "functionhealth-biomarkers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { TestTubes } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthButton } from \"@foundry/functionhealth-button\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\nimport { FunctionhealthMedia } from \"@foundry/functionhealth-media\";\nimport \"./functionhealth-biomarkers.css\";\n\nexport interface FunctionhealthCategory {\n  /** category name, set large in serif */\n  title: string;\n  /** e.g. \"16 markers\" */\n  count: string;\n  /** test names; the last one fades out */\n  items: string[];\n}\n\nexport interface FunctionhealthBiomarkersProps {\n  title: HeadingPart[];\n  /** the expert's quote, avatar (media slot), name and role */\n  quote: { text: string; name: string; role: string; avatar?: ReactNode };\n  /** category cells, in reading order; the \"more\" tile follows the last one */\n  categories: FunctionhealthCategory[];\n  /** the last, cream tile */\n  more: { kicker: string; title: string; cta: { label: string; href: string } };\n  /** the row under the grid */\n  share: {\n    title: HeadingPart[];\n    text: string;\n    /** brand mark for the small hub tile */\n    hub?: ReactNode;\n    /** destination tiles, each with an optional icon */\n    targets: { label: string; icon?: ReactNode }[];\n  };\n  className?: string;\n}\n\nexport function FunctionhealthBiomarkers({ title, quote, categories, more, share, className }: FunctionhealthBiomarkersProps) {\n  return (\n    <section id=\"what-we-test\" className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} />\n        <figure className=\"mx-auto mt-10 flex max-w-[44rem] flex-col gap-5 px-3 text-base leading-snug font-light lg:mt-12 lg:flex-row lg:items-center lg:justify-center lg:gap-12 lg:px-0\">\n          <blockquote className=\"lg:max-w-[22rem]\">{quote.text}</blockquote>\n          <figcaption className=\"flex items-center gap-3\">\n            <FunctionhealthMedia media={quote.avatar} ratio=\"size-[2.875rem] shrink-0\" rounded=\"rounded-full\" />\n            <span className=\"block text-sm leading-snug font-light\">\n              <span className=\"block font-semibold\">{quote.name}</span>\n              {quote.role}\n            </span>\n          </figcaption>\n        </figure>\n\n        <ul className=\"mt-12 grid grid-cols-2 lg:mt-[5rem] lg:grid-cols-3\">\n          {categories.map((c, i) => (\n            <li\n              key={c.title}\n              className={cn(\n                \"min-w-0 border-border pt-6 pb-10 pl-4 lg:pb-[5.5rem] lg:pl-8\",\n                i % 2 === 0 ? \"pl-0 pr-4 lg:pr-8\" : \"border-l pr-0\",\n                \"lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(3n+1)]:pl-0 lg:[&:nth-child(3n+2)]:border-l lg:[&:nth-child(3n+2)]:pl-8 lg:[&:nth-child(3n)]:border-l lg:[&:nth-child(3n)]:pl-8\",\n                i >= 2 && \"border-t lg:border-t-0\",\n                i >= 3 && \"lg:border-t\",\n              )}\n            >\n              <h3 className=\"max-w-[6.4em] font-display text-[clamp(1.5rem,1.52vw+1.13rem,2.5rem)] leading-[1.03] font-light\">{c.title}</h3>\n              <p className=\"mt-4 flex items-center gap-2 text-sm leading-none font-semibold text-primary lg:font-light\">\n                <TestTubes className=\"size-4\" strokeWidth={2} />\n                {c.count}\n              </p>\n              <ul className=\"functionhealth-biomarkers-list mt-8 space-y-1 text-base leading-[1.5] font-light text-muted-foreground lg:text-[1.0625rem]\">\n                {c.items.map((it) => (\n                  <li key={it}>{it}</li>\n                ))}\n              </ul>\n            </li>\n          ))}\n          <li className={cn(\"flex min-h-[26rem] min-w-0 flex-col bg-card px-4 pt-6 pb-10 lg:min-h-0 lg:px-8 lg:pb-12\")}>\n            <p className=\"font-display text-[1.75rem] leading-none font-light text-primary italic lg:text-[2.5rem]\">{more.kicker}</p>\n            <p className=\"mt-6 max-w-[5.5em] font-display text-[1.75rem] leading-[1.1] font-light text-primary italic lg:mt-12 lg:text-[2.5rem]\">{more.title}</p>\n            <FunctionhealthButton href={more.cta.href} variant=\"outline\" className=\"mt-auto self-start\">\n              {more.cta.label}\n            </FunctionhealthButton>\n          </li>\n        </ul>\n\n        <div className=\"mt-10 flex flex-col items-center gap-6 border-t border-border pt-10 text-center lg:flex-row lg:justify-between lg:gap-10 lg:text-start\">\n          <div>\n            <FunctionhealthHeading title={share.title} align=\"start\" className=\"text-center lg:text-start [&_h2]:text-[1.75rem] [&_h2]:tracking-normal [&_h2]:leading-tight lg:[&_h2]:text-[1.875rem]\" />\n            <p className=\"mt-2 text-sm leading-snug font-light\">{share.text}</p>\n          </div>\n          <div className=\"flex items-center gap-3 lg:gap-0\">\n            <div className=\"hidden items-center lg:flex\">\n              <FunctionhealthMedia media={share.hub} ratio=\"size-[3.25rem]\" rounded=\"rounded-md\" className=\"bg-background\" />\n              <span aria-hidden className=\"mx-4 w-8 border-t border-dotted border-border\" />\n            </div>\n            <ul className=\"grid w-full grid-cols-2 gap-3 lg:flex lg:w-auto lg:gap-3\">\n              {share.targets.map((t) => (\n                <li key={t.label} className=\"flex h-14 items-center justify-center gap-2 rounded-md bg-card px-5 text-base font-semibold whitespace-nowrap lg:px-6\">\n                  {t.icon}\n                  {t.label}\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-button",
+    "functionhealth-heading",
+    "functionhealth-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "quote",
+      "type": "{ text: string; name: string; role: string; avatar?: ReactNode; }",
+      "required": true,
+      "description": "the expert's quote, avatar (media slot), name and role"
+    },
+    {
+      "name": "categories",
+      "type": "FunctionhealthCategory[]",
+      "required": true,
+      "description": "category cells, in reading order; the \"more\" tile follows the last one"
+    },
+    {
+      "name": "more",
+      "type": "{ kicker: string; title: string; cta: { label: string; href: string; }; }",
+      "required": true,
+      "description": "the last, cream tile"
+    },
+    {
+      "name": "share",
+      "type": "{ title: HeadingPart[]; text: string; hub?: ReactNode; targets: { label: string; icon?: ReactNode; }[]; }",
+      "required": true,
+      "description": "the row under the grid"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fcee5ff9bfe2bafb519c6dae74d2f7030fd0bac93b01a17d5077b10de067fd58"
+}

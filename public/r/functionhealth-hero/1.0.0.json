@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health hero",
+  "description": "A full-window photo hero (window height minus the announcement strip) with a dark fade at the bottom: a glass pill, a huge light italic serif headline, a light line of copy and two pills bottom-left, and three headline figures with thin vertical dividers bottom-right (stacked in a row under the copy on phones). The copy rises in on load.",
+  "category": "hero",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "photo",
+    "video",
+    "overlay",
+    "serif",
+    "italic",
+    "stats",
+    "load-in",
+    "warm"
+  ],
+  "notes": [
+    "the media slot takes a photo or video; the empty placeholder is dark so the light text reads",
+    "text uses the page colour over a foreground-coloured backdrop, so it flips with the mode",
+    "leaves room at the top for the floating header, which sits over this block"
+  ],
+  "entry": "functionhealth-hero.tsx",
+  "source": "foundry",
+  "name": "functionhealth-hero",
+  "files": [
+    {
+      "path": "functionhealth-hero.css",
+      "content": "/* The copy rises 24px and fades in, one piece after another. Only when motion is welcome. */\n@media (prefers-reduced-motion: no-preference) {\n  .functionhealth-hero-rise {\n    animation: functionhealth-hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;\n    animation-delay: calc(var(--i, 0) * 110ms + 120ms);\n  }\n}\n\n@keyframes functionhealth-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "functionhealth-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthButton } from \"@foundry/functionhealth-button\";\nimport \"./functionhealth-hero.css\";\n\nexport interface FunctionhealthHeroStat {\n  /** the figure, e.g. \"140+ markers\" */\n  value: string;\n  /** small line under it */\n  label: string;\n}\n\nexport interface FunctionhealthHeroProps {\n  /** glass pill above the headline */\n  badge?: string;\n  /** the headline, set in italic light serif */\n  title: string;\n  /** line of copy under the headline */\n  text: string;\n  /** the two pills; the first is the page-coloured pill, the second an outline */\n  actions?: { label: string; href: string }[];\n  /** figures at the bottom right (a row under the copy on phones) */\n  stats?: FunctionhealthHeroStat[];\n  /** background photo or video; an empty slot shows a dark placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nconst rise = (i: number) => ({ \"--i\": i }) as CSSProperties;\n\nexport function FunctionhealthHero({ badge, title, text, actions = [], stats = [], media, className }: FunctionhealthHeroProps) {\n  return (\n    <section className={cn(\"relative isolate flex min-h-[45.5rem] flex-col justify-end overflow-clip bg-foreground text-background lg:h-[calc(100svh-2.5rem)] lg:min-h-[36rem]\", className)}>\n      <div\n        aria-hidden={media ? undefined : true}\n        className={cn(\"absolute inset-0 -z-20 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\", !media && \"bg-linear-to-br from-muted-foreground to-foreground\")}\n      >\n        {media}\n      </div>\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-b from-transparent from-35% to-foreground/70\" />\n      <div className=\"mx-auto flex w-full max-w-page flex-col justify-between gap-10 px-gutter pt-32 pb-10 lg:flex-row lg:items-end lg:pb-[3.75rem]\">\n        <div className=\"max-w-[40rem]\">\n          {badge && (\n            <p style={rise(0)} className=\"functionhealth-hero-rise inline-flex h-[2.375rem] items-center rounded-full bg-background/10 px-4 text-sm font-semibold backdrop-blur-sm\">\n              {badge}\n            </p>\n          )}\n          <h1 style={rise(1)} className=\"functionhealth-hero-rise mt-4 font-display text-[clamp(3.5625rem,2.1617vw+3.0545rem,5rem)] leading-none font-light tracking-[-0.025em] text-balance italic\">\n            {title}\n          </h1>\n          <p style={rise(2)} className=\"functionhealth-hero-rise mt-4 max-w-[34rem] text-[clamp(1.125rem,0.188vw+1.0808rem,1.25rem)] leading-[1.3] font-light\">\n            {text}\n          </p>\n          {actions.length > 0 && (\n            <div style={rise(3)} className=\"functionhealth-hero-rise mt-6 flex flex-wrap gap-3\">\n              {actions.map((a, i) => (\n                <FunctionhealthButton key={a.href + a.label} href={a.href} variant={i === 0 ? \"light\" : \"outline\"} className={i > 0 ? \"border-background bg-transparent text-background\" : undefined}>\n                  {a.label}\n                </FunctionhealthButton>\n              ))}\n            </div>\n          )}\n        </div>\n        {stats.length > 0 && (\n          <ul style={rise(4)} className=\"functionhealth-hero-rise grid grid-cols-3 lg:flex lg:gap-0\">\n            {stats.map((s, i) => (\n              <li key={s.value} className={cn(\"pr-3 lg:px-8\", i > 0 && \"border-l border-background/60 pl-3 lg:pl-8\", i === stats.length - 1 && \"lg:pr-0\")}>\n                <p className=\"text-base leading-tight font-semibold lg:text-[1.375rem]\">{s.value}</p>\n                <p className=\"mt-1 text-sm leading-tight font-light lg:mt-2 lg:text-base\">{s.label}</p>\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-button"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "glass pill above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline, set in italic light serif"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "line of copy under the headline"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "the two pills; the first is the page-coloured pill, the second an outline"
+    },
+    {
+      "name": "stats",
+      "type": "FunctionhealthHeroStat[]",
+      "required": false,
+      "default": "[]",
+      "description": "figures at the bottom right (a row under the copy on phones)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "background photo or video; an empty slot shows a dark placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e5e0aede510fb19efcfb46cb918be856e9820cceb25d7a5b005cc8e393f9c091"
+}

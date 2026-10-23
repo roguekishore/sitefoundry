@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health press logos",
+  "description": "A slow endless strip of publication names in grey display serif, fading out at both edges, with a mono 'pause motion' control under it. Crawls left for 48 seconds a lap (42 on phones).",
+  "category": "logos",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "press",
+    "social-proof",
+    "warm",
+    "pause"
+  ],
+  "notes": [
+    "names are plain text; pass styled nodes if you have real logos",
+    "CSS loop; stops under reduced motion and with the pause control"
+  ],
+  "entry": "functionhealth-press-logos.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "functionhealth-press-logos",
+  "files": [
+    {
+      "path": "functionhealth-press-logos.css",
+      "content": "/* One lap = the list once; the list is rendered twice, so -50% lands exactly on the start. */\n.functionhealth-press-logos-track {\n  animation: functionhealth-press-logos-slide 42s linear infinite;\n}\n@media (min-width: 1024px) {\n  .functionhealth-press-logos-track {\n    animation-duration: 48s;\n  }\n}\n[data-paused=\"true\"] .functionhealth-press-logos-track {\n  animation-play-state: paused;\n}\n.functionhealth-press-logos-fade {\n  mask-image: linear-gradient(to right, transparent, var(--foreground) 12%, var(--foreground) 88%, transparent);\n}\n\n@keyframes functionhealth-press-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .functionhealth-press-logos-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "functionhealth-press-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthPauseMotion, usePauseMotion } from \"@foundry/functionhealth-pause-motion\";\nimport \"./functionhealth-press-logos.css\";\n\nexport interface FunctionhealthPressLogosProps {\n  /** publication names (or styled logo nodes), shown in a loop */\n  logos: ReactNode[];\n  /** accessible name of the list, e.g. \"As seen in\" */\n  label: string;\n  pauseLabel: string;\n  playLabel: string;\n  className?: string;\n}\n\nexport function FunctionhealthPressLogos({ logos, label, pauseLabel, playLabel, className }: FunctionhealthPressLogosProps) {\n  const { paused, toggle, rootProps } = usePauseMotion();\n  const lap = (hidden: boolean) =>\n    logos.map((l, i) => (\n      <li key={`${hidden}-${i}`} aria-hidden={hidden || undefined} className=\"shrink-0 px-6 font-display text-[2.125rem] leading-none font-semibold tracking-[-0.03em] text-muted-foreground lg:px-[3.25rem] lg:text-[2.5rem]\">\n        {l}\n      </li>\n    ));\n  return (\n    <section {...rootProps} aria-label={label} className={cn(\"bg-background pt-[3.25rem] pb-12 text-foreground lg:pt-[4.75rem] lg:pb-[5.75rem]\", className)}>\n      <div className=\"functionhealth-press-logos-fade overflow-clip\">\n        <ul className=\"functionhealth-press-logos-track flex w-max items-center\">\n          {lap(false)}\n          {lap(true)}\n        </ul>\n      </div>\n      <div className=\"mx-auto mt-8 max-w-page px-gutter lg:mt-[4.25rem]\">\n        <FunctionhealthPauseMotion paused={paused} onToggle={toggle} pauseLabel={pauseLabel} playLabel={playLabel} />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-pause-motion"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "publication names (or styled logo nodes), shown in a loop"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the list, e.g. \"As seen in\""
+    },
+    {
+      "name": "pauseLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "playLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3295b6f81e7e928164de0e34bdb49acb08c1dc416fc1cf414683656ebf6eb2bd"
+}

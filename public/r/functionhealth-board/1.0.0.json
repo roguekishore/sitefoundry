@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health advisory board",
+  "description": "A serif heading with an italic phrase and a lead line over a sideways rail of square portraits (6px corners) with a semibold name and a light two-line bio. On desktop the last visible card fades out and a round outlined arrow button scrolls the rail; on phones the rail just swipes with snap.",
+  "category": "gallery",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "rail",
+    "team",
+    "portraits",
+    "snap",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "portraits are media slots (square)",
+    "the arrow button scrolls by one card with smooth scrolling (instant under reduced motion)"
+  ],
+  "entry": "functionhealth-board.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "functionhealth-board",
+  "files": [
+    {
+      "path": "functionhealth-board.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\nimport { FunctionhealthMedia } from \"@foundry/functionhealth-media\";\n\nexport interface FunctionhealthBoardMember {\n  name: string;\n  /** one or two lines about them */\n  bio: string;\n  /** square portrait; empty shows a placeholder */\n  photo?: ReactNode;\n}\n\nexport interface FunctionhealthBoardProps {\n  title: HeadingPart[];\n  text?: string;\n  members: FunctionhealthBoardMember[];\n  /** screen-reader label of the arrow button */\n  nextLabel: string;\n  className?: string;\n}\n\nexport function FunctionhealthBoard({ title, text, members, nextLabel, className }: FunctionhealthBoardProps) {\n  const rail = useRef<HTMLUListElement>(null);\n  const next = () => {\n    const el = rail.current;\n    if (!el) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: 312, behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} text={text} textClassName=\"text-base lg:text-lg\" />\n      </div>\n      <div className=\"relative mx-auto mt-10 max-w-page lg:mt-[4.5rem]\">\n        <ul\n          ref={rail}\n          className=\"flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-pl-[var(--page-gutter)] px-gutter [scrollbar-width:none] lg:gap-8 lg:[mask-image:linear-gradient(to_right,var(--foreground)_78%,transparent)] [&::-webkit-scrollbar]:hidden\"\n        >\n          {members.map((m) => (\n            <li key={m.name} className=\"w-[17rem] shrink-0 snap-start lg:w-[17.5rem]\">\n              <FunctionhealthMedia media={m.photo} ratio=\"aspect-square w-full\" rounded=\"rounded-[0.375rem]\" />\n              <p className=\"mt-4 text-base leading-snug font-semibold lg:text-lg\">{m.name}</p>\n              <p className=\"mt-2 text-sm leading-[1.5] font-light\">{m.bio}</p>\n            </li>\n          ))}\n        </ul>\n        <button\n          type=\"button\"\n          onClick={next}\n          aria-label={nextLabel}\n          className=\"absolute top-[7.5rem] right-[calc(var(--page-gutter)-1.25rem)] hidden size-10 place-items-center rounded-full border border-primary bg-background text-primary transition-[background-color,color] duration-200 hover:bg-primary hover:text-primary-foreground motion-reduce:transition-none lg:grid\"\n        >\n          <ArrowRight className=\"size-4\" />\n        </button>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-heading",
+    "functionhealth-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "members",
+      "type": "FunctionhealthBoardMember[]",
+      "required": true
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the arrow button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "20a7f5eb911ad07f5287b9bd6c784a357587b257d5d1246bf4261b949b1c3891"
+}

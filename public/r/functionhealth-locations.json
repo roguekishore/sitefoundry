@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health locations",
+  "description": "Left: a serif heading half in italic terracotta, a lead paragraph, a bold label and a pill zip-code field with a solid Submit pill. Right: outlined rounded stat cards: a tall one with a huge light figure over a bar-chart slot, one with a dot-map slot behind its figure, and a short wide one with a van icon. On phones the cards stack under the form.",
+  "category": "stats",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "form",
+    "cards",
+    "outlined",
+    "chart",
+    "map",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "the chart and map are media slots",
+    "the form posts to `action`; the demo points to #"
+  ],
+  "entry": "functionhealth-locations.tsx",
+  "source": "foundry",
+  "name": "functionhealth-locations",
+  "files": [
+    {
+      "path": "functionhealth-locations.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthButton } from \"@foundry/functionhealth-button\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\nimport { FunctionhealthMedia } from \"@foundry/functionhealth-media\";\n\n/** A sentence whose first words are in bold terracotta. */\nexport interface FunctionhealthLead {\n  strong: string;\n  rest: string;\n}\n\nexport interface FunctionhealthLocationsProps {\n  title: HeadingPart[];\n  text: string;\n  /** the form */\n  form: { label: string; placeholder: string; submit: string; action?: string };\n  /** tall card: caption, the big figure, and the chart slot */\n  results: { caption: FunctionhealthLead; figure: string; chart?: ReactNode };\n  /** map card: the big figure, caption below it, and the map slot */\n  sites: { figure: string; caption: FunctionhealthLead; map?: ReactNode };\n  /** wide card: an icon (any node), then the sentence */\n  visit: { icon?: ReactNode; text: FunctionhealthLead };\n  className?: string;\n}\n\nfunction Lead({ text }: { text: FunctionhealthLead }) {\n  return (\n    <>\n      <strong className=\"font-semibold text-primary\">{text.strong}</strong> {text.rest}\n    </>\n  );\n}\n\nconst card = \"rounded-xl border border-border bg-background\";\nconst figureClass = \"font-sans text-[clamp(3rem,1.5038vw+2.6466rem,4rem)] leading-none font-light text-muted-foreground\";\n\nexport function FunctionhealthLocations({ title, text, form, results, sites, visit, className }: FunctionhealthLocationsProps) {\n  return (\n    <section id=\"scans\" className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] gap-10 px-gutter lg:grid-cols-[minmax(0,1fr)_minmax(0,42rem)] lg:gap-[4.5rem]\">\n        <div className=\"lg:pt-0\">\n          <FunctionhealthHeading title={title} align=\"start\" />\n          <p className=\"mt-6 max-w-[34rem] text-[clamp(1.125rem,0.188vw+1.0808rem,1.25rem)] leading-[1.4] font-light\">{text}</p>\n          <form action={form.action} className=\"mt-8 lg:mt-12\">\n            <label htmlFor=\"functionhealth-zip\" className=\"block text-base leading-none font-semibold\">\n              {form.label}\n            </label>\n            <div className=\"mt-4 flex gap-3\">\n              <input\n                id=\"functionhealth-zip\"\n                name=\"zip\"\n                inputMode=\"numeric\"\n                placeholder={form.placeholder}\n                className=\"h-12 min-w-0 flex-1 rounded-full border border-input bg-background px-6 text-base font-light transition-colors duration-200 outline-none placeholder:text-muted-foreground focus-visible:border-primary lg:max-w-60\"\n              />\n              <FunctionhealthButton type=\"submit\" className=\"h-[3.125rem] px-7\">\n                {form.submit}\n              </FunctionhealthButton>\n            </div>\n          </form>\n        </div>\n\n        <div className=\"grid gap-5 lg:grid-cols-2 lg:grid-rows-[auto_auto] lg:items-stretch\">\n          <div className={cn(card, \"flex flex-col p-6 lg:row-span-2\")}>\n            <p className=\"text-sm leading-snug font-light\">\n              <Lead text={results.caption} />\n            </p>\n            <div className=\"mt-4 flex items-end gap-4 lg:mt-8 lg:flex-1 lg:flex-col lg:items-stretch lg:gap-6\">\n              <p className={cn(figureClass, \"lg:mt-4\")}>{results.figure}</p>\n              <FunctionhealthMedia media={results.chart} ratio=\"h-36 flex-1 lg:h-auto lg:min-h-48 lg:w-full lg:flex-none\" rounded=\"rounded-md\" className=\"lg:mt-auto\" />\n            </div>\n          </div>\n\n          <div className={cn(card, \"relative flex min-h-[12.5rem] flex-col p-6 lg:min-h-[18rem]\")}>\n            <FunctionhealthMedia\n              media={sites.map}\n              ratio=\"absolute right-6 bottom-6 h-28 w-1/2 lg:top-6 lg:right-6 lg:bottom-auto lg:h-36 lg:w-[calc(100%-3rem)]\"\n              rounded=\"rounded-md\"\n            />\n            <p className=\"relative order-1 text-sm leading-snug font-light lg:order-3 lg:mt-3\">\n              <Lead text={sites.caption} />\n            </p>\n            <p className={cn(figureClass, \"relative order-2 mt-auto pt-8 lg:mt-0 lg:pt-[8.5rem]\")}>{sites.figure}</p>\n          </div>\n\n          <div className={cn(card, \"flex items-center gap-4 p-6 lg:col-start-2\")}>\n            <span className=\"shrink-0 text-primary [&_svg]:size-12 [&_svg]:stroke-[1.25]\">{visit.icon}</span>\n            <p className=\"text-sm leading-snug font-light\">\n              <Lead text={visit.text} />\n            </p>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-button",
+    "functionhealth-heading",
+    "functionhealth-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "form",
+      "type": "{ label: string; placeholder: string; submit: string; action?: string | undefined; }",
+      "required": true,
+      "description": "the form"
+    },
+    {
+      "name": "results",
+      "type": "{ caption: FunctionhealthLead; figure: string; chart?: ReactNode; }",
+      "required": true,
+      "description": "tall card: caption, the big figure, and the chart slot"
+    },
+    {
+      "name": "sites",
+      "type": "{ figure: string; caption: FunctionhealthLead; map?: ReactNode; }",
+      "required": true,
+      "description": "map card: the big figure, caption below it, and the map slot"
+    },
+    {
+      "name": "visit",
+      "type": "{ icon?: ReactNode; text: FunctionhealthLead; }",
+      "required": true,
+      "description": "wide card: an icon (any node), then the sentence"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "83b22c086614939670e87e58519c2b90ce0aa31fdb0ad2eac0d0cd179e1cde05"
+}

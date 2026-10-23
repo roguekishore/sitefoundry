@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health FAQ",
+  "description": "A centred serif heading over a narrow stack of cream, hairline-bordered question rows: semibold question on the left and a small white square with a terracotta plus on the right that turns into a cross when the row opens. An underlined terracotta arrow link closes the section.",
+  "category": "faq",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "details",
+    "cream",
+    "hairline",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "native <details>, no JavaScript; browsers that support ::details-content animate the height"
+  ],
+  "entry": "functionhealth-faq.tsx",
+  "source": "foundry",
+  "name": "functionhealth-faq",
+  "files": [
+    {
+      "path": "functionhealth-faq.css",
+      "content": "/* Open rows grow smoothly where the browser can animate to `auto`; elsewhere they just open. */\n@supports (interpolate-size: allow-keywords) {\n  .functionhealth-faq-item {\n    interpolate-size: allow-keywords;\n  }\n  .functionhealth-faq-item::details-content {\n    block-size: 0;\n    overflow: clip;\n    transition: block-size 0.25s ease, content-visibility 0.25s ease allow-discrete;\n  }\n  .functionhealth-faq-item[open]::details-content {\n    block-size: auto;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .functionhealth-faq-item::details-content { transition: none; }\n}\n"
+    },
+    {
+      "path": "functionhealth-faq.tsx",
+      "content": "import { ArrowRight, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\nimport \"./functionhealth-faq.css\";\n\nexport interface FunctionhealthFaqProps {\n  title: HeadingPart[];\n  items: { question: string; answer: string }[];\n  /** the closing link under the list */\n  link?: { label: string; href: string };\n  className?: string;\n}\n\nexport function FunctionhealthFaq({ title, items, link, className }: FunctionhealthFaqProps) {\n  return (\n    <section id=\"faqs\" className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} />\n        <div className=\"mx-auto mt-10 max-w-[54rem] space-y-3 lg:mt-[4.25rem]\">\n          {items.map((it) => (\n            <details key={it.question} name=\"functionhealth-faq\" className=\"functionhealth-faq-item group rounded-lg border border-border bg-card\">\n              <summary className=\"flex min-h-[3.875rem] cursor-pointer list-none items-center justify-between gap-4 py-3 pr-3.5 pl-5 text-base leading-snug font-semibold marker:content-none lg:pl-6 [&::-webkit-details-marker]:hidden\">\n                {it.question}\n                <span className=\"grid size-9 shrink-0 place-items-center rounded-md border border-border bg-background text-primary transition-colors duration-200 group-hover:border-primary motion-reduce:transition-none\">\n                  <Plus className=\"size-5 transition-transform duration-200 group-open:rotate-45 motion-reduce:transition-none\" strokeWidth={1.5} />\n                </span>\n              </summary>\n              <p className=\"px-5 pb-5 text-base leading-[1.55] font-light text-muted-foreground lg:px-6\">{it.answer}</p>\n            </details>\n          ))}\n        </div>\n        {link && (\n          <p className=\"mt-10 text-center lg:mt-[3.75rem]\">\n            <a\n              href={link.href}\n              className=\"inline-flex items-center gap-2 border-b border-primary pb-0.5 text-base font-semibold text-primary transition-opacity duration-200 hover:opacity-70 motion-reduce:transition-none\"\n            >\n              {link.label}\n              <ArrowRight className=\"size-3.5\" />\n            </a>\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "items",
+      "type": "{ question: string; answer: string; }[]",
+      "required": true
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the closing link under the list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4c74ca8d42eb3191bbeaae79f65f1f7ae929b38273f606347b2f9b81cbc333ab"
+}

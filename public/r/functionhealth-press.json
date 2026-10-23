@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health press wall",
+  "description": "A serif heading and lead line over a four-column masonry of tiles: cream award tiles (a serif publication name, mono caption) alternate with dark photo cards carrying a white quote and a mono name, each column pairing one short and one tall tile. On phones the columns become a sideways snap rail.",
+  "category": "testimonials",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "masonry",
+    "quotes",
+    "press",
+    "awards",
+    "photo",
+    "rail",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "quote tiles assume a photo behind them (a dark fade sits under the text); the placeholder is dark",
+    "award tiles use plain text names; swap in a logo with the same props if you have one"
+  ],
+  "entry": "functionhealth-press.tsx",
+  "source": "foundry",
+  "name": "functionhealth-press",
+  "files": [
+    {
+      "path": "functionhealth-press.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\n\nexport type FunctionhealthPressTile =\n  | { kind: \"award\"; /** publication or prize name */ name: string; /** small mono caption under it */ detail?: string }\n  | { kind: \"quote\"; quote: string; /** who said it */ name: string; /** portrait; empty shows a dark placeholder */ media?: ReactNode };\n\nexport interface FunctionhealthPressProps {\n  title: HeadingPart[];\n  text?: string;\n  /** four columns of tiles, each normally one award and one quote (short and tall) */\n  columns: FunctionhealthPressTile[][];\n  className?: string;\n}\n\nfunction Tile({ tile }: { tile: FunctionhealthPressTile }) {\n  if (tile.kind === \"award\") {\n    return (\n      <div className=\"flex h-[7.75rem] flex-col items-center justify-center gap-2 rounded-xl bg-card px-4 text-center lg:h-[8.875rem]\">\n        <p className=\"font-display text-[1.625rem] leading-none font-medium tracking-[-0.02em] lg:text-[1.875rem]\">{tile.name}</p>\n        {tile.detail && <p className=\"font-mono text-xs leading-none tracking-[0.1em] text-muted-foreground uppercase\">{tile.detail}</p>}\n      </div>\n    );\n  }\n  return (\n    <figure className=\"relative isolate flex aspect-[251/330] flex-col justify-end overflow-clip rounded-xl bg-foreground p-5 text-background lg:aspect-[288/379]\">\n      <div\n        aria-hidden={tile.media ? undefined : true}\n        className={cn(\"absolute inset-0 -z-20 [&>img]:size-full [&>img]:object-cover\", !tile.media && \"bg-linear-to-br from-muted-foreground to-foreground\")}\n      >\n        {tile.media}\n      </div>\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-b from-transparent from-4% to-foreground/90\" />\n      <blockquote className=\"text-base leading-snug font-semibold\">{tile.quote}</blockquote>\n      <figcaption className=\"mt-3 font-mono text-xs leading-none tracking-[0.1em] uppercase\">{tile.name}</figcaption>\n    </figure>\n  );\n}\n\nexport function FunctionhealthPress({ title, text, columns, className }: FunctionhealthPressProps) {\n  return (\n    <section className={cn(\"bg-background pt-9 pb-section text-foreground lg:pt-20\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} text={text} textClassName=\"lg:mt-5\" />\n      </div>\n      <div className=\"mx-auto mt-10 max-w-page lg:mt-[4rem] lg:px-gutter\">\n        <ul className=\"flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-[var(--page-gutter)] px-gutter pb-2 [scrollbar-width:none] lg:grid lg:grid-cols-4 lg:gap-8 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden\">\n          {columns.map((col, c) => (\n            <li key={c} className=\"flex w-[15.7rem] shrink-0 snap-start flex-col gap-6 lg:w-auto\">\n              {col.map((t, i) => (\n                <Tile key={i} tile={t} />\n              ))}\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "columns",
+      "type": "FunctionhealthPressTile[][]",
+      "required": true,
+      "description": "four columns of tiles, each normally one award and one quote (short and tall)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "02b03e264bc4aa82334e97662bc896dfe40fc6e6cfb558143d736d314f2744ca"
+}
