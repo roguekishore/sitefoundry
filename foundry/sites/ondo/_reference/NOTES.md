@@ -113,3 +113,23 @@ The serif has no foundry token: the theme sets `--ondo-serif`, and blocks read i
   `dark` class, so they stay black in light mode, as on the original.
 - Light mode is the faithful mode; the dark sibling turns the white bands black and keeps the
   greys.
+
+## Round 1 (ours vs original, light, 390 + 1440)
+
+Section heights at 1440 already track the original (hero 1125 = 1125, news 683/685, products
+3090/3201, stats 967/962, testimonials 876/913, beliefs 900/900, principles 946/947, Nexus +
+visual 1881/1857, insights 806/838, closing 700/699). The footer is 754 vs 2257: ours carries
+four short fictional disclaimers instead of the original's pages of legal text (by choice).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | matches (word / 300px frame / word, sentence low) | frame sat 90px left of centre because the two words differ in width; the original centres the frame | load shrink + slide-out run; hint fades | yes: 3-column grid, frame always centred |
+| news | card + tickers match | card, peeks, ring match; image placeholder black (the original's image is a dark graphic) | ring fills, slides in | — |
+| products | per-product panels match | sticky bento pins and switches Equities → Tidemark → Ballast as in the original | pinned + accordion | — |
+| products | chart slots read heavier than the original's faint dotted grids | same | — | yes: faint tone lighter |
+| stats | "$2.84B" at 96px pushed the label out (page 406px wide at 360) | at 1024 the 150px numeral overflowed the right half | digits roll mid-scroll like the original's | yes: numeral clamps to 22vw on phones, 112px at lg, 150px from xl; grid columns min-w-0 |
+| testimonials | black current card, grey neighbours, arrows: match | same | slide on arrows | — |
+| beliefs | statement + centred circles | circles bottom-right | cross-fade on timer | — |
+| principles | photo slot placeholder (#313131) much lighter than the original's black band on desktop | same | accordion widen, text fade | yes: placeholder one step darker |
+| Nexus / insights / closing / footer | match the inferred layouts | match | reveals fire (fade up 40px) | — |
+| overflow | 360 overflowed (stats) | 1024 overflowed (stats) | — | yes |

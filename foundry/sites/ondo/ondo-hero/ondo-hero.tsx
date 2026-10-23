@@ -38,9 +38,9 @@ export function OndoHero({ lead, trail, text, hint, frames, className }: OndoHer
       <div className="flex min-h-[125svh] flex-col items-center justify-center px-gutter pb-16 lg:pb-0">
         <div
           aria-hidden
-          className="flex flex-col items-center gap-10 [--ondo-hero-dx:0px] [--ondo-hero-dy:175px] lg:flex-row lg:gap-8 lg:[--ondo-hero-dx:260px] lg:[--ondo-hero-dy:0px] xl:gap-12"
+          className="flex w-full flex-col items-center gap-10 [--ondo-hero-dx:0px] [--ondo-hero-dy:175px] lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-8 lg:[--ondo-hero-dx:260px] lg:[--ondo-hero-dy:0px] xl:gap-12"
         >
-          <span className={cn(word, "ondo-hero-word-a")}>{lead}</span>
+          <span className={cn(word, "ondo-hero-word-a lg:justify-self-end")}>{lead}</span>
           <div className="relative z-10 grid size-[18.75rem] shrink-0 place-items-center lg:size-[22rem] xl:size-[28.3rem]">
             {layers.map((layer, i) => (
               <div
@@ -57,7 +57,7 @@ export function OndoHero({ lead, trail, text, hint, frames, className }: OndoHer
               </div>
             ))}
           </div>
-          <span className={cn(word, "ondo-hero-word-b")}>{trail}</span>
+          <span className={cn(word, "ondo-hero-word-b lg:justify-self-start")}>{trail}</span>
         </div>
       </div>
       {hint && (
