@@ -102,7 +102,7 @@ export function LevelsSystem({ eyebrow, title, lead, rows, privacy, action, id, 
                 {privacy.tags.map((tag) => (
                   <li
                     key={tag}
-                    className="rounded-md border border-foreground/12 px-3 py-1 text-xs leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase"
+                    className="rounded-md border border-foreground/12 px-3 py-1 text-xs leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase"
                   >
                     {tag}
                   </li>

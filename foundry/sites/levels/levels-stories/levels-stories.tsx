@@ -62,7 +62,7 @@ export function LevelsStories({ eyebrow, title, lead, stories, watchLabel, class
               </div>
               <div className="px-7 pt-7 pb-9">
                 <blockquote className="text-lg leading-8 tracking-[-0.01em] text-card-foreground">{story.quote}</blockquote>
-                <p className="mt-6 text-sm leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase">{story.name}</p>
+                <p className="mt-6 text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{story.name}</p>
                 {story.role ? <p className="mt-1 text-sm leading-5 text-muted-foreground">{story.role}</p> : null}
               </div>
             </li>

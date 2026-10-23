@@ -59,7 +59,7 @@ const tones = {
   plain: "border border-border bg-card text-card-foreground",
   featured:
     "border border-highlight/35 bg-accent text-foreground shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--highlight)_35%,transparent)]",
-  dark: "dark bg-background text-foreground",
+  dark: "dark border border-transparent bg-background text-foreground",
 };
 
 /** Heading, a recommendation strip and three plan cards. */
@@ -73,7 +73,7 @@ export function LevelsPlans({ eyebrow, title, lead, recommend, plans, id, classN
           <div className="mt-12 flex flex-col items-start gap-5 rounded-lg border border-foreground/10 bg-accent px-6 py-7 lg:flex-row lg:items-center lg:justify-between lg:px-8">
             <div className="max-w-[40rem]">
               {recommend.eyebrow ? (
-                <p className="text-xs leading-4 font-semibold tracking-[0.187em] text-highlight uppercase">{recommend.eyebrow}</p>
+                <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-highlight uppercase">{recommend.eyebrow}</p>
               ) : null}
               <p className="mt-3 text-base leading-7 text-foreground">{recommend.text}</p>
             </div>
@@ -109,7 +109,7 @@ export function LevelsPlans({ eyebrow, title, lead, recommend, plans, id, classN
                     </span>
                   ) : null}
                 </div>
-                <h3 className="mt-6 font-display text-[2rem] leading-[1.3] font-medium tracking-[-0.04em]">{plan.name}</h3>
+                <h3 className="mt-6 font-display text-[2rem] leading-[1.3] font-[550] tracking-[-0.04em]">{plan.name}</h3>
                 {plan.description ? <p className="mt-3 text-base leading-8 text-muted-foreground">{plan.description}</p> : null}
                 <p className="mt-6 flex items-baseline gap-1.5">
                   <span className="font-display text-[3.3rem] leading-none font-medium tracking-[-0.05em]">{plan.price}</span>

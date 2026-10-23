@@ -43,7 +43,7 @@ export function LevelsHero({ eyebrow, title, lead, action, media, mediaLabel, cl
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="mt-7 max-w-[56rem] font-display text-[3.5rem] leading-[1.5] font-medium tracking-[-0.045em] text-balance lg:mt-8 lg:text-[6rem] lg:leading-[1.02]">
+        <h1 className="mt-7 max-w-[56rem] font-display text-[3.5rem] leading-[1.5] font-[550] tracking-[-0.045em] lg:mt-8 lg:text-[6rem] lg:leading-[1.02]">
           {title}
         </h1>
         {lead ? (

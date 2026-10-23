@@ -50,10 +50,10 @@ export function LevelsFooter({ brand, newsletter, columns, copyright, legal, dis
           <div className="lg:max-w-[28rem] lg:grow">
             <LevelsWordmark brand={brand} size="lg" />
             {newsletter ? (
-              <form action={newsletter.action} className="mt-10">
-                <p className="text-sm leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase">{newsletter.title}</p>
-                {newsletter.text ? <p className="mt-4 text-sm leading-7 text-foreground/80">{newsletter.text}</p> : null}
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <form action={newsletter.action} className="mt-8">
+                <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{newsletter.title}</p>
+                {newsletter.text ? <p className="mt-3 text-sm leading-7 text-foreground/80">{newsletter.text}</p> : null}
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <input
                     type="email"
                     name="email"
@@ -75,8 +75,8 @@ export function LevelsFooter({ brand, newsletter, columns, copyright, legal, dis
           <div className="grid gap-12 lg:w-[38.75rem] lg:grid-cols-3 lg:gap-6">
             {columns.map((column) => (
               <div key={column.title}>
-                <p className="text-sm leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase">{column.title}</p>
-                <ul className="mt-7 flex flex-col gap-5 lg:mt-8">
+                <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{column.title}</p>
+                <ul className="mt-5 flex flex-col gap-5 lg:mt-6">
                   {column.links.map((link) => (
                     <li key={link.label}>
                       <a href={link.href} className={linkClass}>
@@ -90,7 +90,7 @@ export function LevelsFooter({ brand, newsletter, columns, copyright, legal, dis
           </div>
         </div>
 
-        <div className="mt-16 border-t border-border pt-10 lg:mt-14">
+        <div className="mt-16 border-t border-border pt-10 lg:mt-14 lg:pt-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             {copyright ? <p className="text-sm leading-6 text-foreground/70">{copyright}</p> : null}
             {legal?.length ? (

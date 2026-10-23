@@ -47,7 +47,7 @@ export function LevelsResults({ eyebrow, title, lead, evidence, stats, footnote,
           {evidence ? (
             <div className="rounded-lg border border-border bg-secondary px-8 py-10">
               {evidence.eyebrow ? (
-                <p className="text-xs leading-4 font-semibold tracking-[0.187em] text-muted-foreground uppercase">{evidence.eyebrow}</p>
+                <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{evidence.eyebrow}</p>
               ) : null}
               <p className="mt-5 text-lg leading-8 text-secondary-foreground">{evidence.text}</p>
               {evidence.links?.length ? (
@@ -69,7 +69,7 @@ export function LevelsResults({ eyebrow, title, lead, evidence, stats, footnote,
               <p className="font-display text-[4rem] leading-none font-normal tracking-[-0.05em] text-glow lg:text-[4.75rem]">
                 {stat.value}
               </p>
-              <p className="mt-9 font-display text-[1.375rem] leading-8 font-medium tracking-[-0.02em]">{stat.label}</p>
+              <p className="mt-9 font-display text-[1.375rem] leading-8 font-[550] tracking-[-0.02em]">{stat.label}</p>
               {stat.body ? <p className="mt-4 max-w-[20rem] text-sm leading-7 text-foreground/76">{stat.body}</p> : null}
             </li>
           ))}

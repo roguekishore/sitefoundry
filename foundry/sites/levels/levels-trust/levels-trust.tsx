@@ -26,7 +26,7 @@ export function LevelsTrust({ items, className }: LevelsTrustProps) {
             className="border-border py-4 not-first:border-t lg:pt-5 lg:pb-2 lg:not-first:border-t-0 lg:not-first:border-l lg:px-6"
           >
             <p className="text-lg leading-7 font-semibold tracking-[-0.01em] text-foreground">{item.title}</p>
-            <p className="mt-3 max-w-[22rem] text-sm leading-6 text-muted-foreground lg:mt-2">{item.body}</p>
+            <p className="mt-2 max-w-[22rem] text-sm leading-6 text-muted-foreground">{item.body}</p>
           </li>
         ))}
       </ul>

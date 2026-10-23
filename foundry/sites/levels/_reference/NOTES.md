@@ -107,3 +107,55 @@ Motion is hover-only, 150ms `cubic-bezier(0.4,0,0.2,1)` colour fades and 200ms t
   artefact of the original's image positioning; ours put the still flush at the top.
 - Dark mode is a sibling: near-black page `#0f1110`, cards a step lighter, same greens
   brightened.
+
+## Comparison round 1
+
+Heights first (ours vs original): 390 — hero 844 (860; the original's content just overflows
+the window), trust 434 (400), spike 1368 (1325), system 3630 (3603), monitor 1347 (1318),
+patterns 4008 (3880), habits 1835 (1850), results 1842 (1822), stories 3142 (2948), plans
+3970 (3822), closing 572 (610), footer 1505 (1457). 1440 — hero 900 = window (marked "sized
+by the window" in ours too), trust 184 (190), spike 856 (856), system 2461 (2418), monitor
+864 (865), patterns 1720 (1674), habits 1079 (1065), results 874 (939), stories 1037 (1058),
+plans 1816 (1788), closing 552 (550), footer 634 (626). No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all headings | titles balanced into 3 short lines ("Diet tips are written / for everyone…") where the original fills the line | same; Hanken 500 reads lighter than TT Hoves Medium | — | yes: no text-balance, weight 550 |
+| all eyebrows | 12px, narrower than the original | the original's eyebrows are 14px at 0.16em (measured per-character advance) | — | yes: 14px / 0.16em; 12px kept for tags, 11px for plan labels and the chart caption |
+| spike chart card | wash placeholder stopped in a hard line above the chips | same | chips switch on click (hydrated) | yes: chart area runs to the bottom, chip panel fades over it |
+| trust | 434 tall, body a little low | ok | — | yes: body mt-2 |
+| patterns | small cards a touch tall | small cards 220 vs 208, big cards 14px tall | zoom on hover ok | yes: tighter title/desc gaps |
+| plans | ok | dark card 1px higher than the bordered ones | — | yes: transparent border |
+| habits | ok | phone slot 308 wide vs 320 | — | yes: 320 |
+| footer | ok | mailing block and link lists ~12px lower | link hover ok | yes: tighter gaps |
+| header, hero, system, monitor, results, stories, closing | match in layout, proportion and colour | match | header fixed, hover fades 150ms match | — |
+
+## Comparison round 2
+
+Heights after round 1: 390 trust 422 (400), spike 1372 (1325), patterns 3940 (3880),
+stories 3146 (2948); 1440 patterns 1700 (1674), footer 618 (626); the rest within ~1–3%.
+Hover list in `ours-design.md` matches the original's one for one: nav/login white/80 → white,
+white and ink buttons → 90%, green links darken with the arrow moving 4px, chips white/92 →
+white with the border darkening, the watch pill brightening; all 150ms (0.4,0,0.2,1).
+Header fixed for the whole page in both. Hero "sized by the window" in both.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| spike | our sample title ran to three lines (the original's is two) | same | — | yes: shorter sample title, same length as the original's |
+| plans | sample title three lines vs two | ok | — | yes: shorter sample title |
+| monitor | sage eyebrow hard to read over the pale photo placeholder (the original's photo is mid-dark) | same | — | yes: photo tone 45% grey, stronger bottom shade |
+| footer | link lists sit ~8px low under their headings | ok | — | yes: mt-5 |
+| stories | 4 cards ~ 200px taller in total: our quotes run a line longer; the original's first card also shows a hover-lifted state in its crop | ok | lift + zoom on hover | kept (content) |
+| header, hero, trust, system, patterns, habits, results, closing | look the same apart from content and placeholders | same | — | — |
+
+Round 3 capture (after the round 2 fixes): spike 1324 (1325) at 390 and 856 (856) at 1440,
+plans 3932 / 1768 (3822 / 1788), monitor caption readable; no overflow at 360/768/1024;
+hover list unchanged. Stopping here: each section pair reads as the same design apart from
+content and placeholders.
+
+**Re-theme check:** `levels-results` under `sample-ember` light and `levels-plans` under
+`sample-ember` dark both re-theme cleanly (the .dark-scoped stat cards and top plan take
+ember's dark palette, the green links take ember's highlight); `levels-spike` in our own dark
+mode keeps the chip contrast (the selected chip turns white). In dark mode the page itself is
+the ink colour, so the dark bands (closing, footer, stat cards) blend into the page: expected
+for a sibling mode.

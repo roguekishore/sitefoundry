@@ -60,12 +60,12 @@ export function LevelsPatterns({ eyebrow, title, lead, cards, features, link, id
                   {card.media ?? <LevelsPlaceholder tone="film" label={card.mediaLabel} />}
                 </div>
               </div>
-              <div className="px-8 pt-8 pb-10">
-                <h3 className="font-display text-[1.75rem] leading-[1.55] font-medium tracking-[-0.03em] text-card-foreground">
+              <div className="px-8 pt-8 pb-9">
+                <h3 className="font-display text-[1.75rem] leading-[1.55] font-[550] tracking-[-0.03em] text-card-foreground">
                   {card.title}
                 </h3>
                 <p className="mt-4 text-base leading-7 text-muted-foreground">{card.body}</p>
-                <ul className="mt-7 flex flex-col gap-3">
+                <ul className="mt-6 flex flex-col gap-3">
                   {card.points.map((point, j) => (
                     <li key={j} className="flex gap-3 text-sm leading-6 text-secondary-foreground">
                       <span aria-hidden className="mt-[0.5625rem] size-1.5 shrink-0 rounded-full bg-highlight" />
@@ -83,10 +83,10 @@ export function LevelsPatterns({ eyebrow, title, lead, cards, features, link, id
             {features.map((feature, i) => (
               <li key={i} className="rounded-lg border border-border bg-card p-6">
                 <LevelsIconTile>{feature.icon}</LevelsIconTile>
-                <h3 className="mt-8 font-display text-xl leading-7 font-medium tracking-[-0.02em] text-card-foreground">
+                <h3 className="mt-7 font-display text-xl leading-7 font-[550] tracking-[-0.02em] text-card-foreground">
                   {feature.title}
                 </h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{feature.body}</p>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">{feature.body}</p>
               </li>
             ))}
           </ul>
