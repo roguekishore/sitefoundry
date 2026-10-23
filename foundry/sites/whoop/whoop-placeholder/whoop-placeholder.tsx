@@ -2,7 +2,7 @@ import { cn } from "@foundry/foundry-utils";
 
 const tones = {
   /** a warm amber gradient: the hero banner */
-  warm: "bg-glow bg-linear-to-b from-glow/25 via-glow/70 to-glow",
+  warm: "bg-background bg-linear-to-b from-glow/35 via-glow/75 to-glow",
   /** a neutral grey wash: photos */
   photo: "bg-muted bg-linear-to-br from-muted via-muted to-muted-foreground/35",
   /** grey into ink: photos that carry light text (inverts with dark mode, like the text) */

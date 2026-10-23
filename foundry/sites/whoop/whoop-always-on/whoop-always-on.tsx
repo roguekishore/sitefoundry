@@ -86,7 +86,7 @@ export function WhoopAlwaysOn({ heading, steps, interval = 6000, labels, classNa
     >
       <div className="mx-auto max-w-page px-gutter">
         <WhoopSectionHeading heading={heading} />
-        <div className="mt-[6.25rem] lg:mt-16 lg:grid lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20">
+        <div className="mt-[4.5rem] lg:mt-16 lg:grid lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20">
           <div className="lg:order-2">{photo}</div>
           {/* desktop: the accordion */}
           <ol className="hidden lg:block">

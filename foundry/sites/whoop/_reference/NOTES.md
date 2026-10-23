@@ -99,3 +99,20 @@ element changed while scrolling apart from the accordion: nothing to rebuild the
 - Headings and the section that follows them are one block (e.g. "Choose a device" is inside
   `whoop-plans`), so each block works alone.
 - Currency/price strings are props; the demo uses dollars.
+
+## Comparison round 1 (390 against the original; 1440 against the inferred plan)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark ~15% narrower than the original's | links centred, icons right: reads right | sticky bar ✓, strip scrolls away ✓ | yes: wordmark 1.75rem |
+| hero | placeholder a flat orange (the gradient sat on an opaque glow base); badge panel 190px tall vs 139px | same flat colour | – | yes: gradient on the page colour; badge tighter |
+| statement | heights match (750 vs 756) | heading/body row ✓ | photo hover zoom ✓ | – |
+| insights | 100px between the photo and the next heading vs 50px (both blocks padded) | 3.3 cards visible ✓ | track + dots ✓, plus fades panel ✓ | yes: page drops the insights top padding |
+| plans | matches (1140 vs 1128): centred on the middle card, both neighbours peek | three cards side by side | snap, dots ✓ | – |
+| athletes | 723 vs 656: our block keeps its top padding after the black band (the original's band ends in 70px of padding instead) | 4 × 2 grid | – | kept: the block must work alone |
+| always-on | heading → photo 100px vs ~70px | accordion + square photo ✓ | steps advance with a filling line ✓ (CSSAnimation in the capture) | yes: 4.5rem |
+| styles | matches (980 vs 954, our titles wrap to two lines) | image left, text right | tabs crossfade ✓ | – |
+| disclaimer | matches (309 vs 306) | ✓ | – | – |
+| footer | 1108 vs 904: link rows 46px apart vs 37px, wordmark gap 120 vs 84 | four-column grid for three groups | link hover dims ✓ | yes: leading-none rows, tighter gaps, three columns |
+
+Overflow at 360/768/1024: fits.
