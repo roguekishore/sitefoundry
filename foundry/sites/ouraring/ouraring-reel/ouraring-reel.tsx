@@ -67,7 +67,7 @@ export function OuraringReel({ cards, labels = { previous: "Previous", next: "Ne
             </div>
 
             <div className="ouraring-reel-fade absolute inset-x-6 bottom-7">
-              <a href={card.href} className="block max-w-[8.6em] text-[28px] leading-none font-light tracking-[0.01em] lg:text-[40px]">
+              <a href={card.href} className="block max-w-[8.6em] text-[28px] leading-none font-[250] tracking-[-0.02em] lg:text-[40px]">
                 {card.title}
               </a>
             </div>

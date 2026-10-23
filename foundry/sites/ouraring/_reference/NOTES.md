@@ -41,7 +41,7 @@ copy is ours.
 
 | # | section | block | height | layout at 390 | layout at 1440 | media slots | motion |
 |---|---|---|---|---|---|---|---|
-| 1 | announcement strip + header | `ouraring-header` | 52 + 90px (content) | 52px strip; nav becomes a frosted pill fixed at the bottom (logo, cart circle, menu circle) | 52px cream strip, then a 90px bar over the hero: wordmark left, 4 nav links with chevrons centred, 48px cart circle right; sand→transparent gradient behind | — | sticky; bar background fades in once scrolled (400ms); bar hides on scroll down, returns on scroll up (inferred from the scroll frames, where it never shows) |
+| 1 | announcement strip + header | `ouraring-header` | 52 + 90px (content) | 52px strip; nav becomes a frosted pill at the top of the screen, shown only once the hero is scrolled away (logo, cart circle, menu circle) | 52px cream strip, then a 90px bar over the hero: wordmark left, 4 nav links with chevrons centred, 48px cart circle right; sand→transparent gradient behind | — | sticky; bar background fades in once scrolled (400ms); bar hides on scroll down, returns on scroll up (inferred from the scroll frames, where it never shows) |
 | 2 | hero | `ouraring-hero` | **window** (100svh, media fills it) | photo fills the window; copy centred at the bottom: 48px serif title on 2 lines, 20px lede, blue pill | photo fills the window; copy block left at x=64, vertically centred: 80px serif title on 2 lines, 20px lede (≈470px wide), blue pill 48px | 1440×900 cover (390×844 cover) | none seen |
 | 3 | intro | `ouraring-intro` | content (~420px) | 56px serif on 3 lines, 24px lede, two pills stacked | centred 68px serif on one line, 24px lede ≈750 wide, two pills side by side | — | heading/lede/buttons fade + rise 20px on entering view (500ms) |
 | 4 | category reel | `ouraring-reel` | content (~830px) | one 312×392 card + peek of the next, snap scrolling; divider; arrows right | 493×689 cards, gap 24, running off the right edge; hairline; ← and dark → circle right-aligned | 6 photos (493×689 / 312×392 cover) | photo inside each card scrubbed translateY −138→69px (−78→39 phones); first card's copy fades in |
@@ -89,9 +89,10 @@ of the card design, not the photo).
 
 ## Decisions
 
-- **Mobile nav pill at the bottom.** The 390 capture never shows a top bar; the only header
-  is a frosted pill (logo, cart, menu) that appears mid-page in the section crops, which is
-  where a fixed element lands in a full-page shot. Built as a fixed bottom pill on phones.
+- **Mobile nav pill at the top, after the hero.** The 390 capture never shows a bar over the
+  hero; the only header is a frosted pill (logo, cart, menu) that the capture measured sticky
+  at the top of the screen mid-page. Built as a pill fixed 12px from the top that fades and
+  slides in once 70% of the first screen is scrolled away (round 1 tried the bottom: wrong).
 - **Header hide-on-scroll** is inferred: the header is "sticky for 12 half-screens" but
   absent from every desktop scroll frame.
 - **Payment marks** are third-party logos: replaced by white chips holding lucide icons
@@ -103,3 +104,36 @@ of the card design, not the photo).
 - **Press band rounding.** The band's bottom corners round over the footer; the footer has an
   `overlap` prop that tucks it 40px underneath (page.tsx turns it on).
 - The cookie banner in every capture is the site's consent tool, not design: not rebuilt.
+
+## Comparison round 1
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| announcement | flex container ate the spaces around the links; our line wrapped to two rows (58px) | spaces missing | — | yes: text wrapped in a `<p>`, shorter demo line |
+| header (phones) | a bottom-fixed pill covered the hero's CTA; the original's pill is absent over the hero and sits at the top of the screen further down (the capture measured it sticky at the top at scroll 2807) | — | pill appears after scrolling | yes: pill now fixed at the top, fades/slides in once 70% of the first screen is scrolled away |
+| hero | ok | copy block ~45px lower than the original (title top 330 vs 285) | — | yes: no top padding on desktop, so the block centres slightly high like the original |
+| serif headings | Instrument Serif set 11–17% narrower than Editorial New at the original's tracking (measured: "Understand your body…" 864 vs 975px at 68px) | same | — | yes: tracking loosened (hero −0.02em, headings −0.005em, feature/newsletter 0), quotes 19/25px |
+| grotesk ledes | Public Sans ~8% wider than Akkurat at the original's tracking (780 vs 724px) | same | — | yes: ledes −0.045em, hero lede −0.01em, feature body +0.005em |
+| reel card titles | Public Sans 300 heavier and wider than Akkurat Light | same | parallax and caption fade visible in scroll frames | yes: weight 250, −0.02em |
+| footer | wordmark too big | wordmark 218px wide vs 150 | — | yes: 46px |
+| press band, footer (phones) | featured card 256px tall, payment chips collapsed | fine | — | not a block bug: the first (390) load with the live-reload socket stubbed got Tailwind CSS from before our new classes were scanned; round 2 warms the gallery first |
+| stats, testimonials, feature | sizes, spacing and placeholders match | match | reveals (rise, blur) show mid-way in the scroll frames | — |
+| overflow | fits at 360/768/1024 | — | — | — |
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| announcement | one line, 52px, spaces right | right | — | — |
+| header | pill hidden over the hero, appears at the top of the screen further down, like the original | bar over the hero; slides away scrolling down (capture: translateY 0→−100px), backdrop fades in | matches inventory | — |
+| hero | title, lede, CTA at the bottom of the window, same positions (title top 485 vs 493) | copy block now at the original's height (title top 285, button bottom 618 vs 612) | — | — |
+| intro, stats | matching sizes; serif now within 5–9% of Editorial New's width | same | rise 20px reveals, staggered; picture blurs in | — |
+| reel | 312×317 cards with peek, hairline, arrows | 493×626 cards off the right edge | photo drift −138→69px (capture reads exactly that), caption fade | — |
+| testimonials, feature | match | match (feature at 4021 vs 4030, height 789 = 789) | rise / blur reveals | — |
+| press band | featured card 565px, carousel 293×387 with 1 / 3 and dots, footnotes | 1059 vs 1143px: hairline sat right under the cards (64px) instead of ~129px below | photo drift −164→34px (exact) | yes: footnotes get 64px more top room on desktop |
+| footer | matches the 390 layout (columns 2-up, newsletter after) | 691 vs 652px (hairline 35px lower) | phone payment groups crossfade | yes: 56px above the hairline instead of 90px |
+| dark mode | — | hero, cards and tags invert cleanly; press band and footer stay ink | — | — |
+| re-theme (sample-ember) | — | testimonials and press band take ember's colours and fonts and still read right | — | — |
+
+Left as is: the reel chip is a pill (the 1440 crop shows square corners, the 390 crop a pill; we kept one shape);
+Instrument Serif stays a touch narrower than Editorial New.

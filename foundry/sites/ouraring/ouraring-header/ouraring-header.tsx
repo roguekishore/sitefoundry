@@ -28,6 +28,7 @@ export interface OuraringHeaderProps {
 export function OuraringHeader({ announcement, logo, logoHref = "/", nav, cart, menuLabels = { open: "Menu", close: "Close" }, className }: OuraringHeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
   const [open, setOpen] = useState(false);
   const last = useRef(0);
 
@@ -35,6 +36,8 @@ export function OuraringHeader({ announcement, logo, logoHref = "/", nav, cart, 
     const onScroll = () => {
       const y = window.scrollY;
       setScrolled(y > 8);
+      // phones: the pill only appears once the first screen is mostly scrolled away
+      setPastHero(y > window.innerHeight * 0.7);
       // slide away going down (past the first screen's top), come back going up
       setHidden(y > 240 && y > last.current);
       last.current = y;
@@ -50,7 +53,7 @@ export function OuraringHeader({ announcement, logo, logoHref = "/", nav, cart, 
     <div className={cn("contents", className)}>
       {announcement && (
         <div className="relative z-50 flex min-h-[52px] items-center justify-center bg-background px-gutter py-3 text-center text-[13px] leading-[1.3] font-semibold text-foreground lg:text-[14px] [&_a]:underline [&_a]:underline-offset-2">
-          {announcement}
+          <p>{announcement}</p>
         </div>
       )}
 
@@ -94,18 +97,13 @@ export function OuraringHeader({ announcement, logo, logoHref = "/", nav, cart, 
         </div>
       </header>
 
-      {/* phones: a frosted pill fixed to the bottom of the screen */}
-      <div className="fixed inset-x-3 bottom-3 z-40 lg:hidden">
-        {open && (
-          <nav className="mb-2 flex flex-col rounded-xl bg-background p-3 text-foreground shadow-[0_0_18px_0] shadow-foreground/20">
-            {nav.map((item) => (
-              <a key={item.label} href={item.href} className="flex h-12 items-center justify-between rounded-md px-3 text-[18px] hover:bg-card">
-                {item.label}
-                {item.hasMenu && <ChevronDown aria-hidden strokeWidth={1.5} className="size-4 -rotate-90" />}
-              </a>
-            ))}
-          </nav>
+      {/* phones: a frosted pill floating at the top, shown once the hero is scrolled away */}
+      <div
+        className={cn(
+          "fixed inset-x-3 top-3 z-40 transition-[translate,opacity] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none lg:hidden",
+          pastHero || open ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-[calc(100%+0.75rem)] opacity-0",
         )}
+      >
         <div className="flex h-16 items-center justify-between rounded-xl bg-foreground/60 pr-3 pl-4 text-background backdrop-blur-md">
           <a href={logoHref}>{wordmark}</a>
           <div className="flex items-center gap-2">
@@ -123,6 +121,16 @@ export function OuraringHeader({ announcement, logo, logoHref = "/", nav, cart, 
             </button>
           </div>
         </div>
+        {open && (
+          <nav className="mt-2 flex flex-col rounded-xl bg-background p-3 text-foreground shadow-[0_0_18px_0] shadow-foreground/20">
+            {nav.map((item) => (
+              <a key={item.label} href={item.href} className="flex h-12 items-center justify-between rounded-md px-3 text-[18px] hover:bg-card">
+                {item.label}
+                {item.hasMenu && <ChevronDown aria-hidden strokeWidth={1.5} className="size-4 -rotate-90" />}
+              </a>
+            ))}
+          </nav>
+        )}
       </div>
     </div>
   );
