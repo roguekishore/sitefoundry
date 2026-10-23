@@ -6,7 +6,7 @@ export const heroSample: EzraHeroProps = {
   title: "Full-body MRI that",
   lead: "sees",
   accent: "what’s coming",
-  body: "Once a year. One quiet scan looks for early signs of cancer and hundreds of other conditions. From $1,050.",
+  body: "Once a year, one quiet scan looks for early signs of cancer and hundreds of other conditions. Prices from $1,050.",
   action: { label: "Reserve a scan", href: "#" },
   notice: {
     logo: <EzraLockup partner="Alder" name="kestrel" mark={<Orbit aria-hidden className="size-[1em]" strokeWidth={2.25} />} />,

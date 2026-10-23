@@ -42,7 +42,7 @@ export function EzraScan({ eyebrow, title, body, actions, result, media, classNa
         <div className="mx-auto box-content max-w-page lg:px-gutter">
           <div className="px-gutter pt-19 pb-6 lg:w-[36rem] lg:bg-muted lg:px-[2.125rem] lg:pt-[6.5rem] lg:pb-[6.25rem]">
             <p className="text-xs uppercase">{eyebrow}</p>
-            <h2 className="mt-5 font-display text-[1.9rem] leading-[1.1] font-light tracking-[-0.01em] lg:mt-8 lg:text-[2.8rem]">
+            <h2 className="mt-5 font-display text-[1.9rem] leading-[1.1] font-[350] tracking-[-0.01em] lg:mt-8 lg:text-[2.8rem]">
               {title}
             </h2>
             <p className="mt-5 text-base leading-[1.6] lg:mt-6 lg:max-w-[29rem]">{body}</p>
@@ -59,7 +59,7 @@ export function EzraScan({ eyebrow, title, body, actions, result, media, classNa
           {media ?? <EzraPlaceholder className="absolute inset-0" />}
           {result && (
             <div className="dark absolute top-0 right-0 left-[3.7rem] bg-background p-6 text-foreground lg:top-[58%] lg:left-auto lg:w-[31.25rem]">
-              <p className="font-display text-[1.375rem] leading-[1.2] font-light lg:text-[2.25rem]">{result.title}</p>
+              <p className="font-display text-[1.375rem] leading-[1.2] font-[350] lg:text-[2.25rem]">{result.title}</p>
               <p className="mt-4 text-xs uppercase lg:mt-5">{result.label}</p>
               <p className="mt-3 text-sm leading-[1.6] lg:mt-4">{result.text}</p>
             </div>

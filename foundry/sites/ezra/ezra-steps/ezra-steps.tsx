@@ -83,7 +83,7 @@ export function EzraSteps({ title, phrases, steps, className }: EzraStepsProps) 
             <li key={step.number} className="lg:max-w-[23.75rem]">
               <p className="text-xs">{step.number}</p>
               <div className="mt-9 size-32 lg:mt-9">{step.icon ?? <EzraPlaceholder tone="icon" className="size-full rounded-lg" />}</div>
-              <h3 className="mt-9 font-display text-[2rem] leading-[1.1] font-light tracking-[-0.01em] lg:text-[2.15rem]">{step.title}</h3>
+              <h3 className="mt-9 font-display text-[2rem] leading-[1.1] font-[350] tracking-[-0.01em] lg:text-[2.15rem]">{step.title}</h3>
               <p className="mt-2 text-base leading-[1.6] tracking-[0.01em]">{step.body}</p>
             </li>
           ))}

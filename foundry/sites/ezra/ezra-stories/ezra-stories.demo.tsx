@@ -1,7 +1,7 @@
 import { EzraStories, type EzraStoriesProps } from "./ezra-stories";
 
 export const storiesSample: EzraStoriesProps = {
-  title: "Knowing early changes what comes next. A few of our members tell it best.",
+  title: "Knowing sooner changes what comes next. A few members tell it best.",
   previousLabel: "Previous story",
   nextLabel: "Next story",
   stories: [

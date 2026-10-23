@@ -56,7 +56,7 @@ with a made-up partner, **Alder** (the original shows its parent brand beside it
 | section | trigger | what changes | timing / easing | build |
 |---|---|---|---|---|
 | header | pinned | stays at the top for the whole page | — | `sticky top-0` |
-| hero media | scrubbed with scroll | terracotta rings around the hand draw in one by one from the top while the hero scrolls up | linear with scroll, over ~1 screen | inside the media (not rebuilt); the placeholder gets a stand-in: a terracotta wash layer whose clip opens top→bottom on a CSS view timeline (`entry 0%` → `cover 50%`), inside `@supports`, off under reduced motion |
+| hero media | scrubbed with scroll | terracotta rings around the hand draw in one by one from the top while the hero scrolls up | linear with scroll, over ~1 screen | inside the media (not rebuilt); the placeholder gets a stand-in: a terracotta wash layer whose clip opens top→bottom on a CSS view timeline (`cover 30%` → `cover 90%`), inside `@supports`, off under reduced motion |
 | steps heading | loop | italic phrase types in, pauses, deletes, next phrase | ~60ms/char type, ~30ms/char delete, ~1.6s hold | small JS typing loop (`useEffect` + timeouts); static HTML shows the first phrase whole; reduced motion: first phrase, no typing; `hydrate: visible` |
 | steps cursor | loop | `|` blinks opacity 1↔0 | 700ms | CSS `@keyframes ezra-steps-blink`, off under reduced motion |
 | buttons | hover | terracotta pill → midnight bg; outline pill border #e1e1df → ink; nav arrows grey → ink with cream chevron | Webflow default ~0.2s ease | Tailwind `transition-colors duration-200` + `hover:` |
@@ -86,3 +86,21 @@ with a made-up partner, **Alder** (the original shows its parent brand beside it
   "card bleeding right" shape.
 - `--section-y` is the desktop value (6.25rem); blocks use half of it on phones, as the
   original's fluid spacing does.
+
+## Comparison round 1
+
+Heights (390 / 1440, ours vs original): header 70/90 = · hero 1373/1664 vs 1376/1667 · press
+363/226 vs 318/213 · scan ≈ · stat 632/487 card vs 528/430 · steps 1399/657 vs 1430/649 · note
+250/270 vs 305/271 · pricing+CTA 3059/2336 vs 3227/2267 · stories 958/904 vs 1005/899 · footer
+1731/518 vs 1717/504. Motion list: sticky header, scrubbed clip on the hero slot, 700ms cursor
+blink and the hover colour changes all show up in ours.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| press | names too wide: page 365px wide at 360 | — | — | yes: smaller phone sizes, shorter names, row gap 32px |
+| footer | — | page 1054px wide at 1024 (cells sized by content) | — | yes: cells `min-w-0`, narrower padding and 27px heads at lg, full size from xl |
+| stat | 6 lines vs 4: Newsreader runs ~15% wider than Financier at the same size | 3 lines vs 2 | — | yes: copy shortened to the original's line count (kept the size); asterisk set in the sans like the original's |
+| hero | — | body wraps to an orphaned price | — | yes: copy |
+| mid-size serif heads (scan, steps, stories, note, footer) | read lighter than Financier at 300 | same | — | yes: weight 350 below 60px; hero and stat stay 300 |
+| pricing | — | visit time 12px low | — | yes: 36px gap |
+| scan | the original's photo has a light left margin (part of the photo) | — | — | no: placeholder fills the slot |

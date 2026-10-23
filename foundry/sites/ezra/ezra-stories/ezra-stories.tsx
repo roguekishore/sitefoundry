@@ -37,7 +37,7 @@ export function EzraStories({ title, stories, previousLabel, nextLabel, classNam
   return (
     <section className={cn("dark bg-background text-foreground", className)}>
       <div className="mx-auto box-content max-w-page px-gutter pt-16 pb-16 lg:pt-[5.5rem] lg:pb-22">
-        <h2 className="max-w-[33rem] font-display text-[2rem] leading-[1.25] font-light tracking-[-0.01em] lg:text-[2.15rem] lg:leading-[1.17]">
+        <h2 className="max-w-[33rem] font-display text-[2rem] leading-[1.25] font-[350] tracking-[-0.01em] lg:text-[2.15rem] lg:leading-[1.17]">
           {title}
         </h2>
         <div className="mt-4 overflow-clip lg:mt-7">
