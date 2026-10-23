@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule workforce strip",
+  "description": "A white section with a featherlight heading left, paragraph and button right, then a strip of 4px-radius photos alternating tall and wide that bleeds off both edges and drifts sideways (about 16rem on desktop) as the section scrolls through.",
+  "category": "gallery",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "strip",
+    "marquee",
+    "parallax",
+    "scroll",
+    "light",
+    "reveal"
+  ],
+  "notes": [
+    "photos are 464px tall on desktop and 240px on phones",
+    "CSS only; the drift is off under reduced motion",
+    "has `relative z-10` so it slides over a pinned section above it"
+  ],
+  "entry": "zetta-joule-workforce.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-workforce",
+  "files": [
+    {
+      "path": "zetta-joule-workforce.css",
+      "content": "/* The photo strip glides sideways a little while the section scrolls through the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-workforce-strip {\n      --zetta-joule-drift: -8rem;\n      animation: zetta-joule-workforce-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n    @media (min-width: 64rem) {\n      .zetta-joule-workforce-strip { --zetta-joule-drift: -16rem; }\n    }\n  }\n}\n\n@keyframes zetta-joule-workforce-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(var(--zetta-joule-drift)); }\n}\n"
+    },
+    {
+      "path": "zetta-joule-workforce.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleButton } from \"@foundry/zetta-joule-button\";\nimport { ZettaJoulePlaceholder } from \"@foundry/zetta-joule-placeholder\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\nimport { ZettaJouleSplitHeading } from \"@foundry/zetta-joule-split-heading\";\nimport \"./zetta-joule-workforce.css\";\n\nexport interface ZettaJoulePhoto {\n  /** a wide photo (aspect 1.47) instead of a tall one (0.72); the original alternates */\n  wide?: boolean;\n  /** the photo (cropped like object-fit: cover); empty shows a placeholder */\n  image?: ReactNode;\n}\n\nexport interface ZettaJouleWorkforceProps {\n  /** the heading (\"\\n\" breaks the line on desktop) */\n  heading: string;\n  /** the paragraph on the right */\n  body: string;\n  /** the button */\n  cta: { label: string; href: string };\n  /** the strip of photos, bleeding off both sides; ten fill a wide screen */\n  photos: ZettaJoulePhoto[];\n  className?: string;\n}\n\nexport function ZettaJouleWorkforce({ heading, body, cta, photos, className }: ZettaJouleWorkforceProps) {\n  return (\n    <section className={cn(\"relative z-10 overflow-clip bg-background pt-20 pb-8 text-foreground lg:pt-40 lg:pb-12\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter lg:px-10\">\n        <ZettaJouleSplitHeading heading={heading} body={body}>\n          <ZettaJouleReveal>\n            <ZettaJouleButton label={cta.label} href={cta.href} />\n          </ZettaJouleReveal>\n        </ZettaJouleSplitHeading>\n      </div>\n      <div className=\"zetta-joule-workforce-strip -ml-4 mt-[4.5rem] flex w-max gap-4 lg:-ml-6 lg:mt-24\">\n        {photos.map((p, i) => (\n          <div key={i} className={cn(\"h-60 shrink-0 overflow-clip rounded-sm lg:h-[29rem] [&>*]:size-full [&>*]:object-cover\", p.wide ? \"aspect-[352/240]\" : \"aspect-[172/240]\")}>\n            {p.image ?? <ZettaJoulePlaceholder tone=\"wash\" className=\"size-full\" />}\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-button",
+    "zetta-joule-placeholder",
+    "zetta-joule-reveal",
+    "zetta-joule-split-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading (\"\\n\" breaks the line on desktop)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph on the right"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button"
+    },
+    {
+      "name": "photos",
+      "type": "ZettaJoulePhoto[]",
+      "required": true,
+      "description": "the strip of photos, bleeding off both sides; ten fill a wide screen"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "87d9559a095a8bc31e7abea024e9ed2ba58d387b5a99463fe29bf0d9319a8a61"
+}

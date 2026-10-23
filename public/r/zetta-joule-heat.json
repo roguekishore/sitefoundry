@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule heat chart",
+  "description": "A dark band with a split heading and a tabbed horizontal bar chart on a dotted-grid axis: dashed floating ranges per tab (what each industry needs), a sky-blue bar for your product with the wordmark inside, and four dark comparison bars with a blue end marker. Tabs have a 4px blue underline and a 0.2s colour hover; on phones the tabs become a select box and the chart scrolls sideways with a slider beneath.",
+  "category": "stats",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "chart",
+    "tabs",
+    "bars",
+    "dark",
+    "data",
+    "grid",
+    "comparison"
+  ],
+  "notes": [
+    "forces the dark colour scope",
+    "bar lengths come from the numbers, so any unit works (set unit, axisMax, axisStep)",
+    "needs JavaScript for the tabs and slider"
+  ],
+  "hydrate": "visible",
+  "entry": "zetta-joule-heat.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-heat",
+  "files": [
+    {
+      "path": "zetta-joule-heat.tsx",
+      "content": "import { useRef, useState, type CSSProperties } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleMark } from \"@foundry/zetta-joule-mark\";\nimport { ZettaJouleSplitHeading } from \"@foundry/zetta-joule-split-heading\";\n\nexport interface ZettaJouleHeatTab {\n  /** tab label */\n  label: string;\n  /** the dashed floating ranges shown for this tab */\n  ranges: { label: string; from: number; to: number }[];\n}\n\nexport interface ZettaJouleHeatBar {\n  /** what the bar is */\n  label: string;\n  /** text after the label, e.g. \"750 °C\" */\n  valueLabel: string;\n  /** the number that sets the bar length (same unit as the axis) */\n  value: number;\n}\n\nexport interface ZettaJouleHeatProps {\n  /** heading (\"\\n\" is kept as a line break) */\n  heading: string;\n  /** paragraph on the right */\n  body: string;\n  /** the tabs; the first is open at the start. On phones they become a select box */\n  tabs: ZettaJouleHeatTab[];\n  /** your own bar, drawn first in sky blue with the wordmark in it */\n  brand: { name: string } & ZettaJouleHeatBar;\n  /** the comparison bars (shorter, dark, with a blue end marker) */\n  bars: ZettaJouleHeatBar[];\n  /** the unit shown on the axis, e.g. \"°C\" */\n  unit: string;\n  /** the axis goes from 0 to this value */\n  axisMax: number;\n  /** the distance between axis ticks */\n  axisStep: number;\n  /** accessible name of the tab selector on phones */\n  tabsLabel: string;\n  className?: string;\n}\n\n/** Position of a value along the plot: a 24px margin on both sides, the rest split evenly. */\nconst plotLeft = \"calc(1.5rem + (100% - 3rem) * var(--from))\";\n\nexport function ZettaJouleHeat({ heading, body, tabs, brand, bars, unit, axisMax, axisStep, tabsLabel, className }: ZettaJouleHeatProps) {\n  const [active, setActive] = useState(0);\n  const [scroll, setScroll] = useState(0);\n  const track = useRef<HTMLDivElement>(null);\n  const ticks = Array.from({ length: Math.floor(axisMax / axisStep) + 1 }, (_, i) => i * axisStep);\n  const frac = (v: number) => ({ \"--from\": v / axisMax }) as CSSProperties;\n\n  const onScroll = () => {\n    const el = track.current;\n    if (el && el.scrollWidth > el.clientWidth) setScroll((el.scrollLeft / (el.scrollWidth - el.clientWidth)) * 100);\n  };\n  const onSlide = (pct: number) => {\n    const el = track.current;\n    setScroll(pct);\n    if (el) el.scrollLeft = (pct / 100) * (el.scrollWidth - el.clientWidth);\n  };\n\n  const barBase = \"relative flex h-10 items-center px-4 text-base tracking-[-0.01em] text-foreground\";\n\n  return (\n    <section className={cn(\"dark bg-background pt-20 pb-14 text-foreground lg:pt-section\", className)}>\n      <div className=\"mx-auto w-full max-w-[calc(var(--page-width)+5rem)] px-gutter lg:px-10\">\n        <ZettaJouleSplitHeading heading={heading} body={body} bodyTone=\"strong\" keepBreaks />\n\n        <div className=\"mt-12 lg:mt-14\">\n          {/* tabs: underlined row on desktop, a select box on phones */}\n          <div role=\"tablist\" aria-label={tabsLabel} className=\"hidden gap-10 border-b border-border lg:flex\">\n            {tabs.map((t, i) => (\n              <button\n                key={t.label}\n                role=\"tab\"\n                type=\"button\"\n                aria-selected={i === active}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"-mb-px border-b-4 pb-4 text-base tracking-[-0.01em] transition-colors duration-200\",\n                  i === active ? \"border-glow text-foreground\" : \"border-transparent text-muted-foreground hover:text-foreground/90\",\n                )}\n              >\n                {t.label}\n              </button>\n            ))}\n          </div>\n          <div className=\"relative border-b border-border lg:hidden\">\n            <select\n              aria-label={tabsLabel}\n              value={active}\n              onChange={(e) => setActive(Number(e.target.value))}\n              className=\"w-full appearance-none bg-transparent py-4 pr-8 text-base tracking-[-0.01em] text-foreground\"\n            >\n              {tabs.map((t, i) => (\n                <option key={t.label} value={i} className=\"bg-background\">\n                  {t.label}\n                </option>\n              ))}\n            </select>\n            <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-1 size-4 -translate-y-1/2 text-foreground\" strokeWidth={1.5} />\n          </div>\n\n          {/* the chart: a sideways-scrolling strip on phones, the full width on desktop */}\n          <div ref={track} onScroll={onScroll} className=\"-mx-gutter mt-10 overflow-x-auto px-gutter [scrollbar-width:none] lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden\">\n            <div className=\"relative w-[78rem] lg:w-full\">\n              {ticks.map((v) => (\n                <span key={v} aria-hidden className=\"absolute inset-y-0 w-px border-l border-dotted border-foreground/10\" style={{ ...frac(v), left: plotLeft }} />\n              ))}\n              <div className=\"relative h-[12.8rem]\">\n                {tabs[active].ranges.map((r, i) => (\n                  <div key={r.label} className=\"absolute inset-x-0 h-10\" style={{ ...frac(r.from), top: `${i * 3.25}rem`, \"--w\": (r.to - r.from) / axisMax } as CSSProperties}>\n                    <span aria-hidden className=\"absolute inset-y-0 rounded-sm border border-dashed border-glow bg-glow/15\" style={{ left: plotLeft, width: \"calc((100% - 3rem) * var(--w))\" }} />\n                    <span className=\"absolute top-1/2 -translate-y-1/2 text-sm leading-[1.3] tracking-[-0.01em] whitespace-nowrap\" style={{ left: \"calc(1.5rem + (100% - 3rem) * (var(--from) + var(--w)) + 0.75rem)\" }}>\n                      {r.label}\n                      <span className=\"block\">\n                        {r.from} {unit} - {r.to} {unit}\n                      </span>\n                    </span>\n                  </div>\n                ))}\n              </div>\n              <ul className=\"relative flex flex-col gap-3\">\n                <li className={cn(barBase, \"bg-glow text-highlight-foreground\")} style={{ width: `calc(1.5rem + (100% - 3rem) * ${brand.value / axisMax})` }}>\n                  <ZettaJouleMark name={brand.name} className=\"mr-2 text-base\" />\n                  {brand.label}\n                  <span className=\"ml-2\">{brand.valueLabel}</span>\n                </li>\n                {bars.map((b) => (\n                  <li key={b.label} className={cn(barBase, \"bg-secondary\")} style={{ width: `calc(1.5rem + (100% - 3rem) * ${b.value / axisMax})` }}>\n                    {b.label}\n                    <span className=\"ml-2\">{b.valueLabel}</span>\n                    <span aria-hidden className=\"absolute inset-y-0 right-0 w-[3px] bg-glow\" />\n                  </li>\n                ))}\n              </ul>\n              <div aria-hidden className=\"relative mt-8 h-8 border-t border-border\">\n                {ticks.map((v) => (\n                  <span key={v} className=\"absolute top-0 flex -translate-x-1/2 flex-col items-center\" style={{ ...frac(v), left: plotLeft }}>\n                    <span className=\"h-2 w-px bg-border\" />\n                    <span className=\"mt-3 text-xs leading-none whitespace-nowrap\">\n                      {v} {unit}\n                    </span>\n                  </span>\n                ))}\n              </div>\n            </div>\n          </div>\n          <input\n            type=\"range\"\n            min={0}\n            max={100}\n            step={1}\n            value={scroll}\n            aria-label={tabsLabel}\n            onChange={(e) => onSlide(Number(e.target.value))}\n            className=\"mt-10 block h-3 w-full cursor-pointer appearance-none bg-transparent lg:hidden [&::-moz-range-thumb]:size-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-glow [&::-moz-range-track]:h-px [&::-moz-range-track]:bg-glow [&::-webkit-slider-runnable-track]:h-px [&::-webkit-slider-runnable-track]:bg-glow [&::-webkit-slider-thumb]:-mt-[5px] [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-glow\"\n          />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-mark",
+    "zetta-joule-split-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "heading (\"\\n\" is kept as a line break)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "paragraph on the right"
+    },
+    {
+      "name": "tabs",
+      "type": "ZettaJouleHeatTab[]",
+      "required": true,
+      "description": "the tabs; the first is open at the start. On phones they become a select box"
+    },
+    {
+      "name": "brand",
+      "type": "{ name: string; } & ZettaJouleHeatBar",
+      "required": true,
+      "description": "your own bar, drawn first in sky blue with the wordmark in it"
+    },
+    {
+      "name": "bars",
+      "type": "ZettaJouleHeatBar[]",
+      "required": true,
+      "description": "the comparison bars (shorter, dark, with a blue end marker)"
+    },
+    {
+      "name": "unit",
+      "type": "string",
+      "required": true,
+      "description": "the unit shown on the axis, e.g. \"°C\""
+    },
+    {
+      "name": "axisMax",
+      "type": "number",
+      "required": true,
+      "description": "the axis goes from 0 to this value"
+    },
+    {
+      "name": "axisStep",
+      "type": "number",
+      "required": true,
+      "description": "the distance between axis ticks"
+    },
+    {
+      "name": "tabsLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the tab selector on phones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8f8e89e51152c5c208ec988c71a3a13b61687ea23817cf7411c236158a775692"
+}

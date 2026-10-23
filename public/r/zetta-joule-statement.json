@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Zetta-Joule statement row",
+  "description": "A small 14px label in the left four columns and a large featherlight (weight 250) statement in the right eight; stacked on phones. The label fades in letter by letter and the statement lifts and uncovers as it scrolls into view. Room for a button underneath.",
+  "category": "text-effect",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "statement",
+    "label",
+    "reveal",
+    "scroll",
+    "light",
+    "minimal",
+    "css-only"
+  ],
+  "notes": [
+    "needs a display font with a light weight (Geist at 250 in the theme)",
+    "accent tone is for pale panels; default follows the text colour so it also works on dark bands"
+  ],
+  "entry": "zetta-joule-statement.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-statement",
+  "files": [
+    {
+      "path": "zetta-joule-statement.css",
+      "content": "/* Each letter of the small label fades in as it scrolls into view, one after the other:\n   the range of letter n starts a little later than letter n-1. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zetta-joule-statement-char {\n      animation: zetta-joule-statement-char linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--i) * 1.4%) entry calc(24% + var(--i) * 1.4%);\n    }\n  }\n}\n\n@keyframes zetta-joule-statement-char {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "zetta-joule-statement.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleReveal } from \"@foundry/zetta-joule-reveal\";\nimport \"./zetta-joule-statement.css\";\n\nexport interface ZettaJouleStatementProps {\n  /** the small label in the left column; \"\\n\" starts a new line */\n  label: string;\n  /** the large light statement in the right columns */\n  statement: string;\n  /** default follows the text colour; accent uses the navy highlight colour (for pale-blue sections) */\n  tone?: \"default\" | \"accent\";\n  /** extra content under the statement (a button) */\n  children?: ReactNode;\n  className?: string;\n}\n\n/** A label that types itself in letter by letter. */\nfunction Chars({ text }: { text: string }) {\n  let n = 0;\n  return text.split(\"\\n\").map((line, li) => (\n    <span key={li} className=\"block\">\n      {line.split(\" \").map((word, wi) => (\n        <span key={wi}>\n          {wi > 0 && \" \"}\n          <span className=\"inline-block whitespace-nowrap\">\n            {[...word].map((ch, ci) => (\n              <span key={ci} className=\"zetta-joule-statement-char\" style={{ \"--i\": n++ } as CSSProperties}>\n                {ch}\n              </span>\n            ))}\n          </span>\n        </span>\n      ))}\n    </span>\n  ));\n}\n\nexport function ZettaJouleStatement({ label, statement, tone = \"default\", children, className }: ZettaJouleStatementProps) {\n  return (\n    <div className={cn(\"grid gap-x-4 gap-y-3 lg:grid-cols-12\", tone === \"accent\" ? \"text-highlight\" : \"text-foreground\", className)}>\n      <p className=\"text-sm leading-[1.2] font-medium tracking-[-0.01em] lg:col-span-4\">\n        <span className=\"sr-only\">{label}</span>\n        <span aria-hidden>\n          <Chars text={label} />\n        </span>\n      </p>\n      <div className=\"lg:col-span-8\">\n        <ZettaJouleReveal variant=\"lines\" as=\"p\" className=\"font-display text-2xl leading-[1.2] font-[250] tracking-[-0.03em] lg:max-w-[49rem] lg:text-[2rem]\">\n          {statement}\n        </ZettaJouleReveal>\n        {children && <div className=\"mt-10 lg:mt-12\">{children}</div>}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-reveal"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label in the left column; \"\\n\" starts a new line"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the large light statement in the right columns"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "default",
+      "description": "default follows the text colour; accent uses the navy highlight colour (for pale-blue sections)"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "extra content under the statement (a button)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1f2c77a90c85eade6cf9c390f7c0df470a2d31f327f3ed0f725c276da8eb5c93"
+}

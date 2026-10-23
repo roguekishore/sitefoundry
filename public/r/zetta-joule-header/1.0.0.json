@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zetta-Joule header",
+  "description": "A transparent header floating over the hero: wordmark left, seven small centred links whose text rolls up on hover, a pale-blue CTA right. On phones a white rounded menu button opens a full-width list. Slides away while scrolling down and returns going up on a dark blurred bar.",
+  "category": "header",
+  "site": "zetta-joule",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "transparent",
+    "sticky",
+    "hide-on-scroll",
+    "hover-roll",
+    "dark"
+  ],
+  "notes": [
+    "it is a zero-height sticky element: place it directly above the hero",
+    "white text: made for a coloured or photographic hero"
+  ],
+  "hydrate": "load",
+  "entry": "zetta-joule-header.tsx",
+  "source": "foundry",
+  "name": "zetta-joule-header",
+  "files": [
+    {
+      "path": "zetta-joule-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZettaJouleButton } from \"@foundry/zetta-joule-button\";\nimport { ZettaJouleMark } from \"@foundry/zetta-joule-mark\";\n\nexport interface ZettaJouleHeaderLink {\n  /** link text */\n  label: string;\n  /** link target */\n  href: string;\n}\n\nexport interface ZettaJouleHeaderProps {\n  /** the company name (wordmark) */\n  brand: string;\n  /** where the wordmark links */\n  homeHref?: string;\n  /** the centre links (desktop) and the menu list (phones) */\n  links: ZettaJouleHeaderLink[];\n  /** the call-to-action on the right (desktop) and at the end of the menu (phones) */\n  cta: ZettaJouleHeaderLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** One nav link: the text rolls up and a copy rolls in from below on hover. */\nfunction RollLink({ label, href }: ZettaJouleHeaderLink) {\n  const roll = \"block transition-transform duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] motion-reduce:transition-none group-hover:-translate-y-full\";\n  return (\n    <a href={href} className=\"group block h-[1.05rem] overflow-clip text-sm leading-[1.05rem] font-medium tracking-[-0.01em] text-foreground transition-colors duration-200 hover:text-primary\">\n      <span className={roll}>{label}</span>\n      <span aria-hidden className={roll}>\n        {label}\n      </span>\n    </a>\n  );\n}\n\n/** Sits over the top of the page (zero height, sticky). Hides while scrolling down, returns on the way up with a dark bar. */\nexport function ZettaJouleHeader({ brand, homeHref = \"#\", links, cta, menuLabel, className }: ZettaJouleHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [scrolled, setScrolled] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      setScrolled(y > 40);\n      if (y > last && y > 120) setHidden(true);\n      else if (y < last) setHidden(false);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  return (\n    <header className={cn(\"dark sticky top-0 z-50 h-0 text-foreground\", className)}>\n      <div\n        className={cn(\n          \"absolute inset-x-0 top-0 transition-[transform,background-color] duration-300 ease-out motion-reduce:transition-none\",\n          hidden && !open && \"-translate-y-full\",\n          scrolled || open ? \"bg-popover/90 backdrop-blur-md\" : \"bg-transparent\",\n        )}\n      >\n        <div className=\"mx-auto flex w-full max-w-[calc(var(--page-width)+5rem)] items-center justify-between px-gutter py-6 lg:px-10\">\n          <a href={homeHref} className=\"transition-opacity duration-200 hover:opacity-70\">\n            <ZettaJouleMark name={brand} className=\"text-[1.5rem] lg:text-[1.75rem]\" />\n          </a>\n          <nav aria-label=\"Main\" className=\"absolute left-1/2 hidden -translate-x-1/2 gap-8 lg:flex\">\n            {links.map((l) => (\n              <RollLink key={l.label} {...l} />\n            ))}\n          </nav>\n          <ZettaJouleButton variant=\"solid\" label={cta.label} href={cta.href} className=\"hidden lg:inline-flex\" />\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"grid size-9 place-items-center rounded-lg bg-foreground text-background lg:hidden\"\n          >\n            {open ? <X className=\"size-5\" strokeWidth={1.5} /> : <Menu className=\"size-5\" strokeWidth={1.5} />}\n          </button>\n        </div>\n        {open && (\n          <nav aria-label=\"Menu\" className=\"grid gap-1 px-gutter pb-8 lg:hidden\">\n            {links.map((l) => (\n              <a key={l.label} href={l.href} className=\"border-b border-border py-3 font-display text-2xl font-[250] tracking-[-0.03em]\">\n                {l.label}\n              </a>\n            ))}\n            <ZettaJouleButton variant=\"solid\" label={cta.label} href={cta.href} className=\"mt-6 w-full\" />\n          </nav>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "zetta-joule-button",
+    "zetta-joule-mark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name (wordmark)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "ZettaJouleHeaderLink[]",
+      "required": true,
+      "description": "the centre links (desktop) and the menu list (phones)"
+    },
+    {
+      "name": "cta",
+      "type": "ZettaJouleHeaderLink",
+      "required": true,
+      "description": "the call-to-action on the right (desktop) and at the end of the menu (phones)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2c5df9d3426d89babc7bc12601bc5961a12cde18af44d5b43dac53217309d1e2"
+}
