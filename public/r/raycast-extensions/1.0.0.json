@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast extensions carousel",
+  "description": "A left-aligned two-tone heading with a pill of category tabs (right on desktop, under it on phones), then a sideways track of tall rounded cards, each washed with its own colour: app tile, name, a small arrow button, a one-line pitch, a hairline and an artwork slot. Cards slide in from the right on load, two round arrows scroll the track, and a 'browse more' link sits at the left.",
+  "category": "gallery",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "cards",
+    "tabs",
+    "pill",
+    "dark",
+    "gradient",
+    "slide-in",
+    "interactive"
+  ],
+  "notes": [
+    "each card's tone is one of chart-1…5, so the washes follow the theme",
+    "needs JavaScript for the tabs and arrows (state, scrollBy); static HTML shows the first tab",
+    "best on dark themes"
+  ],
+  "hydrate": "visible",
+  "entry": "raycast-extensions.tsx",
+  "source": "foundry",
+  "name": "raycast-extensions",
+  "files": [
+    {
+      "path": "raycast-extensions.css",
+      "content": "/* Cards slide in from the right over 700ms, 60ms apart; the set is re-keyed when a tab changes so it replays. */\n.raycast-extensions-card {\n  animation: raycast-extensions-slide 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;\n  animation-delay: calc(var(--raycast-card-i, 0) * 60ms);\n}\n\n@keyframes raycast-extensions-slide {\n  from { opacity: 0; transform: translateX(64px); }\n  to { opacity: 1; transform: none; }\n}\n\n.raycast-extensions-track {\n  scrollbar-width: none;\n}\n.raycast-extensions-track::-webkit-scrollbar {\n  display: none;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .raycast-extensions-card { animation: none; }\n}\n"
+    },
+    {
+      "path": "raycast-extensions.tsx",
+      "content": "import { useRef, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastHeading } from \"@foundry/raycast-heading\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\nimport \"./raycast-extensions.css\";\n\nexport interface RaycastExtensionCard {\n  /** the extension's name */\n  name: ReactNode;\n  /** the one-line pitch */\n  description: ReactNode;\n  /** colour wash of the card: which chart token tints it (1–5) */\n  tone: 1 | 2 | 3 | 4 | 5;\n  /** the app tile (48px square); a placeholder tile when empty */\n  icon?: ReactNode;\n  /** where the card's arrow button goes */\n  href: string;\n  /** the artwork under the hairline; a placeholder panel when empty */\n  media?: ReactNode;\n}\n\nexport interface RaycastExtensionTab {\n  /** the tab's name */\n  label: string;\n  /** the cards of this tab */\n  cards: RaycastExtensionCard[];\n}\n\nexport interface RaycastExtensionsProps {\n  /** the white heading sentence */\n  title: ReactNode;\n  /** the grey heading sentence */\n  subtitle?: ReactNode;\n  /** the category tabs, each with its cards */\n  tabs: RaycastExtensionTab[];\n  /** the link at the bottom left */\n  browse: { label: ReactNode; href: string };\n  /** screen-reader labels of the two round arrows */\n  arrowLabels?: { prev: string; next: string };\n  /** screen-reader label of each card's arrow button */\n  openLabel?: string;\n  className?: string;\n}\n\n/** Heading + category pills + a track of tinted extension cards with round scroll arrows. */\nexport function RaycastExtensions({ title, subtitle, tabs, browse, arrowLabels, openLabel, className }: RaycastExtensionsProps) {\n  const [tab, setTab] = useState(0);\n  const track = useRef<HTMLDivElement>(null);\n  const cards = tabs[tab]?.cards ?? [];\n  const scrollBy = (dir: 1 | -1) => track.current?.scrollBy({ left: dir * 416, behavior: \"smooth\" });\n  return (\n    <section className={cn(\"bg-background py-section text-foreground lg:py-56\", className)}>\n      <div className=\"mx-auto flex max-w-[calc(var(--page-width)+2*var(--page-gutter))] flex-col gap-12 px-gutter lg:flex-row lg:items-start lg:justify-between\">\n        <RaycastHeading title={title} subtitle={subtitle} align=\"left\" className=\"max-w-[24rem] lg:max-w-[22rem]\" />\n        <div role=\"tablist\" className=\"-mr-gutter flex max-w-none overflow-x-auto rounded-full bg-card/60 p-1.5 ring-1 ring-foreground/10 [scrollbar-width:none] lg:mr-0 lg:max-w-none lg:overflow-visible\">\n          {tabs.map((t, i) => (\n            <button\n              key={t.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === tab}\n              onClick={() => setTab(i)}\n              className={cn(\n                \"shrink-0 rounded-full px-4 py-[0.6875rem] text-sm font-medium tracking-[0.2px] whitespace-nowrap transition-colors duration-200 motion-reduce:transition-none\",\n                i === tab\n                  ? \"bg-linear-to-b from-foreground/[0.14] to-foreground/[0.04] text-foreground shadow-[0_1px_0_0_color-mix(in_oklab,var(--foreground)_10%,transparent)_inset]\"\n                  : \"text-muted-foreground hover:text-foreground\",\n              )}\n            >\n              {t.label}\n            </button>\n          ))}\n        </div>\n      </div>\n\n      <div\n        ref={track}\n        key={tab}\n        className=\"raycast-extensions-track mx-auto mt-12 flex max-w-[calc(var(--page-width)+3rem)] snap-x snap-mandatory gap-6 overflow-x-auto scroll-pl-gutter px-gutter pb-16 lg:mt-[4.5rem] lg:gap-14 lg:pb-14\"\n      >\n        {cards.map((card, i) => (\n          <article\n            key={i}\n            style={{ [\"--raycast-card-i\" as string]: i, [\"--tone\" as string]: `var(--chart-${card.tone})` } as CSSProperties}\n            className={cn(\n              \"raycast-extensions-card group relative flex h-[27.875rem] w-[18.75rem] shrink-0 snap-start flex-col rounded-[1.25rem] p-6 ring-1 ring-foreground/10 lg:h-[33.5rem] lg:w-[22.5rem]\",\n              \"bg-card bg-[radial-gradient(ellipse_90%_55%_at_50%_45%,color-mix(in_oklab,var(--tone)_32%,transparent),transparent_80%)]\",\n              \"transition-shadow duration-300 hover:shadow-[0_0_48px_8px_color-mix(in_oklab,var(--tone)_16%,transparent)] motion-reduce:transition-none\",\n            )}\n          >\n            <header className=\"flex items-center gap-3\">\n              <span className=\"flex size-12 shrink-0 items-center justify-center overflow-clip rounded-xl bg-background/60 ring-1 ring-foreground/25 [&_svg]:size-6\">\n                {card.icon ?? <RaycastPlaceholder tone=\"muted\" className=\"size-full rounded-xl\" />}\n              </span>\n              <h3 className=\"min-w-0 flex-1 truncate text-lg font-medium tracking-[0.2px]\">{card.name}</h3>\n              <a\n                href={card.href}\n                aria-label={openLabel}\n                className=\"flex size-[2.375rem] shrink-0 items-center justify-center rounded-lg bg-background/30 ring-1 ring-foreground/20 transition-colors hover:bg-foreground/10 [&_svg]:size-4\"\n              >\n                <ChevronRight />\n              </a>\n            </header>\n            <p className=\"mt-6 text-base leading-[1.6] font-semibold tracking-[0.2px]\">{card.description}</p>\n            <div className=\"mt-5 flex min-h-0 flex-1 flex-col border-t border-foreground/10 pt-5 [&>*]:flex-1\">\n              {card.media ?? <RaycastPlaceholder tone=\"panel\" className=\"rounded-xl\" />}\n            </div>\n          </article>\n        ))}\n      </div>\n\n      <div className=\"mx-auto flex max-w-[calc(var(--page-width)+2*var(--page-gutter))] items-center justify-between gap-4 px-gutter\">\n        <a href={browse.href} className=\"inline-flex items-center gap-1.5 text-base font-medium tracking-[0.2px] text-muted-foreground transition-colors duration-300 hover:text-foreground [&_svg]:size-4 [&_svg]:transition-transform hover:[&_svg]:translate-x-0.5\">\n          {browse.label}\n          <ArrowRight />\n        </a>\n        <div className=\"flex gap-3.5\">\n          <button type=\"button\" aria-label={arrowLabels?.prev} onClick={() => scrollBy(-1)} className=\"flex size-[2.875rem] items-center justify-center rounded-full bg-card/70 text-muted-foreground ring-1 ring-foreground/10 transition-colors hover:text-foreground lg:size-[3.625rem]\">\n            <ChevronLeft className=\"size-4\" />\n          </button>\n          <button type=\"button\" aria-label={arrowLabels?.next} onClick={() => scrollBy(1)} className=\"flex size-[2.875rem] items-center justify-center rounded-full bg-card/70 text-foreground ring-1 ring-foreground/10 transition-colors hover:bg-card lg:size-[3.625rem]\">\n            <ChevronRight className=\"size-4\" />\n          </button>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-heading",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the white heading sentence"
+    },
+    {
+      "name": "subtitle",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the grey heading sentence"
+    },
+    {
+      "name": "tabs",
+      "type": "RaycastExtensionTab[]",
+      "required": true,
+      "description": "the category tabs, each with its cards"
+    },
+    {
+      "name": "browse",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the link at the bottom left"
+    },
+    {
+      "name": "arrowLabels",
+      "type": "{ prev: string; next: string; }",
+      "required": false,
+      "description": "screen-reader labels of the two round arrows"
+    },
+    {
+      "name": "openLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label of each card's arrow button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ca1f6ea324be5dafefe18f3df51d7ebc03d97062a68953a5666681590739462c"
+}

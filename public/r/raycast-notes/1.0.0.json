@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast notes",
+  "description": "A split section: a large soft-ringed window slot on one side, and on the other a big 24px paragraph whose opening sentence is white with a faint glow and the rest brightens word by word as you scroll, then a small chip and a grey note with an underlined link. On phones the window sits on top, then the chip, then the paragraph.",
+  "category": "features",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "split",
+    "scroll",
+    "scrubbed",
+    "text-reveal",
+    "dark",
+    "glow"
+  ],
+  "notes": [
+    "the word-by-word brightening is a CSS scroll-driven animation; without support the words stay in the dim colour",
+    "the media slot is a placeholder when empty",
+    "the small note below the chip is hidden on phones, as in the original"
+  ],
+  "entry": "raycast-notes.tsx",
+  "source": "foundry",
+  "name": "raycast-notes",
+  "files": [
+    {
+      "path": "raycast-notes.css",
+      "content": "/* Each word of the paragraph brightens as it travels up the screen: its own view timeline,\n   from just entering the bottom to a third of the way up. */\n@supports (animation-timeline: view()) {\n  .raycast-notes-word {\n    animation: raycast-notes-word linear both;\n    animation-timeline: view();\n    animation-range: entry 90% cover 38%;\n  }\n}\n\n@keyframes raycast-notes-word {\n  from { color: color-mix(in oklab, var(--foreground) 22%, transparent); }\n  to { color: var(--foreground); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .raycast-notes-word { animation: none; color: var(--muted-foreground); }\n}\n"
+    },
+    {
+      "path": "raycast-notes.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\nimport \"./raycast-notes.css\";\n\nexport interface RaycastNotesProps {\n  /** the first line, white (a question) */\n  question: ReactNode;\n  /** the opening answer, white with a faint glow */\n  answer: ReactNode;\n  /** the long paragraph that follows; its words brighten one by one while scrolling (plain text) */\n  body: string;\n  /** the small chip: an icon and a name */\n  chip: { icon: ReactNode; label: ReactNode };\n  /** the grey note under the chip (desktop) with its underlined link */\n  note: { text: ReactNode; link: { label: ReactNode; href: string } };\n  /** the window shot; a token placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Window slot beside (or above) a paragraph that brightens word by word as it scrolls into view. */\nexport function RaycastNotes({ question, answer, body, chip, note, media, className }: RaycastNotesProps) {\n  const words = body.split(/\\s+/).filter(Boolean);\n  return (\n    <section className={cn(\"overflow-clip bg-background px-gutter py-section text-foreground lg:py-48\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-8 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-6\">\n        <div className=\"aspect-square max-w-[20.375rem] overflow-clip rounded-[0.5625rem] max-lg:self-center lg:order-2 lg:-mr-14 lg:w-[calc(100%+3.5rem)] lg:max-w-none [&>*]:size-full\">\n          {media ?? <RaycastPlaceholder tone=\"panel\" className=\"rounded-[0.5625rem]\" />}\n        </div>\n\n        <div className=\"flex flex-col lg:order-1\">\n          <span className=\"inline-flex w-fit items-center gap-2 rounded-lg bg-foreground/[0.08] px-2.5 py-1.5 text-sm font-semibold tracking-[0.2px] max-lg:order-1 lg:order-2 lg:mt-24 [&_svg]:size-4\">\n            {chip.icon}\n            {chip.label}\n          </span>\n          <p className=\"text-2xl leading-[1.6] font-medium tracking-[0.2px] max-lg:order-2 max-lg:mt-8 lg:order-1 lg:max-w-[25rem] lg:leading-[1.6]\">\n            <span className=\"block font-semibold\">{question}</span>\n            <span className=\"font-semibold [text-shadow:0_0_24px_color-mix(in_oklab,var(--glow)_55%,transparent)]\">{answer}</span>{\" \"}\n            {words.map((w, i) => (\n              <span key={i} className=\"raycast-notes-word text-foreground/20\">\n                {w}{\" \"}\n              </span>\n            ))}\n          </p>\n          <p className=\"mt-5 hidden max-w-[17rem] text-sm leading-[1.65] font-medium tracking-[0.2px] text-muted-foreground lg:order-3 lg:block\">\n            {note.text}{\" \"}\n            <a href={note.link.href} className=\"underline underline-offset-2 transition-colors hover:text-foreground\">\n              {note.link.label}\n            </a>\n          </p>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "question",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the first line, white (a question)"
+    },
+    {
+      "name": "answer",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the opening answer, white with a faint glow"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the long paragraph that follows; its words brighten one by one while scrolling (plain text)"
+    },
+    {
+      "name": "chip",
+      "type": "{ icon: ReactNode; label: ReactNode; }",
+      "required": true,
+      "description": "the small chip: an icon and a name"
+    },
+    {
+      "name": "note",
+      "type": "{ text: ReactNode; link: { label: ReactNode; href: string; }; }",
+      "required": true,
+      "description": "the grey note under the chip (desktop) with its underlined link"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the window shot; a token placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "75624b51e64723749ba00332667f6119cd89e09e4eb9e30317b370aa0aa5bea5"
+}

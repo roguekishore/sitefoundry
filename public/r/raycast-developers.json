@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast developers grid",
+  "description": "A blueprint-style three-column hairline grid on a near-black page, with faint rules running past it: an intro cell (a 56px light-weight title, a hairline, a mono paragraph and a bold mono link), six dotted figure cells labelled FIG_01…06 holding artwork slots, and four text cells (title, mono blurb, a small arrow top-right) placed between them in a zig-zag. One column on phones. Hover nudges the arrows.",
+  "category": "features",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "grid",
+    "blueprint",
+    "hairline",
+    "mono",
+    "dark",
+    "dotted",
+    "figures"
+  ],
+  "notes": [
+    "the figures are media slots (a faint panel over a dotted floor when empty)",
+    "uses the theme's mono face for body text",
+    "best on dark themes"
+  ],
+  "entry": "raycast-developers.tsx",
+  "source": "foundry",
+  "name": "raycast-developers",
+  "files": [
+    {
+      "path": "raycast-developers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\n\nexport interface RaycastDevFeature {\n  /** the cell's title */\n  title: ReactNode;\n  /** the mono blurb */\n  description: ReactNode;\n  /** where the little arrow goes */\n  href: string;\n}\n\nexport interface RaycastDevelopersProps {\n  /** the big light title in the intro cell */\n  title: ReactNode;\n  /** the mono paragraph under it */\n  text: ReactNode;\n  /** the bold mono link at the bottom of the intro cell */\n  link: { label: ReactNode; href: string };\n  /** four text cells in page order: beside FIG_02, between FIG_03 and FIG_04, beside FIG_05, beside FIG_06 */\n  features: [RaycastDevFeature, RaycastDevFeature, RaycastDevFeature, RaycastDevFeature];\n  /** the six figures in order (FIG_01…06); a faint panel over the dotted floor when empty */\n  figures?: ReactNode[];\n  /** the label prefix of each figure (\"FIG_\" gives FIG_01…) */\n  figurePrefix?: string;\n  /** the closing link in the last row */\n  cta: { label: ReactNode; href: string };\n  className?: string;\n}\n\n/* On phones every cell is its own bordered strip with a gap between; from lg the cells of a row\n   share one-pixel lines (the row's background shows through the gaps). */\nconst cell = \"relative border-y border-foreground/10 lg:border-0 lg:bg-background\";\nconst row = \"grid gap-y-[3.125rem] lg:grid-cols-3 lg:gap-px lg:gap-y-px lg:border lg:border-foreground/10 lg:bg-foreground/10\";\n\nfunction Figure({ n, prefix, media, className }: { n: number; prefix: string; media?: ReactNode; className?: string }) {\n  return (\n    <div className={cn(cell, \"min-h-[17.5rem] overflow-clip\", className)}>\n      <RaycastPlaceholder tone=\"dots\" className=\"absolute inset-0\" />\n      <span className=\"absolute top-3 left-3 font-mono text-[0.6875rem] tracking-[0.1px] text-muted-foreground/70\">\n        {prefix}\n        {String(n).padStart(2, \"0\")}\n      </span>\n      <div className=\"absolute inset-[12%] overflow-clip [&>*]:size-full\">{media ?? <RaycastPlaceholder tone=\"panel\" className=\"rounded-xl\" />}</div>\n    </div>\n  );\n}\n\nfunction Feature({ f, className }: { f: RaycastDevFeature; className?: string }) {\n  return (\n    <a href={f.href} className={cn(cell, \"group flex min-h-[12.5rem] flex-col justify-end p-6\", className)}>\n      <ArrowUpRight className=\"absolute top-6 right-6 size-4 text-muted-foreground transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5\" />\n      <h3 className=\"text-2xl leading-[1.15] font-medium tracking-[-0.01em]\">{f.title}</h3>\n      <p className=\"mt-2 font-mono text-[0.8125rem] leading-[1.75] tracking-[0.1px] text-muted-foreground/80\">{f.description}</p>\n    </a>\n  );\n}\n\n/** A hairline blueprint grid: intro, six dotted figure cells and four text cells. */\nexport function RaycastDevelopers({ title, text, link, features, figures = [], figurePrefix, cta, className }: RaycastDevelopersProps) {\n  const prefix = figurePrefix ?? \"\";\n  return (\n    <section className={cn(\"relative overflow-clip bg-background px-[1.875rem] py-[8rem] text-foreground lg:px-gutter lg:py-[24rem]\", className)}>\n      {/* rules that run on past the grid, fading toward the ends of the section */}\n      <div aria-hidden className=\"absolute inset-0 hidden [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] lg:block\">\n        <div className=\"relative mx-auto h-full max-w-[75rem]\">\n          {[0, 1, 2, 3].map((i) => (\n            <span key={i} className=\"absolute inset-y-0 w-px bg-foreground/[0.07]\" style={{ left: `${5.6 + i * 29.6}%` }} />\n          ))}\n        </div>\n      </div>\n\n      <div className=\"relative mx-auto flex max-w-[66.75rem] flex-col gap-y-[3.125rem]\">\n        <div className={row}>\n          <Figure n={1} prefix={prefix} media={figures[0]} className=\"lg:order-2 lg:col-span-2 lg:h-[30.375rem]\" />\n          <div className={cn(cell, \"flex flex-col lg:order-1 lg:h-[30.375rem]\")}>\n            <h2 className=\"px-6 pt-8 pb-6 text-[2rem] leading-[1.15] font-normal tracking-[-0.02em] lg:h-[17.1875rem] lg:border-b lg:border-foreground/10 lg:px-[1.3125rem] lg:pt-6 lg:text-[3.5rem] lg:leading-[1.18]\">{title}</h2>\n            <div className=\"flex flex-1 flex-col border-t border-foreground/10 px-6 py-6 lg:border-t-0 lg:px-[1.3125rem] lg:pt-8 lg:pb-5\">\n              <p className=\"max-w-[18rem] font-mono text-sm leading-[1.6] tracking-[0.1px] text-muted-foreground/80 lg:text-[0.8125rem] lg:leading-[1.75]\">{text}</p>\n              <a href={link.href} className=\"group mt-10 inline-flex w-fit items-center gap-2 font-mono text-[0.8125rem] font-semibold tracking-[0.1px] lg:mt-auto [&_svg]:size-3.5 [&_svg]:transition-transform group-hover:[&_svg]:translate-x-0.5\">\n                {link.label}\n                <ArrowUpRight className=\"text-muted-foreground\" />\n              </a>\n            </div>\n          </div>\n        </div>\n\n        <div className={row}>\n          <Figure n={2} prefix={prefix} media={figures[1]} className=\"lg:col-span-2 lg:h-[28.5rem]\" />\n          <Feature f={features[0]} className=\"lg:h-[28.5rem]\" />\n        </div>\n\n        <div className={row}>\n          <Figure n={3} prefix={prefix} media={figures[2]} className=\"lg:h-[22.25rem]\" />\n          <Feature f={features[1]} className=\"lg:h-[22.25rem]\" />\n          <Figure n={4} prefix={prefix} media={figures[3]} className=\"lg:h-[22.25rem]\" />\n        </div>\n\n        <div className={row}>\n          <Feature f={features[2]} className=\"lg:h-[28.5rem]\" />\n          <Figure n={5} prefix={prefix} media={figures[4]} className=\"max-lg:-order-1 lg:col-span-2 lg:h-[28.5rem]\" />\n        </div>\n\n        <div className={row}>\n          <Figure n={6} prefix={prefix} media={figures[5]} className=\"lg:col-span-2 lg:h-[28.5rem]\" />\n          <Feature f={features[3]} className=\"lg:h-[28.5rem]\" />\n        </div>\n\n        <a href={cta.href} className={cn(cell, \"group flex h-16 items-center justify-center gap-2 border-x font-mono text-[0.8125rem] font-semibold tracking-[0.1px] lg:border\")}>\n          {cta.label}\n          <ArrowUpRight className=\"size-3.5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5\" />\n        </a>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the big light title in the intro cell"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mono paragraph under it"
+    },
+    {
+      "name": "link",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the bold mono link at the bottom of the intro cell"
+    },
+    {
+      "name": "features",
+      "type": "[RaycastDevFeature, RaycastDevFeature, RaycastDevFeature, RaycastDevFeature]",
+      "required": true,
+      "description": "four text cells in page order: beside FIG_02, between FIG_03 and FIG_04, beside FIG_05, beside FIG_06"
+    },
+    {
+      "name": "figures",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "the six figures in order (FIG_01…06); a faint panel over the dotted floor when empty"
+    },
+    {
+      "name": "figurePrefix",
+      "type": "string",
+      "required": false,
+      "description": "the label prefix of each figure (\"FIG_\" gives FIG_01…)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the closing link in the last row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5831fb5191e3a39a13f4bc8a87871bfb67f1c5e65fb3d7f58d67de568869c830"
+}

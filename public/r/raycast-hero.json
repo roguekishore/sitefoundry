@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast hero",
+  "description": "A dark, centred hero over a big crimson artwork slot: a 56px semibold two-line title, a white lead, on desktop the light download button with two mono grey lines under it, and a small pill at the bottom edge whose border highlight spins. The title and lead rise in on load, the lead a beat later.",
+  "category": "hero",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "centered",
+    "glow",
+    "red",
+    "load",
+    "reveal",
+    "loop",
+    "pill"
+  ],
+  "notes": [
+    "leaves room at the top for the fixed raycast header (heading starts ~256px down on phones, ~352px on desktop)",
+    "the artwork slot is a crimson wash when empty; a real image or video fills it (cover)",
+    "load animation is CSS only; the pill border spin needs @property and falls back to a plain ring"
+  ],
+  "entry": "raycast-hero.tsx",
+  "source": "foundry",
+  "name": "raycast-hero",
+  "files": [
+    {
+      "path": "raycast-hero.css",
+      "content": "/* Load-in: the title and lead fade up over 1s, the lead 150ms later. */\n.raycast-hero-rise {\n  animation: raycast-hero-rise 1s cubic-bezier(0.22, 1, 0.36, 1) both;\n}\n.raycast-hero-rise-late {\n  animation-delay: 0.15s;\n}\n.raycast-hero-rise-later {\n  animation-delay: 0.3s;\n}\n\n@keyframes raycast-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n\n/* The pill's border highlight travels around it every 3s. */\n@property --raycast-hero-angle {\n  syntax: \"<angle>\";\n  initial-value: 0deg;\n  inherits: false;\n}\n\n.raycast-hero-pill {\n  background: conic-gradient(from var(--raycast-hero-angle), color-mix(in oklab, var(--foreground) 12%, transparent) 0%, color-mix(in oklab, var(--foreground) 12%, transparent) 60%, var(--highlight) 82%, color-mix(in oklab, var(--foreground) 12%, transparent) 100%);\n  animation: raycast-hero-spin 3s linear infinite;\n}\n\n@keyframes raycast-hero-spin {\n  to { --raycast-hero-angle: 360deg; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .raycast-hero-rise,\n  .raycast-hero-pill { animation: none; }\n}\n"
+    },
+    {
+      "path": "raycast-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastButton } from \"@foundry/raycast-button\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\nimport \"./raycast-hero.css\";\n\nexport interface RaycastHeroProps {\n  /** the page title (wraps to two lines) */\n  title: ReactNode;\n  /** the lead under the title */\n  lead: ReactNode;\n  /** the light download button (desktop only) */\n  cta?: { label: ReactNode; href: string; icon?: ReactNode };\n  /** two small mono lines under the button (desktop only) */\n  notes?: ReactNode[];\n  /** the pill at the bottom edge, with a travelling border highlight */\n  pill: { label: ReactNode; href: string; icon?: ReactNode };\n  /** the crimson artwork behind everything (image, video, canvas); a soft red wash when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A dark hero: a big artwork slot behind a centred title and lead, the download button with\n * its small print on desktop, and a pill sitting on the bottom edge.\n */\nexport function RaycastHero({ title, lead, cta, notes = [], pill, media, className }: RaycastHeroProps) {\n  return (\n    <section className={cn(\"relative isolate flex flex-col items-center overflow-clip bg-background px-gutter pt-64 text-center text-foreground lg:pt-[23rem]\", className)}>\n      <div aria-hidden className=\"absolute inset-x-0 top-0 bottom-0 -z-10 overflow-clip [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_88%,transparent)] [&>*]:size-full\">\n        {media ?? <RaycastPlaceholder tone=\"glow\" className=\"!bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,color-mix(in_oklab,var(--glow)_70%,transparent),color-mix(in_oklab,var(--glow)_20%,transparent)_55%,transparent_80%)]\" />}\n      </div>\n\n      <h1 className=\"raycast-hero-rise max-w-[22rem] text-[2rem] leading-[1.15] font-semibold tracking-[-0.01em] text-balance sm:max-w-none lg:max-w-[34rem] lg:text-[3.5rem] lg:leading-[1.25]\">\n        {title}\n      </h1>\n      <p className=\"raycast-hero-rise raycast-hero-rise-late mt-8 max-w-[17rem] text-sm leading-[1.2] font-medium tracking-[0.2px] text-balance lg:mt-9 lg:max-w-[30rem] lg:text-lg\">\n        {lead}\n      </p>\n\n      {cta && (\n        <div className=\"raycast-hero-rise raycast-hero-rise-later mt-[13.25rem] hidden flex-col items-center lg:flex\">\n          <RaycastButton label={cta.label} href={cta.href} icon={cta.icon} />\n          {notes.map((note, i) => (\n            <p key={i} className={cn(\"font-mono text-xs tracking-[0.1px] text-muted-foreground/70\", i === 0 ? \"mt-6\" : \"mt-3\")}>\n              {note}\n            </p>\n          ))}\n        </div>\n      )}\n\n      <a\n        href={pill.href}\n        className={cn(\"raycast-hero-pill mt-[10.25rem] inline-flex rounded-full p-px lg:mt-12\")}\n      >\n        <span className=\"inline-flex h-8 items-center gap-2 rounded-full bg-background px-4 text-sm font-semibold tracking-[0.2px] [&_svg]:size-4\">\n          {pill.label}\n          {pill.icon}\n        </span>\n      </a>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-button",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the page title (wraps to two lines)"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lead under the title"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "the light download button (desktop only)"
+    },
+    {
+      "name": "notes",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "two small mono lines under the button (desktop only)"
+    },
+    {
+      "name": "pill",
+      "type": "{ label: ReactNode; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the pill at the bottom edge, with a travelling border highlight"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the crimson artwork behind everything (image, video, canvas); a soft red wash when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1165ee6ca380c32172b8a7a674605dbd5791808d6858a2389a022a15d9051aed"
+}

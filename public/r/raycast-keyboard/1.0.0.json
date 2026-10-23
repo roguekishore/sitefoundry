@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Raycast keyboard",
+  "description": "A full-size, dark keycap keyboard wider than the screen and cropped at both edges: 110px keys with 11px corners and stacked inset highlights, rows staggered like a real keyboard. Keys can hold a feature tile (they fade 0.2 → 1 as they scroll into view) or glow red; a soft breathing glow loops on lit keys.",
+  "category": "background",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "keyboard",
+    "keys",
+    "dark",
+    "glow",
+    "scroll",
+    "reveal",
+    "loop",
+    "background"
+  ],
+  "notes": [
+    "best on dark themes",
+    "keys are 110px at every screen size; the board is centred (or left-anchored) and clipped by its parent, so give the parent a height and overflow-clip",
+    "tile reveal uses a CSS scroll-driven animation with a static fallback"
+  ],
+  "entry": "raycast-keyboard.tsx",
+  "source": "foundry",
+  "name": "raycast-keyboard",
+  "files": [
+    {
+      "path": "raycast-keyboard.css",
+      "content": "/* Feature tiles fade up from 20% as they cross the viewport (scrubbed with the scroll). */\n@supports (animation-timeline: view()) {\n  .raycast-key-tile {\n    animation: raycast-keyboard-tile linear both;\n    animation-timeline: view();\n    animation-range: entry 30% cover 40%;\n    animation-delay: calc(var(--raycast-tile-i, 0) * 1ms);\n  }\n}\n\n@keyframes raycast-keyboard-tile {\n  from { opacity: 0.2; }\n  to { opacity: 1; }\n}\n\n/* Lit keys breathe a red glow. */\n.raycast-key-lit {\n  animation: raycast-keyboard-breathe 3.2s ease-in-out infinite;\n}\n\n@keyframes raycast-keyboard-breathe {\n  0%, 100% { box-shadow: 0 0 0 1px color-mix(in oklab, var(--highlight) 35%, transparent), 0 14px 40px -6px color-mix(in oklab, var(--glow) 55%, transparent); }\n  50% { box-shadow: 0 0 0 1px color-mix(in oklab, var(--highlight) 60%, transparent), 0 14px 64px -2px color-mix(in oklab, var(--glow) 85%, transparent); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .raycast-key-tile,\n  .raycast-key-lit { animation: none; }\n}\n"
+    },
+    {
+      "path": "raycast-keyboard.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./raycast-keyboard.css\";\n\nexport interface RaycastKey {\n  /** the main legend (big, bottom-centre for letters; bottom-left for modifiers) */\n  label?: ReactNode;\n  /** the small legend above it (shifted symbol, modifier glyph) */\n  top?: ReactNode;\n  /** width in key units (default 1; 1.5 is a tab key) */\n  width?: number;\n  /** modifier style: label small at the bottom-left, glyph top-right */\n  modifier?: boolean;\n  /** turns the key into a feature tile: icon, then bold lead + grey text. Tiles fade in on scroll */\n  tile?: { icon?: ReactNode; lead: ReactNode; text: ReactNode };\n  /** glow red (the shortcut keys in the closing call to action) */\n  lit?: boolean;\n  /** leave this key out on phones (keeps the first tile at the board's left edge) */\n  desktopOnly?: boolean;\n}\n\n/** One row of keys; `offset` shifts the row right by that many key units (may be negative). */\nexport interface RaycastKeyboardRow {\n  keys: RaycastKey[];\n  offset?: number;\n}\n\nexport interface RaycastKeyboardProps {\n  /** the rows, top to bottom */\n  rows: RaycastKeyboardRow[];\n  /** how the board sits in its box: centred (cropped both sides) or anchored left */\n  anchor?: \"center\" | \"left\";\n  /** fade the plain keys to about a third so that only the feature tiles read */\n  dim?: boolean;\n  className?: string;\n}\n\nconst unit = 110; // key size, px\nconst gap = 12; // gap between keys, px\n\nconst keyShadow =\n  \"shadow-[0_1.5px_0.5px_2.5px_color-mix(in_oklab,var(--background)_40%,transparent),0_0_0.5px_1px_var(--background),inset_0_2px_1px_1px_color-mix(in_oklab,var(--background)_25%,transparent),inset_0_1px_1px_1px_color-mix(in_oklab,var(--foreground)_20%,transparent)]\";\n\n/**\n * A big keyboard used as page backdrop. Needs a parent with a height and `overflow-clip`;\n * the board itself is as wide as its keys and is cropped by the parent.\n */\nexport function RaycastKeyboard({ rows, anchor = \"center\", dim = false, className }: RaycastKeyboardProps) {\n  let tileIndex = 0;\n  return (\n    <div\n      aria-hidden={rows.every((r) => r.keys.every((k) => !k.tile)) ? true : undefined}\n      className={cn(\"absolute top-0 flex w-max flex-col text-foreground\", anchor === \"center\" ? \"left-1/2 -translate-x-1/2 items-center\" : \"left-0\", className)}\n      style={{ gap }}\n    >\n      {rows.map((row, r) => (\n        <div key={r} className=\"flex\" style={{ gap, marginLeft: (row.offset ?? 0) * (unit + gap) }}>\n          {row.keys.map((key, k) => {\n            const w = (key.width ?? 1) * (unit + gap) - gap;\n            const i = key.tile ? tileIndex++ : 0;\n            return (\n              <div\n                key={k}\n                style={{ width: w, height: unit, [\"--raycast-tile-i\" as string]: i * 60 } as CSSProperties}\n                className={cn(\n                  \"relative shrink-0 rounded-[11px] bg-[radial-gradient(75%_75%_at_50%_91.9%,color-mix(in_oklab,var(--foreground)_7%,var(--background)),color-mix(in_oklab,var(--foreground)_4%,var(--background)))]\",\n                  keyShadow,\n                  dim && !key.tile && \"opacity-35\",\n                  key.desktopOnly && \"max-lg:hidden\",\n                  key.tile && \"raycast-key-tile bg-linear-to-b from-foreground/[0.04] to-foreground/[0.08]\",\n                  key.lit && \"raycast-key-lit text-highlight ring-1 ring-highlight/40\",\n                )}\n              >\n                {key.tile ? (\n                  <div className=\"flex size-full flex-col justify-between p-[15px] text-left text-[14px] leading-[1.4] [&_svg]:size-5 [&_svg]:text-muted-foreground\">\n                    <span>{key.tile.icon}</span>\n                    <span className=\"text-muted-foreground\">\n                      <strong className=\"font-semibold text-foreground\">{key.tile.lead}</strong> {key.tile.text}\n                    </span>\n                  </div>\n                ) : key.modifier ? (\n                  <>\n                    <span className=\"absolute top-[14px] right-[14px] text-xl leading-none text-muted-foreground [&_svg]:size-5\">{key.top}</span>\n                    <span className=\"absolute bottom-[12px] left-[14px] text-[22px] leading-none font-medium tracking-[-0.01em]\">{key.label}</span>\n                  </>\n                ) : (\n                  <>\n                    {key.top && <span className=\"absolute top-[12px] left-1/2 -translate-x-1/2 text-xl leading-none text-muted-foreground [&_svg]:size-5\">{key.top}</span>}\n                    {key.label && <span className=\"absolute inset-x-0 bottom-[18px] text-center text-[32px] leading-none font-medium\">{key.label}</span>}\n                  </>\n                )}\n              </div>\n            );\n          })}\n        </div>\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "rows",
+      "type": "RaycastKeyboardRow[]",
+      "required": true,
+      "description": "the rows, top to bottom"
+    },
+    {
+      "name": "anchor",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "how the board sits in its box: centred (cropped both sides) or anchored left"
+    },
+    {
+      "name": "dim",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "fade the plain keys to about a third so that only the feature tiles read"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0163f7ea4a844189abfc30828ac1b0b83b46860182403575b93549c698b37a9a"
+}

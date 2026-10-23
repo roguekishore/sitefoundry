@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast AI agent",
+  "description": "A centred intro (mono red eyebrow, 32px semibold title, grey lead) above a 1020px bento of three big softly-ringed cards: a wide one with a chat-window slot cropped by a fade, then two side by side (stacked on phones), the first with a prompt box whose cursor blinks over a list of faded suggestions, the second an empty framed panel. A 'learn more' link closes it.",
+  "category": "features",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "dark",
+    "ai",
+    "centered",
+    "eyebrow",
+    "loop"
+  ],
+  "notes": [
+    "chat window and extensions panel are media slots (token placeholders when empty)",
+    "the prompt box is built from the `quick` props; the cursor blink is CSS and stops under reduced motion",
+    "best on dark themes"
+  ],
+  "entry": "raycast-ai-agent.tsx",
+  "source": "foundry",
+  "name": "raycast-ai-agent",
+  "files": [
+    {
+      "path": "raycast-ai-agent.css",
+      "content": "/* The prompt cursor blinks every 1.1s. */\n.raycast-ai-cursor {\n  animation: raycast-ai-blink 1.1s steps(1) infinite;\n}\n\n@keyframes raycast-ai-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .raycast-ai-cursor { animation: none; }\n}\n"
+    },
+    {
+      "path": "raycast-ai-agent.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastEyebrow } from \"@foundry/raycast-eyebrow\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\nimport \"./raycast-ai-agent.css\";\n\nexport interface RaycastAiCard {\n  /** the card's title */\n  title: ReactNode;\n  /** the grey sentence under it */\n  description: ReactNode;\n  /** the media slot (window shot, panel); a token placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface RaycastAiQuick {\n  /** the title under the prompt box */\n  title: ReactNode;\n  /** the sentence under it */\n  description: ReactNode;\n  /** a small icon at the left of the prompt box */\n  icon: ReactNode;\n  /** the prompt text, typed with a blinking cursor */\n  prompt: ReactNode;\n  /** the small label at the right of the box */\n  hint: ReactNode;\n  /** the icon on the little key beside the hint */\n  hintIcon: ReactNode;\n  /** suggestions listed under the box; each is fainter than the one above */\n  suggestions: ReactNode[];\n}\n\nexport interface RaycastAiAgentProps {\n  /** the mono eyebrow */\n  eyebrow: ReactNode;\n  /** the title */\n  title: ReactNode;\n  /** the grey lead (two lines) */\n  lead: ReactNode;\n  /** the wide card at the top (a chat window) */\n  chat: RaycastAiCard;\n  /** the left card of the pair (prompt box) */\n  quick: RaycastAiQuick;\n  /** the right card of the pair (empty framed panel) */\n  extensions: RaycastAiCard;\n  /** the link under the cards */\n  link: { label: ReactNode; href: string };\n  className?: string;\n}\n\nconst card = \"relative flex min-w-0 flex-col overflow-clip rounded-3xl bg-linear-to-b from-foreground/[0.05] to-foreground/[0.015] p-4 ring-1 ring-foreground/[0.08] lg:rounded-[2.5rem] lg:p-6\";\n\nfunction CardText({ title, description }: { title: ReactNode; description: ReactNode }) {\n  return (\n    <div className=\"mt-auto pt-4 lg:pt-6\">\n      <h3 className=\"text-base font-semibold tracking-[0.2px] lg:text-base\">{title}</h3>\n      <p className=\"mt-2 max-w-[28rem] text-sm leading-[1.6] font-medium tracking-[0.2px] text-muted-foreground lg:text-base lg:leading-[1.4]\">{description}</p>\n    </div>\n  );\n}\n\n/** Intro plus a bento of three big cards: chat window, prompt box, empty panel. */\nexport function RaycastAiAgent({ eyebrow, title, lead, chat, quick, extensions, link, className }: RaycastAiAgentProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter pt-16 pb-3 text-foreground lg:pt-[4.5rem] lg:pb-3\", className)}>\n      <div className=\"mx-auto flex max-w-[63.75rem] flex-col items-center text-center\">\n        <RaycastEyebrow>{eyebrow}</RaycastEyebrow>\n        <h2 className=\"mt-3 max-w-[19rem] text-[2rem] leading-[1.15] font-semibold tracking-[-0.01em] text-balance lg:mt-2 lg:max-w-none lg:text-[2rem]\">{title}</h2>\n        <p className=\"mt-5 max-w-[17rem] text-base leading-[1.7] font-medium tracking-[0.2px] text-balance text-muted-foreground lg:mt-7 lg:max-w-[24rem] lg:text-lg lg:leading-[1.5]\">{lead}</p>\n\n        <div className=\"mt-12 grid w-full gap-4 text-left lg:mt-[4.5rem] lg:grid-cols-2 lg:gap-[1.875rem]\">\n          <div className={cn(card, \"lg:col-span-2 lg:h-[29.75rem]\")}>\n            <div className=\"h-[9.5rem] overflow-clip rounded-t-xl [mask-image:linear-gradient(to_bottom,black_55%,transparent)] lg:h-[22rem] [&>*]:size-full\">\n              {chat.media ?? <RaycastPlaceholder tone=\"panel\" className=\"rounded-t-xl\" />}\n            </div>\n            <CardText title={chat.title} description={chat.description} />\n          </div>\n\n          <div className={cn(card, \"h-[21.25rem] lg:h-[32rem]\")}>\n            <div className=\"flex items-center gap-3 rounded-2xl bg-background/60 px-3.5 py-3 ring-1 ring-foreground/10 lg:rounded-[1.5rem] lg:px-5 lg:py-4\">\n              <span className=\"text-muted-foreground [&_svg]:size-6\">{quick.icon}</span>\n              <span className=\"min-w-0 flex-1 truncate text-base font-medium tracking-[0.2px] lg:text-xl\">\n                {quick.prompt}\n                <span aria-hidden className=\"raycast-ai-cursor ml-px inline-block h-[1.1em] w-px translate-y-[0.2em] bg-foreground\" />\n              </span>\n              <span className=\"flex shrink-0 items-center gap-2 text-xs font-medium text-muted-foreground\">\n                {quick.hint}\n                <span className=\"flex size-6 items-center justify-center rounded-md ring-1 ring-foreground/20 [&_svg]:size-3\">{quick.hintIcon}</span>\n              </span>\n            </div>\n            <ul className=\"mt-4 flex flex-col gap-2.5 pl-12 [mask-image:linear-gradient(to_bottom,black_30%,transparent_85%)] lg:mt-5 lg:gap-3 lg:pl-14\">\n              {quick.suggestions.map((s, i) => (\n                <li key={i} className=\"truncate text-sm font-medium tracking-[0.2px] text-muted-foreground lg:text-xl\" style={{ opacity: Math.max(0.2, 0.75 - i * 0.12) }}>\n                  {s}\n                </li>\n              ))}\n            </ul>\n            <CardText title={quick.title} description={quick.description} />\n          </div>\n\n          <div className={cn(card, \"h-[30rem] lg:h-[32rem]\")}>\n            <div className=\"min-h-0 flex-1 overflow-clip rounded-2xl ring-1 ring-foreground/10 lg:rounded-[1.75rem] [&>*]:size-full\">\n              {extensions.media ?? <RaycastPlaceholder tone=\"panel\" className=\"bg-foreground/[0.02]\" />}\n            </div>\n            <CardText title={extensions.title} description={extensions.description} />\n          </div>\n        </div>\n\n        <a href={link.href} className=\"mt-10 inline-flex items-center gap-1.5 text-base font-medium tracking-[0.2px] text-muted-foreground transition-colors duration-300 hover:text-foreground lg:mt-16 lg:text-lg [&_svg]:size-4\">\n          {link.label}\n          <ArrowRight />\n        </a>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-eyebrow",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mono eyebrow"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the grey lead (two lines)"
+    },
+    {
+      "name": "chat",
+      "type": "RaycastAiCard",
+      "required": true,
+      "description": "the wide card at the top (a chat window)"
+    },
+    {
+      "name": "quick",
+      "type": "RaycastAiQuick",
+      "required": true,
+      "description": "the left card of the pair (prompt box)"
+    },
+    {
+      "name": "extensions",
+      "type": "RaycastAiCard",
+      "required": true,
+      "description": "the right card of the pair (empty framed panel)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the link under the cards"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b67c75142cff899b5d5f0efe2307dd3a650162d8723e579099da54dca4f88ad7"
+}
