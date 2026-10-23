@@ -38,7 +38,7 @@ export function LevelsMonitor({ eyebrow, title, lead, notes, media, mediaLabel, 
           {caption ? (
             <div className="dark absolute inset-x-0 bottom-0 bg-linear-to-t from-background/70 via-background/25 to-transparent px-8 pt-24 pb-12 lg:px-10 lg:pt-32">
               {caption.eyebrow ? (
-                <p className="text-xs leading-4 font-semibold tracking-[0.187em] text-glow uppercase">{caption.eyebrow}</p>
+                <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-glow uppercase">{caption.eyebrow}</p>
               ) : null}
               <p className="mt-5 max-w-[30rem] text-lg leading-8 text-foreground/86">{caption.text}</p>
             </div>

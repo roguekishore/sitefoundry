@@ -42,14 +42,14 @@ export function LevelsHeading({
       {eyebrow ? (
         <p
           className={cn(
-            "mb-4 text-xs leading-4 font-semibold tracking-[0.187em] uppercase",
+            "mb-4 text-sm leading-5 font-semibold tracking-[0.16em] uppercase",
             eyebrowTone === "sage" ? "text-glow" : "text-muted-foreground",
           )}
         >
           {eyebrow}
         </p>
       ) : null}
-      <Tag className={cn("font-display font-medium tracking-[-0.04em] text-balance text-foreground", titleSizes[size])}>
+      <Tag className={cn("font-display font-[550] tracking-[-0.04em] text-foreground", titleSizes[size])}>
         {title}
       </Tag>
       {lead ? (

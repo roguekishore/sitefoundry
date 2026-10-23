@@ -43,7 +43,7 @@ export function LevelsHabits({ eyebrow, title, lead, items, panel, className }: 
           <ul className="mt-12 lg:mt-14">
             {items.map((item, i) => (
               <li key={i} className="border-border py-8 first:pt-0 not-first:border-t last:pb-0">
-                <h3 className="font-display text-[1.45rem] leading-8 font-medium tracking-[-0.03em] text-foreground">{item.title}</h3>
+                <h3 className="font-display text-[1.45rem] leading-8 font-[550] tracking-[-0.03em] text-foreground">{item.title}</h3>
                 <p className="mt-4 text-sm leading-8 text-muted-foreground">{item.body}</p>
               </li>
             ))}
@@ -52,10 +52,10 @@ export function LevelsHabits({ eyebrow, title, lead, items, panel, className }: 
 
         <div className="rounded-lg border border-border bg-secondary px-6 pt-8 pb-8">
           {panel.eyebrow ? (
-            <p className="text-sm leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase">{panel.eyebrow}</p>
+            <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{panel.eyebrow}</p>
           ) : null}
           {panel.text ? <p className="mt-5 max-w-[22.5rem] text-base leading-7 text-muted-foreground">{panel.text}</p> : null}
-          <div className="mx-auto mt-8 aspect-[0.49] w-[16.75rem] overflow-clip rounded-[calc(var(--radius)+2.25rem)] sm:w-[19.25rem] [&>*]:size-full [&>img]:object-contain">
+          <div className="mx-auto mt-8 aspect-[0.49] w-[16.75rem] overflow-clip rounded-[calc(var(--radius)+2.25rem)] sm:w-80 [&>*]:size-full [&>img]:object-contain">
             {panel.media ?? <LevelsPlaceholder tone="film" label={panel.mediaLabel} />}
           </div>
         </div>
