@@ -45,7 +45,7 @@ export function PaxosRegulation({ eyebrow, title, lead, media, milestones, class
         <ol className="mt-12 grid gap-10 lg:mt-[5.6rem] lg:grid-cols-3 lg:gap-[7.6rem]">
           {milestones.map((m) => (
             <li key={m.year}>
-              <p className="border-b border-border pb-[0.85rem] text-[0.8rem] tracking-[-0.01em] text-muted-foreground lg:pb-[1.15rem] lg:text-base">
+              <p className="border-b border-border pb-[0.85rem] text-[0.8rem] tracking-[-0.01em] text-muted-foreground lg:pb-3 lg:text-base">
                 {m.year}
               </p>
               <h3 className="mt-5 font-display text-xl/[1.2] font-normal tracking-[-0.02em] text-foreground lg:mt-6 lg:text-2xl/[1.25]">{m.title}</h3>
