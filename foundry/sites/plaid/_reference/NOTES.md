@@ -121,3 +121,7 @@ colours). The plaid dark sibling renders the whole page coherently.
 Left as is: the stories row starts at the gutter (no sliver of a previous card); wave-line
 canvases (hero, feed, API band, under the stories) are not rebuilt; the original's line numbers
 in the code window are spaced wider than the code lines, kept that way.
+
+Round 2 follow-up (checked with a hover screenshot): the spinning rainbow square was 160% of the
+card's width, so on the tall cards its corners left the rim bare at two corners; it's now 300%
+and the rim is continuous.

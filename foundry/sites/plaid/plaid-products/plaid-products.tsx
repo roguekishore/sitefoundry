@@ -55,7 +55,7 @@ export function PlaidProducts({ title, action, products, linkLabel, className }:
                 <span
                   aria-hidden
                   className={cn(
-                    "plaid-products-rim absolute top-1/2 left-1/2 -z-20 aspect-square w-[160%] -translate-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
+                    "plaid-products-rim absolute top-1/2 left-1/2 -z-20 aspect-square w-[300%] -translate-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
                     rainbow,
                   )}
                 />
