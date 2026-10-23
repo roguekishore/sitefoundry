@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast community",
+  "description": "A two-tone heading, two ringed community cards side by side (stacked on phones) each with an icon, name, a mono member count, a grey sentence and a bold link with an arrow, over a blurred crimson art slot that spills behind them; below, a centred row of 230×129 video thumbnails with titles, faded at both edges and scrollable, then a grey note and a channel link.",
+  "category": "gallery",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "community",
+    "cards",
+    "videos",
+    "carousel",
+    "dark",
+    "glow",
+    "centered",
+    "mono"
+  ],
+  "notes": [
+    "backdrop and thumbnails are media slots (placeholders when empty)",
+    "the video row starts centred and can be scrolled sideways; needs JavaScript only for the centring",
+    "best on dark themes"
+  ],
+  "hydrate": "visible",
+  "entry": "raycast-community.tsx",
+  "source": "foundry",
+  "name": "raycast-community",
+  "files": [
+    {
+      "path": "raycast-community.tsx",
+      "content": "import { useEffect, useRef, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastHeading } from \"@foundry/raycast-heading\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\n\nexport interface RaycastCommunityCard {\n  /** a small icon before the name (lucide) */\n  icon: ReactNode;\n  /** the community's name */\n  name: ReactNode;\n  /** the mono figure at the right (\"37k members\") */\n  stat: ReactNode;\n  /** the grey sentence */\n  description: ReactNode;\n  /** the bold link under it */\n  link: { label: ReactNode; href: string };\n}\n\nexport interface RaycastVideo {\n  /** the video's title */\n  title: ReactNode;\n  /** where it links */\n  href: string;\n  /** the 230×129 thumbnail; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface RaycastCommunityProps {\n  /** the white heading sentence */\n  title: ReactNode;\n  /** the grey heading sentence */\n  subtitle?: ReactNode;\n  /** the two cards */\n  cards: RaycastCommunityCard[];\n  /** the video thumbnails (five fit across a desktop screen) */\n  videos: RaycastVideo[];\n  /** the grey note under the videos */\n  note: ReactNode;\n  /** the channel link under the note: wordmark and arrow */\n  channel: { label: ReactNode; href: string };\n  /** the crimson streak art behind the cards; a soft crimson wash when empty */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\n/** Community cards over a crimson backdrop, then a centred strip of video thumbnails. */\nexport function RaycastCommunity({ title, subtitle, cards, videos, note, channel, backdrop, className }: RaycastCommunityProps) {\n  const strip = useRef<HTMLDivElement>(null);\n  useEffect(() => {\n    const el = strip.current;\n    if (el) el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;\n  }, []);\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background px-gutter pt-0 pb-14 text-foreground lg:pb-16\", className)}>\n      <div aria-hidden className=\"absolute inset-x-0 top-[18%] -z-10 h-[62%] [mask-image:linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)] [&>*]:size-full\">\n        {backdrop ?? <RaycastPlaceholder tone=\"glow\" />}\n      </div>\n\n      <RaycastHeading title={title} subtitle={subtitle} className=\"mx-auto max-w-[17rem] lg:max-w-none\" />\n\n      <div className=\"mx-auto mt-14 grid max-w-[56.25rem] gap-5 lg:mt-[4.25rem] lg:grid-cols-2 lg:gap-10\">\n        {cards.map((c, i) => (\n          <a\n            key={i}\n            href={c.link.href}\n            className=\"group relative block rounded-xl bg-card/70 p-6 ring-1 ring-foreground/[0.1] backdrop-blur-sm transition-colors duration-300 hover:bg-card motion-reduce:transition-none lg:p-6\"\n          >\n            <div className=\"flex items-center gap-4 [&_svg]:size-6\">\n              {c.icon}\n              <span className=\"text-xl font-medium tracking-[0.2px]\">{c.name}</span>\n              <span className=\"ml-auto font-mono text-sm tracking-[0.1px] text-muted-foreground\">{c.stat}</span>\n            </div>\n            <p className=\"mt-5 max-w-[21rem] text-sm leading-[1.6] font-medium tracking-[0.2px] text-muted-foreground lg:mt-6\">{c.description}</p>\n            <span className=\"mt-4 inline-flex items-center gap-1.5 text-sm font-semibold tracking-[0.2px] [&_svg]:size-3.5 [&_svg]:transition-transform group-hover:[&_svg]:translate-x-0.5\">\n              {c.link.label}\n              <ArrowRight />\n            </span>\n          </a>\n        ))}\n      </div>\n\n      <div\n        ref={strip}\n        className=\"mt-40 overflow-x-auto [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)] [scrollbar-width:none] lg:mt-[10.5rem] [&::-webkit-scrollbar]:hidden\"\n      >\n        <ul className=\"mx-auto flex w-max snap-x gap-10 px-[calc(50%-7.1875rem)] lg:px-0\">\n          {videos.map((v, i) => (\n            <li key={i} className=\"w-[14.375rem] shrink-0 snap-center\">\n              <a href={v.href} className=\"group block\">\n                <div className=\"aspect-[230/129] overflow-clip rounded-xl ring-1 ring-foreground/10 transition-[filter,opacity] duration-300 group-hover:brightness-125 motion-reduce:transition-none [&>*]:size-full\">\n                  {v.media ?? <RaycastPlaceholder tone=\"muted\" className=\"rounded-xl\" />}\n                </div>\n                <p className=\"mt-3 text-sm leading-[1.35] font-semibold tracking-[0.2px] text-foreground/80 transition-colors group-hover:text-foreground\">{v.title}</p>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n\n      <div className=\"mx-auto mt-12 flex max-w-[22rem] flex-col items-center text-center lg:mt-14\">\n        <p className=\"text-sm leading-[1.6] font-medium tracking-[0.2px] text-muted-foreground\">{note}</p>\n        <a href={channel.href} className=\"mt-8 inline-flex items-center gap-1.5 text-2xl font-semibold tracking-[-0.02em] text-foreground transition-opacity hover:opacity-80 [&_svg]:size-4 [&_svg]:text-muted-foreground\">\n          {channel.label}\n          <ArrowRight />\n        </a>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-heading",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the white heading sentence"
+    },
+    {
+      "name": "subtitle",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the grey heading sentence"
+    },
+    {
+      "name": "cards",
+      "type": "RaycastCommunityCard[]",
+      "required": true,
+      "description": "the two cards"
+    },
+    {
+      "name": "videos",
+      "type": "RaycastVideo[]",
+      "required": true,
+      "description": "the video thumbnails (five fit across a desktop screen)"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the grey note under the videos"
+    },
+    {
+      "name": "channel",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": true,
+      "description": "the channel link under the note: wordmark and arrow"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the crimson streak art behind the cards; a soft crimson wash when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3389af7b5637db94a0df8517ee0c2b0f22cb054e8ae049c5a88c4b4fc2a1e77d"
+}

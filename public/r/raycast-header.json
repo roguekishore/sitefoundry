@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast header",
+  "description": "A floating rounded bar fixed to the top: a hairline ring and a faint top-left sheen over a blurred dark fill. A wordmark at the left, nine grey links centred (white on hover), a quiet 'Log in' and the light keycap button at the right on desktop; a wordmark and a menu icon opening a dropdown panel on phones.",
+  "category": "header",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "floating",
+    "dark",
+    "blur",
+    "rounded",
+    "hamburger"
+  ],
+  "notes": [
+    "fixed to the top: the page needs no top padding, the hero leaves room",
+    "best on dark themes"
+  ],
+  "hydrate": "load",
+  "entry": "raycast-header.tsx",
+  "source": "foundry",
+  "name": "raycast-header",
+  "files": [
+    {
+      "path": "raycast-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastButton } from \"@foundry/raycast-button\";\n\nexport interface RaycastNavLink {\n  /** the link text */\n  label: ReactNode;\n  /** where it goes */\n  href: string;\n}\n\nexport interface RaycastHeaderProps {\n  /** the wordmark: a small icon and the product name */\n  brand: ReactNode;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the centre links (desktop bar; phone dropdown) */\n  links: RaycastNavLink[];\n  /** the quiet account link left of the button */\n  login: RaycastNavLink;\n  /** the light keycap button at the right */\n  cta: RaycastNavLink & { icon?: ReactNode };\n  /** screen-reader label of the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\n/**\n * A floating bar fixed 16px under the top edge: wordmark, links, login and the download\n * button at desktop widths; wordmark and a menu button (dropdown panel) on phones.\n */\nexport function RaycastHeader({ brand, brandHref = \"/\", links, login, cta, menuLabel, className }: RaycastHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"fixed inset-x-0 top-0 z-50 px-4 pt-4 lg:px-gutter\", className)}>\n      <nav\n        className={cn(\n          \"mx-auto flex h-[3.625rem] max-w-page items-center rounded-2xl border border-foreground/10 bg-card/80 pr-4 pl-4 text-foreground backdrop-blur-xl\",\n          \"bg-gradient-to-br from-foreground/[0.04] to-transparent\",\n          \"lg:h-[4.75rem] lg:rounded-[1.25rem] lg:pr-[1.75rem] lg:pl-8\",\n        )}\n      >\n        <a\n          href={brandHref}\n          className=\"flex items-center gap-2.5 text-base font-medium tracking-[0.2px] transition-transform duration-300 hover:scale-105 [&_svg]:size-5 [&_svg]:text-highlight\"\n        >\n          {brand}\n        </a>\n        <ul className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 lg:flex xl:gap-8\">\n          {links.map((link, i) => (\n            <li key={i}>\n              <a href={link.href} className=\"text-sm font-medium tracking-[0.2px] text-muted-foreground transition-colors duration-200 ease-in-out hover:text-foreground\">\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n        <div className=\"ml-auto hidden items-center gap-7 lg:flex\">\n          <a href={login.href} className=\"text-sm font-medium tracking-[0.2px] text-muted-foreground transition-colors duration-200 hover:text-foreground\">\n            {login.label}\n          </a>\n          <RaycastButton label={cta.label} href={cta.href} icon={cta.icon} size=\"sm\" />\n        </div>\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen(!open)}\n          className=\"ml-auto flex size-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden\"\n        >\n          {open ? <X className=\"size-6\" strokeWidth={1.5} /> : <Menu className=\"size-6\" strokeWidth={1.5} />}\n        </button>\n      </nav>\n      {open && (\n        <div className=\"mx-auto mt-2 flex max-w-page flex-col rounded-2xl border border-foreground/10 bg-card/95 p-4 backdrop-blur-xl lg:hidden\">\n          {links.map((link, i) => (\n            <a key={i} href={link.href} onClick={() => setOpen(false)} className=\"py-2.5 text-base font-medium text-muted-foreground transition-colors hover:text-foreground\">\n              {link.label}\n            </a>\n          ))}\n          <a href={login.href} className=\"py-2.5 text-base font-medium text-muted-foreground transition-colors hover:text-foreground\">\n            {login.label}\n          </a>\n          <RaycastButton label={cta.label} href={cta.href} icon={cta.icon} className=\"mt-3 justify-center\" />\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark: a small icon and the product name"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "RaycastNavLink[]",
+      "required": true,
+      "description": "the centre links (desktop bar; phone dropdown)"
+    },
+    {
+      "name": "login",
+      "type": "RaycastNavLink",
+      "required": true,
+      "description": "the quiet account link left of the button"
+    },
+    {
+      "name": "cta",
+      "type": "RaycastNavLink & { icon?: ReactNode; }",
+      "required": true,
+      "description": "the light keycap button at the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b7a6a6060f06f0bde7aca4fb33bb9552adb9ca762754c833d7c5b481b69c9262"
+}

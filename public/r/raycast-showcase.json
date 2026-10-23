@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Raycast showcase",
+  "description": "A two-tone heading, then a framed app-window slot (full-bleed on phones, a 1204px rounded frame on desktop) with a dock of five square keycap buttons at its bottom: the active one is a bigger silver key with a tooltip above it, and choosing one swaps the window and the caption below the frame.",
+  "category": "gallery",
+  "site": "raycast",
+  "license": "proprietary",
+  "tags": [
+    "showcase",
+    "tabs",
+    "dock",
+    "keycap",
+    "dark",
+    "device-frame",
+    "interactive",
+    "centered"
+  ],
+  "notes": [
+    "each item has its own media slot; empty it is a token placeholder",
+    "needs JavaScript for the dock (state); static HTML shows the first item",
+    "best on dark themes"
+  ],
+  "hydrate": "visible",
+  "entry": "raycast-showcase.tsx",
+  "source": "foundry",
+  "name": "raycast-showcase",
+  "files": [
+    {
+      "path": "raycast-showcase.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RaycastHeading } from \"@foundry/raycast-heading\";\nimport { RaycastPlaceholder } from \"@foundry/raycast-placeholder\";\n\nexport interface RaycastShowcaseItem {\n  /** the name shown in the tooltip over the active key and used as the key's accessible label */\n  label: string;\n  /** a lucide icon for the dock key */\n  icon: ReactNode;\n  /** the window shot for this item; a placeholder panel when empty */\n  media?: ReactNode;\n  /** the bold opening of the caption under the frame */\n  captionLead: ReactNode;\n  /** the grey rest of the caption */\n  caption: ReactNode;\n}\n\nexport interface RaycastShowcaseProps {\n  /** the white heading sentence */\n  title: ReactNode;\n  /** the grey heading sentence */\n  subtitle?: ReactNode;\n  /** the dock items (five fit) */\n  items: RaycastShowcaseItem[];\n  className?: string;\n}\n\n/** Heading, framed window with a keycap dock, caption. The dock chooses the window and caption. */\nexport function RaycastShowcase({ title, subtitle, items, className }: RaycastShowcaseProps) {\n  const [active, setActive] = useState(0);\n  const current = items[active] ?? items[0];\n  return (\n    <section className={cn(\"bg-background py-section text-foreground lg:py-56\", className)}>\n      <RaycastHeading title={title} subtitle={subtitle} className=\"px-gutter\" />\n\n      <div className=\"relative mx-auto mt-[4.5rem] max-w-page border-y border-foreground/10 bg-card/40 lg:mt-[4.25rem] lg:aspect-[1204/737] lg:rounded-xl lg:border\">\n        <div className=\"relative aspect-[390/386] overflow-clip lg:absolute lg:inset-0 lg:aspect-auto lg:rounded-xl [&>*]:size-full\">\n          {current.media ?? <RaycastPlaceholder tone=\"panel\" className=\"rounded-none ring-0\" />}\n        </div>\n\n        <div className=\"relative flex justify-center px-4 py-5 lg:absolute lg:inset-x-0 lg:bottom-8 lg:py-0\">\n          <div className=\"relative flex items-end gap-2 rounded-[1.25rem] bg-background/60 p-3 ring-1 ring-foreground/10 backdrop-blur-md\">\n            {items.map((item, i) => {\n              const on = i === active;\n              return (\n                <button\n                  key={item.label}\n                  type=\"button\"\n                  aria-label={item.label}\n                  aria-pressed={on}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"relative flex items-center justify-center text-muted-foreground transition-[width,height,color,background-color,box-shadow] duration-[400ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none [&_svg]:size-5\",\n                    \"shadow-[0_1.5px_0.5px_2.5px_color-mix(in_oklab,var(--background)_40%,transparent),0_0_0.5px_1px_var(--background),inset_0_2px_1px_1px_color-mix(in_oklab,var(--background)_25%,transparent),inset_0_1px_1px_1px_color-mix(in_oklab,var(--foreground)_20%,transparent)]\",\n                    on\n                      ? \"size-[4.25rem] rounded-[1.0625rem] bg-linear-to-b from-foreground/35 to-foreground/10 text-foreground [&_svg]:size-6\"\n                      : \"size-[3.25rem] rounded-[0.8125rem] bg-linear-to-b from-foreground/[0.07] to-foreground/[0.03] hover:text-foreground\",\n                  )}\n                >\n                  {item.icon}\n                  {on && (\n                    <span className=\"pointer-events-none absolute -top-12 left-1/2 -translate-x-1/2 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold tracking-[0.2px] whitespace-nowrap text-foreground ring-1 ring-foreground/15\">\n                      {item.label}\n                    </span>\n                  )}\n                </button>\n              );\n            })}\n          </div>\n        </div>\n      </div>\n\n      <p className=\"mx-auto mt-7 max-w-[22.5rem] px-gutter text-center text-base leading-[1.6] font-medium tracking-[0.2px] text-balance text-muted-foreground lg:mt-9 lg:max-w-[30rem] lg:leading-[1.65]\">\n        <strong className=\"font-semibold text-foreground\">{current.captionLead}</strong> {current.caption}\n      </p>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "raycast-heading",
+    "raycast-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the white heading sentence"
+    },
+    {
+      "name": "subtitle",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the grey heading sentence"
+    },
+    {
+      "name": "items",
+      "type": "RaycastShowcaseItem[]",
+      "required": true,
+      "description": "the dock items (five fit)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a1a9a30bf83c012be5259d4df0cc735d8d116149b10035a0ce88a47aae48bfb5"
+}
