@@ -5,12 +5,12 @@ export const productsSample: PaxosProductsProps = {
   products: [
     {
       name: "Brokerage Engine",
-      summary: "Branded buy-and-hold accounts for apps that want digital assets without running a desk.",
+      summary: "Branded buy-and-hold accounts for apps that would rather not run a desk.",
       action: { label: "See Details", href: "#" },
     },
     {
       name: "Token Minting",
-      summary: "Launch a dollar token under your own name, with our charter and reserves behind it.",
+      summary: "Your own dollar token, with our charter and reserves behind it.",
       action: { label: "See Details", href: "#" },
     },
   ],

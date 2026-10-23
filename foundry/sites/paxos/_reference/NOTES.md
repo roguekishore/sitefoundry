@@ -79,3 +79,37 @@ Nothing else moves on the original: no scroll reveals were seen in the frames or
 - Token wordmarks on the asset cards are design-relevant chrome (an icon disc + bold
   ticker) so they are built with lucide icons and chart colours, not drawn logos.
 - Footer: link groups as props; the original's large logo becomes an icon + wordmark.
+
+## Comparison round 1
+
+Page height 5398 vs 5418 (1440) and 6714 vs 6867 (390); every section within ~30px of the
+original. No section is window-sized on either side. Overflow: fits at 360/768/1024.
+Motion: header hide (opacity 1→0, up 100px, sticky) and the logo loop (55 s / 20 s) both
+show in ours-design.md, like the original's (54.6 s / 19.8 s).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | original's header never rendered in its captures, ours inferred | same | hide on scroll matches | n/a |
+| hero | lead wrapped to 3 short lines (original ~290px wide) | lime corner stronger and tighter than the original's pale spread | static, as original | yes: lead 296px; lime 22% over a wider ellipse |
+| products | — | descriptions wrap to 2 lines (original 1) so the section ran 26px tall | — | yes: shorter demo copy |
+| assets | matches | matches (ticker discs are icons, not logos) | link hover | — |
+| regulation | matches | year→hairline gap 31px vs 22px; title 2 lines vs 3 (copy length) | — | yes: gap; title length left |
+| partner / cta | match | match (film placeholder dark slate, lockup is text) | — | — |
+| footer | groups flowed one per cell, original stacks Products+Platform in col 1 | link rows 24px apart vs 22px (li inherited body leading) | link hover | yes: columns kept as cells; li leading 22px |
+
+## Comparison round 2
+
+Captured with a copy of capture.mjs that stubs the gallery's live-reload socket (the stock one
+died three times on reloads caused by other sessions). Heights now: products 938 vs 934,
+footer 499 (1440); 390 footer groups stack like the original's.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | lead still 3 lines: our copy is longer, not the width | lime wash now pale and spread like the original | — | left (copy) |
+| products | matches | 938 vs 934, one-line descriptions | — | done |
+| regulation | matches | hairline gap matches | — | done |
+| footer | Platform + Infrastructure stacked in col 1, tokens col 2, like the original | 22px link rows | link hover | done |
+| all | — | — | header hide + 55 s/20 s logo loop present; no reveals on either side | — |
+
+Re-theme check: `paxos-assets` (sample-ember, light) and `paxos-hero` (sample-ember, dark)
+both pick up the other theme's fonts, colours and washes cleanly.

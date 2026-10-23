@@ -54,7 +54,7 @@ function Group({ group }: { group: PaxosFooterGroup }) {
       <p className="text-xs/[1.85] font-medium tracking-[0.01em] text-muted-foreground">{group.title}</p>
       <ul className="mt-0.5">
         {group.links.map((link) => (
-          <li key={link.label}>
+          <li key={link.label} className="text-xs/[1.85]">
             <a href={link.href} className={linkClass}>
               {link.label}
             </a>
@@ -73,7 +73,7 @@ export function PaxosFooter({ columns, newsletter, mark, brand, socials, legal, 
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between lg:gap-10">
           <div className="grid grid-cols-2 gap-x-6 gap-y-8 lg:order-none lg:flex lg:gap-10 xl:gap-[2.4rem]">
             {columns.map((column, i) => (
-              <div key={i} className="contents lg:flex lg:flex-col lg:gap-5">
+              <div key={i} className="flex flex-col gap-5">
                 {column.map((group) => (
                   <Group key={group.title} group={group} />
                 ))}
