@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast progress slider",
+  "description": "A big section title above a horizontal strip of tall photo slides (75% of the window wide on desktop, nearly full width on phones, the next one peeking in) that snap into place. Each slide carries a glassy grey caption card with a mono label and a short sentence. Underneath, a row of hairline ticks with an orange square on the current slide; on desktop a mono caption sits at the left and square arrow buttons at the right.",
+  "category": "gallery",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "slider",
+    "carousel",
+    "gallery",
+    "snap",
+    "progress",
+    "ticks",
+    "captions",
+    "light",
+    "mono"
+  ],
+  "notes": [
+    "swipe, drag the scrollbar-free strip, press the arrows or click a tick; the orange square follows the scroll position",
+    "slides are photo slots (about 1084×701 on desktop, 344×600 on phones); empty they show flat placeholders",
+    "caption cards use white text (highlight-foreground) over a dark glass gradient, so they work on any photo"
+  ],
+  "hydrate": "visible",
+  "entry": "vastspace-progress.tsx",
+  "source": "foundry",
+  "name": "vastspace-progress",
+  "files": [
+    {
+      "path": "vastspace-progress.tsx",
+      "content": "import { useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspaceArrows } from \"@foundry/vastspace-arrows\";\nimport { VastspacePlaceholder } from \"@foundry/vastspace-placeholder\";\nimport { VastspaceSectionHeading } from \"@foundry/vastspace-section-heading\";\n\nexport interface VastspaceProgressSlide {\n  /** the mono label on the caption card, e.g. \"Test rig fit check\" */\n  label: string;\n  /** the sentence under it */\n  text: string;\n  /** the photo (an <img> or any node that fills its box); empty shows a placeholder */\n  image?: ReactNode;\n}\n\nexport interface VastspaceProgressProps {\n  /** the section title */\n  title: string;\n  /** the slides */\n  slides: VastspaceProgressSlide[];\n  /** the mono caption under the strip, left (desktop only) */\n  caption: string;\n  /** screen-reader label of the previous arrow */\n  prevLabel: string;\n  /** screen-reader label of the next arrow */\n  nextLabel: string;\n  className?: string;\n}\n\nexport function VastspaceProgress({ title, slides, caption, prevLabel, nextLabel, className }: VastspaceProgressProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const [active, setActive] = useState(0);\n\n  const step = useCallback(() => {\n    const el = track.current;\n    const first = el?.children[0] as HTMLElement | undefined;\n    if (!el || !first) return 0;\n    return first.offsetWidth + parseFloat(getComputedStyle(el).columnGap || \"0\");\n  }, []);\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    const onScroll = () => {\n      const s = step();\n      if (s) setActive(Math.min(slides.length - 1, Math.max(0, Math.round(el.scrollLeft / s))));\n    };\n    el.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => el.removeEventListener(\"scroll\", onScroll);\n  }, [slides.length, step]);\n\n  const goTo = (i: number) => track.current?.scrollTo({ left: i * step(), behavior: \"smooth\" });\n\n  return (\n    <section className={cn(\"bg-background pt-[3.875rem] pb-[4.5rem] text-foreground md:pt-10 md:pb-[7.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <VastspaceSectionHeading title={title} className=\"[&>h2]:max-w-[11em] md:[&>h2]:max-w-none\" />\n      </div>\n      <div\n        ref={track}\n        className=\"mt-24 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-gutter [scrollbar-width:none] md:mt-[4.875rem] [&::-webkit-scrollbar]:hidden\"\n        style={{ scrollPaddingInline: \"var(--page-gutter)\" }}\n      >\n        {slides.map((s) => (\n          <article key={s.label} className=\"relative h-[37.5rem] w-[calc(100vw-2.875rem)] shrink-0 snap-start overflow-clip md:aspect-[1084/701] md:h-auto md:w-[75.3vw]\">\n            <div className=\"size-full [&>*]:size-full [&>*]:object-cover\">{s.image ?? <VastspacePlaceholder className=\"size-full\" />}</div>\n            <div className=\"absolute inset-x-4 bottom-4 flex h-[10.625rem] flex-col justify-between bg-linear-to-b from-foreground/40 to-foreground/80 p-5 text-highlight-foreground backdrop-blur-[2px] md:inset-x-auto md:bottom-5 md:left-5 md:h-[13.375rem] md:w-[21.25rem]\">\n              <p className=\"flex items-center gap-2 font-mono text-xs/3 font-medium tracking-[0.02em] uppercase\">\n                <span aria-hidden className=\"size-3 bg-highlight-foreground\" />\n                {s.label}\n              </p>\n              <p className=\"text-base/[1.375]\">{s.text}</p>\n            </div>\n          </article>\n        ))}\n      </div>\n      <div className=\"mx-auto mt-8 grid max-w-page grid-cols-1 items-start px-gutter md:grid-cols-[1fr_auto_1fr]\">\n        <p className=\"hidden max-w-[16rem] font-mono text-xs/3 tracking-[0.02em] uppercase md:block\">{caption}</p>\n        <ul className=\"mx-auto flex items-center gap-3 md:mt-1\" aria-label={title}>\n          {slides.map((s, i) => {\n            const d = Math.abs(i - active);\n            return (\n              <li key={s.label}>\n                <button type=\"button\" aria-label={s.label} aria-current={i === active} onClick={() => goTo(i)} className=\"flex h-7 w-3 items-center justify-center\">\n                  {i === active ? (\n                    <span className=\"size-3 bg-highlight\" />\n                  ) : (\n                    <span className=\"w-px bg-muted-foreground/70\" style={{ height: Math.max(12, 28 - 6 * (d - 1)) }} />\n                  )}\n                </button>\n              </li>\n            );\n          })}\n        </ul>\n        <VastspaceArrows\n          prevLabel={prevLabel}\n          nextLabel={nextLabel}\n          onPrev={() => goTo(Math.max(0, active - 1))}\n          onNext={() => goTo(Math.min(slides.length - 1, active + 1))}\n          prevDisabled={active === 0}\n          nextDisabled={active === slides.length - 1}\n          className=\"hidden justify-self-end md:flex\"\n        />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-arrows",
+    "vastspace-placeholder",
+    "vastspace-section-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "slides",
+      "type": "VastspaceProgressSlide[]",
+      "required": true,
+      "description": "the slides"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": true,
+      "description": "the mono caption under the strip, left (desktop only)"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the previous arrow"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the next arrow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d8e8b06fe6046717363aeeee35b2552bc756615e4d53be27f52e6d1c8398d18d"
+}

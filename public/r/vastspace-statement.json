@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast statement",
+  "description": "A flat moon-rock band with one large mission statement (48px, medium weight, tight) in a narrow left column and small '+' crop marks in the four corners. The words start dim asteroid-dust brown and turn white one after another as the band scrolls into view, driven by the scroll position.",
+  "category": "text-effect",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "mission",
+    "scroll",
+    "scrubbed",
+    "word-reveal",
+    "crop-marks",
+    "flat",
+    "big-type"
+  ],
+  "notes": [
+    "the band is the theme's muted colour with white (highlight-foreground) text; pick a theme where those contrast",
+    "the word colour reveal uses CSS scroll-driven animations; without support the text simply shows in white",
+    "about 16 words reads best; the stagger is 2.5% of the entry per word"
+  ],
+  "entry": "vastspace-statement.tsx",
+  "source": "foundry",
+  "name": "vastspace-statement",
+  "files": [
+    {
+      "path": "vastspace-statement.css",
+      "content": "/* Each word moves from the dim colour to white while the band enters the window, one after\n   another (the stagger is per word index). Without scroll-driven animation the words stay white. */\n@supports (animation-timeline: view()) {\n  .vastspace-statement {\n    view-timeline: --vastspace-statement block;\n  }\n  .vastspace-statement-word {\n    animation: vastspace-statement-word linear both;\n    animation-timeline: --vastspace-statement;\n    animation-range: entry calc(8% + var(--i) * 2.5%) entry calc(38% + var(--i) * 2.5%);\n  }\n}\n\n@keyframes vastspace-statement-word {\n  from { color: var(--muted-foreground); }\n  to { color: var(--highlight-foreground); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vastspace-statement-word {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "vastspace-statement.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./vastspace-statement.css\";\n\nexport interface VastspaceStatementProps {\n  /** the statement; its words turn from dim to white as the band scrolls in */\n  text: string;\n  className?: string;\n}\n\nconst corner = \"absolute size-4 before:absolute before:top-1/2 before:h-px before:w-full before:bg-current after:absolute after:left-1/2 after:h-full after:w-px after:bg-current\";\n\nexport function VastspaceStatement({ text, className }: VastspaceStatementProps) {\n  const words = text.split(\" \");\n  return (\n    <section className={cn(\"vastspace-statement relative bg-muted px-gutter min-h-[31.8rem] pt-[7.6rem] pb-40 text-highlight-foreground md:min-h-[45rem] md:pt-60 md:pb-[17.5rem]\", className)}>\n      <span aria-hidden className={cn(corner, \"top-4 left-4 md:top-10 md:left-10\")} />\n      <span aria-hidden className={cn(corner, \"top-4 right-4 md:top-10 md:right-10\")} />\n      <span aria-hidden className={cn(corner, \"bottom-4 left-4 md:bottom-10 md:left-10\")} />\n      <span aria-hidden className={cn(corner, \"right-4 bottom-4 md:right-10 md:bottom-10\")} />\n      <p className=\"max-w-[17.2em] font-display text-[2rem]/[1.02] font-[560] tracking-[-0.01em] md:ml-10 md:text-5xl/[1.04]\">\n        {words.map((w, i) => (\n          <span key={i}>\n            <span className=\"vastspace-statement-word\" style={{ \"--i\": i } as CSSProperties}>\n              {w}\n            </span>{\" \"}\n          </span>\n        ))}\n      </p>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the statement; its words turn from dim to white as the band scrolls in"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b89a9b764e6550ca538e1fba4cc9d5b4e852a8da1eced5e8b19e36bd6b8003ad"
+}

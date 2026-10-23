@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast hero",
+  "description": "A full-window opening: a photo or looping video fills the screen edge to edge, with a huge, tightly tracked white headline (76px on desktop, 48px on phones) sitting bottom-left. The headline words rise in one after another on load; the media drifts down slowly as you scroll past, so it seems to lag behind.",
+  "category": "hero",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "photo",
+    "video",
+    "parallax",
+    "load-in",
+    "big-type",
+    "overlay"
+  ],
+  "notes": [
+    "exactly one window tall (100svh); the media is cropped like object-fit: cover",
+    "white text sits straight on the media (highlight-foreground), so use a darker or busy photo, or add your own scrim in the media slot",
+    "pairs with the fixed vastspace-header, which floats over the top of it",
+    "empty media shows a flat moon-rock placeholder"
+  ],
+  "entry": "vastspace-hero.tsx",
+  "source": "foundry",
+  "name": "vastspace-hero",
+  "files": [
+    {
+      "path": "vastspace-hero.css",
+      "content": "/* Words rise into place on load, 60ms apart. */\n.vastspace-hero-word {\n  display: inline-block;\n  animation: vastspace-hero-rise 0.9s cubic-bezier(0.62, 0.05, 0.01, 0.99) both;\n  animation-delay: calc(var(--i) * 60ms + 150ms);\n}\n\n@keyframes vastspace-hero-rise {\n  from { opacity: 0; transform: translateY(0.45em); }\n  to { opacity: 1; transform: translateY(0); }\n}\n\n/* The media layer is 120% tall and starts 20% above the section; as the hero scrolls away it\n   slides down by that much, so it lags behind the page and never shows a gap. */\n@supports (animation-timeline: view()) {\n  .vastspace-hero-media {\n    animation: vastspace-hero-drift linear both;\n    animation-timeline: view();\n    animation-range: exit 0% exit 100%;\n  }\n}\n\n@keyframes vastspace-hero-drift {\n  from { transform: translateY(0); }\n  to { transform: translateY(16.66%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vastspace-hero-word,\n  .vastspace-hero-media {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "vastspace-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspacePlaceholder } from \"@foundry/vastspace-placeholder\";\nimport \"./vastspace-hero.css\";\n\nexport interface VastspaceHeroProps {\n  /** the headline; it breaks word by word and each word rises in on load */\n  title: string;\n  /** the full-bleed background: an <img>, a <video>, or any node that fills its box (it is cropped like object-fit: cover) */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function VastspaceHero({ title, media, className }: VastspaceHeroProps) {\n  const words = title.split(\" \");\n  return (\n    <section className={cn(\"relative h-svh overflow-clip bg-muted text-highlight-foreground\", className)}>\n      <div className=\"vastspace-hero-media absolute inset-x-0 -top-[20%] h-[120%] [&>*]:size-full [&>*]:object-cover\">\n        {media ?? <VastspacePlaceholder className=\"size-full\" />}\n      </div>\n      <div className=\"relative flex h-full items-end px-gutter pb-16 md:pb-[6.875rem]\">\n        <h1 className=\"max-w-[8em] font-display text-5xl/[0.9] font-semibold tracking-[-0.055em] md:text-[4.75rem]/[0.86]\">\n          {words.map((w, i) => (\n            <span key={i}>\n              <span className=\"vastspace-hero-word\" style={{ \"--i\": i } as CSSProperties}>\n                {w}\n              </span>{\" \"}\n            </span>\n          ))}\n        </h1>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; it breaks word by word and each word rises in on load"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed background: an <img>, a <video>, or any node that fills its box (it is cropped like object-fit: cover)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f9d1bd8f37c8aa6e8045c0a76c133ef5ae71de9aae101bb5a76dd8f02474eede"
+}

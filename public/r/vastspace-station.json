@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vast station feature",
+  "description": "A 900px warm-white product stage: a gigantic pale-grey product name fills the width behind a circular dial of fine tick marks with one orange needle at twelve o'clock, and the 3D object sits in the middle of the dial. Small mono labels (name and launch year) top-left, a right-aligned spec table top-right on desktop, a two-line headline and a 'Learn more' link bottom-left whose chevron slides forward and back on a loop. On phones the name moves to the top and the dial sits below it.",
+  "category": "features",
+  "site": "vastspace",
+  "license": "proprietary",
+  "tags": [
+    "feature",
+    "product",
+    "dial",
+    "ticks",
+    "specs",
+    "mono",
+    "big-type",
+    "light",
+    "loop",
+    "3d-slot"
+  ],
+  "notes": [
+    "fixed 900px tall at every width, like the original (not window-sized)",
+    "the dial is drawn with CSS (a repeating conic gradient masked to a ring); the object in it is the `media` slot (a 3D render, PNG or canvas, about 3:4)",
+    "the huge word uses the card colour on the page colour: keep those two close",
+    "the spec table is hidden on phones"
+  ],
+  "entry": "vastspace-station.tsx",
+  "source": "foundry",
+  "name": "vastspace-station",
+  "files": [
+    {
+      "path": "vastspace-station.css",
+      "content": "/* The dial: 120 hairline ticks around a circle (one every 3 degrees), cut to a thin ring by a mask.\n   Only the mask's transparency matters, so its colour is a token. */\n.vastspace-station-dial {\n  --tick: 0.38deg;\n  --ring: 6px;\n  background: repeating-conic-gradient(from calc(var(--tick) / -2), currentColor 0deg var(--tick), transparent var(--tick) 3deg);\n  -webkit-mask-image: radial-gradient(circle farthest-side, transparent calc(100% - var(--ring)), var(--foreground) calc(100% - var(--ring)), var(--foreground) calc(100% - 0.5px), transparent 100%);\n  mask-image: radial-gradient(circle farthest-side, transparent calc(100% - var(--ring)), var(--foreground) calc(100% - var(--ring)), var(--foreground) calc(100% - 0.5px), transparent 100%);\n}\n\n@media (min-width: 768px) {\n  .vastspace-station-dial {\n    --tick: 0.19deg;\n    --ring: 8px;\n  }\n}\n\n/* The chevron of the link nudges forward and back, fading as it goes. */\n.vastspace-station-chevron {\n  animation: vastspace-station-chevron 1300ms ease-in-out infinite;\n}\n\n@keyframes vastspace-station-chevron {\n  0%, 100% { transform: translateX(0); opacity: 1; }\n  50% { transform: translateX(4px); opacity: 0.45; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vastspace-station-chevron {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "vastspace-station.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VastspacePlaceholder } from \"@foundry/vastspace-placeholder\";\nimport \"./vastspace-station.css\";\n\nexport interface VastspaceSpec {\n  /** the row label, e.g. \"Crew\" */\n  label: string;\n  /** the value, e.g. \"4\" */\n  value: string;\n}\n\nexport interface VastspaceStationProps {\n  /** the giant pale word behind the dial (the product name) */\n  word: string;\n  /** the small label top-left (dark) */\n  eyebrow: string;\n  /** the second small label top-left (orange), e.g. the launch year */\n  status: string;\n  /** the spec table at the top right (desktop only) */\n  specs: VastspaceSpec[];\n  /** the headline bottom-left */\n  tagline: string;\n  /** the link under the headline */\n  link: { label: string; href: string };\n  /** the object in the middle of the dial: a transparent PNG, canvas or 3D view, about 3:4; empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\nexport function VastspaceStation({ word, eyebrow, status, specs, tagline, link, media, className }: VastspaceStationProps) {\n  return (\n    <section className={cn(\"relative h-[56.25rem] overflow-clip bg-background text-foreground\", className)}>\n      <p\n        aria-hidden\n        className=\"absolute inset-x-0 top-16 text-center font-display text-[6.09rem]/none font-semibold tracking-[-0.05em] text-card select-none md:top-1/2 md:-translate-y-1/2 md:text-[20.7rem]/none\"\n      >\n        {word}\n      </p>\n\n      <div className=\"absolute top-[52%] left-1/2 aspect-square w-[min(21.9rem,calc(100%-2.5rem))] -translate-x-1/2 -translate-y-1/2 md:top-1/2 md:w-[37.75rem]\">\n        <div aria-hidden className=\"vastspace-station-dial absolute inset-0 text-foreground/60\" />\n        <div aria-hidden className=\"absolute top-0 left-1/2 h-[3%] w-px -translate-x-1/2 bg-highlight md:h-[12.4%]\" />\n        <div className=\"absolute top-1/2 left-1/2 aspect-[3/4] w-[72%] -translate-x-1/2 -translate-y-1/2 md:w-[45%] [&>*]:size-full [&>*]:object-contain\">\n          {media ?? <VastspacePlaceholder className=\"size-full bg-muted/60\" />}\n        </div>\n      </div>\n\n      <div className=\"absolute top-[12.4rem] left-gutter font-mono text-xs/3 tracking-[0.02em] uppercase md:top-[6.1rem] md:left-[calc(var(--page-gutter)+2.5rem)]\">\n        <p>{eyebrow}</p>\n        <p className=\"text-highlight\">{status}</p>\n      </div>\n\n      <dl className=\"absolute top-[6.1rem] right-[calc(var(--page-gutter)+2.5rem)] hidden grid-cols-[auto_auto] gap-x-4 font-mono text-[0.625rem]/3 tracking-[0.01em] uppercase md:grid\">\n        {specs.map((s) => (\n          <div key={s.label} className=\"contents\">\n            <dt className=\"text-right text-muted-foreground\">{s.label}:</dt>\n            <dd>{s.value}</dd>\n          </div>\n        ))}\n      </dl>\n\n      <div className=\"absolute bottom-16 left-gutter md:bottom-24 md:left-[calc(var(--page-gutter)+2.5rem)]\">\n        <p className=\"font-display text-[2rem]/[0.96] font-[560] tracking-[-0.01em] md:max-w-[11em] md:text-xl/[1]\">{tagline}</p>\n        <a href={link.href} className=\"mt-8 inline-flex items-center gap-2 text-base md:mt-9\">\n          <ChevronRight className=\"vastspace-station-chevron size-4\" strokeWidth={1.25} />\n          {link.label}\n        </a>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vastspace-placeholder"
+  ],
+  "props": [
+    {
+      "name": "word",
+      "type": "string",
+      "required": true,
+      "description": "the giant pale word behind the dial (the product name)"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small label top-left (dark)"
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "required": true,
+      "description": "the second small label top-left (orange), e.g. the launch year"
+    },
+    {
+      "name": "specs",
+      "type": "VastspaceSpec[]",
+      "required": true,
+      "description": "the spec table at the top right (desktop only)"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "the headline bottom-left"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the link under the headline"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the object in the middle of the dial: a transparent PNG, canvas or 3D view, about 3:4; empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c146333235b8224f2722ea8a86039dcba784a98fd6f0efccb315aa40a2ae9a8e"
+}
