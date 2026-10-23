@@ -109,3 +109,26 @@ Overflow: fits at 360/768/1024. Header pinned (sticky) in both.
 | feature grid | matches | card columns at 720/1040 vs 728/1054 (8px) | underline grows; heading greys on hover | left as is (8px) |
 | CTA | 40px less air above the card | 44px less air above the card; band paler/greener than the original's sky streaks | link underline | yes: more top padding; stronger wash |
 | footer | link rows 52px apart vs 43px | same; 53px taller overall | – | yes: 21px lines + 22px gaps, smaller gap to the small print |
+
+## Round 2
+
+Heights at 1440 (ours / original): hero 864 / 857 · logos 438 / 438 · products 893 / 893 ·
+solutions 738 / 747 · CTA 726 / 731 · footer 740 / 755 (page 4433 / 4477). At 390: hero 1286 /
+1300 (inferred) · logos 749 / 756 · products 1769 / 1771 · solutions 1532 / 1524 · CTA 722 / 738
+· footer 785 / 809 (page 6875 / 6932). Overflow: fits at 360/768/1024. Header sticky in both;
+the 1440 scroll frame shows the next heading blurred under the header as in the original.
+Hovers in ours' Motion list: sky button brightness 0.9 over 0.25s (original: darker sky 0.25s),
+outline buttons → secondary / foreground 5% (original: #f9fafb / grey 16%).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | matches | matches (near-clear bar over the wash) | sticky ✓ | – |
+| hero | matches the inferred layout | matches; the diagram slot is a solid grey surface where the original shows sparse chips on white (placeholder by design) | ✓ | accepted |
+| logos | matches | matches | ✓ | – |
+| feature grid | matches | cards 8px left of the original's columns | ✓ | accepted (8px) |
+| CTA | matches | matches; wash greener than the original's mostly-sky photo (the placeholder mixes glow and highlight) | ✓ | accepted: it's a placeholder |
+| footer | matches (43px rows, small print, split legal links) | matches | – | – |
+
+Re-theme check: `bridge-feature-grid` and `bridge-cta` under `sample-ember` take its serif,
+cream page, rust square and warm wash; the whole page in `.dark` reads as a near-black navy
+page with a teal-to-navy wash, dark diagram surface and dark CTA card.
