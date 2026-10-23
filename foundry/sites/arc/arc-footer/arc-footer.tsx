@@ -31,7 +31,7 @@ export interface ArcFooterProps {
 
 /** Arc's white footer: wordmark, three link columns and a newsletter form, then a hairline and a legal row. */
 export function ArcFooter({ brand, columns, newsletter, copyright, legal, socials, className }: ArcFooterProps) {
-  const linkClass = "transition-colors duration-200 hover:text-foreground motion-reduce:transition-none";
+  const linkClass = "transition-colors duration-200 ease-[ease] hover:text-foreground motion-reduce:transition-none";
   return (
     <footer className={cn("bg-background text-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter pt-[3.25rem] pb-12 lg:pt-[4.5rem] lg:pb-[7.5rem]">

@@ -25,7 +25,7 @@ export interface ArcHeaderProps {
 /** Arc's pinned header: wordmark left, links centred, a log-in link and an outlined button right. */
 export function ArcHeader({ brand, links, login, cta, menuLabel, className }: ArcHeaderProps) {
   const linkClass =
-    "text-base font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground motion-reduce:transition-none";
+    "text-base font-medium text-muted-foreground transition-colors duration-200 ease-[ease] hover:text-foreground motion-reduce:transition-none";
   return (
     <header className={cn("arc-header sticky top-0 z-40 bg-muted text-foreground", className)}>
       <nav className="relative mx-auto grid h-[4.5rem] max-w-page grid-cols-[1fr_auto] items-center px-gutter lg:h-[6.25rem] lg:grid-cols-[1fr_auto_1fr]">
