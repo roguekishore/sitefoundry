@@ -27,7 +27,7 @@ export interface LithicHeaderProps {
 }
 
 const linkClass =
-  "text-sm font-medium text-foreground transition-colors duration-300 ease-[cubic-bezier(.215,.61,.355,1)] hover:text-foreground/70 motion-reduce:transition-none";
+  "text-sm font-semibold text-foreground transition-colors duration-300 ease-[cubic-bezier(.215,.61,.355,1)] hover:text-foreground/70 motion-reduce:transition-none";
 
 /** The top bar: wordmark and links left, a text link and a dark pill right. */
 export function LithicHeader({ wordmark, mark, homeHref = "#", links, secondary, action, menuLabel, className }: LithicHeaderProps) {

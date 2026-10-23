@@ -32,7 +32,7 @@ export function LithicHero({ title, text, secondary, primary, media, className }
           )}
         </div>
         <div className="mx-auto flex max-w-[56rem] flex-col items-center px-9 py-[7.5rem] text-center lg:py-[15.5rem]">
-          <h1 className="font-display text-[2.5rem]/[1] font-medium tracking-[-0.02em] md:text-[3.5rem]/[1] lg:text-[4rem]/[1]">{title}</h1>
+          <h1 className="font-display text-[2.5rem]/[1] font-semibold tracking-[-0.02em] md:text-[3.5rem]/[1] lg:text-[4rem]/[1]">{title}</h1>
           <p className="mt-6 max-w-[49rem] text-base/[1.4] lg:mt-[2.125rem] lg:text-2xl/[1.4]">{text}</p>
           <div className="mt-8 flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row lg:mt-[2.125rem]">
             <LithicButton href={secondary.href} variant="glass" className="w-[11.625rem] sm:w-auto">

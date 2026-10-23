@@ -94,3 +94,43 @@ theme font with small style changes: caps, tracking, weight).
   matter and it stays a token.
 - On phones the original keeps the testimonial intro beside a card that peeks in from the
   right (the card starts at x=308). We keep that, as captured.
+
+## Comparison rounds
+
+Captures of ours via a /tmp copy of `capture.mjs` with Vite's live-reload websocket stubbed
+(the shared gallery kept reloading from other sessions' edits; see batch-capture notes).
+
+### Round 1
+
+Heights (390 / 1440, original → ours): hero 640→608 / 804→791 · logos 254→250 / 310→302 ·
+trust 659→660 / 464→464 · strip 291→304 / 204→204 · tabs 958→964 / 770→768 · services
+1971→1849 / 1286→1291 · quotes 616→640 / 752→772 · developers 614→602 / 514→514 · CTA 262→266 /
+330→330 · footer 1056→1181 / 396→445. No horizontal overflow at 360/768/1024 (both).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all | Host Grotesk 500 reads a step lighter than Monument Grotesk 500 (heads, nav, bullets, buttons) | same | — | yes: every 500 → 600 |
+| footer | list items inherited 1.5 line height: link pitch 32 instead of 27.6, footer 125px too tall | same, 49px too tall | — | yes: list set to 14/1.4, title→links 16/12px |
+| services | phone placeholder too small (194 tall vs ~275) | text column at x=116, not 128 | cards rise on view: present (5 cards) | yes: width 110% bleeding right; column = page width |
+| services | lead tracking too open | same | — | yes: 0.02em → 0.01em |
+| trust | card titles 18px, original 20px; bronze lines too light | badge placeholder had a drop shadow; our demo text ran to 4 lines | — | yes |
+| developers | contour rings too dense and strong | same | — | yes: /45 → /30, gap 10 |
+| hero | head 3 lines vs 4 (our copy is shorter) | — | none in either | no (content) |
+| logos | — | — | marquee 45s loop in both | — |
+| tabs | — | — | autoplay + ring + 0.25s fade present | — |
+| quotes | — | arrows land at the same place (1232/1288 vs 1240/1296) | — | — |
+
+### Round 2
+
+Heights now (390 / 1440): trust 655 / 464 · services 1895 / 1291 · footer 1069 / 410; the rest
+unchanged from round 1 (all within 5% of the original). Overflow fits at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| footer | heading→first link 32 vs 35 | — | — | yes: mt-4 on phones |
+| services | 76px shorter: our card copy is shorter than theirs | matches | reveal present | no (content) |
+| hero | weight now close; type a touch wider (Host Grotesk is wider than Monument) | same | — | no (font) |
+| re-theme | `lithic-platform` and `lithic-trust` checked under `sample-ember` light and dark: surfaces, ink and rings all follow the theme | | | — |
+| dark mode | the black hero/services panels merge with a black page in our dark mode (no edge) | same | — | no: noted in the blocks' meta |
+
+Pairs now read alike section by section, apart from copy, fictional wordmarks and placeholders.

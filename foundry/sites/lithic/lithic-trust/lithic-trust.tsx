@@ -30,16 +30,16 @@ export interface LithicTrustProps {
 }
 
 function Card({ card, wide, className }: { card: LithicTrustCard; wide: boolean; className?: string }) {
-  const badge = card.badge === true ? <LithicPlaceholder tone="ink" className="size-28 rounded-full" /> : card.badge;
+  const badge = card.badge === true ? <LithicPlaceholder tone="ink" className="size-28 rounded-full bg-foreground shadow-none" /> : card.badge;
   return (
     <div className={cn("relative isolate flex overflow-clip rounded-lg bg-muted p-6 text-foreground lg:h-[13.75rem] lg:p-10", className)}>
       {card.contours && <LithicContours at="62% -10%" gap={11} className="-z-10 text-highlight/30 lg:left-[40%]" />}
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-6">
         <div>
-          <h3 className={cn("font-display text-lg/[1.2] font-medium tracking-[-0.02em] lg:max-w-[14rem] lg:text-xl/[1.2]", !card.marks && "lg:max-w-[15rem]")}>
+          <h3 className={cn("font-display text-xl/[1.2] font-semibold tracking-[-0.02em] lg:max-w-[14rem] lg:text-xl/[1.2]", !card.marks && "lg:max-w-[15rem]")}>
             {card.title}
           </h3>
-          {card.text && <p className="mt-6 max-w-[14rem] text-sm/[1.4] font-medium text-highlight max-lg:max-w-[20rem] lg:mt-8 lg:text-base/[1.4]">{card.text}</p>}
+          {card.text && <p className="mt-6 max-w-[14rem] text-sm/[1.4] font-semibold text-highlight max-lg:max-w-[20rem] lg:mt-6 lg:text-base/[1.4]">{card.text}</p>}
         </div>
         {card.marks && (
           <ul className={cn("grid grid-cols-2 items-center gap-x-6 gap-y-5 lg:flex lg:gap-12", wide && card.marks.length > 3 ? "lg:justify-between" : "max-lg:flex max-lg:gap-8")}>
