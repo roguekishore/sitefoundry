@@ -11,7 +11,7 @@ export interface LevelsPlaceholderProps {
 const tones = {
   // the film tone scopes itself to the dark palette, so it stays dark on any ground and in any mode
   film: "dark bg-card",
-  photo: "bg-muted-foreground/30",
+  photo: "bg-muted-foreground/45",
   wash: "bg-linear-to-b from-background/0 via-glow/15 to-highlight/15",
 };
 

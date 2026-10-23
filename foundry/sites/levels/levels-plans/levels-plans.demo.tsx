@@ -7,7 +7,7 @@ const perk = { title: "Pay pre-tax", text: "Most members save about a quarter", 
 export const plansSample: LevelsPlansProps = {
   id: "plans",
   eyebrow: "Pick your path",
-  title: "One way to steady your metabolism. Three places to begin.",
+  title: "One steady system. Three ways to begin.",
   lead: "Choose where you start: Starter if you want to mix and match, Steady for a ready-made bundle of the basics, or Whole for everything from the first day.",
   recommend: {
     eyebrow: "Not sure yet?",

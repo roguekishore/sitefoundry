@@ -76,7 +76,7 @@ export function LevelsFooter({ brand, newsletter, columns, copyright, legal, dis
             {columns.map((column) => (
               <div key={column.title}>
                 <p className="text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase">{column.title}</p>
-                <ul className="mt-7 flex flex-col gap-5 lg:mt-6">
+                <ul className="mt-5 flex flex-col gap-5 lg:mt-6">
                   {column.links.map((link) => (
                     <li key={link.label}>
                       <a href={link.href} className={linkClass}>

@@ -129,3 +129,21 @@ plans 1816 (1788), closing 552 (550), footer 634 (626). No overflow at 360/768/1
 | habits | ok | phone slot 308 wide vs 320 | — | yes: 320 |
 | footer | ok | mailing block and link lists ~12px lower | link hover ok | yes: tighter gaps |
 | header, hero, system, monitor, results, stories, closing | match in layout, proportion and colour | match | header fixed, hover fades 150ms match | — |
+
+## Comparison round 2
+
+Heights after round 1: 390 trust 422 (400), spike 1372 (1325), patterns 3940 (3880),
+stories 3146 (2948); 1440 patterns 1700 (1674), footer 618 (626); the rest within ~1–3%.
+Hover list in `ours-design.md` matches the original's one for one: nav/login white/80 → white,
+white and ink buttons → 90%, green links darken with the arrow moving 4px, chips white/92 →
+white with the border darkening, the watch pill brightening; all 150ms (0.4,0,0.2,1).
+Header fixed for the whole page in both. Hero "sized by the window" in both.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| spike | our sample title ran to three lines (the original's is two) | same | — | yes: shorter sample title, same length as the original's |
+| plans | sample title three lines vs two | ok | — | yes: shorter sample title |
+| monitor | sage eyebrow hard to read over the pale photo placeholder (the original's photo is mid-dark) | same | — | yes: photo tone 45% grey, stronger bottom shade |
+| footer | link lists sit ~8px low under their headings | ok | — | yes: mt-5 |
+| stories | 4 cards ~ 200px taller in total: our quotes run a line longer; the original's first card also shows a hover-lifted state in its crop | ok | lift + zoom on hover | kept (content) |
+| header, hero, trust, system, patterns, habits, results, closing | look the same apart from content and placeholders | same | — | — |
