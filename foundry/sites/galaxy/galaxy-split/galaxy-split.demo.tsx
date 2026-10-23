@@ -51,7 +51,7 @@ export const featuredSample: GalaxySplitProps = {
 };
 
 export const railsSample: GalaxySplitProps = {
-  title: "Here is the software laying new tracks for money.",
+  title: "Here is the code laying new tracks for money.",
   body: "Brightrail works with banks, networks and developers to stand up settlement rails and speed up adoption, pairing core infrastructure with the reach of our trading desk.",
   action: { label: "See the rails", href: "#" },
   mediaSide: "right",

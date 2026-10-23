@@ -33,7 +33,7 @@ export function GalaxyIntro({ eyebrow, lines, size = "xl", lead, className }: Ga
         {eyebrow && <p className="mb-3 text-xs leading-[1.5] tracking-[0.1em] uppercase lg:mb-[1.125rem] lg:text-sm lg:leading-5">{eyebrow}</p>}
         <h2
           className={cn(
-            "font-display font-[560] tracking-[-0.035em] [font-stretch:var(--galaxy-stretch,100%)]",
+            "font-display font-[560] tracking-[-0.04em] [font-stretch:var(--galaxy-stretch,100%)]",
             size === "xl" ? "text-[2.5rem] leading-[1.1] lg:text-[4.5rem] lg:leading-[1.0555]" : "text-4xl leading-[1.1] lg:text-[3.75rem] lg:leading-[1.0667]",
           )}
         >

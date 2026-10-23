@@ -20,7 +20,7 @@ export function GalaxyPostGrid({ title, viewAll, posts, columns = 3, className }
         <div className="flex items-end justify-between gap-6 border-b border-foreground/80 pb-4">
           <h2 className="text-xl leading-7">{title}</h2>
           {viewAll && (
-            <a href={viewAll.href} className="text-base leading-6 underline underline-offset-2 transition-colors duration-300 ease-in-out hover:text-muted-foreground motion-reduce:transition-none">
+            <a href={viewAll.href} className="text-base leading-6 underline underline-offset-2 transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground motion-reduce:transition-none">
               {viewAll.label}
             </a>
           )}

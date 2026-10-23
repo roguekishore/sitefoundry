@@ -29,13 +29,13 @@ export interface GalaxyHeaderProps {
   className?: string;
 }
 
-const linkHover = "transition-colors duration-300 ease-in-out hover:text-muted-foreground motion-reduce:transition-none";
+const linkHover = "transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground/70 motion-reduce:transition-none";
 
 export function GalaxyHeader({ brand, brandHref = "#", mark, links, action, searchHref = "#", searchLabel, menuLabel, className }: GalaxyHeaderProps) {
   return (
     <header className={cn("sticky top-0 z-50 bg-background text-foreground", className)}>
       <div className="relative mx-auto flex h-[3.375rem] max-w-page items-center px-gutter lg:h-20">
-        <a href={brandHref} className="flex items-center gap-2.5 transition-opacity duration-300 ease-in-out hover:opacity-60 motion-reduce:transition-none">
+        <a href={brandHref} className="flex items-center gap-2.5 transition-opacity duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:opacity-60 motion-reduce:transition-none">
           <span aria-hidden className="grid size-[1.875rem] place-items-center [&_svg]:size-full">
             {mark ?? <Hexagon strokeWidth={2.25} />}
           </span>

@@ -100,3 +100,23 @@ Checked against Urbanist (too round, small x-height) and Figtree / DM Sans / Ins
 - No load-in or scroll reveals are added: the original has none.
 - Section padding and gutter change at `lg` through the theme (`--section-y` 3.5rem → 6rem,
   `--page-gutter` 1.5rem → 3rem).
+
+## Round 1 (ours vs original, 390 and 1440)
+
+Section heights at 1440 (ours / original): hero 601/593, stats 292/298 (inferred), letter
+848/848, intro 404/402, money 706/685, compute 530/543, featured 561/561, research 535/528,
+onchain intro 238/228, rails 697/641, news 504/576, join 392/372, footnote 176/172,
+footer 1156/1141. No horizontal overflow at 360/768/1024. Sticky header and the 1050ms
+cursor blink both show up in ours' Motion list; every hover row shows up too.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all | — | — | Tailwind's `ease-in-out` is cubic-bezier(0.4,0,0.2,1), the original's is CSS `ease-in-out` | yes: `ease-[cubic-bezier(0.42,0,0.58,1)]` everywhere |
+| header | ok | ok | links fade to #939598, original to #6d6e71 | yes: `hover:text-muted-foreground/70` |
+| hero | 3-line headline vs 4 (our copy is shorter) | ok; inline tiles read heavier than the sparse art (placeholder) | — | no: copy and placeholder |
+| letter / intro / split heads | ok | tracking a hair looser than Forma DJR | — | yes: −0.04em |
+| rails | ok | heading wrapped to 4 lines (longer copy) vs 3 | — | yes: shorter headline |
+| news | ok | 72px shorter: the original's titles run to 4 lines and it has ~116px under the cards | — | yes: `lg:pb-[6.5rem]` on the page's news grid |
+| join | ok | rule sat at the half-way line with 80px before the second text; original: rule on the first panel's edge, 48px gap, 32px inset | — | yes |
+| footer / footnote | legal, copyright and footnote are 12px on phones, ours 14px | ok | — | yes: `text-xs lg:text-sm` |
+| money (digital assets) | ok | 21px taller: our art tile is 9:10 and the text centres on it | — | no: within the art slot's ratio |

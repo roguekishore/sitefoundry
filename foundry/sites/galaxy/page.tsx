@@ -33,7 +33,7 @@ export default function Page() {
       <GalaxyPostGrid {...researchSample} />
       <GalaxyIntro {...onchainSample} />
       <GalaxySplit {...railsSample} />
-      <GalaxyPostGrid {...newsSample} />
+      <GalaxyPostGrid {...newsSample} className="lg:pb-[6.5rem]" />
       <GalaxyJoin {...joinSample} />
       <GalaxyFootnote {...footnoteSample} />
       <GalaxyFooter {...footerSample} />

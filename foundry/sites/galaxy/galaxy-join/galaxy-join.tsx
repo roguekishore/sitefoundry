@@ -16,16 +16,17 @@ export interface GalaxyJoinProps {
 }
 
 export function GalaxyJoin({ panels, className }: GalaxyJoinProps) {
+  // the rule sits on the first panel's right edge; the 48px column gap keeps it off the second
   return (
     <section className={cn("bg-background py-section text-foreground lg:pt-16 lg:pb-28", className)}>
-      <div className="mx-auto grid max-w-page gap-12 px-gutter lg:grid-cols-2 lg:gap-0">
+      <div className="mx-auto grid max-w-page gap-12 px-gutter lg:grid-cols-2">
         {panels.map((panel, i) => (
-          <div key={panel.title} className={cn("px-4 lg:px-8 lg:py-9", i > 0 && "lg:border-l lg:border-border lg:pl-20")}>
+          <div key={panel.title} className={cn("px-4 lg:px-8 lg:py-9", i < panels.length - 1 && "lg:border-r lg:border-border")}>
             <h2 className="font-display text-2xl leading-[1.3] font-[560] tracking-[-0.02em] lg:text-[2rem] lg:leading-[1.25]">{panel.title}</h2>
             <p className="mt-2 text-lg leading-6 text-muted-foreground lg:text-xl lg:leading-7">{panel.text}</p>
             <a
               href={panel.link.href}
-              className="mt-4 inline-block text-base leading-6 underline underline-offset-2 transition-colors duration-300 ease-in-out hover:text-muted-foreground motion-reduce:transition-none"
+              className="mt-4 inline-block text-base leading-6 underline underline-offset-2 transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground motion-reduce:transition-none"
             >
               {panel.link.label}
             </a>

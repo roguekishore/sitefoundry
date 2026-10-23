@@ -62,7 +62,7 @@ export interface GalaxyFooterProps {
   className?: string;
 }
 
-const linkHover = "transition-colors duration-300 ease-in-out hover:text-muted-foreground motion-reduce:transition-none";
+const linkHover = "transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground motion-reduce:transition-none";
 const kicker = "text-xs leading-[1.5] tracking-[0.1em] uppercase lg:text-sm lg:leading-5";
 
 export function GalaxyFooter({
@@ -86,7 +86,7 @@ export function GalaxyFooter({
         {/* left: mark + groups + socials */}
         <div>
           <div className="grid grid-cols-[3.5rem_1fr] gap-y-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-14">
-            <a href={brandHref} aria-label={brandLabel} className="row-start-1 size-8 transition-opacity duration-300 ease-in-out hover:opacity-60 motion-reduce:transition-none [&_svg]:size-full">
+            <a href={brandHref} aria-label={brandLabel} className="row-start-1 size-8 transition-opacity duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:opacity-60 motion-reduce:transition-none [&_svg]:size-full">
               {mark ?? <Hexagon aria-hidden strokeWidth={2.25} />}
             </a>
             {groups.map((group, i) => (
@@ -132,7 +132,7 @@ export function GalaxyFooter({
         </div>
 
         {/* bottom row: copyright | legal */}
-        <p className="mt-10 text-sm leading-5 tracking-[0.1em] uppercase lg:mt-12">
+        <p className="mt-10 text-xs leading-[1.5] tracking-[0.1em] uppercase lg:mt-12 lg:text-sm lg:leading-5">
           {copyright}{" "}
           {copyrightLink && (
             <a href={copyrightLink.href} className={cn("underline underline-offset-2", linkHover)}>
@@ -141,7 +141,7 @@ export function GalaxyFooter({
           )}
         </p>
         {legal && legal.length > 0 && (
-          <div className="mt-8 flex flex-col gap-6 text-sm leading-5 tracking-[0.1em] text-muted-foreground uppercase lg:mt-12 lg:gap-6 [&>p:last-child]:mt-5">
+          <div className="mt-8 flex flex-col gap-6 text-xs leading-[1.5] lg:text-sm lg:leading-5 tracking-[0.1em] text-muted-foreground uppercase lg:mt-12 lg:gap-6 [&>p:last-child]:mt-5">
             {legal.map((paragraph, i) => (
               <p key={i}>
                 {paragraph.map((part, j) =>
