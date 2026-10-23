@@ -104,3 +104,22 @@ blink and the hover colour changes all show up in ours.
 | mid-size serif heads (scan, steps, stories, note, footer) | read lighter than Financier at 300 | same | — | yes: weight 350 below 60px; hero and stat stay 300 |
 | pricing | — | visit time 12px low | — | yes: 36px gap |
 | scan | the original's photo has a light left margin (part of the photo) | — | — | no: placeholder fills the slot |
+
+## Comparison round 2
+
+Fits at 360, 768 and 1024. Heights (390 / 1440, ours vs original): press 330/216 vs 318/213 ·
+stat card 527/432 vs 528/430 · stories 958/904 vs 1005/899 · the rest as round 1. Motion list
+in ours: sticky header (whole page), scrubbed clip-path on the hero slot, 700ms cursor blink,
+typed phrases (seen in the scroll frames), hover colour changes on pills, links and arrows.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero slot | — | the wash had already opened ~80% one screen down; the original's rings are only starting there | scrubbed, same direction | yes: range moved to `cover 30%` → `cover 90%`; frames now match the original's pace |
+| press | row pitch 61px vs 54px: `cn()` dropped `leading-none` after the size class | rows 8px tight | — | yes: size first, leading after; row gaps 36/64px |
+| lockup | caller sizes could drop its `leading-none` the same way | — | — | yes |
+| stories | — | heading wrapped to 3 lines after the weight bump | — | yes: copy |
+| all serif heads | Newsreader stays ~8–15% wider than Financier at the same size | same | — | no: kept the original's sizes; line counts matched through copy length |
+| stories | band 47px shorter at 390 (our quote panel copy is shorter) | — | — | no: content |
+
+Re-theme check: `ezra-hero` and `ezra-pricing` under `sample-ember` take its colours, fonts and
+radius (green italic accent, dark pill, rose cards) and keep their layout.

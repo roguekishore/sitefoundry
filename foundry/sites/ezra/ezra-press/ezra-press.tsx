@@ -34,9 +34,9 @@ export function EzraPress({ label, names, className }: EzraPressProps) {
     <section className={cn("bg-background text-foreground", className)}>
       <div className="mx-auto box-content max-w-[66rem] px-gutter pt-12 pb-11 text-center lg:pt-7 lg:pb-9">
         <p className="text-xs uppercase">{label}</p>
-        <ul className="mx-auto mt-9 grid max-w-[22rem] grid-cols-2 items-center justify-items-center gap-x-4 gap-y-8 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-x-12 sm:gap-y-12 lg:mt-5">
+        <ul className="mx-auto mt-9 grid max-w-[22rem] grid-cols-2 items-center justify-items-center gap-x-4 gap-y-9 sm:flex sm:max-w-none sm:flex-wrap sm:justify-center sm:gap-x-12 sm:gap-y-16 lg:mt-5">
           {names.map((item) => (
-            <li key={item.name} className={cn("leading-none whitespace-nowrap", styles[item.style ?? "serif"])}>
+            <li key={item.name} className={cn(styles[item.style ?? "serif"], "leading-none whitespace-nowrap")}>
               {item.name}
             </li>
           ))}

@@ -15,7 +15,7 @@ export interface EzraLockupProps {
 /** "mark Partner | brand": the co-brand wordmark used in the header, hero card and footer. */
 export function EzraLockup({ name, partner, mark, className }: EzraLockupProps) {
   return (
-    <span className={cn("inline-flex items-center gap-[0.55em] text-[1.5rem] leading-none", className)}>
+    <span className={cn("inline-flex items-center gap-[0.55em] text-[1.5rem]", className, "leading-none")}>
       {partner && (
         <>
           <span className="inline-flex items-center gap-[0.3em] font-light tracking-[-0.01em]">
