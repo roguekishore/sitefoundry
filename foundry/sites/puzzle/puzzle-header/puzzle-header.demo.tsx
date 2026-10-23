@@ -5,6 +5,7 @@ export const headerSample: PuzzleHeaderProps = {
   announcement: {
     lead: "Oakbook Connect is out:",
     text: "ask your ledger from any AI assistant.",
+    shortText: "your ledger in any AI",
     link: { label: "See how", href: "#" },
   },
   closeLabel: "Hide announcement",

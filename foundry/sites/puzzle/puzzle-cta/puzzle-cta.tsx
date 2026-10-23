@@ -21,7 +21,7 @@ export interface PuzzleCtaProps {
 export function PuzzleCta({ title, text, primary, secondary, link, className }: PuzzleCtaProps) {
   return (
     <section className={cn("bg-background", className)}>
-      <div className="relative overflow-clip rounded-t-[calc(var(--radius)*0.9)] bg-primary px-6 pt-[6.25rem] pb-28 text-center text-primary-foreground lg:rounded-t-lg lg:pt-[9.25rem] lg:pb-40">
+      <div className="relative overflow-clip rounded-t-[calc(var(--radius)*0.9)] bg-primary px-6 pt-[6.25rem] pb-28 text-center text-primary-foreground lg:rounded-t-lg lg:pt-[9.25rem] lg:pb-36">
         <PuzzlePixels pattern="block" className="absolute top-16 -left-4 hidden [--pixel:4.25rem] lg:grid" />
         <PuzzlePixels pattern="step" className="absolute top-[18rem] -right-8 [--pixel:2.5rem] lg:top-[17rem] lg:[--pixel:3.9rem]" />
         <PuzzlePixels pattern="stair" className="absolute -bottom-36 left-4 [--pixel:2.25rem] lg:-bottom-48 lg:left-[24rem] lg:[--pixel:4.25rem]" />

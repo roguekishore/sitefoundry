@@ -24,8 +24,8 @@ export function PuzzleFaq({ title, groups, className }: PuzzleFaqProps) {
 
   return (
     <section className={cn("bg-card text-card-foreground", className)}>
-      <div className="mx-auto max-w-[63.5rem] px-gutter pt-10 pb-16 lg:pt-[3.25rem] lg:pb-24">
-        <h2 className="text-center font-display text-[1.75rem]/[1.2] font-normal lg:text-4xl/[1.2]">{title}</h2>
+      <div className="mx-auto max-w-[63.5rem] px-gutter pt-10 pb-16 lg:pt-[3.25rem] lg:pb-20">
+        <h2 className="text-center font-display text-[1.75rem]/[1.2] font-medium lg:text-4xl/[1.2]">{title}</h2>
         {groups.length > 1 && (
           <div role="tablist" className="mt-8 flex justify-center gap-1 lg:mt-14">
             {groups.map((g, i) => (

@@ -99,3 +99,27 @@ Skipped: the cookie banner and chat launcher (third-party overlays, not the desi
   column); the 1200px column is `max-w-[78.5rem]` with the same gutter.
 - Dark mode is a sibling: an ink-violet night page with violet-tinted panels; the deep violet
   bands stay violet.
+
+## Comparison round 1
+
+Heights 1440 (original → ours): header 119→120, hero 576→602, stats 263→264, two ways 663→704,
+AI suite 2116→2095, services 1176→1228, chooser 469→495, platform 505→518, guarantee 342→391,
+stories 733→801, migrate 998→1027, firms 293→296, CTA 624→650, FAQ 1206→1243, footer 652→651.
+390 within ±60px everywhere except two ways (1330→1461). No horizontal overflow at 360/768/1024.
+Motion: sticky header ✓; stat-card reveal (opacity 0→1, rise 21→0) ✓; hover colours and timings
+on links and every button variant match the original's list ✓; story card hover zoom ✓.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all display titles | Figtree at 400 reads lighter than Haskoy | same | — | yes: card/section titles to 500 (stat figures and feature titles stay 400) |
+| header | announcement truncates (longer copy) | ✓ | ✓ | yes: optional `shortText` for phones |
+| hero | ✓ | 26px taller (bottom padding) | ✓ | yes: pb 100→80px |
+| two ways | eyebrow wraps, lists wrap (longer copy); card 40px taller | price line wraps to 3 lines; list pitch 37 vs 34px | ✓ | yes: shorter demo copy, list gap 12→10px |
+| AI suite | ✓ | ✓ (heading 3 lines vs 2: longer copy) | — | — |
+| services | ✓ | plan cards 30px taller | — | yes: tighter inner spacing |
+| chooser | ✓ | heading row 14px lower than original (aligned to bottom) | — | yes: align top |
+| guarantee | ✓ | title wraps to 3 lines | — | yes: shorter demo title |
+| stories | heading 3 lines vs 2 | heading 2 lines vs 1 | ✓ | yes: wider heading measure |
+| firms callout | ✓ | button label left-aligned when wrapped | — | yes: centred |
+| CTA | ✓ | pixel squares brighter than the original's; 26px taller | — | yes: dimmer squares, pb 160→144px |
+| FAQ | ✓ | 37px taller | — | yes: pb 96→80px |

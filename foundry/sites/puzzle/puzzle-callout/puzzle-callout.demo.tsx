@@ -3,7 +3,7 @@ import { PuzzleCallout, type PuzzleCalloutProps } from "./puzzle-callout";
 export const guaranteeSample: PuzzleCalloutProps = {
   title: (
     <>
-      Close your month twice as fast —
+      Half the month-end close —
       <br /> or your fees come back.
     </>
   ),

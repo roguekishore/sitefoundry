@@ -53,9 +53,9 @@ export function PuzzlePaths({ eyebrow, title, paths, className }: PuzzlePathsPro
                 >
                   {p.tag}
                 </p>
-                <h3 className="mt-4 font-display text-[1.5rem]/[1.25] font-normal lg:mt-5 lg:text-[1.75rem]/[1.3]">{p.title}</h3>
+                <h3 className="mt-4 font-display text-[1.5rem]/[1.25] font-medium lg:mt-5 lg:text-[1.75rem]/[1.3]">{p.title}</h3>
                 <p className={cn("mt-3 text-base/[1.65] lg:mt-4", brand ? "text-primary-foreground/70" : "text-card-foreground")}>{p.text}</p>
-                <ul className="mt-3 flex flex-col gap-2.5 text-base/[1.55] lg:mt-4 lg:gap-3">
+                <ul className="mt-3 flex flex-col gap-2.5 text-base/[1.55] lg:mt-4 lg:gap-2.5">
                   {p.points.map((pt) => (
                     <li key={pt} className="flex items-center gap-2">
                       {brand ? (
