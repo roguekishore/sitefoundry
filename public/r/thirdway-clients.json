@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway clients",
+  "description": "A big heading and paragraph beside three groups of square client tiles (a faint ink veil, 2px corners, plain wordmarks). From lg up they are columns drifting vertically with the scroll, the middle one the opposite way, fading out top and bottom; on phones they are three rows of 128px tiles drifting sideways.",
+  "category": "logos",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "clients",
+    "marquee",
+    "parallax",
+    "scroll",
+    "tiles",
+    "cream",
+    "minimal"
+  ],
+  "notes": [
+    "clients are plain-text wordmarks in six styles; replace them with real logos by changing the tile content",
+    "groups are every third client, repeated three times to fill the travel; give it at least 6 clients",
+    "scroll-driven CSS: browsers without it show the tiles static; off under reduced motion",
+    "desktop height is fixed at 42.8rem like the original; phones are content-sized"
+  ],
+  "entry": "thirdway-clients.tsx",
+  "source": "foundry",
+  "name": "thirdway-clients",
+  "files": [
+    {
+      "path": "thirdway-clients.css",
+      "content": "/* Three groups of tiles drift with the page: rows sideways on phones, columns vertically from lg up.\n   The outer two go one way and the middle one the other. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .thirdway-clients-up {\n      animation: thirdway-clients-left linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n    .thirdway-clients-down {\n      animation: thirdway-clients-right linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n    @media (min-width: 64rem) {\n      .thirdway-clients-up { animation-name: thirdway-clients-rise; }\n      .thirdway-clients-down { animation-name: thirdway-clients-sink; }\n    }\n  }\n}\n\n/* fade the columns out at the top and bottom of the field */\n@media (min-width: 64rem) {\n  .thirdway-clients-field {\n    mask-image: linear-gradient(to bottom, transparent 0%, var(--foreground) 14%, var(--foreground) 86%, transparent 100%);\n  }\n}\n\n@keyframes thirdway-clients-left {\n  from { transform: translateX(0); }\n  to { transform: translateX(-110px); }\n}\n@keyframes thirdway-clients-right {\n  from { transform: translateX(0); }\n  to { transform: translateX(110px); }\n}\n@keyframes thirdway-clients-rise {\n  from { transform: translateY(0); }\n  to { transform: translateY(-230px); }\n}\n@keyframes thirdway-clients-sink {\n  from { transform: translateY(0); }\n  to { transform: translateY(260px); }\n}\n"
+    },
+    {
+      "path": "thirdway-clients.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayHeading } from \"@foundry/thirdway-heading\";\nimport { ThirdwayReveal } from \"@foundry/thirdway-reveal\";\nimport \"./thirdway-clients.css\";\n\nexport type ThirdwayClientStyle = \"sans\" | \"serif\" | \"caps\" | \"mono\" | \"bold\" | \"italic\";\n\nexport interface ThirdwayClient {\n  /** the client's name, set as a plain wordmark in one of the styles */\n  name: string;\n  /** how to set it (default sans) */\n  style?: ThirdwayClientStyle;\n}\n\nexport interface ThirdwayClientsProps {\n  heading: string;\n  text: string;\n  clients: ThirdwayClient[];\n  className?: string;\n}\n\nconst looks: Record<ThirdwayClientStyle, string> = {\n  sans: \"text-2xl font-[560] tracking-[-0.06em] lg:text-3xl\",\n  serif: \"font-[family-name:var(--typeface-serif,Georgia,serif)] text-2xl font-[350] tracking-[-0.02em] lg:text-3xl\",\n  caps: \"text-sm font-[560] tracking-[0.28em] uppercase lg:text-base\",\n  mono: \"font-mono text-base font-[560] tracking-tight lg:text-xl\",\n  bold: \"text-3xl font-bold tracking-[-0.07em] lg:text-4xl\",\n  italic: \"text-sm font-bold tracking-[0.22em] uppercase italic lg:text-lg\",\n};\n\nfunction Tiles({ clients, hidden }: { clients: ThirdwayClient[]; hidden?: boolean }) {\n  return clients.map((c, i) => (\n    <li\n      key={i}\n      aria-hidden={hidden || undefined}\n      className={cn(\"flex size-32 shrink-0 items-center justify-center rounded-[2px] bg-foreground/4 px-3 text-center leading-none lg:size-auto lg:aspect-square\", looks[c.style ?? \"sans\"])}\n    >\n      {c.name}\n    </li>\n  ));\n}\n\n/**\n * Heading and paragraph beside three drifting groups of client tiles. From lg up the groups are\n * columns that glide vertically with the scroll (the middle one the other way) behind a fade;\n * on phones they are three rows gliding sideways. Clients are plain wordmarks, not logos.\n */\nexport function ThirdwayClients({ heading, text, clients, className }: ThirdwayClientsProps) {\n  const groups = [0, 1, 2].map((k) => clients.filter((_, i) => i % 3 === k));\n  return (\n    <section className={cn(\"thirdway-clients relative overflow-clip bg-background py-section text-foreground lg:flex lg:h-[42.8rem] lg:items-center lg:py-0\", className)}>\n      <div className=\"grid gap-10 lg:h-full lg:w-full lg:grid-cols-2 lg:gap-x-4 lg:px-8\">\n        <div className=\"px-gutter lg:flex lg:flex-col lg:justify-center lg:px-0\">\n          <ThirdwayHeading text={heading} />\n          <ThirdwayReveal className=\"mt-6 max-w-[32rem] lg:mt-8\">\n            <p className=\"text-base leading-[1.3] font-[560] tracking-[-0.04em] lg:text-lg\">{text}</p>\n          </ThirdwayReveal>\n        </div>\n        <div className=\"thirdway-clients-field relative flex flex-col gap-3 overflow-clip lg:grid lg:h-full lg:grid-cols-3 lg:grid-rows-[100%] lg:gap-4\">\n          {groups.map((g, k) => (\n            <div\n              key={k}\n              className={cn(\n                \"thirdway-clients-group flex w-max gap-3 lg:w-auto lg:flex-col lg:gap-4\",\n                k === 1 ? \"thirdway-clients-down -mr-[4.9rem] self-end lg:mr-0 lg:mb-[3.9rem]\" : \"thirdway-clients-up -ml-[3.9rem] lg:-mt-[11.3rem] lg:ml-0\",\n              )}\n            >\n              <ul className=\"contents\">\n                <Tiles clients={g} />\n                <Tiles clients={g} hidden />\n                <Tiles clients={g} hidden />\n              </ul>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-heading",
+    "thirdway-reveal"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "clients",
+      "type": "ThirdwayClient[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "26f23361d29c9c112fa9db0b4cf4766ea28142dc249860dfbc39bc981243116a"
+}

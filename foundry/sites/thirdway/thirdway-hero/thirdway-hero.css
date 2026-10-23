@@ -1,0 +1,47 @@
+/* The scroll cue's arrow runs down the capsule on a loop. */
+@keyframes thirdway-hero-arrow {
+  0% { transform: translateY(-6px); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+
+.thirdway-hero-arrow {
+  animation: thirdway-hero-arrow 2800ms ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thirdway-hero-arrow { animation: none; }
+}
+
+/* The statement brightens character by character (0.3 -> 1) while the paragraph crosses the window;
+   every character shares the paragraph's own view timeline and starts a little later than the last. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .thirdway-hero-fill {
+      view-timeline: --thirdway-hero-fill block;
+    }
+    .thirdway-hero-char {
+      animation: thirdway-hero-char linear both;
+      animation-timeline: --thirdway-hero-fill;
+      animation-range:
+        cover calc(14% + 24% * var(--i) / var(--n))
+        cover calc(28% + 24% * var(--i) / var(--n));
+    }
+    /* the scroll cue fades out as soon as the page moves */
+    .thirdway-hero-scroll {
+      animation: thirdway-hero-scroll-out linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 30svh;
+    }
+  }
+}
+
+@keyframes thirdway-hero-char {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+@keyframes thirdway-hero-scroll-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

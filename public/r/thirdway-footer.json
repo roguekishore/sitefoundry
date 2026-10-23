@@ -1,0 +1,150 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway footer",
+  "description": "A full-width photo (480px phones, 606px desktop) with a cream call-to-action card at its bottom corner, then an ink footer: a huge vertical wordmark beside a tick ruler with a live 'You've scrolled N cm' label, address and contact details in small type with serif headings, large 32px page links, a small legal list and a credits bar.",
+  "category": "footer",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "cta",
+    "ruler",
+    "vertical-type",
+    "big-type",
+    "photo-led",
+    "scroll-counter"
+  ],
+  "notes": [
+    "the footer panel forces the dark colour scope (cream on ink); the call-to-action card is a page-coloured panel (cream with ink type in the light theme)",
+    "the scroll counter needs JavaScript (hydrate: visible) and shows 0 until it hydrates",
+    "the original's small circled mark above the vertical wordmark is left out"
+  ],
+  "entry": "thirdway-footer.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "thirdway-footer",
+  "files": [
+    {
+      "path": "thirdway-footer.css",
+      "content": "/* The ruler: fine ticks every 8px and longer ones every 80px, pointing left from the line. */\n.thirdway-footer-ruler {\n  background:\n    repeating-linear-gradient(to bottom, var(--foreground) 0 1px, transparent 1px 80px) right / 0.875rem 100% no-repeat,\n    repeating-linear-gradient(to bottom, var(--foreground) 0 1px, transparent 1px 8px) right / 0.5rem 100% no-repeat;\n  opacity: 0.8;\n}\n"
+    },
+    {
+      "path": "thirdway-footer.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayPlaceholder } from \"@foundry/thirdway-placeholder\";\nimport \"./thirdway-footer.css\";\n\nexport interface ThirdwayFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface ThirdwayFooterProps {\n  /** photo behind the call-to-action card; a placeholder when empty */\n  media?: ReactNode;\n  /** the sentence in the cream card, up to its linked ending */\n  cta: string;\n  /** the underlined ending of the sentence */\n  ctaLink: ThirdwayFooterLink;\n  /** the wordmark, set vertically along the left edge */\n  wordmark: string;\n  /** text before the live scroll length, e.g. \"You've scrolled\" */\n  scrolledPrefix: string;\n  /** the unit after it, e.g. \"cm\" */\n  scrolledUnit: string;\n  /** small serif heading above the address */\n  addressLabel: string;\n  /** address lines */\n  address: string[];\n  emailLabel: string;\n  email: ThirdwayFooterLink;\n  socialLabel: string;\n  social: ThirdwayFooterLink[];\n  /** small serif heading above the large links */\n  exploreLabel: string;\n  explore: ThirdwayFooterLink[];\n  /** the small legal list */\n  legal: ThirdwayFooterLink[];\n  copyright: string;\n  /** credits at the bottom right: a lead-in and a link each */\n  credits: { prefix: string; link: ThirdwayFooterLink }[];\n  className?: string;\n}\n\n/** The page's scroll position in centimetres (96 px to the inch), one decimal. */\nfunction useScrolledCm() {\n  const [cm, setCm] = useState(\"0\");\n  useEffect(() => {\n    const update = () => setCm(String(Math.round(window.scrollY * 0.02646 * 10) / 10).replace(/\\.0$/, \"\"));\n    update();\n    window.addEventListener(\"scroll\", update, { passive: true });\n    return () => window.removeEventListener(\"scroll\", update);\n  }, []);\n  return cm;\n}\n\nconst small = \"text-sm leading-[1.3] font-[560] tracking-[-0.02em]\";\nconst serifLabel = \"font-[family-name:var(--typeface-serif,Georgia,serif)] text-sm leading-[1.3] font-[350] tracking-[-0.01em]\";\n\n/**\n * A full-width photo with a cream call-to-action card, then the dark footer: a vertical wordmark\n * beside a ruler that counts how far you have scrolled, address and contact details, large page\n * links, a small legal list and a credits bar.\n */\nexport function ThirdwayFooter({ media, cta, ctaLink, wordmark, scrolledPrefix, scrolledUnit, addressLabel, address, emailLabel, email, socialLabel, social, exploreLabel, explore, legal, copyright, credits, className }: ThirdwayFooterProps) {\n  const cm = useScrolledCm();\n  return (\n    <footer id=\"footer\" className={cn(\"relative bg-background text-foreground\", className)}>\n      <div className=\"relative h-[30rem] lg:h-[37.9rem]\">\n        <div className=\"absolute inset-0\">{media ?? <ThirdwayPlaceholder className=\"size-full rounded-none\" />}</div>\n        <div className=\"absolute inset-x-4 bottom-4 rounded-[2px] bg-background p-4 text-foreground lg:right-6 lg:bottom-6 lg:left-auto lg:h-[15.4rem] lg:w-[calc(50%-0.7rem)] lg:p-8\">\n          <p className=\"[word-spacing:-0.07em] max-w-[30rem] text-[2rem] leading-none font-[560] tracking-[-0.06em] lg:max-w-[40rem] lg:text-[3rem]\">\n            {cta}{\" \"}\n            <a href={ctaLink.href} className=\"underline decoration-2 underline-offset-[0.12em]\">\n              {ctaLink.label}\n            </a>\n          </p>\n        </div>\n      </div>\n\n      <div className=\"dark bg-background text-foreground\">\n        <div className=\"grid lg:grid-cols-2\">\n          <div className=\"relative h-[22rem] border-b border-border lg:h-auto lg:border-b-0\">\n            <span className=\"absolute bottom-4 left-4 text-[3.5rem] leading-none font-[560] tracking-[-0.06em] [text-orientation:mixed] [writing-mode:vertical-rl] rotate-180 lg:bottom-6 lg:left-8 lg:text-[7.5rem]\">{wordmark}</span>\n            <div aria-hidden className=\"thirdway-footer-ruler absolute inset-y-0 left-[5.2rem] w-3.5 border-r border-foreground/60 lg:left-[9.4rem]\" />\n            <div className=\"absolute top-0 left-[6rem] flex items-center gap-4 text-xl leading-none font-[560] tracking-[-0.04em] lg:left-[10.2rem]\">\n              <span aria-hidden className=\"h-px w-10 bg-foreground/60 lg:w-14\" />\n              <span className=\"tabular-nums\">{`${scrolledPrefix} ${cm}${scrolledUnit}`}</span>\n            </div>\n          </div>\n\n          <div className=\"flex flex-col\">\n            <div className=\"grid grid-cols-2 gap-x-4 px-gutter py-5 lg:min-h-[29.3rem] lg:border-b lg:border-border lg:px-0 lg:pr-8 lg:pb-0\">\n              <div className=\"order-2 grid content-start gap-8 lg:order-1\">\n                <div>\n                  <p className={serifLabel}>{addressLabel}</p>\n                  <address className={cn(small, \"mt-2 not-italic\")}>\n                    {address.map((l, i) => (\n                      <span key={i} className=\"block\">\n                        {l}\n                      </span>\n                    ))}\n                  </address>\n                </div>\n                <div>\n                  <p className={serifLabel}>{emailLabel}</p>\n                  <a href={email.href} className={cn(small, \"mt-2 block\")}>\n                    {email.label}\n                  </a>\n                </div>\n                <div>\n                  <p className={serifLabel}>{socialLabel}</p>\n                  <ul className={cn(small, \"mt-2 grid gap-1.5\")}>\n                    {social.map((l) => (\n                      <li key={l.label}>\n                        <a href={l.href}>{l.label}</a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              </div>\n              <div className=\"order-1 lg:order-2\">\n                <p className={serifLabel}>{exploreLabel}</p>\n                <ul className=\"mt-2 [word-spacing:-0.07em] text-[1.375rem] leading-[1.1] font-[560] tracking-[-0.06em] lg:text-[2rem] lg:leading-[1.1]\">\n                  {explore.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"transition-opacity duration-150 hover:opacity-60 motion-reduce:transition-none\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            </div>\n            <ul className={cn(small, \"grid gap-0.5 border-t border-border px-gutter py-5 lg:border-t-0 lg:px-0 lg:py-7\")}>\n              {legal.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href}>{l.label}</a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n\n        <div className=\"flex items-end justify-between gap-6 border-t border-border px-gutter py-4 text-xs leading-[1.1] font-[560] tracking-[-0.02em] md:px-[calc(var(--page-gutter)*2)] lg:items-center\">\n          <p>{copyright}</p>\n          <p className=\"flex flex-col items-end gap-2 lg:flex-row lg:gap-3\">\n            {credits.map((c) => (\n              <span key={c.link.label}>\n                {c.prefix}{\" \"}\n                <a href={c.link.href} className=\"underline underline-offset-2\">\n                  {c.link.label}\n                </a>\n              </span>\n            ))}\n          </p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-placeholder"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "photo behind the call-to-action card; a placeholder when empty"
+    },
+    {
+      "name": "cta",
+      "type": "string",
+      "required": true,
+      "description": "the sentence in the cream card, up to its linked ending"
+    },
+    {
+      "name": "ctaLink",
+      "type": "ThirdwayFooterLink",
+      "required": true,
+      "description": "the underlined ending of the sentence"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set vertically along the left edge"
+    },
+    {
+      "name": "scrolledPrefix",
+      "type": "string",
+      "required": true,
+      "description": "text before the live scroll length, e.g. \"You've scrolled\""
+    },
+    {
+      "name": "scrolledUnit",
+      "type": "string",
+      "required": true,
+      "description": "the unit after it, e.g. \"cm\""
+    },
+    {
+      "name": "addressLabel",
+      "type": "string",
+      "required": true,
+      "description": "small serif heading above the address"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "address lines"
+    },
+    {
+      "name": "emailLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "email",
+      "type": "ThirdwayFooterLink",
+      "required": true
+    },
+    {
+      "name": "socialLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "social",
+      "type": "ThirdwayFooterLink[]",
+      "required": true
+    },
+    {
+      "name": "exploreLabel",
+      "type": "string",
+      "required": true,
+      "description": "small serif heading above the large links"
+    },
+    {
+      "name": "explore",
+      "type": "ThirdwayFooterLink[]",
+      "required": true
+    },
+    {
+      "name": "legal",
+      "type": "ThirdwayFooterLink[]",
+      "required": true,
+      "description": "the small legal list"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "credits",
+      "type": "{ prefix: string; link: ThirdwayFooterLink; }[]",
+      "required": true,
+      "description": "credits at the bottom right: a lead-in and a link each"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "404aead4ea9ea0885fa29d658396cb93423ba0a68ebed7b09d3589cd2c6a60e1"
+}

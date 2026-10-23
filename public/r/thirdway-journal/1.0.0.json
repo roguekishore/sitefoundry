@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Thirdway journal",
+  "description": "A big section heading with a 'view all' link, over three ink-veil post cards (3:2 cover, three circled date figures, a 20px title). On phones and tablets the cards are a snap carousel with round arrows and the link sits below; from xl they form a 6 / 3 / 3 grid whose first card is large. Covers zoom 4% on hover.",
+  "category": "gallery",
+  "site": "thirdway",
+  "license": "proprietary",
+  "tags": [
+    "journal",
+    "blog",
+    "cards",
+    "carousel",
+    "grid",
+    "hover",
+    "reveal",
+    "cream"
+  ],
+  "notes": [
+    "covers are placeholders until filled",
+    "the carousel arrows need JavaScript (hydrate: visible); from lg up the track becomes a grid and the arrows hide"
+  ],
+  "entry": "thirdway-journal.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "thirdway-journal",
+  "files": [
+    {
+      "path": "thirdway-journal.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ThirdwayArrowLink } from \"@foundry/thirdway-arrow-link\";\nimport { ThirdwayCarousel } from \"@foundry/thirdway-carousel\";\nimport { ThirdwayCountPill } from \"@foundry/thirdway-count-pill\";\nimport { ThirdwayHeading } from \"@foundry/thirdway-heading\";\nimport { ThirdwayPlaceholder } from \"@foundry/thirdway-placeholder\";\n\nexport interface ThirdwayPost {\n  /** day, month and year as separate figures, e.g. [\"06\", \"10\", \"2026\"] */\n  date: [string, string, string];\n  title: string;\n  href: string;\n  /** cover photo (3:2); a placeholder when empty */\n  image?: ReactNode;\n}\n\nexport interface ThirdwayJournalProps {\n  heading: string;\n  viewAll: { label: string; href: string };\n  /** the posts; the first is shown large on desktop */\n  posts: ThirdwayPost[];\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** Heading with a \"view all\" link, then posts: a snap carousel on phones and tablets, a 6 / 3 / 3 column grid from xl. */\nexport function ThirdwayJournal({ heading, viewAll, posts, prevLabel, nextLabel, className }: ThirdwayJournalProps) {\n  return (\n    <section className={cn(\"relative bg-background py-[5.5rem] text-foreground md:py-[7.65rem]\", className)}>\n      <div className=\"flex items-end justify-between gap-4 px-gutter pb-6 md:px-[calc(var(--page-gutter)*2)] md:pb-12\">\n        <ThirdwayHeading text={heading} />\n        <ThirdwayArrowLink label={viewAll.label} href={viewAll.href} size=\"sm\" chip={false} className=\"mb-2 hidden md:inline-flex\" />\n      </div>\n      <ThirdwayCarousel\n        prevLabel={prevLabel}\n        nextLabel={nextLabel}\n        label={null}\n        controlsClassName=\"lg:hidden\"\n        trackClassName=\"lg:grid lg:snap-none lg:grid-cols-3 lg:items-start lg:overflow-visible xl:grid-cols-12\"\n        itemClassName={(i) => cn(\"w-[19.4rem] sm:w-[22rem] lg:w-auto\", i === 0 ? \"xl:col-span-6\" : \"xl:col-span-3\")}\n      >\n        {posts.map((post, i) => (\n          <a key={post.href + post.title} href={post.href} className=\"group block rounded-[2px] bg-foreground/6 p-2\">\n            <div className=\"aspect-[3/2] overflow-clip rounded-[2px]\">\n              <div className=\"size-full transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.04] motion-reduce:transition-none\">\n                {post.image ?? <ThirdwayPlaceholder className=\"size-full rounded-none\" />}\n              </div>\n            </div>\n            <div className=\"flex items-center gap-0.5 px-2 pt-3\">\n              {post.date.map((d, k) => (\n                <ThirdwayCountPill key={k} value={d} />\n              ))}\n            </div>\n            <h3 className={cn(\"px-2 pt-3 pb-3 text-xl leading-[1.1] font-[560] tracking-[-0.04em]\", i === 0 && \"xl:pb-4\")}>{post.title}</h3>\n          </a>\n        ))}\n      </ThirdwayCarousel>\n      <div className=\"px-gutter pt-0 md:hidden\">\n        <ThirdwayArrowLink label={viewAll.label} href={viewAll.href} size=\"sm\" chip={false} className=\"-mt-5 ml-auto flex w-fit\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "thirdway-arrow-link",
+    "thirdway-carousel",
+    "thirdway-count-pill",
+    "thirdway-heading",
+    "thirdway-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "viewAll",
+      "type": "{ label: string; href: string; }",
+      "required": true
+    },
+    {
+      "name": "posts",
+      "type": "ThirdwayPost[]",
+      "required": true,
+      "description": "the posts; the first is shown large on desktop"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "aaca1894230cdb6d9b01a28de4b2b8016ec8475777807c487388332bcfd7cda2"
+}
