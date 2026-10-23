@@ -43,7 +43,7 @@ export function PlaidContact({ title, formTitle, fields, consent, submitLabel, a
   return (
     <section
       className={cn(
-        "relative isolate bg-glow bg-linear-to-br from-foreground/75 via-glow to-highlight pb-[calc(5rem+2.5rem)] lg:pb-[calc(4.5rem+2.5rem)]",
+        "relative isolate bg-glow bg-linear-to-br from-foreground/75 via-glow to-highlight pb-[calc(2rem+2.5rem)] lg:pb-[calc(4.5rem+2.5rem)]",
         "dark:from-background/75",
         className,
       )}

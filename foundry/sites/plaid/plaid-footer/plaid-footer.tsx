@@ -34,14 +34,14 @@ export function PlaidFooter({ brand, groups, socials, copyright, region, privacy
   return (
     <footer
       className={cn(
-        "relative rounded-t-[calc(var(--radius)+1rem)] bg-foreground text-background dark:bg-card dark:text-foreground",
+        "relative rounded-t-[calc(var(--radius)+1rem)] bg-[color-mix(in_oklab,var(--foreground)_55%,var(--primary))] text-background dark:bg-card dark:text-foreground",
         overlap && "-mt-10",
         className,
       )}
     >
       <div className="mx-auto max-w-[65.125rem] px-13 pt-12 pb-20 lg:px-0 lg:pt-[5.5rem] lg:pb-24">
         <div className="lg:grid lg:grid-cols-[12.9375rem_1fr]">
-          <PlaidWordmark {...brand} markOnly />
+          <PlaidWordmark {...brand} markOnly className="self-start" />
           <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 lg:mt-0 lg:grid-cols-4 lg:gap-x-0 lg:gap-y-[2.875rem]">
             {groups.map((g) => (
               <div key={g.title}>

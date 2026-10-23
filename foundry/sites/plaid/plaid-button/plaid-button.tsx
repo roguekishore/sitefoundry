@@ -36,13 +36,13 @@ const sizes = {
   lg: "h-12 px-6 text-lg tracking-[-0.03em] lg:h-14 lg:px-8 lg:text-xl",
 };
 
-/** Plaid's pill: the label sits on a face; rimmed variants wrap that face in a 1.5px rainbow. */
+/** Plaid's pill: the label sits on a face; rimmed variants wrap that face in a 2px rainbow. */
 export function PlaidButton({ children, href, variant = "ink", size = "lg", type = "button", className }: PlaidButtonProps) {
   const rimmed = variant === "ink" || variant === "paper";
   const outer = cn(
     "group/btn inline-flex shrink-0 rounded-full font-medium whitespace-nowrap",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-    rimmed && cn(rainbow, "p-[1.5px] transition-shadow duration-100 ease-in-out hover:shadow-[0_0_14px_var(--chart-3)] motion-reduce:transition-none"),
+    rimmed && cn(rainbow, "p-[2px] transition-shadow duration-100 ease-in-out hover:shadow-[0_0_14px_var(--chart-3)] motion-reduce:transition-none"),
     className,
   );
   const face = (
@@ -51,8 +51,8 @@ export function PlaidButton({ children, href, variant = "ink", size = "lg", type
         "inline-flex w-full items-center justify-center rounded-full transition-[background-color,filter,--tw-gradient-from] duration-250 ease-in-out motion-reduce:transition-none",
         faces[variant],
         sizes[size],
-        rimmed && size === "lg" && "h-[calc(3rem-3px)] lg:h-[calc(3.5rem-3px)]",
-        rimmed && size === "md" && "h-[calc(2.375rem-3px)]",
+        rimmed && size === "lg" && "h-[calc(3rem-4px)] lg:h-[calc(3.5rem-4px)]",
+        rimmed && size === "md" && "h-[calc(2.375rem-4px)]",
       )}
     >
       {children}

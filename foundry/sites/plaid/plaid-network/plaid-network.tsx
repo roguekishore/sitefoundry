@@ -79,7 +79,7 @@ export function PlaidNetwork({ title, body, stats, notes, chips = [], className 
 
   return (
     <section className={cn("overflow-clip bg-background pb-20 text-foreground lg:pb-24", className)}>
-      <div className="mx-auto grid max-w-page px-gutter lg:grid-cols-2 lg:gap-x-5">
+      <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] px-gutter lg:grid-cols-2 lg:gap-x-5">
         {/* desktop feed: a zig-zag column pinned to the page's left edge */}
         <div className="hidden lg:block lg:ml-[calc(min(0px,(var(--page-width)-100vw)/2)-var(--page-gutter))]">
           <ul className="flex flex-col gap-[4.375rem] pt-px">
@@ -92,11 +92,11 @@ export function PlaidNetwork({ title, body, stats, notes, chips = [], className 
         </div>
 
         <div className="lg:pt-[9.5rem] lg:pl-[1.125rem]">
-          <h2 className="font-display text-[1.875rem]/[1.22] font-medium tracking-[-0.05em] lg:text-[4.375rem]/[1.2] lg:tracking-[-0.035em]">{title}</h2>
+          <h2 className="font-display lg:max-w-[31rem] text-[1.875rem]/[1.22] font-medium tracking-[-0.05em] lg:text-[4.375rem]/[1.2] lg:tracking-[-0.035em]">{title}</h2>
           <p className="mt-6 max-w-[30.5rem] text-lg/[1.5] text-foreground/75 lg:mt-8 lg:text-2xl/[1.5]">{body}</p>
           <dl className="mt-12 grid gap-y-9 lg:mt-[8.75rem] lg:grid-cols-[18.75rem_1fr] lg:gap-y-[5.25rem]">
             {stats.map((s) => (
-              <div key={s.label} className="flex flex-col-reverse">
+              <div key={s.label} className="flex flex-col-reverse justify-end">
                 <dt className="mt-0.5 max-w-[18rem] font-display text-lg/[0.94] font-medium tracking-[-0.045em] lg:mt-5 lg:max-w-[13.5rem] lg:text-[1.875rem]/[0.94] lg:tracking-[-0.03em]">
                   {s.label}
                 </dt>

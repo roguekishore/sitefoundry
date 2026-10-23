@@ -55,18 +55,20 @@ export function PlaidProducts({ title, action, products, linkLabel, className }:
                 <span
                   aria-hidden
                   className={cn(
-                    "plaid-products-rim absolute top-1/2 left-1/2 -z-20 aspect-square w-[160%] -translate-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
+                    "plaid-products-rim absolute top-1/2 left-1/2 -z-20 aspect-square w-[300%] -translate-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100",
                     rainbow,
                   )}
                 />
                 <span
                   aria-hidden
-                  className="plaid-products-surface absolute inset-0 -z-10 rounded-lg bg-card bg-linear-to-b from-highlight/15 via-secondary/70 to-accent/60 transition-[inset,border-radius] duration-250 ease-out group-hover:inset-1 group-hover:rounded-[calc(var(--radius)-4px)] motion-reduce:transition-none"
+                  className="plaid-products-surface absolute inset-0 -z-10 rounded-lg bg-card bg-linear-to-b from-glow/15 via-secondary/70 to-accent/60 transition-[inset,border-radius] duration-250 ease-out group-hover:inset-1 group-hover:rounded-[calc(var(--radius)-4px)] motion-reduce:transition-none"
                 />
 
                 <span className="flex items-start gap-4 p-4 pt-6 lg:p-6 lg:pt-6">
                   <span className="flex-1 font-display text-xl/[1.4] font-medium tracking-[-0.02em] text-muted-foreground lg:text-[1.625rem]/[1.4]">
-                    <span className="font-semibold text-foreground">{p.lead}</span> {p.rest}
+                    <span className={cn("block", i < 2 ? "lg:max-w-[25rem]" : "lg:max-w-[17rem]")}>
+                      <span className="font-semibold text-foreground">{p.lead}</span> {p.rest}
+                    </span>
                     <span className="sr-only"> · {linkLabel}</span>
                   </span>
                   <span
