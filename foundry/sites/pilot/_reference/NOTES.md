@@ -113,3 +113,26 @@ scenarios 1480/1988 vs 1505/2251 · cases 1362/1478 vs 1329/1654 · insights 824
 | insights | ok | rows 146px vs 155–175 | row hover ✓ | yes: py-7, link mt-6 |
 | paths | explore art a hard-edged rectangle | same | — | yes: radial wash |
 | footer | shorter (fewer long links) | column at x=180 vs 156; titles lighter | — | yes |
+
+## Round 2
+
+Heights (1440 / 390): hero 1100/1187 vs 986/1293 · insights 872/1206 vs 881/1299 · others as
+round 1. Header pinned 23 half-screens at 1440 (original 23) ✓; no overflow at 360/768/1024 ✓.
+Re-theme: `pilot-hero` and `pilot-scenarios` under sample-ember, `pilot-paths` under
+sample-midnight dark: all readable, bands take the other theme's colours (the hero goes
+light under ember because its band is `secondary`). Dark sibling of the full page looked
+over: cyan cards too loud → dark `accent` toned down to #2f9fb8.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| headings | natural wraps, as original | bold weight now matches Euclid's colour | — | ✓ |
+| hero | ok | still ~110px taller (the lede, a deliberate addition; see Decisions) | hover ✓ | kept |
+| features | icon → title → copy → card, as original | ok | — | ✓ |
+| ask | ok | window clipped at the frame line | — | ✓ |
+| cases | ok | one-line titles; violet-washed photo placeholder | arrows ✓ | ✓ |
+| insights | ok | rows 158px, section 872 vs 881 | row hover ✓ | ✓ |
+| paths | ok | corner wash now soft | — | ✓ |
+| footer | shorter (our link labels are shorter, fewer wrap) | column on x=156 | — | ✓ |
+
+Left as is: the A/B hero difference; advisor/scenario sections shorter on phones because our
+copy is shorter; chat-frame crossfade only runs when frames are given (motion inside media).

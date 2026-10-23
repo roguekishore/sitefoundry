@@ -53,9 +53,14 @@ export function PilotPaths({ title, main, explore, begin, note, className }: Pil
 
           <div className="flex flex-col">
             <div className="relative flex-1 overflow-clip bg-secondary p-6 text-secondary-foreground lg:min-h-[23.125rem] lg:p-10">
-              <div className="absolute right-0 bottom-0 aspect-[345/190] w-[70%] lg:w-[54%]">
-                {explore.art ?? <div aria-hidden className="size-full bg-radial-[at_100%_100%] from-glow/45 via-glow/10 via-55% to-transparent to-75%" />}
-              </div>
+              {explore.art ? (
+                <div className="absolute right-0 bottom-0 aspect-[345/190] w-[70%] lg:w-[54%]">{explore.art}</div>
+              ) : (
+                <div
+                  aria-hidden
+                  className="absolute inset-0 bg-[radial-gradient(60%_50%_at_100%_100%,color-mix(in_oklab,var(--glow)_45%,transparent),transparent)]"
+                />
+              )}
               <div className="relative">
                 <h3 className="font-display text-2xl leading-[1.2] font-medium lg:text-[2rem]">{explore.title}</h3>
                 <p className="mt-4 max-w-[23rem] text-base leading-6">{explore.text}</p>
