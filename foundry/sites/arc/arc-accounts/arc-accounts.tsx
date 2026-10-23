@@ -10,8 +10,8 @@ const tones = {
   accent: "bg-accent",
   /** sage */
   secondary: "bg-secondary",
-  /** sand */
-  highlight: "bg-highlight",
+  /** sand: the highlight colour at 30%, so themes with a strong highlight still get a pastel */
+  highlight: "bg-highlight/30",
 } as const;
 
 export interface ArcAccount {

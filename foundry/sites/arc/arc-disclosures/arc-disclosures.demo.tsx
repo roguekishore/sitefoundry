@@ -26,6 +26,18 @@ export const disclosuresSample: ArcDisclosuresProps = {
       leadOnOwnLine: true,
       text: "Yields change with market conditions and without notice. Figures quoted on this page are illustrations of how the products work, calculated on example balances, and are not offers or promises of any return. Interest on Operating accounts is paid monthly on the average daily balance of the prior calendar month.",
     },
+    {
+      lead: "For deposit accounts held at Northfield Trust:",
+      leadOnOwnLine: true,
+      text: "Operating and Reserve cash balances are eligible for deposit insurance up to the standard limit per depositor, per bank, for each ownership category, provided the bank's records show the account is held for your company. Basin is not a bank and is not itself insured; insurance protects only against the failure of an insured bank. Coverage above the standard limit applies only to balances placed through the deposit sweep described above.",
+    },
+    {
+      text: "Rewards on card spend are paid as statement credits once a month and may change or end at any time. Rewards do not apply to cash withdrawals, fees, refunds or transfers between your own accounts, and unused rewards expire when an account is closed.",
+    },
+    {
+      lead: "Venture debt and the analyst agent",
+      text: "are services of Basin Labs. Credit is extended by independent lenders, not by Basin, and every facility is subject to the lender's own approval and documentation. The analyst agent is a software tool and does not give investment, tax or legal advice.",
+    },
     { lead: "Product images are illustrations only.", text: "Screens shown on this page are examples and any figures in them are invented." },
   ],
   footnotes: [

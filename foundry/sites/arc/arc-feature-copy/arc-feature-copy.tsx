@@ -22,7 +22,7 @@ export function ArcFeatureCopy({ badge, title, body, linkLabel, className }: Arc
         {title}
       </h3>
       <p className="mt-4 max-w-[32rem] text-[0.884rem]/[1.5] text-muted-foreground lg:mt-5 lg:text-base/6">{body}</p>
-      <span className="mt-auto pt-8 text-[0.884rem] font-medium text-foreground lg:pt-10 lg:text-base">{linkLabel}</span>
+      <span className="mt-auto pt-6 text-[0.884rem] font-medium text-foreground lg:pt-8 lg:text-base">{linkLabel}</span>
     </div>
   );
 }

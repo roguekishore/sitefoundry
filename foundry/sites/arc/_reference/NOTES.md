@@ -76,8 +76,9 @@ inside `@supports (animation-timeline: view())`.
 
 ## Decisions
 
-- Pastel card tones map to `--accent` (blue-grey), `--secondary` (sage) and `--highlight`
-  (sand), so `arc-accounts` takes a `tone` per card; the hero/AI grey is `--muted`.
+- Pastel card tones map to `--accent` (blue-grey), `--secondary` (sage) and `--highlight` at
+  30% (sand; the theme sets a mid sand #b9aa82 so 30% over white gives #ebe6d9, and themes whose
+  highlight is a strong colour still get a pastel), so `arc-accounts` takes a `tone` per card; the hero/AI grey is `--muted`.
 - The dark parts (announcement, slate panel, testimonial, CTA) put the `dark` class on their
   own wrapper (the brex pattern), so they use the theme's dark tokens: mint `--primary`, slate
   `--card`, #222 `--muted`, #1e1e1c `--background`.
@@ -87,3 +88,44 @@ inside `@supports (animation-timeline: view())`.
   disclosures with the same structure (bold leads, a rule, numbered footnotes) and density.
 - The header's grey → white change is built with a scroll timeline rather than JS, so the
   header needs no hydration.
+
+## Round 1 (first capture of ours)
+
+Heights: main (hero → CTA) 5242 vs 5226 at 1440 and 6572 vs 6549 at 390; header 100/72 and
+announcement 56/74 exact. Motion list shows the sticky header, its scroll-linked grey→white
+change, the hero load-in and the reveals (opacity 0→1, rise 15px) as in the original. Fits at
+360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | matches (4-line headline, buttons side by side, slightly bleeding screenshot) | matches | load-in ok | — |
+| solid buttons | — | hover lightened the teal (`primary/90` over grey); the original keeps it | hover | yes: `brightness(0.92)` instead |
+| section headings | full width ok | measure ~1100px gave an orphan ("…finance / team"); original lines run 650–865px | reveal ok | yes: `lg:max-w-[56rem]` |
+| solutions | badge ok | badge label pushed out of its pill (an `[&>span]` padding override also hit the badge) | reveal ok | yes: override removed, link gap `pt-6 lg:pt-8` in the copy stack |
+| testimonial | portrait placeholder see-through (grid lines showed) | same; also much darker than the original's pale portrait | reveal ok | yes: opaque frame, glow→ink wash |
+| CTA | — | heading on two lines, original three | reveal ok | yes: demo copy |
+| disclosures | shorter than the original (legal copy is ours) | 931 vs ~1500 px | — | partly: three more paragraphs |
+| footer | wordmark and links a size large at 390 (original 12px links) | matches | — | yes |
+
+## Round 2
+
+Heights: main 5304 vs 5226 at 1440 (our CTA heading ran to three lines with longer copy), 6624
+vs 6549 at 390. Hover list now matches the original's (nav ink, outline → teal fill, link
+dims). No window-sized sections in either. Fits at 360/768/1024. Dark mode and sample-ember
+captures checked.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| solutions | ok | badge back in its pill; panel copy centred like the original | reveal ok | — |
+| section headings | ok | two-line breaks like the original (56rem measure) | reveal ok | — |
+| testimonial | glow-to-ink gradient read as a murky green photo | same | reveal ok | yes: flat mid-grey (foreground 25%) on an opaque frame |
+| CTA | heading ran to five lines (original four) | three lines ok | reveal ok | yes: shorter demo copy |
+| accounts under sample-ember | — | the sand card used `bg-highlight` and turned saturated green there, with poor text contrast | — | yes: `bg-highlight/30`, and arc-theme's highlight is now a mid sand (#b9aa82) that gives the same #ebe6d9 at 30% |
+| links (nav, footer) | — | Tailwind's default easing, original `ease` | hover | yes: `ease-[ease]` |
+| disclosures | still shorter than the original | ~1120 vs ~1500 px | — | left: the original's legal text is longer; ours keeps the structure and density |
+
+## Round 3
+
+Accounts (sand card now `highlight/30`), testimonial and CTA re-captured at 390 and 1440: the
+section pairs read alike apart from copy and placeholders; motion list and hover list unchanged
+from round 2. Stopped here.
