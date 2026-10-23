@@ -123,3 +123,30 @@ universe 1072 → 1097, rows 677/642/642 → 666/642/642, network 1034 → 1038,
 | customers | ✓ | ✓ | two drifting rows ✓ (loop 96.8s), hover zoom + quote ✓ | – |
 | CTA | 35px shorter | ✓ | – | – |
 | footer | 213px taller | 93px taller: links spaced 38px vs 31.5px (inherited 24px line) | hover violet ✓ | yes: links set at 14px/1.3 |
+
+## Comparison round 2
+
+Heights now (original → ours), 1440: hero 597 → 621 (→ ~601 after the dot fix below), logos
+191 → 197, solutions 838 → 850, universe 1359 → 1366, statement 312 → 324, rows 494 → 475,
+network 734 → 762, customers 994 → 954, CTA 430 → 416, footer 912 → 930. 390: hero 686 →
+702, solutions 2188 → 2173, universe 1072 → 1097, network 1034 → 1038, customers 742 → 764,
+footer 1609 → 1682 (our link lists are the same length; the gap is our longer group names
+wrapping). No horizontal overflow at 360, 768 or 1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ✓ | ✓, fits at 1024 now | ✓ | – |
+| hero | ✓ (lede runs 3 lines: our copy is longer) | lede 20px lower than the original; the device frame sets the band's height, with the dots 16px under it where the original tucks them into the image's bottom margin | ✓ | yes: lede gap 32px, dots 6px under the frame |
+| solutions | cards were 312px against the original's ~336px | ✓ | ✓ | yes: 336px cards on phones |
+| universe | ✓ | ✓ (lower captions aligned) | ✓ | – |
+| network | ✓ | ✓ globe slot in place, bleeding past the band's bottom like the original | – | – |
+| rest | ✓ | ✓ | ✓ | – |
+
+Re-theme check: `airwallex-solutions` (sample-ember, dark), `airwallex-network` and
+`airwallex-universe` (sample-ember, light) all take the other theme's colours and fonts;
+the gradients become ember's chart colours, the universe band reads ember's dark scope.
+
+Stopping here: each section pair reads as the same design at a glance (apart from copy and
+the placeholders), the motion list matches the inventory (hero crossfade and dots 15s loop,
+logos 30s marquee, solutions view-timeline rise, universe panel fade and Learn-more grow,
+customers 96.8s drift, hover lifts and colour changes).
