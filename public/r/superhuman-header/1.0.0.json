@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superhuman header",
+  "description": "A sticky white bar 67px high with a hairline underneath: the lockup at the left, six regular-weight nav links (those with menus carry a thin chevron) beside it, and a quiet 'Contact sales' link with a bordered 'Sign in' pill at the right. On phones: the lockup and a menu button that opens a dropdown list. Links and the pill ring deepen on hover over 0.2s.",
+  "category": "header",
+  "site": "superhuman",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "light",
+    "minimal",
+    "hamburger"
+  ],
+  "notes": [
+    "sticky at the top of its container: place it as the first child of the page",
+    "best on light themes (white bar)"
+  ],
+  "hydrate": "load",
+  "entry": "superhuman-header.tsx",
+  "source": "foundry",
+  "name": "superhuman-header",
+  "files": [
+    {
+      "path": "superhuman-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface SuperhumanNavLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** shows a chevron: the item opens a menu on the real site */\n  hasMenu?: boolean;\n}\n\nexport interface SuperhumanHeaderProps {\n  /** the lockup at the left (a SuperhumanMark) */\n  brand: ReactNode;\n  /** where the lockup links */\n  brandHref?: string;\n  /** the navigation links */\n  links: SuperhumanNavLink[];\n  /** the quiet link before the sign-in pill (desktop only) */\n  contact: SuperhumanNavLink;\n  /** the bordered sign-in pill */\n  signIn: SuperhumanNavLink;\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass = \"inline-flex items-center gap-1 text-base font-[460] text-foreground transition-colors duration-200 hover:text-chart-5 hover:underline-offset-4 motion-reduce:transition-none\";\n\nexport function SuperhumanHeader({ brand, brandHref = \"/\", links, contact, signIn, menuLabel, className }: SuperhumanHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"sticky top-0 z-50 border-b border-border bg-popover text-foreground\", className)}>\n      <div className=\"mx-auto flex h-[4.125rem] max-w-[calc(var(--page-width)+2*var(--page-gutter))] items-center px-gutter\">\n        <a href={brandHref} className=\"shrink-0\">\n          {brand}\n        </a>\n        <nav aria-label=\"Main\" className=\"ml-10 hidden items-center gap-6 lg:flex\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className={linkClass}>\n              {l.label}\n              {l.hasMenu && <ChevronDown className=\"size-4 text-foreground/65\" strokeWidth={1.5} />}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto hidden items-center gap-6 lg:flex\">\n          <a href={contact.href} className={linkClass}>\n            {contact.label}\n          </a>\n          <a\n            href={signIn.href}\n            className=\"inline-flex h-[2.1875rem] items-center gap-1.5 rounded-sm px-3.5 text-sm font-medium shadow-[inset_0_0_0_1px_var(--border)] transition-shadow duration-200 ease-in-out hover:shadow-[inset_0_0_0_2px_var(--border)] motion-reduce:transition-none\"\n          >\n            {signIn.label}\n            <ChevronDown className=\"size-4\" strokeWidth={1.5} />\n          </a>\n        </div>\n        <button type=\"button\" aria-label={menuLabel} aria-expanded={open} onClick={() => setOpen(!open)} className=\"ml-auto flex size-10 items-center justify-center lg:hidden\">\n          {open ? <X className=\"size-6\" strokeWidth={1.5} /> : <Menu className=\"size-6\" strokeWidth={1.5} />}\n        </button>\n      </div>\n      {open && (\n        <div className=\"border-t border-border px-gutter pb-4 lg:hidden\">\n          {[...links, contact, signIn].map((l) => (\n            <a key={l.label} href={l.href} className=\"block py-3 text-base font-[460]\">\n              {l.label}\n            </a>\n          ))}\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lockup at the left (a SuperhumanMark)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the lockup links"
+    },
+    {
+      "name": "links",
+      "type": "SuperhumanNavLink[]",
+      "required": true,
+      "description": "the navigation links"
+    },
+    {
+      "name": "contact",
+      "type": "SuperhumanNavLink",
+      "required": true,
+      "description": "the quiet link before the sign-in pill (desktop only)"
+    },
+    {
+      "name": "signIn",
+      "type": "SuperhumanNavLink",
+      "required": true,
+      "description": "the bordered sign-in pill"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5739543ff558c3668fe43377b3e1b5ce098d29f2ea82536ddc7a1dc266d414da"
+}

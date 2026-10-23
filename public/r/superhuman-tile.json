@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Superhuman feature tile",
+  "description": "A 12px-radius colour tile: a small eyebrow and a 25px headline at the bottom-left, a media slot beside it (or above it) bleeding off the edge. Six surfaces: teal, maroon, indigo, purple, stone and pale lilac. On phones the text sits on top and the media below.",
+  "category": "card",
+  "site": "superhuman",
+  "license": "proprietary",
+  "tags": [
+    "tile",
+    "bento",
+    "card",
+    "colour-field",
+    "media"
+  ],
+  "notes": [
+    "teal, maroon, indigo and purple are deep surfaces (chart-1…4) with light text; stone and lilac are light",
+    "give height at desktop through className (e.g. lg:h-[16.25rem]); phones size by content",
+    "media is a ReactNode; empty shows a placeholder"
+  ],
+  "entry": "superhuman-tile.tsx",
+  "source": "foundry",
+  "name": "superhuman-tile",
+  "files": [
+    {
+      "path": "superhuman-tile.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperhumanPlaceholder } from \"@foundry/superhuman-placeholder\";\n\nconst tones = {\n  teal: \"bg-chart-1 text-primary-foreground\",\n  maroon: \"bg-chart-2 text-primary-foreground\",\n  indigo: \"bg-chart-3 text-primary-foreground\",\n  purple: \"bg-chart-4 text-primary-foreground\",\n  stone: \"bg-muted text-foreground\",\n  lilac: \"bg-accent text-accent-foreground\",\n} as const;\n\nexport interface SuperhumanTileProps {\n  /** the surface colour */\n  tone: keyof typeof tones;\n  /** the small label above the headline */\n  eyebrow: string;\n  /** the headline */\n  title: string;\n  /** the image or screenshot; empty shows a placeholder */\n  media?: ReactNode;\n  /** side: text left, media right (phones: text then media) · stack: media above, text below at every width */\n  layout?: \"side\" | \"stack\";\n  /** phones only (stack layout): the media fills the whole tile behind the text instead of sitting above it, so the tile stays short */\n  overlay?: boolean;\n  /** pad the media from the top and left so a window sits inside the tile instead of bleeding in */\n  inset?: boolean;\n  /** width of the media area at desktop when layout is side (a Tailwind width class) */\n  mediaWidth?: string;\n  /** height and grid placement at desktop */\n  className?: string;\n}\n\nexport function SuperhumanTile({ tone, eyebrow, title, media, layout = \"side\", overlay, inset, mediaWidth = \"lg:w-[57%]\", className }: SuperhumanTileProps) {\n  const side = layout === \"side\";\n  const text = (\n    <div className={cn(\"p-8\", side && \"lg:w-[43%] lg:self-end\", !side && \"lg:pt-6\", overlay && \"relative max-lg:mt-auto max-lg:pt-24\")}>\n      <p className=\"text-sm/[1.2] font-medium opacity-80\">{eyebrow}</p>\n      <h3 className=\"mt-4 text-xl/[1.2] font-[460] tracking-[-0.0275em] lg:text-[1.5625rem]/[1.2]\">{title}</h3>\n    </div>\n  );\n  const slot = (\n    <div\n      className={cn(\n        \"aspect-[3/2] overflow-clip lg:aspect-auto [&_img]:size-full [&_img]:object-cover\",\n        side ? cn(\"lg:absolute lg:inset-y-0 lg:right-0\", mediaWidth) : cn(\"lg:min-h-0 lg:flex-1\", overlay && \"max-lg:absolute max-lg:inset-0 max-lg:aspect-auto\"),\n        inset && \"pt-3 pl-8 lg:pt-12 lg:pl-4\",\n      )}\n    >\n      {media ?? <SuperhumanPlaceholder tone={inset ? \"panel\" : \"tint\"} className={cn(\"size-full\", inset && \"rounded-tl-lg bg-popover/80 text-foreground\")} />}\n    </div>\n  );\n  return (\n    <article className={cn(\"relative flex flex-col overflow-clip rounded-lg\", tones[tone], side ? \"lg:flex-row\" : \"\", className)}>\n      {side ? (\n        <>\n          {text}\n          {slot}\n        </>\n      ) : (\n        <>\n          {slot}\n          {text}\n        </>\n      )}\n    </article>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "superhuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": true,
+      "description": "the surface colour"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small label above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the image or screenshot; empty shows a placeholder"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "default": "side",
+      "description": "side: text left, media right (phones: text then media) · stack: media above, text below at every width"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "description": "phones only (stack layout): the media fills the whole tile behind the text instead of sitting above it, so the tile stays short"
+    },
+    {
+      "name": "inset",
+      "type": "boolean",
+      "required": false,
+      "description": "pad the media from the top and left so a window sits inside the tile instead of bleeding in"
+    },
+    {
+      "name": "mediaWidth",
+      "type": "string",
+      "required": false,
+      "default": "lg:w-[57%]",
+      "description": "width of the media area at desktop when layout is side (a Tailwind width class)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "height and grid placement at desktop"
+    }
+  ],
+  "hash": "cde5b8031acc847939416aaa0bc535b5728d02d800b40e30771ddf779aab7bc8"
+}

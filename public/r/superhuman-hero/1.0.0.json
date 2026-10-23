@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superhuman hero carousel",
+  "description": "A split hero: near-black on the left half, maroon on the right. A big two-tone headline (grey lead, bright product name), a lilac button and a lilac link, and at the bottom a 'toolkit' list of product rows. The media sits in the right half, cropped to the section; on phones it moves below the buttons and the rows become a three-cell switcher. Every 10 seconds the next product dissolves in (500ms) while a thin progress line fills on its row; hovering a row sweeps a faint white wash.",
+  "category": "hero",
+  "site": "superhuman",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "carousel",
+    "split",
+    "dark",
+    "progress",
+    "dissolve",
+    "tabs"
+  ],
+  "notes": [
+    "deep surface: left half uses chart-5, right half chart-2, text uses primary-foreground; best on the Superhuman theme",
+    "auto-advances every 10s; with reduced motion it stays on the chosen product",
+    "the media is a screenshot or video slot; empty shows a colour-wash placeholder"
+  ],
+  "hydrate": "load",
+  "entry": "superhuman-hero.tsx",
+  "source": "foundry",
+  "name": "superhuman-hero",
+  "files": [
+    {
+      "path": "superhuman-hero.css",
+      "content": "/* Slide change: the incoming content fades in. The active row's line fills over the interval. */\n.superhuman-hero-dissolve {\n  animation: superhuman-hero-dissolve 500ms ease both;\n}\n.superhuman-hero-progress {\n  transform-origin: left;\n  animation: superhuman-hero-progress var(--superhuman-hero-interval, 10s) linear both;\n}\n\n@keyframes superhuman-hero-dissolve {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes superhuman-hero-progress {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .superhuman-hero-dissolve,\n  .superhuman-hero-progress {\n    animation: none;\n  }\n  .superhuman-hero-progress {\n    transform: scaleX(1);\n  }\n}\n"
+    },
+    {
+      "path": "superhuman-hero.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperhumanButton } from \"@foundry/superhuman-button\";\nimport { SuperhumanLink } from \"@foundry/superhuman-link\";\nimport { SuperhumanPlaceholder } from \"@foundry/superhuman-placeholder\";\nimport \"./superhuman-hero.css\";\n\nexport interface SuperhumanHeroItem {\n  /** the product name in the list */\n  name: string;\n  /** a lucide icon for the list row */\n  icon: ReactNode;\n  /** the one-line pitch in the list row (desktop) */\n  tagline: string;\n  /** the headline's grey first part */\n  lead: string;\n  /** the headline's bright second part (the product) */\n  title: string;\n  /** the lilac button */\n  primary: { label: string; href: string };\n  /** the lilac text link */\n  secondary: { label: string; href: string };\n  /** the screenshot or video for this product; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface SuperhumanHeroProps {\n  /** one entry per product; the hero rotates through them */\n  items: SuperhumanHeroItem[];\n  /** the small heading above the list */\n  listLabel: string;\n  /** index shown first */\n  initialIndex?: number;\n  /** milliseconds each product stays */\n  interval?: number;\n  className?: string;\n}\n\nexport function SuperhumanHero({ items, listLabel, initialIndex = 0, interval = 10000, className }: SuperhumanHeroProps) {\n  const [active, setActive] = useState(initialIndex);\n  const reduce = useReducedMotion();\n\n  useEffect(() => {\n    if (reduce || items.length < 2) return;\n    const t = setTimeout(() => setActive((a) => (a + 1) % items.length), interval);\n    return () => clearTimeout(t);\n  }, [active, interval, items.length, reduce]);\n\n  const item = items[active];\n  return (\n    <section\n      className={cn(\"bg-linear-to-b from-chart-5 to-chart-2 text-primary-foreground lg:bg-[linear-gradient(to_right,var(--chart-5)_50%,var(--chart-2)_50%)]\", className)}\n      style={{ \"--superhuman-hero-interval\": `${interval}ms` } as React.CSSProperties}\n    >\n      <div className=\"mx-auto grid max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter lg:min-h-[40.625rem] lg:grid-cols-2 lg:grid-rows-[1fr_auto]\">\n        <div key={`text-${active}`} className=\"superhuman-hero-dissolve pt-10 lg:pt-12 lg:pr-10\">\n          <h1 className=\"max-w-[40rem] text-[2rem]/[1.2] font-[460] tracking-[-0.0275em] lg:text-[3.0625rem]/[1.2]\">\n            <span className=\"text-primary-foreground/65\">{item.lead}</span> {item.title}\n          </h1>\n          <div className=\"mt-7 flex items-center gap-4 lg:mt-8\">\n            <SuperhumanButton label={item.primary.label} href={item.primary.href} variant=\"secondary\" size=\"sm\" />\n            <SuperhumanLink label={item.secondary.label} href={item.secondary.href} tone=\"soft\" />\n          </div>\n        </div>\n\n        <div key={`media-${active}`} className=\"superhuman-hero-dissolve mt-10 aspect-[4/5] overflow-clip rounded-lg lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:aspect-auto lg:rounded-none [&_img]:size-full [&_img]:object-cover [&_video]:size-full [&_video]:object-cover\">\n          {item.media ?? <SuperhumanPlaceholder tone=\"wash\" className=\"size-full\" />}\n        </div>\n\n        <div className=\"mt-5 pb-5 lg:mt-0 lg:pb-0\">\n          <p className=\"mb-6 hidden text-sm font-semibold text-primary-foreground/80 lg:block\">{listLabel}</p>\n          <ul className=\"grid grid-cols-3 gap-2 lg:block lg:gap-0\">\n            {items.map((it, i) => {\n              const on = i === active;\n              return (\n                <li key={it.name} className=\"relative lg:border-t lg:border-primary-foreground/10\">\n                  <button\n                    type=\"button\"\n                    aria-pressed={on}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"group relative flex w-full flex-col items-start gap-2 rounded-sm py-3 text-left text-base font-[540] transition-colors duration-200 hover:bg-linear-to-r hover:from-transparent hover:from-0% hover:via-primary-foreground/6 hover:via-10% hover:to-primary-foreground/6 motion-reduce:transition-none\",\n                      \"lg:grid lg:h-[3.5625rem] lg:grid-cols-[1.5rem_4.5rem_1fr] lg:items-center lg:gap-x-3 lg:rounded-none lg:py-0 lg:pl-8\",\n                      on ? \"text-primary-foreground\" : \"text-primary-foreground/65\",\n                    )}\n                  >\n                    <span className={cn(\"flex size-6 items-center justify-center rounded-[0.4rem] text-chart-5 [&_svg]:size-4\", on ? \"bg-primary-foreground\" : \"bg-primary-foreground/65\")}>{it.icon}</span>\n                    <span>{it.name}</span>\n                    <span className={cn(\"hidden lg:block\", on ? \"text-primary-foreground\" : \"text-primary-foreground/80\")}>{it.tagline}</span>\n                    {on && !reduce && <span key={`bar-${active}`} aria-hidden className=\"superhuman-hero-progress absolute inset-x-0 top-0 h-0.5 bg-primary-foreground/80 lg:-top-px lg:h-px\" />}\n                  </button>\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superhuman-button",
+    "superhuman-link",
+    "superhuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "SuperhumanHeroItem[]",
+      "required": true,
+      "description": "one entry per product; the hero rotates through them"
+    },
+    {
+      "name": "listLabel",
+      "type": "string",
+      "required": true,
+      "description": "the small heading above the list"
+    },
+    {
+      "name": "initialIndex",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "index shown first"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "10000",
+      "description": "milliseconds each product stays"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1023476edce038c16cc9bb63bc2c760759cef96965a7272ccd1991d513c53d65"
+}

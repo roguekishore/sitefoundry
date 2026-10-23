@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Superhuman assistant section",
+  "description": "A product section on the light page: centred lockup, two-tone headline, lead and buttons, then a bento of three colour tiles (one wide teal tile and two half-width tiles, maroon and stone) with media slots, then a five-tab strip with icons (active tab underlined, hover tint) over three soft cards that change with the tab. On phones the tiles and cards stack and the tab strip scrolls sideways.",
+  "category": "features",
+  "site": "superhuman",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "tabs",
+    "cards",
+    "light",
+    "colour-field"
+  ],
+  "notes": [
+    "deep tiles use chart-1/2 with light text; best on the Superhuman theme",
+    "each tab holds its own cards; the first tab is shown in static HTML",
+    "media slots: three tile screenshots"
+  ],
+  "hydrate": "visible",
+  "entry": "superhuman-pilot.tsx",
+  "source": "foundry",
+  "name": "superhuman-pilot",
+  "files": [
+    {
+      "path": "superhuman-pilot.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SuperhumanCard, type SuperhumanCardProps } from \"@foundry/superhuman-card\";\nimport { SuperhumanSectionHeading, type SuperhumanSectionHeadingProps } from \"@foundry/superhuman-section-heading\";\nimport { SuperhumanTile, type SuperhumanTileProps } from \"@foundry/superhuman-tile\";\n\nexport interface SuperhumanPilotTab {\n  /** the tab label */\n  label: string;\n  /** a lucide icon before the label */\n  icon: ReactNode;\n  /** the three cards shown under this tab */\n  cards: SuperhumanCardProps[];\n}\n\nexport interface SuperhumanPilotProps {\n  /** the centred heading block */\n  heading: SuperhumanSectionHeadingProps;\n  /** the wide tile (teal) */\n  wide: Omit<SuperhumanTileProps, \"tone\" | \"layout\">;\n  /** the left half tile (maroon) */\n  left: Omit<SuperhumanTileProps, \"tone\" | \"layout\">;\n  /** the right half tile (stone) */\n  right: Omit<SuperhumanTileProps, \"tone\" | \"layout\">;\n  /** the tabs; the first is open at first */\n  tabs: SuperhumanPilotTab[];\n  className?: string;\n}\n\nexport function SuperhumanPilot({ heading, wide, left, right, tabs, className }: SuperhumanPilotProps) {\n  const [open, setOpen] = useState(0);\n  return (\n    <section className={cn(\"bg-background px-gutter py-10 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <SuperhumanSectionHeading {...heading} className=\"mb-10 lg:mb-24\" />\n        <div className=\"grid gap-4 lg:grid-cols-2 lg:gap-8\">\n          <SuperhumanTile {...wide} tone=\"teal\" className=\"lg:col-span-2 lg:h-[20.5625rem]\" />\n          <SuperhumanTile {...left} tone=\"maroon\" inset className=\"lg:h-[16.25rem]\" />\n          <SuperhumanTile {...right} tone=\"stone\" inset className=\"lg:h-[16.25rem]\" />\n        </div>\n\n        <div role=\"tablist\" className=\"-mx-gutter mt-8 flex overflow-x-auto border-b border-border px-gutter lg:mx-0 lg:px-0 [scrollbar-width:none]\">\n          {tabs.map((t, i) => (\n            <button\n              key={t.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === open}\n              onClick={() => setOpen(i)}\n              className={cn(\n                \"relative flex h-[3.625rem] shrink-0 items-center justify-center gap-2 px-6 text-[1.125rem]/[1.5] font-[460] whitespace-nowrap transition-colors duration-200 hover:bg-foreground/5 motion-reduce:transition-none lg:flex-auto [&_svg]:size-5\",\n                i === open ? \"text-foreground after:absolute after:inset-x-0 after:bottom-[-1px] after:h-0.5 after:bg-foreground\" : \"text-foreground/65\",\n              )}\n            >\n              {t.icon}\n              {t.label}\n            </button>\n          ))}\n        </div>\n\n        <div role=\"tabpanel\" className=\"mt-16 grid gap-4 lg:grid-cols-3 lg:gap-8\">\n          {tabs[open].cards.map((c) => (\n            <SuperhumanCard key={c.title} {...c} />\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "superhuman-card",
+    "superhuman-section-heading",
+    "superhuman-tile"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SuperhumanSectionHeadingProps",
+      "required": true,
+      "description": "the centred heading block"
+    },
+    {
+      "name": "wide",
+      "type": "Omit<SuperhumanTileProps, \"tone\" | \"layout\">",
+      "required": true,
+      "description": "the wide tile (teal)"
+    },
+    {
+      "name": "left",
+      "type": "Omit<SuperhumanTileProps, \"tone\" | \"layout\">",
+      "required": true,
+      "description": "the left half tile (maroon)"
+    },
+    {
+      "name": "right",
+      "type": "Omit<SuperhumanTileProps, \"tone\" | \"layout\">",
+      "required": true,
+      "description": "the right half tile (stone)"
+    },
+    {
+      "name": "tabs",
+      "type": "SuperhumanPilotTab[]",
+      "required": true,
+      "description": "the tabs; the first is open at first"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9b1e1e78eee92767f7ade8067d5a3209f12d5f142e22621e0a7584ad13c8ae9a"
+}
