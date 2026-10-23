@@ -155,7 +155,7 @@ export function PuzzleAiSuite({ eyebrow, title, text, cta, features, strip, clas
                 <div className="flex items-center gap-2 lg:gap-2.5">
                   <span
                     className={cn(
-                      "flex size-9 items-center justify-center rounded-[calc(var(--radius)*0.6)] text-foreground lg:size-11 [&_svg]:size-[1.125rem] lg:[&_svg]:size-5",
+                      "flex size-9 items-center justify-center rounded-[calc(var(--radius)*0.6)] text-foreground lg:size-11 dark:text-background [&_svg]:size-[1.125rem] lg:[&_svg]:size-5",
                       tile[f.tone ?? "violet"],
                     )}
                   >

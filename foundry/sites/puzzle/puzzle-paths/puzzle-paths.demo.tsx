@@ -29,7 +29,7 @@ export const pathsSample: PuzzlePathsProps = {
       points: ["Checked Over or Fully Run bookkeeping", "A named bookkeeper and month-end recap", "Moving over, catch-up, R&D and tax"],
       price: (
         <>
-          Bookkeeping from <strong>$95/mo</strong> per company,
+          From <strong>$95/mo</strong> per company,
           <br /> on top of the software
         </>
       ),

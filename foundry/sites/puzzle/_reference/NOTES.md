@@ -123,3 +123,23 @@ on links and every button variant match the original's list ✓; story card hove
 | firms callout | ✓ | button label left-aligned when wrapped | — | yes: centred |
 | CTA | ✓ | pixel squares brighter than the original's; 26px taller | — | yes: dimmer squares, pb 160→144px |
 | FAQ | ✓ | 37px taller | — | yes: pb 96→80px |
+
+## Comparison round 2
+
+Heights 1440 (original → ours): header 119→120, hero 576→582, stats 263→264, two ways 663→677,
+AI suite 2116→2095, services 1176→1208, chooser 469→470, platform 505→518, guarantee 342→346,
+stories 733→758, migrate 998→1027, firms 293→296, CTA 624→634, FAQ 1206→1227, footer 652→651.
+390: all within ±60px of the original (two ways 1330→1363, AI suite 2836→2733). No overflow at
+360/768/1024. Motion list unchanged: sticky header, stat-card reveal (0→1, 21px), hovers.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| two ways | ✓ | price line wrapped to 3 lines in the violet card | ✓ | yes: shorter demo price line |
+| stories | ✓ | heading on 2 lines vs 1 | ✓ | yes: no max width from desktop |
+| dark mode | icons and the "Software" tag on the green tiles were light-on-green | same | — | yes: `dark:text-background` on green/violet tiles |
+| AI suite | answer card 100px shorter (shorter demo copy) | ✓ | — | no: content length only |
+| stories cards | tag set in mono, the original uses a serif fallback | same | — | no: kept mono (the original's serif looks like a missing font) |
+
+Re-theme check: `puzzle-paths` under sample-ember (light) and `puzzle-ai-suite` under
+sample-midnight (dark) both re-colour cleanly; the AI band takes the other theme's brand
+colour, as its notes say.

@@ -43,7 +43,7 @@ export function PuzzleStories({ title, text, stories, link, prevLabel, nextLabel
 
   return (
     <section className={cn("overflow-x-clip bg-background py-14 text-foreground lg:pt-[4.25rem] lg:pb-24", className)}>
-      <PuzzleHeading title={title} className="max-w-[24rem] px-gutter sm:max-w-[48rem]" />
+      <PuzzleHeading title={title} className="max-w-[24rem] px-gutter sm:max-w-[48rem] lg:max-w-none" />
       {text && <p className="mt-4 px-gutter text-center text-base/[1.5] lg:mt-5">{text}</p>}
 
       <ul

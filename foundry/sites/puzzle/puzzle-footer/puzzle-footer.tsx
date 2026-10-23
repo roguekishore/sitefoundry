@@ -40,7 +40,7 @@ export function PuzzleFooter({ brand, tagline, socials, columns, copyright, lega
           <div className="px-4 pt-9 pb-9 lg:px-8 lg:pt-8 lg:pb-12">
             <a href={brand.href} className="flex items-center gap-4 font-display text-[2.25rem]/none font-semibold tracking-[-0.01em] lg:text-[2rem]/none">
               {brand.icon && (
-                <span className="flex size-14 items-center justify-center rounded-[calc(var(--radius)*0.9)] bg-glow text-foreground [&_svg]:size-7">{brand.icon}</span>
+                <span className="flex size-14 items-center justify-center rounded-[calc(var(--radius)*0.9)] bg-glow text-foreground dark:text-background [&_svg]:size-7">{brand.icon}</span>
               )}
               {brand.name}
             </a>

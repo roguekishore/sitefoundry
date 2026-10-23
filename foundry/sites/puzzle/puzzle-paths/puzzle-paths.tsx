@@ -48,7 +48,7 @@ export function PuzzlePaths({ eyebrow, title, paths, className }: PuzzlePathsPro
                 <p
                   className={cn(
                     "self-start rounded-full px-2 py-2 text-xs/none lg:px-2.5 lg:py-3 lg:text-[0.8125rem]/none",
-                    brand ? "bg-accent text-accent-foreground" : "bg-glow/55 text-foreground",
+                    brand ? "bg-accent text-accent-foreground" : "bg-glow/55 text-foreground dark:text-background",
                   )}
                 >
                   {p.tag}

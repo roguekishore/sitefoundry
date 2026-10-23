@@ -76,7 +76,7 @@ export function PuzzleHeader({ announcement, closeLabel, brand, links, demo, tri
         <div className="mx-auto flex h-[4.3rem] max-w-page items-center justify-between gap-6 px-4 lg:h-[4.5625rem] lg:px-[3.25rem]">
           <a href={brand.href} className="flex shrink-0 items-center gap-2.5 font-display text-lg/none font-semibold tracking-[-0.01em] lg:gap-3 lg:text-2xl/none">
             {brand.icon && (
-              <span className="flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.6)] bg-glow text-foreground lg:size-10 [&_svg]:size-4 lg:[&_svg]:size-5">
+              <span className="flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.6)] bg-glow text-foreground lg:size-10 dark:text-background [&_svg]:size-4 lg:[&_svg]:size-5">
                 {brand.icon}
               </span>
             )}
