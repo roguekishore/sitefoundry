@@ -147,3 +147,15 @@ Header fixed for the whole page in both. Hero "sized by the window" in both.
 | footer | link lists sit ~8px low under their headings | ok | — | yes: mt-5 |
 | stories | 4 cards ~ 200px taller in total: our quotes run a line longer; the original's first card also shows a hover-lifted state in its crop | ok | lift + zoom on hover | kept (content) |
 | header, hero, trust, system, patterns, habits, results, closing | look the same apart from content and placeholders | same | — | — |
+
+Round 3 capture (after the round 2 fixes): spike 1324 (1325) at 390 and 856 (856) at 1440,
+plans 3932 / 1768 (3822 / 1788), monitor caption readable; no overflow at 360/768/1024;
+hover list unchanged. Stopping here: each section pair reads as the same design apart from
+content and placeholders.
+
+**Re-theme check:** `levels-results` under `sample-ember` light and `levels-plans` under
+`sample-ember` dark both re-theme cleanly (the .dark-scoped stat cards and top plan take
+ember's dark palette, the green links take ember's highlight); `levels-spike` in our own dark
+mode keeps the chip contrast (the selected chip turns white). In dark mode the page itself is
+the ink colour, so the dark bands (closing, footer, stat cards) blend into the page: expected
+for a sibling mode.
