@@ -93,7 +93,7 @@ export function WhoopAlwaysOn({ heading, steps, interval = 6000, labels, classNa
             {steps.map((s, i) => {
               const open = i === active;
               return (
-                <li key={i} className="border-b border-current/15 py-6 first:pt-0">
+                <li key={i} className="relative border-b border-current/15 py-6 first:pt-0">
                   <button
                     type="button"
                     aria-expanded={open}
@@ -113,17 +113,17 @@ export function WhoopAlwaysOn({ heading, steps, interval = 6000, labels, classNa
                   >
                     <div className="min-h-0 overflow-hidden">
                       <p className="max-w-[32rem] pt-3 text-base leading-[1.6] opacity-80">{s.body}</p>
-                      <div className="mt-5 h-0.5 bg-current/15">
-                        {open && playing && (
-                          <span
-                            key={active}
-                            className="whoop-always-on-progress block h-full bg-current"
-                            style={{ animationDuration: `${interval}ms` }}
-                          />
-                        )}
-                      </div>
                     </div>
                   </div>
+                  {/* the step's bottom rule fills while it plays */}
+                  {open && playing && (
+                    <span
+                      key={active}
+                      aria-hidden
+                      className="whoop-always-on-progress absolute inset-x-0 -bottom-px h-0.5 bg-current"
+                      style={{ animationDuration: `${interval}ms` }}
+                    />
+                  )}
                 </li>
               );
             })}

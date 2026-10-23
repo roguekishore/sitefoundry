@@ -116,3 +116,20 @@ element changed while scrolling apart from the accordion: nothing to rebuild the
 | footer | 1108 vs 904: link rows 46px apart vs 37px, wordmark gap 120 vs 84 | four-column grid for three groups | link hover dims ✓ | yes: leading-none rows, tighter gaps, three columns |
 
 Overflow at 360/768/1024: fits.
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | amber gradient now light at the top, rust at the foot like the original's backdrop; badge 180px | ✓ | – | – |
+| insights | 926 vs 921 ✓ | ✓ | ✓ | – |
+| always-on | 991 vs 963 ✓ | the open step showed an empty track line above its rule (two lines) | the line now fills along the step's own bottom rule | yes |
+| footer | 973 vs 904: row pitch now 37px like the original; the rest is our wordmark at 70px | three columns | ✓ | kept |
+| all | headings, tabs, cards, buttons, dots match in place, size and weight; Figtree reads a touch narrower than Proxima Nova | – | sticky header ✓, CSSAnimation for the progress line ✓, hover transitions 0.125s ✓ | – |
+
+Overflow at 360/768/1024: fits. Sections "sized by the window" in the original: none (ours: none).
+
+Re-theme check: `whoop-plans` and `whoop-insights` under `sample-ember` (light) read right: the
+black band takes ember's dark brown, plan cards take ember's chart colours (the third card's
+darker ember gradient makes its list lower-contrast; fine for a picker to see). Dark mode of the
+whoop theme checked on the full page: black bands become #1a1a1a cards on a #0b0b0b page.
