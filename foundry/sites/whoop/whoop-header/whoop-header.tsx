@@ -51,7 +51,7 @@ export function WhoopHeader({ brand, announcement, links, account, bag, menuLabe
       )}
       <header className={cn("sticky top-0 z-40", band, className)}>
         <div className="mx-auto flex h-20 max-w-page items-center px-gutter">
-          <WhoopWordmark name={brand.name} href={brand.href} className="text-[1.65rem]" />
+          <WhoopWordmark name={brand.name} href={brand.href} className="text-[1.75rem]" />
           <nav className="mx-auto hidden lg:block">
             <ul className="flex items-center gap-9">
               {links.map((l) => (

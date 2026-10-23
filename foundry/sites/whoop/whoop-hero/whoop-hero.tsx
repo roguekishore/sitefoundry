@@ -28,11 +28,11 @@ export function WhoopHero({ media, badge, href, label, className }: WhoopHeroPro
           {media ?? <WhoopPlaceholder tone="warm" />}
         </div>
         {badge && (
-          <div className="absolute inset-x-4 top-4 bg-background/75 px-4 pt-4 pb-5 text-foreground sm:right-auto sm:w-[26rem] lg:top-12 lg:left-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))] lg:w-[34rem] lg:px-7 lg:pt-7 lg:pb-8">
+          <div className="absolute inset-x-4 top-4 bg-background/75 px-4 pt-4 pb-4 text-foreground sm:right-auto sm:w-[26rem] lg:top-12 lg:left-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))] lg:w-[34rem] lg:px-7 lg:pt-7 lg:pb-8">
             <p className="text-[1.375rem] leading-[1.2] font-bold tracking-[0.06em] uppercase lg:text-[2rem]">
               {badge.title}
             </p>
-            <WhoopWordmark name={badge.brand} className="mt-6 text-[3.25rem] lg:mt-9 lg:text-[4.75rem]" />
+            <WhoopWordmark name={badge.brand} className="mt-3 text-[3.5rem] lg:mt-6 lg:text-[4.75rem]" />
           </div>
         )}
       </Frame>

@@ -28,7 +28,7 @@ export default function Page() {
       <WhoopHeader {...headerSample} />
       <WhoopHero {...heroSample} />
       <WhoopStatement {...statementSample} className="pt-10" />
-      <WhoopInsights {...insightsSample} />
+      <WhoopInsights {...insightsSample} className="pt-0 lg:pt-0" />
       <WhoopPlans {...plansSample} />
       <WhoopAthletes {...athletesSample} />
       <WhoopAlwaysOn {...alwaysOnSample} />

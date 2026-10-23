@@ -99,3 +99,37 @@ element changed while scrolling apart from the accordion: nothing to rebuild the
 - Headings and the section that follows them are one block (e.g. "Choose a device" is inside
   `whoop-plans`), so each block works alone.
 - Currency/price strings are props; the demo uses dollars.
+
+## Comparison round 1 (390 against the original; 1440 against the inferred plan)
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark ~15% narrower than the original's | links centred, icons right: reads right | sticky bar ✓, strip scrolls away ✓ | yes: wordmark 1.75rem |
+| hero | placeholder a flat orange (the gradient sat on an opaque glow base); badge panel 190px tall vs 139px | same flat colour | – | yes: gradient on the page colour; badge tighter |
+| statement | heights match (750 vs 756) | heading/body row ✓ | photo hover zoom ✓ | – |
+| insights | 100px between the photo and the next heading vs 50px (both blocks padded) | 3.3 cards visible ✓ | track + dots ✓, plus fades panel ✓ | yes: page drops the insights top padding |
+| plans | matches (1140 vs 1128): centred on the middle card, both neighbours peek | three cards side by side | snap, dots ✓ | – |
+| athletes | 723 vs 656: our block keeps its top padding after the black band (the original's band ends in 70px of padding instead) | 4 × 2 grid | – | kept: the block must work alone |
+| always-on | heading → photo 100px vs ~70px | accordion + square photo ✓ | steps advance with a filling line ✓ (CSSAnimation in the capture) | yes: 4.5rem |
+| styles | matches (980 vs 954, our titles wrap to two lines) | image left, text right | tabs crossfade ✓ | – |
+| disclaimer | matches (309 vs 306) | ✓ | – | – |
+| footer | 1108 vs 904: link rows 46px apart vs 37px, wordmark gap 120 vs 84 | four-column grid for three groups | link hover dims ✓ | yes: leading-none rows, tighter gaps, three columns |
+
+Overflow at 360/768/1024: fits.
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | amber gradient now light at the top, rust at the foot like the original's backdrop; badge 180px | ✓ | – | – |
+| insights | 926 vs 921 ✓ | ✓ | ✓ | – |
+| always-on | 991 vs 963 ✓ | the open step showed an empty track line above its rule (two lines) | the line now fills along the step's own bottom rule | yes |
+| footer | 973 vs 904: row pitch now 37px like the original; the rest is our wordmark at 70px | three columns | ✓ | kept |
+| all | headings, tabs, cards, buttons, dots match in place, size and weight; Figtree reads a touch narrower than Proxima Nova | – | sticky header ✓, CSSAnimation for the progress line ✓, hover transitions 0.125s ✓ | – |
+
+Overflow at 360/768/1024: fits. Sections "sized by the window" in the original: none (ours: none).
+
+Re-theme check: `whoop-plans` and `whoop-insights` under `sample-ember` (light) read right: the
+black band takes ember's dark brown, plan cards take ember's chart colours (the third card's
+darker ember gradient makes its list lower-contrast; fine for a picker to see). Dark mode of the
+whoop theme checked on the full page: black bands become #1a1a1a cards on a #0b0b0b page.
