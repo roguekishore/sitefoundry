@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Function Health section heading",
+  "description": "A light high-contrast serif heading, 48px on phones up to 64px, tight leading, with one italic terracotta phrase (or a struck-through one). Optional lead line in the grotesk underneath. Centred by default.",
+  "category": "text-effect",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "serif",
+    "italic",
+    "editorial",
+    "warm"
+  ],
+  "notes": [
+    "needs a serif display font with an italic (the theme provides one)",
+    "the title is a list of plain strings and { accent } parts, so the italic phrase can sit anywhere"
+  ],
+  "entry": "functionhealth-heading.tsx",
+  "source": "foundry",
+  "name": "functionhealth-heading",
+  "files": [
+    {
+      "path": "functionhealth-heading.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\n/** Plain text, or the italic coloured phrase (optionally struck through, like an old price). */\nexport type HeadingPart = string | { accent: string; strike?: boolean };\n\nexport interface FunctionhealthHeadingProps {\n  /** the heading as parts, in order; include the spaces between them, e.g. [\"Testing is \", { accent: \"easy\" }]; the part \"\\n\" is a line break */\n  title: HeadingPart[];\n  /** line under the heading */\n  text?: string;\n  /** h1 for the page title, h2 for sections */\n  as?: \"h1\" | \"h2\";\n  /** section: 48 → 64px · hero: 57 → 80px */\n  size?: \"section\" | \"hero\";\n  align?: \"center\" | \"start\";\n  className?: string;\n  /** extra classes for the lead line */\n  textClassName?: string;\n}\n\nexport function FunctionhealthHeading({ title, text, as: Tag = \"h2\", size = \"section\", align = \"center\", className, textClassName }: FunctionhealthHeadingProps) {\n  return (\n    <div className={cn(align === \"center\" ? \"text-center\" : \"text-start\", className)}>\n      <Tag\n        className={cn(\n          \"font-display font-light\",\n          size === \"hero\"\n            ? \"text-[clamp(3.5625rem,2.1617vw+3.0545rem,5rem)] leading-none tracking-[-0.025em]\"\n            : \"text-[clamp(3rem,1.5038vw+2.6466rem,4rem)] leading-none tracking-[-0.03em]\",\n        )}\n      >\n        {title.map((part, i) =>\n          typeof part === \"string\" ? (\n            part === \"\\n\" ? <br key={i} /> : part\n          ) : (\n            <em key={i} className={cn(\"font-light text-primary italic\", part.strike && \"line-through decoration-1\")}>\n              {part.accent}\n            </em>\n          ),\n        )}\n      </Tag>\n      {text && <p className={cn(\"mt-6 text-[clamp(1.125rem,0.188vw+1.0808rem,1.25rem)] leading-snug font-light\", align === \"center\" && \"mx-auto\", textClassName)}>{text}</p>}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true,
+      "description": "the heading as parts, in order; include the spaces between them, e.g. [\"Testing is \", { accent: \"easy\" }]; the part \"\\n\" is a line break"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "line under the heading"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "h1 for the page title, h2 for sections"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "section: 48 → 64px · hero: 57 → 80px"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "textClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the lead line"
+    }
+  ],
+  "hash": "7382de88b749c6958a61ad2ae4f4116168a1f6a41f2898bb9e08cd46567c1195"
+}

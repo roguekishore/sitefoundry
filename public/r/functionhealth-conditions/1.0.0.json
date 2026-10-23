@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health conditions",
+  "description": "A serif heading with an italic phrase, a row of three terracotta check-circle benefits, and a bordered chart card in the middle with a mono 'pause motion' control under it. Two rows of condition names with dot separators slide sideways in opposite directions as you scroll, passing behind the card on desktop and below it on phones.",
+  "category": "features",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "marquee",
+    "scroll",
+    "scrubbed",
+    "parallax",
+    "checklist",
+    "chart",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "the scroll-scrubbed rows use CSS scroll-driven animation (Chrome, Edge, Safari 26); elsewhere the rows stay still",
+    "the chart card is a media slot; the rows are plain text lists",
+    "pause control stops the slide animation of this block"
+  ],
+  "entry": "functionhealth-conditions.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "functionhealth-conditions",
+  "files": [
+    {
+      "path": "functionhealth-conditions.css",
+      "content": "/* Two rows of names slide sideways as the section passes through the window: the first to the\n   left, the second to the right. Browsers without scroll-driven animation leave them in place. */\n.functionhealth-conditions-track {\n  --shift: 600px;\n}\n@media (min-width: 1024px) {\n  .functionhealth-conditions-track {\n    --shift: 1100px;\n  }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .functionhealth-conditions-track {\n      animation: functionhealth-conditions-left linear both;\n      animation-timeline: view();\n      animation-range: entry 0% exit 100%;\n    }\n    .functionhealth-conditions-track[data-dir=\"right\"] {\n      animation-name: functionhealth-conditions-right;\n    }\n    [data-paused=\"true\"] .functionhealth-conditions-track {\n      animation-play-state: paused;\n    }\n  }\n}\n\n@keyframes functionhealth-conditions-left {\n  from { transform: translateX(0); }\n  to { transform: translateX(calc(var(--shift) * -1)); }\n}\n@keyframes functionhealth-conditions-right {\n  from { transform: translateX(calc(var(--shift) * -1)); }\n  to { transform: translateX(0); }\n}\n"
+    },
+    {
+      "path": "functionhealth-conditions.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CircleCheck } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\nimport { FunctionhealthMedia } from \"@foundry/functionhealth-media\";\nimport { FunctionhealthPauseMotion, usePauseMotion } from \"@foundry/functionhealth-pause-motion\";\nimport \"./functionhealth-conditions.css\";\n\nexport interface FunctionhealthConditionsProps {\n  title: HeadingPart[];\n  /** short benefits, each with a check-circle */\n  benefits: string[];\n  /** the chart card in the middle; empty shows a placeholder */\n  media?: ReactNode;\n  /** condition names for the two sliding rows (each row repeats its list to fill the width) */\n  rowOne: string[];\n  rowTwo: string[];\n  /** labels of the pause control */\n  pauseLabel: string;\n  playLabel: string;\n  className?: string;\n}\n\nfunction Row({ names, dir }: { names: string[]; dir: \"left\" | \"right\" }) {\n  const list = [...names, ...names, ...names];\n  return (\n    <div className=\"overflow-clip\">\n      <ul data-dir={dir} className=\"functionhealth-conditions-track flex w-max items-center gap-6 text-base leading-none font-light text-muted-foreground lg:text-xl\">\n        {list.map((n, i) => (\n          <li key={i} aria-hidden={i >= names.length ? true : undefined} className=\"flex items-center gap-6\">\n            <span>{n}</span>\n            <span aria-hidden className=\"size-2 rounded-full bg-border\" />\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport function FunctionhealthConditions({ title, benefits, media, rowOne, rowTwo, pauseLabel, playLabel, className }: FunctionhealthConditionsProps) {\n  const { paused, toggle, rootProps } = usePauseMotion();\n  return (\n    <section {...rootProps} className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} align=\"start\" className=\"max-w-[20rem] lg:max-w-none lg:text-center\" />\n        <ul className=\"mt-6 flex flex-col gap-3.5 lg:mt-5 lg:flex-row lg:justify-center lg:gap-6\">\n          {benefits.map((b) => (\n            <li key={b} className=\"flex items-center gap-2.5 text-base leading-tight font-light lg:text-[1.0625rem]\">\n              <CircleCheck className=\"size-[1.125rem] shrink-0 text-primary\" strokeWidth={1.5} />\n              {b}\n            </li>\n          ))}\n        </ul>\n      </div>\n      <div className=\"relative mt-12 lg:mt-[5.75rem]\">\n        <div className=\"relative z-10 mx-auto w-full max-w-page px-gutter lg:px-0\">\n          <FunctionhealthMedia media={media} ratio=\"mx-auto aspect-[41/31] w-[20.5rem] max-w-full\" rounded=\"rounded-3xl\" className=\"relative z-10 border-2 bg-background bg-none\" />\n          <div className=\"mt-4 flex justify-center\">\n            <FunctionhealthPauseMotion paused={paused} onToggle={toggle} pauseLabel={pauseLabel} playLabel={playLabel} />\n          </div>\n        </div>\n        <div className=\"mt-12 space-y-4 lg:absolute lg:inset-x-0 lg:top-[5.375rem] lg:mt-0 lg:space-y-9\">\n          <Row names={rowOne} dir=\"left\" />\n          <Row names={rowTwo} dir=\"right\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-heading",
+    "functionhealth-media",
+    "functionhealth-pause-motion"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "benefits",
+      "type": "string[]",
+      "required": true,
+      "description": "short benefits, each with a check-circle"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the chart card in the middle; empty shows a placeholder"
+    },
+    {
+      "name": "rowOne",
+      "type": "string[]",
+      "required": true,
+      "description": "condition names for the two sliding rows (each row repeats its list to fill the width)"
+    },
+    {
+      "name": "rowTwo",
+      "type": "string[]",
+      "required": true
+    },
+    {
+      "name": "pauseLabel",
+      "type": "string",
+      "required": true,
+      "description": "labels of the pause control"
+    },
+    {
+      "name": "playLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fc00315751d2feba9aa81c932d06e31a6f144c5874343ae318fa6eed5ffc4248"
+}

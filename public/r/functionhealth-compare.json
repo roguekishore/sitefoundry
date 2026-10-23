@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health comparison table",
+  "description": "A serif heading (italic first half) over a two-column comparison: a cream rounded table with hairline rows, and the brand's column picked out as a tall terracotta-to-sand gradient pillar that rises above the table and hangs below it, holding the brand mark, bold figures and white check discs. The competing column shows a bold figure then outlined crosses.",
+  "category": "pricing",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "comparison",
+    "table",
+    "checklist",
+    "gradient",
+    "pillar",
+    "warm",
+    "serif"
+  ],
+  "notes": [
+    "a row value is a string (shown bold), true (check) or false (cross)",
+    "the pillar assumes a dark-enough primary: its text uses the page colour"
+  ],
+  "entry": "functionhealth-compare.tsx",
+  "source": "foundry",
+  "name": "functionhealth-compare",
+  "files": [
+    {
+      "path": "functionhealth-compare.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { Check, CircleX } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthHeading, type HeadingPart } from \"@foundry/functionhealth-heading\";\n\nexport interface FunctionhealthCompareRow {\n  label: string;\n  /** our value: a string (bold), or true for a check */\n  ours: string | boolean;\n  /** the other column: a string (bold), or false for a cross */\n  theirs: string | boolean;\n}\n\nexport interface FunctionhealthCompareProps {\n  title: HeadingPart[];\n  /** the brand mark shown at the top of the terracotta pillar */\n  mark: ReactNode;\n  /** header over the other column, e.g. \"Standard checkup\" */\n  otherLabel: string;\n  rows: FunctionhealthCompareRow[];\n  /** screen-reader words for the two icons */\n  yesLabel: string;\n  noLabel: string;\n  className?: string;\n}\n\nfunction Cell({ value, yes, no, ours }: { value: string | boolean; yes: string; no: string; ours: boolean }) {\n  if (typeof value === \"string\") return <span className=\"text-base font-semibold lg:text-[1.0625rem]\">{value}</span>;\n  return value ? (\n    <span className=\"grid size-6 place-items-center rounded-full bg-background text-primary\" role=\"img\" aria-label={yes}>\n      <Check className=\"size-3.5\" strokeWidth={3} />\n    </span>\n  ) : (\n    <CircleX className={cn(\"size-6\", ours ? \"text-background\" : \"text-muted-foreground\")} strokeWidth={1} role=\"img\" aria-label={no} />\n  );\n}\n\nexport function FunctionhealthCompare({ title, mark, otherLabel, rows, yesLabel, noLabel, className }: FunctionhealthCompareProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground [--c1:6.9rem] [--c2:5.9rem] lg:[--c1:13.75rem] lg:[--c2:13.9rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <FunctionhealthHeading title={title} className=\"[&_h2]:text-balance\" />\n        <div className=\"relative mx-auto mt-[7.25rem] max-w-[68rem] pb-10 lg:mt-[9.25rem]\">\n          <p className=\"absolute right-4 bottom-[calc(100%+0.75rem)] w-[var(--c2)] text-center text-sm leading-tight font-light lg:right-10\">{otherLabel}</p>\n          <div className=\"grid grid-cols-[minmax(0,1fr)_var(--c1)_var(--c2)] rounded-3xl bg-card px-4 pb-3.5 lg:px-10\">\n            <div\n              className=\"relative z-0 col-start-2 row-start-1 -mt-[4.625rem] -mb-[3.6rem] rounded-3xl bg-linear-to-b from-primary to-glow text-background shadow-[0_18px_40px_color-mix(in_oklab,var(--foreground)_14%,transparent)]\"\n              style={{ gridRow: `1 / span ${rows.length}` }}\n            >\n              <div className=\"flex h-[4.625rem] items-center justify-center border-b border-background/25 text-background\">{mark}</div>\n            </div>\n            {rows.map((r, i) => (\n              <div key={r.label} className=\"contents\">\n                <p className={cn(\"col-start-1 flex items-center py-4 pr-2 text-base leading-snug font-light lg:min-h-[4.4375rem] lg:text-[1.0625rem]\", i < rows.length - 1 && \"border-b border-border\", \"row-start-[var(--r)]\")} style={{ \"--r\": i + 1 } as CSSProperties}>\n                  {r.label}\n                </p>\n                <div className={cn(\"relative z-10 col-start-2 flex items-center justify-center\", i < rows.length - 1 && \"border-b border-background/25\", \"row-start-[var(--r)]\")} style={{ \"--r\": i + 1 } as CSSProperties}>\n                  <Cell value={r.ours} yes={yesLabel} no={noLabel} ours />\n                </div>\n                <div className={cn(\"col-start-3 flex items-center justify-center\", i < rows.length - 1 && \"border-b border-border\", \"row-start-[var(--r)]\")} style={{ \"--r\": i + 1 } as CSSProperties}>\n                  <Cell value={r.theirs} yes={yesLabel} no={noLabel} ours={false} />\n                </div>\n              </div>\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "HeadingPart[]",
+      "required": true
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the brand mark shown at the top of the terracotta pillar"
+    },
+    {
+      "name": "otherLabel",
+      "type": "string",
+      "required": true,
+      "description": "header over the other column, e.g. \"Standard checkup\""
+    },
+    {
+      "name": "rows",
+      "type": "FunctionhealthCompareRow[]",
+      "required": true
+    },
+    {
+      "name": "yesLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader words for the two icons"
+    },
+    {
+      "name": "noLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "39ef3ba985af2598f57141dafe59c1ef288990846f753ed3cf75317cfb40134c"
+}

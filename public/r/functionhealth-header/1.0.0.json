@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health header",
+  "description": "A solid terracotta announcement strip, then a rounded 80px nav bar floating over the top of the page: glass with light text over a photo hero, melting into a transparent bar with terracotta text and a solid pill once you scroll past it. Wordmark left, centred links, Log in, pill, search and menu icons; on phones only the wordmark, pill and icons. The menu icon opens a rounded panel of all links.",
+  "category": "header",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "sticky",
+    "glass",
+    "overlay",
+    "warm",
+    "pill",
+    "blur"
+  ],
+  "notes": [
+    "sits over the hero: the nav wrapper has zero height, so put the hero straight after it",
+    "the glass state assumes a dark photo behind the bar; it switches to the solid state after scrolling `solidAfter` × window height",
+    "the sticky wrapper needs a tall parent: render the block and the page in the same container"
+  ],
+  "entry": "functionhealth-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "functionhealth-header",
+  "files": [
+    {
+      "path": "functionhealth-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Menu, Search, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthButton } from \"@foundry/functionhealth-button\";\n\nexport interface FunctionhealthHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface FunctionhealthHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the wordmark (text, svg or img), shown in light on glass and in brand colour once solid */\n  logo: ReactNode;\n  homeHref?: string;\n  /** centred links on wide screens */\n  links: FunctionhealthHeaderLink[];\n  /** every link, listed in the panel the menu icon opens */\n  menuLinks: FunctionhealthHeaderLink[];\n  /** plain \"Log in\" link beside the pill (hidden on phones) */\n  login?: FunctionhealthHeaderLink;\n  /** the pill */\n  cta: FunctionhealthHeaderLink;\n  /** announcement strip above the bar, with an optional underlined link inside it */\n  announcement?: { text: string; link?: FunctionhealthHeaderLink };\n  /** screen-reader labels of the two icon buttons */\n  searchLabel?: string;\n  menuLabel?: string;\n  closeLabel?: string;\n  /** the bar turns solid once the page has scrolled this many window heights (the hero is ~0.95) */\n  solidAfter?: number;\n  className?: string;\n}\n\nexport function FunctionhealthHeader({\n  brand,\n  logo,\n  homeHref = \"/\",\n  links,\n  menuLinks,\n  login,\n  cta,\n  announcement,\n  searchLabel = \"Search\",\n  menuLabel = \"Menu\",\n  closeLabel = \"Close menu\",\n  solidAfter = 0.9,\n  className,\n}: FunctionhealthHeaderProps) {\n  const [solid, setSolid] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    const onScroll = () => setSolid(window.scrollY > window.innerHeight * solidAfter);\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [solidAfter]);\n\n  const glass = !solid && !open;\n\n  return (\n    <>\n      {announcement && (\n        <div className=\"bg-primary text-primary-foreground\">\n          <p className=\"mx-auto flex h-10 max-w-page items-center justify-center px-gutter text-sm leading-none font-light\">\n            <span className=\"truncate\">\n              {announcement.text}\n              {announcement.link && (\n                <>\n                  {\" \"}\n                  <a href={announcement.link.href} className=\"underline underline-offset-2 transition-opacity duration-200 hover:opacity-80\">\n                    {announcement.link.label}\n                  </a>\n                </>\n              )}\n            </span>\n          </p>\n        </div>\n      )}\n      <div className={cn(\"sticky top-0 z-40 h-0\", className)}>\n        <div className=\"px-[clamp(1.25rem,4.1353vw+0.2782rem,4rem)] pt-4\">\n          <header\n            className={cn(\n              \"relative mx-auto flex h-[4.125rem] max-w-[82rem] items-center justify-between gap-3 rounded-lg pr-3 pl-4 transition-[background-color,color,backdrop-filter] duration-[180ms] ease-in-out motion-reduce:transition-none lg:h-20 lg:pr-6 lg:pl-8\",\n              glass ? \"bg-foreground/15 text-background backdrop-blur-md\" : \"bg-background/85 text-foreground backdrop-blur-md\",\n            )}\n          >\n            <a href={homeHref} aria-label={brand} className={cn(\"flex items-center transition-colors duration-[180ms]\", glass ? \"text-background\" : \"text-primary\")}>\n              {logo}\n            </a>\n            <nav aria-label={brand} className=\"hidden flex-1 items-center justify-center gap-6 text-base font-light lg:flex\">\n              {links.map((l) => (\n                <a key={l.href + l.label} href={l.href} className=\"transition-opacity duration-150 hover:opacity-70\">\n                  {l.label}\n                </a>\n              ))}\n            </nav>\n            <div className=\"flex items-center gap-2 lg:gap-5\">\n              {login && (\n                <a href={login.href} className=\"hidden text-base font-semibold transition-opacity duration-150 hover:opacity-70 lg:block\">\n                  {login.label}\n                </a>\n              )}\n              <FunctionhealthButton href={cta.href} variant={glass ? \"light\" : \"solid\"} className=\"h-11 px-4 text-[0.9375rem] lg:h-[3.125rem] lg:px-6 lg:text-base\">\n                {cta.label}\n              </FunctionhealthButton>\n              <div className=\"flex items-center lg:gap-2\">\n                <button type=\"button\" aria-label={searchLabel} className=\"grid size-8 place-items-center transition-opacity duration-150 hover:opacity-70 lg:size-9\">\n                  <Search className=\"size-5\" strokeWidth={1.5} />\n                </button>\n                <button\n                  type=\"button\"\n                  aria-label={open ? closeLabel : menuLabel}\n                  aria-expanded={open}\n                  onClick={() => setOpen((o) => !o)}\n                  className=\"grid size-8 place-items-center transition-opacity duration-150 hover:opacity-70 lg:size-9\"\n                >\n                  {open ? <X className=\"size-5\" strokeWidth={1.5} /> : <Menu className=\"size-5\" strokeWidth={1.5} />}\n                </button>\n              </div>\n            </div>\n            {open && (\n              <nav aria-label={menuLabel} className=\"absolute top-[calc(100%+0.5rem)] right-0 left-0 rounded-lg bg-popover p-3 text-popover-foreground shadow-[0_18px_40px_color-mix(in_oklab,var(--foreground)_14%,transparent)] lg:left-auto lg:w-72\">\n                <ul>\n                  {menuLinks.map((l) => (\n                    <li key={l.href + l.label}>\n                      <a href={l.href} className=\"block rounded-md px-4 py-2.5 text-lg font-light transition-colors duration-150 hover:bg-accent\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </nav>\n            )}\n          </header>\n        </div>\n      </div>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (text, svg or img), shown in light on glass and in brand colour once solid"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "FunctionhealthHeaderLink[]",
+      "required": true,
+      "description": "centred links on wide screens"
+    },
+    {
+      "name": "menuLinks",
+      "type": "FunctionhealthHeaderLink[]",
+      "required": true,
+      "description": "every link, listed in the panel the menu icon opens"
+    },
+    {
+      "name": "login",
+      "type": "FunctionhealthHeaderLink",
+      "required": false,
+      "description": "plain \"Log in\" link beside the pill (hidden on phones)"
+    },
+    {
+      "name": "cta",
+      "type": "FunctionhealthHeaderLink",
+      "required": true,
+      "description": "the pill"
+    },
+    {
+      "name": "announcement",
+      "type": "{ text: string; link?: FunctionhealthHeaderLink; }",
+      "required": false,
+      "description": "announcement strip above the bar, with an optional underlined link inside it"
+    },
+    {
+      "name": "searchLabel",
+      "type": "string",
+      "required": false,
+      "default": "Search",
+      "description": "screen-reader labels of the two icon buttons"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "default": "Close menu"
+    },
+    {
+      "name": "solidAfter",
+      "type": "number",
+      "required": false,
+      "default": "0.9",
+      "description": "the bar turns solid once the page has scrolled this many window heights (the hero is ~0.95)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ed9f3c4e53c7ad811513877f8e53ca48da9af70b64d924f2d53f30c5a13ae315"
+}

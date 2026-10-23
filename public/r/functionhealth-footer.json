@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Function Health footer",
+  "description": "A cream band holding one big page-coloured card with rounded bottom corners and a wide soft shadow: wordmark in terracotta, three link columns, a newsletter block (serif line with italic ending, lead, pill email field and Submit pill), app QR and store buttons, round social icons and small legal links. Fine-print paragraphs sit below the card on the cream. On phones the newsletter moves above the link columns.",
+  "category": "footer",
+  "site": "functionhealth",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "newsletter",
+    "cards",
+    "legal",
+    "social",
+    "warm",
+    "serif",
+    "shadow"
+  ],
+  "notes": [
+    "social icons come in as nodes (lucide-react has no brand icons)",
+    "QR code and store buttons are media slots"
+  ],
+  "entry": "functionhealth-footer.tsx",
+  "source": "foundry",
+  "name": "functionhealth-footer",
+  "files": [
+    {
+      "path": "functionhealth-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FunctionhealthButton } from \"@foundry/functionhealth-button\";\nimport type { HeadingPart } from \"@foundry/functionhealth-heading\";\nimport { FunctionhealthMedia } from \"@foundry/functionhealth-media\";\n\nexport interface FunctionhealthFooterProps {\n  /** wordmark in terracotta (text, svg or img) */\n  logo: ReactNode;\n  /** link columns, e.g. Company, Explore, Community */\n  columns: { title: string; links: { label: string; href: string }[] }[];\n  newsletter: {\n    title: HeadingPart[];\n    text: string;\n    placeholder: string;\n    submit: string;\n    action?: string;\n  };\n  /** QR code slot and the store buttons */\n  apps: { qr?: ReactNode; qrLabel: string; stores: { caption: string; name: string; href: string }[] };\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** small legal links beside the socials */\n  legal: { label: string; href: string }[];\n  /** fine-print paragraphs under the card */\n  disclaimers: string[];\n  /** last line, in semibold */\n  copyright: string;\n  className?: string;\n}\n\nexport function FunctionhealthFooter({ logo, columns, newsletter, apps, socials, legal, disclaimers, copyright, className }: FunctionhealthFooterProps) {\n  return (\n    <footer className={cn(\"bg-card pb-12 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"grid gap-10 rounded-b-[2.25rem] bg-background px-6 pt-8 pb-8 shadow-[12px_32px_80px_color-mix(in_oklab,var(--foreground)_10%,transparent)] lg:[grid-template-areas:'logo_logo'_'cols_news'_'apps_social'] lg:grid-cols-[minmax(0,41.5rem)_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-0 lg:px-14 lg:pt-14 lg:pb-14\">\n          <div className={cn(\"text-primary\", \"lg:[grid-area:logo]\")}>{logo}</div>\n\n          <div className={cn(\"lg:mt-[4.25rem]\", \"lg:[grid-area:news]\")}>\n            <h2 className=\"font-display text-2xl leading-[1.2] font-light text-balance\">\n              {newsletter.title.map((p, i) =>\n                typeof p === \"string\" ? (\n                  p\n                ) : (\n                  <em key={i} className=\"text-primary italic\">\n                    {p.accent}\n                  </em>\n                ),\n              )}\n            </h2>\n            <p className=\"mt-4 text-sm leading-[1.5] font-light\">{newsletter.text}</p>\n            <form action={newsletter.action} className=\"mt-6 flex flex-col items-start gap-3 lg:mt-7 lg:flex-row lg:items-center\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                placeholder={newsletter.placeholder}\n                className=\"h-12 w-full min-w-0 rounded-full border border-input bg-background px-5 text-base font-light outline-none transition-colors duration-200 placeholder:text-muted-foreground focus-visible:border-primary lg:flex-1\"\n              />\n              <FunctionhealthButton type=\"submit\">{newsletter.submit}</FunctionhealthButton>\n            </form>\n          </div>\n\n          <div className={cn(\"grid grid-cols-2 gap-x-6 gap-y-8 lg:mt-[4.25rem] lg:grid-cols-3 lg:gap-y-0\", \"lg:[grid-area:cols]\")}>\n            {columns.map((c) => (\n              <nav key={c.title} aria-label={c.title}>\n                <p className=\"text-sm leading-none font-semibold\">{c.title}</p>\n                <ul className=\"mt-4 space-y-[0.4375rem] lg:mt-[1.125rem]\">\n                  {c.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"text-base leading-6 font-light transition-colors duration-150 hover:text-primary lg:text-[1.0625rem]\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </nav>\n            ))}\n          </div>\n\n          <div className={cn(\"flex flex-wrap items-start gap-4 lg:mt-28\", \"lg:[grid-area:apps]\")}>\n            <FunctionhealthMedia media={apps.qr} ratio=\"size-[7.6875rem]\" rounded=\"rounded-md\" className=\"border-border\" />\n            <span className=\"sr-only\">{apps.qrLabel}</span>\n            <div className=\"flex w-[11.4rem] flex-col gap-3\">\n              {apps.stores.map((s) => (\n                <a\n                  key={s.name}\n                  href={s.href}\n                  className=\"flex h-[3.3rem] flex-col justify-center rounded-md border border-border bg-card px-4 leading-none transition-colors duration-200 hover:border-primary motion-reduce:transition-none\"\n                >\n                  <span className=\"text-[0.625rem] font-light uppercase\">{s.caption}</span>\n                  <span className=\"mt-1 text-lg font-semibold\">{s.name}</span>\n                </a>\n              ))}\n            </div>\n          </div>\n\n          <div className={cn(\"lg:mt-28\", \"lg:[grid-area:social]\")}>\n            <ul className=\"flex flex-wrap gap-2.5\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a\n                    href={s.href}\n                    aria-label={s.label}\n                    className=\"grid size-8 place-items-center rounded-full bg-card transition-[transform,color] duration-150 hover:-translate-y-px hover:text-primary motion-reduce:transition-none [&_svg]:size-4\"\n                  >\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <ul className=\"mt-5 flex flex-wrap gap-x-4 gap-y-2 text-xs leading-none font-light lg:mt-6\">\n              {legal.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className=\"transition-colors duration-150 hover:text-primary\">\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n\n        <div className=\"space-y-4 px-0 pt-8 text-xs leading-[1.4] font-light text-muted-foreground lg:px-4 lg:text-[0.8125rem] lg:leading-[1.35]\">\n          {disclaimers.map((d) => (\n            <p key={d.slice(0, 40)}>{d}</p>\n          ))}\n          <p className=\"font-semibold\">{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "functionhealth-button",
+    "functionhealth-media"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "wordmark in terracotta (text, svg or img)"
+    },
+    {
+      "name": "columns",
+      "type": "{ title: string; links: { label: string; href: string; }[]; }[]",
+      "required": true,
+      "description": "link columns, e.g. Company, Explore, Community"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: HeadingPart[]; text: string; placeholder: string; submit: string; action?: string | undefined; }",
+      "required": true
+    },
+    {
+      "name": "apps",
+      "type": "{ qr?: ReactNode; qrLabel: string; stores: { caption: string; name: string; href: string; }[]; }",
+      "required": true,
+      "description": "QR code slot and the store buttons"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "small legal links beside the socials"
+    },
+    {
+      "name": "disclaimers",
+      "type": "string[]",
+      "required": true,
+      "description": "fine-print paragraphs under the card"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "last line, in semibold"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9af16742995c67ef3b2a5c87d685ebb600c41ccfed353a8f1fd74c5c28d1fadf"
+}
