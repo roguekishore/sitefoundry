@@ -119,3 +119,21 @@ pinned stage: all present, same kinds and directions.
 | footer | — | page overflowed 15px at 1024 (last column's e-mail) | — | yes: min-w-0 + overflow-wrap, shorter e-mails |
 | orbits | original's planet sits in thin elliptical orbit lines; ours a single ring with 4 ticks | desktop layout inferred | — | no: the orbit lines are illustration, kept as HUD ring |
 | media | placeholders instead of footage | same | — | by design |
+
+## Comparison round 2
+
+All round-1 fixes confirmed: list 728/728px at 1440 (720/712 at 390), footer columns land at
+50/66.7/84% with the wordmark top-aligned, no horizontal overflow at 360/768/1024. Motion list
+unchanged and complete (header leave, line reveals, media settle, list rise, pinned planet zoom
+410→−41px / 3→1, tabs fade, orbit steps, quote rise, news title rise).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| footer | wordmark 213px wide vs the logo's 140px; 12px more top air | matches | — | yes: 10px wordmark, pt 40px |
+| showcase | 1152 vs 1104px tall (our title wraps the same, more top air) | matches (1095/1090) | — | yes: pt 150px |
+| orbits | — | desktop stage layout still inferred (tabs + paragraph bottom-left, planet centred) | pin length ours ~2.7 windows, theirs similar by section height | no: nothing in the capture to match it against |
+
+Re-theme check: k2space-list, k2space-news and k2space-quote under `sample-ember` (light and
+dark) pick up its serif, palette and radius; the page in our own light mode reads as grey paper
+with graphite type. Stopping here: each section pair matches in layout, proportion, type and
+motion apart from content and the media placeholders.

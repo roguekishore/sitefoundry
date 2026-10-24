@@ -28,12 +28,12 @@ export function K2spaceFooter({ brand, columns, copyright, className }: K2spaceF
   return (
     <footer
       className={cn(
-        "bg-background px-gutter pt-[45px] pb-6 font-sans font-[560] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[2.6vw] lg:pb-[4vw]",
+        "bg-background px-gutter pt-[40px] pb-8 font-sans font-[560] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[2.6vw] lg:pb-[4vw]",
         className,
       )}
     >
       <div className="lg:grid lg:grid-cols-[47.15vw_17.25vw_17.25vw_1fr]">
-        <K2spaceWordmark {...brand} className={cn("self-start text-[15px] lg:text-[1.58vw]", brand.className)} />
+        <K2spaceWordmark {...brand} className={cn("self-start text-[10px] lg:text-[1.58vw]", brand.className)} />
         <div className="mt-[50px] grid grid-cols-[56%_1fr] gap-y-10 lg:contents">
           {columns.map((column, c) => (
             <div

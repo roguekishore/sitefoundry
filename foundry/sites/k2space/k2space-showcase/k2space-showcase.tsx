@@ -30,7 +30,7 @@ export function K2spaceShowcase({ title, media, markers = [], className }: K2spa
   return (
     <section
       className={cn(
-        "bg-background pt-[186px] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[14.6vw]",
+        "bg-background pt-[150px] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[14.6vw]",
         className,
       )}
     >
