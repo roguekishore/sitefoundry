@@ -125,3 +125,19 @@ and hover list.
 | careers | — | empty slot was light muted under a black/80 shade: muddy brown | — | yes: the slot is a .dark scope (dark surface, like a photo under a white caption) |
 | footer | 1110 vs 1248; email field collapsed to 22px (flex-1 in a column); wordmark too wide (clipped) | 763 vs 736; wordmark filled 1190 of 1376 | links .7 in 0.15s ✓, legal colour .5→.7 + sweep ✓ | yes: field w-full, wordmark 21vw / 24vw, gaps rebalanced |
 | all | — | — | horizontal overflow: fits at 360/768/1024 | — |
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | matches | cluster 564 wide vs 674: our labels are shorter now, and DM Mono sets ~1px/char narrower than Monument Grotesk Mono; gaps (21 vs 22) and chevron gap match | blend and hover ✓ | no (content / font) |
+| vehicles | 1834 vs 1824 ✓ | 867 ✓, cards 437 wide with 32 gaps ✓ | ✓ | — |
+| missions | 1291 vs 1329 (our list is 7 missions, theirs 15) | 1102 ✓ | zoom ✓ | no (content) |
+| partners | 541 vs 533 ✓ | 183 ✓ | ✓ | — |
+| careers | 1231 vs 1232 ✓ | 912 vs 908 ✓, 672 squares ✓ | ✓ | — |
+| footer | 1212 vs 1248 ✓ (inferred layout) | 749 vs 736 ✓ | ✓ | — |
+| re-theme | `impulsespace-vehicles` and `impulsespace-careers` under `sample-ember` light: cards, render slots, pill and the dark photo slots all follow the theme | | | — |
+
+Every section the original marks window-sized (the hero; the missions frame's photo) is
+window-sized in ours; no horizontal overflow at 360/768/1024. Below the statement, likeness
+can only be judged against numbers, since the original's capture never got past its first screen.
