@@ -48,7 +48,7 @@ export function RailwayHeader({ brand, nav, actions, menuLabel, className }: Rai
               <div key={item.label} className="group relative">
                 <button
                   type="button"
-                  className="flex h-9 items-center gap-1.5 rounded-md px-3 text-[0.9375rem] font-medium text-foreground/90 transition-colors duration-150 group-focus-within:bg-card group-hover:bg-card group-hover:text-foreground motion-reduce:transition-none"
+                  className="flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 group-focus-within:bg-card group-hover:bg-card group-hover:text-foreground motion-reduce:transition-none"
                 >
                   {item.label}
                   <ChevronDown className="size-3.5 text-muted-foreground" strokeWidth={2} />
@@ -69,7 +69,7 @@ export function RailwayHeader({ brand, nav, actions, menuLabel, className }: Rai
               <a
                 key={item.label}
                 href={item.href}
-                className="flex h-9 items-center rounded-md px-3 text-[0.9375rem] font-medium text-foreground/90 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none"
+                className="flex h-9 items-center rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none"
               >
                 {item.label}
               </a>

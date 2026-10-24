@@ -125,3 +125,32 @@ drift, car ride per feature section (view timeline), station pulse loop, post ma
 | stats | ok | the value digits were still flipping when the board was mid-screen (10px per-column offset too slow) | flip-in | yes: 4px per column, 20→140px range |
 | CTA | ok, doorway wider than the phone as on the original | ok | train arrives, doors open, copy fades | — |
 | footer | ok | link pitch 36 vs 32px (inline links on a 24px line); container padded | hover ok | yes: 20px line, no padding from xl |
+
+## Comparison round 2
+
+Re-captured after round 1. Heights at 390: hero 424 (was 470; original 420), footer 1234
+(original 1250); at 1440 footer 880 (original 834). Overflow fits at 360/768/1024. Motion
+list unchanged and complete (sticky, hero drift, car ride ×5, pulse loop, marquee loop,
+board flip-in, CTA arrive/doors/copy). The CTA shown alone in the gallery rests with its
+doors open (entry ranges complete), and under reduced motion the doors stay open.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ok | nav text now read 1px large next to the original (its 14px measured ~52px for "Product") | ok | yes: back to 14px, kept the wider gap |
+| hero | headline 2 lines, panel 424 vs 420 | tab bar overshot with 16px labels; active pill greyer than the original's violet | tabs ok | yes: 15px labels, 6px divider margins, active pill primary/60 (checked on the block alone) |
+| feature | ok | rail now hidden behind the wide media; links stay on one line | car sits just below the station mid-read, as on the original | — |
+| testimonials | ok | cards 360 wide, logo at x=201 (original 200); plum wash read grey-violet | ok | yes: plum tint is now pink + copper mixed at 8% + 4% |
+| stats | ok | board digits settle before the board reaches mid-screen | ok | — |
+| CTA, footer | ok | footer 46px taller (our demo has one more link in two groups) | ok | no: content, not layout |
+
+Re-theme check: `railway-feature` under sample-ember light and `railway-testimonials` under
+sample-ember dark pick up the theme's paper, ink, serif and accents; the railway light mode is
+a lilac-paper sibling with the same violet primary.
+
+## What still differs (by design)
+
+- All art is placeholders: the hero sky, app windows, network/scale diagrams, environments
+  card, avatars, company and tool logos (plain-text names), the train body and platform.
+- The original's board counts live (numbers tick up from an API); ours flips in on scroll and
+  flips its last digits on a 4s loop with the same figures.
+- The rail car is a plain capsule (the original draws a little train with windows).

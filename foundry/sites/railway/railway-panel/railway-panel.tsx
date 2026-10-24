@@ -17,7 +17,8 @@ const tints = {
   none: "",
   "chart-5": "bg-chart-5/15",
   "chart-2": "bg-chart-2/20",
-  highlight: "bg-highlight/8",
+  // pink and copper together give the original's reddish plum
+  highlight: "bg-[color-mix(in_oklab,var(--highlight)_8%,var(--chart-3)_4%)]",
 };
 
 /**
