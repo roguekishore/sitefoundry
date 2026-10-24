@@ -15,7 +15,7 @@ export function CursorCta({ title, action, className }: CursorCtaProps) {
   return (
     <section className={cn("bg-background pt-section pb-[calc(var(--section-y)*2)] text-foreground", className)}>
       <div className="mx-auto flex max-w-[calc(var(--page-width)+2*var(--page-gutter))] flex-col items-center px-gutter text-center">
-        <h2 className="font-display text-[3.125rem] leading-[1.1] tracking-[-0.035em] sm:text-6xl lg:text-[4.5rem]">{title}</h2>
+        <h2 className="font-display text-[3.125rem] font-[450] leading-[1.1] tracking-[-0.035em] sm:text-6xl lg:text-[4.5rem]">{title}</h2>
         <CursorButton href={action.href} className="mt-5.5">
           {action.mobileLabel ? (
             <>

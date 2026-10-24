@@ -38,12 +38,12 @@ export function CursorPostRow({ title, posts, more, className }: CursorPostRowPr
             <li key={post.href + post.title} className="w-[16.5rem] shrink-0 snap-start lg:w-auto">
               <a
                 href={post.href}
-                className="flex h-full min-h-[6.75rem] flex-col rounded-lg border border-border bg-card px-4 py-4 text-[0.9375rem] leading-6 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-muted motion-reduce:transition-none lg:text-base"
+                className="flex h-full min-h-[6.75rem] flex-col rounded-lg border border-border bg-card px-4 py-3.5 text-[0.9375rem] leading-6 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-muted motion-reduce:transition-none lg:py-4 lg:text-base"
               >
                 <span className="text-muted-foreground">{post.meta}</span>
                 <span className="text-foreground">{post.title}</span>
                 {post.byline && (
-                  <span className="mt-auto flex items-center gap-2 pt-3.5 text-muted-foreground">
+                  <span className="mt-auto flex items-center gap-2 pt-2.5 lg:pt-3 text-muted-foreground">
                     <CursorMedia tone="plain" className="size-6 shrink-0 rounded-full">{post.avatar}</CursorMedia>
                     {post.byline}
                   </span>

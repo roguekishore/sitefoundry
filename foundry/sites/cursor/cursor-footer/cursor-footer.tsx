@@ -40,12 +40,12 @@ export function CursorFooter({ columns, copyright, compliance, modeLabels, activ
           {columns.map((col) => (
             <div key={col.title}>
               <h3 className="text-[0.9375rem] leading-[1.4] text-muted-foreground lg:text-sm lg:leading-[1.5]">{col.title}</h3>
-              <ul className="mt-2.5 flex flex-col gap-2.5 lg:gap-[0.5625rem]">
+              <ul className="mt-2.5 flex flex-col gap-2.5 text-[0.9375rem] leading-[1.4] lg:gap-[0.5625rem] lg:text-sm lg:leading-[1.5]">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="text-[0.9375rem] leading-[1.4] transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground/75 motion-reduce:transition-none lg:text-sm lg:leading-[1.5]"
+                      className="transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground/75 motion-reduce:transition-none"
                     >
                       {l.label}
                     </a>

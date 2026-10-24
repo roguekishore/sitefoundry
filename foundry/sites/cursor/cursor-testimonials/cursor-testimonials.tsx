@@ -26,7 +26,7 @@ export function CursorTestimonials({ title, quotes, className }: CursorTestimoni
   return (
     <section className={cn("bg-background py-section text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter">
-        <h2 className="mx-auto max-w-[9em] text-center font-display text-[2.125rem] leading-[1.2] tracking-[-0.015em] text-balance sm:max-w-none lg:text-4xl">
+        <h2 className="mx-auto max-w-[9em] text-center font-display text-[2.125rem] font-[450] leading-[1.2] tracking-[-0.015em] text-balance sm:max-w-none lg:text-4xl">
           {title}
         </h2>
         <ul className="mt-13 grid gap-2.5 md:grid-cols-2 lg:mt-14 lg:grid-cols-3">
