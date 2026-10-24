@@ -23,7 +23,7 @@ export function StokespaceHero({ title, media, className }: StokespaceHeroProps)
         <div className="absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover">
           {media ?? <StokespacePlaceholder />}
         </div>
-        <div className="absolute inset-x-0 bottom-8 px-gutter md:bottom-[8.5%]">
+        <div className="absolute inset-x-0 bottom-8 px-gutter md:bottom-[14%]">
           <StokespaceHeading as="h1" size="hero" className="md:max-w-[62%]">
             {title}
           </StokespaceHeading>

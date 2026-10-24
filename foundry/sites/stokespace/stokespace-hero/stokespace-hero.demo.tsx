@@ -2,7 +2,7 @@
 import { StokespaceHero, type StokespaceHeroProps } from "./stokespace-hero";
 
 export const heroSample: StokespaceHeroProps = {
-  title: "Reliable rides to orbit and home again",
+  title: "Reliable rides to orbit and home again, every week",
 };
 
 export default function Demo() {

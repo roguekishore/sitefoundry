@@ -20,7 +20,7 @@ export function StokespaceEyebrow({ label, tone = "primary", className }: Stokes
   return (
     <p
       className={cn(
-        "inline-flex flex-col gap-3 text-[length:clamp(0.5625rem,0.506rem+0.23vw,0.714rem)] leading-[1.4] font-normal tracking-[0.25em] uppercase lg:gap-3.5 lg:tracking-[0.12em]",
+        "inline-flex flex-col gap-2 text-[length:clamp(0.5625rem,0.506rem+0.23vw,0.714rem)] leading-[1.4] font-normal tracking-[0.25em] uppercase lg:gap-2.5 lg:tracking-[0.12em]",
         className,
       )}
     >
