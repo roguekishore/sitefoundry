@@ -116,7 +116,7 @@ export function ReflectHero({
           <ReflectMedia
             tone="glow"
             label={backdropLabel}
-            className="absolute top-0 left-1/2 aspect-video w-[60rem] -translate-1/2 lg:w-[90rem]"
+            className="absolute top-0 left-1/2 aspect-video w-[60rem] -translate-1/2 bg-[radial-gradient(20%_26%_at_50%_50%,color-mix(in_oklab,var(--glow)_85%,var(--foreground)),color-mix(in_oklab,var(--glow)_50%,transparent)_50%,color-mix(in_oklab,var(--glow)_12%,transparent)_80%,transparent)] lg:w-[90rem]"
           >
             {backdrop}
           </ReflectMedia>
@@ -143,7 +143,7 @@ export function ReflectHero({
             aria-label={play.label}
             className="group absolute top-[14.3rem] left-1/2 grid size-[5.5rem] -translate-x-1/2 place-items-center lg:top-[15.3rem] lg:size-28"
           >
-            <span className="absolute inset-0 rounded-full border border-foreground/10 bg-foreground/5 backdrop-blur-md transition-all duration-300 ease-in-out group-hover:scale-[1.07] motion-reduce:transition-none" />
+            <span className="absolute inset-0 rounded-full border border-foreground/10 bg-foreground/[0.06] transition-all duration-300 ease-in-out group-hover:scale-[1.07] motion-reduce:transition-none" />
             <span className="relative grid size-16 place-items-center rounded-full bg-background/80 text-foreground transition-all duration-300 ease-in-out group-hover:scale-[1.2] motion-reduce:transition-none lg:size-20">
               <Play aria-hidden className="size-5 fill-current" />
             </span>

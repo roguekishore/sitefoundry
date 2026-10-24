@@ -112,3 +112,58 @@ All slots are `ReactNode` props; empty ones are token surfaces of the same size 
 - Header overlays the hero (the original is `position: fixed`); ours is sticky with a
   negative bottom margin so it works both as a page header and alone in the gallery.
 - Starfields are generated from a fixed seed, so server and client render the same dots.
+
+## Comparison round 1
+
+Heights (original → ours, px) at 1440: hero 1463→1474, features 392→409, AI 1311→1363,
+connected 1265→1366, research 1086→1070, privacy 844→868, pricing 1184→1242, migrate
+480→498, testimonials 868→854, about 824→826, academy 916→916, CTA 600→610, footer
+723→739. No overflow at 360/768/1024. Section crops are taken at scroll 0, so view-timeline
+reveals (media fades, globe) show their pre-state there; they are checked in the scroll
+frames, where they play.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | lead 3 lines vs 2 (copy longer) | play button showed a square glass box (backdrop-blur artefact); horizon glow much fainter than the original's bright light | rings + stars turn ✓ | yes: no backdrop blur; brighter core in the glow wash; shorter lead |
+| features | ✓ | ✓ | hover glow ✓ | — |
+| AI | lead 7 lines vs 6; capability icon→title gap 36 vs 30 | icon→title gap 36 vs 20; one capability wrapped to 3 lines | hue loop, streaks, media fade ✓ | yes: mt-7/lg:mt-5, shorter copy |
+| connected | ✓ | heading two lines vs one (+64px) | media fade ✓ | yes: one-line title; card placeholders made softer (radial muted, no hard box) |
+| research | ✓ | ✓ | disc fade ✓ | — |
+| privacy | ✓ | ✓ | pool fade ✓ | — |
+| pricing | label/price/sub/button gaps 15–40% looser; second sub wrapped | plans start 20px low; planet sat ~190px too low (anchored to the bottom) | drift scrubbed ✓ | yes: tighter gaps, planet anchored 72px from the top |
+| migrate | ✓ | ✓ | — | — |
+| testimonials | heading wrapped to two lines; the 12% edge fade ate the phone card | rings a little bright; cards shorter (shorter posts) | marquee + sway ✓ | yes: shorter title, 3% fade on phones, min card height, fainter rings |
+| about | ✓ | ✓ | globe scale+fade ✓ (scroll frames) | — |
+| academy | ✓ | lead 3 lines vs 2 | panel fade ✓ | yes: shorter lead with a desktop break |
+| CTA | lead 2 lines vs 1 | ✓ | glow fade ✓ | yes: shorter lead |
+| footer | ✓ | ✓ | link hover ✓ | — |
+
+## Comparison round 2
+
+Heights (original → ours) at 1440: hero 1463→1474, features 392→409, AI 1311→1307,
+connected 1265→1302, research 1086→1070, privacy 844→868, pricing 1184→1182, migrate
+480→498, testimonials 868→858, about 824→826, academy 916→916, CTA 600→610, footer
+723→739. At 390 after the fixes below: hero 1268→1282, AI 1824→1881, connected
+1632→1622, research 1250→1220, privacy 622→586, pricing 1380→1342, testimonials 852→878,
+CTA 538→538, footer 1203→1184. Fits at 360/768/1024. Every inventory row appears in ours'
+Motion list: header sticky; orbit 100s, stars 70s + twinkle 11s, AI hue 2s and 5s streaks,
+marquee 200s, ring sway 5s, globe rim 70s (loops); media fades and globe scale .5→1 (view
+timeline reveals); planet drift ±64px (scrubbed); hovers on nav (.9→.6 in .3s), buttons,
+badge glow (.14→.28), play button, footer links (.6→.7 in .45s).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| connected | 120px of empty padding under the second card (original ends right after its text) | ✓ (one-line title now) | ✓ | yes: no bottom padding on phones |
+| research | ~50px extra at the bottom | ✓ | ✓ | yes: phone bottom padding cut |
+| CTA | glow area ~28px taller | ✓ | ✓ | yes: 13rem on phones |
+| pricing | ✓ gaps now within a few px | ✓ planet top at 72px; plans start where the original's do | drift ✓ | — |
+| hero | ✓ | glow brighter; play button clean | ✓ | — |
+| AI | still ~57px taller (lead one line longer at 390) | ✓ | ✓ | left: copy length only |
+
+Re-theme check: `reflect-hero`, `reflect-pricing` and `reflect-testimonials` under
+`sample-ember` (light) pick up its paper, ink, rust buttons and orange glow cleanly; the
+site's own light sibling reads as lavender paper with indigo ink.
+
+Left as is: media slots are placeholders (glow washes and muted panels), so the
+original's bright black-hole, light-cone, planet and globe artwork is only suggested by
+the glow; Figtree sets a touch wider than AeonikPro, so headings run ~5% longer.

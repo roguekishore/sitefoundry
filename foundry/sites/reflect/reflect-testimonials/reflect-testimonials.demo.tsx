@@ -3,7 +3,7 @@ import { ReflectTestimonials } from "./reflect-testimonials";
 
 export const testimonialsSample: ReflectTestimonialsProps = {
   eyebrow: "Kind words",
-  title: "Loved by night owls",
+  title: "Night owls agree",
   lead: "A few things people have said about us",
   rows: [
     [

@@ -6,7 +6,7 @@ const icon = { strokeWidth: 1.25, "aria-hidden": true } as const;
 
 export const connectedSample: ReflectConnectedProps = {
   eyebrow: "Everything linked",
-  title: "A second memory\nthat never sleeps",
+  title: "A second memory that never sleeps",
   lead: "Ideas join up the way they do in your head: one page points to the next.\nOver the months Nocturne grows into a map you can wander back through.",
   mediaLabel: "Cone of light rising out of the dark",
   cards: [

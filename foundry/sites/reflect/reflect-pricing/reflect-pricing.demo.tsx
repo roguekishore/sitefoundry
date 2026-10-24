@@ -15,7 +15,7 @@ export const pricingSample: ReflectPricingProps = {
       name: "Phone & tablet",
       price: "Yearly plan",
       priceSize: "small",
-      text: "Prices for your country are in the app store.",
+      text: "Local prices are in the app store.",
       action: { label: "Open the app store page", href: "#" },
       actionVariant: "secondary",
     },

@@ -43,7 +43,7 @@ export function ReflectAcademy({ eyebrow, title, lead, action, media, mediaLabel
           eyebrow={eyebrow}
           title={title}
           lead={lead}
-          leadClassName="max-w-[20rem] sm:max-w-[19rem]"
+          leadClassName="max-w-[20rem] sm:max-w-[22rem]"
           className="relative"
         >
           {action && (
