@@ -89,3 +89,36 @@ Geist is allowed here because the original uses it.
 - Theme switch icons in the footer are built as plain buttons (no behaviour), like UI chrome.
 - Shipped-card hover (border darkens) is inferred from the site's `group-hover:border-*`
   rules; not seen in a capture.
+
+## Comparison round 1
+
+Ours: hero marked "sized by the window" at 1440 like the original; fits at 360/768/1024;
+header sticky with the scroll-linked hairline; marquee and phone line cycle running.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | 65px tall (hairline added to 64) | same | sticky + hairline ✓, hover ✓ | yes: bar 63px + 1px line |
+| hero | mono line invisible in the frame (all three spans ran in sync and were all in their hidden phase); haze too faint to read as a slot | title weight 500 vs the original's 400 | line cycle had no stagger | yes: per-line delay 0/3/6s, haze 9% → 12%, title 400 |
+| cases | headings 4 lines (copy too long) | headings 3–4 lines vs 3/2/2; 240px padding split top/bottom where the original puts ~270px all above and none below; window box 921×485 vs ~450 | none (media only) ✓ | yes: shorter copy, `lg:pt-[16.875rem] lg:pb-0`, window aspect 2.05 |
+| case statements | 3 lines vs 2 | 3 lines vs 2 | — | yes: shorter copy |
+| shipped | ok | 120px top/bottom vs ~200 top, 0 bottom | border hover ✓ | yes: `lg:pt-[12.5rem] lg:pb-0` |
+| CTA | ok (674 vs content) | 680 vs 688 | copy label fade ✓ | — |
+| footer | ok (1955 vs 1958) | 871 vs 846 | link hover ✓ | close enough |
+| placeholders | case windows read as grey windows where the original shows white screenshots | same | — | kept: a placeholder must read as one |
+
+## Comparison round 2
+
+Section tops at 1440 now land on the original's: first case heading at 1108 (orig 1108),
+second at 2039 (orig 2038); page 6041px vs 5986. Header 64px. Phone line cycle visible and
+staggered; marquee running; overflow fits at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| case 2 | ok | heading 3 lines vs 2 (pushed the rest 56px down) | — | yes: heading width 11.5em (measured: 112px = 2 lines) |
+| CTA | heading 3 lines vs 2 | ok | — | yes: phone width 9.5em (measured: 80px = 2 lines) |
+| hero | haze still pale on phones (it is a placeholder; the original's art is a black shape) | ok | ✓ | kept |
+| shipped | ok | ok | ✓ | — |
+| footer | ok | +25px taller (longer fictional link lists) | ✓ | kept (content) |
+
+Re-theme: `vercel-shipped` and `vercel-case` under `sample-ember` take its serif, cream and
+greens cleanly; `vercel-hero` in the dark sibling reads well (haze turns into a soft light).

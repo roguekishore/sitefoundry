@@ -46,14 +46,14 @@ export function VercelCase({
 }: VercelCaseProps) {
   const end = align === "end";
   return (
-    <section className={cn("bg-background px-gutter py-12 text-foreground lg:py-section", className)}>
+    <section className={cn("bg-background px-gutter py-12 text-foreground lg:pt-[16.875rem] lg:pb-0", className)}>
       <div className="mx-auto grid max-w-page grid-cols-1 lg:grid-cols-12 lg:gap-x-6">
         <VercelHeading className={cn("max-w-[8.5em] lg:col-span-8", end && "lg:col-start-5", titleClassName)}>{title}</VercelHeading>
 
         {/* the window(s) */}
         <div
           className={cn(
-            "relative mt-12 aspect-[1.4] lg:row-start-2 lg:mt-11 lg:aspect-[1.9]",
+            "relative mt-12 aspect-[1.4] lg:row-start-2 lg:mt-11 lg:aspect-[2.05]",
             end ? "lg:col-span-8 lg:col-start-5" : "lg:col-span-8 lg:col-start-1",
           )}
         >

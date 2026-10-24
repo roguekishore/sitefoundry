@@ -19,7 +19,7 @@ export default function Page() {
       <VercelHeader {...headerSample} />
       <VercelHero {...heroSample} />
       {/* the first story sits further below the hero than the stories sit below each other */}
-      <VercelCase {...caseAgentsSample} className="pt-44 lg:pt-52" />
+      <VercelCase {...caseAgentsSample} className="pt-40 lg:pt-52" />
       <VercelCase {...caseAppsSample} />
       <VercelCase {...casePlatformsSample} />
       <VercelShipped {...shippedSample} />

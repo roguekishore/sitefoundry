@@ -44,7 +44,7 @@ export function VercelHeader({ brand, mark, brandHref, links, secondary = [], ac
         className,
       )}
     >
-      <div className="relative flex h-16 items-center">
+      <div className="relative flex h-[calc(4rem-1px)] items-center">
         <VercelMark brand={brand} mark={mark} href={brandHref} />
 
         <nav className="ml-8 hidden items-center gap-6 lg:flex">
