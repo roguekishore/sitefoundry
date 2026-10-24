@@ -1,0 +1,51 @@
+/* Resting state (no scroll timelines, or reduced motion): the doors are open and the copy shows. */
+.railway-cta-door-left { translate: -101% 0; }
+.railway-cta-door-right { translate: 101% 0; }
+
+/* The section's own view timeline drives everything. The ranges are "entry", which always
+   completes (even for a last section or a block shown alone): the carriage arrives over the
+   first 70% of the section entering, then the doors open over the rest. */
+.railway-cta {
+  view-timeline-name: --railway-cta;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .railway-cta-train {
+      animation: railway-cta-arrive linear both;
+      animation-timeline: --railway-cta;
+      animation-range: entry 0% entry 70%;
+    }
+    .railway-cta-door-left,
+    .railway-cta-door-right,
+    .railway-cta-copy {
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: both;
+      animation-timeline: --railway-cta;
+      animation-range: entry 72% entry 100%;
+    }
+    .railway-cta-door-left { animation-name: railway-cta-door-left; }
+    .railway-cta-door-right { animation-name: railway-cta-door-right; }
+    .railway-cta-copy { animation-name: railway-cta-copy; }
+  }
+}
+
+@keyframes railway-cta-arrive {
+  from { translate: 70vw 0; }
+  to { translate: 0 0; }
+}
+
+@keyframes railway-cta-door-left {
+  from { translate: 0 0; }
+  to { translate: -101% 0; }
+}
+
+@keyframes railway-cta-door-right {
+  from { translate: 0 0; }
+  to { translate: 101% 0; }
+}
+
+@keyframes railway-cta-copy {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

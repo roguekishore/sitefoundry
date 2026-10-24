@@ -1,0 +1,32 @@
+/* Each character flips down into its cell as the board scrolls in, left to right: the range
+   is a fixed distance into the view, pushed later by 10px per column (an inline variable). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .railway-stats-char {
+      animation: railway-stats-flip linear both;
+      animation-timeline: view();
+      animation-range: entry calc(40px + var(--railway-stats-col, 0px)) entry calc(200px + var(--railway-stats-col, 0px));
+      transform-origin: 50% 50%;
+    }
+  }
+}
+
+@keyframes railway-stats-flip {
+  from { transform: perspective(300px) rotateX(-90deg); opacity: 0; }
+  to { transform: perspective(300px) rotateX(0deg); opacity: 1; }
+}
+
+/* The last two digits of each wide-board figure flip over every few seconds, like a live counter. */
+.railway-stats-tick {
+  animation: railway-stats-tick 4s ease-in-out infinite;
+}
+
+@keyframes railway-stats-tick {
+  0%, 88% { transform: perspective(300px) rotateX(0deg); }
+  94% { transform: perspective(300px) rotateX(-90deg); }
+  100% { transform: perspective(300px) rotateX(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .railway-stats-tick { animation: none; }
+}
