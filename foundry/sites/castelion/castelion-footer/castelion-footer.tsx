@@ -36,7 +36,7 @@ const link =
 export function CastelionFooter({ brand, homeHref = "/", columns, addresses, legal, copyright, className }: CastelionFooterProps) {
   return (
     <footer className={cn("border-t-2 border-border bg-background text-foreground", className)}>
-      <div className="mx-auto grid max-w-page grid-cols-3 gap-x-4 px-gutter pt-7 pb-8 text-base/[1.4] font-medium lg:grid-cols-[23rem_17.5rem_17.5rem_1fr_auto] lg:gap-x-0 lg:pt-12">
+      <div className="mx-auto grid max-w-page grid-cols-3 gap-x-4 px-gutter pt-7 pb-8 text-base/[1.4] font-medium lg:grid-cols-[28.3%_21.7%_21.7%_1fr_auto] lg:gap-x-0 lg:pt-12">
         <a
           href={homeHref}
           className="col-span-3 justify-self-start font-display text-[2.5rem]/none font-semibold tracking-[-0.03em] italic lg:col-span-1 lg:text-[2.875rem]"

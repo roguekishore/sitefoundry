@@ -26,7 +26,7 @@ export function CastelionCareersCall({ phrases, title, body, ctaLabel, ctaHref, 
           <CastelionLines
             as="p"
             lines={phrases}
-            className="font-display text-[clamp(2.625rem,1.6rem+4.19vw,5.375rem)]/[1.31] font-bold tracking-[0.02em] [&_br]:inline max-lg:[&_.castelion-lines-line]:block"
+            className="font-display text-[clamp(2.625rem,1.6rem+4.19vw,5.375rem)]/[1.31] font-bold tracking-[0.02em]  max-lg:[&_.castelion-lines-line]:block"
           />
         </div>
         <div className="castelion-careers-call-aside">

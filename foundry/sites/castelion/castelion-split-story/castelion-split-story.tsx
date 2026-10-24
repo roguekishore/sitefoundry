@@ -33,7 +33,7 @@ const objectSlots = [
 export function CastelionSplitStory({ stories, backdrop, backdropLabel, objects = [], className }: CastelionSplitStoryProps) {
   return (
     <section className={cn("bg-background pt-[10.5rem] lg:pt-36 lg:pb-[6.5rem]", className)}>
-      <div className="castelion-split-story-band relative isolate overflow-clip">
+      <div className="castelion-split-story-band relative isolate overflow-clip pt-[9.25rem] pb-[7.875rem] lg:py-0">
         <div className="castelion-split-story-backdrop absolute inset-x-0 -top-48 -bottom-48 -z-20">
           <CastelionPlaceholder media={backdrop} tone="dusk" label={backdropLabel} className="size-full" />
         </div>
@@ -43,7 +43,7 @@ export function CastelionSplitStory({ stories, backdrop, backdropLabel, objects 
           </div>
         ))}
 
-        <div className="mt-[9.25rem] mb-[7.875rem] bg-background px-gutter pt-12 pb-12 text-foreground lg:my-0 lg:ml-[45.4%] lg:w-[30.6%] lg:px-[2.625rem] lg:pt-[2.125rem] lg:pb-8">
+        <div className="bg-background px-gutter pt-12 pb-12 text-foreground lg:ml-[45.4%] lg:w-[30.6%] lg:px-[2.625rem] lg:pt-[2.125rem] lg:pb-8">
           {stories.map((story, i) => (
             <div key={i} className={cn(i > 0 && "mt-9 lg:mt-[4.25rem]")}>
               <CastelionLines

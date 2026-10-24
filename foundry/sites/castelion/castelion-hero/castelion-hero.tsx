@@ -68,7 +68,7 @@ export function CastelionHero({ title, lead, motto, media, mediaLabel, className
                     style={
                       {
                         "--castelion-blind-from": (0.14 + 0.26 * t).toFixed(3),
-                        "--castelion-blind-mid": (0.3 + 0.38 * t).toFixed(3),
+                        "--castelion-blind-mid": (0.42 + 0.4 * t).toFixed(3),
                       } as CSSProperties
                     }
                   />
