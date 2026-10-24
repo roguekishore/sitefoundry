@@ -1,0 +1,132 @@
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useReducedMotion } from "motion/react";
+import { cn } from "@foundry/foundry-utils";
+import { ValaratomicsIntro } from "@foundry/valaratomics-intro";
+import { ValaratomicsPlaceholder } from "@foundry/valaratomics-placeholder";
+
+export interface ValaratomicsCoreItem {
+  /** the small label above, e.g. "Fuel" */
+  eyebrow: string;
+  /** the big word, e.g. "Pebble" */
+  name: string;
+  /** the video or image shown in the panel while this item is active; empty shows a placeholder */
+  media?: ReactNode;
+}
+
+export interface ValaratomicsCoreProps {
+  /** the section heading */
+  title: string;
+  /** the paragraph beside it */
+  body: string;
+  /** the parts the panel cycles through (three in the original) */
+  items: ValaratomicsCoreItem[];
+  /** seconds each item stays before the next one takes over */
+  interval?: number;
+  className?: string;
+}
+
+const TAB_WIDTH = 30; // % of the panel width
+const EASE = "ease-[cubic-bezier(0.92,0,0.08,1)]";
+
+/**
+ * Intro, then a wide black panel that grows a short tab down towards the active label below
+ * it. The panel auto-advances through the items: the tab slides across, the media
+ * crossfades, the active label turns black with a gold eyebrow and the others dim to half.
+ * On phones the label row is wider than the screen and slides so the active one shows.
+ */
+export function ValaratomicsCore({ title, body, items, interval = 4, className }: ValaratomicsCoreProps) {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const reduce = useReducedMotion();
+  const last = Math.max(items.length - 1, 1);
+  const step = active / last; // 0 at the first item, 1 at the last
+
+  useEffect(() => {
+    if (reduce || paused || items.length < 2) return;
+    const id = setTimeout(() => setActive((a) => (a + 1) % items.length), interval * 1000);
+    return () => clearTimeout(id);
+  }, [active, reduce, paused, interval, items.length]);
+
+  // the tab is a trapezoid; at either end its outer edge stays straight under the panel's corner
+  const inL = active === 0 ? "0px" : "1.5rem";
+  const inR = active === items.length - 1 ? "0px" : "1.5rem";
+  const tab: CSSProperties = {
+    left: `calc(${100 - TAB_WIDTH}% * ${step})`,
+    width: `${TAB_WIDTH}%`,
+    clipPath: `polygon(0 0, 100% 0, calc(100% - ${inR}) 100%, ${inL} 100%)`,
+  };
+
+  return (
+    <section className={cn("bg-background px-gutter py-section text-foreground", className)}>
+      <div className="mx-auto max-w-page">
+        <ValaratomicsIntro title={title} body={body} />
+
+        <div className="mt-9 lg:mt-section" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+          <div className="relative">
+            <div className="dark relative aspect-[363/418] overflow-clip rounded-sm bg-background ring-1 ring-border/40 ring-inset lg:aspect-auto lg:h-[26.125rem]">
+              {items.map((item, i) => (
+                <div
+                  key={item.name}
+                  aria-hidden={i !== active}
+                  className={cn(
+                    "absolute inset-0 transition-opacity duration-500 ease-in-out motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover",
+                    i === active ? "opacity-100" : "opacity-0",
+                  )}
+                >
+                  {item.media ?? <ValaratomicsPlaceholder />}
+                </div>
+              ))}
+            </div>
+            {/* the tab: overlaps the panel by 8px to cover its rounded corner */}
+            <div
+              aria-hidden
+              style={tab}
+              className={cn(
+                "dark absolute top-[calc(100%-0.5rem)] h-[1.875rem] rounded-b-sm bg-background",
+                "transition-[left,clip-path] duration-500 motion-reduce:transition-none",
+                EASE,
+              )}
+            />
+          </div>
+
+          <div className="mt-14 overflow-x-clip [container-type:inline-size]">
+            <ul
+              style={{ "--valaratomics-core-step": step } as CSSProperties}
+              className={cn(
+                "flex w-max gap-12 [translate:calc((100cqw-100%)*var(--valaratomics-core-step))_0] transition-[translate] duration-500 motion-reduce:transition-none",
+                "lg:w-full lg:justify-between lg:gap-0 lg:[translate:none]",
+                EASE,
+              )}
+            >
+              {items.map((item, i) => (
+                <li key={item.name}>
+                  <button
+                    type="button"
+                    aria-pressed={i === active}
+                    onClick={() => setActive(i)}
+                    className={cn(
+                      "flex flex-col items-start gap-2 text-left transition-[opacity,filter] duration-500 ease-in-out motion-reduce:transition-none",
+                      i === active ? "opacity-100" : "opacity-50 hover:opacity-70",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "font-mono text-sm leading-none font-medium uppercase transition-colors duration-500 lg:text-lg lg:leading-none",
+                        i === active ? "text-primary" : "text-foreground/40",
+                      )}
+                    >
+                      {item.eyebrow}
+                    </span>
+                    <span className="font-sans text-[2rem] leading-none font-medium tracking-[-0.02em] uppercase lg:text-5xl lg:leading-none">
+                      {item.name}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
