@@ -38,13 +38,13 @@ export interface ZoeExploreProps {
 /** Zoe's plum explore band with the newsletter sign-up. */
 export function ZoeExplore({ eyebrow, newsletter, cards, className }: ZoeExploreProps) {
   return (
-    <section className={cn("bg-secondary pt-24 pb-24 text-secondary-foreground lg:pt-[8.5rem] lg:pb-[4.75rem]", className)}>
+    <section className={cn("bg-secondary pt-24 pb-8 text-secondary-foreground xl:pt-[8.5rem] xl:pb-[4.75rem]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <p className="text-sm font-medium uppercase">{eyebrow}</p>
-        <div className="mt-8 hidden border-t border-secondary-foreground/25 lg:block" />
+        <div className="mt-8 hidden border-t border-secondary-foreground/25 xl:block" />
 
-        <div className="mt-10 flex flex-col gap-20 lg:mt-[3.375rem] lg:grid lg:grid-cols-[27rem_1fr] lg:gap-0">
-          <div className="lg:max-w-[20.25rem]">
+        <div className="mt-10 flex flex-col gap-20 xl:mt-[3.375rem] xl:grid xl:grid-cols-[27rem_1fr] xl:gap-0">
+          <div className="max-w-[26rem] xl:max-w-[20.25rem]">
             <h2 className="font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[1.75rem] leading-[1.15] font-light tracking-[-0.01em] lg:text-[1.875rem]">
               {newsletter.title}
             </h2>
@@ -67,12 +67,12 @@ export function ZoeExplore({ eyebrow, newsletter, cards, className }: ZoeExplore
             <p className="mt-4 text-sm leading-[1.2] opacity-90">{newsletter.note}</p>
           </div>
 
-          <ul className="-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-6 overflow-x-auto px-gutter [scrollbar-width:none] max-lg:order-first lg:mx-0 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
+          <ul className="-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-6 overflow-x-auto px-gutter [scrollbar-width:none] max-xl:order-first xl:mx-0 xl:overflow-visible xl:px-0 [&::-webkit-scrollbar]:hidden">
             {cards.map((c) => (
-              <li key={c.tag} className="w-[15.625rem] shrink-0 snap-start">
+              <li key={c.tag} className="flex w-[15.625rem] shrink-0 snap-start">
                 <a
                   href={c.href}
-                  className="group block overflow-clip rounded-lg bg-background text-foreground transition-transform duration-300 ease-in-out hover:-translate-y-1 motion-reduce:transition-none"
+                  className="group flex w-full flex-col overflow-clip rounded-lg bg-background text-foreground transition-transform duration-300 ease-in-out hover:-translate-y-1 motion-reduce:transition-none"
                 >
                   <div className="relative aspect-square overflow-clip rounded-lg">
                     <div className="absolute inset-0 *:size-full *:object-cover">

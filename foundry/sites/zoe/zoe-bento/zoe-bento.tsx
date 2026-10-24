@@ -53,7 +53,7 @@ function Tile({ tile }: { tile: ZoeBentoTile }) {
       <div className={cn("flex size-full flex-col justify-between p-3 lg:p-[1.125rem]", tones[tile.tone ?? "ink"])}>
         <p
           className={cn(
-            "font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[3.25rem] leading-none font-light tracking-[-0.03em] lg:text-[4.5rem]",
+            "font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[3rem] leading-none font-light tracking-[-0.03em] lg:text-[4rem]",
             (tile.tone ?? "ink") === "ink" && "text-primary",
           )}
         >

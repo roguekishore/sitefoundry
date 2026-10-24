@@ -34,14 +34,14 @@ export function ZoeStories({ eyebrow, title, stories, labels, className }: ZoeSt
         prevLabel={labels.prev}
         nextLabel={labels.next}
         slideClassName="w-[17.25rem]"
-        trackClassName="px-8 scroll-px-8 lg:justify-center"
-        controlsClassName="mt-12 lg:hidden"
+        trackClassName="px-8 scroll-px-8 xl:justify-center"
+        controlsClassName="mt-12 xl:hidden"
         slides={stories.map((s) => (
           <figure key={s.name} className="flex h-[21.5rem] flex-col rounded-lg bg-muted p-6 text-foreground">
             {/* foundry-allow-text: a decorative opening quote mark */}
             <span
               aria-hidden
-              className="zoe-stories-mark block h-16 font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[8rem] leading-[0.9] text-foreground/15"
+              className="zoe-stories-mark block h-16 font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[9.5rem] leading-[0.85] font-medium text-foreground/15"
             >
               “
             </span>

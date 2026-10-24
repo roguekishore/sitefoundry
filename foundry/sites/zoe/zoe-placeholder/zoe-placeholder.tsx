@@ -7,7 +7,7 @@ const tones = {
   /** a faint ink tint: product shots sitting on cream cards */
   soft: "bg-foreground/[0.05]",
   /** a navy surface with a soft sheen: photos shot on navy */
-  ink: "bg-foreground bg-linear-to-br from-foreground via-foreground to-background/15 dark:bg-card dark:from-card dark:to-foreground/10",
+  ink: "bg-foreground bg-linear-to-br from-foreground via-foreground to-background/15 dark:bg-card dark:from-card dark:via-card dark:to-foreground/10",
   /** a pale glass panel: composites on the yellow band */
   glass: "bg-background/30 ring-1 ring-background/50 ring-inset",
   /** flat yellow: covers that are the brand colour */

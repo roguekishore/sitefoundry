@@ -34,7 +34,7 @@ export function ZoePodcast({ eyebrow, title, platforms, media, className }: ZoeP
       </div>
 
       <div className="mx-auto grid max-w-page items-center gap-10 px-gutter pt-16 pb-16 lg:grid-cols-2 lg:gap-0 lg:py-section">
-        <div className="text-center lg:pl-[12.5rem] lg:text-left">
+        <div className="text-center lg:pr-8 lg:pl-8 lg:text-left xl:pr-0 xl:pl-[12.5rem]">
           <p className="text-lg font-semibold lg:text-2xl">{eyebrow}</p>
           <h2 className="mx-auto mt-4 max-w-[20rem] font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[2.125rem] leading-[1.1] font-light tracking-[-0.01em] lg:mx-0 lg:mt-5 lg:max-w-[24rem] lg:text-[2.875rem] lg:leading-[1.05]">
             {title}
@@ -53,7 +53,7 @@ export function ZoePodcast({ eyebrow, title, platforms, media, className }: ZoeP
             ))}
           </ul>
         </div>
-        <div className="relative order-first mx-auto aspect-[600/700] w-full max-w-[37.5rem] *:absolute *:inset-0 *:size-full *:rounded-[2rem] *:object-cover lg:order-last lg:mx-0">
+        <div className="relative order-first -mx-gutter aspect-[600/700] *:absolute *:inset-0 *:size-full *:rounded-[2rem] *:object-cover sm:mx-auto sm:w-full sm:max-w-[37.5rem] lg:order-last lg:mx-0">
           {media ?? <ZoePlaceholder tone="glass" />}
         </div>
       </div>
