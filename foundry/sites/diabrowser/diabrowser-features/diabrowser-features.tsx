@@ -31,34 +31,36 @@ export function DiabrowserFeatures({ heading, cards, className }: DiabrowserFeat
       <div className="diabrowser-features-fade px-gutter">
         <DiabrowserHeading>{heading}</DiabrowserHeading>
       </div>
-      <div className="mx-auto mt-[60px] grid max-w-page grid-cols-1 gap-[10px] px-gutter lg:mt-[82px] lg:grid-cols-12 lg:gap-5">
-        {cards.map((card) => (
-          <article
-            key={card.label}
-            className={cn(
-              "diabrowser-features-fade flex flex-col overflow-clip rounded-2xl border border-foreground/30 px-[30px] pt-[30px] lg:min-h-[630px]",
-              card.wide ? "lg:col-span-7" : "lg:col-span-5",
-            )}
-          >
-            <p className="-ml-1 inline-flex h-[30px] w-fit items-center rounded-full bg-card px-3 text-[12px] leading-none tracking-[0.11em] text-foreground/80 uppercase">
-              {card.label}
-            </p>
-            <p className="mt-[18px] text-[16px] leading-6 tracking-[0.005em] text-pretty text-foreground/75 lg:mt-5 lg:text-[20px] lg:leading-[30px]">
-              {card.body}
-            </p>
-            <div className="mt-auto flex justify-center pt-[30px] lg:pt-[52px]">
-              <div
-                className={cn(
-                  "diabrowser-features-media w-full overflow-hidden rounded-t-lg bg-muted [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover",
-                  card.wide ? "lg:max-w-[558px]" : "lg:max-w-[318px]",
-                )}
-                style={{ aspectRatio: card.mediaAspect ?? (card.wide ? "558 / 362" : "318 / 399") }}
-              >
-                {card.media}
+      <div className="px-gutter">
+        <div className="mx-auto mt-[60px] grid max-w-page grid-cols-1 gap-[10px] lg:mt-[82px] lg:grid-cols-12 lg:gap-5">
+          {cards.map((card) => (
+            <article
+              key={card.label}
+              className={cn(
+                "diabrowser-features-fade flex flex-col overflow-clip rounded-2xl border border-foreground/30 px-[30px] pt-[30px] lg:min-h-[630px]",
+                card.wide ? "lg:col-span-7" : "lg:col-span-5",
+              )}
+            >
+              <p className="-ml-1 inline-flex h-[30px] w-fit items-center rounded-full bg-card px-3 text-[12px] leading-none tracking-[0.11em] text-foreground/80 uppercase">
+                {card.label}
+              </p>
+              <p className="mt-[18px] text-[16px] leading-6 tracking-[0.005em] text-pretty text-foreground/75 lg:mt-5 lg:text-[20px] lg:leading-[30px]">
+                {card.body}
+              </p>
+              <div className="mt-auto flex justify-center pt-[30px] lg:pt-[52px]">
+                <div
+                  className={cn(
+                    "diabrowser-features-media w-full overflow-hidden rounded-t-lg bg-muted [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover",
+                    card.wide ? "lg:max-w-[558px]" : "lg:max-w-[318px]",
+                  )}
+                  style={{ aspectRatio: card.mediaAspect ?? (card.wide ? "558 / 362" : "318 / 399") }}
+                >
+                  {card.media}
+                </div>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -93,3 +93,47 @@ Components: `diabrowser-button` (black pill CTA with lift, grey pill, outline pi
 - The original's Dia logo (a black dome) and giant "DIA" lettering are replaced by a plain
   serif wordmark; the footer seal becomes a plain round text stamp built from type (no logo shape).
 - Phones' second bar has a pale yellow wash behind the arc in the original; skipped (the arc reads the same without it).
+
+## Comparison round 1
+
+Motion checks: hero "sized by the window" at both widths ✓; dock sticky at 748px (152px) ✓ like
+the original; scroll frames show the dock shrinking to a 376px button mid-page and growing back
+to 451px with small print under the closer ✓; header pill appears top right after the hero ✓;
+tour list pinned at 20vh with the active step following the frame in view ✓; no horizontal
+overflow at 360/768/1024 ✓. Full-page crops show the scroll reveals at their start (blank), as expected.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | name too small and high (caps 200–275 vs 250–338), window 64px too high | name caps start 27px too high and run too tall; window top ✓ (400) | window lift ✓ | yes: name 34vw/21vw (300px max), more space above, window overlap retuned |
+| hero | — | light type reads grey on the gold | — | yes: dark-scope foreground 0.94 → 0.965 |
+| hero | window placeholder glaring white | same | — | yes: card at 85% |
+| features | ✓ | cards 64px narrower than the 1180 page (gutter inside max-w) | reveal ✓ | yes: gutter outside the max-width |
+| dock | ✓ | a faint shadow seam along the docked bar's flat bottom edge (visible above the footer) | ✓ | yes: clip-path keeps the arc's shadow above the curve |
+| tour | ✓ | body text a touch loose next to Oracle | ✓ | yes: −0.005em |
+| privacy | ✓ | ✓ (box 609 vs 600) | drift ✓ | — |
+| footer | ✓ | ✓ | ✓ | — |
+
+## Comparison round 2
+
+Motion checks repeated: hero still window-sized at both widths, dock sticky (748px, 152px), shrink
+and regrow seen in the scroll frames, active tour step follows the frames, no overflow at
+360/768/1024 ✓.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | ✓ name caps 245–355, window top 336 (orig 250 / 338) | name now ~760px wide, caps from 212, its lower third hidden by the window like the original | ✓ | yes (round 1 change) |
+| hero | — | translucent window let the name show through (the original's is opaque) | — | yes: opaque card again |
+| tour → features | gap 160px vs the original's 80px | gap 243px vs ~170px | — | yes: tour bottom padding 0 / 50px |
+| tour | — | heading to first frame 80px vs ~52px | — | yes: 50px |
+| features | ✓ card padding, tag pill, 4-line body, shot at the bottom | ✓ 1180 wide now, 7/5 · 5/7 · 7/5 | ✓ | — |
+| privacy, closer, footer | ✓ | ✓ | ✓ | — |
+
+Re-theme check: diabrowser-hero, -features and -privacy under sample-ember (dark) keep their
+structure and take ember's colours and fonts (hero: green highlight backdrop, orange pill on a
+dark arc). In our own dark mode the hero's butter pools read as brown smudges, so the dark glow
+is now pale butter.
+
+Left as is: the original's photo, WebGL light, product video and screenshots (placeholders of the
+same size, radius and frame); the Dia logo and swash lettering (a plain serif wordmark instead);
+the phones' second bar's pale yellow wash; Oracle Triple's semi-mono rhythm (Hanken Grotesk is
+proportional, so body lines run a few characters different).
