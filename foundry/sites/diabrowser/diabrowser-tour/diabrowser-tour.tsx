@@ -49,12 +49,12 @@ export function DiabrowserTour({ heading, items, mediaAspect = "760 / 562", clas
   }, [items.length]);
 
   return (
-    <section className={cn("bg-background pt-5 pb-section text-foreground lg:pt-[10px]", className)}>
+    <section className={cn("bg-background pt-5 text-foreground lg:pt-[10px] lg:pb-[50px]", className)}>
       <div className="diabrowser-tour-fade px-gutter">
         <DiabrowserHeading>{heading}</DiabrowserHeading>
       </div>
 
-      <div className="mx-auto mt-[44px] max-w-[1440px] px-3 lg:mt-[78px] lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-12 lg:pr-[110px] lg:pl-[30px] xl:grid-cols-[minmax(0,1fr)_760px]">
+      <div className="mx-auto mt-[44px] max-w-[1440px] px-3 lg:mt-[50px] lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-12 lg:pr-[110px] lg:pl-[30px] xl:grid-cols-[minmax(0,1fr)_760px]">
         {/* desktop: the pinned list */}
         <div className="hidden lg:block">
           <ol className="sticky top-[20vh] flex flex-col gap-[42px] pt-6">
@@ -85,7 +85,7 @@ export function DiabrowserTour({ heading, items, mediaAspect = "760 / 562", clas
                     )}
                   >
                     <div className="min-h-0 overflow-hidden">
-                      <p className="max-w-[290px] pt-[10px] text-[14px] leading-5 tracking-[0.005em] text-foreground/80">{item.body}</p>
+                      <p className="max-w-[290px] pt-[10px] text-[14px] leading-5 tracking-[-0.005em] text-foreground/80">{item.body}</p>
                     </div>
                   </div>
                 </li>

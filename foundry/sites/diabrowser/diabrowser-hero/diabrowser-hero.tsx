@@ -36,11 +36,11 @@ export function DiabrowserHero({ headline, wordmark, media, backdrop, cta, note,
         </h1>
         <p
           aria-hidden
-          className="dark mt-[46px] font-display text-[31vw] leading-[0.72] font-[380] tracking-[-0.04em] whitespace-nowrap text-foreground uppercase lg:mt-[58px] lg:text-[23vw] xl:text-[330px]"
+          className="dark mt-[96px] font-display text-[34vw] leading-[0.72] font-[380] tracking-[-0.04em] whitespace-nowrap text-foreground uppercase lg:mt-[100px] lg:text-[23vw] xl:text-[330px]"
         >
           {wordmark}
         </p>
-        <div className="diabrowser-hero-window relative z-10 -mt-[9vw] w-full lg:-mt-[60px] lg:w-[min(1115px,100%)]">
+        <div className="diabrowser-hero-window relative z-10 -mt-[8vw] w-full lg:-mt-[104px] lg:w-[min(1115px,100%)]">
           <div className="aspect-[1115/793] overflow-hidden rounded-[6px] border border-card/70 bg-card shadow-[0_24px_60px_-30px_color-mix(in_oklab,var(--foreground)_35%,transparent)] lg:rounded-xl [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover">
             {media}
           </div>
