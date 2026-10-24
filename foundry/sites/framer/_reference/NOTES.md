@@ -97,3 +97,44 @@ UI shots do (`fade: right / bottom`). Nothing is drawn inside.
   the same props (`action`, `prompts`, `chips`, `secondary`).
 - **Logos**: customer marks become plain-text fictional names set in the display face.
 - Section padding: `--section-y` is the desktop 7.5rem; phones use a fixed 3.75rem in blocks.
+
+## Comparison round 1
+
+Positions measured from `ours-design.md` sections and the scroll frames (frame NN sits at
+scrollY = NN × window height).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all headings | Outfit 500 at −0.04em read heavier and tighter than GT Walsheim Medium | same | — | yes: weight 450, tracking −0.025em |
+| hero | matches (title 4 lines, buttons, link below, full-bleed video between hairlines) | buttons 6px low | — | yes: mt-6 |
+| logos | ticker in place | grid right size; the band ended 30px early (agents head at 1435 vs 1465) | phone ticker ✓ | yes: lg:pb-8 |
+| agents | matches | closing card copy wrapped to 4 lines (original 3) → section 44px tall | reveal 0.2→1 / −20px ✓, aside pinned ✓ | yes: wider measure on the closing card |
+| platform | subtitle runs full width (original holds a narrow ~180px measure, 5 lines); Hosting/Security cells are 240px on phones, not 320 | subtitle wrapped to 3 lines (2 on original) | — | yes: narrow phone measure, `compact` small cells, shorter sample copy |
+| showcase | matches | title broke onto 2 lines (1 on original), +48px | drift ✓ (rows opposite ways) | yes: one-line sample title |
+| stories | matches | 26px taller than measured | ticker ✓ | no: within a line of the heading's leading |
+| community | matches (350×253 window) | window was 540 tall; the original's is 840 (misread first time) | — | yes: lg:h-[52.5rem] |
+| CTA | 37px short; glow rim far dimmer than the original's bright blue bloom | matches (prompt box, chips, link) | typing ✓ (JS) | yes: pt-24 pb-14, stronger glow tone |
+| footer | groups flow into 2 balanced columns (original regroups them differently) | matches (6 columns, 27px rows, bottom row) | hover ✓ | no: grouping is content order |
+| overflow | fits at 360/768/1024 | — | — | ✓ |
+
+## Comparison round 2
+
+Page heights now 11096 / 10927 px (original 11076 / 10865). Section heading tops at 1440, ours
+vs original: agents 1463 / 1465, platform 4608 / 4585, showcase 6496 / 6460, stories 7739 / 7700.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| headings | weight 450 / −0.025em now reads like the original's medium geometric | same | — | ✓ |
+| logos → agents | ✓ | agents head within 2px | — | ✓ |
+| agents | ✓ | section 20px taller (our copy wraps a little later) | reveal + pinned panel ✓ | no: content-driven |
+| platform | narrow subtitle measure and 240px compact cells now match | 2-line subtitle ✓, bento 1440px ✓ | — | ✓ |
+| showcase | ✓ | one-line title ✓ | drift ✓ | ✓ |
+| stories | ✓ | 26px taller | ticker ✓ | yes: lg:py-[6.75rem] |
+| community | ✓ | 840px window ✓ | — | ✓ |
+| CTA | the glow was clipped by the fade mask (box-shadow is masked too) | ✓ | typing ✓ | yes: padded the masked wrapper; 34px button |
+| re-theme | framer-agents and framer-platform under sample-ember (dark/light) and framer-hero under sample-midnight keep their structure; only colours and fonts change | | | ✓ |
+| overflow | fits at 360/768/1024 | | | ✓ |
+
+Left as is: the footer's phone grouping (CSS columns balance our groups rather than
+reproducing the original's hand-made phone order), and a ~20–40px drift in where lower sections
+start at 1440, all from copy length.

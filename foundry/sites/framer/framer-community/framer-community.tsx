@@ -34,7 +34,7 @@ export function FramerCommunity({ title, count, action, media, mediaLabel, class
             </>
           }
         />
-        <div className="mt-12 aspect-[350/253] overflow-clip rounded-2xl border border-border lg:mt-11 lg:aspect-auto lg:h-[33.75rem]">
+        <div className="mt-12 aspect-[350/253] overflow-clip rounded-2xl border border-border lg:mt-11 lg:aspect-auto lg:h-[52.5rem]">
           {media ?? <FramerPlaceholder tone="panel" label={mediaLabel} />}
         </div>
       </div>

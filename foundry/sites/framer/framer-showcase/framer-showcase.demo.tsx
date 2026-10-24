@@ -2,7 +2,7 @@ import type { FramerShowcaseProps } from "./framer-showcase";
 import { FramerShowcase } from "./framer-showcase";
 
 export const showcaseSample: FramerShowcaseProps = {
-  title: "Launched on\nTessel",
+  title: "Launched with Tessel",
   action: { label: "Browse live sites", href: "#" },
   rows: [
     [

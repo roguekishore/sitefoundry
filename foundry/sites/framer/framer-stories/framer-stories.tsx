@@ -27,7 +27,7 @@ export interface FramerStoriesProps {
 /** Edge-to-edge ticker of customer-story cards. */
 export function FramerStories({ title, action, stories, className }: FramerStoriesProps) {
   return (
-    <section className={cn("bg-background py-15 text-foreground lg:py-section", className)}>
+    <section className={cn("bg-background py-15 text-foreground lg:py-[6.75rem]", className)}>
       <div className="mx-auto max-w-page px-gutter lg:box-content">
         <FramerSectionHead
           title={title}

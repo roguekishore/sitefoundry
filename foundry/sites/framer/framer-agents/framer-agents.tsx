@@ -35,7 +35,7 @@ export interface FramerAgentsProps {
   className?: string;
 }
 
-function Card({ card, className }: { card: FramerAgentCard; className?: string }) {
+function Card({ card, wide, className }: { card: FramerAgentCard; wide?: boolean; className?: string }) {
   return (
     <article
       className={cn(
@@ -49,7 +49,7 @@ function Card({ card, className }: { card: FramerAgentCard; className?: string }
       <div className="flex flex-col items-start gap-4 px-5 pt-5 pb-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:pt-6">
         <div>
           <h3 className="text-lg leading-[1.35] tracking-[-0.01em] text-foreground">{card.title}</h3>
-          <p className="max-w-[31rem] text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground">{card.body}</p>
+          <p className={cn("text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground", wide ? "max-w-[39rem]" : "max-w-[31rem]")}>{card.body}</p>
         </div>
         <FramerArrowLink href={card.link.href} label={card.link.label} className="shrink-0" />
       </div>
@@ -86,7 +86,7 @@ export function FramerAgents({ title, action, cards, aside, asideLabel, closing,
 
         {closing && (
           <div className="mt-10 lg:mt-15 lg:grid lg:grid-cols-[75fr_44fr] lg:gap-2.5">
-            <Card card={closing.card} />
+            <Card card={closing.card} wide />
             <div className="framer-agents-card hidden overflow-clip rounded-[calc(var(--radius)*2.5)] border border-border lg:block">
               {closing.panel ?? <FramerPlaceholder tone="panel" label={closing.panelLabel} />}
             </div>
