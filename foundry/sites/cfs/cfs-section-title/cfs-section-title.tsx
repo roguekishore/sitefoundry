@@ -15,7 +15,7 @@ export function CfsSectionTitle({ children, as: Tag = "h2", tick = true, classNa
   return (
     <Tag
       className={cn(
-        "relative max-w-[14em] font-display text-[clamp(2.125rem,4.383vw,3.945rem)] leading-[1.2] font-light text-balance",
+        "relative max-w-[14em] font-display text-[clamp(2.125rem,4.383vw,3.945rem)] leading-[1.2] font-[350] text-balance",
         className,
       )}
     >

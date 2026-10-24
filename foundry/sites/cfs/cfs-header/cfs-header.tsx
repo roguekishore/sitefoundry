@@ -35,7 +35,7 @@ export function CfsHeader({ name, homeHref, mark, links, menuLabel, overlay = tr
         <a href={homeHref} className="group flex min-w-0 flex-1 items-center gap-3 pr-4 pl-2.5 lg:gap-5">
           <span
             className={cn(
-              "grid size-[55px] shrink-0 place-items-center group-hover:bg-foreground group-hover:text-card [&_svg]:size-10",
+              "grid size-[55px] shrink-0 place-items-center group-hover:bg-foreground group-hover:text-card [&_svg]:size-12",
               ease,
             )}
           >

@@ -46,7 +46,7 @@ export function CfsValues({ title, media, quote, values, link, className }: CfsV
 
           <figure className="dark relative -mt-[2.2rem] flex flex-col items-center justify-center border-t-[3px] border-primary bg-card px-[1.875rem] py-10 text-center text-foreground lg:absolute lg:top-[51px] lg:right-0 lg:bottom-[52px] lg:mt-0 lg:w-[49%] lg:border-t-0 lg:border-l-[3px] lg:px-20">
             {quote.mark && <span className="text-primary [&_svg]:size-12 lg:[&_svg]:size-[3.25rem]">{quote.mark}</span>}
-            <blockquote className="mt-7 max-w-[31rem] font-display text-2xl leading-[1.5] font-light lg:mt-10 lg:text-[1.9rem]">
+            <blockquote className="mt-7 max-w-[31rem] font-display text-2xl leading-[1.5] font-[350] lg:mt-10 lg:text-[1.9rem]">
               {quote.text}
             </blockquote>
             <span aria-hidden className="mt-7 h-10 w-px bg-primary lg:mt-12 lg:h-20" />

@@ -91,3 +91,22 @@ a centring transform (half the window), not a motion; not rebuilt.
   with its own motion. Dismissing needs state, so `hydrate: "idle"`.
 - Menu at 390: a `<details>` disclosure (no JS) that drops the nav cells below the box.
 - Light mode is faithful (tan page); dark mode turns the page navy with the same orange.
+
+## Comparison round 1
+
+Heights: 1440 hero 900 (window) / breakthrough 1533 / values 1417 / footer 898 against
+900 / 1517 / 1396 / 900; 390 hero 844 (window) / 1250 + 1711 / 1486 against 844 / 2988
+together / 1472. Motion list: load fade, view-timeline scale 1→1.05 and pillar fade at
+scroll 450, 2s pulse, cookie slide and bar, every hover (cells invert, underlines
+orange→white, cookie buttons) all present. No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | mark 36px against the original's ~55px sunburst | same | – | yes: icon 48px |
+| hero | title 3 lines starting at 325 vs 4 lines at 255 (shorter copy); pillars 60px apart vs 45, label→text 35 vs 29 | title wraps with a one-word last line | – | yes: copy length closer to the original, gap-y 36px, mt-3 |
+| all titles | Mona 300 reads lighter than NB International 300 | same | – | yes: weight 350 (titles, hero, footer call, quote) |
+| breakthrough | – | figure 03 sat 110px low: the right column spanned 3 grid rows and its rows stretched | – | yes: self-start on the column |
+| breakthrough | – | figures 11px low, text 8px low | – | yes: mt 56px for both |
+| values | – | everything ~10px low (follows the title) | – | accepted |
+| cookie notice | matches (full width, 7px inset) | matches (320px, 25px inset) | slide + bar | – |
+| footer | matches | matches | underline hover | – |
