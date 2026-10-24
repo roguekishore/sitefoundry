@@ -117,7 +117,7 @@ export function RailwayFeature({
             <a
               href={link.href}
               className={cn(
-                "font-medium text-foreground transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none",
+                "font-medium whitespace-nowrap text-foreground transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none",
                 split && "mt-1 block w-fit",
               )}
             >
@@ -131,7 +131,7 @@ export function RailwayFeature({
 
   const alternativesRow = alternatives && (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6">
-      <span className="flex items-center gap-4 text-base font-medium">
+      <span className="flex items-center gap-4 text-base font-medium whitespace-nowrap">
         <span className={cn("[&_svg]:size-5", t.icon)}>{alternatives.icon}</span>
         {alternatives.label}
       </span>
@@ -144,7 +144,7 @@ export function RailwayFeature({
   );
 
   const mediaSlot = split ? (
-    <div className="-mx-3 mt-16 lg:mx-0 lg:mt-8">
+    <div className="relative -mx-3 mt-16 lg:mx-0 lg:mt-8">
       <div className={cn("aspect-[464/509] overflow-clip rounded-xl border border-border bg-linear-to-t to-foreground/[0.03] to-60%", t.glow)}>
         {media}
       </div>
@@ -152,7 +152,7 @@ export function RailwayFeature({
   ) : (
     <div
       className={cn(
-        "mt-12 overflow-clip border border-border lg:mt-20",
+        "relative mt-12 overflow-clip border border-border lg:mt-20",
         frame === "window" ? "aspect-[1160/824] rounded-lg bg-muted" : "-mx-3 aspect-[1160/600] rounded-2xl bg-card lg:mx-0",
         framed && frame === "card" && "mx-0",
       )}

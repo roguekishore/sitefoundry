@@ -3,7 +3,7 @@ import { Cloud, Eye, GitBranch, Network, TrendingUp } from "lucide-react";
 import { RailwayHero, type RailwayHeroProps } from "./railway-hero";
 
 export const heroSample: RailwayHeroProps = {
-  title: "Launch code without the noise",
+  title: "Launch without the noise",
   lead: (
     <>
       The calm, all-in-one cloud for{" "}

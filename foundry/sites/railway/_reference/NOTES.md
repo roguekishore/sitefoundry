@@ -105,3 +105,52 @@ Reduced motion: all off; doors render open and the CTA visible.
   on the last digits: no JavaScript, and still reads as a live board.
 - The CTA door motion runs on `entry` ranges (not `cover`) so it completes even when the block
   is shown alone in the gallery (see the scroll-range rule).
+
+## Comparison round 1
+
+Ours captured from the gallery (`mode=dark`). Section heights at 1440: header 72/72, hero
+1242/1244, build 1710/1745 (+16 gap), network ~766/794, scale ~760/770, monitor ~1740/1745,
+testimonials 1390/1409, stats + CTA 1800/1783, footer 834/925. No section is window-sized in
+either. Overflow: fits at 360/768/1024 in both. Motion list: sticky header, scrubbed hero
+drift, car ride per feature section (view timeline), station pulse loop, post marquee loop
+(120s), board flip-in (view), CTA arrive + doors + copy (view, entry ranges): every inventory row shows up.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ok | logo at 157 vs 136 (container padded); nav text 14 vs 15px, items packed tighter | ok | yes: no padding from xl, 15px, gap-3 |
+| hero | headline 3 lines vs 2 (demo copy longer) → panel 470 vs 404 | tab bar 545 vs 593 wide (15px text, tight dividers) | tabs advance, fill sweeps; drift ok | yes: shorter demo title, 16px tabs, wider dividers |
+| feature (all) | ok | rail track drawn over the wide media (original: media covers it); "See how →" link broke over two lines; "Instead of" label wrapped in split layout | car rides, station pulses | yes: media `relative`, link and label nowrap |
+| testimonials | sans heading 3 lines vs 2 (demo copy) | cards 348 vs 360 wide (inner padding) | marquee ok | yes: no inner padding at lg, shorter demo heading |
+| testimonials | — | plum wash a little greyer than the original | — | no: within the token tint; kept |
+| stats | ok | the value digits were still flipping when the board was mid-screen (10px per-column offset too slow) | flip-in | yes: 4px per column, 20→140px range |
+| CTA | ok, doorway wider than the phone as on the original | ok | train arrives, doors open, copy fades | — |
+| footer | ok | link pitch 36 vs 32px (inline links on a 24px line); container padded | hover ok | yes: 20px line, no padding from xl |
+
+## Comparison round 2
+
+Re-captured after round 1. Heights at 390: hero 424 (was 470; original 420), footer 1234
+(original 1250); at 1440 footer 880 (original 834). Overflow fits at 360/768/1024. Motion
+list unchanged and complete (sticky, hero drift, car ride ×5, pulse loop, marquee loop,
+board flip-in, CTA arrive/doors/copy). The CTA shown alone in the gallery rests with its
+doors open (entry ranges complete), and under reduced motion the doors stay open.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ok | nav text now read 1px large next to the original (its 14px measured ~52px for "Product") | ok | yes: back to 14px, kept the wider gap |
+| hero | headline 2 lines, panel 424 vs 420 | tab bar overshot with 16px labels; active pill greyer than the original's violet | tabs ok | yes: 15px labels, 6px divider margins, active pill primary/60 (checked on the block alone) |
+| feature | ok | rail now hidden behind the wide media; links stay on one line | car sits just below the station mid-read, as on the original | — |
+| testimonials | ok | cards 360 wide, logo at x=201 (original 200); plum wash read grey-violet | ok | yes: plum tint is now pink + copper mixed at 8% + 4% |
+| stats | ok | board digits settle before the board reaches mid-screen | ok | — |
+| CTA, footer | ok | footer 46px taller (our demo has one more link in two groups) | ok | no: content, not layout |
+
+Re-theme check: `railway-feature` under sample-ember light and `railway-testimonials` under
+sample-ember dark pick up the theme's paper, ink, serif and accents; the railway light mode is
+a lilac-paper sibling with the same violet primary.
+
+## What still differs (by design)
+
+- All art is placeholders: the hero sky, app windows, network/scale diagrams, environments
+  card, avatars, company and tool logos (plain-text names), the train body and platform.
+- The original's board counts live (numbers tick up from an API); ours flips in on scroll and
+  flips its last digits on a 4s loop with the same figures.
+- The rail car is a plain capsule (the original draws a little train with windows).

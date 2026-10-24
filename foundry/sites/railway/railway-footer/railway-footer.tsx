@@ -44,7 +44,7 @@ export interface RailwayFooterProps {
 export function RailwayFooter({ featuredLabel, featured, groups, badges, mark, status, copyright, className }: RailwayFooterProps) {
   return (
     <footer className={cn("text-foreground", className)}>
-      <div className="mx-auto max-w-[74rem] px-12 pt-14 pb-20 lg:px-gutter lg:pb-24">
+      <div className="mx-auto max-w-[74rem] px-12 pt-14 pb-20 lg:px-gutter lg:pb-24 xl:px-0">
         <div className="lg:grid lg:grid-cols-[minmax(0,24.8rem)_minmax(0,41rem)] lg:justify-between lg:gap-12">
           <div className="hidden flex-col lg:flex">
             <p className="text-sm font-semibold">{featuredLabel}</p>
@@ -78,7 +78,7 @@ export function RailwayFooter({ featuredLabel, featured, groups, badges, mark, s
                 <p className="text-sm font-semibold">{group.title}</p>
                 <ul className="mt-5 grid gap-3">
                   {group.links.map((link) => (
-                    <li key={link.label}>
+                    <li key={link.label} className="leading-5">
                       <a href={link.href} className="text-sm leading-5 text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none">
                         {link.label}
                       </a>
