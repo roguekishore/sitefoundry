@@ -53,7 +53,7 @@ export function ZoePodcast({ eyebrow, title, platforms, media, className }: ZoeP
             ))}
           </ul>
         </div>
-        <div className="relative order-first mx-auto aspect-[600/700] w-full max-w-[37.5rem] *:absolute *:inset-0 *:size-full *:rounded-[2rem] *:object-cover lg:order-last lg:mx-0">
+        <div className="relative order-first -mx-gutter aspect-[600/700] *:absolute *:inset-0 *:size-full *:rounded-[2rem] *:object-cover sm:mx-auto sm:w-full sm:max-w-[37.5rem] lg:order-last lg:mx-0">
           {media ?? <ZoePlaceholder tone="glass" />}
         </div>
       </div>

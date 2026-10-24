@@ -41,7 +41,7 @@ export function ZoeStories({ eyebrow, title, stories, labels, className }: ZoeSt
             {/* foundry-allow-text: a decorative opening quote mark */}
             <span
               aria-hidden
-              className="zoe-stories-mark block h-16 font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[8rem] leading-[0.9] text-foreground/15"
+              className="zoe-stories-mark block h-16 font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[9.5rem] leading-[0.85] font-medium text-foreground/15"
             >
               “
             </span>

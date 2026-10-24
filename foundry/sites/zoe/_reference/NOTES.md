@@ -105,3 +105,24 @@ All via `zoe-placeholder` (a plain token surface, `aria-hidden`):
   don't autoplay (no evidence on desktop, and it fights reading).
 - **Hero height** follows the original's aspect (4:5 on phones, 2:1 from 1024 up) since the
   capture does not mark it window-sized.
+
+## Comparison round 1
+
+Section crops of ours are taken at scroll 0, so the fading placeholders (bento photos,
+documentary photo) show blank there; checked on the scroll frames instead, where they show.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | matches (strip 74, bar 72, logo + burger) | matches (strip 44, bar 72, links, outlined login) | pinned: matches (sticky, 26 / 19 half-screens) | — |
+| hero | headline wrapped to 3 lines (our copy longer) | matches: 716 tall, text left at x126, CTA bottom centre | — | yes: shorter copy |
+| spotlight | 943 tall vs 676: the original shows no pitch on phones, only headline + button over the photo | matches; pitch reads lighter than Lota's | — | yes: pitch hidden below lg, semibold; phone padding pt-4 pb-12; 16:10 photo from sm |
+| products | matches (1-col, 34px light titles, full-width buttons) | matches (2×2 of 600, 48 gaps, badges) | button hover | — |
+| podcast | composite inset by the gutter; the original runs it edge to edge | heading 3 lines vs 2 (copy longer) | — | yes: full-bleed on phones, shorter copy |
+| statement | matches | matches (content shorter) | — | — |
+| bento | matches (2 cols, wide tile hidden) | matches 6×3 edge to edge; figures a bit larger than the original's 64px | fade on entering view: matches | yes: figures 48/64px |
+| documentary | matches | matches | fade: matches | — |
+| research | matches (peeking card, progress line, arrows flush left) | matches (600 cards from 32px, 25% fill) | slider | — |
+| stories | matches | matches; quote marks smaller and lighter than the original's | glyph fade | yes: bigger, medium weight |
+| explore | matches | cards unequal heights (3-line text) | — | yes: equal heights |
+| footer | 1076 vs 901: gaps between groups too big | matches | — | yes: gaps 48/40 |
+| overflow | 360 / 768 fit | **1024 overflowed** (explore 27rem column + 3 cards, footer fixed columns) | — | yes: explore side-by-side from xl, footer fluid columns at lg |
