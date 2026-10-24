@@ -35,7 +35,7 @@ const readoutSpots = ["left-[47.5%] top-[17.5%]", "left-[83%] top-[9%]", "left-[
  *  on the left, and on desktop a thin circular lens with mono HUD readouts on the right. */
 export function UltrahumanPromo({ eyebrow, title, body, action, media, mediaLabel, readouts = [], className }: UltrahumanPromoProps) {
   return (
-    <section className={cn("bg-background px-2.5 pt-0.5 lg:pt-0", className)}>
+    <section className={cn("bg-background px-2.5 pt-0.5 pb-2.5 lg:pt-0", className)}>
       <div className="dark relative isolate flex h-[90svh] flex-col justify-end overflow-clip rounded-lg bg-background text-foreground lg:aspect-[1420/503] lg:h-auto lg:justify-center">
         <div className="absolute inset-0 -z-10">
           {media ?? <UltrahumanPlaceholder tone="photo" label={mediaLabel} />}
@@ -57,7 +57,7 @@ export function UltrahumanPromo({ eyebrow, title, body, action, media, mediaLabe
 
         <div className="px-5 pb-10 lg:px-24 lg:pb-0">
           <p className="text-base leading-none font-light tracking-[-0.01em] uppercase lg:text-2xl">{eyebrow}</p>
-          <h2 className="mt-5 font-[family-name:var(--ultrahuman-condensed,var(--typeface-display))] text-[3.75rem] leading-[0.92] font-medium tracking-[-0.01em] uppercase italic [font-stretch:50%] lg:mt-6 lg:text-[6rem] lg:leading-[0.97]">
+          <h2 className="mt-5 font-[family-name:var(--ultrahuman-condensed,var(--typeface-display))] text-[3.75rem] leading-[0.92] font-medium tracking-[calc(-0.01em-var(--ultrahuman-squeeze,0em))] uppercase italic [font-stretch:50%] lg:mt-6 lg:text-[6rem] lg:leading-[0.97]">
             {title.map((line) => (
               <span key={line} className="block">
                 {line}

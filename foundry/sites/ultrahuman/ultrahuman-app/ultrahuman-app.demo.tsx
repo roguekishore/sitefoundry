@@ -4,7 +4,7 @@ import { UltrahumanApp, type UltrahumanAppProps } from "./ultrahuman-app";
 
 export const appSample: UltrahumanAppProps = {
   title: "Kinrise, rebuilt from the inside.",
-  body: "Made so each reading is easier to follow, and each suggestion easier to act on.",
+  body: "Made so every reading is easier to follow, and every next step easier to take.",
   stores: [
     { label: "App Store", href: "#", icon: <Apple aria-hidden className="fill-current" strokeWidth={0} /> },
     { label: "Google Play", href: "#", icon: <Play aria-hidden className="fill-current" strokeWidth={0} /> },

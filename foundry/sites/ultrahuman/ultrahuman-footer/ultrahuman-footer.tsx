@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@foundry/foundry-utils";
 
@@ -60,7 +60,7 @@ const linkText = "text-base leading-[1.375rem] tracking-[-0.0175em] text-foregro
 
 function FooterLink({ link }: { link: UltrahumanFooterLink }) {
   return (
-    <a href={link.href} className={cn(linkText, "inline-flex items-center gap-2")}>
+    <a href={link.href} className={cn(linkText, "flex w-fit items-center gap-2")}>
       {link.label}
       {link.badge && (
         <span className="rounded-[3px] bg-foreground/8 px-1.5 py-0.5 text-[0.5625rem] leading-none font-medium tracking-[0.04em] text-foreground/60 uppercase">
@@ -119,7 +119,7 @@ export function UltrahumanFooter({ columns, contact, follow, apps, legal, pills 
         </div>
 
         <div className="mt-2 grid gap-8 border-t border-foreground/10 pt-8 lg:mt-0 lg:grid-cols-3 lg:gap-0 lg:pt-0">
-          <div className="lg:py-9">
+          <div className="lg:pt-9 lg:pb-7">
             <p className={groupTitle}>{contact.title}</p>
             <ul className="mt-4 grid gap-2">
               {contact.links.map((link) => (
@@ -129,7 +129,7 @@ export function UltrahumanFooter({ columns, contact, follow, apps, legal, pills 
               ))}
             </ul>
           </div>
-          <div className="lg:border-l lg:border-foreground/6 lg:py-9 lg:pl-7">
+          <div className="lg:border-l lg:border-foreground/6 lg:pt-9 lg:pb-7 lg:pl-7">
             <p className={groupTitle}>{follow.title}</p>
             <ul className="mt-4 flex gap-6">
               {follow.links.map((link) => (
@@ -141,7 +141,7 @@ export function UltrahumanFooter({ columns, contact, follow, apps, legal, pills 
               ))}
             </ul>
           </div>
-          <div className="lg:border-l lg:border-foreground/6 lg:py-9 lg:pl-7">
+          <div className="lg:border-l lg:border-foreground/6 lg:pt-9 lg:pb-7 lg:pl-7">
             <p className={groupTitle}>{apps.title}</p>
             <ul className="mt-4 flex gap-2">
               {apps.badges.map((badge) => (
@@ -184,14 +184,22 @@ export function UltrahumanFooter({ columns, contact, follow, apps, legal, pills 
           )}
         </div>
 
-        <div className="@container mt-5 border-t border-foreground/10 pt-10 lg:mt-5 lg:pt-11">
-          <p
-            aria-hidden
-            className="overflow-clip text-center leading-[0.8] font-black tracking-[-0.02em] whitespace-nowrap text-muted uppercase italic"
-            style={{ fontSize: `calc(100cqw / ${(brand.length * 0.7).toFixed(2)})` } as CSSProperties}
-          >
-            {brand}
-          </p>
+        <div className="mt-5 border-t border-foreground/10 pt-10 lg:mt-5 lg:pt-11">
+          {/* the name stretched to the full width: SVG text fitted with textLength (a little short of
+              1280, leaving room for the slant of the italic's top-right corner) */}
+          <svg aria-hidden viewBox="0 0 1280 124" className="block h-auto w-full overflow-visible text-muted">
+            <text
+              x="-8"
+              y="118"
+              textLength="1244"
+              lengthAdjust="spacingAndGlyphs"
+              fill="currentColor"
+              className="font-display font-black uppercase italic"
+              style={{ fontSize: "164px" }}
+            >
+              {brand}
+            </text>
+          </svg>
         </div>
       </div>
     </footer>

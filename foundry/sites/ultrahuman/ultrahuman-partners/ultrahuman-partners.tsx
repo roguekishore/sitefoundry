@@ -27,7 +27,7 @@ export function UltrahumanPartners({ label, partners, rule = true, className }: 
       <li
         key={`${copy}-${partner.name}`}
         aria-hidden={copy > 0 ? true : undefined}
-        className="flex w-[10rem] shrink-0 items-center justify-center px-3 text-center text-[0.9375rem] leading-tight font-medium tracking-[-0.02em] text-foreground/35 lg:w-[15.625rem] lg:text-lg [&_img]:max-h-12 [&_svg]:max-h-12"
+        className="flex w-[10rem] shrink-0 items-center justify-center px-3 text-center text-[0.9375rem] leading-tight font-medium tracking-[-0.02em] text-foreground/45 lg:w-[15.625rem] lg:text-lg [&_img]:max-h-12 [&_svg]:max-h-12"
       >
         {partner.logo ?? partner.name}
       </li>
