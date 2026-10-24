@@ -32,7 +32,7 @@ export function FormenergyNews({ id, title, items, more, className }: Formenergy
     <section id={id} className={cn("bg-background py-section text-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <FormenergyHeading title={title} />
-        <ul className="mt-8 grid gap-y-[2.1rem] md:grid-cols-2 md:gap-x-3 lg:grid-cols-4">
+        <ul className="mt-8 grid gap-y-3 md:grid-cols-2 md:gap-x-3 lg:grid-cols-4">
           {items.map((item) => (
             <li key={item.title + item.date} className="flex flex-col items-start">
               <span className="rounded-t-[3px] bg-primary px-2 py-[0.35rem] font-mono text-[0.7rem] leading-none font-medium tracking-[0.083em] text-primary-foreground uppercase lg:py-1.5 lg:text-xs">

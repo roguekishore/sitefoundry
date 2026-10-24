@@ -54,7 +54,7 @@ export function FormenergyHeader({
         className,
       )}
     >
-      <div className="flex items-center justify-between px-5 pt-5 pb-4 lg:px-[1.875rem] lg:pt-[1.75rem] lg:pb-6">
+      <div className="flex items-center justify-between px-5 pt-[1.9rem] pb-4 lg:pt-[2.6rem] lg:pr-[2.8rem] lg:pl-[1.875rem] lg:pb-6">
         <FormenergyWordmark
           name={brand}
           suffix={brandSuffix}
@@ -65,8 +65,8 @@ export function FormenergyHeader({
 
         {/* desktop links */}
         <nav className="hidden lg:block">
-          <ul className="flex items-center gap-9">
-            {links.map((link) => (
+          <ul className="flex items-center gap-8">
+            {links.map((link, i) => (
               <li key={link.label} className="group relative">
                 <a
                   href={link.href}
@@ -76,7 +76,13 @@ export function FormenergyHeader({
                   {link.children && link.children.length > 0 && <Caret />}
                 </a>
                 {link.children && link.children.length > 0 && (
-                  <ul className="invisible absolute top-full left-0 min-w-56 bg-background py-2 opacity-0 transition-opacity duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none">
+                  <ul
+                    className={cn(
+                      "invisible absolute top-full min-w-56 bg-background py-2 opacity-0 transition-opacity duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none",
+                      // the last two open leftwards so they never stick out past the window edge
+                      i >= links.length - 2 ? "right-0" : "left-0",
+                    )}
+                  >
                     {link.children.map((child) => (
                       <li key={child.label}>
                         <a
