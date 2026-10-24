@@ -20,7 +20,7 @@ working prototype) and *Basin* (the first plant, being built). All copy is ours.
   20 → 33px; h5 (card titles, fusion captions) 18 → 22px; news titles 16 → 19px (lh 1); body
   15px / 1.35; small 13px / 1.38; mono 12px eyebrows, 14px nav and footer.
 - **Spacing.** 12-column grid, 20px gaps, gutter 10px at 390 and 56px (3.5rem) at 1440.
-  Section top padding 95 → 133px to the eyebrow. Very airy: pinned and stacked sections give
+  Section top padding 113 → 133px to the eyebrow. Very airy: pinned and stacked sections give
   each idea a whole screen.
 - **Shapes.** Small radii: 8px media cards, 6px video frames, 4–5px buttons and nav pill,
   2px square arrow buttons. A rounded-full pill only for the fusion section's CTA. No shadows;
@@ -90,7 +90,7 @@ a strip artefact to captures and this page reads fine without it; skipped (decis
 ## Decisions
 
 - **Gutter** 10px at 390 → 56px at 1440: `clamp(0.625rem, 4.381vw - 0.443rem, 3.5rem)`.
-- **Section padding** 95 → 133px: `clamp(5.9375rem, 5.056rem + 3.619vw, 8.3125rem)`.
+- **Section padding** 113 → 133px: `clamp(7.0625rem, 6.598rem + 1.905vw, 8.3125rem)`.
 - **Careers band darkening:** the section crops (scroll 0) show it light, the scroll frames dark:
   a scroll-triggered page-colour change. Built as a `dark` overlay layer fading in on entry, so the
   content is always in `.dark` tokens. Without scroll timelines it is simply dark.

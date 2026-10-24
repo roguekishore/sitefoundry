@@ -1,0 +1,105 @@
+/* The section (450svh) publishes its own view timeline; the stage inside it is sticky, so the
+   `contain` range of that timeline is exactly the stretch while the stage is pinned.
+
+   Plain layout (no scroll timelines, or reduced motion): every caption is listed, one under
+   the other, and nothing moves. */
+.helionenergy-steps {
+  view-timeline: --helionenergy-steps block;
+}
+
+/* The empty stage: navy at the top easing into the page colour at the bottom, with one soft,
+   round glow in the middle. A plain stand-in for the original's animated scene. */
+.helionenergy-steps-backdrop {
+  background:
+    radial-gradient(ellipse 34% 30% at 50% 54%, color-mix(in oklab, var(--glow) 34%, transparent), transparent 72%),
+    linear-gradient(
+      to bottom,
+      var(--secondary) 0%,
+      color-mix(in oklab, var(--secondary) 82%, var(--background)) 30%,
+      color-mix(in oklab, var(--secondary) 48%, var(--background)) 64%,
+      var(--background) 100%
+    );
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* captions stack in one place and take turns (ranges set inline per caption) */
+    .helionenergy-steps-captions {
+      display: grid;
+    }
+    .helionenergy-steps-caption {
+      grid-area: 1 / 1;
+      animation-name: var(--hs-anim);
+      animation-range: var(--hs-range);
+      animation-fill-mode: var(--hs-fill);
+      animation-timing-function: linear;
+      animation-timeline: --helionenergy-steps;
+    }
+
+    /* the heading drifts up 20px over the whole stretch */
+    .helionenergy-steps-title {
+      animation: helionenergy-steps-drift linear both;
+      animation-timeline: --helionenergy-steps;
+      animation-range: entry 50% exit 100%;
+    }
+
+    /* the button block rises in, unblurring, as the stage arrives */
+    .helionenergy-steps-cta {
+      animation: helionenergy-steps-cta-in linear both;
+      animation-timeline: --helionenergy-steps;
+      animation-range: entry 50% entry 100%;
+    }
+
+    /* the pill's surface closes in from the sides as the stage leaves */
+    .helionenergy-steps-surface {
+      animation: helionenergy-steps-surface-out linear both;
+      animation-timeline: --helionenergy-steps;
+      animation-range: exit 40% exit 90%;
+    }
+  }
+}
+
+@keyframes helionenergy-steps-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes helionenergy-steps-out {
+  to {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes helionenergy-steps-drift {
+  from {
+    transform: translateY(10px);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes helionenergy-steps-cta-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes helionenergy-steps-surface-out {
+  from {
+    clip-path: inset(-0.5rem -0.5rem -0.5rem -0.5rem round 999px);
+  }
+  to {
+    clip-path: inset(50% 50% 50% 50% round 999px);
+  }
+}
