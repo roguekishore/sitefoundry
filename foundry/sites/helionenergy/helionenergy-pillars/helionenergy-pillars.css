@@ -1,0 +1,54 @@
+/* Desktop stack. Each row is `sticky` at the same spot, so the next row slides over it. A
+   sticky row barely moves while stuck, so its motion runs on a "sensor": an invisible
+   span at the row's resting place (rows sit 690px apart, the sensor is that tall) whose view
+   timeline is shared with its sibling row through `timeline-scope` on the list.
+
+   Sensor geometry, for a ~900px window: entry 85% = the row reaches its sticky spot;
+   contain 0% = the next row starts to enter; exit 55% = the next row has arrived on top. */
+.helionenergy-pillars-list {
+  timeline-scope: var(--hp-scope);
+}
+.helionenergy-pillars-sensor {
+  view-timeline-name: var(--hp-name);
+  view-timeline-axis: block;
+}
+
+@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* the covered picture shrinks to 92% and lifts 40px */
+    .helionenergy-pillars-media {
+      animation-name: var(--hp-media-anim);
+      animation-timeline: var(--hp-tl);
+      animation-range: contain 0% exit 55%;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+    }
+    /* words fade up 20px as their row arrives, and fade out as the next one comes */
+    .helionenergy-pillars-text {
+      animation-name: var(--hp-text-anim);
+      animation-timeline: var(--hp-tl);
+      animation-range: var(--hp-text-range);
+      animation-fill-mode: var(--hp-text-fill);
+      animation-timing-function: linear;
+    }
+  }
+}
+
+@keyframes helionenergy-pillars-shrink {
+  to {
+    transform: translateY(-40px) scale(0.92);
+  }
+}
+
+@keyframes helionenergy-pillars-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@keyframes helionenergy-pillars-out {
+  to {
+    opacity: 0;
+  }
+}
