@@ -28,18 +28,18 @@ export function K2spaceFooter({ brand, columns, copyright, className }: K2spaceF
   return (
     <footer
       className={cn(
-        "bg-background px-gutter pt-[45px] pb-6 font-sans font-medium text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[2.6vw] lg:pb-[4vw]",
+        "bg-background px-gutter pt-[45px] pb-6 font-sans font-[560] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[2.6vw] lg:pb-[4vw]",
         className,
       )}
     >
       <div className="lg:grid lg:grid-cols-[47.15vw_17.25vw_17.25vw_1fr]">
-        <K2spaceWordmark {...brand} className={cn("text-[15px] lg:text-[1.58vw]", brand.className)} />
+        <K2spaceWordmark {...brand} className={cn("self-start text-[15px] lg:text-[1.58vw]", brand.className)} />
         <div className="mt-[50px] grid grid-cols-[56%_1fr] gap-y-10 lg:contents">
           {columns.map((column, c) => (
             <div
               key={c}
               className={cn(
-                "flex flex-col gap-[1.2em] text-base/[1.2] lg:text-[max(1rem,1.3227vw)]/[1.2]",
+                "flex min-w-0 flex-col gap-[1.2em] text-base/[1.2] [overflow-wrap:anywhere] lg:text-[max(1rem,1.3227vw)]/[1.2]",
                 // phones: a column of several groups spreads them across both grid columns
                 column.groups.length > 1 && "max-lg:col-span-2 max-lg:grid max-lg:grid-cols-[56%_1fr] max-lg:gap-0",
               )}

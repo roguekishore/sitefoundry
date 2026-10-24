@@ -52,7 +52,7 @@ export function K2spaceShowcase({ title, media, markers = [], className }: K2spa
             <span aria-hidden className="absolute top-1/2 left-1/2 size-1.5 -translate-1/2 bg-foreground lg:size-[0.45vw]" />
             <span
               aria-hidden
-              className="pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 bg-primary px-3 py-2 text-sm/none font-medium whitespace-nowrap text-primary-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none lg:text-[max(0.875rem,0.93vw)]/none"
+              className="pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 bg-primary px-3 py-2 text-sm/none font-[560] whitespace-nowrap text-primary-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none lg:text-[max(0.875rem,0.93vw)]/none"
             >
               {marker.label}
             </span>

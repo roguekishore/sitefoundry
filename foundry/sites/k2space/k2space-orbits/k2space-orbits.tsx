@@ -105,7 +105,7 @@ export function K2spaceOrbits({ title, orbits, media, className }: K2spaceOrbits
                   aria-selected={k === active}
                   onClick={() => choose(k)}
                   className={cn(
-                    "h-14 rounded-sm text-base/none font-medium transition-colors duration-200 ease-[ease] motion-reduce:transition-none lg:h-[3.9vw] lg:w-[8vw] lg:text-[max(1rem,1.3227vw)]/none",
+                    "h-14 rounded-sm text-base/none font-[560] transition-colors duration-200 ease-[ease] motion-reduce:transition-none lg:h-[3.9vw] lg:w-[8vw] lg:text-[max(1rem,1.3227vw)]/none",
                     k === active ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground",
                   )}
                 >
@@ -120,7 +120,7 @@ export function K2spaceOrbits({ title, orbits, media, className }: K2spaceOrbits
                   role="tabpanel"
                   aria-hidden={k !== active}
                   className={cn(
-                    "col-start-1 row-start-1 text-base/none font-medium transition-opacity duration-300 ease-[ease] motion-reduce:transition-none lg:text-[max(1rem,1.3227vw)]/none",
+                    "col-start-1 row-start-1 text-base/none font-[560] transition-opacity duration-300 ease-[ease] motion-reduce:transition-none lg:text-[max(1rem,1.3227vw)]/none",
                     k === active ? "opacity-100" : "opacity-0",
                   )}
                 >

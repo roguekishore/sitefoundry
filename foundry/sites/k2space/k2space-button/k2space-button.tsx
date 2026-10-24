@@ -24,7 +24,7 @@ export interface K2spaceButtonProps {
 export function K2spaceButton({ children, href, variant = "solid", direction = "right", ariaLabel, onClick, disabled, className }: K2spaceButtonProps) {
   const Icon = direction === "left" ? ArrowLeft : ArrowRight;
   const classes = cn(
-    "inline-flex items-center justify-center font-sans font-medium transition-colors duration-200 ease-[ease] motion-reduce:transition-none",
+    "inline-flex items-center justify-center font-sans font-[560] transition-colors duration-200 ease-[ease] motion-reduce:transition-none",
     variant === "solid" &&
       "h-[50px] gap-1.5 bg-primary px-7 text-base/none text-primary-foreground hover:bg-accent lg:h-[4.24vw] lg:px-[2.64vw] lg:text-[max(1rem,1.3227vw)]/none",
     variant === "arrow" &&

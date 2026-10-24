@@ -100,3 +100,22 @@ real line boxes; ours reveals by line position, which looks the same.
   the scroll frames stop at the list), so its desktop layout is **inferred** from the 390 layout,
   the motion list (planet zoom, tabs fade) and the section height.
 - `--page-gutter` is `max(1.25rem, 2.43vw)`: 20px on phones, 35px at 1440 like the original.
+
+## Comparison round 1
+
+Heights all within ~5% (390: hero 844/844, slider 795/797, showcase 1152/1104, orbits 943/933,
+quote 675/675, news 481/481, closer+footer 1587/1595; 1440: slider 690/689, showcase 1095/1090,
+orbits 3668/3700, quote 900/900, news 718/716). Window-sized: hero 100svh both widths, quote
+80svh/100svh, as the original. Motion list: header leave 0→−59px, line reveals 24/37px, media
+scale 1.15→1 + blur, list rise 15px, planet translateY 410→−41px with scale 3→1, tabs fade,
+pinned stage: all present, same kinds and directions.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all | body type read lighter than Telegraf (only its 600 face loads, so every word is that weight) | same | — | yes: font-medium → 560 everywhere |
+| header | wordmark too thin next to the original's line logo | clock had a gap before "/ name" (min-width) | — | yes: wordmark 400 weight, clock width removed |
+| list | rows had a 224px min height; the original sizes rows by content (3-line row is shorter) | rows 229px min; original 229/229/211 | — | yes: content-sized rows (pb 64px / 8.8vw), link row 58px |
+| footer | — | wordmark centred in the row instead of top-aligned; address wrapped to 3 lines | — | yes: self-start, shorter address |
+| footer | — | page overflowed 15px at 1024 (last column's e-mail) | — | yes: min-w-0 + overflow-wrap, shorter e-mails |
+| orbits | original's planet sits in thin elliptical orbit lines; ours a single ring with 4 ticks | desktop layout inferred | — | no: the orbit lines are illustration, kept as HUD ring |
+| media | placeholders instead of footage | same | — | by design |
