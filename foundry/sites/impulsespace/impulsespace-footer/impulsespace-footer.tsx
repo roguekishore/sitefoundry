@@ -39,7 +39,7 @@ export interface ImpulsespaceFooterProps {
 export function ImpulsespaceFooter({ title, lede, emailLabel, submitLabel, action, columns, legal, copyright, wordmark, className }: ImpulsespaceFooterProps) {
   return (
     <footer className={cn("overflow-clip bg-secondary px-gutter pt-section pb-8 text-secondary-foreground", className)}>
-      <div className="grid gap-16 lg:grid-cols-12 lg:gap-2.5">
+      <div className="grid gap-20 lg:grid-cols-12 lg:gap-2.5">
         <div className="lg:col-span-5">
           <h2 className="font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em]">{title}</h2>
           {lede && <p className="mt-4 max-w-[26rem] text-base leading-[1.4] text-muted-foreground">{lede}</p>}
@@ -50,12 +50,12 @@ export function ImpulsespaceFooter({ title, lede, emailLabel, submitLabel, actio
               required
               aria-label={emailLabel}
               placeholder={emailLabel}
-              className="h-11 min-w-0 flex-1 rounded-full border border-input bg-background px-5 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="h-11 w-full min-w-0 rounded-full sm:flex-1 border border-input bg-background px-5 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring"
             />
             <ImpulsespaceButton type="submit">{submitLabel}</ImpulsespaceButton>
           </form>
         </div>
-        <div className="grid grid-cols-2 gap-x-2.5 gap-y-12 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
+        <div className="grid grid-cols-2 gap-x-2.5 gap-y-16 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
           {columns.map((col) => (
             <div key={col.title}>
               <p className="font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase">{col.title}</p>
@@ -73,7 +73,7 @@ export function ImpulsespaceFooter({ title, lede, emailLabel, submitLabel, actio
         </div>
       </div>
 
-      <div className="mt-24 flex flex-col gap-6 lg:mt-36 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mt-32 flex flex-col gap-6 lg:mt-24 lg:flex-row lg:items-center lg:justify-between">
         <ul className="flex flex-wrap gap-x-6 gap-y-3">
           {legal.map((link) => (
             <li key={link.href}>
@@ -85,7 +85,7 @@ export function ImpulsespaceFooter({ title, lede, emailLabel, submitLabel, actio
       </div>
 
       {wordmark && (
-        <p aria-hidden className="mt-10 font-display text-[23.5vw] leading-[0.8] font-semibold tracking-[-0.05em] whitespace-nowrap uppercase lg:text-[21vw]">
+        <p aria-hidden className="mt-16 font-display text-[21vw] leading-[0.8] font-semibold tracking-[-0.05em] whitespace-nowrap uppercase lg:mt-10 lg:text-[24vw]">
           {wordmark}
         </p>
       )}

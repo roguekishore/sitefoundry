@@ -7,8 +7,8 @@ export const headerSample: ImpulsespaceHeaderProps = {
   links: [
     { label: "Corvus", href: "#corvus" },
     { label: "Lumen", href: "#lumen" },
-    { label: "Shuttle Share", href: "#shuttle" },
-    { label: "Proving Ground", href: "#ground" },
+    { label: "Share", href: "#shuttle" },
+    { label: "Range", href: "#range" },
     { label: "Jobs", href: "#jobs" },
     { label: "Method", href: "#method" },
   ],

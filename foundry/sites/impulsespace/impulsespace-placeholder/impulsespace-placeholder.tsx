@@ -6,7 +6,7 @@ export interface ImpulsespacePlaceholderProps {
   media?: ReactNode;
   /** what the slot will show, for screen readers (only used while it is empty) */
   label?: string;
-  /** scene: a photo / video frame (muted, faint glow at the foot) · render: a product cut-out (a soft glow square, no frame) */
+  /** scene: a photo / video frame (muted, faint glow at the foot) · render: a product cut-out (a faint flat square, no frame) */
   kind?: "scene" | "render";
   className?: string;
 }
@@ -22,7 +22,7 @@ export function ImpulsespacePlaceholder({ media, label, kind = "scene", classNam
         !media && kind === "scene" &&
           "bg-muted bg-[radial-gradient(120%_70%_at_50%_110%,color-mix(in_oklab,var(--glow)_26%,transparent),transparent_70%)]",
         !media && kind === "render" &&
-          "rounded-lg bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--foreground)_14%,transparent),color-mix(in_oklab,var(--foreground)_5%,transparent)_70%,transparent)]",
+          "rounded-lg bg-foreground/[0.045]",
         "[&>img]:absolute [&>img]:inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:absolute [&>video]:inset-0 [&>video]:size-full [&>video]:object-cover",
         className,
       )}

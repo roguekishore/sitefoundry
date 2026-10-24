@@ -30,12 +30,12 @@ export function ImpulsespaceVehicles({ title, vehicles, id, className }: Impulse
   return (
     <section id={id} className={cn("bg-background px-gutter py-section text-foreground", className)}>
       <h2 className="font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em]">{title}</h2>
-      <ul className="mt-12 grid gap-2.5 lg:grid-cols-3">
+      <ul className="mt-12 grid gap-8 lg:mt-20 lg:grid-cols-3">
         {vehicles.map((v) => (
           <li key={v.name}>
             <a
               href={v.href}
-              className="group relative isolate flex aspect-[0.68] flex-col overflow-clip rounded-lg bg-card text-card-foreground lg:aspect-[0.78]"
+              className="group relative isolate flex aspect-[0.66] flex-col overflow-clip rounded-lg bg-card text-card-foreground lg:aspect-[0.8]"
             >
               {/* the glow that wells up on hover (the original's canvas light) */}
               <span

@@ -51,7 +51,7 @@ export function ImpulsespaceMissions({ title, lede, cta, media, mediaLabel, miss
         )}
       </div>
 
-      <div className="impulsespace-missions-frame relative isolate mt-12 grid h-[calc(100svh-2.375rem)] min-h-[34rem] overflow-clip">
+      <div className="impulsespace-missions-frame relative isolate mt-12 grid h-svh min-h-[34rem] lg:h-[calc(100svh-2.375rem)] overflow-clip">
         <div className="impulsespace-missions-zoom absolute inset-0 z-0">
           <ImpulsespacePlaceholder media={media} label={mediaLabel} className="size-full" />
         </div>
@@ -67,7 +67,7 @@ export function ImpulsespaceMissions({ title, lede, cta, media, mediaLabel, miss
                   {m.media}
                 </div>
               )}
-              <a href={m.href} className="relative z-[3] flex items-baseline gap-4 py-0.5 lg:gap-6">
+              <a href={m.href} className="relative z-[3] flex flex-wrap items-baseline gap-x-4 py-0.5 lg:gap-x-6">
                 <span
                   className={cn(
                     "font-display text-[1.375rem] leading-[1.3] font-semibold tracking-[-0.01em] lg:text-[2.5rem] lg:leading-[1.2] lg:tracking-[-0.02em]",
@@ -78,7 +78,7 @@ export function ImpulsespaceMissions({ title, lede, cta, media, mediaLabel, miss
                 >
                   {m.name}
                 </span>
-                <span className="font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase transition-colors duration-250 group-hover:text-foreground">
+                <span className="font-mono text-sm leading-[1.5] tracking-[0.08em] whitespace-nowrap text-muted-foreground uppercase transition-colors duration-250 group-hover:text-foreground">
                   {m.detail}
                 </span>
               </a>
