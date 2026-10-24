@@ -34,8 +34,8 @@ export function ZoeStories({ eyebrow, title, stories, labels, className }: ZoeSt
         prevLabel={labels.prev}
         nextLabel={labels.next}
         slideClassName="w-[17.25rem]"
-        trackClassName="px-8 scroll-px-8 lg:justify-center"
-        controlsClassName="mt-12 lg:hidden"
+        trackClassName="px-8 scroll-px-8 xl:justify-center"
+        controlsClassName="mt-12 xl:hidden"
         slides={stories.map((s) => (
           <figure key={s.name} className="flex h-[21.5rem] flex-col rounded-lg bg-muted p-6 text-foreground">
             {/* foundry-allow-text: a decorative opening quote mark */}

@@ -38,7 +38,7 @@ export interface ZoeExploreProps {
 /** Zoe's plum explore band with the newsletter sign-up. */
 export function ZoeExplore({ eyebrow, newsletter, cards, className }: ZoeExploreProps) {
   return (
-    <section className={cn("bg-secondary pt-24 pb-24 text-secondary-foreground lg:pt-[8.5rem] lg:pb-[4.75rem]", className)}>
+    <section className={cn("bg-secondary pt-24 pb-8 text-secondary-foreground xl:pt-[8.5rem] xl:pb-[4.75rem]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <p className="text-sm font-medium uppercase">{eyebrow}</p>
         <div className="mt-8 hidden border-t border-secondary-foreground/25 xl:block" />

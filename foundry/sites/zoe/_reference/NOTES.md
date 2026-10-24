@@ -126,3 +126,22 @@ documentary photo) show blank there; checked on the scroll frames instead, where
 | explore | matches | cards unequal heights (3-line text) | — | yes: equal heights |
 | footer | 1076 vs 901: gaps between groups too big | matches | — | yes: gaps 48/40 |
 | overflow | 360 / 768 fit | **1024 overflowed** (explore 27rem column + 3 cards, footer fixed columns) | — | yes: explore side-by-side from xl, footer fluid columns at lg |
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| spotlight | now 678 vs 676 | matches | — | — |
+| podcast | composite edge to edge, 2-line heading: matches | matches; at 1024 the 200px text inset squeezed the heading | — | yes: the inset only from xl |
+| explore + footer | 1873 vs 1746 together: 96px too much under the newsletter note, group gaps a little loose | matches; cards equal height (checked live: the crop had stale CSS) | — | yes: pb-8 on phones, group gap 40 |
+| stories | matches | at 1024 the centred row overflowed and the first card couldn't be reached | slider | yes: centred row and hidden controls only from xl |
+| dark mode | the ink placeholder's gradient ran through cream | — | — | yes: dark via-card |
+| overflow | 360 / 768 / 1024 fit | — | — | — |
+| motion | pinned header (sticky, 26 half-screens), placeholders fade on entering view in bento and documentary: same kinds and ranges as the original's list | same (19 half-screens; 4050–4500 and 4950–5400px) | — | — |
+
+Re-theme check: `zoe-products` under sample-ember (light), `zoe-stories` under sample-ember
+(dark) and `zoe-bento` under sample-midnight all read correctly with their tokens and faces.
+
+Left as is: Figtree is a touch narrower and lighter than Lota at the same size; our copy runs
+shorter than the original's in a few places (statement, research), so those sections are
+30–90px shorter; the research slider doesn't autoplay.

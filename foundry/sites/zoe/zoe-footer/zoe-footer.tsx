@@ -70,7 +70,7 @@ export function ZoeFooter({ followLabel, socials, groups, copyright, region, cla
     <footer className={cn("bg-secondary pb-24 text-secondary-foreground lg:pb-36", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <div className="border-t border-secondary-foreground/25 pt-24 lg:pt-12">
-          <div className="flex flex-col gap-12 lg:grid lg:grid-cols-[1.6fr_1fr_1.3fr_1fr] lg:gap-6 xl:grid-cols-[27rem_13.5rem_20.25rem_1fr] xl:gap-0">
+          <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[1.6fr_1fr_1.3fr_1fr] lg:gap-6 xl:grid-cols-[27rem_13.5rem_20.25rem_1fr] xl:gap-0">
             <div>
               <p className="-mt-1 text-lg font-light">{followLabel}</p>
               <ul className="mt-3 flex gap-3">
