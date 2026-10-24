@@ -118,3 +118,22 @@ original (its frames are taken mid-glide), so vertical offsets under that were i
 | footer | ok | 655 vs 728: socials row 70px too high; wordmark strokes lighter than the original's | link hovers | yes: row `lg:mt-[12.4rem]`, wordmark semibold |
 | placeholders | the light frames' magenta wash read pink | same | — | yes: wash 20% → 12% |
 | hero, header, machines | ok | ok (header pill wider only because our link names are longer) | header mark fades by 300px | — |
+
+## Comparison round 2
+
+All sections now match by height and rule: hero 100%, steps 450%, **pillars 310% (original 311%,
+desktop)**, careers 100%; footer 726 vs 728, news 1310 vs 1303 at 1440. 360/768/1024 fit.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| pillars | ok | right height (2793 vs 2796) but not window-sized: rem spacing | stack, shrink, fades unchanged | yes: spacing in svh (pt `calc(114.4svh-16.875rem)`, rows 76.67svh apart, pb 31.9svh), so it scales like the original (2119px at a 675px window vs 2121) |
+| careers | closer; still greyer than the original's cyan-white cones | same | ok | yes: bigger, stronger ellipses (92/78%) and a lighter dark `glow` #bcd9df |
+| footer | ok | row and wordmark now in place | ok | — |
+| everything else | matches at a glance (copy and placeholders aside) | same | Motion lists agree: pinned stage, cross-fades with blur, drift, rise, clip, sticky stack, scale-down, darkening, zooms, sweeps | — |
+
+Re-theme check: `helionenergy-news` and `helionenergy-machines` under sample-ember pick up its
+serif headings, warm palette, radii and dark band cleanly. Dark mode of the whole page reads as
+one near-black page with the navy stage gradient.
+
+Left as is: the careers spotlights are soft radial glows, not the original's two hard-edged
+beams (that's the WebGL canvas showing through, i.e. media); the hero/stage art is a placeholder.
