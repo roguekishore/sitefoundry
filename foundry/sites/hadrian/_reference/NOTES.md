@@ -60,7 +60,7 @@ Encode Sans Expanded (wordmark, marquee, footer company name only).
 | hero words | scrubbed with scroll | opacity 1 → 0, translateY 0 → 15px (390) / 36px (1440) | scroll 47svh → 97svh (390) / 147svh (1440) | CSS `animation-timeline: scroll(root)` with ranges set per breakpoint |
 | hero | pinned | hero stays fixed behind the page for its whole length | – | `position: sticky; top: 0` on the hero; later blocks are `relative bg-background` and slide over |
 | hero buttons | hover | faint white wash | 150ms | `hover:bg-foreground/5` |
-| platform box | entering view (inferred) | opacity 0 → 1, rise 32px | entry 0% → entry 60% | CSS `view()` |
+| platform box | entering view (inferred) | opacity 0 → 1, rise 32px | entry 0px → entry 360px | CSS `view()` |
 | careers marquee | loop | translateX 0 → −50% | ~28s linear infinite | CSS `@keyframes` |
 | careers button | hover | gold dims slightly | 150ms | `hover:bg-primary/85` |
 | page | smooth scrolling | Lenis seen | – | `hadrian-smooth-scroll` component (Lenis), `hydrate: load` |
