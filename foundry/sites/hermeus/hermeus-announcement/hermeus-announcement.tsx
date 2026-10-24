@@ -33,7 +33,7 @@ export function HermeusAnnouncement({ tag, text, href, closeLabel, className }: 
       </span>
       <a
         href={href}
-        className="flex min-w-0 items-center gap-1.5 transition-colors duration-200 ease-in-out hover:text-primary motion-reduce:transition-none lg:absolute lg:left-1/2 lg:-translate-x-1/2"
+        className="flex min-w-0 items-center gap-1.5 transition-colors duration-200 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none lg:absolute lg:left-1/2 lg:-translate-x-1/2"
       >
         <span className="truncate">{text}</span>
         <ArrowRight aria-hidden strokeWidth={1.5} className="size-[1.1em] shrink-0" />
@@ -42,7 +42,7 @@ export function HermeusAnnouncement({ tag, text, href, closeLabel, className }: 
         type="button"
         aria-label={closeLabel}
         onClick={() => setOpen(false)}
-        className="ml-auto grid size-6 shrink-0 cursor-pointer place-items-center transition-colors duration-200 ease-in-out hover:text-primary motion-reduce:transition-none"
+        className="ml-auto grid size-6 shrink-0 cursor-pointer place-items-center transition-colors duration-200 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none"
       >
         <X aria-hidden strokeWidth={1.25} className="size-3.5" />
       </button>

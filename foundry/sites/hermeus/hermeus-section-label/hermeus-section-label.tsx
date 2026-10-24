@@ -19,7 +19,7 @@ export function HermeusSectionLabel({ index, label, action, as: Name = "h2", cla
   return (
     <div
       className={cn(
-        "hermeus-section-label relative flex items-end justify-between gap-6 pb-[clamp(0.5rem,0.4rem+0.4vw,0.75rem)]",
+        "hermeus-section-label relative flex items-end justify-between gap-6 pb-2",
         className,
       )}
     >
@@ -27,7 +27,7 @@ export function HermeusSectionLabel({ index, label, action, as: Name = "h2", cla
         <p className="hermeus-section-label-index text-[clamp(0.58rem,0.519rem+0.257vw,0.75rem)]/none tracking-[0.06em]">
           {index}
         </p>
-        <Name className="mt-[clamp(0.6rem,0.5rem+0.4vw,0.9rem)] overflow-clip text-[clamp(0.92rem,0.704rem+0.884vw,1.5rem)]/[1.15] font-normal">
+        <Name className="mt-[clamp(0.5rem,0.4rem+0.45vw,0.8rem)] -mb-[0.2em] overflow-clip pb-[0.2em] text-[clamp(0.92rem,0.704rem+0.884vw,1.5rem)]/none font-normal">
           <span className="hermeus-section-label-name block">{label}</span>
         </Name>
       </div>

@@ -20,7 +20,7 @@ export function HermeusButton({ label, href, tone = "card", className }: Hermeus
       className={cn(
         "relative inline-flex h-[clamp(2.125rem,1.893rem+0.952vw,2.75rem)] items-center justify-center px-[clamp(1.75rem,1.5625rem+0.762vw,2.25rem)]",
         "text-[clamp(0.68rem,0.606rem+0.299vw,0.875rem)]/none tracking-[-0.03em] uppercase",
-        "transition-colors duration-250 ease-in-out hover:bg-primary hover:text-primary-foreground motion-reduce:transition-none",
+        "transition-colors duration-250 ease-[ease-in-out] hover:bg-primary hover:text-primary-foreground motion-reduce:transition-none",
         tone === "card" ? "bg-card text-card-foreground" : "bg-secondary text-secondary-foreground",
         className,
       )}
