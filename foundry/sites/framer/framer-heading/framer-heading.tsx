@@ -12,8 +12,8 @@ export interface FramerHeadingProps {
 }
 
 const sizes = {
-  title: "text-4xl leading-[1.02] tracking-[-0.04em] lg:text-[3.375rem]",
-  section: "text-[1.75rem] leading-[1.1] tracking-[-0.04em] lg:text-[2.75rem]",
+  title: "text-4xl leading-[1.02] tracking-[-0.025em] lg:text-[3.375rem]",
+  section: "text-[1.75rem] leading-[1.1] tracking-[-0.025em] lg:text-[2.75rem]",
 };
 
 /** Splits on "\n" and breaks there only from lg up, so phone lines wrap naturally. */
@@ -38,7 +38,7 @@ export function DesktopLines({ text }: { text: string }) {
 /** The site's tight geometric heading. */
 export function FramerHeading({ children, as: Tag = "h2", size = "section", className }: FramerHeadingProps) {
   return (
-    <Tag className={cn("font-display font-medium text-balance text-foreground", sizes[size], className)}>
+    <Tag className={cn("font-display font-[450] text-balance text-foreground", sizes[size], className)}>
       <DesktopLines text={children} />
     </Tag>
   );
@@ -53,11 +53,13 @@ export interface FramerSectionHeadProps {
   actions?: ReactNode;
   /** keep the actions beside the title on phones too (the showcase head does this) */
   actionsInline?: boolean;
+  /** extra classes for the subtitle (e.g. its measure) */
+  subtitleClassName?: string;
   className?: string;
 }
 
 /** Heading on the left, small actions pinned to its bottom right. */
-export function FramerSectionHead({ title, subtitle, actions, actionsInline, className }: FramerSectionHeadProps) {
+export function FramerSectionHead({ title, subtitle, actions, actionsInline, subtitleClassName, className }: FramerSectionHeadProps) {
   return (
     <div
       className={cn(
@@ -69,7 +71,12 @@ export function FramerSectionHead({ title, subtitle, actions, actionsInline, cla
       <div>
         <FramerHeading>{title}</FramerHeading>
         {subtitle && (
-          <p className="mt-3 max-w-[26rem] text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground lg:mt-4">
+          <p
+            className={cn(
+              "mt-3 max-w-[26rem] text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground lg:mt-4",
+              subtitleClassName,
+            )}
+          >
             {subtitle}
           </p>
         )}

@@ -86,7 +86,7 @@ export function FramerCta({
 }: FramerCtaProps) {
   const typed = useTypedPrompt(prompts);
   return (
-    <section className={cn("bg-background px-gutter pt-20 pb-12 text-foreground lg:pt-30 lg:pb-38", className)}>
+    <section className={cn("bg-background px-gutter pt-24 pb-14 text-foreground lg:pt-30 lg:pb-38", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center text-center">
         <FramerHeading size="title">{title}</FramerHeading>
 

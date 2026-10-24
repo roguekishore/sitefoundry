@@ -27,7 +27,7 @@ export default function Page() {
       <FramerHeader {...headerSample} />
       <FramerHero {...heroSample} />
       {/* the logos sit closer to the agents head than sections sit to each other */}
-      <FramerLogos {...logosSample} className="pt-15 pb-5 lg:pt-[6.25rem] lg:pb-0" />
+      <FramerLogos {...logosSample} className="pt-15 pb-5 lg:pt-[6.25rem] lg:pb-8" />
       <FramerAgents {...agentsSample} />
       <FramerPlatform {...platformSample} />
       <FramerShowcase {...showcaseSample} />

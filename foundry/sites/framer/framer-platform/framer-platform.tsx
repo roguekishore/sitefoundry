@@ -11,6 +11,8 @@ export interface FramerPlatformCell {
   href: string;
   /** tall: 1 column × 2 rows · wide: 2 columns × 2 rows · small: 1 × 1 */
   size: "tall" | "wide" | "small";
+  /** small cells only: 240px tall on phones instead of 320px */
+  compact?: boolean;
   /** how the media sits: inset (margins all round) · bleed (runs off the right edge) · full (fills the cell) */
   fit?: "inset" | "bleed" | "full";
   /** the cell's UI shot or art; empty shows a placeholder */
@@ -46,13 +48,13 @@ export function FramerPlatform({ title, subtitle, cells, className }: FramerPlat
   return (
     <section className={cn("bg-background px-gutter py-15 text-foreground lg:py-section", className)}>
       <div className="mx-auto max-w-page">
-        <FramerSectionHead title={title} subtitle={subtitle} />
+        <FramerSectionHead title={title} subtitle={subtitle} subtitleClassName="max-w-[12.5rem] sm:max-w-[26rem]" />
 
         <div className="mt-10 grid grid-cols-1 gap-px overflow-clip rounded-[calc(var(--radius)*2.5)] border border-border bg-border lg:mt-10 lg:auto-rows-[15rem] lg:grid-cols-3">
           {cells.map((cell) => {
             const fit = fits[cell.fit ?? "inset"];
             return (
-              <div key={cell.label} className={cn("relative flex items-end overflow-clip bg-background p-6", sizes[cell.size])}>
+              <div key={cell.label} className={cn("relative flex items-end overflow-clip bg-background p-6", sizes[cell.size], cell.compact && "h-60")}>
                 <div className={cn("absolute", fit.box)}>
                   {cell.media ?? (
                     <FramerPlaceholder

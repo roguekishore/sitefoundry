@@ -44,7 +44,7 @@ export function FramerHero({ title, subtitle, primary, secondary, news, media, m
           {subtitle}
         </p>
 
-        <div className="mt-5 flex flex-col items-start gap-8 lg:mt-7 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mt-5 flex flex-col items-start gap-8 lg:mt-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap gap-2.5">
             <FramerButton href={primary.href} icon={primary.icon}>
               {primary.label}

@@ -97,3 +97,22 @@ UI shots do (`fade: right / bottom`). Nothing is drawn inside.
   the same props (`action`, `prompts`, `chips`, `secondary`).
 - **Logos**: customer marks become plain-text fictional names set in the display face.
 - Section padding: `--section-y` is the desktop 7.5rem; phones use a fixed 3.75rem in blocks.
+
+## Comparison round 1
+
+Positions measured from `ours-design.md` sections and the scroll frames (frame NN sits at
+scrollY = NN × window height).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all headings | Outfit 500 at −0.04em read heavier and tighter than GT Walsheim Medium | same | — | yes: weight 450, tracking −0.025em |
+| hero | matches (title 4 lines, buttons, link below, full-bleed video between hairlines) | buttons 6px low | — | yes: mt-6 |
+| logos | ticker in place | grid right size; the band ended 30px early (agents head at 1435 vs 1465) | phone ticker ✓ | yes: lg:pb-8 |
+| agents | matches | closing card copy wrapped to 4 lines (original 3) → section 44px tall | reveal 0.2→1 / −20px ✓, aside pinned ✓ | yes: wider measure on the closing card |
+| platform | subtitle runs full width (original holds a narrow ~180px measure, 5 lines); Hosting/Security cells are 240px on phones, not 320 | subtitle wrapped to 3 lines (2 on original) | — | yes: narrow phone measure, `compact` small cells, shorter sample copy |
+| showcase | matches | title broke onto 2 lines (1 on original), +48px | drift ✓ (rows opposite ways) | yes: one-line sample title |
+| stories | matches | 26px taller than measured | ticker ✓ | no: within a line of the heading's leading |
+| community | matches (350×253 window) | window was 540 tall; the original's is 840 (misread first time) | — | yes: lg:h-[52.5rem] |
+| CTA | 37px short; glow rim far dimmer than the original's bright blue bloom | matches (prompt box, chips, link) | typing ✓ (JS) | yes: pt-24 pb-14, stronger glow tone |
+| footer | groups flow into 2 balanced columns (original regroups them differently) | matches (6 columns, 27px rows, bottom row) | hover ✓ | no: grouping is content order |
+| overflow | fits at 360/768/1024 | — | — | ✓ |

@@ -17,7 +17,7 @@ export interface FramerPlaceholderProps {
 const tones = {
   well: "bg-muted",
   panel: "bg-card",
-  glow: "bg-card ring-1 ring-glow/70 shadow-[0_0_2.5rem_0.25rem_color-mix(in_oklab,var(--glow)_45%,transparent),inset_0_0_1.5rem_color-mix(in_oklab,var(--glow)_25%,transparent)]",
+  glow: "bg-card ring-2 ring-glow shadow-[0_0_3rem_0.5rem_color-mix(in_oklab,var(--glow)_70%,transparent),inset_0_0_2rem_color-mix(in_oklab,var(--glow)_35%,transparent)]",
 };
 
 const fades = {
