@@ -1,0 +1,72 @@
+/* Load: each heading word fades in, ~80ms after the one before; the line beside it follows.
+   Scroll: once the page has moved ~half a screen, the words fade out and sink (15px on
+   phones, 36px on desktop), done one screen (phones) or 1.5 screens (desktop) later. The
+   outer spans carry the scroll animation and the inner ones the load-in, so the two never
+   fight over opacity. */
+.hadrian-hero-word {
+  animation: hadrian-hero-in 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: calc(var(--hadrian-i, 0) * 80ms + 150ms);
+}
+.hadrian-hero-lede {
+  animation: hadrian-hero-in 300ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: var(--hadrian-delay, 600ms);
+}
+
+@keyframes hadrian-hero-in {
+  from { opacity: 0; }
+}
+
+@supports (animation-timeline: scroll()) {
+  .hadrian-hero-sink,
+  .hadrian-hero-fade {
+    animation: hadrian-hero-sink linear both;
+    animation-timeline: scroll(root);
+    animation-range: 47svh 97svh;
+    --hadrian-sink: 15px;
+  }
+  @media (min-width: 64rem) {
+    .hadrian-hero-sink {
+      animation-range: 47svh 147svh;
+      --hadrian-sink: 36px;
+    }
+    /* on desktop the side line goes almost at once, as the bar slides away */
+    .hadrian-hero-fade {
+      animation-range: 40svh 47svh;
+    }
+  }
+}
+
+@keyframes hadrian-hero-sink {
+  to { opacity: 0; transform: translateY(var(--hadrian-sink, 0)); }
+}
+
+/* The frame: rounded top, both bottom corners cut at an angle. Outer box = the hairline
+   colour, inner box (1px in) = the media, both clipped to the same shape. */
+.hadrian-hero-frame,
+.hadrian-hero-frame > .hadrian-hero-media {
+  --hadrian-cut-y: 5.5rem;
+  --hadrian-cut-x: 1.5625rem;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--hadrian-cut-y)),
+    calc(100% - var(--hadrian-cut-x)) 100%,
+    var(--hadrian-cut-x) 100%,
+    0 calc(100% - var(--hadrian-cut-y))
+  );
+}
+@media (min-width: 64rem) {
+  .hadrian-hero-frame,
+  .hadrian-hero-frame > .hadrian-hero-media {
+    --hadrian-cut-x: 5.9375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hadrian-hero-word,
+  .hadrian-hero-lede,
+  .hadrian-hero-sink,
+  .hadrian-hero-fade {
+    animation: none;
+  }
+}
