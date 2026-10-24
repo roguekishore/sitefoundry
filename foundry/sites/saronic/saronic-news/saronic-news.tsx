@@ -14,15 +14,17 @@ export interface SaronicNewsProps {
   cta?: { label: ReactNode; href: string; icon?: SaronicButtonProps["icon"]; external?: boolean };
   /** the story's photo; empty it is a placeholder */
   media?: ReactNode;
+  /** the photo's shape on phones, under the text: 4:3 or a wide 16:9 */
+  mobileAspect?: "4/3" | "16/9";
   className?: string;
 }
 
 /**
  * A news card on a slate band: a hairline-framed half with a mono caption and a lime dot at
  * the top and the headline, a short paragraph and a lime button at the bottom, beside a photo
- * the same height. Phones stack the text over a 4:3 photo.
+ * the same height. Phones stack the text over a 4:3 (or 16:9) photo.
  */
-export function SaronicNews({ eyebrow, title, body, cta, media, className }: SaronicNewsProps) {
+export function SaronicNews({ eyebrow, title, body, cta, media, mobileAspect = "4/3", className }: SaronicNewsProps) {
   return (
     <section className={cn("dark bg-background p-5 text-foreground lg:p-10", className)}>
       <article className="grid lg:grid-cols-2">
@@ -43,7 +45,10 @@ export function SaronicNews({ eyebrow, title, body, cta, media, className }: Sar
         </div>
         <SaronicPlaceholder
           media={media}
-          className="aspect-[4/3] rounded-b-lg lg:aspect-[680/620] lg:rounded-r-lg lg:rounded-bl-none"
+          className={cn(
+            mobileAspect === "16/9" ? "aspect-video" : "aspect-[4/3]",
+            "rounded-b-lg lg:aspect-[680/620] lg:rounded-r-lg lg:rounded-bl-none",
+          )}
         />
       </article>
     </section>

@@ -142,3 +142,25 @@ and display word spacing now track the original's line lengths. Remaining differ
 | news (rescue) | body 3 lines vs 2 → 676 vs 661 | ✓ | — | yes: shorter body copy |
 | footer | ✓ | links started 6px low | ✓ | yes: lg:mt-[4.625rem] |
 | header | solid pale bar + centre hairline after the hero ✓ | same; wordmark appears at 900 ✓ | ✓ | — |
+
+## Comparison round 3 (verification)
+
+Section heights, ours vs original. At 390: hero 796 (below the 48px bar, ends at the window
+bottom) · 654/661 · 1294/1294 · 655/662 · 683/683 · 719/719 · 520/520 · 540/536 · 1320/1325.
+At 1440: 836 (below the 64px bar) · 700/700 · 1651/1647 · 700/700 · 1332/1328 · 1368/1364 ·
+960/960 · 960/960 · 805/803. No horizontal overflow at 360/768/1024. Motion list matches the
+inventory: sticky header plus the solid switch at the hero's end, hero pin and dim
+(translateY 0→836, opacity →.2, 450–900), wordmark and copy fade, the load rise
+(1s/1.1s/1.2s), the label rolls, the 1.02 hover grow on buttons, and the card shadow and zoom.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| news (contract) | its picture is 16:9 on phones (350×197), ours was 4:3 → 721 vs 662 | ✓ | — | yes: `mobileAspect` prop, the demo uses 16:9 |
+
+Still different, on purpose: the hero lockup is a text-only wordmark (no logo mark), so it spans
+the full width. Host Grotesk is a little rounder than Suisse. Media are placeholders.
+
+**Re-theme check:** `saronic-fleet` under sample-ember (light) and `saronic-news` under
+sample-ember (dark) take that theme's serif display face, warm palette, larger radius and
+orange primary; the `dark` scopes give its dark card tones. Our own dark mode is a coherent
+slate page with the ink footer.
