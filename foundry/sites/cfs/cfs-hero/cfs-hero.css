@@ -1,0 +1,52 @@
+/* Load: the whole content fades in over 500ms. */
+@media (prefers-reduced-motion: no-preference) {
+  .cfs-hero-in {
+    animation: cfs-hero-fade 500ms ease both;
+  }
+  /* The active pillar's dot pulses every two seconds. */
+  .cfs-hero-dot-active {
+    animation: cfs-hero-pulse 2s ease-in-out infinite;
+  }
+}
+
+@keyframes cfs-hero-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cfs-hero-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.7); }
+}
+
+/* Scrubbed while the hero leaves the window: the photo grows 1 → 1.05 over the whole exit,
+   the pillars fade out over the first half (half a screen of scrolling). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cfs-hero {
+      view-timeline-name: --cfs-hero;
+    }
+    .cfs-hero-media,
+    .cfs-hero-pillars {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --cfs-hero;
+    }
+    .cfs-hero-media {
+      animation-name: cfs-hero-grow;
+      animation-range: exit 0% exit 100%;
+    }
+    .cfs-hero-pillars {
+      animation-name: cfs-hero-out;
+      animation-range: exit 0% exit 50%;
+    }
+  }
+}
+
+@keyframes cfs-hero-grow {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+@keyframes cfs-hero-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
