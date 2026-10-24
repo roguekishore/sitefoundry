@@ -71,14 +71,14 @@ export function ValaratomicsFooter({
     >
       <div
         aria-hidden={!mark}
-        className="valaratomics-footer-mark pointer-events-none absolute bottom-0 left-1/2 -z-10 aspect-[1000/890] w-[min(62.5rem,170%)] -translate-x-1/2 translate-y-[18%] lg:translate-y-[32%] [&>*]:size-full [&_img]:object-contain"
+        className="valaratomics-footer-mark pointer-events-none absolute bottom-0 left-1/2 -z-10 aspect-[1000/890] w-[min(62.5rem,170%)] -translate-x-1/2 translate-y-[18%] lg:translate-y-[24%] [&>*]:size-full [&_img]:object-contain"
       >
         {mark ?? (
           <div className="size-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_85%,transparent)_0%,color-mix(in_oklab,var(--glow)_30%,transparent)_30%,transparent_72%)]" />
         )}
       </div>
 
-      <div className="mx-auto grid w-full max-w-page flex-1 grid-rows-[auto_auto_1fr] gap-y-12 px-gutter pt-[1.75rem] pb-5 lg:grid-cols-12 lg:grid-rows-none lg:flex-none lg:gap-x-[2vw] lg:pt-[6.625rem]">
+      <div className="mx-auto grid w-full max-w-page flex-1 grid-rows-[auto_auto_1fr] gap-y-12 px-gutter pt-[1.75rem] pb-5 lg:grid-cols-12 lg:grid-rows-none lg:flex-none lg:gap-x-[2vw] lg:pt-10">
         <div className="max-lg:contents lg:col-span-7 lg:flex lg:flex-col">
           <h2 className="font-display text-[2.625rem] leading-[0.88] font-black uppercase [font-stretch:var(--valaratomics-stretch,100%)] lg:col-span-7 lg:text-[5.3125rem] lg:leading-[0.88]">
             {title.map((line) => (
@@ -114,7 +114,7 @@ export function ValaratomicsFooter({
               </li>
             ))}
           </ul>
-          <ul className="mt-12 flex justify-between font-mono text-base leading-none uppercase lg:mt-[5.75rem]">
+          <ul className="mt-12 flex justify-between font-mono text-base leading-none uppercase lg:mt-[5.25rem]">
             {links.map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="transition-colors duration-150 hover:text-primary">

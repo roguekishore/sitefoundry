@@ -70,7 +70,7 @@ export function ValaratomicsHeader({
             </span>
             <span
               aria-hidden
-              className="valaratomics-header-fade font-display text-[1.375rem] leading-[0.8] font-black tracking-[-0.01em] uppercase [font-stretch:var(--valaratomics-stretch,100%)]"
+              className="valaratomics-header-fade font-display text-lg leading-[0.82] font-black tracking-[-0.01em] uppercase [font-stretch:var(--valaratomics-stretch,100%)]"
             >
               {wordmark.map((line) => (
                 <span key={line} className="block">

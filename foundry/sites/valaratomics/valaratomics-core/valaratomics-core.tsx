@@ -26,11 +26,12 @@ export interface ValaratomicsCoreProps {
 }
 
 const TAB_WIDTH = 30; // % of the panel width
+const NOTCH = "1.375rem"; // how far the tab reaches below the panel
 const EASE = "ease-[cubic-bezier(0.92,0,0.08,1)]";
 
 /**
  * Intro, then a wide black panel that grows a short tab down towards the active label below
- * it. The panel auto-advances through the items: the tab slides across, the media
+ * it (the media fills panel and tab, clipped to one shape). The panel auto-advances through the items: the tab slides across, the media
  * crossfades, the active label turns black with a gold eyebrow and the others dim to half.
  * On phones the label row is wider than the screen and slides so the active one shows.
  */
@@ -47,13 +48,15 @@ export function ValaratomicsCore({ title, body, items, interval = 4, className }
     return () => clearTimeout(id);
   }, [active, reduce, paused, interval, items.length]);
 
-  // the tab is a trapezoid; at either end its outer edge stays straight under the panel's corner
+  // One shape for panel + tab: the panel's bottom edge sits 22px above the box's bottom, and
+  // the tab (30% wide, bevelled on its inner sides) reaches down to it under the active label.
+  // Same number of points in every state, so the clip-path animates between them.
+  const L = `calc(${100 - TAB_WIDTH}% * ${step})`;
+  const R = `calc(${L} + ${TAB_WIDTH}%)`;
   const inL = active === 0 ? "0px" : "1.5rem";
   const inR = active === items.length - 1 ? "0px" : "1.5rem";
-  const tab: CSSProperties = {
-    left: `calc(${100 - TAB_WIDTH}% * ${step})`,
-    width: `${TAB_WIDTH}%`,
-    clipPath: `polygon(0 0, 100% 0, calc(100% - ${inR}) 100%, ${inL} 100%)`,
+  const shape: CSSProperties = {
+    clipPath: `polygon(0 0, 100% 0, 100% calc(100% - ${NOTCH}), ${R} calc(100% - ${NOTCH}), calc(${R} - ${inR}) 100%, calc(${L} + ${inL}) 100%, ${L} calc(100% - ${NOTCH}), 0 calc(100% - ${NOTCH}))`,
   };
 
   return (
@@ -62,34 +65,29 @@ export function ValaratomicsCore({ title, body, items, interval = 4, className }
         <ValaratomicsIntro title={title} body={body} />
 
         <div className="mt-9 lg:mt-section" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-          <div className="relative">
-            <div className="dark relative aspect-[363/418] overflow-clip rounded-sm bg-background ring-1 ring-border/40 ring-inset lg:aspect-auto lg:h-[26.125rem]">
-              {items.map((item, i) => (
-                <div
-                  key={item.name}
-                  aria-hidden={i !== active}
-                  className={cn(
-                    "absolute inset-0 transition-opacity duration-500 ease-in-out motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover",
-                    i === active ? "opacity-100" : "opacity-0",
-                  )}
-                >
-                  {item.media ?? <ValaratomicsPlaceholder />}
-                </div>
-              ))}
-            </div>
-            {/* the tab: overlaps the panel by 8px to cover its rounded corner */}
-            <div
-              aria-hidden
-              style={tab}
-              className={cn(
-                "dark absolute top-[calc(100%-0.5rem)] h-[1.875rem] rounded-b-sm bg-background",
-                "transition-[left,clip-path] duration-500 motion-reduce:transition-none",
-                EASE,
-              )}
-            />
+          <div
+            style={shape}
+            className={cn(
+              "dark relative aspect-[363/440] rounded-sm bg-background lg:aspect-auto lg:h-[27.5rem]",
+              "transition-[clip-path] duration-500 motion-reduce:transition-none",
+              EASE,
+            )}
+          >
+            {items.map((item, i) => (
+              <div
+                key={item.name}
+                aria-hidden={i !== active}
+                className={cn(
+                  "absolute inset-0 transition-opacity duration-500 ease-in-out motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover",
+                  i === active ? "opacity-100" : "opacity-0",
+                )}
+              >
+                {item.media ?? <ValaratomicsPlaceholder tone="photo" />}
+              </div>
+            ))}
           </div>
 
-          <div className="mt-14 overflow-x-clip [container-type:inline-size]">
+          <div className="mt-9 overflow-x-clip [container-type:inline-size]">
             <ul
               style={{ "--valaratomics-core-step": step } as CSSProperties}
               className={cn(
@@ -117,7 +115,7 @@ export function ValaratomicsCore({ title, body, items, interval = 4, className }
                     >
                       {item.eyebrow}
                     </span>
-                    <span className="font-sans text-[2rem] leading-none font-medium tracking-[-0.02em] uppercase lg:text-5xl lg:leading-none">
+                    <span className="font-sans text-[2rem] leading-none font-semibold tracking-[-0.03em] uppercase lg:text-5xl lg:leading-none">
                       {item.name}
                     </span>
                   </button>

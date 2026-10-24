@@ -8,7 +8,7 @@ export interface ValaratomicsMissionProps {
   paragraphs: string[];
   /** the big plate-shaped link on the right */
   cta: { label: string; href: string };
-  /** a texture or picture inside the plate (the original's is a fine lattice); empty leaves it plain */
+  /** a texture or picture inside the plate (the original's is a fine lattice); empty shows a pale muted fill */
   texture?: ReactNode;
   className?: string;
 }
@@ -27,14 +27,14 @@ const PLATE =
 export function ValaratomicsMission({ title, paragraphs, cta, texture, className }: ValaratomicsMissionProps) {
   return (
     <section
-      className={cn("bg-card px-gutter pt-[calc(var(--section-y)*2)] pb-section text-card-foreground lg:py-[24svh]", className)}
+      className={cn("bg-card px-gutter pt-[calc(var(--section-y)*2)] pb-section text-card-foreground", className)}
     >
       <div className="mx-auto grid max-w-page items-center gap-y-9 lg:grid-cols-2 lg:gap-x-[2vw]">
         <div className="max-w-[31.5rem]">
-          <h2 className="font-sans text-[2.625rem] leading-[0.9] font-medium tracking-[-0.02em] lg:text-5xl lg:leading-[0.9]">
+          <h2 className="font-sans text-[2.625rem] leading-[0.9] font-semibold tracking-[-0.03em] lg:text-5xl lg:leading-[0.9]">
             {title}
           </h2>
-          <div className="mt-9 space-y-[1.375rem] text-lg leading-[1.1] tracking-[-0.01em] lg:mt-12 lg:text-[1.375rem] lg:leading-[1.1]">
+          <div className="mt-9 space-y-[1.375rem] text-lg leading-[1.1] tracking-[-0.02em] lg:mt-12 lg:text-[1.375rem] lg:leading-[1.1]">
             {paragraphs.map((p) => (
               <p key={p}>{p}</p>
             ))}
@@ -54,7 +54,7 @@ export function ValaratomicsMission({ title, paragraphs, cta, texture, className
             className="absolute inset-px bg-card [&>*]:size-full [&_img]:object-cover"
             style={{ clipPath: PLATE }}
           >
-            {texture}
+            {texture ?? <span className="block size-full bg-muted/60" />}
           </span>
           <span className="absolute inset-0 grid place-items-center font-mono text-lg leading-none uppercase">
             {cta.label}

@@ -46,10 +46,10 @@ export function ValaratomicsProducts({ title, body, items, className }: Valarato
                   className="dark relative isolate flex min-h-[14.375rem] flex-col overflow-clip rounded-sm bg-background p-[0.9375rem] text-foreground lg:aspect-[303/410]"
                 >
                   <div className="absolute inset-0 -z-10 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/card:scale-[1.04] motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover">
-                    {item.media ?? <ValaratomicsPlaceholder />}
+                    {item.media ?? <ValaratomicsPlaceholder tone="photo" />}
                   </div>
                   <h3 className="font-mono text-2xl leading-none font-medium uppercase">{item.name}</h3>
-                  <p className="mt-[4.5rem] text-[1.375rem] leading-[1.06] tracking-[-0.01em] lg:mt-[10.75rem]">
+                  <p className="mt-[4.5rem] text-[1.375rem] leading-[1.06] tracking-[-0.02em] lg:mt-[10.75rem]">
                     {item.body}
                   </p>
                   <div

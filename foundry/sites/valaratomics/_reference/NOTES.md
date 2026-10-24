@@ -91,3 +91,39 @@ heat and power to farms, mines and fertiliser plants on the plains. All copy is 
 - Press: 9 shown, SHOW MORE reveals the rest (needs JS; static HTML shows the first 9).
 - The footer reveal is built in page.tsx (`main` relative z-10 over a sticky footer), so the
   footer block also works alone in the gallery.
+
+## Comparison round 1
+
+Heights matched on the first capture (390: 844 / 700 / 860 / 972 / 1445 / 844 / 969 / 3108 / 832 vs
+844 / 700 / 877 / 990 / 1541 / 844 / 969 / 3357 / 835; 1440 within 20px everywhere). Every motion
+row showed up in ours' Motion list (header fade, statement blur scrub, model settle, tab clip-path +
+label/media swaps, sticky footer + mark fade). No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all headings | Hanken 500 reads lighter and airier than Saans 500 | same | — | yes: 600, −0.03em |
+| all body | looser-looking spacing | same | — | yes: −0.02em |
+| header | wordmark 22px, much bigger than the original's ~18px | same | fade ok | yes: 18px |
+| hero | title 42px wraps to 3 lines; the original's is 32px on phones | "POWER FROM" ran wide | — | yes: 32px phones, copy "Heat for / the plains" |
+| statement | — | bracket bumps only 14px deep (path drawn in viewBox units, not px) and centred too low | blur scrub ok | yes: path to the box edge, centre 32px higher |
+| model / core / products / pilot | placeholders nearly pure black, read as empty bands | same | — | yes: new `photo` placeholder tone (mid-grey fade) |
+| mission | — | plate 72px too high: the original pads 32vh top / 16vh bottom (as on phones) | — | yes |
+| mission | plate empty white; the original's lattice reads pale grey | same | — | yes: pale muted fill when no texture |
+| press | headlines ~6% wider than the original | same | hover ok | yes: −0.05em |
+| footer | — | title 72px below the footer's top edge (original ~43px); links row 14px low | sticky + fade ok | yes |
+
+## Comparison round 2
+
+Heights unchanged except mission (390: 929 vs 969 — copy one line shorter; 1440: 836 = 836) and
+products (390: 1425 vs 1541, our card copy is shorter). Scroll frames at 1440 (statement,
+technology, footer) now overlay closely; motion list identical to round 1.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| technology | the tab was a separate black strip; under the photo placeholder it read as a different colour (the original's media, 363×440 / 1270×440, spans panel and tab) | same | tab move ok | yes: panel + tab are one element clipped by one animated polygon |
+| technology | — | — | checked live: after 4s the tab sits under the middle label and the phone label row has slid to it | — |
+| press | headlines wrapped wider than the original's (~260px on phones) | ok | — | yes: 17rem phones, 21rem desktop |
+| footer | glow slot centre ~70px low | same | ok | yes: lifted |
+| footer | mark is a glow placeholder, not the original's sharp logo (artwork) | same | fade ok | no: media slot by design |
+| footer | min-height is min(52rem, 100svh), so the capture marks it window-sized on a short window; the original is fixed at 835px | — | — | kept: sticky reveal would hide the top of a taller-than-window footer |
+| re-theme | `valaratomics-core`, `-products`, `-mission` under sample-ember light: dark panels/cards pick up ember's dark palette, gold → ember's primary; the model card under our own dark mode keeps its edge via the photo placeholder | | | ok |
