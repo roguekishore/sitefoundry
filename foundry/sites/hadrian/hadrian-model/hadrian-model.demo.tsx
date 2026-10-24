@@ -16,7 +16,7 @@ export const modelSample: HadrianModelProps = {
     },
     {
       title: "Turnkey Plants",
-      text: "Whole part, assembly and component plants that Kestrel designs, builds and runs around the country's toughest production programs.",
+      text: "Whole part, assembly and component plants that Kestrel designs, builds and runs around the country's toughest and most urgent production programs.",
     },
   ],
 };

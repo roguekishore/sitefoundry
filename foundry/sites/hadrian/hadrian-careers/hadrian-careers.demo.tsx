@@ -5,7 +5,7 @@ export const careersSample: HadrianCareersProps = {
   id: "careers",
   slogan: "Build what comes next with Kestrel",
   title: "Come Build the Next Plant",
-  text: "Kestrel is hiring machinists, controls engineers, software developers, quality leads and the people who keep fast teams moving.",
+  text: "Kestrel is hiring machinists, controls engineers, software developers, quality leads, plant managers and the people who keep fast teams moving.",
   action: { label: "See open positions", href: "#roles" },
 };
 

@@ -33,8 +33,8 @@ const link = "transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] ho
 export function HadrianFooter({ brand, homeHref = "/", company, links, legal, place, placeIcon, className }: HadrianFooterProps) {
   return (
     <footer className={cn("relative border-t border-foreground bg-background text-foreground", className)}>
-      <div className="mx-auto max-w-page px-gutter pt-[3.25rem] pb-16 lg:pt-12 lg:pb-[4.25rem]">
-        <div className="flex flex-col items-center gap-5 lg:flex-row lg:justify-between">
+      <div className="mx-auto max-w-page px-gutter pt-12 pb-16 lg:pt-12 lg:pb-[4.25rem]">
+        <div className="flex flex-col items-center gap-3 lg:flex-row lg:justify-between">
           <HadrianWordmark name={brand} href={homeHref} className="text-[2.25rem]" />
           <ul className="flex gap-8 font-mono text-base leading-none uppercase">
             {links.map((l) => (
