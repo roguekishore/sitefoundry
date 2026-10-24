@@ -21,8 +21,8 @@ export interface HermeusHeaderProps {
   className?: string;
 }
 
-/** amber on hover, 0.25s ease-in-out like the original's links */
-const link = "transition-colors duration-250 ease-in-out hover:text-primary motion-reduce:transition-none";
+/** amber on hover, 0.25s ease-[ease-in-out] like the original's links */
+const link = "transition-colors duration-250 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none";
 
 /** Transparent sticky bar: wordmark left, small uppercase links right, full-screen menu on phones. */
 export function HermeusHeader({ name, homeHref = "#", links, menuLabel, closeLabel, className }: HermeusHeaderProps) {
@@ -46,10 +46,10 @@ export function HermeusHeader({ name, homeHref = "#", links, menuLabel, closeLab
         </a>
 
         <nav className="hidden lg:block">
-          <ul className="flex gap-[clamp(1.25rem,-0.5rem+2.4vw,1.9rem)]">
+          <ul className="flex gap-[clamp(1.25rem,-0.5rem+2.4vw,1.875rem)]">
             {links.map((l) => (
               <li key={l.label}>
-                <a href={l.href} className={cn("text-[0.8125rem]/none tracking-[0.06em] uppercase", link)}>
+                <a href={l.href} className={cn("text-xs/none tracking-[0.06em] uppercase", link)}>
                   {l.label}
                 </a>
               </li>
@@ -72,7 +72,7 @@ export function HermeusHeader({ name, homeHref = "#", links, menuLabel, closeLab
       <div
         aria-hidden={!open}
         className={cn(
-          "fixed inset-0 z-50 flex flex-col bg-secondary px-gutter text-secondary-foreground transition-opacity duration-300 ease-in-out motion-reduce:transition-none lg:hidden",
+          "fixed inset-0 z-50 flex flex-col bg-secondary px-gutter text-secondary-foreground transition-opacity duration-300 ease-[ease-in-out] motion-reduce:transition-none lg:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         )}
       >

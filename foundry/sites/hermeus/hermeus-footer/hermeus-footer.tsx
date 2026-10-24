@@ -40,7 +40,7 @@ export interface HermeusFooterProps {
 
 /** pale grey capitals that turn amber on hover */
 const small = "text-[clamp(0.58rem,0.519rem+0.257vw,0.75rem)]/[1.6] tracking-[0.06em] uppercase";
-const link = "transition-colors duration-250 ease-in-out hover:text-primary motion-reduce:transition-none";
+const link = "transition-colors duration-250 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none";
 
 /** Near-white footer with address, link columns, legal row and a giant cropped name. */
 export function HermeusFooter({
@@ -57,17 +57,17 @@ export function HermeusFooter({
   className,
 }: HermeusFooterProps) {
   return (
-    <footer className={cn("overflow-clip bg-card pt-[clamp(1.375rem,1rem+1.6vw,3.125rem)] text-muted-foreground", className)}>
+    <footer className={cn("overflow-clip bg-card pt-[clamp(1.375rem,0.725rem+2.667vw,2.9rem)] text-muted-foreground", className)}>
       <div className="mx-auto max-w-page px-gutter">
-        <div className="flex flex-col gap-[clamp(3rem,2.6rem+1.6vw,4rem)] lg:flex-row lg:justify-between">
+        <div className="flex flex-col gap-[clamp(2.75rem,2.5rem+1vw,4rem)] lg:flex-row lg:justify-between">
           <div>
             <a
               href={homeHref}
-              className={cn("text-[clamp(1.1rem,0.95rem+0.62vw,1.5rem)]/none font-bold tracking-[0.1em] text-foreground uppercase", link)}
+              className={cn("text-[clamp(0.95rem,0.75rem+0.81vw,1.5rem)]/none font-bold tracking-[0.1em] text-foreground uppercase", link)}
             >
               {name}
             </a>
-            <address className="mt-[clamp(1.1rem,1rem+0.4vw,1.4rem)] text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.1] not-italic uppercase">
+            <address className="mt-[clamp(0.85rem,0.6rem+1vw,1.4rem)] text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.1] not-italic uppercase">
               {address.map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -77,16 +77,16 @@ export function HermeusFooter({
             <HermeusMedia
               media={badge}
               label={badgeLabel}
-              className="mt-[clamp(1rem,0.9rem+0.4vw,1.25rem)] h-[clamp(0.875rem,0.75rem+0.5vw,1.125rem)] w-[clamp(1.5rem,1.3rem+0.8vw,1.875rem)]"
+              className="mt-[clamp(0.75rem,0.55rem+0.8vw,1.25rem)] h-[clamp(0.875rem,0.75rem+0.5vw,1.125rem)] w-[clamp(1.5rem,1.3rem+0.8vw,1.875rem)]"
             />
           </div>
 
-          <div className="grid grid-cols-[auto_auto_auto] justify-between gap-x-6 sm:justify-start sm:gap-x-12 lg:gap-x-0 lg:[&>*]:w-[8.75rem]">
+          <div className="flex *:w-[29.5vw] *:shrink-0 *:last:w-auto sm:*:w-40 lg:pt-2.5 lg:*:w-[8.75rem] lg:*:last:w-[6.875rem]">
             {columns.map((col, c) => (
-              <ul key={c}>
+              <ul key={c} className={cn(small, "leading-[2]")}>
                 {col.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className={cn(small, link)}>
+                    <a href={l.href} className={link}>
                       {l.label}
                     </a>
                   </li>
@@ -94,8 +94,8 @@ export function HermeusFooter({
               </ul>
             ))}
             <div>
-              <p className={small}>{socialTitle}</p>
-              <ul className="mt-1.5 flex gap-2.5">
+              <p className={cn(small, "leading-[2]")}>{socialTitle}</p>
+              <ul className="mt-1 flex gap-2.5">
                 {socials.map((s) => (
                   <li key={s.label}>
                     <a href={s.href} aria-label={s.label} className={cn("block [&_svg]:size-4 [&_svg]:stroke-[1.5]", link)}>
@@ -108,7 +108,7 @@ export function HermeusFooter({
           </div>
         </div>
 
-        <div className="mt-[clamp(3rem,2.5rem+2vw,5rem)] flex flex-col gap-1 lg:flex-row lg:justify-between">
+        <div className="mt-[clamp(2.75rem,2.07rem+3.3vw,5rem)] flex flex-col gap-1 lg:flex-row lg:justify-between">
           <ul className={cn(small, "flex flex-wrap")}>
             {legal.map((l, i) => (
               <li key={l.label}>
@@ -126,7 +126,7 @@ export function HermeusFooter({
         <svg
           aria-hidden
           viewBox="0 0 1000 116"
-          className="mt-[clamp(2.5rem,2.2rem+1.4vw,4.7rem)] block w-full text-secondary"
+          className="mt-[clamp(2.3rem,1.42rem+3.62vw,4.7rem)] block w-full text-secondary"
         >
           <text
             x="0"

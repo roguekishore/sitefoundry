@@ -41,11 +41,11 @@ export function HermeusNewsGrid({ index, label, action, items, className }: Herm
         <HermeusReveal className="mt-[clamp(1.94rem,1.24rem+2.86vw,3.81rem)]">
           <ul className="-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-4 overflow-x-auto px-gutter [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:px-0">
             {items.map((item) => (
-              <li key={item.title} className="w-4/5 shrink-0 snap-start sm:w-[45%] lg:w-auto">
+              <li key={item.title} className="w-[80vw] shrink-0 snap-start sm:w-[45vw] lg:w-auto">
                 <a href={item.href} className="group block">
                   <HermeusMedia media={item.media} label={item.mediaLabel} className="aspect-square w-full" />
                   <div className="flex h-[clamp(6.69rem,5.69rem+4.1vw,9.375rem)] flex-col justify-between bg-card p-[clamp(0.75rem,0.5625rem+0.762vw,1.25rem)]">
-                    <h3 className="line-clamp-3 text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.1] font-normal text-pretty transition-colors duration-200 ease-in-out group-hover:text-primary motion-reduce:transition-none">
+                    <h3 className="line-clamp-3 text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.1] font-normal text-pretty transition-colors duration-200 ease-[ease-in-out] group-hover:text-primary motion-reduce:transition-none">
                       {item.title}
                     </h3>
                     <p className="flex items-center justify-between gap-3 text-[clamp(0.58rem,0.519rem+0.257vw,0.75rem)]/none">

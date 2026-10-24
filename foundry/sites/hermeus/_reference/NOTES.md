@@ -96,3 +96,44 @@ fade-and-rise wrapper), `hermeus-smooth-scroll` (Lenis).
 - The desktop edge squares in the original's stage (left/right at mid-height) read as the
   slider's controls there; ours shows them as amber square prev/next buttons on desktop and
   as light chevrons on phones.
+
+## Comparison round 1
+
+Measured on full-page shots of ours with reduced motion (reveals in place), paired with the
+original's full captures. Section heights before → after the fixes, original in brackets:
+390 mission 270→267 (266), product 397+100 collapsed margin→493 (489), news 536→532 (562),
+recent 534→564 (561), footer 467→436 (416); 1440 mission 440→431 (429), product 781→972
+(973), news 1276→1267 (1250), recent 843→834 (833), footer 478→525 (520).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero headline | words ran together (trailing space inside inline-block words collapsed); sat 25px low | same; 29px and warm grey, original 26px near-black | blur-in + flicker loop present | yes: spaces between word spans, `top-[47%]`, 21→26px fluid, secondary-foreground |
+| header | — | nav 13px, original 12px (8.1px per capital) | sticky shows in the Motion list | yes: 12px, 30px gaps |
+| section labels (all) | name→line gap too big | line 10px low (label line-height 1.15, 12px padding) | number fade, name rise, line draw present (scrubbed) | yes: label line-height 1 with descender padding, 8px padding, 8→13px number gap |
+| product | bottom space was a collapsed margin outside the band (white gap before News) | same, band 781px vs 973 | pulse loop present | yes: bottom space is the band's own padding |
+| recent news | rail cards 280px (80% of the content box), original 312 (80% of the window) | — | reveal present | yes: `w-[80vw]` |
+| footer | link rows 24px apart (inherited leading), original 19 | columns spread from 944px, original 975/1115/1255; legal row and giant name ~35px high | hover amber | yes: leading 2 on the lists, fixed column widths (140/140/110), gaps re-measured |
+| all hovers | Tailwind's ease-in-out is (0.4,0,0.2,1) | | original `ease-in-out` keyword | yes: `ease-[ease-in-out]` |
+| news feature | headline 2 lines vs original 3 (our copy is shorter), so band 30px shorter | 17px taller | — | no: content length |
+
+## Comparison round 2
+
+Heights after round 1 (original in brackets): 390 hero+film 1156 (1156), mission 267 (266),
+product 493 (489), news 532 (562), recent 564 (561), footer 436 (416); 1440 hero+film 1710
+(1710), mission 431 (429), product 972 (973), news 1267 (1250), recent 834 (833), footer
+525 (520). No horizontal overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| footer | brand block ~11px low (address and flag gaps), links 17px low, legal 26px low | wordmark 10px low, legal and giant name ~11px low | — | yes: top padding to 2.9rem max, address/flag/legal gaps re-fitted |
+| section labels + reveals | — | — | ours finished in 400–450px, so the capture saw a jump ("reveal"); the original's runs over ~3 half-screen samples ("scrubbed") | yes: ranges now 80% of the window (line 100%); capture lists them as scrubbed (some samples still read as reveal, as some of the original's do) |
+| header | sticky over hero + film at 390 and 1440 (2 half-screens; original 2–3) | same | pinned | ok |
+| Mission word | letters rise ~1.2em staggered on entering view | same (1319–1768 vs original 1161–1560) | reveal | ok |
+| hero headline | blur-in and flicker loop listed | same | load + loop | ok |
+| re-theme | `hermeus-mission`, `hermeus-news-grid`, `hermeus-product` under sample-ember light: tokens, display serif and accent all follow; hermeus dark: footer and mission read as graphite bands | | | ok |
+
+Still different, by choice: media are placeholders (hero render, film, aircraft cut-out,
+news photos, flag); the wordmarks are plain Arimo capitals instead of the winged logo, and
+the footer's giant name is set type rather than the logo's custom letters; the product
+stage's two edge hotspots are plain hotspots (the original's may be slider controls); copy
+is ours, so the news headline wraps to 2 lines instead of 3 at 390.
