@@ -58,8 +58,8 @@ export function FormenergyFooter({
       <div className="mx-auto max-w-page px-gutter pt-[3.75rem] pb-[3.3rem] lg:pt-[5.75rem] lg:pb-[3.4rem]">
         <div className="grid justify-items-center gap-y-[2.4rem] text-center lg:grid-cols-[383fr_281fr_428fr_164fr] lg:justify-items-start lg:px-2.5 lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
-            <FormenergyWordmark name={brand} suffix={brandSuffix} className="text-[2.6rem] lg:text-[3.6rem]" />
-            <p className="mt-[2.4rem] text-lg leading-[1.4] font-medium lg:mt-[3.3rem] lg:text-[1.75rem] lg:leading-[1.32]">
+            <FormenergyWordmark name={brand} suffix={brandSuffix} className="text-[2.6rem] lg:text-[3.1rem]" />
+            <p className="mt-[2.4rem] text-lg leading-[1.4] font-medium lg:mt-[3.6rem] lg:text-[1.75rem] lg:leading-[1.32]">
               {taglineLines.map((line, i) => (
                 <span key={i} className="block">
                   {line}
@@ -70,7 +70,7 @@ export function FormenergyFooter({
 
           <nav aria-label={menuTitle}>
             <p className={heading}>{menuTitle}</p>
-            <ul className="mt-[2.4rem] flex flex-col gap-[0.95rem] lg:mt-[2.6rem] lg:gap-[1.1rem]">
+            <ul className="mt-[2.4rem] flex flex-col gap-[1.2rem] leading-none lg:mt-[2.6rem] lg:gap-[1.28rem]">
               {menu.map((link) => (
                 <li key={link.label}>
                   <a href={link.href} className={cn("text-base leading-none font-medium lg:text-xl", hover)}>
@@ -90,7 +90,7 @@ export function FormenergyFooter({
                 </span>
               ))}
             </address>
-            <ul className="mt-4 flex flex-col gap-4 lg:mt-3 lg:gap-[1.15rem]">
+            <ul className="mt-4 flex flex-col gap-[1.3rem] leading-none lg:mt-[0.9rem] lg:gap-[1.45rem]">
               {emails.map((email) => (
                 <li key={email.label}>
                   <a href={email.href} className={cn("text-base leading-none font-medium lg:text-xl", hover)}>
@@ -101,7 +101,7 @@ export function FormenergyFooter({
             </ul>
           </div>
 
-          <ul className="flex max-w-[8rem] flex-wrap justify-start gap-2.5 lg:max-w-[10.25rem] lg:justify-self-end">
+          <ul className="flex max-w-[8rem] flex-wrap content-start justify-start gap-2.5 lg:max-w-[10.25rem] lg:justify-self-end">
             {social.map((item) => (
               <li key={item.label}>
                 <a
@@ -116,8 +116,8 @@ export function FormenergyFooter({
           </ul>
         </div>
 
-        <div className="mt-[3.4rem] border-t border-border pt-[3.4rem] lg:mt-[6.5rem] lg:flex lg:items-center lg:justify-between lg:pt-[2.6rem]">
-          <ul className="flex flex-col items-center gap-[0.9rem] lg:flex-row lg:gap-0">
+        <div className="mt-[3.4rem] border-t border-border pt-[2.6rem] lg:mt-[6.5rem] lg:flex lg:items-center lg:justify-between lg:pt-[2.6rem]">
+          <ul className="flex flex-col items-center lg:flex-row lg:gap-0">
             {legal.map((link, i) => (
               <li key={link.label} className={cn("lg:px-[1.1rem] lg:first:pl-2", i > 0 && "lg:border-l lg:border-primary")}>
                 <a href={link.href} className={cn("font-mono text-[0.9rem] leading-[1.9rem] font-medium lg:text-sm", hover)}>
@@ -126,7 +126,7 @@ export function FormenergyFooter({
               </li>
             ))}
           </ul>
-          <p className="mt-[3.4rem] text-center font-mono text-[0.6rem] leading-none font-medium lg:mt-0 lg:text-xs">{copyright}</p>
+          <p className="mt-[2.9rem] text-center font-mono text-[0.6rem] leading-none font-medium lg:mt-0 lg:text-xs">{copyright}</p>
         </div>
       </div>
     </footer>

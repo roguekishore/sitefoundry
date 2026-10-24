@@ -97,3 +97,19 @@ overlays, not part of the design: skipped.
   square is its logo shape). Footer social icons are lucide icons.
 - Hero height is a fixed content height per breakpoint (535 → 758px), because the capture
   does not mark it window-sized.
+
+## Comparison round 1
+
+Section heights before fixes (ours vs original): 1440 hero 758/758, body 3493/3477,
+footer 611/606; 390 hero 534/535, body 3720/3695, footer 1198/1129.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark and hamburger ~10px high of the original's centre line | links at y 50 vs 64, right edge 1410 vs 1395, item gap 36 vs 31px | hover white → orange 0.4s matches | yes: more top padding, right padding 2.8rem, gap-8 |
+| header | — | at 1024 the last dropdowns (hidden) stuck out 32px, page 1056px wide | — | yes: last two dropdowns open leftwards |
+| hero | our title wraps in 3 lines, not 4 (content length) | matches (title 86px, lead with rule, low in frame) | none | content, left |
+| splits | heading → text gap 27px vs 50 (tech) / 16 (factory) in the original: kept between | match | button fill on hover matches | — |
+| about | match | match | — | — |
+| hiring | match | match (597px band) | — | — |
+| news | gap between stacked cards 35px vs 13px | badge 6px lower (longer title) | link → orange matches | yes: gap-y-3 |
+| footer | link pitch 39 vs 35px, legal links 45 vs 30px apart, footer 69px too tall | social squares split into two far-apart rows (wrapped lines stretched over the tall grid row); wordmark wider than the original's 150px logo | link hover → orange | yes: content-start, leading-none lists, tighter legal list, smaller wordmark |
