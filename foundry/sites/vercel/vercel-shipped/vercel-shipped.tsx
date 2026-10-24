@@ -29,7 +29,7 @@ export interface VercelShippedProps {
 /** Bento of new products: one tall card and two stacked ones. */
 export function VercelShipped({ title, cards, className }: VercelShippedProps) {
   return (
-    <section className={cn("bg-background px-gutter py-16 text-foreground lg:py-section", className)}>
+    <section className={cn("bg-background px-gutter py-16 text-foreground lg:pt-[12.5rem] lg:pb-0", className)}>
       <div className="mx-auto max-w-page">
         <VercelHeading>{title}</VercelHeading>
         <ul className="mt-12 grid gap-5 lg:mt-20 lg:grid-cols-2 lg:grid-rows-[17.5rem_17.5rem]">

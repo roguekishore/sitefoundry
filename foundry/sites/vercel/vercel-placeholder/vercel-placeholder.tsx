@@ -15,7 +15,7 @@ export interface VercelPlaceholderProps {
 const tones = {
   window:
     "rounded-t-lg bg-muted shadow-xs shadow-foreground/5 ring-1 ring-foreground/8 mask-b-from-55% mask-b-to-100%",
-  haze: "bg-radial-[closest-side] from-foreground/9 to-transparent",
+  haze: "bg-radial-[closest-side] from-foreground/12 to-transparent",
   wash: "bg-linear-to-br from-glow/60 to-highlight",
   side: "bg-muted mask-l-from-40% mask-l-to-100%",
 };

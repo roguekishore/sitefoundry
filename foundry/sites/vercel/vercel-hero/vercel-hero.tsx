@@ -52,8 +52,8 @@ export function VercelHero({ title, primary, secondary, lines, logos, media, med
 
           {/* phones: one mono line at a time */}
           <p className="mt-4 grid font-mono text-base text-muted-foreground lg:hidden">
-            {lines.map((line) => (
-              <span key={line} className="vercel-hero-line [grid-area:1/1]">
+            {lines.map((line, i) => (
+              <span key={line} className="vercel-hero-line [grid-area:1/1]" style={{ animationDelay: `${i * 3}s` }}>
                 {line}
               </span>
             ))}

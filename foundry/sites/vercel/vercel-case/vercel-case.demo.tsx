@@ -2,10 +2,10 @@
 import { VercelCase, type VercelCaseProps } from "./vercel-case";
 
 export const caseAgentsSample: VercelCaseProps = {
-  title: "Give agents a runtime that reasons the way they do",
+  title: "Run agents on a cloud that works the way they do",
   titleClassName: "lg:max-w-[8em]",
-  lead: "Pagewright handles millions",
-  rest: "of assistant sessions a day on Halyard.",
+  lead: "Pagewright runs millions",
+  rest: "of agent chats a day on Halyard.",
   featuresLabel: "Built with",
   features: [
     { label: "Long-running Jobs", href: "#" },
@@ -19,10 +19,10 @@ export const caseAgentsSample: VercelCaseProps = {
 };
 
 export const caseAppsSample: VercelCaseProps = {
-  title: "Launch apps that go from first user to peak traffic overnight",
+  title: "Launch apps that grow from one user to every user",
   titleClassName: "lg:max-w-[10.5em]",
   lead: "Relaylane serves 90 million",
-  rest: "page views a month on Halyard.",
+  rest: "monthly page views on Halyard.",
   featuresLabel: "Built with",
   features: [
     { label: "Edge Network", href: "#" },
@@ -36,9 +36,9 @@ export const caseAppsSample: VercelCaseProps = {
 };
 
 export const casePlatformsSample: VercelCaseProps = {
-  title: "Run platforms that give every client a home",
-  titleClassName: "lg:max-w-[9em]",
-  lead: "Docksmith hosts help centres for more than 18,000",
+  title: "Run platforms that give each client a home",
+  titleClassName: "lg:max-w-[10.5em]",
+  lead: "Docksmith hosts help centres for 18,000",
   rest: "teams on Halyard.",
   featuresLabel: "Built with",
   features: [

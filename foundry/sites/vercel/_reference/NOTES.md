@@ -89,3 +89,19 @@ Geist is allowed here because the original uses it.
 - Theme switch icons in the footer are built as plain buttons (no behaviour), like UI chrome.
 - Shipped-card hover (border darkens) is inferred from the site's `group-hover:border-*`
   rules; not seen in a capture.
+
+## Comparison round 1
+
+Ours: hero marked "sized by the window" at 1440 like the original; fits at 360/768/1024;
+header sticky with the scroll-linked hairline; marquee and phone line cycle running.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | 65px tall (hairline added to 64) | same | sticky + hairline ✓, hover ✓ | yes: bar 63px + 1px line |
+| hero | mono line invisible in the frame (all three spans ran in sync and were all in their hidden phase); haze too faint to read as a slot | title weight 500 vs the original's 400 | line cycle had no stagger | yes: per-line delay 0/3/6s, haze 9% → 12%, title 400 |
+| cases | headings 4 lines (copy too long) | headings 3–4 lines vs 3/2/2; 240px padding split top/bottom where the original puts ~270px all above and none below; window box 921×485 vs ~450 | none (media only) ✓ | yes: shorter copy, `lg:pt-[16.875rem] lg:pb-0`, window aspect 2.05 |
+| case statements | 3 lines vs 2 | 3 lines vs 2 | — | yes: shorter copy |
+| shipped | ok | 120px top/bottom vs ~200 top, 0 bottom | border hover ✓ | yes: `lg:pt-[12.5rem] lg:pb-0` |
+| CTA | ok (674 vs content) | 680 vs 688 | copy label fade ✓ | — |
+| footer | ok (1955 vs 1958) | 871 vs 846 | link hover ✓ | close enough |
+| placeholders | case windows read as grey windows where the original shows white screenshots | same | — | kept: a placeholder must read as one |

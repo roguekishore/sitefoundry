@@ -12,7 +12,7 @@ export interface VercelHeadingProps {
 
 const sizes = {
   section: "text-[2rem] leading-10 tracking-[-0.05em] lg:text-[3.5rem] lg:leading-[3.5rem] lg:tracking-[-0.06em]",
-  title: "text-5xl leading-[3.5rem] tracking-[-0.05em] lg:text-[4rem] lg:leading-[4rem] lg:tracking-[-0.055em]",
+  title: "font-normal text-5xl leading-[3.5rem] tracking-[-0.05em] lg:text-[4rem] lg:leading-[4rem] lg:tracking-[-0.055em]",
 };
 
 /** The site's big tight heading. */
