@@ -22,12 +22,12 @@ export interface MymindWelcomeProps {
 export function MymindWelcome({ line1, line2, mark, cta, targets, className }: MymindWelcomeProps) {
   return (
     <section className={cn("relative isolate overflow-x-clip bg-background text-primary-foreground", className)}>
-      <div className="relative flex min-h-[40rem] flex-col items-center justify-center pt-20 pb-24 lg:min-h-[52rem] lg:pt-28 lg:pb-32">
+      <div className="relative flex min-h-[40rem] flex-col items-center justify-center pt-20 pb-24 lg:min-h-[46rem] lg:pt-24 lg:pb-28">
         <div
           aria-hidden
-          className="absolute inset-x-[-30%] inset-y-0 -z-10 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,color-mix(in_oklab,var(--chart-1)_55%,var(--background))_0%,color-mix(in_oklab,var(--chart-1)_80%,var(--primary))_30%,var(--primary)_45%,color-mix(in_oklab,var(--primary)_40%,transparent)_62%,transparent_76%)] blur-[30px] lg:inset-x-[-8%]"
+          className="absolute inset-x-[-30%] inset-y-0 -z-10 bg-[radial-gradient(ellipse_52%_62%_at_50%_34%,color-mix(in_oklab,var(--chart-2)_30%,var(--background))_0%,color-mix(in_oklab,var(--chart-1)_75%,var(--background))_38%,color-mix(in_oklab,var(--chart-1)_60%,var(--primary))_62%,color-mix(in_oklab,var(--primary)_55%,transparent)_80%,transparent_100%)] blur-[30px] lg:inset-x-[-4%] lg:bg-[radial-gradient(ellipse_62%_70%_at_50%_30%,color-mix(in_oklab,var(--chart-2)_25%,var(--background))_0%,color-mix(in_oklab,var(--chart-1)_70%,var(--background))_40%,color-mix(in_oklab,var(--chart-1)_55%,var(--primary))_64%,color-mix(in_oklab,var(--primary)_45%,transparent)_82%,transparent_100%)]"
         />
-        <h2 className="w-fit font-display text-[3rem] leading-[0.9] tracking-[-0.04em] italic lg:text-[6rem] lg:leading-[0.72]">
+        <h2 className="w-fit font-display text-[3rem] leading-[0.9] font-[350] tracking-[-0.04em] italic lg:text-[6rem] lg:leading-[0.72]">
           <span className="flex items-end gap-1">
             {line1}
             {mark && <span className="mb-1 inline-grid size-10 place-items-center lg:size-[4.5rem] [&_svg]:size-full">{mark}</span>}

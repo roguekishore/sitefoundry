@@ -6,12 +6,13 @@ import { MymindMedia } from "@foundry/mymind-media";
 import "./mymind-use-cases.css";
 
 /** pastel surface of the card */
-export type MymindUseCaseTone = "beige" | "blue" | "sage" | "rose" | "peach" | "grey";
+export type MymindUseCaseTone = "beige" | "blue" | "sage" | "teal" | "rose" | "peach" | "grey";
 
 const tones: Record<MymindUseCaseTone, string> = {
   beige: "bg-secondary",
   blue: "bg-muted",
   sage: "bg-highlight/20",
+  teal: "bg-[color-mix(in_oklab,var(--highlight)_16%,var(--muted))]",
   rose: "bg-chart-2/15",
   peach: "bg-primary/10",
   grey: "bg-muted-foreground/15",
@@ -55,7 +56,7 @@ export function MymindUseCases({ eyebrow, title, cases, labels, playHref, classN
     <section className={cn("bg-accent pt-20 pb-16 text-foreground lg:pt-[2.5rem] lg:pb-[6rem]", className)}>
       <div className="mx-auto flex max-w-[81.25rem] flex-col items-center px-gutter text-center lg:px-0">
         <MymindEyebrow tone="primary">{eyebrow}</MymindEyebrow>
-        <h2 className="mt-5 max-w-[20rem] font-display text-[3rem] leading-[1.06] tracking-[-0.045em] lg:mt-4 lg:max-w-none lg:text-[5.25rem] lg:leading-none">{title}</h2>
+        <h2 className="mt-5 max-w-[20rem] font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] lg:mt-4 lg:max-w-none lg:text-[5.25rem] lg:leading-none">{title}</h2>
 
         <div className="mt-8 flex items-center gap-7 lg:hidden">
           <button type="button" aria-label={labels.previous} onClick={() => step(-1)} className="text-primary [&_svg]:size-6">

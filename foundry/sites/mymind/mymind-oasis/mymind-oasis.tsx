@@ -108,7 +108,7 @@ export function MymindOasis({ eyebrow, title, cards, after, className }: MymindO
       <div className="mx-auto max-w-[85.5rem] rounded-t-[2.25rem] rounded-b-lg bg-card px-3.5 pt-[6.5rem] pb-3.5 text-card-foreground shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--primary)_30%,transparent)] lg:rounded-t-[1.25rem] lg:px-[1.875rem] lg:pt-[7rem] lg:pb-[1.875rem]">
         <div className="text-center">
           <MymindEyebrow tone="primary">{eyebrow}</MymindEyebrow>
-          <h2 className="mt-5 font-display text-[3rem] leading-[1.06] tracking-[-0.045em] lg:mt-4 lg:text-[5.25rem] lg:leading-[0.98]">
+          <h2 className="mt-5 font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] lg:mt-4 lg:text-[5.25rem] lg:leading-[0.98]">
             {title.map((line, i) => (
               <span key={i} className="lg:block">
                 {line}{" "}

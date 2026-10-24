@@ -50,13 +50,13 @@ Heights measured on the 1440 (page 18994px) and 390 (16149px) full captures.
 |---|---|---|---|---|---|---|---|
 | 1 | header | mymind-header | 87px fixed (10% of window) | white pill (inset 20px, 50px tall) with wordmark and a round menu button | full-width transparent bar at top: wordmark left, dot-marked links centre, "Log in" + orange pill right; after ~100px scroll it shrinks into a 980px white pill with a shadow | — | scrubbed with scroll (bar → pill) |
 | 2 | hero | mymind-hero | content (~1510 / ~1050) | 4-line 50px serif headline, tag-pill sentence, one orange CTA; disc glow behind; preview frame 310×220 below | 2-line 134px headline over a 1050px white disc ringed with orange→pink→lavender light; tag-pill sentence; three app pills; 1098×779 preview frame overlapping the disc bottom with play button + "Watch the intro" | app preview video (aspect 1.41, radius 12px) | load: headline rise/fade; play button scale 0.5→1 + caption rise 30px on entering view |
-| 3 | manifesto | mymind-manifesto | content (~1200) | label, italic drop-cap word, 28/44 paragraphs, bold last phrase, NO list | same in a 730px column, 42/50 | — | entering view: paragraphs rise |
+| 3 | manifesto | mymind-manifesto | content (~1200) | label, italic drop-cap word, 28/44 paragraphs, bold last phrase, NO list | same in a 730px column, 42/50 | — | none (static in the original) |
 | 4 | welcome | mymind-welcome | content (~800 / ~650) | big orange/peach glow; 2-line italic white serif, second line indented; small orange pill | same, wider glow | brand mark (optional) | none seen (static) |
 | 5 | install row | mymind-install-row (component, inside welcome and closing) | content (~230) | hidden on phones (first one); shown in closing as 5 tiles in a row | five tiles split by hairlines: icon, serif name, orange small-capital action | store icons → lucide icons | hover: colour to orange |
 | 6 | extension | mymind-extension | content (~1240) | 48px heading, paragraph, small collage, link | 96px two-line heading, 18px paragraph, 844×618 collage with coloured category pills around it, orange play link | collage image | link hover → orange 0.7s expo-out |
 | 7 | it just works | mymind-ai | content (~1860 / ~1010) on warm grey | label, heading with outlined "AI" pill, paragraph, small 5-photo collage, link | same, collage ~1000×900 of five scattered photos with a "Save" chip | 5 photos | none seen |
 | 8 | search | mymind-search | content (~1400 / ~900) on tangerine | label, black serif heading, white paragraph, white link, search line | same, search line 760px wide with typed chips and a caret | — | loop: chips type in, caret blinks |
-| 9 | oasis | mymind-oasis | content (~5000 / ~4800) | white card inset 10px on an orange→peach gradient; label, heading; cards stacked | white card inset 36px with 20px top corners; bento rows 40/60, 57/43, full, 40/60, 57/43; cards 716px tall, 16px radius, pastel tones; then the tabbed panel | one media per card | cards reveal (fade + slight scale) on entering view |
+| 9 | oasis | mymind-oasis | content (~5000 / ~4800) | white card inset 10px on an orange→peach gradient; label, heading; cards stacked | white card inset 36px with 20px top corners; bento rows 40/60, 57/43, full, 40/60, 57/43; cards 716px tall, 16px radius, pastel tones; then the tabbed panel | one media per card | hover: picture eases up 2% (the capture's "scale 1→1" on .video-button cards reads as a hover scale, not a reveal) |
 | 10 | feature tabs | mymind-feature-tabs (inside oasis) | content (800 / ~700) | thin progress lines, title, text, media | four tab labels over hairlines, active one fills orange over ~6s and moves on; title + text left, media right | one media per tab | loop (auto-advance + progress line), hover on tabs |
 | 11 | testimonials | mymind-testimonials | content (~1550 / ~1700) | pink glow; bubbles stacked and alternating left/right, heading between | five white speech bubbles scattered around a centred white serif heading, each with two tail dots and an avatar | avatar per quote | bubbles drift up 40–100px scrubbed with scroll |
 | 12 | use cases | mymind-use-cases | content (~1100 / ~1000) | label, heading, "← Designers →" switcher, card with play button | label, heading, six tabs (active orange with a dot), 1300×410 tinted card: label, heading with italic second line, collage below | panel collage | tabs switch; panel content rises on entering view |
@@ -71,11 +71,10 @@ Heights measured on the 1440 (page 18994px) and 390 (16149px) full captures.
 | header (phone) | click | menu opens | 0.3s ease-out | React state, `hydrate: load` |
 | hero | load | headline, sentence, pills rise 24px + fade in, staggered | ~0.9s expo-out | CSS keyframes, fill both |
 | hero | entering view | play button scale 0.5→1 + fade; "Watch the intro" rises 30px + fades | ~ over 400px of scroll | CSS view timeline, `entry` px ranges |
-| manifesto | entering view | each paragraph rises 30px + fades | over 200px | CSS view timeline |
 | links (all) | hover | colour → tangerine | 0.7s cubic-bezier(0.19,1,0.22,1) | Tailwind transition classes |
 | app pills / install tiles | hover | colour → tangerine | 0.7s expo-out | Tailwind |
 | search | loop | chips pop in one by one (scale 0→1, 200ms "pop-out"), caret blinks | 7s loop | CSS keyframes |
-| oasis cards | entering view | opacity 0→1, scale 0.96→1 | over 240px | CSS view timeline |
+| oasis cards | hover | picture scale 1→1.02 | 0.7s cubic-bezier(0.19,1,0.22,1) | Tailwind transition (inferred: the capture logged an unchanged scale on these cards) |
 | feature tabs | loop / click | active tab's line fills left→right, then the next tab; panel crossfades | 6s per tab | React state + CSS keyframe on the line, `hydrate: visible` |
 | testimonials | scrubbed | each bubble translateY 0 → −40/−85/−100/−42/−68px | across its time in view | CSS view timeline `cover` range |
 | use cases | click / entering view | panel swaps; label + heading rise | 0.5s | React state; CSS view timeline |
@@ -111,3 +110,53 @@ original's size/aspect/radius (`bg-muted-foreground/15`, darker on dark cards).
   primary/10, sage = highlight/20, rose = chart-2/15, grey = muted-foreground/15), so they
   re-theme.
 - No Lenis/smooth scroll: the capture shows GSAP ScrollTrigger only.
+
+## Comparison round 1 (ours vs original, 1440 and 390)
+
+Page height: ours 18461 / 15604 vs original 18994 / 16149. Motion list: hero veil/play/caption
+reveal at 450–1350 (same as original), testimonial drifts −40/−85/−100/−42/−68 at 13050–14850
+(original 13050–15300), use-case panel rise, header fixed + bar→pill. Overflow: 360 overflowed
+(375px) because of the manifesto's lead word; 768/1024 fit.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | headline sits ~20px high; ring bottom lavender where the original turns orange on phones | headline ~25px high; serif reads heavier than Louize; ring bleed a bit wide | load rise + scroll reveal match | yes (pt, weight 350, bleed 11%); phone ring colour left |
+| manifesto | lead word too long → page 375px wide at 360 | "NO" set smaller than the serif (original: same size, heavy); ~100px extra bottom padding | static, as original | yes (shorter lead, NO at serif size, pb) |
+| welcome | ok | glow a compact ellipse; original is a wide bowl, pale pink centre, tangerine rim below | — | yes (wider radial with pale centre) |
+| install row | hidden on phones, as original | matches | hover colour | — |
+| extension | ok | headline heavier | link hover matches | yes (weight 350) |
+| it just works | ok | band yellower than the original's neutral warm grey | — | yes (secondary/70) |
+| search | ok | search line ~180px high, band ~400px short before the sheet | chip loop | yes (line mt 22rem, pb 26rem) |
+| feature cards | ok | photo card renders black (dark-scoped placeholder) | hover | yes (dark placeholder mid-grey) |
+| feature tabs | ok | ok | auto-advance seen in the Motion list (panel opacity changes) | — |
+| testimonials | ok | avatars sit a bit close to the bubbles | drift matches | left (small) |
+| use cases | ok | card tone yellow-green; original cool sage | rise on view | yes (teal = highlight mixed into muted) |
+| closing | ok | text starts ~50px close to the arc; arc fades too early | drift | yes |
+| footer | ok | colour wash behind the card too pale | — | yes (stronger radial wash) |
+
+## Comparison round 2
+
+Page height: ours 18708 / 15555 vs original 18994 / 16149; section tops now within ~60–240px of
+the original's all the way down (extension 4108 vs ~4050, it-just-works 5389 vs 5436, search
+7148 vs 7296, sheet 8495 vs 8704, testimonials 13484 vs 13720, closing 16308 vs 16400).
+360/768/1024 all fit. Scrolled header pill matches the original's width and height.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero, manifesto, extension, it just works, search, feature cards, use cases | close | close | as round 1 | — |
+| welcome | ok | the original's pink tint starts behind the NO list; ours starts just under it | — | left: a later block's glow would paint over the list's text |
+| testimonials | bubbles packed tighter than the original's (~140px apart, section ~1700px) | ok | drift ok | yes (bubble spacing, top padding, heading margins) |
+| footer | colour wash on the sides too pale (original: tangerine → rose → lavender stripes down both sides) | wordmark a touch small | — | yes (phone linear wash, 28px wordmark) |
+
+## Comparison round 3 (check)
+
+Page height: ours 18708 / 15803 vs 18994 / 16149. Phone testimonials and footer now read like the
+original; 360/768/1024 fit; the Motion list still shows every inventory row (header fixed with the
+scroll-driven pill, hero veil/play/caption reveals, search chip loop, feature-tab crossfades,
+five testimonial drifts, use-case rise, closing drift). Re-theme check: mymind-hero (light),
+mymind-use-cases (dark) and mymind-oasis (phone) under sample-ember keep their layout and take
+the other theme's colours and fonts.
+
+Left as is (reasons): the phone hero ring turns lavender at the bottom where the original's turns
+orange; the headline is one line shorter on phones because our copy is shorter; all pictures,
+avatars and the brand mascot are placeholders (or a lucide icon) by design.

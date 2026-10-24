@@ -47,12 +47,12 @@ export function MymindFooter({ brand, mark, slogan, feature, primaryLinks, colum
     <footer className={cn("relative isolate overflow-x-clip bg-accent px-5 pt-20 text-foreground lg:px-[4.375rem] lg:pt-24", className)}>
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_30%_60%_at_0%_70%,color-mix(in_oklab,var(--primary)_55%,var(--accent))_0%,transparent_100%),radial-gradient(ellipse_30%_60%_at_100%_85%,color-mix(in_oklab,var(--chart-3)_70%,var(--chart-2))_0%,transparent_100%),radial-gradient(ellipse_40%_40%_at_20%_100%,color-mix(in_oklab,var(--chart-2)_60%,var(--accent))_0%,transparent_100%)] blur-[30px]"
+        className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_34%_55%_at_0%_62%,color-mix(in_oklab,var(--primary)_80%,var(--accent))_0%,transparent_100%),radial-gradient(ellipse_30%_60%_at_100%_88%,color-mix(in_oklab,var(--chart-3)_55%,var(--chart-2))_0%,transparent_100%),radial-gradient(ellipse_45%_45%_at_15%_100%,color-mix(in_oklab,var(--chart-2)_80%,var(--accent))_0%,transparent_100%),radial-gradient(ellipse_50%_30%_at_50%_10%,color-mix(in_oklab,var(--primary)_25%,var(--accent))_0%,transparent_100%)] blur-[30px] max-lg:bg-[linear-gradient(to_bottom,var(--accent)_0%,color-mix(in_oklab,var(--primary)_45%,var(--accent))_30%,color-mix(in_oklab,var(--chart-4)_45%,var(--accent))_50%,color-mix(in_oklab,var(--chart-2)_60%,var(--accent))_75%,color-mix(in_oklab,var(--chart-3)_45%,var(--chart-2))_100%)] max-lg:blur-none"
       />
       <div className="mx-auto max-w-[81.25rem] rounded-t-[1.25rem] bg-card px-[1.875rem] pt-10 pb-6 text-card-foreground lg:px-[4.375rem] lg:pt-[3.75rem] lg:pb-8">
         <div className="grid gap-y-16 lg:grid-cols-[1fr_41.25rem] lg:gap-x-10 lg:gap-y-[5rem]">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <span className={cn(round, "flex items-center gap-1.5 text-2xl font-bold tracking-[-0.02em] [&_svg]:size-6")}>
+            <span className={cn(round, "flex items-center gap-1.5 text-2xl font-bold lg:text-[1.75rem] tracking-[-0.02em] [&_svg]:size-6")}>
               {mark}
               {brand}
             </span>

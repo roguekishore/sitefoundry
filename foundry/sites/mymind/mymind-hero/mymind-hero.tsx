@@ -49,15 +49,15 @@ export interface MymindHeroProps {
 /** Glow-ringed disc hero with a scroll-revealed play button on the preview. */
 export function MymindHero({ title, sentence, apps, phoneCta, media, watchLabel, watchHref, className }: MymindHeroProps) {
   return (
-    <section className={cn("relative isolate overflow-x-clip bg-background pt-[13.25rem] text-foreground md:pt-[10rem] lg:pt-[9.375rem]", className)}>
+    <section className={cn("relative isolate overflow-x-clip bg-background pt-[13.25rem] text-foreground md:pt-[10rem] lg:pt-[10.75rem]", className)}>
       {/* the ring of light and the white disc */}
       <div aria-hidden className="absolute top-[6.25rem] left-1/2 -z-10 aspect-square w-[42.5rem] -translate-x-1/2 md:top-[1rem] md:w-[56rem] lg:top-[-4.25rem] lg:w-[65.375rem]">
-        <div className="absolute -inset-[13%] rounded-full bg-[conic-gradient(from_0deg,var(--primary)_0deg,var(--primary)_35deg,var(--glow)_95deg,color-mix(in_oklab,var(--chart-3)_70%,var(--glow))_150deg,var(--chart-3)_190deg,color-mix(in_oklab,var(--glow)_60%,var(--chart-3))_250deg,var(--glow)_290deg,var(--primary)_330deg)] opacity-90 blur-[60px] lg:blur-[80px]" />
+        <div className="absolute -inset-[11%] rounded-full bg-[conic-gradient(from_0deg,var(--primary)_0deg,var(--primary)_35deg,var(--glow)_95deg,color-mix(in_oklab,var(--chart-3)_70%,var(--glow))_150deg,var(--chart-3)_190deg,color-mix(in_oklab,var(--glow)_60%,var(--chart-3))_250deg,var(--glow)_290deg,var(--primary)_330deg)] opacity-90 blur-[60px] lg:blur-[80px]" />
         <div className="absolute inset-0 rounded-full bg-background blur-[3px]" />
       </div>
 
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter text-center">
-        <h1 className="font-display text-[3.125rem] leading-[0.96] font-normal tracking-[-0.045em] md:text-[5.75rem] md:leading-[0.9] lg:text-[8.375rem] lg:leading-[0.88]">
+        <h1 className="font-display text-[3.125rem] leading-[0.96] font-[350] tracking-[-0.045em] md:text-[5.75rem] md:leading-[0.9] lg:text-[8.375rem] lg:leading-[0.88]">
           {title.map((line, i) => (
             <span key={line} className="mymind-hero-in block" style={{ animationDelay: `${0.1 + i * 0.12}s` }}>
               {line}

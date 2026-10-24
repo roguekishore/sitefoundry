@@ -23,10 +23,10 @@ export interface MymindSearchProps {
 /** Tangerine band with a looping search line. */
 export function MymindSearch({ eyebrow, title, text, link, chips, searchLabel, className }: MymindSearchProps) {
   return (
-    <section className={cn("bg-primary pt-14 pb-24 text-foreground lg:pt-[7rem] lg:pb-[11rem]", className)}>
+    <section className={cn("bg-primary pt-14 pb-24 text-foreground lg:pt-[7rem] lg:pb-[26rem]", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter text-center">
         <MymindEyebrow tone="inherit" className="text-foreground/80">{eyebrow}</MymindEyebrow>
-        <h2 className="mt-6 font-display text-[3rem] leading-[1.06] tracking-[-0.045em] text-foreground lg:mt-5 lg:text-[6rem] lg:leading-[0.92]">
+        <h2 className="mt-6 font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-foreground lg:mt-5 lg:text-[6rem] lg:leading-[0.92]">
           {title.map((line, i) => (
             <span key={i} className="lg:block">
               {line}{" "}
@@ -38,7 +38,7 @@ export function MymindSearch({ eyebrow, title, text, link, chips, searchLabel, c
           {link.label}
         </MymindPlayLink>
 
-        <div role="img" aria-label={searchLabel} className="relative mt-28 flex h-12 w-full max-w-[13rem] items-center justify-center gap-2 border-b border-primary-foreground/40 lg:mt-[11.5rem] lg:h-[4.5rem] lg:max-w-[47.25rem] lg:gap-2.5">
+        <div role="img" aria-label={searchLabel} className="relative mt-28 flex h-12 w-full max-w-[13rem] items-center justify-center gap-2 border-b border-primary-foreground/40 lg:mt-[22rem] lg:h-[4.5rem] lg:max-w-[47.25rem] lg:gap-2.5">
           {chips.map((c, i) => (
             <span
               key={c}
