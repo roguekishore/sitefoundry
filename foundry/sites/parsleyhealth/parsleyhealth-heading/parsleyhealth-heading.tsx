@@ -48,7 +48,7 @@ export function ParsleyhealthHeading({
         <p
           className={cn(
             "mb-3 font-sans text-[0.6875rem] leading-tight font-medium tracking-[0.09em] uppercase lg:mb-4 lg:text-xs",
-            tone === "brand" && "text-secondary",
+            tone === "brand" && "text-ring",
           )}
         >
           {eyebrow}

@@ -28,7 +28,7 @@ export function ParsleyhealthExperts({ title, lead, points, person, media, media
       <div className="mx-auto max-w-[calc(var(--page-width)+10rem)]">
         <div className="parsleyhealth-experts-text">
           <ParsleyhealthHeading title={title} titleClassName="max-w-[20rem] lg:max-w-none" />
-          <div className="mt-6 max-w-[56rem] border-b border-foreground/15 pb-9 text-[1.1rem] leading-[1.5] text-foreground lg:mt-8 lg:border-0 lg:pb-0 lg:text-[1.4438rem] lg:leading-[1.455] [&_a]:text-secondary [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
+          <div className="mt-6 max-w-[56rem] border-b border-foreground/15 pb-9 text-[1.1rem] leading-[1.5] text-foreground lg:mt-8 lg:border-0 lg:pb-0 lg:text-[1.4438rem] lg:leading-[1.455] [&_a]:text-ring [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
             {lead}
           </div>
         </div>
@@ -38,7 +38,7 @@ export function ParsleyhealthExperts({ title, lead, points, person, media, media
             <ul className="flex flex-col gap-6 text-[1.0312rem] leading-[1.409] text-primary lg:max-w-[32rem] lg:gap-4 lg:text-[1.1rem] lg:leading-[1.5]">
               {points.map((point) => (
                 <li key={point} className="flex gap-2.5 lg:gap-3">
-                  <Check aria-hidden className="mt-1 size-3.5 shrink-0 text-secondary" strokeWidth={1.5} />
+                  <Check aria-hidden className="mt-1 size-3.5 shrink-0 text-ring" strokeWidth={1.5} />
                   <span>{point}</span>
                 </li>
               ))}

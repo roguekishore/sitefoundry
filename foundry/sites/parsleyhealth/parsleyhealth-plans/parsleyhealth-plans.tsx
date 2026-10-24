@@ -101,7 +101,7 @@ export function ParsleyhealthPlans({ eyebrow, title, plans, className }: Parsley
               />
               <div
                 className={cn(
-                  "mt-8 text-[1.1rem] leading-[1.364] [&_a]:text-secondary [&_a]:underline [&_a]:underline-offset-4",
+                  "mt-8 text-[1.1rem] leading-[1.364] [&_a]:text-ring [&_a]:underline [&_a]:underline-offset-4",
                   wide ? "lg:col-start-2 lg:row-start-3 lg:mt-0 lg:self-end lg:pb-1" : "lg:mt-11 lg:text-[1.0312rem] lg:leading-[1.318]",
                 )}
               >

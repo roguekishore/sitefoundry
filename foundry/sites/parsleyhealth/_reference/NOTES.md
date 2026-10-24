@@ -119,3 +119,22 @@ pre-state in the section crops; checked on the scroll frames instead.
 | quote, experts | — | — | reveals present: fade + rise 20px, rise 16px, scale 0.96→1 | — |
 | floating pill | — | — | appears after the first screen, rise 16px | — |
 | overflow | fits at 360/768/1024 | | | |
+
+## Comparison round 2
+
+Heights at 1440 now within 13px of the original for every section except the FAQ (content
+length) and the footer (+55px, its feed slot and link stack). Phones: the reviews and
+conditions titles are back; text sizes read like the original.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | — | 4-line headline, text block centred in the 760px photo like the original | none | — |
+| plans | — | 1019 vs 1006px | — | — |
+| reviews | our first card has no neighbour to its left (the original loops) | 2.8 cards visible vs 2.75 | arrows + dots work | no: a looping track needs cloned cards; not worth it |
+| footer | groups split Full Circle+Lab Readout+About / Resources+Clinics; original Complete+About+Centers / Lab+Resources | 55px taller | hover | no: phone grouping follows the desktop columns |
+| re-theme (sample-ember) | — | plans and split re-theme cleanly, but sage text used `--secondary`, a surface colour that is near-white in ember | — | yes: sage text (eyebrows, links, names, checks, ring arrows) now uses `--ring`, the same sage in this theme |
+| dark mode | — | FAQ in dark: forest band, bone text, clover rules | — | — |
+
+Stopped here: each section pair reads as the same design at a glance (content and media
+placeholders aside), the motion rows all show up in our Motion list, and nothing overflows at
+360/768/1024.

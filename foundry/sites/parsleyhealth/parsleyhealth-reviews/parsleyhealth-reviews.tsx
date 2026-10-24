@@ -80,7 +80,7 @@ export function ParsleyhealthReviews({ eyebrow, title, items, action, prevLabel,
                     </div>
                   </div>
                   <div className="px-3 pb-4 lg:px-3">
-                    <p className="border-b border-primary pt-3 pb-2.5 text-[1.3063rem] leading-[1.273] text-secondary lg:text-[1.4438rem]">{item.name}</p>
+                    <p className="border-b border-primary pt-3 pb-2.5 text-[1.3063rem] leading-[1.273] text-ring lg:text-[1.4438rem]">{item.name}</p>
                     <p className="mt-3 text-[0.9625rem] leading-[1.455] text-foreground">{item.quote}</p>
                     {featured && action ? (
                       <ParsleyhealthButton href={action.href} variant="highlight" size="sm" className="mt-3.5 px-6.5">

@@ -16,7 +16,7 @@ export interface ParsleyhealthArrowProps {
 }
 
 const variants = {
-  ring: "size-12 border border-border text-secondary hover:border-secondary hover:bg-secondary/6",
+  ring: "size-12 border border-border text-ring hover:border-ring hover:bg-ring/6",
   solid: "size-12 bg-primary text-primary-foreground hover:bg-primary/88",
   dot: "size-[1.875rem] bg-secondary text-secondary-foreground hover:bg-secondary/88",
 };

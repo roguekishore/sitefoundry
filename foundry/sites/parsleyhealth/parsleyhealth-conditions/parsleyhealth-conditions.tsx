@@ -81,7 +81,7 @@ export function ParsleyhealthConditions({ title, action, items, prevLabel, nextL
                 <p className="mt-4 text-[1.1688rem] leading-[1.409] text-foreground/75 lg:text-[1.2375rem] lg:leading-[1.455]">{item.text}</p>
                 <a
                   href={item.link.href}
-                  className="group/link mt-auto inline-flex items-center gap-2.5 self-start pl-0.5 text-[0.9625rem] text-secondary"
+                  className="group/link mt-auto inline-flex items-center gap-2.5 self-start pl-0.5 text-[0.9625rem] text-ring"
                 >
                   <span className="underline decoration-1 underline-offset-[0.3rem]">{item.link.label}</span>
                   <ArrowRight
