@@ -29,7 +29,7 @@ export function CursorHero({ title, primaryAction, secondaryAction, media, media
   return (
     <section className={cn("bg-background pb-section text-foreground", className)}>
       <div className="mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter pt-26 lg:pt-28">
-        <h1 className="max-w-[15em] font-display text-2xl leading-[1.25] tracking-[-0.01em] text-balance lg:text-[1.625rem]">
+        <h1 className="max-w-[15em] font-display text-2xl font-[450] leading-[1.25] tracking-[-0.01em] text-balance lg:text-[1.625rem]">
           {title}
         </h1>
         <div className="mt-5.5 flex flex-wrap gap-2.5">

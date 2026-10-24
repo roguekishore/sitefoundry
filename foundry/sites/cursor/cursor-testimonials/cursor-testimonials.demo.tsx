@@ -6,17 +6,17 @@ export const testimonialsSample: CursorTestimonialsProps = {
   title: "A calmer way to make software.",
   quotes: [
     {
-      quote: "“We rolled it out to one squad on a Monday. By Friday every team had asked for seats, and the strongest engineers were the loudest about it.”",
+      quote: "“We rolled it out to one squad on a Monday. By Friday every team in the building had asked for seats, and the strongest engineers were the loudest voices asking.”",
       name: "Marisol Ekdahl",
       role: "VP Engineering, Tidewell",
     },
     {
-      quote: "“Nine thousand of our developers now pair with Fernwork every day, and our release cadence has roughly doubled.”",
+      quote: "“Nine thousand of our developers now pair with Fernwork every single day, and our release cadence has roughly doubled since spring.”",
       name: "Jun Abernathy",
       role: "CTO, Copperline Systems",
     },
     {
-      quote: "“The trick is letting you choose how much to delegate. Nudge a single line, or let it carry a whole feature from plan to merge.”",
+      quote: "“The trick is letting you choose how much to delegate. In Fernwork you can nudge a single line by hand, or let it carry a whole feature from plan to merge.”",
       name: "Teodor Vance",
       role: "Founder, Lattice School",
     },
@@ -31,7 +31,7 @@ export const testimonialsSample: CursorTestimonialsProps = {
       role: "Author of the Bramble UI kit",
     },
     {
-      quote: "“Programming feels playful again. We're early, and tools like this are where new models get to show what they can really do.”",
+      quote: "“Programming feels playful again. We are very early on this curve, and tools like this are where new models get to show what they can really do.”",
       name: "Adaeze Morrow",
       role: "President, Northgate Research",
     },

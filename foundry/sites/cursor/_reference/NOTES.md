@@ -97,3 +97,41 @@ Skipped: the cookie banner (not the site's design, a consent layer); the logo ti
   the original's "Get started →".
 - Testimonials: phones show the first three cards, as the original does.
 - Phone menu is a `<details>` disclosure so the header needs no JavaScript.
+
+## Comparison round 1 (light, 390 and 1440)
+
+Page height: 390 10358 vs 10186 · 1440 8216 vs 8199. No sideways overflow at 360/768/1024
+(both). Header is sticky (original: fixed) and stays on top in every scroll frame.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | 1063 vs 1066; layout, pill, 720px frame match | 1085 vs 1086; heading a touch lighter than CursorGothic | hovers only, as original | weight 450 on the heading: yes |
+| logos | 216 vs 219, 4×2 tiles match | 176 vs 177 | — | — |
+| features | 3888 vs 3741: gaps 88 vs 85, and the original's last frame is 650 not 680 | media 829 vs 840 wide | — | media width 66.4%, phone gap 84px: yes; kept one 680px frame height for all panels (one rule) |
+| testimonials | 861 vs 886 | 650 vs 700: our quotes 3 lines vs the original's 4–5 | — | quotes lengthened to 4–5 lines; heading weight 450: yes |
+| avatars / team photo | plain placeholder (bg-muted) nearly invisible on the card panel | same | — | plain tone now bg-glow/70: yes |
+| frontier | 1627 vs 1630 | 742 vs 739 | link hovers | — |
+| changelog / highlights | cards 143 vs 130 tall (padding) | 345 vs 341 | card hover darkens a step | py-3.5 on phones, byline gap 10/12px: yes |
+| research | 440 vs 437 | 685 vs 694 | — | — |
+| cta | 304 vs 310 | 344 vs 346; type lighter and rounder | — | weight 450: yes |
+| footer | 1223 vs 1183: link rhythm 34 vs 31 | 549 vs 526: link rhythm 33 vs 30 (line-height lost on the inline links) | — | leading moved onto the list: yes |
+
+## Comparison round 2 (light, after the round 1 fixes)
+
+Page height: 390 10320 vs 10186 · 1440 8218 vs 8199. Fits at 360/768/1024. Header sticky
+for the whole scroll. Every hover in ours-design.md matches the original's values and
+timing: nav ink → ink 75%, outline pill → panel fill, ink pill #26251e → #3b3a33, pale pill
+#e6e5e0 → #e1e0db, orange links → 75%, link cards #f2f1ed → #ebeae5, all 150ms
+cubic-bezier(.4,0,.2,1). No scroll reveals on either side (the original's are inside its
+product mock-ups, which are placeholders here).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| features | 3876 vs 3741: the original's fourth frame is 650px, ours 680 (one rule for all) | 3253 vs 3203, same cause; media now 840 wide | — | left as is (judgement: one frame height) |
+| testimonials | 906 vs 886 | 674 vs 700: our second-row quotes run 3–4 lines, theirs 5 | — | copy length only; left |
+| footer | 1160 vs 1183 | 522 vs 526 | — | — |
+| all others | within 10px | within 10px | — | — |
+
+Re-theme: `cursor-hero` and `cursor-post-row` under `sample-ember` take its serif, terracotta
+pill, green links, rounder cards and orange glow wash with no leftovers.
+Stopped here: each section pair reads as the same design apart from copy and placeholders.

@@ -24,7 +24,7 @@ export function CursorSplitPanel({ children, media, mediaSide = "right", mediaCl
       )}
     >
       <div className="min-w-0 lg:flex-1 lg:px-1">{children}</div>
-      <div className={cn("min-w-0 overflow-clip rounded-lg lg:w-[65.5%] lg:shrink-0", mediaClassName)}>{media}</div>
+      <div className={cn("min-w-0 overflow-clip rounded-lg lg:w-[66.4%] lg:shrink-0", mediaClassName)}>{media}</div>
     </div>
   );
 }

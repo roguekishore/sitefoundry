@@ -34,7 +34,7 @@ const text = "text-[0.9375rem] leading-[1.5] lg:text-[1.375rem] lg:leading-[1.3]
 export function CursorFeatures({ features, className }: CursorFeaturesProps) {
   return (
     <section className={cn("bg-background py-section text-foreground", className)}>
-      <div className="mx-auto flex max-w-[calc(var(--page-width)+2*var(--page-gutter))] flex-col gap-22 px-gutter">
+      <div className="mx-auto flex max-w-[calc(var(--page-width)+2*var(--page-gutter))] flex-col gap-21 px-gutter lg:gap-22">
         {features.map((f, i) => (
           <CursorSplitPanel
             key={f.title}
