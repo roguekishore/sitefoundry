@@ -133,3 +133,30 @@ reveal at 450–1350 (same as original), testimonial drifts −40/−85/−100/�
 | use cases | ok | card tone yellow-green; original cool sage | rise on view | yes (teal = highlight mixed into muted) |
 | closing | ok | text starts ~50px close to the arc; arc fades too early | drift | yes |
 | footer | ok | colour wash behind the card too pale | — | yes (stronger radial wash) |
+
+## Comparison round 2
+
+Page height: ours 18708 / 15555 vs original 18994 / 16149; section tops now within ~60–240px of
+the original's all the way down (extension 4108 vs ~4050, it-just-works 5389 vs 5436, search
+7148 vs 7296, sheet 8495 vs 8704, testimonials 13484 vs 13720, closing 16308 vs 16400).
+360/768/1024 all fit. Scrolled header pill matches the original's width and height.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero, manifesto, extension, it just works, search, feature cards, use cases | close | close | as round 1 | — |
+| welcome | ok | the original's pink tint starts behind the NO list; ours starts just under it | — | left: a later block's glow would paint over the list's text |
+| testimonials | bubbles packed tighter than the original's (~140px apart, section ~1700px) | ok | drift ok | yes (bubble spacing, top padding, heading margins) |
+| footer | colour wash on the sides too pale (original: tangerine → rose → lavender stripes down both sides) | wordmark a touch small | — | yes (phone linear wash, 28px wordmark) |
+
+## Comparison round 3 (check)
+
+Page height: ours 18708 / 15803 vs 18994 / 16149. Phone testimonials and footer now read like the
+original; 360/768/1024 fit; the Motion list still shows every inventory row (header fixed with the
+scroll-driven pill, hero veil/play/caption reveals, search chip loop, feature-tab crossfades,
+five testimonial drifts, use-case rise, closing drift). Re-theme check: mymind-hero (light),
+mymind-use-cases (dark) and mymind-oasis (phone) under sample-ember keep their layout and take
+the other theme's colours and fonts.
+
+Left as is (reasons): the phone hero ring turns lavender at the bottom where the original's turns
+orange; the headline is one line shorter on phones because our copy is shorter; all pictures,
+avatars and the brand mascot are placeholders (or a lucide icon) by design.

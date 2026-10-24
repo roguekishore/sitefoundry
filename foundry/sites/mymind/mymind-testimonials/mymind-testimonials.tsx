@@ -37,7 +37,7 @@ function Bubble({ quote, i }: { quote: MymindQuote; i: number }) {
   const right = spot ? spot.side === "right" : i % 2 === 0;
   return (
     <figure
-      className={cn("mymind-testimonials-drift relative w-[68%] pb-14 lg:pb-0", spot ? cn(spot.phone, "lg:absolute lg:ml-0", spot.desk) : "mx-auto lg:mt-10")}
+      className={cn("mymind-testimonials-drift relative w-[68%] pb-[5.5rem] lg:pb-0", spot ? cn(spot.phone, "lg:absolute lg:ml-0", spot.desk) : "mx-auto lg:mt-10")}
       style={{ "--mymind-drift": `${spot ? spot.drift : -50}px` } as CSSProperties}
     >
       <blockquote className="rounded-full bg-card px-6 py-3.5 text-[0.6875rem] leading-[1.35] text-card-foreground lg:px-12 lg:py-[1.375rem] lg:text-lg lg:leading-[1.4]">
@@ -58,7 +58,7 @@ export function MymindTestimonials({ title, quotes, link, className }: MymindTes
   return (
     <section
       className={cn(
-        "relative isolate overflow-x-clip bg-accent pt-24 pb-16 text-foreground lg:pt-0 lg:pb-[9.5rem]",
+        "relative isolate overflow-x-clip bg-accent pt-40 pb-16 text-foreground lg:pt-0 lg:pb-[9.5rem]",
         className,
       )}
     >
@@ -70,7 +70,7 @@ export function MymindTestimonials({ title, quotes, link, className }: MymindTes
         {quotes.slice(0, 3).map((q, i) => (
           <Bubble key={q.name} quote={q} i={i} />
         ))}
-        <h2 className="my-10 text-center font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-primary-foreground lg:absolute lg:inset-x-0 lg:top-[43.75rem] lg:my-0 lg:text-[5.75rem] lg:leading-[0.92]">
+        <h2 className="mt-6 mb-20 text-center font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-primary-foreground lg:absolute lg:inset-x-0 lg:top-[43.75rem] lg:my-0 lg:text-[5.75rem] lg:leading-[0.92]">
           {title.map((line, i) => (
             <span key={i} className="block">
               {line}
