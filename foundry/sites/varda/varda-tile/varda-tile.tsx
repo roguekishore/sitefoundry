@@ -60,7 +60,7 @@ export function VardaTile({
         </div>
         <h3
           className={cn(
-            "font-display font-medium",
+            "font-display font-[550]",
             size === "lg"
               ? "text-[2rem]/[1.15] tracking-[-0.02em] lg:text-[3.42rem]/[1.15]"
               : "text-xl/6 lg:text-[2.22rem]/[1.2]",

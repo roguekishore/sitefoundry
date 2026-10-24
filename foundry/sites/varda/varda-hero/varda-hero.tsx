@@ -34,7 +34,7 @@ export function VardaHero({ title, lead, links, background, className }: VardaHe
         {background ?? <div className="varda-hero-wash size-full" />}
       </div>
 
-      <div className="relative mx-auto grid max-w-page grid-cols-3 lg:aspect-[2/1] lg:grid-cols-6 lg:grid-rows-3 lg:border lg:border-muted-foreground">
+      <div className="@container relative mx-auto grid max-w-page grid-cols-3 lg:aspect-[2/1] lg:grid-cols-6 lg:grid-rows-3 lg:border lg:border-muted-foreground">
         {/* the drawing grid: 6 × 3 square cells in dashed hairlines (desktop) */}
         <div aria-hidden className="pointer-events-none absolute inset-0 hidden grid-cols-6 grid-rows-3 lg:grid">
           {Array.from({ length: 18 }, (_, i) => (
@@ -45,7 +45,7 @@ export function VardaHero({ title, lead, links, background, className }: VardaHe
         <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 left-1/2 hidden border-l border-muted-foreground lg:block" />
         <div aria-hidden className="pointer-events-none absolute top-2/3 right-0 left-1/2 hidden border-t border-muted-foreground lg:block" />
 
-        <h1 className="relative col-span-2 flex min-h-[16.25rem] items-end p-gutter font-display text-[2.8rem]/none font-bold tracking-[-0.03em] text-primary lg:col-span-3 lg:row-start-2 lg:min-h-0 lg:items-center lg:text-[min(7.46vw,6.716rem)]/none">
+        <h1 className="relative col-span-2 flex min-h-[16.25rem] items-end p-gutter font-display text-[2.8rem]/none font-bold tracking-[-0.03em] text-primary lg:col-span-3 lg:row-start-2 lg:min-h-0 lg:items-start lg:pt-1 lg:text-[min(7.69cqw,6.716rem)]/none">
           <span>
             {title.map((line, i) => (
               <Fragment key={i}>
@@ -74,7 +74,7 @@ export function VardaHero({ title, lead, links, background, className }: VardaHe
                 {link.label}
                 <ArrowUpRight
                   aria-hidden
-                  strokeWidth={1.75}
+                  strokeWidth={2.25}
                   className={cn("mt-1 size-5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5", ease)}
                 />
               </a>

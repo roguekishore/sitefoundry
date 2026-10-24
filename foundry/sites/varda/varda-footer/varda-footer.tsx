@@ -57,7 +57,7 @@ export function VardaFooter({ name, icon, homeHref = "#", details, socials, colu
     <footer className={cn("bg-background text-foreground", className)}>
       <div className="mx-gutter border-x border-dashed border-border px-[calc(var(--page-gutter)+0.0625rem)] pt-[calc(var(--page-gutter)*2)] pb-[calc(var(--page-gutter)*2.4)]">
         <div className="mx-auto max-w-page">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-6">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-6">
             <div>
               <a href={homeHref} className="inline-flex items-center gap-3.5">
                 <span aria-hidden className="[&_svg]:size-10 lg:[&_svg]:size-[2.625rem]">
@@ -65,11 +65,11 @@ export function VardaFooter({ name, icon, homeHref = "#", details, socials, colu
                 </span>
                 <span className="text-[1.75rem]/none font-extrabold tracking-[0.06em] uppercase lg:text-[1.875rem]">{name}</span>
               </a>
-              <dl className="mt-8 flex flex-col gap-4 lg:mt-9 lg:gap-6">
+              <dl className="mt-6 flex flex-col gap-4 lg:mt-7 lg:gap-3.5">
                 {details.map((d) => (
                   <div key={d.label}>
                     <dt className={label}>{d.label}</dt>
-                    <dd className="mt-1 text-base/6 font-medium lg:max-w-[16.5rem] lg:text-[1.079rem]/[1.5]">
+                    <dd className="mt-1 text-base/6 font-semibold lg:max-w-[16.5rem] lg:text-[1.079rem]/[1.5]">
                       {d.href ? (
                         <a href={d.href} className={cn(link, "transition-colors hover:text-card")}>
                           {d.lines.join(" ")}
@@ -92,16 +92,16 @@ export function VardaFooter({ name, icon, homeHref = "#", details, socials, colu
               </ul>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 lg:pl-3">
+            <div className="grid grid-cols-2 gap-6 lg:pt-1">
               {columns.map((groups, i) => (
-                <div key={i} className="flex flex-col gap-10">
+                <div key={i} className="flex flex-col gap-10 lg:gap-7">
                   {groups.map((g) => (
                     <div key={g.title}>
                       <h2 className={label}>{g.title}</h2>
-                      <ul className="mt-2 flex flex-col gap-2 lg:mt-2.5 lg:gap-[1.0625rem]">
+                      <ul className="mt-2 flex flex-col gap-2 lg:mt-2 lg:gap-[1.0625rem]">
                         {g.links.map((l) => (
                           <li key={l.label}>
-                            <a href={l.href} className={cn(link, "text-base/6 font-medium lg:text-[1.063rem]/none")}>
+                            <a href={l.href} className={cn(link, "block text-base/6 font-semibold lg:text-[1.063rem]/none")}>
                               {l.label}
                             </a>
                           </li>
@@ -114,7 +114,7 @@ export function VardaFooter({ name, icon, homeHref = "#", details, socials, colu
             </div>
           </div>
 
-          <div className="mt-14 flex flex-col gap-3 border-t border-dashed border-border pt-6 text-[0.8rem]/[1.5] font-medium lg:mt-14 lg:flex-row lg:items-center lg:justify-between lg:pt-8">
+          <div className="mt-12 flex flex-col gap-3 border-t border-dashed border-border pt-6 text-[0.8rem]/[1.5] font-medium lg:mt-12 lg:flex-row lg:items-center lg:justify-between lg:pt-8">
             <p>{copyright}</p>
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               {legal.map((l) => (
