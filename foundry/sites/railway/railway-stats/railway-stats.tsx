@@ -65,7 +65,7 @@ function Cell({ ch, col, grey, tickDelay }: { ch: string; col: number; grey: boo
       {ch && (
         <span
           className={cn("railway-stats-char block", grey ? "text-muted-foreground/70" : "text-foreground")}
-          style={{ "--railway-stats-col": `${col * 10}px` } as CSSProperties}
+          style={{ "--railway-stats-col": `${col * 4}px` } as CSSProperties}
         >
           <span className={cn("block", tickDelay !== undefined && "railway-stats-tick")} style={tickDelay !== undefined ? { animationDelay: `${tickDelay}s` } : undefined}>
             {ch}

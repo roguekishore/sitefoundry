@@ -30,7 +30,7 @@ export const testimonialsSample: RailwayTestimonialsProps = {
       role: "Co-founder & CTO at Tessel",
     },
   ],
-  postsTitle: "...and liked by the people who use it",
+  postsTitle: "...and liked by builders",
   postsLink: { label: "Join three million builders on Halyard →", href: "#" },
   posts: [
     { name: "mira codes", handle: "@mirabuilds", text: <>i love how {at("halyard")} lets me show the whole setup to someone and the architecture explains itself.</> },

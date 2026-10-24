@@ -54,7 +54,7 @@ export function RailwayTestimonials({ title, lead, action, quotes, postsTitle, p
   return (
     <section className={cn("px-gutter pb-4 text-foreground", className)}>
       <RailwayPanel tint="highlight">
-        <div className="mx-auto max-w-[70.5rem] px-4 pt-20 text-center">
+        <div className="mx-auto max-w-[70.5rem] px-4 pt-20 text-center lg:px-0">
           <h2 className="mx-auto max-w-[20rem] font-display text-[2.5rem] leading-[1.2] tracking-[-0.01em] sm:max-w-none">{title}</h2>
           <p className="mx-auto mt-1.5 max-w-[38rem] text-lg leading-7 text-muted-foreground">{lead}</p>
           {action && (

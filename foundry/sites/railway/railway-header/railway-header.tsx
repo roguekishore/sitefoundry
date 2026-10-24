@@ -36,19 +36,19 @@ export interface RailwayHeaderProps {
 export function RailwayHeader({ brand, nav, actions, menuLabel, className }: RailwayHeaderProps) {
   return (
     <header className={cn("sticky top-0 z-40 bg-background text-foreground", className)}>
-      <div className="mx-auto flex h-[4.125rem] max-w-page items-center justify-between px-gutter lg:h-[4.5rem]">
+      <div className="mx-auto flex h-[4.125rem] max-w-page items-center justify-between px-gutter lg:h-[4.5rem] xl:px-0">
         <a href={brand.href} className="flex items-center gap-2 text-[1.375rem] font-semibold tracking-[-0.02em] [&_svg]:size-6">
           {brand.mark}
           <span>{brand.name}</span>
         </a>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-3 lg:flex">
           {nav.map((item) =>
             item.links ? (
               <div key={item.label} className="group relative">
                 <button
                   type="button"
-                  className="flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 group-focus-within:bg-card group-hover:bg-card group-hover:text-foreground motion-reduce:transition-none"
+                  className="flex h-9 items-center gap-1.5 rounded-md px-3 text-[0.9375rem] font-medium text-foreground/90 transition-colors duration-150 group-focus-within:bg-card group-hover:bg-card group-hover:text-foreground motion-reduce:transition-none"
                 >
                   {item.label}
                   <ChevronDown className="size-3.5 text-muted-foreground" strokeWidth={2} />
@@ -69,7 +69,7 @@ export function RailwayHeader({ brand, nav, actions, menuLabel, className }: Rai
               <a
                 key={item.label}
                 href={item.href}
-                className="flex h-9 items-center rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none"
+                className="flex h-9 items-center rounded-md px-3 text-[0.9375rem] font-medium text-foreground/90 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none"
               >
                 {item.label}
               </a>

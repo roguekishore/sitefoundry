@@ -80,14 +80,14 @@ export function RailwayHero({ title, lead, actions, background, tabs, tabsLabel,
             >
               {tabs.map((tab, i) => (
                 <div key={tab.label} className="flex items-center">
-                  {i > 0 && <span className="mx-1 h-4 w-px bg-border" aria-hidden />}
+                  {i > 0 && <span className="mx-2 h-4 w-px bg-border" aria-hidden />}
                   <button
                     type="button"
                     role="tab"
                     aria-selected={i === active}
                     onClick={() => setActive(i)}
                     className={cn(
-                      "relative flex h-[2.125rem] items-center gap-2 overflow-clip rounded-md px-4 text-[0.9375rem] whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none [&_svg]:size-4 [&_svg]:shrink-0",
+                      "relative flex h-[2.125rem] items-center gap-2 overflow-clip rounded-md px-4 text-base whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none [&_svg]:size-4 [&_svg]:shrink-0",
                       i === active ? "bg-primary/45 text-foreground" : "text-muted-foreground hover:text-foreground",
                     )}
                   >

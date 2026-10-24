@@ -105,3 +105,23 @@ Reduced motion: all off; doors render open and the CTA visible.
   on the last digits: no JavaScript, and still reads as a live board.
 - The CTA door motion runs on `entry` ranges (not `cover`) so it completes even when the block
   is shown alone in the gallery (see the scroll-range rule).
+
+## Comparison round 1
+
+Ours captured from the gallery (`mode=dark`). Section heights at 1440: header 72/72, hero
+1242/1244, build 1710/1745 (+16 gap), network ~766/794, scale ~760/770, monitor ~1740/1745,
+testimonials 1390/1409, stats + CTA 1800/1783, footer 834/925. No section is window-sized in
+either. Overflow: fits at 360/768/1024 in both. Motion list: sticky header, scrubbed hero
+drift, car ride per feature section (view timeline), station pulse loop, post marquee loop
+(120s), board flip-in (view), CTA arrive + doors + copy (view, entry ranges): every inventory row shows up.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ok | logo at 157 vs 136 (container padded); nav text 14 vs 15px, items packed tighter | ok | yes: no padding from xl, 15px, gap-3 |
+| hero | headline 3 lines vs 2 (demo copy longer) → panel 470 vs 404 | tab bar 545 vs 593 wide (15px text, tight dividers) | tabs advance, fill sweeps; drift ok | yes: shorter demo title, 16px tabs, wider dividers |
+| feature (all) | ok | rail track drawn over the wide media (original: media covers it); "See how →" link broke over two lines; "Instead of" label wrapped in split layout | car rides, station pulses | yes: media `relative`, link and label nowrap |
+| testimonials | sans heading 3 lines vs 2 (demo copy) | cards 348 vs 360 wide (inner padding) | marquee ok | yes: no inner padding at lg, shorter demo heading |
+| testimonials | — | plum wash a little greyer than the original | — | no: within the token tint; kept |
+| stats | ok | the value digits were still flipping when the board was mid-screen (10px per-column offset too slow) | flip-in | yes: 4px per column, 20→140px range |
+| CTA | ok, doorway wider than the phone as on the original | ok | train arrives, doors open, copy fades | — |
+| footer | ok | link pitch 36 vs 32px (inline links on a 24px line); container padded | hover ok | yes: 20px line, no padding from xl |
