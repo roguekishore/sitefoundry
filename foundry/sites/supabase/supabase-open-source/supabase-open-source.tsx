@@ -58,7 +58,7 @@ export function SupabaseOpenSource({ title, body, cta, figure, figureLabel, clas
   const dots = litDots(figure);
   return (
     <section className={cn("relative overflow-x-clip border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content grid max-w-page px-gutter py-section lg:grid-cols-2 lg:py-24">
+      <div className="mx-auto box-content grid max-w-page grid-cols-1 px-gutter py-24 lg:grid-cols-2">
         <div className="text-center lg:text-left">
           <SupabaseHeading parts={[{ text: title }]} size="large" className="mx-auto max-w-[13ch] lg:mx-0 lg:max-w-none" />
           <p className="mt-6 text-[0.9375rem] leading-[1.5] text-muted-foreground lg:mt-5 lg:max-w-[30rem]">{body}</p>

@@ -52,7 +52,7 @@ No substitution needed.
 | 6 | frameworks | supabase-frameworks | content (696px) | heading, code card full width (6 icon tabs, code scrolls sideways) | heading left (framework name swaps), 544px code card right | – | tabs switch code + name |
 | 7 | templates | supabase-templates | content (898px) | heading, underlined link, stacked cards | heading + link right; 2 wide cards with browser-frame preview, 4 small cards | 2 preview screenshots | card hover border |
 | 8 | customer stories | supabase-stories | content (812px) | heading, link, tall gradient card, 4 64px strips stacked | heading + link; 480px-tall row: wide gradient card + 4 narrow strips | 1 portrait avatar | strips expand on hover/focus (flex-grow) |
-| 9 | community | supabase-community | content (909px) | centred heading, text, button; 2 columns of post cards visible, left-aligned | 5 columns 287px wide, arched offsets (0/60/100/60/0), outer columns cut by the page edge, faded at the edges and bottom | avatars | columns drift vertically (marquee 35s / 30s reverse); cards fade + unblur + rise on entering view |
+| 9 | community | supabase-community | content (909px) | centred heading, text, button; 2 columns of post cards visible, left-aligned | 5 columns 287px wide, arched offsets (0/60/100/60/0), outer columns cut by the page edge, faded at the edges and bottom | avatars | cards fade + unblur + rise on entering view |
 | 10 | open source | supabase-open-source | content (373px) | centred text + button, dot-matrix counter below | text left, dot-matrix counter right with a radial fade | – | dots light up on entering view |
 | 11 | closing CTA | supabase-cta | content (375px) | centred two-tone heading on 2 lines, buttons | one-line two-tone heading, buttons | – | – |
 | 12 | footer | supabase-footer | content (1097px) | trust row (stacked), wordmark, social icons, newsletter, 2-col link lists, bottom bar | trust row, then wordmark/social/newsletter left + 6 link columns, bottom bar with theme icon | – | link hover colour |
@@ -69,11 +69,14 @@ No substitution needed.
 | dashboard tabs | hover / click | border → grey; active tab ink border; media swaps | 150ms | Tailwind transition + React state (`hydrate: visible`) |
 | frameworks tabs | hover / click | icon colour; code + heading word swap | 150ms | React state |
 | customer stories | hover / focus | hovered strip grows, featured shrinks | ~500ms ease-out | CSS `flex-grow` transition in the block's .css |
-| community columns | loop | vertical drift, alternate directions | 35s / 30s linear infinite | CSS `@keyframes supabase-community-drift` |
-| community cards | entering view | opacity 0→1, blur 6px→0, rise per column (60/100px) | view timeline, entry 0% → cover 30% | CSS `animation-timeline: view()` in `@supports` |
+| community cards | entering view | opacity 0→1, blur 6px→0, rise per column (40/60/100px, the arch's middle furthest) | view timeline, entry 0% → entry 100% | CSS `animation-timeline: view()` in `@supports` |
 | open source dots | entering view | lit dots fade in, staggered by column | view timeline | CSS scroll-driven, delay via range offset per column |
 
-Skipped: the `pulse` 600ms loop on a 6px dot sits inside the Realtime card's illustration (a
+Skipped: the capture lists `marquee` (35s) and `marquee-reverse` (30s) loops at 1440, but no
+frame shows anything drifting: the logo band and the community columns sit at identical
+positions (and clean, arched card tops) in every crop and scroll frame, so the looping element
+is hidden at that width. Not rebuilt; the community wall is static columns with a view reveal.
+The `pulse` 600ms loop on a 6px dot sits inside the Realtime card's illustration (a
 typing indicator), which is a media slot; the ~450ms opacity animations on tweets are the
 original's own card swaps, folded into the drift loop.
 
@@ -117,3 +120,26 @@ out by a sideways overflow, so phones are judged in round 2.
 | community | – | crops blank at scroll 0 (view-timeline pre-state, expected); scroll frames match the arch, edge fade and bottom fade | reveal fade + blur + rise ✓ | – |
 | open source | – | grey dots far denser/darker than the original's faint field; body 4 lines vs 3 (399 vs 373px) | dots light up left→right ✓ | yes: field tint 12%/20%; shorter body |
 | footer | – | link rows 32px apart vs 28px | – | yes: links `block leading-5` |
+
+## Comparison round 2
+
+Heights now: 1440 — hero 391/386, bento 950/949, logos 270/270, dashboard 862/862, frameworks
+706/696, templates 896/898, stories 812/812, community 929/909, open source 376/373, CTA
+380/375, footer 1063/1097. 390 page 9929 vs 9857px. Fits at 360, 768 and 1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| frameworks | grid column grew to the code's longest line → page 418px wide | – | – | yes: `grid-cols-1` (minmax 0) so the code scrolls inside the card |
+| open source | 65-dot field (341px) wider than a 360 screen; top padding 64 vs ~100px | – | dots light ✓ | yes: pitch `min(5.25px, (100vw−3rem)/65)`; py 96px |
+| templates, stories | sections padded 64px vs the original's ~96px on phones | – | – | yes: py 96px at every width |
+| community | gap above the title shorter than the original's ~180px after the stories | – | reveal ✓ (40/60/100px rise, blur) | yes: pt 80px |
+| logos | wordmarks a touch small after round 1 | – | – | yes: 72% |
+| hero, bento, dashboard, footer | match the 390 captures (stacked text cards without art, cropped window, 2-up link columns) | – | – | – |
+
+Motion check (ours-design.md vs original): sticky header ✓, header fade-in 300ms ✓, nav hover
+green + chevron 180° at 200ms ease-out ✓, button hovers ✓, bento hover shadow ✓, dashboard tab
+border hover 150ms ✓, community reveal (opacity, blur, translateY 40/60/100→0) ✓, dot reveal ✓.
+Stories hover widening is CSS `:hover` (the capture doesn't hover those strips; checked by hand).
+
+Re-theme check: supabase-stories (sample-ember light) and supabase-products (sample-ember
+dark) both pick up the other palette and fonts; strips stay dark through the `.dark` scope.

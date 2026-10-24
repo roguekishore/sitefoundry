@@ -28,7 +28,7 @@ export function SupabaseLogos({ label, logos, className }: SupabaseLogosProps) {
               key={item.name}
               role="img"
               aria-label={item.name}
-              className="flex h-20 min-w-0 items-center justify-center text-muted-foreground/75 [&_svg]:h-6 [&_svg]:w-auto [&>*]:scale-[0.62] [&>*]:whitespace-nowrap lg:[&>*]:scale-100"
+              className="flex h-20 min-w-0 items-center justify-center text-muted-foreground/75 [&_svg]:h-6 [&_svg]:w-auto [&>*]:scale-[0.72] [&>*]:whitespace-nowrap lg:[&>*]:scale-100"
             >
               {item.logo ?? <span className="font-display text-lg font-bold tracking-[-0.02em]">{item.name}</span>}
             </li>

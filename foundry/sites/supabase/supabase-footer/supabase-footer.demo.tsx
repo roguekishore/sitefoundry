@@ -8,7 +8,7 @@ const links = (labels: string[]) => labels.map((label) => ({ label, href: "#" })
 export const footerSample: SupabaseFooterProps = {
   logo: <TidepoolMark large />,
   trust: {
-    lead: "Your data stays guarded.",
+    lead: "Your data is guarded.",
     link: { label: "How we secure it", href: "#" },
     badges: [
       { name: "SOC 2 Type II", note: "Audited" },

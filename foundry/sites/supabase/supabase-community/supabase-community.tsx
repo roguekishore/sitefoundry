@@ -38,7 +38,7 @@ export function SupabaseCommunity({ title, description, cta, posts, badge, class
   const columns = OFFSETS.map((_, c) => posts.filter((_, i) => i % OFFSETS.length === c));
   return (
     <section className={cn("overflow-x-clip border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content max-w-page px-gutter pt-section text-center lg:pt-24">
+      <div className="mx-auto box-content max-w-page px-gutter pt-20 text-center lg:pt-24">
         <SupabaseHeading parts={[{ text: title }]} className="text-center" />
         {description && <p className="mx-auto mt-3 max-w-[20rem] text-base text-muted-foreground sm:max-w-none">{description}</p>}
         {cta && (

@@ -44,7 +44,7 @@ const tones = {
 export function SupabaseStories({ title, link, stories, className }: SupabaseStoriesProps) {
   return (
     <section className={cn("border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content max-w-page px-gutter py-section lg:py-24">
+      <div className="mx-auto box-content max-w-page px-gutter py-24">
         <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
           <SupabaseHeading parts={title} stack="always" />
           {link && (
