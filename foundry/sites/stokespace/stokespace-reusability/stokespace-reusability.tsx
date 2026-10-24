@@ -75,14 +75,14 @@ export function StokespaceReusability({
                   aria-expanded={isOpen}
                   onClick={() => setOpen(isOpen ? undefined : i)}
                   className={cn(
-                    "flex w-full items-start justify-between gap-6 pt-6 pb-6 text-left transition-colors duration-350 ease-[cubic-bezier(0.165,0.84,0.44,1)] lg:pt-7 lg:pb-[3.25rem]",
+                    "flex w-full items-center justify-between gap-6 pt-6 pb-6 text-left transition-colors duration-350 ease-[cubic-bezier(0.165,0.84,0.44,1)] lg:pt-7 lg:pb-[3.25rem]",
                     isOpen ? "text-foreground" : "text-foreground/30 hover:text-foreground",
                   )}
                 >
                   <span className="block text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:leading-[1.2]">
                     {item.title}
                   </span>
-                  <span aria-hidden className="relative mt-px size-4 shrink-0 lg:-mt-1 lg:size-8">
+                  <span aria-hidden className="relative size-4 shrink-0 lg:-my-2 lg:size-8">
                     <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-current" />
                     <span
                       className={cn(
@@ -101,7 +101,7 @@ export function StokespaceReusability({
                   )}
                 >
                   <div className="min-h-0 overflow-hidden">
-                    <p className="pr-10 pb-6 text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:-mt-6 lg:pb-10 lg:leading-[1.2]">
+                    <p className="pr-10 pb-6 text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:pb-10 lg:leading-[1.2]">
                       {item.body}
                     </p>
                   </div>

@@ -111,3 +111,19 @@ out; plus our shimmer loop (paused until hover, like the original's `border-shim
 | work | matches | +23px overall, within the label→heading rounding | fade matches | – |
 | footer | link grid, contact row, badge, small wordmark + address all in the original's order and place | wordmark's "O" starts ~8px in (glyph side bearing) vs the original's 10px edge | rise matches | – (glyph-dependent) |
 | header | bar 76px, glowing plus matches | pill 64px tall at y=31, frosted over media while scrolling | sticky matches | – |
+
+## Comparison round 2
+
+Heights unchanged except where round 1 aimed (reusability's height is set by its 4:5 image,
+so the row fix shows only in the list). No overflow at 360/768/1024; motion list unchanged
+(sticky header, work fade on entry, footer glow rise, shimmer on hover).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | matches (heading 4 lines, 32px above the frame bottom) | heading now 4 lines spanning y≈520–830 of the fold like the original's | – | – |
+| reusability rows | 68px | rows 109px → 104px (the 32px plus was taller than the label line; now centred with negative margins) | open state: body's first line was clipped by a negative top margin inside the collapsing box | yes: plus `items-center` + `lg:-my-2`; body margin removed |
+| header (phone menu) | plus turns into a glowing cross, panel wipes down with clip-path, links + indented sub-links | – | works | – |
+| re-theme | – | nova (sample-ember light) and footer (sample-ember dark) read correctly: serif display at normal width, gradient takes ember's accents | – | – |
+
+Stopping here: each section pair reads alike at a glance apart from copy and placeholders;
+remaining differences are copy length (line counts) and the wordmark glyph's side bearing.
