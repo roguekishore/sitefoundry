@@ -113,3 +113,31 @@ footer 611/606; 390 hero 534/535, body 3720/3695, footer 1198/1129.
 | hiring | match | match (597px band) | — | — |
 | news | gap between stacked cards 35px vs 13px | badge 6px lower (longer title) | link → orange matches | yes: gap-y-3 |
 | footer | link pitch 39 vs 35px, legal links 45 vs 30px apart, footer 69px too tall | social squares split into two far-apart rows (wrapped lines stretched over the tall grid row); wordmark wider than the original's 150px logo | link hover → orange | yes: content-start, leading-none lists, tighter legal list, smaller wordmark |
+
+## Comparison round 2
+
+Heights now (ours vs original): 1440 hero 758/758, body 3493/3477, footer 601/606; 390 hero
+534/535, body 3656/3695, footer 1110/1129. No horizontal overflow at 360, 768 or 1024.
+Motion check: the original's Motion list has no content reveals (only the header leaving and
+third-party fixed overlays); ours reports none while scrolling, and the hover list matches
+(nav white → orange 0.4s, LEARN-MORE-style buttons transparent → orange fill 0.3s, news link
+and footer links → orange).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark centre now level with the hamburger at the original's height | links at y 64, right edge 1395: match | match | — |
+| hero | 3 title lines vs 4 (our headline is shorter), so the title starts 40px lower | match | — | content, left |
+| splits / about / hiring | match | match | match | — |
+| news | card stack gap 12px: match | match | match | — |
+| footer | 19px shorter than the original (our address and links are one line each, as theirs) | social squares in a tight 3 + 2 block; wordmark ~175px wide vs a 150px boxed logo | match | left: the original's logo is a boxed mark we do not copy |
+
+Re-theme check: `formenergy-split` and `formenergy-news` under `sample-ember` (light) keep
+their layout and pick up that theme's serif titles, rust rule/outline/badge and cream cards.
+The full page in dark mode reads as a black site with #1e1e1e bands and the same orange.
+
+## Left as is
+
+- Hero video, split photos, the four mosaic photos and the hiring photo are placeholders at
+  the original's sizes; the footer logo image became the plain wordmark.
+- The header's possible show-on-scroll-up (the capture only scrolls down) is not built.
+- The cookie banner and the accessibility widget are third-party overlays, not rebuilt.
