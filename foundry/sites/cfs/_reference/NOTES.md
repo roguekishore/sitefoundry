@@ -91,3 +91,39 @@ a centring transform (half the window), not a motion; not rebuilt.
   with its own motion. Dismissing needs state, so `hydrate: "idle"`.
 - Menu at 390: a `<details>` disclosure (no JS) that drops the nav cells below the box.
 - Light mode is faithful (tan page); dark mode turns the page navy with the same orange.
+
+## Comparison round 1
+
+Heights: 1440 hero 900 (window) / breakthrough 1533 / values 1417 / footer 898 against
+900 / 1517 / 1396 / 900; 390 hero 844 (window) / 1250 + 1711 / 1486 against 844 / 2988
+together / 1472. Motion list: load fade, view-timeline scale 1→1.05 and pillar fade at
+scroll 450, 2s pulse, cookie slide and bar, every hover (cells invert, underlines
+orange→white, cookie buttons) all present. No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | mark 36px against the original's ~55px sunburst | same | – | yes: icon 48px |
+| hero | title 3 lines starting at 325 vs 4 lines at 255 (shorter copy); pillars 60px apart vs 45, label→text 35 vs 29 | title wraps with a one-word last line | – | yes: copy length closer to the original, gap-y 36px, mt-3 |
+| all titles | Mona 300 reads lighter than NB International 300 | same | – | yes: weight 350 (titles, hero, footer call, quote) |
+| breakthrough | – | figure 03 sat 110px low: the right column spanned 3 grid rows and its rows stretched | – | yes: self-start on the column |
+| breakthrough | – | figures 11px low, text 8px low | – | yes: mt 56px for both |
+| values | – | everything ~10px low (follows the title) | – | accepted |
+| cookie notice | matches (full width, 7px inset) | matches (320px, 25px inset) | slide + bar | – |
+| footer | matches | matches | underline hover | – |
+
+## Comparison round 2
+
+Heights: 1440 hero 900 (window) / 1511 / 1417 / 898 against 900 / 1517 / 1396 / 900;
+390 unchanged (844 window / 1250 + 1711 / 1486). Motion list unchanged and complete; no
+overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| breakthrough | matches (text first, 02 + bleeding 03 paired) | figure 03 now directly under 02; figures and text within 4px of the original | – | yes |
+| hero | title starts ~100px lower than the original: our copy and pillars are a line shorter each, the block is bottom-anchored like the original | 3-line title with a short last line | fade, scale, pillar fade, pulse | accepted (content length) |
+| values | matches | matches; but under sample-ember (a wider serif) the absolutely placed card was shorter than its quote | – | yes: the photo/card overlap is now a 3-track grid, the card keeps 51px insets and grows with its text |
+| re-theme | cfs-values, cfs-hero and cfs-footer under sample-ember: tokens carry over (cream page, brown navy, orange accents), no literal colours | | | – |
+
+Left as is: the photos are placeholders (navy-grey in the hero, deeper tan elsewhere);
+the quote mark and sunburst mark are lucide icons (`Quote`, `Atom`), not the original's
+outlined italic quotes and logo; the original's custom-drawn thin arrow is lucide `ArrowRight`.

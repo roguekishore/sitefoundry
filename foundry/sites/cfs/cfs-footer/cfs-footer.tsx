@@ -47,7 +47,7 @@ export function CfsFooter({ call, followLabel, socials, cta, mark, address, lega
     <footer className={cn("dark bg-card pt-section pb-24 text-foreground lg:pt-[calc(var(--section-y)*1.5)] lg:pb-[8.5rem]", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <div className="flex flex-col items-center text-center">
-          <h2 className="font-display text-[clamp(1.875rem,3.2vw,2.886rem)] leading-[1.2] font-light">{call}</h2>
+          <h2 className="font-display text-[clamp(1.875rem,3.2vw,2.886rem)] leading-[1.2] font-[350]">{call}</h2>
 
           <div className="mt-10 flex flex-col items-center lg:flex-row">
             <p className="font-mono text-sm leading-[1.2]">{followLabel}</p>

@@ -2,7 +2,7 @@
 import { CfsHero, type CfsHeroProps } from "./cfs-hero";
 
 export const heroSample: CfsHeroProps = {
-  title: "Building the compact fusion plant that ships by the dozen",
+  title: "The first fusion power plant designed to be built by the dozen",
   pillars: [
     {
       label: "Build small",

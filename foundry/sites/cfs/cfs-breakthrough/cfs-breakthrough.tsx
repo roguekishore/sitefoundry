@@ -35,9 +35,9 @@ export function CfsBreakthrough({ title, body, figures, link, className }: CfsBr
       <div className="mx-auto max-w-page px-gutter">
         <CfsSectionTitle>{title}</CfsSectionTitle>
 
-        <div className="mt-[1.875rem] grid grid-cols-1 lg:mt-[4.375rem] lg:grid-cols-4 lg:gap-x-5">
+        <div className="mt-[1.875rem] grid grid-cols-1 lg:mt-14 lg:grid-cols-4 lg:gap-x-5">
           {/* the paragraph comes first on phones, under the wide photo on wide screens */}
-          <p className="order-first max-w-[57rem] text-base leading-[1.5] lg:order-none lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:mt-16 lg:columns-2 lg:gap-12">
+          <p className="order-first max-w-[57rem] text-base leading-[1.5] lg:order-none lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:mt-14 lg:columns-2 lg:gap-12">
             {body}
           </p>
 
@@ -46,7 +46,7 @@ export function CfsBreakthrough({ title, body, figures, link, className }: CfsBr
             <CfsMedia media={wide.media} rule className="aspect-[3/2]" />
           </figure>
 
-          <div className="mt-5 grid grid-cols-2 items-start gap-x-[15px] lg:col-start-4 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:grid-cols-1 lg:gap-y-[1.375rem]">
+          <div className="mt-5 grid grid-cols-2 items-start gap-x-[15px] lg:col-start-4 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:self-start lg:grid-cols-1 lg:gap-y-[1.375rem]">
             <figure>
               <FigureLabel>{small.label}</FigureLabel>
               <CfsMedia media={small.media} rule className="aspect-[3/2]" />

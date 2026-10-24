@@ -37,9 +37,9 @@ export function CfsHero({ title, pillars, activeIndex = 0, media, className }: C
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent" />
 
       <div className="cfs-hero-in relative mx-auto mt-auto w-full max-w-page px-gutter pb-10 lg:pb-[3.25rem]">
-        <h1 className="max-w-[13em] font-display text-[clamp(2.125rem,4.383vw,3.945rem)] leading-[1.2] font-light">{title}</h1>
+        <h1 className="max-w-[13em] font-display text-[clamp(2.125rem,4.383vw,3.945rem)] leading-[1.2] font-[350]">{title}</h1>
 
-        <ul className="cfs-hero-pillars mt-[2.875rem] grid gap-y-[2.75rem] lg:mt-[3.25rem] lg:grid-cols-4 lg:gap-x-5">
+        <ul className="cfs-hero-pillars mt-[2.875rem] grid gap-y-9 lg:mt-[3.25rem] lg:grid-cols-4 lg:gap-x-5">
           {pillars.map((pillar, i) => (
             <li key={pillar.label}>
               <p className="flex items-center gap-[7px] font-mono text-sm leading-[1.2]">
@@ -52,7 +52,7 @@ export function CfsHero({ title, pillars, activeIndex = 0, media, className }: C
                 />
                 {pillar.label}
               </p>
-              <p className="mt-4 max-w-[18.75rem] text-sm leading-[1.5] lg:mt-[1.375rem]">{pillar.text}</p>
+              <p className="mt-3 max-w-[18.75rem] text-sm leading-[1.5] lg:mt-[1.375rem]">{pillar.text}</p>
             </li>
           ))}
         </ul>
