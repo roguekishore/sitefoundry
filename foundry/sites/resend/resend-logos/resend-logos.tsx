@@ -32,7 +32,7 @@ export function ResendLogos({ text, logos, link, className }: ResendLogosProps) 
               </span>
             ))}
           </p>
-          <ul className="mt-14 grid w-full max-w-[63rem] grid-cols-2 lg:mt-16 lg:grid-cols-6">
+          <ul className="mt-10 grid w-full max-w-[63rem] grid-cols-2 lg:mt-12 lg:grid-cols-6">
             {logos.slice(0, 12).map((l, i) => (
               <li key={l.name} className={cn("flex h-24 items-center justify-center", i >= 6 && "hidden lg:flex")}>
                 <span role="img" aria-label={l.name} className="flex items-center text-foreground [&_svg]:h-8 [&_svg]:w-auto">
@@ -42,7 +42,7 @@ export function ResendLogos({ text, logos, link, className }: ResendLogosProps) 
             ))}
           </ul>
           {link && (
-            <ResendButton href={link.href} variant="ghost" chevron className="mt-10 lg:mt-14">
+            <ResendButton href={link.href} variant="ghost" chevron className="mt-8 lg:mt-10">
               {link.label}
             </ResendButton>
           )}

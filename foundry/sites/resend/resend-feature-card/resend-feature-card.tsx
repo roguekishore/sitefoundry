@@ -18,7 +18,7 @@ export interface ResendFeatureCardProps {
 
 export function ResendFeatureCard({ visual, icon, title, text, link, visualClassName, className }: ResendFeatureCardProps) {
   return (
-    <article className={cn("flex flex-col", className)}>
+    <article className={cn("flex min-w-0 flex-col", className)}>
       <div className={cn("relative h-80 overflow-clip rounded-t-2xl mask-b-from-55% mask-b-to-100%", visualClassName)}>
         <div aria-hidden className="pointer-events-none absolute inset-0 rounded-t-2xl border border-b-0 border-border" />
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-radial-[ellipse_at_50%_0%] from-glow/10 to-transparent to-60%" />

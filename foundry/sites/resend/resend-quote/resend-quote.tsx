@@ -26,7 +26,7 @@ export function ResendQuote({ mark, quote, author, link, className }: ResendQuot
               {mark}
             </span>
           )}
-          <blockquote className="mt-12 max-w-[31rem] text-2xl leading-9 text-balance text-foreground">
+          <blockquote className="mt-12 max-w-[31rem] text-2xl leading-9 text-foreground">
             <p>{quote}</p>
           </blockquote>
           <figcaption className="mt-14 flex items-center gap-4 text-left lg:mt-16">

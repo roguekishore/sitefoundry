@@ -87,7 +87,7 @@ export function ResendIntegrate({ title, accent, text, media, sdks, copyLabel = 
         </div>
 
         <div className="relative mx-auto mt-12 max-w-[64rem] overflow-clip rounded-2xl border border-border">
-          <span aria-hidden className="absolute -top-px right-[6%] h-px w-[22%] bg-linear-to-r from-transparent via-foreground/70 to-transparent" />
+          <span aria-hidden className="absolute top-0 right-[6%] h-px w-[22%] bg-linear-to-r from-transparent via-foreground/70 to-transparent" />
           <div className="flex h-16 items-center gap-3 border-b border-border pr-4 pl-4">
             <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none]" role="tablist">
               {tabs.map((t, i) => (

@@ -2,7 +2,7 @@
 import { ResendHeader, type ResendHeaderProps } from "./resend-header";
 
 export function TernWordmark() {
-  return <span className="font-display text-[1.375rem] leading-none font-semibold tracking-[-0.06em]">tern</span>;
+  return <span className="font-display text-[1.625rem] leading-none font-bold tracking-[-0.06em]">tern</span>;
 }
 
 export const headerSample: ResendHeaderProps = {

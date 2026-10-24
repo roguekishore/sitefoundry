@@ -62,7 +62,7 @@ export function ResendFooter({ address, socials = [], status, groups, className 
                 <h3 className="text-sm leading-5 text-foreground">{g.title}</h3>
                 <ul className="mt-7 space-y-5">
                   {g.links.map((l) => (
-                    <li key={l.href}>
+                    <li key={l.href} className="leading-5">
                       <a href={l.href} className="text-sm leading-5 text-muted-foreground transition-colors duration-200 hover:text-foreground motion-reduce:transition-none">
                         {l.label}
                       </a>

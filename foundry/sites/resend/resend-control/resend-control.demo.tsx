@@ -5,8 +5,8 @@ import { ResendControl, type ResendControlProps } from "./resend-control";
 export const controlSample: ResendControlProps = {
   title: "Every lever, one dashboard",
   text: [
-    "Everything you need to run your sending, trace a problem through clear logs",
-    "and keep your domain's good name, without the busywork.",
+    "All you need to run your sending, trace a problem through clear logs",
+    "and keep your domain's good name, minus the busywork.",
   ],
   tabs: [
     { label: "Clear reporting", icon: <ChartColumn strokeWidth={1.75} /> },

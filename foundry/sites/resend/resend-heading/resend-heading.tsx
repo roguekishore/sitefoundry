@@ -57,7 +57,7 @@ export function ResendHeading({
       )}
       <Tag
         className={cn(
-          "font-display text-5xl leading-[1.2] font-normal tracking-[-0.05em] text-balance lg:text-[3.5rem]",
+          "font-display text-5xl leading-[1.2] font-normal tracking-[-0.05em] text-balance [word-spacing:0.06em] lg:text-[3.5rem]",
           "bg-linear-to-br from-foreground from-30% to-foreground/50 bg-clip-text pb-1 text-transparent",
         )}
       >
@@ -73,6 +73,7 @@ export function ResendHeading({
         <p
           className={cn(
             "mt-3 max-w-[40rem] text-base leading-6 text-pretty text-muted-foreground lg:text-lg lg:leading-[1.5]",
+            Array.isArray(text) && "lg:max-w-none",
             textClassName,
           )}
         >
