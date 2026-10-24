@@ -1,0 +1,64 @@
+/* The dot field: a grid of small squares drawn with a mask (two stripe gradients intersected),
+   tinted green in the middle and fading to nothing at the edges. Only the lit dots of the
+   figure are real elements. --supabase-os-pitch is the distance between dots. */
+.supabase-os-field {
+  --supabase-os-pitch: 5.25px;
+  --supabase-os-dot: calc(var(--supabase-os-pitch) * 0.78);
+  grid-template-columns: repeat(65, var(--supabase-os-pitch));
+  grid-template-rows: repeat(34, var(--supabase-os-pitch));
+  view-timeline-name: --supabase-os-field;
+}
+@media (min-width: 64rem) {
+  .supabase-os-field {
+    --supabase-os-pitch: 11px;
+  }
+}
+
+.supabase-os-field::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--highlight) 30%, transparent) 0%,
+    color-mix(in oklab, var(--muted-foreground) 22%, transparent) 45%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(90deg, var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch),
+    linear-gradient(var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch);
+  -webkit-mask-composite: source-in;
+  mask:
+    linear-gradient(90deg, var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch),
+    linear-gradient(var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch);
+  mask-composite: intersect;
+}
+
+.supabase-os-dot {
+  width: var(--supabase-os-dot);
+  height: var(--supabase-os-dot);
+  border-radius: calc(var(--supabase-os-dot) * 0.22);
+}
+
+/* lit dots switch on column by column as the field scrolls into view (on the field's own
+   view timeline, so the range spans the field's height, not one dot's) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .supabase-os-dot {
+      animation: supabase-os-light linear both;
+      animation-timeline: --supabase-os-field;
+      animation-range: cover calc(8% + var(--supabase-os-at) * 22%) cover calc(18% + var(--supabase-os-at) * 22%);
+    }
+  }
+}
+
+@keyframes supabase-os-light {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
