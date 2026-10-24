@@ -36,10 +36,10 @@ export interface MymindAiProps {
 /** Warm band with a pill-in-headline and a four-photo collage. */
 export function MymindAi({ eyebrow, before, badge, after, text, photos = [], chip, link, className }: MymindAiProps) {
   return (
-    <section className={cn("bg-secondary pt-20 pb-16 text-foreground lg:pt-[7.25rem] lg:pb-[6rem]", className)}>
+    <section className={cn("bg-secondary/70 pt-20 pb-16 text-foreground lg:pt-[7.25rem] lg:pb-[6rem]", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter text-center">
         <MymindEyebrow tone="primary">{eyebrow}</MymindEyebrow>
-        <h2 className="mt-4 max-w-[22rem] font-display text-[3rem] leading-[0.92] tracking-[-0.045em] lg:mt-5 lg:max-w-[46rem] lg:text-[6rem] lg:leading-[0.88]">
+        <h2 className="mt-4 max-w-[22rem] font-display text-[3rem] leading-[0.92] font-[350] tracking-[-0.045em] lg:mt-5 lg:max-w-[46rem] lg:text-[6rem] lg:leading-[0.88]">
           {before}{" "}
           <span className="relative -top-[0.08em] mx-[0.04em] inline-flex h-[0.62em] items-center rounded-full border-[0.045em] border-primary px-[0.16em] align-middle font-[family-name:var(--mymind-round,var(--typeface-body))] text-[0.62em] leading-none font-bold tracking-[0.02em] text-primary">
             <span className="text-[0.75em]">{badge}</span>

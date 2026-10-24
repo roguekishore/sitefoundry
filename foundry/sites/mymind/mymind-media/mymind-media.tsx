@@ -16,7 +16,7 @@ export function MymindMedia({ children, tone = "light", className }: MymindMedia
     <div
       className={cn(
         "relative overflow-clip [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover",
-        !children && (tone === "dark" ? "bg-background/20" : "bg-muted-foreground/15"),
+        !children && (tone === "dark" ? "bg-muted-foreground/40" : "bg-muted-foreground/15"),
         className,
       )}
     >

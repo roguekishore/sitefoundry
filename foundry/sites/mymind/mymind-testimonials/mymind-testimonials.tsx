@@ -70,7 +70,7 @@ export function MymindTestimonials({ title, quotes, link, className }: MymindTes
         {quotes.slice(0, 3).map((q, i) => (
           <Bubble key={q.name} quote={q} i={i} />
         ))}
-        <h2 className="my-10 text-center font-display text-[3rem] leading-[1.06] tracking-[-0.045em] text-primary-foreground lg:absolute lg:inset-x-0 lg:top-[43.75rem] lg:my-0 lg:text-[5.75rem] lg:leading-[0.92]">
+        <h2 className="my-10 text-center font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-primary-foreground lg:absolute lg:inset-x-0 lg:top-[43.75rem] lg:my-0 lg:text-[5.75rem] lg:leading-[0.92]">
           {title.map((line, i) => (
             <span key={i} className="block">
               {line}

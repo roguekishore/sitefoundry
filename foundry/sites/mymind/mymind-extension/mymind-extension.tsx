@@ -40,7 +40,7 @@ export function MymindExtension({ title, text, media, pills, link, className }: 
   return (
     <section className={cn("bg-background pt-20 pb-16 text-foreground lg:pt-[6.5rem] lg:pb-[5rem]", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter text-center">
-        <h2 className="font-display text-[3rem] leading-[0.96] tracking-[-0.045em] lg:text-[6rem] lg:leading-[0.9]">
+        <h2 className="font-display text-[3rem] leading-[0.96] font-[350] tracking-[-0.045em] lg:text-[6rem] lg:leading-[0.9]">
           {title.map((line, i) => (
             <span key={i} className="lg:block">
               {line}{" "}

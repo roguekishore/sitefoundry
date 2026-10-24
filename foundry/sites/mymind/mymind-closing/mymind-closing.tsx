@@ -22,14 +22,14 @@ export function MymindClosing({ mark, paragraphs, cta, targets, note, className 
   return (
     <section className={cn("relative isolate overflow-x-clip bg-accent pt-20 pb-20 text-foreground lg:pt-[9rem] lg:pb-14", className)}>
       {/* the arc: the top of a very large thin circle, fading into the band */}
-      <div aria-hidden className="absolute top-[9.5rem] left-1/2 -z-10 h-[16rem] w-[44rem] -translate-x-1/2 overflow-clip lg:top-[12.25rem] lg:h-[24rem] lg:w-[76rem]">
+      <div aria-hidden className="absolute top-[9.5rem] left-1/2 -z-10 h-[18rem] w-[44rem] -translate-x-1/2 overflow-clip lg:top-[11.5rem] lg:h-[32rem] lg:w-[76rem]">
         <div className="aspect-square w-full rounded-full border border-foreground/35" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent from-30% to-accent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent from-45% to-accent" />
       </div>
 
       <div className="mx-auto flex max-w-page flex-col items-center px-gutter text-center">
         {mark && <div className="grid h-[4.5rem] w-12 place-items-center text-foreground [&_svg]:size-full">{mark}</div>}
-        <div className="mymind-closing-drift mt-12 max-w-[22rem] space-y-10 font-display text-[1.75rem] leading-10 tracking-[-0.03em] lg:mt-[5.5rem] lg:max-w-[49rem] lg:space-y-[3.75rem] lg:text-[3.25rem] lg:leading-[3.75rem]">
+        <div className="mymind-closing-drift mt-12 max-w-[22rem] space-y-10 font-display text-[1.75rem] leading-10 tracking-[-0.03em] lg:mt-[8.5rem] lg:max-w-[49rem] lg:space-y-[3.75rem] lg:text-[3.25rem] lg:leading-[3.75rem]">
           {paragraphs.map((p) => (
             <p key={p}>{p}</p>
           ))}
