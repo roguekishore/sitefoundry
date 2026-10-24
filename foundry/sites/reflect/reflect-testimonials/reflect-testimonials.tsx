@@ -39,7 +39,7 @@ function withMentions(text: string) {
 
 function Card({ item }: { item: ReflectTestimonial }) {
   return (
-    <li className="w-[23.75rem] shrink-0 rounded-2xl border border-foreground/8 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--foreground)_1%,transparent),color-mix(in_oklab,var(--foreground)_4%,transparent))] px-6 pt-6 pb-8 lg:w-[30rem]">
+    <li className="min-h-[13.25rem] w-[23.75rem] shrink-0 rounded-2xl border border-foreground/8 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--foreground)_1%,transparent),color-mix(in_oklab,var(--foreground)_4%,transparent))] px-6 pt-6 pb-8 lg:w-[30rem]">
       <div className="flex items-center gap-4">
         <ReflectMedia tone="panel" className="size-11 shrink-0 rounded-full" reveal>
           {item.avatar}
@@ -60,8 +60,8 @@ export function ReflectTestimonials({ eyebrow, title, lead, rows, className }: R
     <section className={cn("relative isolate overflow-clip bg-background pt-[6.5rem] pb-24 text-foreground lg:pt-[6.75rem]", className)}>
       {/* two overlapping rings behind the heading */}
       <div aria-hidden className="absolute top-[4.5rem] left-1/2 -z-10 h-[22.5rem] w-[37.5rem] -translate-x-1/2 max-lg:top-[4.25rem] max-lg:scale-[0.62] max-lg:origin-top">
-        <span className="reflect-testimonials-ring-left absolute top-0 left-0 size-[22.5rem] rounded-full border border-highlight/15 bg-[radial-gradient(closest-side,transparent_70%,color-mix(in_oklab,var(--glow)_10%,transparent))]" />
-        <span className="reflect-testimonials-ring-right absolute top-0 right-0 size-[22.5rem] rounded-full border border-highlight/15 bg-[radial-gradient(closest-side,transparent_70%,color-mix(in_oklab,var(--glow)_10%,transparent))]" />
+        <span className="reflect-testimonials-ring-left absolute top-0 left-0 size-[22.5rem] rounded-full border border-highlight/10 bg-[radial-gradient(closest-side,transparent_70%,color-mix(in_oklab,var(--glow)_10%,transparent))]" />
+        <span className="reflect-testimonials-ring-right absolute top-0 right-0 size-[22.5rem] rounded-full border border-highlight/10 bg-[radial-gradient(closest-side,transparent_70%,color-mix(in_oklab,var(--glow)_10%,transparent))]" />
       </div>
       <ReflectStarfield size={1200} count={60} seed={41} strength={50} className="h-[26rem]" />
       <div className="relative px-gutter">

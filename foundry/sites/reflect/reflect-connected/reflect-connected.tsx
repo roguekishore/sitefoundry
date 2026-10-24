@@ -62,7 +62,7 @@ export function ReflectConnected({ eyebrow, title, lead, media, mediaLabel, card
                 tone="panel"
                 reveal
                 label={card.mediaLabel}
-                className="aspect-[468/256] w-full bg-[linear-gradient(180deg,color-mix(in_oklab,var(--muted)_40%,transparent),var(--muted))]"
+                className="aspect-[468/256] w-full bg-[radial-gradient(60%_70%_at_50%_50%,color-mix(in_oklab,var(--muted)_90%,transparent),transparent)]"
               >
                 {card.media}
               </ReflectMedia>

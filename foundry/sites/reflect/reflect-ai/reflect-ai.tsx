@@ -129,7 +129,7 @@ function Capability({ item, className }: { item: ReflectAiCapability; className?
     >
       <span aria-hidden className={cellGlow} />
       <div className="relative grid size-8 place-items-center lg:mx-auto [&_svg]:size-8">{item.icon}</div>
-      <p className="relative mt-9 text-base/6 lg:mt-9">{item.title}</p>
+      <p className="relative mt-7 text-base/6 lg:mt-5">{item.title}</p>
       <p className="relative text-base/6 text-muted-foreground">{item.text}</p>
     </li>
   );

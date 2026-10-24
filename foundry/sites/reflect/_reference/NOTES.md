@@ -112,3 +112,28 @@ All slots are `ReactNode` props; empty ones are token surfaces of the same size 
 - Header overlays the hero (the original is `position: fixed`); ours is sticky with a
   negative bottom margin so it works both as a page header and alone in the gallery.
 - Starfields are generated from a fixed seed, so server and client render the same dots.
+
+## Comparison round 1
+
+Heights (original → ours, px) at 1440: hero 1463→1474, features 392→409, AI 1311→1363,
+connected 1265→1366, research 1086→1070, privacy 844→868, pricing 1184→1242, migrate
+480→498, testimonials 868→854, about 824→826, academy 916→916, CTA 600→610, footer
+723→739. No overflow at 360/768/1024. Section crops are taken at scroll 0, so view-timeline
+reveals (media fades, globe) show their pre-state there; they are checked in the scroll
+frames, where they play.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | lead 3 lines vs 2 (copy longer) | play button showed a square glass box (backdrop-blur artefact); horizon glow much fainter than the original's bright light | rings + stars turn ✓ | yes: no backdrop blur; brighter core in the glow wash; shorter lead |
+| features | ✓ | ✓ | hover glow ✓ | — |
+| AI | lead 7 lines vs 6; capability icon→title gap 36 vs 30 | icon→title gap 36 vs 20; one capability wrapped to 3 lines | hue loop, streaks, media fade ✓ | yes: mt-7/lg:mt-5, shorter copy |
+| connected | ✓ | heading two lines vs one (+64px) | media fade ✓ | yes: one-line title; card placeholders made softer (radial muted, no hard box) |
+| research | ✓ | ✓ | disc fade ✓ | — |
+| privacy | ✓ | ✓ | pool fade ✓ | — |
+| pricing | label/price/sub/button gaps 15–40% looser; second sub wrapped | plans start 20px low; planet sat ~190px too low (anchored to the bottom) | drift scrubbed ✓ | yes: tighter gaps, planet anchored 72px from the top |
+| migrate | ✓ | ✓ | — | — |
+| testimonials | heading wrapped to two lines; the 12% edge fade ate the phone card | rings a little bright; cards shorter (shorter posts) | marquee + sway ✓ | yes: shorter title, 3% fade on phones, min card height, fainter rings |
+| about | ✓ | ✓ | globe scale+fade ✓ (scroll frames) | — |
+| academy | ✓ | lead 3 lines vs 2 | panel fade ✓ | yes: shorter lead with a desktop break |
+| CTA | lead 2 lines vs 1 | ✓ | glow fade ✓ | yes: shorter lead |
+| footer | ✓ | ✓ | link hover ✓ | — |

@@ -35,14 +35,14 @@ export interface ReflectPricingProps {
 /** Two plans with gradient prices over a rising planet of light and its reflection. */
 export function ReflectPricing({ eyebrow, title, plans, note, media, mediaLabel, className }: ReflectPricingProps) {
   return (
-    <section className={cn("relative isolate overflow-clip bg-background pt-[5.25rem] pb-[35rem] text-foreground lg:pt-[9.25rem] lg:pb-[34.5rem]", className)}>
+    <section className={cn("relative isolate overflow-clip bg-background pt-[5.25rem] pb-[34.5rem] text-foreground lg:pt-[9.25rem] lg:pb-[34.5rem]", className)}>
       {/* the planet and its faint reflection */}
-      <div aria-hidden={!media} className="absolute inset-x-0 bottom-0 -z-10 h-[52rem] lg:h-[69rem]">
+      <div aria-hidden={!media} className="absolute inset-0 -z-10">
         <ReflectMedia
           tone="rise"
           reveal
           label={mediaLabel}
-          className="reflect-pricing-drift absolute top-0 left-1/2 h-[52.3rem] w-[46.5rem] -translate-x-1/2 rounded-b-full bg-[radial-gradient(50%_45%_at_50%_100%,color-mix(in_oklab,var(--glow)_75%,transparent),color-mix(in_oklab,var(--glow)_18%,transparent)_70%,transparent)] lg:top-[4rem]"
+          className="reflect-pricing-drift absolute top-[4.5rem] left-1/2 h-[52.3rem] w-[46.5rem] -translate-x-1/2 rounded-b-full bg-[radial-gradient(50%_45%_at_50%_100%,color-mix(in_oklab,var(--glow)_75%,transparent),color-mix(in_oklab,var(--glow)_18%,transparent)_70%,transparent)]"
         >
           {media}
         </ReflectMedia>
@@ -50,7 +50,7 @@ export function ReflectPricing({ eyebrow, title, plans, note, media, mediaLabel,
       </div>
       <div className="px-gutter">
         <ReflectHeading eyebrow={eyebrow} title={title} />
-        <ul className="mx-auto mt-14 flex max-w-[20rem] flex-col gap-16 sm:max-w-none lg:mt-[4.5rem] lg:flex-row lg:justify-center lg:gap-0">
+        <ul className="mx-auto mt-9 flex max-w-[20rem] flex-col gap-14 sm:max-w-none lg:mt-14 lg:flex-row lg:justify-center lg:gap-0">
           {plans.map((plan, i) => (
             <li
               key={plan.name}
@@ -64,14 +64,14 @@ export function ReflectPricing({ eyebrow, title, plans, note, media, mediaLabel,
                 className={cn(
                   "bg-linear-to-r from-chart-2 via-chart-3 to-chart-4 bg-clip-text font-display font-[560] text-transparent",
                   plan.priceSize === "small"
-                    ? "mt-12 text-[2.25rem]/[2.5rem] lg:mt-10 lg:text-[2rem]/[2.5rem]"
-                    : "mt-6 text-[4.5rem]/[5rem] lg:mt-4",
+                    ? "mt-5 text-[2.25rem]/[2.5rem] lg:mt-6 lg:text-[2rem]/[2.5rem]"
+                    : "text-[4.5rem]/[5rem] lg:mt-2",
                 )}
               >
                 {plan.price}
               </p>
-              <p className="mt-6 text-base/6 text-muted-foreground lg:mt-8">{plan.text}</p>
-              <div className="mt-[3.25rem] w-full lg:mt-auto lg:w-auto lg:pt-[3.25rem]">
+              <p className="mt-5 text-base/6 text-muted-foreground">{plan.text}</p>
+              <div className="mt-9 w-full lg:mt-auto lg:w-auto lg:pt-9">
                 <ReflectButton href={plan.action.href} variant={plan.actionVariant ?? "primary"} className="max-lg:w-full max-lg:justify-start">
                   {plan.action.label}
                 </ReflectButton>
@@ -79,7 +79,7 @@ export function ReflectPricing({ eyebrow, title, plans, note, media, mediaLabel,
             </li>
           ))}
         </ul>
-        {note && <p className="mx-auto mt-[4.5rem] max-w-[23rem] text-center text-sm/5 text-muted-foreground sm:max-w-none">{note}</p>}
+        {note && <p className="mx-auto mt-14 max-w-[23rem] text-center lg:mt-16 text-sm/5 text-muted-foreground sm:max-w-none">{note}</p>}
       </div>
     </section>
   );

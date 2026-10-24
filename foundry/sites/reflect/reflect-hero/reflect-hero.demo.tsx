@@ -8,7 +8,7 @@ export const heroSample: ReflectHeroProps = {
   eyebrowIcon: <Sparkles aria-hidden strokeWidth={1.5} />,
   eyebrowHref: "#",
   title: "Write tonight, think clearly",
-  lead: "A notebook that lives in plain folders on your disk, links your ideas together and opens straight to today's page.",
+  lead: "A notebook kept in plain folders on your disk, with daily pages and linked ideas.",
   primaryAction: { label: "Get it for Mac", href: "#" },
   secondaryAction: { label: "Get the phone & tablet app", href: "#" },
   note: "Free on Mac. A small yearly fee on phone and tablet.",

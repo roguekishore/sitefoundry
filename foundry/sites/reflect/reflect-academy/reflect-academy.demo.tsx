@@ -7,7 +7,7 @@ const k = { strokeWidth: 3, "aria-hidden": true } as const;
 export const academySample: ReflectAcademyProps = {
   eyebrow: "Night school",
   title: "Learn to keep notes\nthat keep you",
-  lead: "Short, free lessons on writing things down so they're there when you need them.",
+  lead: "Free short lessons on notes\nthat are there when you need them.",
   action: { label: "Start lesson one", href: "#" },
   mediaLabel: "A falling-blocks game you can play",
   hints: [

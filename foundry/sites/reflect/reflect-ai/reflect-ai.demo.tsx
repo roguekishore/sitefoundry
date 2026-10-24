@@ -7,14 +7,14 @@ const icon = { strokeWidth: 1.25, "aria-hidden": true } as const;
 export const aiSample: ReflectAiProps = {
   eyebrow: "Bring your own model",
   title: "A notebook that answers back",
-  lead: "Ask a question and get an answer that points to the pages it came from. Tidy a messy paragraph or boil a meeting down to its decisions. Plug in your own model key; your words go straight to the provider you chose, and they bill you directly.",
+  lead: "Get answers that point to your pages, tighten messy text and boil meetings down. Plug in your own model key; your words go straight to that provider, who bills you for them.",
   noteTitle: "Three ways to keep a reading log",
   noteLine: "Which of these suits a slow reader with a busy week?",
   magic: { label: "Tap for a little magic", href: "#", icon: <Sparkles aria-hidden /> },
   mediaLabel: "Beam of light over a glowing grid floor",
   listTitle: "What can the assistant do?",
   items: [
-    { icon: <Mic {...icon} />, title: "Turn voice memos into text", text: "through the speech service you pick" },
+    { icon: <Mic {...icon} />, title: "Turn voice memos into text", text: "with a speech service you pick" },
     { icon: <MessageCircleQuestion {...icon} />, title: "Question your notebook", text: "Every answer cites its pages." },
     { icon: <ListChecks {...icon} />, title: "Pull out decisions and to-dos", text: "from long meeting write-ups" },
     { icon: <BookOpenCheck {...icon} />, title: "Fix typos and loose grammar,", text: "and smooth out your sentences" },
