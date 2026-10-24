@@ -128,3 +128,17 @@ hover grow. No overflow at 360/768/1024.
 | footer | first link 6px high; © 17px tight to the bottom | matches | hover ✓ | yes: mt-5, pb-10 |
 | hero | matches (bottom copy, two buttons, short "Specs" label) | wordmark spans the full width (no mark: ours is text only) | rise ✓ pin ✓ fade ✓ | — (by design) |
 | news ×2, shipyard, software, film, join | match in place, size and frame | match | — | — |
+
+## Comparison round 2
+
+After round 1 every section pair reads as the same layout at both widths; the mono captions
+and display word spacing now track the original's line lengths. Remaining differences:
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| fleet / shipyard / software headings | caption → title 5px tight (title and everything under it sat 4px high) | matches | — | yes: caption mb-3 at all widths |
+| fleet lead | 3 lines ✓ | 2 lines vs 3 (our tighter copy) → section 1616 vs 1647 | — | yes: lead copy lengthened to the original's ~110 characters |
+| software lead | ✓ | 3 lines vs 4 → 1332 vs 1364 | — | yes: lead copy lengthened |
+| news (rescue) | body 3 lines vs 2 → 676 vs 661 | ✓ | — | yes: shorter body copy |
+| footer | ✓ | links started 6px low | ✓ | yes: lg:mt-[4.625rem] |
+| header | solid pale bar + centre hairline after the hero ✓ | same; wordmark appears at 900 ✓ | ✓ | — |

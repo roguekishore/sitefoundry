@@ -6,7 +6,7 @@ export const fleetSample: SaronicFleetProps = {
   id: "fleet",
   eyebrow: "The hulls",
   title: "Made for two missions",
-  lead: "Every hull we launch can patrol for a coast guard or haul for a shipping line, on the same autopilot.",
+  lead: "Every hull we launch is built to patrol for a coast guard or haul freight for a shipping line, on one autopilot.",
   action: <SaronicButton href="#">Compare the hulls</SaronicButton>,
   vessels: [
     { name: "Petrel", linkLabel: "Hull details", href: "#" },

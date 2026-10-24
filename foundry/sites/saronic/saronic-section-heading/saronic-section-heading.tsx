@@ -25,7 +25,7 @@ export function SaronicSectionHeading({ eyebrow, title, lead, action, as: Title 
     <div className={cn("grid gap-y-5 lg:grid-cols-[1fr_auto] lg:gap-x-10 lg:gap-y-8", className)}>
       <div>
         {eyebrow && (
-          <p className="mb-2 font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase lg:mb-3">{eyebrow}</p>
+          <p className="mb-3 font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase">{eyebrow}</p>
         )}
         <Title className="font-display text-[2rem]/[1.12] font-normal tracking-[-0.02em] [word-spacing:-0.08em] text-balance lg:text-[min(3.75vw,4.5rem)]/[1.12]">
           {title}

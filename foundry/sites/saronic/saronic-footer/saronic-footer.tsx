@@ -105,7 +105,7 @@ export function SaronicFooter({
                 )}
               >
                 <p className={cn(caption, "max-lg:hidden")}>{group.title}</p>
-                <ul className="space-y-2 lg:mt-20 lg:space-y-6">
+                <ul className="space-y-2 lg:mt-[4.625rem] lg:space-y-6">
                   {group.links.map((link, j) => (
                     <li key={j}>
                       <a href={link.href} className={cn("font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]", fade)}>

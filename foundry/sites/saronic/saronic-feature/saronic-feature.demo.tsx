@@ -15,7 +15,7 @@ export const featureSoftwareSample: SaronicFeatureProps = {
   id: "helmline",
   eyebrow: "Helmline",
   title: "Every boat. One chart table.",
-  lead: "Helmline is the one control layer behind every Ternway hull: plan the route, rehearse it in simulation and sail it, for a single skiff or a whole squadron.",
+  lead: "Helmline is the one control layer behind every Ternway hull: plan the route, rehearse it in simulation and sail it, for a single skiff or a whole squadron at once.",
   action: <SaronicButton href="#">Tour Helmline</SaronicButton>,
   tone: "dark",
 };

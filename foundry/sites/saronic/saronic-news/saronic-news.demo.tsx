@@ -4,7 +4,7 @@ import { SaronicNews } from "./saronic-news";
 export const newsSample: SaronicNewsProps = {
   eyebrow: "Dispatch",
   title: "A Petrel skiff pulls two sailors from a capsized trawler off Cape Verde",
-  body: "The night recovery is the first time one of our crewless boats has carried survivors home.",
+  body: "Our first night recovery: a crewless boat carried two survivors home.",
   cta: { label: "Read the log", href: "#" },
 };
 
