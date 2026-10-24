@@ -71,7 +71,7 @@ export function ValaratomicsFooter({
     >
       <div
         aria-hidden={!mark}
-        className="valaratomics-footer-mark pointer-events-none absolute bottom-0 left-1/2 -z-10 aspect-[1000/890] w-[min(62.5rem,170%)] -translate-x-1/2 translate-y-[18%] lg:translate-y-[32%] [&>*]:size-full [&_img]:object-contain"
+        className="valaratomics-footer-mark pointer-events-none absolute bottom-0 left-1/2 -z-10 aspect-[1000/890] w-[min(62.5rem,170%)] -translate-x-1/2 translate-y-[18%] lg:translate-y-[24%] [&>*]:size-full [&_img]:object-contain"
       >
         {mark ?? (
           <div className="size-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_85%,transparent)_0%,color-mix(in_oklab,var(--glow)_30%,transparent)_30%,transparent_72%)]" />

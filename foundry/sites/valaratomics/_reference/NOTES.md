@@ -111,3 +111,19 @@ label/media swaps, sticky footer + mark fade). No overflow at 360/768/1024.
 | mission | plate empty white; the original's lattice reads pale grey | same | — | yes: pale muted fill when no texture |
 | press | headlines ~6% wider than the original | same | hover ok | yes: −0.05em |
 | footer | — | title 72px below the footer's top edge (original ~43px); links row 14px low | sticky + fade ok | yes |
+
+## Comparison round 2
+
+Heights unchanged except mission (390: 929 vs 969 — copy one line shorter; 1440: 836 = 836) and
+products (390: 1425 vs 1541, our card copy is shorter). Scroll frames at 1440 (statement,
+technology, footer) now overlay closely; motion list identical to round 1.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| technology | the tab was a separate black strip; under the photo placeholder it read as a different colour (the original's media, 363×440 / 1270×440, spans panel and tab) | same | tab move ok | yes: panel + tab are one element clipped by one animated polygon |
+| technology | — | — | checked live: after 4s the tab sits under the middle label and the phone label row has slid to it | — |
+| press | headlines wrapped wider than the original's (~260px on phones) | ok | — | yes: 17rem phones, 21rem desktop |
+| footer | glow slot centre ~70px low | same | ok | yes: lifted |
+| footer | mark is a glow placeholder, not the original's sharp logo (artwork) | same | fade ok | no: media slot by design |
+| footer | min-height is min(52rem, 100svh), so the capture marks it window-sized on a short window; the original is fixed at 835px | — | — | kept: sticky reveal would hide the top of a taller-than-window footer |
+| re-theme | `valaratomics-core`, `-products`, `-mission` under sample-ember light: dark panels/cards pick up ember's dark palette, gold → ember's primary; the model card under our own dark mode keeps its edge via the photo placeholder | | | ok |

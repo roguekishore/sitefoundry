@@ -58,7 +58,7 @@ export function ValaratomicsPress({
                 href={item.href}
                 className="group relative flex min-h-[17.5rem] flex-col rounded-[1px] bg-muted px-[1.3125rem] pt-[1.5625rem] pb-[1.5rem] transition-colors duration-150 hover:bg-foreground/[0.06] lg:aspect-square lg:min-h-0"
               >
-                <h3 className="max-w-[21rem] text-2xl leading-none tracking-[-0.05em] lg:text-[1.875rem] lg:leading-none">
+                <h3 className="max-w-[17rem] text-2xl leading-none tracking-[-0.05em] lg:max-w-[21rem] lg:text-[1.875rem] lg:leading-none">
                   {item.headline}
                 </h3>
                 <div className="mt-auto pt-16 font-display text-base leading-none font-black tracking-[-0.01em] text-foreground/70 uppercase [font-stretch:var(--valaratomics-stretch,100%)] [&_img]:h-12 [&_img]:w-auto">
