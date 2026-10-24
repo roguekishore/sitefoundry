@@ -1,0 +1,29 @@
+/* Each line is a clipping box; its inner text slides up out of it while the line scrolls into
+   view (over a fixed 280px of scroll, each line 40px later than the one above). The fade
+   variant rises 28px and fades in instead, without clipping. */
+.castelion-lines-line {
+  view-timeline-name: --castelion-line;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .castelion-lines-inner {
+      animation: castelion-lines-rise linear both;
+      animation-timeline: --castelion-line;
+      animation-range: entry calc(var(--castelion-line-i, 0) * 40px) entry calc(280px + var(--castelion-line-i, 0) * 40px);
+    }
+    .castelion-lines[data-variant="fade"] .castelion-lines-inner {
+      animation-name: castelion-lines-fade;
+    }
+  }
+}
+
+@keyframes castelion-lines-rise {
+  from { transform: translateY(110%); }
+  to { transform: none; }
+}
+
+@keyframes castelion-lines-fade {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
