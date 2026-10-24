@@ -1,0 +1,61 @@
+/* The dusk glow behind the footer: transparent at its top, through blue and violet into
+   magenta and orange at the bottom. It rises into place (46% of its height) while the
+   footer scrolls in, finishing as the page reaches its end. */
+.stokespace-footer-glow {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in oklab, var(--chart-4) 30%, transparent) 16%,
+    color-mix(in oklab, var(--glow) 55%, transparent) 30%,
+    color-mix(in oklab, var(--highlight) 80%, transparent) 46%,
+    color-mix(in oklab, var(--primary) 85%, transparent) 64%
+  );
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stokespace-footer-glow {
+      animation: stokespace-footer-rise linear both;
+      animation-timeline: --stokespace-footer;
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+@keyframes stokespace-footer-rise {
+  from { transform: translateY(46%); }
+  to { transform: none; }
+}
+
+/* Contact button: a bright streak travels along the 1px border, only while hovered. */
+.stokespace-footer-shimmer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--foreground) 70%, transparent),
+      transparent
+    )
+    -100% 0 / 50% 100% no-repeat;
+  mask:
+    linear-gradient(var(--foreground) 0 0) content-box exclude,
+    linear-gradient(var(--foreground) 0 0);
+  animation: stokespace-footer-shimmer 4s linear infinite paused;
+  pointer-events: none;
+}
+.stokespace-footer-shimmer:hover::before,
+.stokespace-footer-shimmer:focus-visible::before {
+  animation-play-state: running;
+}
+
+@keyframes stokespace-footer-shimmer {
+  to { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stokespace-footer-shimmer::before { animation: none; }
+}
