@@ -1,0 +1,66 @@
+/* Slate wash over the footage: darker at the bottom on phones (the copy sits there), a lighter
+   top-and-bottom wash on desktop. Built from the theme's ink (card in a dark scope). */
+.saronic-hero-wash {
+  background: linear-gradient(
+    color-mix(in oklab, var(--card) 50%, transparent) 0%,
+    color-mix(in oklab, var(--card) 20%, transparent) 30%,
+    color-mix(in oklab, var(--card) 20%, transparent) 45%,
+    color-mix(in oklab, var(--card) 90%, transparent) 70%,
+    var(--card) 90%
+  );
+}
+@media (min-width: 64rem) {
+  .saronic-hero-wash {
+    background: linear-gradient(
+      color-mix(in oklab, var(--card) 50%, transparent) 0%,
+      color-mix(in oklab, var(--card) 20%, transparent) 35%,
+      color-mix(in oklab, var(--card) 20%, transparent) 60%,
+      color-mix(in oklab, var(--card) 65%, transparent) 100%
+    );
+  }
+}
+
+/* Load: eyebrow, headline and buttons fade in and rise 24px (1s / 1.1s / 1.2s). */
+@media (prefers-reduced-motion: no-preference) {
+  .saronic-hero-rise {
+    animation: saronic-hero-rise 1s cubic-bezier(0.25, 0.25, 0, 1) both;
+  }
+  h1.saronic-hero-rise { animation-duration: 1.1s; }
+  div.saronic-hero-rise { animation-duration: 1.2s; }
+}
+
+@keyframes saronic-hero-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Leaving: the footage stays put (it moves down exactly as fast as the hero moves up, inside
+   the hero's clip) and dims to 20% over the second half; wordmark and copy fade out then. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .saronic-hero {
+      view-timeline-name: --saronic-hero;
+    }
+    .saronic-hero-media {
+      animation: saronic-hero-pin linear both;
+      animation-timeline: --saronic-hero;
+      animation-range: exit 0% exit 100%;
+    }
+    .saronic-hero-fade {
+      animation: saronic-hero-fade linear both;
+      animation-timeline: --saronic-hero;
+      animation-range: exit 50% exit 100%;
+    }
+  }
+}
+
+@keyframes saronic-hero-pin {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0.2; }
+}
+
+@keyframes saronic-hero-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
