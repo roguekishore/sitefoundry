@@ -105,7 +105,7 @@ export function SupabaseHeader({ logo, logoHref = "/", nav, counter, signIn, cta
             <Menu className="size-5 group-open/menu:hidden" strokeWidth={1.5} />
             <X className="hidden size-5 group-open/menu:block" strokeWidth={1.5} />
           </summary>
-          <div className="absolute inset-x-0 top-16 h-[calc(100svh-4rem)] overflow-y-auto border-t border-border bg-background px-gutter pt-6 pb-10">
+          <div className="absolute inset-x-0 top-16 hidden h-[calc(100svh-4rem)] group-open/menu:block overflow-y-auto border-t border-border bg-background px-gutter pt-6 pb-10">
             <ul className="grid gap-1">
               {nav.map((item) => (
                 <li key={item.label}>

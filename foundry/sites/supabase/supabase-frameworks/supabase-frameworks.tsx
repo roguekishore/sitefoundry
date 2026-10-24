@@ -54,7 +54,7 @@ export function SupabaseFrameworks({ lead, frameworks, className }: SupabaseFram
   const current = frameworks[active] ?? frameworks[0];
   return (
     <section className={cn("border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content grid max-w-page gap-6 px-gutter py-section lg:grid-cols-2 lg:gap-12 lg:py-24">
+      <div className="mx-auto box-content grid max-w-page gap-6 px-gutter py-section lg:grid-cols-2 lg:gap-0 lg:py-24">
         <SupabaseHeading parts={[{ text: lead, tone: "muted" }, { text: current?.name }]} />
 
         <div className="overflow-clip rounded-xl border border-border bg-card">

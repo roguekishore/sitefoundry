@@ -4,7 +4,7 @@ import { SupabaseOpenSource, type SupabaseOpenSourceProps } from "./supabase-ope
 
 export const openSourceSample: SupabaseOpenSourceProps = {
   title: "Built where you can see it",
-  body: "Every line of Tidepool is public, because tools you depend on should be readable, auditable and shaped by the people using them. Fork it, run it yourself, send a fix. You can always leave, and you stay in charge.",
+  body: "Every line of Tidepool is public, because the tools you lean on should be readable, auditable and shaped by their users. Fork it, host it, send a fix. You can always leave.",
   cta: {
     label: (
       <>

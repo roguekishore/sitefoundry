@@ -99,3 +99,21 @@ original's own card swaps, folded into the drift loop.
   string chart-3 (amber), punctuation muted-foreground at 70%.
 - Customer and framework logos are lucide icons; logo-band wordmarks are plain text names.
 - The mobile menu is a `<details>` disclosure so the header needs no JavaScript.
+
+## Comparison round 1
+
+Ours at 1440 already tracks section heights (hero 391/386, bento 950/949, frameworks 706/696,
+templates 896/898, stories 812/812, community 929/909, CTA 380/375). The 390 capture was zoomed
+out by a sideways overflow, so phones are judged in round 2.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | closed `<details>` panel overflowed to 418px (Chrome's closed-details slot contains the absolute panel) | wordmark smaller than the original's (75 vs 124px) | right group fades in ✓; nav hover ✓ | yes: panel `hidden` until open; mark 22px |
+| hero | green line wrapped (our phrase longer) | lead ran to 3 lines (original 2) | – | yes: shorter phrase and lead |
+| logos | wordmarks too large for 3 columns | label sat on the band's top edge (246 vs 270px) | – | yes: phone wordmarks scaled to 62%; 24px above the label |
+| dashboard | – | 909 vs 862px: the window grew to its content (aspect-ratio min-height auto) | tabs ✓ | yes: `min-h-0`, top padding 88px |
+| frameworks | – | code card 520 vs 544px (the original fills the right half exactly) | tabs ✓ | yes: no column gap |
+| stories | – | "ink" and "night" strips both grey; the original's first strip is navy | hover widen ✓ (CSS) | yes: ink = background tinted with glow |
+| community | – | crops blank at scroll 0 (view-timeline pre-state, expected); scroll frames match the arch, edge fade and bottom fade | reveal fade + blur + rise ✓ | – |
+| open source | – | grey dots far denser/darker than the original's faint field; body 4 lines vs 3 (399 vs 373px) | dots light up left→right ✓ | yes: field tint 12%/20%; shorter body |
+| footer | – | link rows 32px apart vs 28px | – | yes: links `block leading-5` |

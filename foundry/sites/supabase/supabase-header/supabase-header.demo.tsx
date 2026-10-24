@@ -6,8 +6,8 @@ import { SupabaseHeader, type SupabaseHeaderProps } from "./supabase-header";
 export function TidepoolMark({ large }: { large?: boolean }) {
   return (
     <span className={large ? "flex items-center gap-2.5" : "flex items-center gap-2"}>
-      <Waves className={large ? "size-8 text-highlight" : "size-6 text-highlight"} strokeWidth={2.5} />
-      <span className={large ? "font-display text-[1.625rem] font-semibold tracking-[-0.02em]" : "font-display text-xl font-semibold tracking-[-0.02em]"}>
+      <Waves className={large ? "size-8 text-highlight" : "size-7 text-highlight"} strokeWidth={2.5} />
+      <span className={large ? "font-display text-[1.625rem] font-semibold tracking-[-0.02em]" : "font-display text-[1.375rem] font-semibold tracking-[-0.02em]"}>
         tidepool
       </span>
     </span>

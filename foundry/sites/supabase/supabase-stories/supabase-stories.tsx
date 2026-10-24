@@ -17,7 +17,7 @@ export interface SupabaseStory {
   person: { name: string; avatar?: ReactNode };
   /** the link at the very bottom */
   link: { label: string; href: string };
-  /** the card's colour: sunset (pink→orange gradient), ink, deep (teal), night (near black), glow (blue) */
+  /** the card's colour: sunset (pink→orange gradient), ink (navy), deep (teal), night (near black), glow (blue) */
   tone?: "sunset" | "ink" | "deep" | "night" | "glow";
 }
 
@@ -34,9 +34,9 @@ export interface SupabaseStoriesProps {
 // every tone is a dark scope, so text and borders inside use the theme's dark tokens
 const tones = {
   sunset: "bg-linear-to-b from-chart-4 to-chart-5",
-  ink: "bg-background",
+  ink: "bg-background bg-linear-to-b from-glow/25 to-glow/20",
   deep: "bg-secondary",
-  night: "bg-card",
+  night: "bg-background",
   glow: "bg-linear-to-bl from-glow/80 to-glow",
 };
 

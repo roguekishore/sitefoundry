@@ -31,7 +31,7 @@ export default function Page() {
       <SupabaseHeader {...headerSample} />
       <SupabaseHero {...heroSample} />
       <SupabaseProducts {...productsSample} />
-      <SupabaseLogos {...logosSample} className="pt-8 lg:pt-0" />
+      <SupabaseLogos {...logosSample} className="pt-8 lg:pt-6" />
       <SupabaseDashboard {...dashboardSample} />
       <SupabaseFrameworks {...frameworksSample} />
       <SupabaseTemplates {...templatesSample} />
