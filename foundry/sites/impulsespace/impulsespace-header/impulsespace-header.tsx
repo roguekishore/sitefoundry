@@ -49,7 +49,7 @@ export function ImpulsespaceHeader({ name, homeHref = "/", links, more = [], mor
           </ul>
         </nav>
         {more.length > 0 && (
-          <details className="impulsespace-header-more hidden lg:ml-2 lg:block">
+          <details className="impulsespace-header-more hidden lg:block">
             <summary
               aria-label={moreLabel}
               className="grid size-7 cursor-pointer place-items-center opacity-50 transition-opacity duration-250 hover:opacity-100 motion-reduce:transition-none"

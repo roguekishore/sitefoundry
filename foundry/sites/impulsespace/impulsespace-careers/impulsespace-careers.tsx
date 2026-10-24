@@ -32,19 +32,19 @@ export interface ImpulsespaceCareersProps {
 /** Heading with a pill, then two big photo cards with captions over a dark shade. */
 export function ImpulsespaceCareers({ title, cta, cards, id, className }: ImpulsespaceCareersProps) {
   return (
-    <section id={id} className={cn("bg-background px-gutter py-section text-foreground", className)}>
+    <section id={id} className={cn("bg-background px-gutter pt-section pb-12 text-foreground", className)}>
       <div className="flex items-end justify-between gap-6">
         <h2 className="font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em]">{title}</h2>
         {cta && <ImpulsespaceButton href={cta.href}>{cta.label}</ImpulsespaceButton>}
       </div>
-      <ul className="mt-12 grid gap-2.5 lg:grid-cols-2">
+      <ul className="mt-12 grid gap-8 lg:grid-cols-2">
         {cards.map((card) => (
           <li key={card.title}>
             <a href={card.href} className="group relative isolate block aspect-[0.68] overflow-clip rounded-lg lg:aspect-square">
               <ImpulsespacePlaceholder
                 media={card.media}
                 label={card.mediaLabel}
-                className="absolute inset-0 -z-10 scale-[1.04] transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-100 motion-reduce:transition-none"
+                className="dark absolute inset-0 -z-10 scale-[1.04] transition-transform duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-100 motion-reduce:transition-none"
               />
               <span className="dark absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-linear-to-t from-background/80 to-transparent p-6 pt-24 text-foreground">
                 <span className="grid gap-2">

@@ -32,7 +32,7 @@ export function ImpulsespacePartners({ label, partners, className }: Impulsespac
   const half = Math.ceil(partners.length / 2);
   const slots = partners.slice(0, Math.min(half, 8)).map((a, i) => [a, partners[i + half]] as const);
   return (
-    <section className={cn("dark bg-background pt-12 pb-14 text-foreground lg:py-[3.25rem]", className)}>
+    <section className={cn("dark bg-background pt-12 pb-14 text-foreground lg:py-[2.8rem]", className)}>
       <p className="px-gutter text-center font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase">{label}</p>
 
       {/* desktop marquee */}

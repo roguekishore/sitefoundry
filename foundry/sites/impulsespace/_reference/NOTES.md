@@ -105,3 +105,23 @@ Not rebuilt: the WebGL canvases in the vehicle cards (media) and the hero video;
   hovers and the mono legal links; the large wordmark is optional (prop).
 - Dark bands (hero, missions, partners) are `.dark` scopes, so their tokens flip per subtree.
 - Fonts weights: 500 → 600 (Host Grotesk reads lighter).
+
+## Comparison round 1
+
+Only the header, hero and statement can be compared by eye (the original's capture shows the
+first screen only); the rest is checked against the capture's section heights, media sizes
+and hover list.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark 115 vs 106 wide; burger matches | cluster 728 wide vs 674 (our link labels longer; chevron 44px after the last link vs 28) | difference blend works (white on the hero, black over white); link .5→1 in 0.25s matches | yes: shorter labels, chevron gap |
+| hero | window-sized ✓; title, track, label a little above the middle (inferred) | window-sized ✓; title/track/label at 744/799/827 vs 747/803/830 | — | — |
+| statement | 469 vs 469 ✓, 8 lines | 354 vs 354 ✓, 4 lines, x=407 ✓ | — | — |
+| vehicles | 1746 vs 1824 | 867 vs 867, but cards 452 wide vs the original's 437 canvases with a ~32px gap (1376 = 3×437 + 2×32) | glow 0→.6 on hover ✓, render scale ✓ | yes: gap = gutter (32), card aspect .8, heading gap 80; phones aspect .66 |
+| vehicles | the render placeholder was a blurred radial blob (reads as a shape) | same | — | yes: a faint flat rounded square |
+| missions | 1253 vs 1329; mono details wrapped beside long names | 1102 vs 1102 ✓ | zoom 1.23→1 scrubbed while the frame enters ✓ | yes: phone frame 100svh; details nowrap, rows wrap |
+| partners | 541 vs 533 ✓ | 197 vs 183 | marquee loop ✓ (desktop), blur swap ✓ (phones) | yes: py 52 → 45 |
+| careers | 1257 vs 1232 | 971 vs 908; squares 683 vs 672 (two 672 squares + 32 gap = 1376) | photo scale 1.04→1 on hover ✓ | yes: gap 32, bottom pad 48 |
+| careers | — | empty slot was light muted under a black/80 shade: muddy brown | — | yes: the slot is a .dark scope (dark surface, like a photo under a white caption) |
+| footer | 1110 vs 1248; email field collapsed to 22px (flex-1 in a column); wordmark too wide (clipped) | 763 vs 736; wordmark filled 1190 of 1376 | links .7 in 0.15s ✓, legal colour .5→.7 + sweep ✓ | yes: field w-full, wordmark 21vw / 24vw, gaps rebalanced |
+| all | — | — | horizontal overflow: fits at 360/768/1024 | — |
