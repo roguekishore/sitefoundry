@@ -99,3 +99,42 @@ being dismissed, not a page effect; skipped.
 - **Social icons**: lucide 1.x has no brand icons, so the footer takes icons as props and the
   demo uses neutral lucide glyphs. The HIPAA seal becomes a small text badge.
 - Footer link columns and header links come from props; the cart drawer and modal are skipped.
+
+## Comparison round 1
+
+Our capture runs through a copy of `capture.mjs` in /tmp with Vite's live-reload socket
+stubbed (other sessions' edits kept reloading the shared gallery). Section heights at 1440
+matched within ~10px for 11 of 14 sections. Reveal sections (quote, clinicians) show their
+pre-state in the section crops; checked on the scroll frames instead.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all body text | Outfit reads ~10% smaller than Euclid Circular B at the same px (x-height 0.46 vs ~0.5, and narrower) | same | — | yes: every sans size in the blocks ×1.1 (serif headings untouched), unitless line heights ÷1.1 so line spacing stays |
+| hero | — | headline 3 lines on a wide measure; original 4 lines at ~430px | none on either | yes: measure 27rem |
+| conditions, reviews | title and controls missing: grid without columns grew to the track's width and was clipped | fine | arrows work | yes: `grid-cols-[minmax(0,1fr)]` |
+| plans | fine | band 72px taller (price note wrapped, big gap under the timeline) | — | yes: gap 6→4rem, price column wider, shorter note |
+| split / conditions titles | 3 lines vs 2 (copy length) | hyphen break in "long-running" | — | yes: demo copy |
+| footer | link rows 32px apart vs 27; groups balance differently in 2 columns | links 36 vs 33px apart; footer 94px taller | hover | yes: tighter gaps; phone grouping left as is |
+| FAQ | — | 225px shorter: our questions fit one line, answer shorter | details | no: content length, row rhythm matches |
+| quote, experts | — | — | reveals present: fade + rise 20px, rise 16px, scale 0.96→1 | — |
+| floating pill | — | — | appears after the first screen, rise 16px | — |
+| overflow | fits at 360/768/1024 | | | |
+
+## Comparison round 2
+
+Heights at 1440 now within 13px of the original for every section except the FAQ (content
+length) and the footer (+55px, its feed slot and link stack). Phones: the reviews and
+conditions titles are back; text sizes read like the original.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | — | 4-line headline, text block centred in the 760px photo like the original | none | — |
+| plans | — | 1019 vs 1006px | — | — |
+| reviews | our first card has no neighbour to its left (the original loops) | 2.8 cards visible vs 2.75 | arrows + dots work | no: a looping track needs cloned cards; not worth it |
+| footer | groups split Full Circle+Lab Readout+About / Resources+Clinics; original Complete+About+Centers / Lab+Resources | 55px taller | hover | no: phone grouping follows the desktop columns |
+| re-theme (sample-ember) | — | plans and split re-theme cleanly, but sage text used `--secondary`, a surface colour that is near-white in ember | — | yes: sage text (eyebrows, links, names, checks, ring arrows) now uses `--ring`, the same sage in this theme |
+| dark mode | — | FAQ in dark: forest band, bone text, clover rules | — | — |
+
+Stopped here: each section pair reads as the same design at a glance (content and media
+placeholders aside), the motion rows all show up in our Motion list, and nothing overflows at
+360/768/1024.

@@ -42,7 +42,7 @@ export function ParsleyhealthReviews({ eyebrow, title, items, action, prevLabel,
         className,
       )}
     >
-      <div className="mx-auto grid max-w-page items-center gap-16 lg:grid-cols-[17.5rem_minmax(0,1fr)] lg:gap-[4.75rem]">
+      <div className="mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] items-center gap-16 lg:grid-cols-[17.5rem_minmax(0,1fr)] lg:gap-[4.75rem]">
         <ParsleyhealthHeading
           eyebrow={eyebrow}
           title={title}
@@ -80,8 +80,8 @@ export function ParsleyhealthReviews({ eyebrow, title, items, action, prevLabel,
                     </div>
                   </div>
                   <div className="px-3 pb-4 lg:px-3">
-                    <p className="border-b border-primary pt-3 pb-2.5 text-[1.1875rem] leading-[1.4] text-secondary lg:text-[1.3125rem]">{item.name}</p>
-                    <p className="mt-3 text-sm leading-[1.6] text-foreground">{item.quote}</p>
+                    <p className="border-b border-primary pt-3 pb-2.5 text-[1.3063rem] leading-[1.273] text-ring lg:text-[1.4438rem]">{item.name}</p>
+                    <p className="mt-3 text-[0.9625rem] leading-[1.455] text-foreground">{item.quote}</p>
                     {featured && action ? (
                       <ParsleyhealthButton href={action.href} variant="highlight" size="sm" className="mt-3.5 px-6.5">
                         {action.label}

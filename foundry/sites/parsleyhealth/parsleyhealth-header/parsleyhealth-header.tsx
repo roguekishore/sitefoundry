@@ -33,7 +33,7 @@ export interface ParsleyhealthHeaderProps {
 }
 
 const linkClass =
-  "text-base font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none";
+  "text-[1.1rem] font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none";
 
 /** Mint announcement bar over a deep-sea nav, both sticky. */
 export function ParsleyhealthHeader({
@@ -53,10 +53,10 @@ export function ParsleyhealthHeader({
       {announcement ? (
         <div className="relative bg-accent text-accent-foreground has-[input:checked]:hidden">
           <div className="mx-auto flex min-h-[5.375rem] items-center justify-between gap-4 py-3 pr-10 pl-4 lg:min-h-[3.625rem] lg:justify-center lg:gap-10 lg:py-2.5 lg:pr-12">
-            <p className="max-w-[9.5rem] text-xs leading-[1.55] tracking-[0.01em] lg:max-w-none lg:text-[1.1875rem] lg:leading-[1.4] lg:tracking-[-0.01em]">
+            <p className="max-w-[9.5rem] text-[0.825rem] leading-[1.409] tracking-[0.01em] lg:max-w-none lg:text-[1.3063rem] lg:leading-[1.273] lg:tracking-[-0.01em]">
               {announcement.text}
             </p>
-            <ParsleyhealthButton href={announcement.action.href} size="xs" className="max-lg:h-[2.375rem] max-lg:px-6 max-lg:text-[0.9375rem]">
+            <ParsleyhealthButton href={announcement.action.href} size="xs" className="max-lg:h-[2.375rem] max-lg:px-6 max-lg:text-[1.0312rem]">
               {announcement.action.label}
             </ParsleyhealthButton>
           </div>
@@ -79,12 +79,12 @@ export function ParsleyhealthHeader({
             </summary>
             <nav className="absolute inset-x-0 top-full flex h-[calc(100svh-10rem)] flex-col overflow-y-auto border-t border-foreground/10 bg-muted px-5 pt-2 pb-8">
               {links.map((link) => (
-                <a key={link.label} href={link.href} className="border-b border-foreground/10 py-4 text-lg font-medium">
+                <a key={link.label} href={link.href} className="border-b border-foreground/10 py-4 text-[1.2375rem] font-medium">
                   {link.label}
                 </a>
               ))}
               {secondary ? (
-                <a href={secondary.href} className="py-4 text-lg font-medium">
+                <a href={secondary.href} className="py-4 text-[1.2375rem] font-medium">
                   {secondary.label}
                 </a>
               ) : null}

@@ -50,7 +50,7 @@ export function ParsleyhealthSplit({
         </div>
         <div className={cn("text-center lg:row-start-1 lg:text-left", mediaSide === "right" ? "lg:col-start-1" : "lg:col-start-2")}>
           <ParsleyhealthHeading title={title} eyebrow={eyebrow} align="phone-center" titleClassName="lg:max-w-[23rem]" />
-          <div className="mx-auto mt-6 flex max-w-[22rem] flex-col gap-6 text-base leading-[1.65] text-foreground lg:mx-0 lg:mt-9 lg:max-w-[28rem] lg:text-lg lg:leading-8">
+          <div className="mx-auto mt-6 flex max-w-[22rem] flex-col gap-6 text-[1.1rem] leading-[1.5] text-foreground lg:mx-0 lg:mt-9 lg:max-w-[28rem] lg:text-[1.2375rem] lg:leading-8">
             {paragraphs.map((p) => (
               <p key={p}>{p}</p>
             ))}
