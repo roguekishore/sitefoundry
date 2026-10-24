@@ -41,10 +41,12 @@ export function CfsValues({ title, media, quote, values, link, className }: CfsV
       <div className="mx-auto max-w-page px-gutter">
         <CfsSectionTitle>{title}</CfsSectionTitle>
 
-        <div className="relative mt-[1.625rem] lg:mt-[4.375rem]">
-          <CfsMedia media={media} className="-mx-gutter aspect-[390/422] lg:mx-0 lg:aspect-[844/755] lg:w-[61.6%]" />
+        {/* wide screens: photo over the first two tracks, card over the last two, so the card
+            overlaps the photo and still grows with a long quote */}
+        <div className="relative mt-[1.625rem] lg:mt-[4.375rem] lg:grid lg:grid-cols-[50.95%_10.65%_1fr]">
+          <CfsMedia media={media} className="-mx-gutter aspect-[390/422] lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-0 lg:aspect-[844/755] lg:self-start" />
 
-          <figure className="dark relative -mt-[2.2rem] flex flex-col items-center justify-center border-t-[3px] border-primary bg-card px-[1.875rem] py-10 text-center text-foreground lg:absolute lg:top-[51px] lg:right-0 lg:bottom-[52px] lg:mt-0 lg:w-[49%] lg:border-t-0 lg:border-l-[3px] lg:px-20">
+          <figure className="dark relative -mt-[2.2rem] flex flex-col items-center justify-center border-t-[3px] border-primary bg-card px-[1.875rem] py-10 text-center text-foreground lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:my-[51px] lg:border-t-0 lg:border-l-[3px] lg:px-20">
             {quote.mark && <span className="text-primary [&_svg]:size-12 lg:[&_svg]:size-[3.25rem]">{quote.mark}</span>}
             <blockquote className="mt-7 max-w-[31rem] font-display text-2xl leading-[1.5] font-[350] lg:mt-10 lg:text-[1.9rem]">
               {quote.text}
