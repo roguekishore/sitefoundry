@@ -15,10 +15,10 @@ export function K2spaceWordmark({ name, suffix, className }: K2spaceWordmarkProp
   return (
     <span
       aria-label={suffix ? `${name} ${suffix}` : name}
-      className={cn("inline-flex items-center gap-[0.35em] font-display leading-none font-light tracking-[0.22em] uppercase [font-stretch:125%]", className)}
+      className={cn("inline-flex items-center gap-[0.35em] font-display leading-none font-normal tracking-[0.2em] uppercase [font-stretch:125%]", className)}
     >
       <span aria-hidden>{name}</span>
-      <Orbit aria-hidden strokeWidth={1.25} className="size-[1.45em] shrink-0" />
+      <Orbit aria-hidden strokeWidth={1.5} className="size-[1.45em] shrink-0" />
       {suffix && <span aria-hidden>{suffix}</span>}
     </span>
   );

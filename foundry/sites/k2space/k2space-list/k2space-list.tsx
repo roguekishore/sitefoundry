@@ -28,7 +28,7 @@ export function K2spaceList({ items, link, className }: K2spaceListProps) {
           <li
             key={i}
             className={cn(
-              "k2space-list-row min-h-[224px] px-gutter pt-[30px] pb-10 lg:grid lg:min-h-[15.9vw] lg:grid-cols-[8.06vw_1fr_30.8vw] lg:pt-[1.75vw]",
+              "k2space-list-row px-gutter pt-[30px] pb-16 lg:grid lg:grid-cols-[8.06vw_1fr_30.8vw] lg:pt-[1.75vw] lg:pb-[8.8vw]",
               i % 2 === 0 ? "bg-secondary text-secondary-foreground" : "bg-background",
             )}
           >
@@ -36,14 +36,14 @@ export function K2spaceList({ items, link, className }: K2spaceListProps) {
               <span className="k2space-list-in inline-block lg:block">{item.number}</span>{" "}
               <span className="k2space-list-in ml-1.5 inline-block lg:ml-0 lg:block">{item.title}</span>
             </p>
-            <p className="k2space-list-in mt-[38px] text-base/none font-medium lg:mt-0 lg:max-w-[30vw] lg:text-[max(1rem,1.3227vw)]/none">
+            <p className="k2space-list-in mt-[38px] text-base/none font-[560] lg:mt-0 lg:max-w-[30vw] lg:text-[max(1rem,1.3227vw)]/none">
               {item.body}
             </p>
           </li>
         ))}
       </ol>
       {link && (
-        <div className="px-gutter pt-[27px] pb-[30px] lg:pt-[1.75vw] lg:pb-[1.9vw] lg:pl-[66.74vw]">
+        <div className="px-gutter pt-[27px] pb-[13px] lg:pt-[1.88vw] lg:pb-[0.8vw] lg:pl-[66.74vw]">
           <K2spaceButton variant="link" href={link.href}>
             {link.label}
           </K2spaceButton>

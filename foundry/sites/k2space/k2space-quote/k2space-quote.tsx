@@ -31,7 +31,7 @@ export function K2spaceQuote({ quote, attribution, action, media, className }: K
         <blockquote className="k2space-quote-in max-w-[360px] font-display text-[34px]/none font-[560] lg:max-w-[66vw] lg:text-[5.027vw]/[0.9]">
           “{quote}”
         </blockquote>
-        <figcaption className="k2space-quote-in mt-9 text-base/none font-medium lg:mt-[2vw] lg:text-[max(1rem,1.3227vw)]/none">
+        <figcaption className="k2space-quote-in mt-9 text-base/none font-[560] lg:mt-[2vw] lg:text-[max(1rem,1.3227vw)]/none">
           {attribution}
         </figcaption>
         {action && (

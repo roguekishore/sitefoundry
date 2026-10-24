@@ -64,10 +64,10 @@ export function K2spaceNews({ title, items, readLabel, previousLabel, nextLabel,
           >
             <span className="flex items-start justify-between gap-4">
               <span className="font-display text-2xl/none font-bold tracking-[-0.02em] lg:text-[2.2vw]/none">{item.publication}</span>
-              <span className="pt-1 text-xs/none font-medium text-card-foreground/60 lg:pt-[0.4vw] lg:text-[max(0.75rem,0.926vw)]/none">{item.date}</span>
+              <span className="pt-1 text-xs/none font-[560] text-card-foreground/60 lg:pt-[0.4vw] lg:text-[max(0.75rem,0.926vw)]/none">{item.date}</span>
             </span>
-            <span className="mt-auto text-base/none font-medium lg:text-[1.852vw]/none">{item.title}</span>
-            <span className="mt-[22px] inline-flex items-center gap-1.5 text-base/none font-medium text-muted-foreground transition-colors duration-200 ease-[ease] group-hover:text-foreground motion-reduce:transition-none lg:mt-[2.4vw] lg:text-[max(1rem,1.3227vw)]/none">
+            <span className="mt-auto text-base/none font-[560] lg:text-[1.852vw]/none">{item.title}</span>
+            <span className="mt-[22px] inline-flex items-center gap-1.5 text-base/none font-[560] text-muted-foreground transition-colors duration-200 ease-[ease] group-hover:text-foreground motion-reduce:transition-none lg:mt-[2.4vw] lg:text-[max(1rem,1.3227vw)]/none">
               {readLabel}
               <ArrowRight aria-hidden strokeWidth={1.75} className="size-[0.9em]" />
             </span>

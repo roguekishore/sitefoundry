@@ -62,7 +62,7 @@ export function K2spaceSlider({ title, slides, previousLabel, nextLabel, classNa
               <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-background/70 to-transparent" />
               <div className="relative p-6 lg:p-[2.64vw] lg:pb-[3vw]">
                 <h3 className="font-display text-2xl/none font-[560] lg:text-[2.249vw]/none">{slide.title}</h3>
-                <p className="mt-5 max-w-[270px] text-base/none font-medium lg:mt-[1.25vw] lg:max-w-[25vw] lg:text-[max(1rem,1.3227vw)]/none">
+                <p className="mt-5 max-w-[270px] text-base/none font-[560] lg:mt-[1.25vw] lg:max-w-[25vw] lg:text-[max(1rem,1.3227vw)]/none">
                   {slide.body}
                 </p>
               </div>

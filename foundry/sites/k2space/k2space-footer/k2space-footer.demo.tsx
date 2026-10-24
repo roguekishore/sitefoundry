@@ -27,10 +27,10 @@ export const footerSample: K2spaceFooterProps = {
     {
       groups: [
         [
-          { label: "hello@hecto.example", href: "mailto:hello@hecto.example" },
-          { label: "press@hecto.example", href: "mailto:press@hecto.example" },
+          { label: "hi@hecto.space", href: "mailto:hi@hecto.space" },
+          { label: "press@hecto.space", href: "mailto:press@hecto.space" },
         ],
-        [{ label: "880 Anvil Road" }, { label: "Long Beach, CA 90810" }],
+        [{ label: "880 Anvil Road" }, { label: "Long Beach 90810" }],
       ],
     },
   ],

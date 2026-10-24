@@ -67,7 +67,7 @@ export function K2spaceHeader({ brand, brandHref = "/", links, clock, menuLabel,
   return (
     <header
       className={cn(
-        "k2space-header dark fixed inset-x-0 top-0 z-40 font-sans font-medium text-foreground [font-stretch:var(--k2space-stretch,100%)]",
+        "k2space-header dark fixed inset-x-0 top-0 z-40 font-sans font-[560] text-foreground [font-stretch:var(--k2space-stretch,100%)]",
         className,
       )}
     >
@@ -90,7 +90,7 @@ export function K2spaceHeader({ brand, brandHref = "/", links, clock, menuLabel,
 
         {clock && (
           <p className="text-[max(1rem,1.3227vw)]/none tabular-nums max-lg:hidden">
-            <span className="inline-block min-w-[12.5em]">{now !== null ? elapsed(clock.since, now) : null}</span>
+            <span>{now !== null ? elapsed(clock.since, now) : null}</span>
             <span aria-hidden> / </span>
             {clock.name}
           </p>
