@@ -175,7 +175,7 @@ export function ResendExperience({ title, text, sandbox, webhooks, className }: 
     <section className={cn("bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section", className)}>
       <div className="mx-auto max-w-page px-gutter">
         <ResendHeading align="start" title={title} text={text} className="max-lg:items-center max-lg:text-center" textClassName="lg:max-w-none" />
-        <div className="mt-12 grid gap-14 lg:grid-cols-2 lg:gap-8">
+        <div className="mt-12 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-8">
           <ResendFeatureCard visual={<SandboxVisual {...sandbox} />} icon={sandbox.icon} title={sandbox.title} text={sandbox.text} link={sandbox.link} />
           <ResendFeatureCard visual={<WebhookVisual events={webhooks.events} />} icon={webhooks.icon} title={webhooks.title} text={webhooks.text} link={webhooks.link} />
         </div>

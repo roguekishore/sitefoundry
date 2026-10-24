@@ -50,7 +50,7 @@ export function ResendTestimonials({ title, text, items, className }: ResendTest
       <div className="mx-auto max-w-page px-gutter">
         <ResendHeading title={title} text={text} />
       </div>
-      <div className="group/track mt-16 h-[20rem] overflow-x-auto overflow-y-clip mask-b-from-45% mask-b-to-95% [scrollbar-width:none] motion-safe:overflow-x-clip lg:mt-24 lg:h-[16.5rem]">
+      <div className="group/track mt-16 h-[20rem] overflow-x-auto overflow-y-clip mask-b-from-30% mask-b-to-80% [scrollbar-width:none] motion-safe:overflow-x-clip lg:mt-24 lg:h-[16.5rem]">
         <div
           className="resend-testimonials-track flex w-max items-start gap-8 pr-8 group-hover/track:[animation-play-state:paused]"
           style={{ "--resend-lap": `${Math.max(60, items.length * 30)}s` } as CSSProperties}

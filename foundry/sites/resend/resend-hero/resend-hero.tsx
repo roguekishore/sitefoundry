@@ -53,7 +53,7 @@ export function ResendHero({ badge, title, text, primary, secondary, object, bac
               </span>
             ))}
           </h1>
-          <p className="mt-5 max-w-[29rem] text-base leading-7 text-muted-foreground lg:mt-4 lg:max-w-none lg:text-lg lg:leading-[1.5]">
+          <p className="mt-5 max-w-[29rem] text-base leading-7 text-muted-foreground lg:mt-1 lg:max-w-none lg:text-lg lg:leading-[1.5]">
             {text.map((line, i) => (
               <span key={i} className="lg:block">
                 {line}

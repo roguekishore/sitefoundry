@@ -119,3 +119,69 @@ webhook/test feeds ticking while sampled, not scroll reveals: the timer feed cov
 - The product UI inside cards (#5 logs and webhook feed, #4 code, #6 editor chrome, #8 code
   window) is built: it is text, chips and buttons, and it carries the section's motion. The
   images inside them stay placeholders.
+
+## Comparison round 1 (ours vs original, dark, 390 and 1440)
+
+Heights at 1440 (original → ours): header 58 → 59, hero 900 (window) → 900 (window), logos
+567 → 610, integrate 1296 → 1279, experience 967 → 987, editor 1358 → 1395, beyond 899 → 891,
+react 1367 → 1369, deliverability 941 → 946, quote 631 → 652, control 1352 → 1381,
+testimonials 685 → 684, cta 702 (incl. 80px of footer glow) → 622, footer 597 → 624.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| whole page | **overflowed to 497px at 360**: the feature cards (grid items with `min-width:auto`) grew to their unbroken log lines and chips | – | – | yes: `min-w-0` on the card, `grid-cols-1` on the pairs |
+| header | ✓ | wordmark ~40% smaller and lighter than the original's | drop-in ✓, hairline/blur on scroll ✓ (ScrollTimeline), chevron dip ✓ | yes: 26px bold wordmark |
+| hero | ✓ object on top, centred, full-width button | lead sat 48px under the title vs ~20px | rim spins 30s ✓, button glow ✓ | yes: lead mt 4px |
+| logos | ✓ | logo rows 28px lower and link 43px lower than the original | link chevron ✓ | yes: tighter grid/link margins |
+| all section titles | – | words ran together ("Toolsengineers"): Instrument Sans' space is narrower than Favorit's at −0.05em | – | yes: `word-spacing: 0.06em` |
+| integrate | ✓ tiles and tabs scroll sideways | light streak on the panel's top edge missing (clipped at `-top-px` by the panel's own clip) | tab/tile hover ✓ | yes: streak at `top-0` |
+| experience | (overflow above) | ✓ cards, glow, fades, chips | feeds tick ✓ (checked separately: both lists rotate every 2s/3s once on screen) | – |
+| editor | ✓ | lead wrapped to 3 lines (40rem cap) | – | yes: leads given as line lists drop the cap at lg; shorter demo line |
+| beyond | ✓ | ✓ | – | – |
+| react | ✓ file tabs + preview | ✓ | – | – |
+| deliverability | ✓ | ✓ | rise 20px + fade on entering view, 9 items ✓ | – |
+| quote | ✓ | quote 365px wide (text-balance) vs 495px → 4 lines vs 3 | pill CTA opacity 0 at rest on desktop ✓ (hover 0.5s) | yes: no balance |
+| control | ✓ | lead wrapped to 3 lines; tab labels too tight ("Everymessagetraced") | tab crossfade ✓ | yes: lead lines; tracking −0.02em |
+| testimonials | ✓ | lead wrapped to 3 lines; card bottoms still visible (original fades them out fully) | drift 180s ✓, pauses on hover ✓ | yes: lead lines; stronger bottom mask |
+| cta | ✓ | ✓ wordmark cropped by the footer line | wordmark fades in on entering view ✓ | – |
+| footer | link rows 44px apart vs 40px | same | status pulse ✓ | yes: `leading-5` on rows |
+
+## Comparison round 2
+
+Heights at 1440 now: logos 578 (567), integrate 1279 (1296), experience 987 (967), editor
+1368 (1358), beyond 891 (899), react 1369 (1367), deliverability 946 (941), quote 652 (631),
+control 1354 (1352), testimonials 657 (685), cta 622, footer 603 (597). At 390 every section is
+within ~5% except the quote (612 vs 568: our pill CTA sits a little lower) and the footer
+(1430 vs 1367: our longest group has seven links in a 2-column grid, like the original).
+Overflow at 360 / 768 / 1024: fits. Hero still marked "sized by the window" at 1440 only, as
+in the original.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | ✓ | ✓ serif title, lead, buttons, object slot in place | ✓ | – |
+| section titles | ✓ | ✓ spaces read as in the original | – | – |
+| logos | ✓ | ✓ rows at 250/346 vs 238/334 | ✓ | – |
+| editor, control, testimonials | ✓ | ✓ leads on two lines | ✓ | – |
+| quote | ✓ | ✓ 3-line quote | ✓ | – |
+| testimonials | ✓ | ✓ card bottoms fade into the page | ✓ | – |
+| footer | ✓ | ✓ | ✓ | – |
+
+Motion check against the inventory: header drop-in (1s CSSAnimation) ✓, header hairline on
+scroll (ScrollTimeline) ✓, badge rim loop 30s ✓, deliverability reveal 20px/opacity on a
+ViewTimeline ✓, testimonial drift 180s + hover pause ✓, CTA wordmark fade (ViewTimeline) ✓,
+footer status pulse 1.5s ✓, quote CTA hover fade ✓, button glow and link colour hovers at
+0.2s/0.15s cubic-bezier(.4,0,.2,1) ✓, chevron nudges ✓. The two feeds (motion/react) are not in
+the capture's list because they start only once on screen; checked with a scripted scroll:
+the first rows change after 3.3s.
+
+Re-theme check: `resend-integrate` and `resend-hero` (sample-ember, light) and
+`resend-deliverability` (sample-ember, dark) take the theme's serif, colours and radii
+cleanly; the violet accent becomes ember's highlight green.
+
+Left as is:
+- the serif is Newsreader, ~6% wider than Domaine Display after tracking: "Letters that land"
+  is our own copy anyway, so the line count is what matters, and it holds.
+- the original hero shows a 3D cube over light streaks, the icon tiles glossy 3D icons, the
+  React pane a rendered email, the dashboard a screenshot: all placeholders of the same size.
+- the original's SDK tiles switch a set of framework tabs per SDK; ours does the same from
+  the props (demo: Node.js has three tabs, the rest one).

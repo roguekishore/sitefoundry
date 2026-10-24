@@ -50,7 +50,7 @@ export function ResendControl({ title, text, media, tabs, className }: ResendCon
               >
                 {t.icon}
               </span>
-              <span className="font-display text-base tracking-[-0.04em] text-foreground">{t.label}</span>
+              <span className="font-display text-base tracking-[-0.02em] text-foreground">{t.label}</span>
               <span
                 aria-hidden
                 className={cn(
