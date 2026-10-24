@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hermeus header",
+  "description": "A transparent bar over the hero: a bold tracked wordmark at the left and seven small uppercase links spread at the right (a thin hamburger on phones). It sticks to the top while the first screens scroll by and is pushed away when its wrapper ends. Links turn amber on hover; the hamburger opens a full-screen grey menu of large capitals.",
+  "category": "header",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "transparent",
+    "minimal",
+    "uppercase",
+    "light",
+    "hover",
+    "mobile-menu"
+  ],
+  "notes": [
+    "sticky and in the flow: put it in a wrapper with the first sections and pull the next one up under it (-mt-[3.625rem] lg:-mt-[5.875rem]), as page.tsx does",
+    "needs JavaScript (hydrate: load) for the phone menu; static HTML shows the bar",
+    "transparent: its labels use secondary-foreground, so it reads on the theme's secondary ground"
+  ],
+  "entry": "hermeus-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "hermeus-header",
+  "files": [
+    {
+      "path": "hermeus-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HermeusHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface HermeusHeaderProps {\n  /** the wordmark, set in bold tracked capitals */\n  name: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the navigation links (shown in capitals) */\n  links: HermeusHeaderLink[];\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  /** accessible name of the button that closes the phone menu */\n  closeLabel: string;\n  className?: string;\n}\n\n/** amber on hover, 0.25s ease-[ease-in-out] like the original's links */\nconst link = \"transition-colors duration-250 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none\";\n\n/** Transparent sticky bar: wordmark left, small uppercase links right, full-screen menu on phones. */\nexport function HermeusHeader({ name, homeHref = \"#\", links, menuLabel, closeLabel, className }: HermeusHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={cn(\"sticky top-0 z-40 h-[3.625rem] text-secondary-foreground lg:h-[5.875rem]\", className)}>\n      <div className=\"mx-auto flex h-full max-w-page items-center justify-between gap-8 px-gutter\">\n        <a\n          href={homeHref}\n          className={cn(\"text-[clamp(0.95rem,0.85rem+0.4vw,1.2rem)]/none font-bold tracking-[0.1em] uppercase\", link)}\n        >\n          {name}\n        </a>\n\n        <nav className=\"hidden lg:block\">\n          <ul className=\"flex gap-[clamp(1.25rem,-0.5rem+2.4vw,1.875rem)]\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={cn(\"text-xs/none tracking-[0.06em] uppercase\", link)}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          aria-label={menuLabel}\n          onClick={() => setOpen(true)}\n          className={cn(\"-mr-1 grid size-8 cursor-pointer place-items-center lg:hidden\", link)}\n        >\n          <Menu aria-hidden strokeWidth={1} className=\"size-7\" />\n        </button>\n      </div>\n\n      {/* phone menu: a full-screen grey sheet of large capitals */}\n      <div\n        aria-hidden={!open}\n        className={cn(\n          \"fixed inset-0 z-50 flex flex-col bg-secondary px-gutter text-secondary-foreground transition-opacity duration-300 ease-[ease-in-out] motion-reduce:transition-none lg:hidden\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n      >\n        <div className=\"flex h-[3.625rem] shrink-0 items-center justify-between\">\n          <span className=\"text-[clamp(0.95rem,0.85rem+0.4vw,1.2rem)]/none font-bold tracking-[0.1em] uppercase\">{name}</span>\n          <button\n            type=\"button\"\n            aria-label={closeLabel}\n            tabIndex={open ? undefined : -1}\n            onClick={() => setOpen(false)}\n            className={cn(\"-mr-1 grid size-8 cursor-pointer place-items-center\", link)}\n          >\n            <X aria-hidden strokeWidth={1} className=\"size-7\" />\n          </button>\n        </div>\n        <ul className=\"mt-10 border-t border-border\">\n          {links.map((l) => (\n            <li key={l.label} className=\"border-b border-border\">\n              <a\n                href={l.href}\n                tabIndex={open ? undefined : -1}\n                onClick={() => setOpen(false)}\n                className={cn(\"block py-4 text-2xl/none tracking-[0.06em] uppercase\", link)}\n              >\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set in bold tracked capitals"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "HermeusHeaderLink[]",
+      "required": true,
+      "description": "the navigation links (shown in capitals)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the button that closes the phone menu"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d218c364c9fd7b2b471a93b17b1f36dd6187d3e3b680f1f883acaf66098254a7"
+}

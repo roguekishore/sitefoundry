@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hermeus footer",
+  "description": "A near-white footer: bold wordmark, a three-line uppercase address in pale grey and a small flag slot at the left; two columns of small tracked uppercase links and a follow-us column of line icons at the right; a row of legal links split by bars and the copyright; and, last, the name set huge across the whole column in the next grey, cut off at the bottom edge. Links turn amber on hover.",
+  "category": "footer",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "wordmark",
+    "giant-type",
+    "minimal",
+    "light",
+    "grey",
+    "uppercase",
+    "hover"
+  ],
+  "notes": [
+    "the giant name is an SVG stretched to the column width (textLength), so any word fills it",
+    "the flag slot is a small grey placeholder when empty"
+  ],
+  "entry": "hermeus-footer.tsx",
+  "source": "foundry",
+  "name": "hermeus-footer",
+  "files": [
+    {
+      "path": "hermeus-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HermeusMedia } from \"@foundry/hermeus-media\";\n\nexport interface HermeusFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface HermeusFooterSocial {\n  /** accessible name, e.g. the network's name */\n  label: string;\n  href: string;\n  /** a small line icon (e.g. from lucide-react) */\n  icon: ReactNode;\n}\n\nexport interface HermeusFooterProps {\n  /** the wordmark at the top left, and the giant name at the bottom */\n  name: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the address, one entry per line (shown in capitals) */\n  address: string[];\n  /** a small flag or badge under the address (30×18); empty: a grey slot */\n  badge?: ReactNode;\n  /** what the badge shows, for screen readers while it is empty */\n  badgeLabel?: string;\n  /** link columns (two in the original), each a list of links */\n  columns: HermeusFooterLink[][];\n  /** heading of the social column, e.g. \"Follow us\" */\n  socialTitle: string;\n  socials: HermeusFooterSocial[];\n  /** legal links in the bottom row, split by thin bars */\n  legal: HermeusFooterLink[];\n  /** the copyright line */\n  copyright: string;\n  className?: string;\n}\n\n/** pale grey capitals that turn amber on hover */\nconst small = \"text-[clamp(0.58rem,0.519rem+0.257vw,0.75rem)]/[1.6] tracking-[0.06em] uppercase\";\nconst link = \"transition-colors duration-250 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none\";\n\n/** Near-white footer with address, link columns, legal row and a giant cropped name. */\nexport function HermeusFooter({\n  name,\n  homeHref = \"#\",\n  address,\n  badge,\n  badgeLabel,\n  columns,\n  socialTitle,\n  socials,\n  legal,\n  copyright,\n  className,\n}: HermeusFooterProps) {\n  return (\n    <footer className={cn(\"overflow-clip bg-card pt-[clamp(1.375rem,0.725rem+2.667vw,2.9rem)] text-muted-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex flex-col gap-[clamp(2.75rem,2.5rem+1vw,4rem)] lg:flex-row lg:justify-between\">\n          <div>\n            <a\n              href={homeHref}\n              className={cn(\"text-[clamp(0.95rem,0.75rem+0.81vw,1.5rem)]/none font-bold tracking-[0.1em] text-foreground uppercase\", link)}\n            >\n              {name}\n            </a>\n            <address className=\"mt-[clamp(0.85rem,0.6rem+1vw,1.4rem)] text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.1] not-italic uppercase\">\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </address>\n            <HermeusMedia\n              media={badge}\n              label={badgeLabel}\n              className=\"mt-[clamp(0.75rem,0.55rem+0.8vw,1.25rem)] h-[clamp(0.875rem,0.75rem+0.5vw,1.125rem)] w-[clamp(1.5rem,1.3rem+0.8vw,1.875rem)]\"\n            />\n          </div>\n\n          <div className=\"flex *:w-[29.5vw] *:shrink-0 *:last:w-auto sm:*:w-40 lg:pt-2.5 lg:*:w-[8.75rem] lg:*:last:w-[6.875rem]\">\n            {columns.map((col, c) => (\n              <ul key={c} className={cn(small, \"leading-[2]\")}>\n                {col.map((l) => (\n                  <li key={l.label}>\n                    <a href={l.href} className={link}>\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ))}\n            <div>\n              <p className={cn(small, \"leading-[2]\")}>{socialTitle}</p>\n              <ul className=\"mt-1 flex gap-2.5\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className={cn(\"block [&_svg]:size-4 [&_svg]:stroke-[1.5]\", link)}>\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"mt-[clamp(2.75rem,2.07rem+3.3vw,5rem)] flex flex-col gap-1 lg:flex-row lg:justify-between\">\n          <ul className={cn(small, \"flex flex-wrap\")}>\n            {legal.map((l, i) => (\n              <li key={l.label}>\n                {i > 0 && <span aria-hidden className=\"px-[0.25em]\">|</span>}\n                <a href={l.href} className={link}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <p className={small}>{copyright}</p>\n        </div>\n\n        {/* the giant name, stretched to the column and cut off at the bottom */}\n        <svg\n          aria-hidden\n          viewBox=\"0 0 1000 116\"\n          className=\"mt-[clamp(2.3rem,1.42rem+3.62vw,4.7rem)] block w-full text-secondary\"\n        >\n          <text\n            x=\"0\"\n            y=\"119\"\n            textLength=\"1000\"\n            lengthAdjust=\"spacingAndGlyphs\"\n            fill=\"currentColor\"\n            className=\"font-display text-[166px] font-bold uppercase\"\n          >\n            {name}\n          </text>\n        </svg>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hermeus-media"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark at the top left, and the giant name at the bottom"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "the address, one entry per line (shown in capitals)"
+    },
+    {
+      "name": "badge",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small flag or badge under the address (30×18); empty: a grey slot"
+    },
+    {
+      "name": "badgeLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the badge shows, for screen readers while it is empty"
+    },
+    {
+      "name": "columns",
+      "type": "HermeusFooterLink[][]",
+      "required": true,
+      "description": "link columns (two in the original), each a list of links"
+    },
+    {
+      "name": "socialTitle",
+      "type": "string",
+      "required": true,
+      "description": "heading of the social column, e.g. \"Follow us\""
+    },
+    {
+      "name": "socials",
+      "type": "HermeusFooterSocial[]",
+      "required": true
+    },
+    {
+      "name": "legal",
+      "type": "HermeusFooterLink[]",
+      "required": true,
+      "description": "legal links in the bottom row, split by thin bars"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2939cc9646882516954d4baf5372b5127a66ca60b5d7208046206d21484ec21b"
+}

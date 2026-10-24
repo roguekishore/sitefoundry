@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex logo marquee",
+  "description": "A bold centred trust line over a single row of customer wordmarks that slides left forever (30s a lap), fading out at both edges into the white page.",
+  "category": "logos",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "marquee",
+    "loop",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only; the list is drawn twice for a seamless loop",
+    "with reduced motion the row stands still"
+  ],
+  "entry": "airwallex-logos.tsx",
+  "source": "foundry",
+  "name": "airwallex-logos",
+  "files": [
+    {
+      "path": "airwallex-logos.css",
+      "content": "/* The list is drawn twice side by side; sliding the track by half its width brings the copy\n   exactly where the first list started, so the loop never shows a seam. */\n@media (prefers-reduced-motion: no-preference) {\n  .airwallex-logos-track {\n    animation: airwallex-logos-slide 30s linear infinite;\n  }\n}\n\n@keyframes airwallex-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "airwallex-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./airwallex-logos.css\";\n\nexport interface AirwallexLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n}\n\nexport interface AirwallexLogosProps {\n  /** the bold line above the row */\n  title: string;\n  /** the wordmarks; six or more keep the row full */\n  logos: AirwallexLogo[];\n  className?: string;\n}\n\n/** A trust line and an endless row of logos with faded edges. */\nexport function AirwallexLogos({ title, logos, className }: AirwallexLogosProps) {\n  const row = (copy: number) =>\n    logos.map((l) => (\n      <li\n        key={`${copy}-${l.name}`}\n        aria-hidden={copy > 0 || undefined}\n        className=\"flex h-10 w-[9.5rem] shrink-0 items-center justify-center text-foreground lg:w-[14.5rem]\"\n      >\n        <span role=\"img\" aria-label={l.name} className=\"flex items-center [&_svg]:h-8 [&_svg]:w-auto\">\n          {l.logo}\n        </span>\n      </li>\n    ));\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-2 pb-14 lg:px-12 lg:pt-10 lg:pb-[3.25rem]\">\n        <p className=\"mx-auto max-w-[20rem] text-center text-sm leading-[1.4] font-bold lg:max-w-none lg:text-lg\">{title}</p>\n        <div className=\"mt-8 overflow-clip mask-x-from-85% mask-x-to-100% lg:mt-10\">\n          <ul className=\"airwallex-logos-track flex w-max\">\n            {row(0)}\n            {row(1)}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the bold line above the row"
+    },
+    {
+      "name": "logos",
+      "type": "AirwallexLogo[]",
+      "required": true,
+      "description": "the wordmarks; six or more keep the row full"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d3439ce8df160b619a01694272dae8b7c0fe6e8049d84cb5e4ff79793d01c309"
+}

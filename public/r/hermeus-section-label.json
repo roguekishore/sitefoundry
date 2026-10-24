@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Hermeus section label",
+  "description": "The index label that opens every section: a tiny tracked number over a plain section name, ruled off by a full-width grey hairline, with an optional button at the right. While it scrolls into view the number fades up, the name rises out of a clip line and the hairline draws from left to right, all tied to the scroll.",
+  "category": "text-effect",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "label",
+    "eyebrow",
+    "hairline",
+    "index",
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "minimal"
+  ],
+  "notes": [
+    "CSS scroll-driven animation; without support, and under reduced motion, everything shows in place"
+  ],
+  "entry": "hermeus-section-label.tsx",
+  "source": "foundry",
+  "name": "hermeus-section-label",
+  "files": [
+    {
+      "path": "hermeus-section-label.css",
+      "content": "/* Scrubbed with the scroll, measured from the moment the label's top enters the window:\n   the number fades in and rises 16px, the name rises out of its clip line (both over 80% of\n   the window height), and the hairline draws left to right a little more slowly. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hermeus-section-label {\n      view-timeline-name: --hermeus-section-label;\n    }\n    .hermeus-section-label-index {\n      animation: hermeus-section-label-fade linear both;\n      animation-timeline: --hermeus-section-label;\n      animation-range: entry 0px entry 80vh;\n    }\n    .hermeus-section-label-name {\n      animation: hermeus-section-label-rise linear both;\n      animation-timeline: --hermeus-section-label;\n      animation-range: entry 40px entry 80vh;\n    }\n    .hermeus-section-label-line {\n      transform-origin: left center;\n      animation: hermeus-section-label-draw linear both;\n      animation-timeline: --hermeus-section-label;\n      animation-range: entry 0px entry 100vh;\n    }\n  }\n}\n\n@keyframes hermeus-section-label-fade {\n  from { opacity: 0; translate: 0 16px; }\n  to { opacity: 1; translate: 0 0; }\n}\n@keyframes hermeus-section-label-rise {\n  from { translate: 0 105%; }\n  to { translate: 0 0; }\n}\n@keyframes hermeus-section-label-draw {\n  from { scale: 0 1; }\n  to { scale: 1 1; }\n}\n"
+    },
+    {
+      "path": "hermeus-section-label.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./hermeus-section-label.css\";\n\nexport interface HermeusSectionLabelProps {\n  /** the section's number, e.g. \"01\" */\n  index: string;\n  /** the section's name, e.g. \"Purpose\" */\n  label: string;\n  /** shown at the right end of the row, e.g. a button */\n  action?: ReactNode;\n  /** the heading level of the name (default h2) */\n  as?: \"h2\" | \"h3\" | \"p\";\n  className?: string;\n}\n\n/** Number, name and a full-width hairline; scrubs in as it scrolls into view. */\nexport function HermeusSectionLabel({ index, label, action, as: Name = \"h2\", className }: HermeusSectionLabelProps) {\n  return (\n    <div\n      className={cn(\n        \"hermeus-section-label relative flex items-end justify-between gap-6 pb-2\",\n        className,\n      )}\n    >\n      <div className=\"min-w-0\">\n        <p className=\"hermeus-section-label-index text-[clamp(0.58rem,0.519rem+0.257vw,0.75rem)]/none tracking-[0.06em]\">\n          {index}\n        </p>\n        <Name className=\"mt-[clamp(0.5rem,0.4rem+0.45vw,0.8rem)] -mb-[0.2em] overflow-clip pb-[0.2em] text-[clamp(0.92rem,0.704rem+0.884vw,1.5rem)]/none font-normal\">\n          <span className=\"hermeus-section-label-name block\">{label}</span>\n        </Name>\n      </div>\n      {action && <div className=\"shrink-0 pb-[clamp(0rem,-0.2rem+0.5vw,0.125rem)]\">{action}</div>}\n      <span aria-hidden className=\"hermeus-section-label-line absolute inset-x-0 bottom-0 h-px bg-border\" />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "index",
+      "type": "string",
+      "required": true,
+      "description": "the section's number, e.g. \"01\""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the section's name, e.g. \"Purpose\""
+    },
+    {
+      "name": "action",
+      "type": "ReactNode",
+      "required": false,
+      "description": "shown at the right end of the row, e.g. a button"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the heading level of the name (default h2)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "27fa9b0378ac224c9b50b7cdfb9300b68e4b7704824ae86b03ae0c5fbf47b8ba"
+}

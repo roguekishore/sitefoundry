@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Impulse Space mission index",
+  "description": "A black band: a 40px heading with a short lede and an outline pill, then a full-bleed frame nearly a window tall whose photo settles from a 1.23× zoom to full size as it scrolls into view. Over a bottom-up dark gradient sits a list of mission names at 50% white with mono details; hovering one wipes it to full white from the left and fades that mission's own photo into the frame.",
+  "category": "features",
+  "site": "impulsespace",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "list",
+    "index",
+    "dark",
+    "full-bleed",
+    "photo",
+    "scroll",
+    "scrubbed",
+    "zoom",
+    "wipe",
+    "hover",
+    "mono"
+  ],
+  "notes": [
+    "the frame is sized by the window (100svh on phones, 100svh less 38px on desktop); photos are cropped like object-fit: cover",
+    "a .dark scope: always black with white text",
+    "CSS only: the zoom is a scroll-driven animation (static in browsers without it, and with reduced motion); each mission may bring its own photo, shown while it is hovered"
+  ],
+  "entry": "impulsespace-missions.tsx",
+  "source": "foundry",
+  "name": "impulsespace-missions",
+  "files": [
+    {
+      "path": "impulsespace-missions.css",
+      "content": "/* The frame's photo settles from a 1.23x zoom to 1 while the frame scrolls in\n   (its top edge travelling from the window's foot to its head). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .impulsespace-missions-frame {\n      view-timeline-name: --impulsespace-missions-frame;\n    }\n    .impulsespace-missions-zoom {\n      animation: impulsespace-missions-zoom linear both;\n      animation-timeline: --impulsespace-missions-frame;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes impulsespace-missions-zoom {\n  from { scale: 1.23; }\n  to { scale: 1; }\n}\n"
+    },
+    {
+      "path": "impulsespace-missions.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ImpulsespaceButton } from \"@foundry/impulsespace-button\";\nimport { ImpulsespacePlaceholder } from \"@foundry/impulsespace-placeholder\";\nimport \"./impulsespace-missions.css\";\n\nexport interface ImpulsespaceMission {\n  /** the mission's name */\n  name: string;\n  /** a short mono detail (year, orbit) */\n  detail: string;\n  /** the mission's page */\n  href: string;\n  /** this mission's own photo, faded in while it is hovered */\n  media?: ReactNode;\n}\n\nexport interface ImpulsespaceMissionsProps {\n  /** the section heading */\n  title: string;\n  /** one or two sentences beside the heading */\n  lede?: string;\n  /** an outline pill beside the heading */\n  cta?: { label: string; href: string };\n  /** the frame's photo; empty: a placeholder */\n  media?: ReactNode;\n  /** what the photo shows, for screen readers while it is a placeholder */\n  mediaLabel?: string;\n  /** the missions, newest first (six to fifteen) */\n  missions: ImpulsespaceMission[];\n  /** anchor id for the section */\n  id?: string;\n  className?: string;\n}\n\n/** Black band: heading row, then a window-tall photo frame with a hover-wipe mission list over it. */\nexport function ImpulsespaceMissions({ title, lede, cta, media, mediaLabel, missions, id, className }: ImpulsespaceMissionsProps) {\n  return (\n    <section id={id} className={cn(\"dark bg-background pt-section pb-12 text-foreground max-lg:pb-section\", className)}>\n      <div className=\"flex flex-col gap-6 px-gutter lg:flex-row lg:items-end lg:justify-between\">\n        <h2 className=\"font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em]\">{title}</h2>\n        {(lede || cta) && (\n          <div className=\"flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:gap-8\">\n            {lede && <p className=\"max-w-[26rem] text-base leading-[1.4] text-muted-foreground\">{lede}</p>}\n            {cta && (\n              <ImpulsespaceButton href={cta.href} variant=\"outline\">\n                {cta.label}\n              </ImpulsespaceButton>\n            )}\n          </div>\n        )}\n      </div>\n\n      <div className=\"impulsespace-missions-frame relative isolate mt-12 grid h-svh min-h-[34rem] lg:h-[calc(100svh-2.375rem)] overflow-clip\">\n        <div className=\"impulsespace-missions-zoom absolute inset-0 z-0\">\n          <ImpulsespacePlaceholder media={media} label={mediaLabel} className=\"size-full\" />\n        </div>\n        {/* the bottom-up shade under the list */}\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 z-[2] h-3/4 bg-linear-to-t from-background/80 to-transparent\" />\n\n        {/* static list: each mission's photo layer positions against the frame */}\n        <ul className=\"self-end px-gutter pb-8 [grid-area:1/1] lg:pb-10\">\n          {missions.map((m) => (\n            <li key={m.name} className=\"group\">\n              {m.media && (\n                <div className=\"pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:opacity-100 motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n                  {m.media}\n                </div>\n              )}\n              <a href={m.href} className=\"relative z-[3] flex flex-wrap items-baseline gap-x-4 py-0.5 lg:gap-x-6\">\n                <span\n                  className={cn(\n                    \"font-display text-[1.375rem] leading-[1.3] font-semibold tracking-[-0.01em] lg:text-[2.5rem] lg:leading-[1.2] lg:tracking-[-0.02em]\",\n                    // the wipe: a half-white, half-dim fill slides across the letters\n                    \"bg-[linear-gradient(90deg,var(--foreground)_50%,color-mix(in_oklab,var(--foreground)_50%,transparent)_50%)] bg-size-[200%_100%] bg-position-[100%_0] bg-clip-text text-transparent\",\n                    \"transition-[background-position] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:bg-position-[0_0] group-focus-within:bg-position-[0_0] motion-reduce:transition-none\",\n                  )}\n                >\n                  {m.name}\n                </span>\n                <span className=\"font-mono text-sm leading-[1.5] tracking-[0.08em] whitespace-nowrap text-muted-foreground uppercase transition-colors duration-250 group-hover:text-foreground\">\n                  {m.detail}\n                </span>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "impulsespace-button",
+    "impulsespace-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "one or two sentences beside the heading"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "an outline pill beside the heading"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the frame's photo; empty: a placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the photo shows, for screen readers while it is a placeholder"
+    },
+    {
+      "name": "missions",
+      "type": "ImpulsespaceMission[]",
+      "required": true,
+      "description": "the missions, newest first (six to fifteen)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for the section"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1e1bbc75bf86af10ed534ba798c1826fca326fe5ea6753a960bd08ba6f898da5"
+}

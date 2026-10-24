@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy wordmark footer",
+  "description": "A near-black footer: a newsletter email field with a small text button on the left, uppercase mono link groups on the right (three columns on desktop, two on phones), a row of copyright and social links spread edge to edge, and the brand name stretched across the full width as a giant graphite mono wordmark. Links underline on hover; social links dim to 60%.",
+  "category": "footer",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "newsletter",
+    "mono",
+    "uppercase",
+    "wordmark",
+    "giant-type",
+    "minimal"
+  ],
+  "notes": [
+    "always dark (it carries the `dark` class); the wordmark uses the dark `muted` tone",
+    "the wordmark is SVG text stretched with textLength, so any name fills the width without JavaScript"
+  ],
+  "entry": "helionenergy-footer.tsx",
+  "source": "foundry",
+  "name": "helionenergy-footer",
+  "files": [
+    {
+      "path": "helionenergy-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HelionenergyFooterLink {\n  /** the link text (uppercase mono) */\n  label: ReactNode;\n  href: string;\n}\n\nexport interface HelionenergyFooterProps {\n  /** the label over the email field */\n  newsletterLabel: ReactNode;\n  /** the email field's placeholder */\n  emailPlaceholder: string;\n  /** the submit button's text */\n  submitLabel: ReactNode;\n  /** where the form posts */\n  formAction?: string;\n  /** groups of links (three on desktop, side by side) */\n  groups: HelionenergyFooterLink[][];\n  /** legal links, under the first group on desktop */\n  legal: HelionenergyFooterLink[];\n  /** the copyright line, first in the bottom row */\n  copyright: ReactNode;\n  /** social links, spread along the bottom row */\n  socials: HelionenergyFooterLink[];\n  /** the name set as a giant wordmark across the full width */\n  wordmark: string;\n  className?: string;\n}\n\n/**\n * A near-black footer: a newsletter field with a small text button on the left, uppercase mono\n * link groups on the right (three columns at desktop, two on phones), a row of the copyright and\n * social links spread edge to edge, and the brand's name stretched across the full width as a\n * giant graphite wordmark. Links underline on hover; social links dim.\n */\nexport function HelionenergyFooter({\n  newsletterLabel,\n  emailPlaceholder,\n  submitLabel,\n  formAction = \"#\",\n  groups,\n  legal,\n  copyright,\n  socials,\n  wordmark,\n  className,\n}: HelionenergyFooterProps) {\n  const linkClass = \"decoration-1 underline-offset-[3px] hover:underline\";\n  return (\n    <footer className={cn(\"dark bg-background px-gutter pt-[4.25rem] pb-[1.1rem] text-foreground lg:pt-[5.25rem] lg:pb-[1.7rem]\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <div className=\"lg:grid lg:grid-cols-12 lg:gap-x-5\">\n          <form action={formAction} className=\"lg:col-span-6\">\n            <label htmlFor=\"helionenergy-footer-email\" className=\"block text-[0.8125rem]/none tracking-[-0.01em] uppercase\">\n              {newsletterLabel}\n            </label>\n            <div className=\"mt-1.5 flex items-center gap-[1.6rem] lg:mt-1 lg:gap-[2.1rem]\">\n              <input\n                id=\"helionenergy-footer-email\"\n                type=\"email\"\n                name=\"email\"\n                placeholder={emailPlaceholder}\n                className=\"h-[2.375rem] min-w-0 flex-1 rounded-md border border-input bg-transparent px-[0.9rem] text-sm tracking-[-0.01em] placeholder:text-muted-foreground focus:border-foreground focus:outline-none lg:w-[26.8rem] lg:flex-none\"\n              />\n              <button type=\"submit\" className=\"inline-flex shrink-0 items-center gap-2 text-[0.8125rem]/none tracking-[-0.01em] transition-opacity duration-200 ease-out hover:opacity-60\">\n                {submitLabel}\n                <Play aria-hidden className=\"size-2 fill-current\" strokeWidth={0} />\n              </button>\n            </div>\n          </form>\n\n          <nav className=\"mt-12 grid grid-cols-2 gap-x-5 gap-y-11 font-mono text-sm/none tracking-[-0.01em] uppercase lg:col-span-3 lg:col-start-10 lg:mt-1 lg:grid-cols-3\">\n            {[...groups, legal].map((group, g) => (\n              <ul key={g} className={cn(\"flex flex-col gap-4\", g === groups.length && \"lg:col-start-1\")}>\n                {group.map((link, i) => (\n                  <li key={i}>\n                    <a href={link.href} className={linkClass}>\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ))}\n          </nav>\n        </div>\n\n        <div className=\"mt-[10rem] flex flex-wrap justify-between gap-x-8 gap-y-3 font-mono text-sm/none tracking-[-0.01em] uppercase lg:mt-[12.4rem]\">\n          <p>{copyright}</p>\n          {socials.map((link, i) => (\n            <a key={i} href={link.href} className=\"transition-opacity duration-200 ease-out hover:opacity-60 motion-reduce:transition-none\">\n              {link.label}\n            </a>\n          ))}\n        </div>\n\n        <svg aria-hidden viewBox=\"0 0 1000 142\" className=\"mt-4 block w-full overflow-visible fill-muted lg:mt-[1.1rem]\">\n          <text x=\"0\" y=\"142\" textLength=\"1000\" lengthAdjust=\"spacingAndGlyphs\" className=\"font-mono text-[200px] font-semibold\">\n            {wordmark}\n          </text>\n        </svg>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "newsletterLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label over the email field"
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": true,
+      "description": "the email field's placeholder"
+    },
+    {
+      "name": "submitLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the submit button's text"
+    },
+    {
+      "name": "formAction",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the form posts"
+    },
+    {
+      "name": "groups",
+      "type": "HelionenergyFooterLink[][]",
+      "required": true,
+      "description": "groups of links (three on desktop, side by side)"
+    },
+    {
+      "name": "legal",
+      "type": "HelionenergyFooterLink[]",
+      "required": true,
+      "description": "legal links, under the first group on desktop"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the copyright line, first in the bottom row"
+    },
+    {
+      "name": "socials",
+      "type": "HelionenergyFooterLink[]",
+      "required": true,
+      "description": "social links, spread along the bottom row"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the name set as a giant wordmark across the full width"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "08a3723533f208542a0ac29760361c934ebe8661f32b55cb5453fec59cf4ff91"
+}

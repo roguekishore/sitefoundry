@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space slider",
+  "description": "A section title with two square arrow buttons, over a row of large edge-to-edge photo slides that butt together with no gap (75vw × 40vw on desktop, tall portrait cards on phones), the next one peeking in. Each slide has a 32px title and a short paragraph in its lower-left corner. The title reveals line by line and the photos settle from 115% and blurred to sharp as the row scrolls in; arrows step one slide.",
+  "category": "gallery",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "slider",
+    "carousel",
+    "gallery",
+    "dark",
+    "full-bleed",
+    "photo",
+    "scroll-snap",
+    "arrows",
+    "scrubbed",
+    "scale",
+    "blur",
+    "reveal"
+  ],
+  "notes": [
+    "slides are a native scroll-snap row (swipe on phones); the arrows need JavaScript",
+    "each slide carries a `dark` scope so its caption stays light over footage in light mode",
+    "the photo scrub runs on a named view timeline on the row, because the row itself is a horizontal scroller"
+  ],
+  "hydrate": "visible",
+  "entry": "k2space-slider.tsx",
+  "source": "foundry",
+  "name": "k2space-slider",
+  "files": [
+    {
+      "path": "k2space-slider.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceButton } from \"@foundry/k2space-button\";\nimport { K2spaceLineReveal } from \"@foundry/k2space-line-reveal\";\nimport { K2spaceMedia } from \"@foundry/k2space-media\";\n\nexport interface K2spaceSlide {\n  /** the caption title */\n  title: string;\n  /** one short paragraph under it */\n  body: string;\n  /** the photo or video */\n  media?: ReactNode;\n}\n\nexport interface K2spaceSliderProps {\n  /** the section title */\n  title: string;\n  /** the slides, in order */\n  slides: K2spaceSlide[];\n  /** accessible names of the arrow buttons */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/**\n * A title with arrow buttons over a scroll-snap row of large photo slides that touch edge to\n * edge. Photos settle from 115% and blurred to sharp as the row scrolls into view.\n */\nexport function K2spaceSlider({ title, slides, previousLabel, nextLabel, className }: K2spaceSliderProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const slide = el?.firstElementChild as HTMLElement | null;\n    if (!el || !slide) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * slide.offsetWidth, behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"bg-background text-foreground [font-stretch:var(--k2space-stretch,100%)]\", className)}>\n      <div className=\"flex items-start justify-between gap-6 px-gutter\">\n        <K2spaceLineReveal text={title} className=\"font-display text-[34px]/none font-[560] lg:text-[3.307vw]/none\" />\n        <div className=\"flex shrink-0 gap-1 max-lg:hidden\">\n          <K2spaceButton variant=\"arrow\" direction=\"left\" ariaLabel={previousLabel} onClick={() => step(-1)} />\n          <K2spaceButton variant=\"arrow\" ariaLabel={nextLabel} onClick={() => step(1)} />\n        </div>\n      </div>\n\n      <div className=\"mt-16 [view-timeline:--k2space-slider_block] lg:mt-[4.03vw]\">\n        <div\n          ref={track}\n          className=\"flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden\"\n        >\n          {slides.map((slide, i) => (\n            <article\n              key={i}\n              className=\"dark relative flex h-[170vw] w-[85vw] shrink-0 snap-start flex-col justify-end text-foreground sm:h-[75vw] sm:w-[60vw] lg:h-[40vw] lg:w-[75vw]\"\n            >\n              <K2spaceMedia media={slide.media} scrub timeline=\"--k2space-slider\" className=\"absolute inset-0\" />\n              <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-background/70 to-transparent\" />\n              <div className=\"relative p-6 lg:p-[2.64vw] lg:pb-[3vw]\">\n                <h3 className=\"font-display text-2xl/none font-[560] lg:text-[2.249vw]/none\">{slide.title}</h3>\n                <p className=\"mt-5 max-w-[270px] text-base/none font-[560] lg:mt-[1.25vw] lg:max-w-[25vw] lg:text-[max(1rem,1.3227vw)]/none\">\n                  {slide.body}\n                </p>\n              </div>\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-button",
+    "k2space-line-reveal",
+    "k2space-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "slides",
+      "type": "K2spaceSlide[]",
+      "required": true,
+      "description": "the slides, in order"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f0a1bf2f8aa9855e88f89a14cee1e596e69c45f5e0b10e64f824e340bb3f9800"
+}

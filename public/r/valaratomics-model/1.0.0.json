@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics model card",
+  "description": "A big black card with 8px corners on the page grey, 85% of the window tall on desktop: the heading on the left half, a paragraph and a gold-framed button on the right, over a picture that fills the card beneath a black fade from the top. As the card enters, the picture rises 75px, shrinks from 1.05 to 1 and fades in.",
+  "category": "features",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "dark",
+    "rounded",
+    "media",
+    "two-column",
+    "reveal",
+    "rise",
+    "scale",
+    "scroll-driven",
+    "window-height"
+  ],
+  "notes": [
+    "the card is a `dark` scope: black on a light page, with a faint hairline so it still reads on a black page",
+    "the settle-in is a CSS view timeline (no JS); phones leave ~400px of picture below the text"
+  ],
+  "entry": "valaratomics-model.tsx",
+  "source": "foundry",
+  "name": "valaratomics-model",
+  "files": [
+    {
+      "path": "valaratomics-model.css",
+      "content": "/* The card's picture settles in as the card enters the window: it rises 75px, shrinks from\n   1.05 to 1 (anchored at its bottom edge) and fades in. Ends on `entry`, a fixed distance in,\n   so it always completes. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .valaratomics-model-media {\n      animation: valaratomics-model-settle linear both;\n      animation-timeline: --valaratomics-model;\n      animation-range: entry 80px entry 480px;\n    }\n    .valaratomics-model-card {\n      view-timeline-name: --valaratomics-model;\n    }\n  }\n}\n\n@keyframes valaratomics-model-settle {\n  from { opacity: 0; transform: translateY(75px) scale(1.05); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "valaratomics-model.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ValaratomicsButton } from \"@foundry/valaratomics-button\";\nimport { ValaratomicsIntro } from \"@foundry/valaratomics-intro\";\nimport { ValaratomicsPlaceholder } from \"@foundry/valaratomics-placeholder\";\nimport \"./valaratomics-model.css\";\n\nexport interface ValaratomicsModelProps {\n  /** the heading on the card */\n  title: string;\n  /** the paragraph beside it */\n  body: string;\n  /** the framed button under the paragraph */\n  cta?: { label: string; href: string };\n  /** the image or video filling the card (cropped like object-fit: cover); empty shows a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A big black card with 8px corners, inset by the page gutter on the page grey and 85% of\n * the window tall on desktop. Heading on the left half, paragraph and a gold-framed button\n * on the right, over a picture that fills the card under a black fade from the top. The\n * picture rises and settles in as the card enters.\n */\nexport function ValaratomicsModel({ title, body, cta, media, className }: ValaratomicsModelProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter\", className)}>\n      <div className=\"valaratomics-model-card dark relative isolate mx-auto max-w-page overflow-clip rounded-lg bg-background text-foreground ring-1 ring-border/40 ring-inset lg:h-[85svh] lg:min-h-[36rem]\">\n        <div className=\"valaratomics-model-media absolute inset-0 -z-10 origin-bottom [&>*]:size-full [&_img]:object-cover [&_video]:object-cover\">\n          {media ?? <ValaratomicsPlaceholder tone=\"photo\" />}\n        </div>\n        <div aria-hidden className=\"absolute inset-x-0 top-0 -z-10 h-2/3 bg-linear-to-b from-background to-transparent\" />\n        <div className=\"px-[1.6875rem] pt-[8.75rem] pb-[25rem] lg:px-[5.9vw] lg:pt-[9rem] lg:pb-section\">\n          <ValaratomicsIntro\n            title={title}\n            body={\n              <>\n                <p>{body}</p>\n                {cta && <ValaratomicsButton label={cta.label} href={cta.href} className=\"mt-14\" />}\n              </>\n            }\n          />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "valaratomics-button",
+    "valaratomics-intro",
+    "valaratomics-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading on the card"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside it"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the framed button under the paragraph"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the image or video filling the card (cropped like object-fit: cover); empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "76ea406c136ac6e79bf9b65a6ea87188b403c3a5a233d2e8e87994ab399cd56d"
+}

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Arc solutions",
+  "description": "A big left-aligned heading over full-width 320px panels with 20px corners: an illustration on the left, a pill badge, 30px title, paragraph and bold link on the right. The first panel is pale grey, the second dark slate. On phones the illustration sits on top. Each panel fades and rises 15px as it scrolls into view and dims slightly on hover.",
+  "category": "features",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "panels",
+    "split",
+    "light",
+    "dark",
+    "minimal",
+    "fintech",
+    "reveal",
+    "scroll",
+    "hover"
+  ],
+  "notes": [
+    "the inverse panel puts the `dark` class on itself and uses the theme's dark card colour",
+    "the reveal needs CSS scroll-driven animations; elsewhere the panels simply show"
+  ],
+  "entry": "arc-solutions.tsx",
+  "source": "foundry",
+  "name": "arc-solutions",
+  "files": [
+    {
+      "path": "arc-solutions.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ArcFeatureCopy } from \"@foundry/arc-feature-copy\";\nimport { ArcHeading } from \"@foundry/arc-heading\";\nimport { ArcPlaceholder } from \"@foundry/arc-placeholder\";\nimport { ArcReveal } from \"@foundry/arc-reveal\";\n\nexport interface ArcSolution {\n  /** the pill above the title */\n  badge: string;\n  title: string;\n  body: string;\n  /** the bold link label, e.g. \"Learn more\" */\n  linkLabel: string;\n  href: string;\n  /** muted: the pale grey panel · inverse: a dark slate panel (the theme's dark card colour) */\n  tone: \"muted\" | \"inverse\";\n  /** the illustration on the panel's left (455×316); empty: a faint wash placeholder */\n  media?: ReactNode;\n}\n\nexport interface ArcSolutionsProps {\n  /** the big left-aligned section heading */\n  heading: string;\n  /** the wide panels, one under another */\n  solutions: ArcSolution[];\n  className?: string;\n}\n\n/** Arc's wide product panels: illustration left, badge-title-copy-link right; one pale grey, one dark slate. */\nexport function ArcSolutions({ heading, solutions, className }: ArcSolutionsProps) {\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ArcHeading title={heading} />\n        <ul className=\"mt-[2.1rem] grid gap-[1.875rem] lg:mt-[4.25rem]\">\n          {solutions.map((s) => (\n            <li key={s.title}>\n              <ArcReveal>\n                <a\n                  href={s.href}\n                  className={cn(\n                    \"group grid overflow-clip rounded-[calc(var(--radius)+12px)] text-foreground lg:min-h-80 lg:grid-cols-[28.4375rem_1fr] lg:items-center lg:gap-5 lg:py-0.5 lg:pr-10 lg:pl-5\",\n                    s.tone === \"inverse\" ? \"dark bg-card\" : \"bg-muted\",\n                  )}\n                >\n                  <div className=\"aspect-[352/214] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none lg:aspect-[455/316]\">\n                    {s.media ?? <ArcPlaceholder tone=\"wash\" className=\"size-full lg:rounded-lg\" />}\n                  </div>\n                  <ArcFeatureCopy\n                    badge={s.badge}\n                    title={s.title}\n                    body={s.body}\n                    linkLabel={s.linkLabel}\n                    className=\"px-6 pt-1 pb-[2.125rem] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none lg:px-0 lg:py-0\"\n                  />\n                </a>\n              </ArcReveal>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "arc-feature-copy",
+    "arc-heading",
+    "arc-placeholder",
+    "arc-reveal",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big left-aligned section heading"
+    },
+    {
+      "name": "solutions",
+      "type": "ArcSolution[]",
+      "required": true,
+      "description": "the wide panels, one under another"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "38cc3fa4cd743a8c24ce4426b9cf884df62c94b3f647d5838eedd48e8fc258e7"
+}

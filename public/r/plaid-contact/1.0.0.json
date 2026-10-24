@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid contact",
+  "description": "A navy-to-cyan-to-mint gradient band under a thin rainbow hairline: a 70px lime-to-white gradient headline on the left and, on the right, a white form card with 40px corners inside a rainbow rim (two columns of navy-outlined fields, a select, a small grey consent line, a teal-to-cyan pill). Under them a lavender pill note with plum text and a purple gradient link. On phones everything stacks into one column.",
+  "category": "contact",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "contact",
+    "form",
+    "lead-form",
+    "gradient",
+    "gradient-text",
+    "rainbow",
+    "rounded",
+    "fintech"
+  ],
+  "notes": [
+    "the band's colours come from foreground, glow and highlight, like plaid-hero",
+    "leaves 2.5rem of extra band at the bottom so plaid-footer (overlap) can round its top corners over it",
+    "the form is markup only: it posts to `action`"
+  ],
+  "entry": "plaid-contact.tsx",
+  "source": "foundry",
+  "name": "plaid-contact",
+  "files": [
+    {
+      "path": "plaid-contact.tsx",
+      "content": "import { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlaidButton } from \"@foundry/plaid-button\";\n\nexport interface PlaidContactField {\n  /** the form field's name */\n  name: string;\n  /** the visible placeholder, also the screen-reader label */\n  label: string;\n  /** text (default), email or tel; a select when options are given */\n  type?: \"text\" | \"email\" | \"tel\";\n  /** turns the field into a select with these options */\n  options?: string[];\n  required?: boolean;\n}\n\nexport interface PlaidContactProps {\n  /** the big gradient headline on the left */\n  title: string;\n  /** the form card's heading */\n  formTitle: string;\n  /** the fields, laid out two to a row on desktop */\n  fields: PlaidContactField[];\n  /** the small grey consent line, with its link */\n  consent: { text: string; link: { label: string; href: string } };\n  /** the submit pill */\n  submitLabel: string;\n  /** where the form posts to */\n  action?: string;\n  /** the lavender note under the form */\n  note: { text: string; link: { label: string; href: string } };\n  className?: string;\n}\n\nconst rainbow =\n  \"bg-[conic-gradient(from_160deg,var(--chart-3),var(--chart-2),var(--chart-5),var(--chart-4),var(--highlight),var(--glow),var(--chart-3))]\";\n\nconst field =\n  \"h-12 w-full rounded-[0.375rem] border border-input bg-card px-4 text-base text-foreground placeholder:text-foreground/70 focus:outline-2 focus:outline-offset-1 focus:outline-ring\";\n\n/** Plaid's closing band: gradient words beside a rainbow-rimmed form card. */\nexport function PlaidContact({ title, formTitle, fields, consent, submitLabel, action, note, className }: PlaidContactProps) {\n  return (\n    <section\n      className={cn(\n        \"relative isolate bg-glow bg-linear-to-br from-foreground/75 via-glow to-highlight pb-[calc(2rem+2.5rem)] lg:pb-[calc(4.5rem+2.5rem)]\",\n        \"dark:from-background/75\",\n        className,\n      )}\n    >\n      <div aria-hidden className={cn(\"h-1.5\", \"bg-linear-to-r from-glow via-chart-3 to-highlight\")} />\n      <div className=\"mx-auto max-w-page px-11 pt-10 lg:grid lg:grid-cols-[1fr_41.75rem] lg:items-center lg:gap-10 lg:px-gutter lg:pt-[8.25rem]\">\n        <h2 className=\"bg-linear-to-r from-chart-4 via-highlight to-background bg-clip-text pb-1 font-display text-[1.875rem]/[1.1] font-medium tracking-[-0.03em] text-transparent dark:to-foreground lg:max-w-[28rem] lg:text-[4.375rem]/[1.1]\">\n          {title}\n        </h2>\n\n        <div className={cn(\"mt-8 rounded-[1.25rem] p-[3px] shadow-[0_0_30px] shadow-chart-3/40 lg:mt-0 lg:rounded-[calc(var(--radius)+1rem)] lg:p-[5px]\", rainbow)}>\n          <form action={action} className=\"rounded-[calc(1.25rem-3px)] bg-card px-8 py-9 text-foreground lg:rounded-[calc(var(--radius)+1rem-5px)] lg:px-[4.375rem] lg:pt-[4.5rem] lg:pb-[4.375rem]\">\n            <h3 className=\"font-display text-[1.375rem] font-medium tracking-[-0.03em] lg:text-[1.875rem]\">{formTitle}</h3>\n            <div className=\"mt-8 grid gap-8 lg:grid-cols-2 lg:gap-x-4\">\n              {fields.map((f) =>\n                f.options ? (\n                  <label key={f.name} className=\"relative block\">\n                    <span className=\"sr-only\">{f.label}</span>\n                    <select name={f.name} required={f.required} defaultValue=\"\" className={cn(field, \"appearance-none pr-10\")}>\n                      <option value=\"\" disabled>\n                        {f.label}\n                      </option>\n                      {f.options.map((o) => (\n                        <option key={o}>{o}</option>\n                      ))}\n                    </select>\n                    <ChevronDown aria-hidden className=\"pointer-events-none absolute top-1/2 right-4 size-4 -translate-y-1/2\" />\n                  </label>\n                ) : (\n                  <label key={f.name} className=\"block\">\n                    <span className=\"sr-only\">{f.label}</span>\n                    <input name={f.name} type={f.type ?? \"text\"} required={f.required} placeholder={f.label} className={field} />\n                  </label>\n                ),\n              )}\n            </div>\n            <p className=\"mt-2 text-sm/6 text-muted-foreground lg:mt-6\">\n              {consent.text}{\" \"}\n              <a href={consent.link.href} className=\"underline decoration-muted-foreground/60 underline-offset-4 transition-colors duration-200 hover:text-foreground\">\n                {consent.link.label}\n              </a>\n            </p>\n            <div className=\"mt-4 flex justify-center lg:justify-start\">\n              <PlaidButton type=\"submit\" variant=\"aqua\" className=\"[&>span]:h-10 [&>span]:px-8 lg:[&>span]:h-[2.875rem] lg:[&>span]:px-[1.875rem]\">\n                {submitLabel}\n              </PlaidButton>\n            </div>\n          </form>\n        </div>\n\n        <div className=\"mt-8 rounded-[2.875rem] bg-accent px-8 py-8 text-accent-foreground lg:col-span-2 lg:mt-20 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-[3.375rem]\">\n          <p className=\"max-w-[13.25rem] text-lg/[1.3] lg:max-w-[39rem] lg:text-xl/[1.5]\">{note.text}</p>\n          <a\n            href={note.link.href}\n            className=\"mt-3 inline-block bg-linear-to-r from-chart-2 to-chart-1 bg-clip-text text-lg/[1.3] font-medium text-transparent transition-opacity duration-200 hover:opacity-80 lg:mt-0 lg:text-xl\"\n          >\n            {note.link.label}\n          </a>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plaid-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big gradient headline on the left"
+    },
+    {
+      "name": "formTitle",
+      "type": "string",
+      "required": true,
+      "description": "the form card's heading"
+    },
+    {
+      "name": "fields",
+      "type": "PlaidContactField[]",
+      "required": true,
+      "description": "the fields, laid out two to a row on desktop"
+    },
+    {
+      "name": "consent",
+      "type": "{ text: string; link: { label: string; href: string; }; }",
+      "required": true,
+      "description": "the small grey consent line, with its link"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the submit pill"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts to"
+    },
+    {
+      "name": "note",
+      "type": "{ text: string; link: { label: string; href: string; }; }",
+      "required": true,
+      "description": "the lavender note under the form"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4025f52fc130c3328a1c56947f8e55b6677d59352a45432c3a9fee5899c62137"
+}

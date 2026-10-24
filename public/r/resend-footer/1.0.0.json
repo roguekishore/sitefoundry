@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend footer",
+  "description": "A black footer under a full-width hairline with a soft light pooled at its middle: a small address, a row of round dark social buttons and a status pill whose green dot pulses, beside five columns of quiet grey links (two columns on phones).",
+  "category": "footer",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "minimal",
+    "links",
+    "status",
+    "pulse",
+    "glow"
+  ],
+  "notes": [
+    "the status dot's pulse is a CSS loop, off under reduced motion"
+  ],
+  "entry": "resend-footer.tsx",
+  "source": "foundry",
+  "name": "resend-footer",
+  "files": [
+    {
+      "path": "resend-footer.css",
+      "content": "/* The status dot's halo breathes once every 1.5s. */\n.resend-footer-pulse {\n  animation: resend-footer-pulse 1.5s ease-in-out infinite;\n}\n\n@keyframes resend-footer-pulse {\n  0%, 100% { opacity: 0; }\n  50% { opacity: 0.6; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .resend-footer-pulse { animation: none; }\n}\n"
+    },
+    {
+      "path": "resend-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendFrame } from \"@foundry/resend-frame\";\nimport \"./resend-footer.css\";\n\nexport interface ResendFooterProps {\n  /** the address lines */\n  address: string[];\n  /** round social buttons */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** the status pill */\n  status?: { label: string; href: string };\n  /** link groups (five on desktop) */\n  groups: { title: string; links: { label: string; href: string }[] }[];\n  className?: string;\n}\n\nexport function ResendFooter({ address, socials = [], status, groups, className }: ResendFooterProps) {\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      <ResendFrame edge=\"line\">\n        <div className=\"mx-auto flex max-w-page flex-col gap-12 px-gutter pt-36 pb-36 lg:flex-row lg:gap-0\">\n          <div className=\"lg:w-[21rem] lg:shrink-0\">\n            <address className=\"text-xs leading-4 text-foreground/80 not-italic\">\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </address>\n            {socials.length > 0 && (\n              <ul className=\"mt-8 flex gap-4\">\n                {socials.map((s) => (\n                  <li key={s.href}>\n                    <a\n                      href={s.href}\n                      aria-label={s.label}\n                      className=\"flex size-8 items-center justify-center rounded-full border border-border bg-card/60 text-foreground/80 transition-colors duration-200 hover:text-foreground [&_svg]:size-4\"\n                    >\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {status && (\n              <a\n                href={status.href}\n                className=\"mt-12 inline-flex h-8 items-center gap-2.5 rounded-full bg-accent px-3.5 text-xs text-foreground transition-colors duration-200 hover:bg-foreground/15\"\n              >\n                <span aria-hidden className=\"relative flex size-2\">\n                  <span className=\"resend-footer-pulse absolute -inset-1 rounded-full bg-chart-2/60\" />\n                  <span className=\"relative size-2 rounded-full bg-chart-2\" />\n                </span>\n                {status.label}\n              </a>\n            )}\n          </div>\n          <nav className=\"grid flex-1 grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-5 lg:gap-y-0\">\n            {groups.map((g) => (\n              <div key={g.title} className=\"px-1 lg:px-0\">\n                <h3 className=\"text-sm leading-5 text-foreground\">{g.title}</h3>\n                <ul className=\"mt-7 space-y-5\">\n                  {g.links.map((l) => (\n                    <li key={l.href} className=\"leading-5\">\n                      <a href={l.href} className=\"text-sm leading-5 text-muted-foreground transition-colors duration-200 hover:text-foreground motion-reduce:transition-none\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </nav>\n        </div>\n      </ResendFrame>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-frame"
+  ],
+  "props": [
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "the address lines"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "round social buttons"
+    },
+    {
+      "name": "status",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the status pill"
+    },
+    {
+      "name": "groups",
+      "type": "{ title: string; links: { label: string; href: string; }[]; }[]",
+      "required": true,
+      "description": "link groups (five on desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6430435955bcbcb26ebaaac78d300a6d29bbb15d146164b40a8c0042de597cc8"
+}

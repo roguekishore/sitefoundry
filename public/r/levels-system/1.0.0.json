@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels feature rows",
+  "description": "A warm off-white section: a big left-aligned heading, then feature rows split by hairlines — each a pale green icon tile, tracked eyebrow, large title, grey lead and a two-column list with green dots beside a 1.25 media frame, sides alternating — then a pale green privacy strip with a shield, tracked tag chips and a green link, and one centred ink button.",
+  "category": "features",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "alternating",
+    "split",
+    "list",
+    "light",
+    "minimal",
+    "privacy",
+    "icons"
+  ],
+  "notes": [
+    "rows alternate media right / left on desktop; phones always put text first",
+    "each row's media fills a 1.25 frame like object-fit: cover; empty, a placeholder stands in"
+  ],
+  "entry": "levels-system.tsx",
+  "name": "levels-system",
+  "files": [
+    {
+      "path": "levels-system.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ShieldCheck } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsButton } from \"@foundry/levels-button\";\nimport { LevelsHeading } from \"@foundry/levels-heading\";\nimport { LevelsIconTile } from \"@foundry/levels-icon-tile\";\nimport { LevelsLink } from \"@foundry/levels-link\";\nimport { LevelsPlaceholder, type LevelsPlaceholderProps } from \"@foundry/levels-placeholder\";\n\nexport interface LevelsSystemRow {\n  /** icon in the pale green tile, e.g. a lucide icon element */\n  icon: ReactNode;\n  /** small tracked capitals above the title */\n  eyebrow: string;\n  /** the row title */\n  title: ReactNode;\n  /** grey paragraph under the title */\n  lead: ReactNode;\n  /** the dotted list, two columns from tablet up */\n  points: ReactNode[];\n  /** the image or screens beside the text; fills a 1.25 frame. Empty: a placeholder */\n  media?: ReactNode;\n  /** placeholder tone when media is empty (film for app screens, photo for photos) */\n  mediaTone?: LevelsPlaceholderProps[\"tone\"];\n  /** screen-reader label for the placeholder */\n  mediaLabel?: string;\n}\n\nexport interface LevelsSystemProps {\n  /** small tracked capitals above the heading */\n  eyebrow?: string;\n  /** the section title */\n  title: ReactNode;\n  /** grey text under the title */\n  lead?: ReactNode;\n  /** the feature rows (three on the original) */\n  rows: LevelsSystemRow[];\n  /** the pale green strip under the rows */\n  privacy?: {\n    /** the one-line promise beside the shield */\n    statement: ReactNode;\n    /** the tracked tag chips */\n    tags: string[];\n    /** the green link on the right */\n    link?: { label: string; href: string };\n  };\n  /** the centred ink button at the end */\n  action?: { label: string; href: string };\n  /** id for in-page links */\n  id?: string;\n  className?: string;\n}\n\n/** Heading, alternating text/media rows, privacy strip and a closing button. */\nexport function LevelsSystem({ eyebrow, title, lead, rows, privacy, action, id, className }: LevelsSystemProps) {\n  return (\n    <section id={id} className={cn(\"bg-secondary px-gutter py-[calc(var(--section-y)*0.75)] lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <LevelsHeading eyebrow={eyebrow} title={title} lead={lead} className=\"max-w-[48rem]\" />\n\n        <div className=\"mt-3 lg:mt-8\">\n          {rows.map((row, i) => (\n            <div\n              key={i}\n              className=\"grid items-center gap-y-10 border-border py-12 not-first:border-t last:pb-0 lg:grid-cols-2 lg:gap-x-10\"\n            >\n              <div>\n                <LevelsIconTile>{row.icon}</LevelsIconTile>\n                <LevelsHeading as=\"h3\" size=\"row\" eyebrow={row.eyebrow} title={row.title} className=\"mt-6\" />\n                <p className=\"mt-5 max-w-[37rem] text-base leading-8 text-pretty text-muted-foreground lg:mt-6 lg:text-lg lg:leading-8\">\n                  {row.lead}\n                </p>\n                <ul className=\"mt-10 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:mt-12\">\n                  {row.points.map((point, j) => (\n                    <li key={j} className=\"flex gap-3 text-sm leading-6 text-secondary-foreground\">\n                      <span aria-hidden className=\"mt-[0.5625rem] size-1.5 shrink-0 rounded-full bg-highlight\" />\n                      <span>{point}</span>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n              <div\n                className={cn(\n                  \"aspect-[1.25] overflow-clip rounded-lg [&>*]:size-full [&>img]:object-cover\",\n                  i % 2 === 1 && \"lg:order-first\",\n                )}\n              >\n                {row.media ?? <LevelsPlaceholder tone={row.mediaTone ?? \"film\"} label={row.mediaLabel} />}\n              </div>\n            </div>\n          ))}\n        </div>\n\n        {privacy ? (\n          <div className=\"mt-7 flex flex-col gap-6 rounded-lg border border-foreground/10 bg-accent p-6 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-7\">\n            <div>\n              <p className=\"flex gap-3 text-sm leading-7 text-secondary-foreground\">\n                <ShieldCheck aria-hidden className=\"mt-1 size-5 shrink-0 text-highlight\" strokeWidth={1.75} />\n                <span>{privacy.statement}</span>\n              </p>\n              <ul className=\"mt-4 flex flex-col items-start gap-2 pl-8 sm:flex-row sm:flex-wrap\">\n                {privacy.tags.map((tag) => (\n                  <li\n                    key={tag}\n                    className=\"rounded-md border border-foreground/12 px-3 py-1 text-xs leading-5 font-semibold tracking-[0.187em] text-muted-foreground uppercase\"\n                  >\n                    {tag}\n                  </li>\n                ))}\n              </ul>\n            </div>\n            {privacy.link ? (\n              <LevelsLink href={privacy.link.href} size=\"sm\" className=\"pl-6 lg:pl-0 lg:pr-2\">\n                {privacy.link.label}\n              </LevelsLink>\n            ) : null}\n          </div>\n        ) : null}\n\n        {action ? (\n          <div className=\"mt-14 flex justify-center\">\n            <LevelsButton href={action.href} size=\"lg\">\n              {action.label}\n            </LevelsButton>\n          </div>\n        ) : null}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-button",
+    "levels-heading",
+    "levels-icon-tile",
+    "levels-link",
+    "levels-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small tracked capitals above the heading"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "grey text under the title"
+    },
+    {
+      "name": "rows",
+      "type": "LevelsSystemRow[]",
+      "required": true,
+      "description": "the feature rows (three on the original)"
+    },
+    {
+      "name": "privacy",
+      "type": "{ statement: ReactNode; tags: string[]; link?: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the pale green strip under the rows"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the centred ink button at the end"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "20b7637e77b6f86ddee7099a08137f5371f5b044e3a91c8788b2b1e9653d9f51"
+}

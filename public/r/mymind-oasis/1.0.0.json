@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind feature cards",
+  "description": "A big white sheet with rounded top corners floating on a tangerine-to-blush wash: tangerine spaced capitals and a two-line serif headline, then a bento of soft pastel cards (beige, mist blue, sage, rose, peach, grey) in alternating narrow/wide rows and full-width photo cards, each with a picture area above a large grotesk title and a slate paragraph. Pictures ease up in scale on hover.",
+  "category": "features",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "pastel",
+    "grid",
+    "serif",
+    "light",
+    "gradient",
+    "hover"
+  ],
+  "notes": [
+    "card tones are mixes of tokens (secondary, muted, highlight, chart-2, primary, muted-foreground), so they re-theme",
+    "a full-width card can be a dark photo card (forces the theme's dark tokens inside it)",
+    "the 'after' slot renders inside the sheet under the cards (the page puts mymind-feature-tabs there)"
+  ],
+  "entry": "mymind-oasis.tsx",
+  "source": "foundry",
+  "name": "mymind-oasis",
+  "files": [
+    {
+      "path": "mymind-oasis.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindEyebrow } from \"@foundry/mymind-eyebrow\";\nimport { MymindMedia } from \"@foundry/mymind-media\";\n\n/** pastel surface of a card */\nexport type MymindCardTone = \"beige\" | \"blue\" | \"sage\" | \"rose\" | \"peach\" | \"grey\";\n\nconst tones: Record<MymindCardTone, string> = {\n  beige: \"bg-secondary\",\n  blue: \"bg-muted\",\n  sage: \"bg-highlight/20\",\n  rose: \"bg-chart-2/15\",\n  peach: \"bg-primary/10\",\n  grey: \"bg-muted-foreground/15\",\n};\n\nexport interface MymindFeatureCard {\n  /** card title */\n  title: string;\n  /** card paragraph */\n  text: string;\n  /** the picture above the text (or behind it, for photo cards); empty shows a placeholder */\n  media?: ReactNode;\n  /** pastel surface (ignored by photo cards) */\n  tone?: MymindCardTone;\n  /** narrow (≈41%) or wide (≈59%) half of a row, or the full row */\n  span: \"narrow\" | \"wide\" | \"full\";\n  /** full-width photo card: the picture fills it, text sits light on dark at the bottom */\n  photo?: boolean;\n  /** a small note in the top corner of a photo card, with its icons */\n  badge?: { text: string; icons: ReactNode[] };\n}\n\nexport interface MymindOasisProps {\n  /** tangerine spaced capitals */\n  eyebrow: string;\n  /** headline lines (each starts a new line on desktop) */\n  title: string[];\n  /** the cards in reading order; two halves make a row, a full card is its own row */\n  cards: MymindFeatureCard[];\n  /** rendered inside the sheet under the cards */\n  after?: ReactNode;\n  className?: string;\n}\n\nfunction rowsOf(cards: MymindFeatureCard[]) {\n  const rows: MymindFeatureCard[][] = [];\n  for (const c of cards) {\n    const last = rows[rows.length - 1];\n    if (c.span !== \"full\" && last && last.length === 1 && last[0].span !== \"full\") last.push(c);\n    else rows.push([c]);\n  }\n  return rows;\n}\n\nfunction Card({ card }: { card: MymindFeatureCard }) {\n  if (card.photo) {\n    return (\n      <article className=\"dark group relative isolate flex min-h-[40.5rem] flex-col justify-between overflow-clip rounded-lg bg-background p-[1.875rem] text-foreground lg:h-[42.875rem] lg:p-[3.125rem]\">\n        <MymindMedia tone=\"dark\" className=\"absolute inset-0 -z-10 transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-[1.02] motion-reduce:transition-none\">\n          {card.media}\n        </MymindMedia>\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-gradient-to-t from-background/90 to-transparent\" />\n        {card.badge ? (\n          <div className=\"flex items-center gap-2 text-sm leading-[1.3]\">\n            {card.badge.icons.map((icon, i) => (\n              <span key={i} className=\"grid size-12 place-items-center rounded-[10px] bg-foreground/10 [&_svg]:size-5 lg:size-auto lg:bg-transparent\">\n                {icon}\n              </span>\n            ))}\n            <span className=\"ml-2 max-w-[8.5rem] lg:text-xs\">{card.badge.text}</span>\n          </div>\n        ) : (\n          <span />\n        )}\n        <div className=\"max-w-[30rem]\">\n          <h3 className=\"text-[1.75rem] leading-[1.25] font-normal tracking-[-0.035em] lg:text-[2.5rem] lg:leading-[3.375rem]\">{card.title}</h3>\n          <p className=\"mt-4 text-base leading-[1.45] text-foreground/85 lg:mt-1 lg:leading-[1.6667]\">{card.text}</p>\n        </div>\n      </article>\n    );\n  }\n  return (\n    <article className={cn(\"group flex flex-col overflow-clip rounded-lg text-foreground lg:h-[44.75rem]\", tones[card.tone ?? \"beige\"])}>\n      <div className=\"flex flex-1 items-center justify-center px-[2.625rem] pt-[2.375rem] lg:px-[4.25rem] lg:pt-[3.75rem]\">\n        <MymindMedia className=\"aspect-[1.1] w-full max-w-[24rem] rounded-[4px] transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:scale-[1.02] motion-reduce:transition-none lg:aspect-auto lg:h-[24.5rem] lg:max-w-none\">\n          {card.media}\n        </MymindMedia>\n      </div>\n      <div className=\"px-[1.875rem] pt-10 pb-8 lg:px-[3.125rem] lg:pt-10 lg:pb-[3.125rem]\">\n        <h3 className=\"text-[1.75rem] leading-[1.25] font-normal tracking-[-0.035em] lg:text-[2.5rem] lg:leading-[3.375rem]\">{card.title}</h3>\n        <p className=\"mt-4 max-w-[26rem] text-base leading-[1.45] text-muted-foreground lg:mt-2 lg:leading-[1.6667]\">{card.text}</p>\n      </div>\n    </article>\n  );\n}\n\n/** White sheet of pastel feature cards on a warm wash. */\nexport function MymindOasis({ eyebrow, title, cards, after, className }: MymindOasisProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-[linear-gradient(to_bottom,var(--primary),color-mix(in_oklab,var(--primary)_55%,var(--accent))_30%,color-mix(in_oklab,var(--primary)_18%,var(--accent))_70%,var(--accent))] px-2.5 lg:px-9\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[85.5rem] rounded-t-[2.25rem] rounded-b-lg bg-card px-3.5 pt-[6.5rem] pb-3.5 text-card-foreground shadow-[0_40px_80px_-40px_color-mix(in_oklab,var(--primary)_30%,transparent)] lg:rounded-t-[1.25rem] lg:px-[1.875rem] lg:pt-[7rem] lg:pb-[1.875rem]\">\n        <div className=\"text-center\">\n          <MymindEyebrow tone=\"primary\">{eyebrow}</MymindEyebrow>\n          <h2 className=\"mt-5 font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] lg:mt-4 lg:text-[5.25rem] lg:leading-[0.98]\">\n            {title.map((line, i) => (\n              <span key={i} className=\"lg:block\">\n                {line}{\" \"}\n              </span>\n            ))}\n          </h2>\n        </div>\n        <div className=\"mt-[6.5rem] flex flex-col gap-[1.875rem] lg:mt-[5.75rem] lg:gap-10\">\n          {rowsOf(cards).map((row, i) => (\n            <div\n              key={i}\n              className={cn(\n                \"grid grid-cols-1 gap-[1.875rem] lg:gap-10\",\n                row.length === 2 && (row[0].span === \"narrow\" ? \"lg:grid-cols-[41fr_59fr]\" : \"lg:grid-cols-[59fr_41fr]\"),\n              )}\n            >\n              {row.map((card) => (\n                <Card key={card.title} card={card} />\n              ))}\n            </div>\n          ))}\n          {after}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-eyebrow",
+    "mymind-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "tangerine spaced capitals"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "headline lines (each starts a new line on desktop)"
+    },
+    {
+      "name": "cards",
+      "type": "MymindFeatureCard[]",
+      "required": true,
+      "description": "the cards in reading order; two halves make a row, a full card is its own row"
+    },
+    {
+      "name": "after",
+      "type": "ReactNode",
+      "required": false,
+      "description": "rendered inside the sheet under the cards"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e37cdb2accc29752c9a1470563a75e7fb273961428de844084e5cc13a8024cfd"
+}

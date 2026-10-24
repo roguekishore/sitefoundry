@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Helion Energy arrow button",
+  "description": "A small square outlined button (44px, 50px on desktop, 4px corners) holding a thin right arrow. As it scrolls through the window a filled block sweeps across it from left to right; on hover it fills with the primary colour.",
+  "category": "button",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "icon",
+    "arrow",
+    "square",
+    "outline",
+    "sweep",
+    "scroll",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "tone=\"quiet\" for the light page (hairline border, pale arrow), tone=\"strong\" over photos and dark bands",
+    "the sweep is a CSS view timeline; off under reduced motion"
+  ],
+  "entry": "helionenergy-arrow-button.tsx",
+  "source": "foundry",
+  "name": "helionenergy-arrow-button",
+  "files": [
+    {
+      "path": "helionenergy-arrow-button.css",
+      "content": "/* A filled block parked off the button's left edge; while the button scrolls through the\n   window it sweeps across and out to the right, so the outline shows before and after.\n   Without scroll timelines (or with reduced motion) it simply stays parked. */\n.helionenergy-arrow-button-sweep {\n  transform: translateX(-101%);\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .helionenergy-arrow-button-sweep {\n      animation: helionenergy-arrow-button-sweep linear both;\n      animation-timeline: view();\n      animation-range: cover 15% cover 75%;\n    }\n  }\n}\n\n@keyframes helionenergy-arrow-button-sweep {\n  from {\n    transform: translateX(-101%);\n  }\n  to {\n    transform: translateX(101%);\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-arrow-button.tsx",
+      "content": "import { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./helionenergy-arrow-button.css\";\n\nexport interface HelionenergyArrowButtonProps {\n  /** where it goes */\n  href: string;\n  /** what it opens, for screen readers (the button shows only an arrow) */\n  label: string;\n  /** \"quiet\": hairline border and a pale arrow (on the page); \"strong\": a full-colour border and arrow (over photos) */\n  tone?: \"quiet\" | \"strong\";\n  /** sweep a filled block across the button as it scrolls through the window */\n  sweep?: boolean;\n  className?: string;\n}\n\n/**\n * A small square outlined button holding a right arrow (44px, 50px from desktop, 4px corners).\n * As it scrolls through the window a filled block sweeps across it from left to right; on\n * hover it fills (0.2s).\n */\nexport function HelionenergyArrowButton({ href, label, tone = \"quiet\", sweep = true, className }: HelionenergyArrowButtonProps) {\n  const arrow = <ArrowRight aria-hidden strokeWidth={1.5} className=\"size-[1.125rem]\" />;\n  return (\n    <a\n      href={href}\n      aria-label={label}\n      className={cn(\n        \"group relative inline-flex size-11 shrink-0 items-center justify-center overflow-clip rounded-sm border lg:size-[3.125rem]\",\n        tone === \"quiet\" ? \"border-border text-muted-foreground/70\" : \"border-foreground text-foreground\",\n        className,\n      )}\n    >\n      {arrow}\n      {sweep && (\n        <span aria-hidden className=\"helionenergy-arrow-button-sweep absolute inset-0 flex items-center justify-center bg-primary text-primary-foreground\">\n          {arrow}\n        </span>\n      )}\n      <span\n        aria-hidden\n        className=\"absolute inset-0 flex items-center justify-center bg-primary text-primary-foreground opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 motion-reduce:transition-none\"\n      >\n        {arrow}\n      </span>\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where it goes"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "what it opens, for screen readers (the button shows only an arrow)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "quiet",
+      "description": "\"quiet\": hairline border and a pale arrow (on the page); \"strong\": a full-colour border and arrow (over photos)"
+    },
+    {
+      "name": "sweep",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "sweep a filled block across the button as it scrolls through the window"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b3e66698d2a974e50de943a003ff8263cd59fd46e1b765682bad7cef6ebc71e6"
+}

@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo photo closing card",
+  "description": "A closing band that is almost all photograph: on desktop one 24px-rounded photo card the full content width and about 700px tall, with a soft dark gradient at its foot and a white two-tone heading and pale button in the bottom-left corner; on phones the heading and button sit above a full-bleed photo. The photo eases from slightly zoomed to still as it scrolls in, and the text fades up.",
+  "category": "cta",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "photo",
+    "full-bleed",
+    "overlay",
+    "gradient",
+    "reveal",
+    "scroll",
+    "minimal"
+  ],
+  "notes": [
+    "media slot: the photo; a mid-grey surface when empty",
+    "the desktop card forces the theme's dark colours (white text on the photo) with the dark class",
+    "layout of the text inferred: the original's text was hidden in the capture"
+  ],
+  "entry": "ondo-cta.tsx",
+  "name": "ondo-cta",
+  "files": [
+    {
+      "path": "ondo-cta.css",
+      "content": "/* The photo settles from a slight zoom while the card scrolls in; the text fades up. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ondo-cta-photo {\n      animation: ondo-cta-settle linear both;\n      animation-timeline: --ondo-cta-card;\n      animation-range: entry 0% cover 50%;\n    }\n    .ondo-cta-card {\n      view-timeline-name: --ondo-cta-card;\n    }\n    .ondo-cta-text {\n      animation: ondo-cta-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes ondo-cta-settle {\n  from { transform: scale(1.1); }\n  to { transform: none; }\n}\n\n@keyframes ondo-cta-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ondo-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoButton } from \"@foundry/ondo-button\";\nimport { OndoHeading } from \"@foundry/ondo-heading\";\nimport { OndoPlaceholder } from \"@foundry/ondo-placeholder\";\nimport \"./ondo-cta.css\";\n\nexport interface OndoCtaProps {\n  /** heading, first line */\n  lead: string;\n  /** heading, second line (grey) */\n  trail?: string;\n  /** the button */\n  action: { label: string; href: string };\n  /** the photo. A mid-grey surface when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Closing photo card with the heading and button in its corner. */\nexport function OndoCta({ lead, trail, action, media, className }: OndoCtaProps) {\n  return (\n    <section className={cn(\"bg-background pt-[8rem] lg:px-[calc(var(--page-gutter)*2.75)] lg:pt-0\", className)}>\n      <div className=\"ondo-cta-text mb-10 px-gutter lg:hidden\">\n        <OndoHeading lead={lead} trail={trail} reveal={false} />\n        <OndoButton href={action.href} size=\"md\" className=\"mt-6\">\n          {action.label}\n        </OndoButton>\n      </div>\n      <div className=\"ondo-cta-card dark relative mx-auto h-[31rem] max-w-[84.5rem] overflow-clip lg:h-[43.75rem] lg:rounded-3xl\">\n        <div className=\"ondo-cta-photo absolute inset-0\">{media ?? <OndoPlaceholder tone=\"photo\" />}</div>\n        <div aria-hidden className=\"absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/40\" />\n        <div className=\"ondo-cta-text absolute bottom-0 left-0 hidden p-12 lg:block\">\n          <OndoHeading lead={lead} trail={trail} reveal={false} />\n          <OndoButton href={action.href} size=\"md\" className=\"mt-8\">\n            {action.label}\n          </OndoButton>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-button",
+    "ondo-heading",
+    "ondo-placeholder"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "heading, first line"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": false,
+      "description": "heading, second line (grey)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo. A mid-grey surface when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "816b4a45e43ef7cb8665617a547e4a48df0f2fc88d9c19cecfbbc39a04c2f7d3"
+}

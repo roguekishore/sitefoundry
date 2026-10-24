@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind feature tabs",
+  "description": "A pale panel with a soft shadow: four tab names over thin hairlines, the active one inked while a tangerine line fills across it over a few seconds before moving to the next tab; each tab shows a large grotesk title and slate paragraph at the bottom left and a tall picture on the right, crossfading between tabs. On phones only the lines show, with the picture between title and text.",
+  "category": "features",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "autoplay",
+    "progress",
+    "crossfade",
+    "light",
+    "minimal",
+    "loop"
+  ],
+  "notes": [
+    "needs JavaScript to switch tabs; without it the first tab shows",
+    "with reduced motion the tabs don't advance on their own"
+  ],
+  "hydrate": "visible",
+  "entry": "mymind-feature-tabs.tsx",
+  "source": "foundry",
+  "name": "mymind-feature-tabs",
+  "files": [
+    {
+      "path": "mymind-feature-tabs.css",
+      "content": "/* The active tab's tangerine line fills left to right; when it ends, the block moves on. */\n@media (prefers-reduced-motion: no-preference) {\n  .mymind-feature-tabs-fill {\n    animation: mymind-feature-tabs-fill linear both;\n    transform-origin: left;\n  }\n}\n\n@keyframes mymind-feature-tabs-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n"
+    },
+    {
+      "path": "mymind-feature-tabs.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindMedia } from \"@foundry/mymind-media\";\nimport \"./mymind-feature-tabs.css\";\n\nexport interface MymindFeatureTab {\n  /** short tab name */\n  label: string;\n  /** title shown while the tab is active */\n  title: string;\n  /** paragraph under the title */\n  text: string;\n  /** tall picture on the right; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface MymindFeatureTabsProps {\n  /** the tabs, in order */\n  tabs: MymindFeatureTab[];\n  /** seconds each tab stays before the next one */\n  seconds?: number;\n  className?: string;\n}\n\n/** Auto-advancing tabs with a filling progress line. */\nexport function MymindFeatureTabs({ tabs, seconds = 6, className }: MymindFeatureTabsProps) {\n  const [active, setActive] = useState(0);\n  return (\n    <section className={cn(\"rounded-lg bg-sidebar px-5 pt-5 pb-8 text-foreground shadow-[0_4px_22px_color-mix(in_oklab,var(--muted-foreground)_14%,transparent)] lg:h-[50rem] lg:px-[3.125rem] lg:pt-[3.125rem] lg:pb-[4.75rem]\", className)}>\n      <div className=\"flex flex-col lg:h-full\">\n        <div role=\"tablist\" className=\"grid gap-2 lg:gap-6\" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>\n          {tabs.map((t, i) => (\n            <button\n              key={t.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"relative border-t border-border pt-3 text-left text-xl tracking-[-0.02em] transition-colors duration-200 ease-linear hover:text-foreground\",\n                i === active ? \"text-foreground\" : \"text-muted-foreground/60\",\n              )}\n            >\n              {i === active && (\n                <span\n                  key={active}\n                  aria-hidden\n                  className=\"mymind-feature-tabs-fill absolute -top-px left-0 h-px w-full bg-primary\"\n                  style={{ animationDuration: `${seconds}s` }}\n                  onAnimationEnd={() => setActive((active + 1) % tabs.length)}\n                />\n              )}\n              <span className=\"sr-only lg:not-sr-only\">{t.label}</span>\n            </button>\n          ))}\n        </div>\n\n        <div className=\"grid flex-1 grid-cols-1\">\n          {tabs.map((t, i) => (\n            <div\n              key={t.label}\n              role=\"tabpanel\"\n              aria-hidden={i !== active}\n              className={cn(\n                \"col-start-1 row-start-1 grid min-w-0 grid-cols-1 content-start gap-5 pt-6 transition-opacity duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2 lg:content-stretch lg:gap-10 lg:pt-0\",\n                i === active ? \"opacity-100\" : \"pointer-events-none opacity-0\",\n              )}\n            >\n              <div className=\"contents lg:col-start-1 lg:row-start-1 lg:flex lg:flex-col lg:self-end\">\n                <h3 className=\"text-[1.5rem] leading-[1.25] tracking-[-0.035em] lg:text-[2.5rem] lg:leading-[3.375rem]\">{t.title}</h3>\n                <p className=\"order-2 text-base leading-[1.45] text-muted-foreground lg:order-none lg:mt-2 lg:max-w-[28rem] lg:leading-[1.6667]\">{t.text}</p>\n              </div>\n              <MymindMedia className=\"order-1 aspect-[0.83] w-full max-w-[28rem] justify-self-center rounded-[6px] lg:order-none lg:col-start-2 lg:row-start-1 lg:aspect-auto lg:h-[33.75rem] lg:max-w-[28.125rem] lg:self-center\">\n                {t.media}\n              </MymindMedia>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-media"
+  ],
+  "props": [
+    {
+      "name": "tabs",
+      "type": "MymindFeatureTab[]",
+      "required": true,
+      "description": "the tabs, in order"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each tab stays before the next one"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5de3c75fd536ab6759d4e30b7ad41cd3a8199f0a18106f980406fbe184f72731"
+}

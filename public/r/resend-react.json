@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend template window",
+  "description": "A centred icon tile, lit title, lead and a graphite button beside a text link, over a wide 24px-radius code window: traffic-light dots and device/theme toggles on top, a file list on the left (the open file in blue), a numbered template listing in small mono, and a rendered-preview slot on the right. Phones show the files as tabs and only the preview.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "code",
+    "window",
+    "dark",
+    "developer",
+    "templates"
+  ],
+  "notes": [
+    "the preview pane and the icon tile are media slots: placeholders until filled"
+  ],
+  "entry": "resend-react.tsx",
+  "source": "foundry",
+  "name": "resend-react",
+  "files": [
+    {
+      "path": "resend-react.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { FileCode, Monitor, Moon, Smartphone, Sun } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendButton } from \"@foundry/resend-button\";\nimport { ResendCode } from \"@foundry/resend-code\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\n\nexport interface ResendReactProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** the lead; a list sets its desktop line breaks */\n  text: string | string[];\n  /** fills the icon slot above the title; empty shows a placeholder tile */\n  media?: ReactNode;\n  /** the graphite button */\n  primary: { label: string; href: string };\n  /** the text link beside it */\n  secondary?: { label: string; href: string };\n  /** template files in the side list; the open one is highlighted */\n  files: { name: string; open?: boolean }[];\n  /** the part of the open file shown in the code pane */\n  code: string;\n  /** number of the code's first line */\n  startLine?: number;\n  /** the rendered email beside the code; empty shows a placeholder */\n  preview?: ReactNode;\n  className?: string;\n}\n\nfunction FileBadge() {\n  return (\n    <span aria-hidden className=\"flex size-4 shrink-0 items-center justify-center rounded-[3px] bg-accent text-muted-foreground [&_svg]:size-3\">\n      <FileCode strokeWidth={2} />\n    </span>\n  );\n}\n\nexport function ResendReact({ title, text, media, primary, secondary, files, code, startLine = 1, preview, className }: ResendReactProps) {\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading tile media={media} title={title} text={text} />\n        <div className=\"mt-8 flex flex-col items-center gap-4 lg:flex-row lg:justify-center\">\n          <ResendButton href={primary.href} chevron className=\"w-full max-w-[16.25rem] lg:w-auto\">\n            {primary.label}\n          </ResendButton>\n          {secondary && (\n            <ResendButton href={secondary.href} variant=\"ghost\" chevron>\n              {secondary.label}\n            </ResendButton>\n          )}\n        </div>\n\n        <div className=\"mt-14 overflow-clip rounded-2xl border border-border lg:mt-20\">\n          <div className=\"flex h-12 items-center border-b border-border px-4 max-lg:border-b-0\">\n            <span aria-hidden className=\"flex gap-2\">\n              <span className=\"size-2.5 rounded-full bg-destructive\" />\n              <span className=\"size-2.5 rounded-full bg-chart-3\" />\n              <span className=\"size-2.5 rounded-full bg-chart-2\" />\n            </span>\n            <span aria-hidden className=\"ml-auto hidden gap-2 text-muted-foreground lg:flex [&_svg]:size-3.5\">\n              <span className=\"flex rounded-md border border-border\">\n                <span className=\"flex size-8 items-center justify-center rounded-md bg-accent text-foreground\"><Monitor strokeWidth={1.75} /></span>\n                <span className=\"flex size-8 items-center justify-center\"><Smartphone strokeWidth={1.75} /></span>\n              </span>\n              <span className=\"flex rounded-md border border-border\">\n                <span className=\"flex size-8 items-center justify-center rounded-md bg-accent text-foreground\"><Moon strokeWidth={1.75} /></span>\n                <span className=\"flex size-8 items-center justify-center\"><Sun strokeWidth={1.75} /></span>\n              </span>\n            </span>\n          </div>\n\n          <div className=\"lg:grid lg:h-[40.6rem] lg:grid-cols-[12.5rem_minmax(0,1fr)_minmax(0,1fr)]\">\n            <ul className=\"flex gap-6 overflow-x-auto border-b border-border px-4 py-3 [scrollbar-width:none] lg:flex-col lg:gap-0 lg:border-r lg:border-b-0 lg:py-2\">\n              {files.map((f) => (\n                <li key={f.name} className={cn(\"flex h-10 shrink-0 items-center gap-2 text-sm whitespace-nowrap lg:text-[0.9375rem]\", f.open ? \"text-chart-1\" : \"text-foreground/85\")}>\n                  <FileBadge />\n                  {f.name}\n                </li>\n              ))}\n            </ul>\n            <div className=\"hidden overflow-clip px-4 lg:block\">\n              <ResendCode code={code} startLine={startLine} size=\"sm\" className=\"-mt-2 overflow-hidden\" />\n            </div>\n            <div className=\"relative h-[32.5rem] lg:h-full\">\n              {preview ?? <ResendPlaceholder className=\"absolute inset-0 rounded-none border-0 lg:inset-y-2 lg:right-2\" />}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-button",
+    "resend-code",
+    "resend-heading",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "fills the icon slot above the title; empty shows a placeholder tile"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the graphite button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the text link beside it"
+    },
+    {
+      "name": "files",
+      "type": "{ name: string; open?: boolean | undefined; }[]",
+      "required": true,
+      "description": "template files in the side list; the open one is highlighted"
+    },
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "description": "the part of the open file shown in the code pane"
+    },
+    {
+      "name": "startLine",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "number of the code's first line"
+    },
+    {
+      "name": "preview",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the rendered email beside the code; empty shows a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "961c24538209f721f35a59671398ed3420e54d570172987d55d29dbd5b5e5064"
+}

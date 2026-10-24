@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Slash feature card",
+  "description": "A dark slate card with 10px corners, a hairline border and a faint diagonal gradient: an art area on top, then either a semibold title over grey text or one paragraph opening with a white lead-in; an optional slot above the copy for chips.",
+  "category": "card",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "feature",
+    "dark",
+    "bento",
+    "minimal",
+    "gradient"
+  ],
+  "notes": [
+    "the art area height is set per card (mediaHeight / mediaHeightSm); empty art shows a soft wash"
+  ],
+  "entry": "slash-feature-card.tsx",
+  "source": "foundry",
+  "name": "slash-feature-card",
+  "files": [
+    {
+      "path": "slash-feature-card.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashPlaceholder } from \"@foundry/slash-placeholder\";\n\nexport interface SlashFeatureCardProps {\n  /** the feature's name: a heading line (\"stacked\") or a white lead-in to the text (\"inline\") */\n  title: string;\n  /** the grey description */\n  body: string;\n  /** a small footnote mark after the title or text (\"2\") */\n  note?: string;\n  /** the art above the copy; a soft wash stands in when empty */\n  media?: ReactNode;\n  /** small extra content just above the copy (e.g. tier chips) */\n  extra?: ReactNode;\n  /** stacked: semibold title over 16px text; inline: one 18px paragraph with a white lead-in */\n  layout?: \"stacked\" | \"inline\";\n  /** height of the art area on desktop, as a CSS length (e.g. \"17rem\"); phones use `mediaHeightSm` */\n  mediaHeight?: string;\n  /** height of the art area on phones */\n  mediaHeightSm?: string;\n  /** top: art above the copy; behind: art fills the card and the copy sits over its lower left (the card is then at least mediaHeight tall) */\n  mediaPosition?: \"top\" | \"behind\";\n  /** inline styles for the card (e.g. a custom property the parent's classes read) */\n  style?: CSSProperties;\n  className?: string;\n}\n\n/** A dark slate card: art area on top (or behind), copy at the bottom. */\nexport function SlashFeatureCard({\n  title,\n  body,\n  note,\n  media,\n  extra,\n  layout = \"stacked\",\n  mediaHeight = \"17rem\",\n  mediaHeightSm = \"13rem\",\n  mediaPosition = \"top\",\n  style,\n  className,\n}: SlashFeatureCardProps) {\n  const behind = mediaPosition === \"behind\";\n  const sup = note ? <sup className=\"ml-0.5 text-[0.6em]\">{note}</sup> : null;\n  return (\n    <article\n      style={{ [\"--slash-card-media\" as string]: mediaHeight, [\"--slash-card-media-sm\" as string]: mediaHeightSm, ...style }}\n      className={cn(\n        \"relative flex flex-col overflow-clip rounded-lg border border-border bg-linear-[201deg] from-card from-14% to-popover\",\n        behind && \"min-h-(--slash-card-media-sm) lg:min-h-(--slash-card-media)\",\n        className,\n      )}\n    >\n      <div className={cn(\"shrink-0\", behind ? \"absolute inset-0\" : \"relative h-(--slash-card-media-sm) lg:h-(--slash-card-media)\")}>\n        {media ?? <SlashPlaceholder tone=\"card\" className=\"absolute inset-0\" />}\n      </div>\n      <div className={cn(\"relative mt-auto px-5 pb-6 lg:px-8 lg:pb-7\", layout === \"inline\" && \"lg:px-6 lg:pb-6\")}>\n        {extra}\n        {layout === \"stacked\" ? (\n          <>\n            <h3 className=\"text-base font-semibold tracking-[-0.02em] text-foreground lg:text-lg\">{title}</h3>\n            <p className=\"mt-2 max-w-[26rem] text-[0.9375rem] leading-[1.4] tracking-[-0.02em] text-foreground/70 lg:text-base\">\n              {body}\n              {sup}\n            </p>\n          </>\n        ) : (\n          <p className=\"text-[0.9375rem] leading-[1.4] tracking-[-0.01em] text-foreground/70 lg:text-lg lg:leading-[1.375]\">\n            <strong className=\"font-medium text-foreground\">\n              {title}\n              {sup}\n            </strong>{\" \"}\n            {body}\n          </p>\n        )}\n      </div>\n    </article>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the feature's name: a heading line (\"stacked\") or a white lead-in to the text (\"inline\")"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the grey description"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "a small footnote mark after the title or text (\"2\")"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the art above the copy; a soft wash stands in when empty"
+    },
+    {
+      "name": "extra",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small extra content just above the copy (e.g. tier chips)"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "default": "stacked",
+      "description": "stacked: semibold title over 16px text; inline: one 18px paragraph with a white lead-in"
+    },
+    {
+      "name": "mediaHeight",
+      "type": "string",
+      "required": false,
+      "default": "17rem",
+      "description": "height of the art area on desktop, as a CSS length (e.g. \"17rem\"); phones use `mediaHeightSm`"
+    },
+    {
+      "name": "mediaHeightSm",
+      "type": "string",
+      "required": false,
+      "default": "13rem",
+      "description": "height of the art area on phones"
+    },
+    {
+      "name": "mediaPosition",
+      "type": "enum",
+      "required": false,
+      "default": "top",
+      "description": "top: art above the copy; behind: art fills the card and the copy sits over its lower left (the card is then at least mediaHeight tall)"
+    },
+    {
+      "name": "style",
+      "type": "CSSProperties",
+      "required": false,
+      "description": "inline styles for the card (e.g. a custom property the parent's classes read)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8c7be9a4d02842ffdfcadf0b84191ed3b7d4c4c899fdd49bfbde499498ebca83"
+}

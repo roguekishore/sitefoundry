@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Arc disclosures",
+  "description": "A dense, quiet small-print block across the full content width: 12px warm-grey paragraphs with bold ink run-in leads (or bold lines of their own), a faint rule, then superscript-numbered footnotes. The legal preamble that sits above the footer on financial sites.",
+  "category": "footer",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "legal",
+    "disclosures",
+    "footnotes",
+    "small-print",
+    "light",
+    "minimal",
+    "fintech"
+  ],
+  "notes": [
+    "place it straight above the arc footer; it has top padding only"
+  ],
+  "entry": "arc-disclosures.tsx",
+  "source": "foundry",
+  "name": "arc-disclosures",
+  "files": [
+    {
+      "path": "arc-disclosures.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\nexport interface ArcDisclosure {\n  /** a bold run-in at the start (or a whole bold line when there's no text) */\n  lead?: string;\n  /** the rest of the paragraph */\n  text?: string;\n  /** puts the lead on its own line above the text */\n  leadOnOwnLine?: boolean;\n}\n\nexport interface ArcFootnote {\n  /** the superscript mark, e.g. \"1\"; leave empty for a continuation paragraph */\n  mark?: string;\n  text: string;\n}\n\nexport interface ArcDisclosuresProps {\n  /** the legal paragraphs above the rule */\n  disclosures: ArcDisclosure[];\n  /** the numbered footnotes under it */\n  footnotes: ArcFootnote[];\n  className?: string;\n}\n\n/** Arc's small-print block: 12px paragraphs with bold run-in leads, a hairline, then numbered footnotes. */\nexport function ArcDisclosures({ disclosures, footnotes, className }: ArcDisclosuresProps) {\n  return (\n    <section className={cn(\"bg-background pt-section text-muted-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter text-xs/[1.5]\">\n        <div className=\"space-y-4\">\n          {disclosures.map((d, i) => (\n            <p key={i}>\n              {d.lead && <strong className={cn(\"font-bold text-foreground\", d.leadOnOwnLine && \"block\")}>{d.lead}</strong>}\n              {d.lead && d.text && !d.leadOnOwnLine && \" \"}\n              {d.text}\n            </p>\n          ))}\n        </div>\n        <hr className=\"my-6 border-foreground/25\" />\n        <div className=\"space-y-4\">\n          {footnotes.map((f, i) => (\n            <p key={i}>\n              {f.mark && <sup className=\"mr-1.5 text-[0.5625rem]\">{f.mark}</sup>}\n              {f.text}\n            </p>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "disclosures",
+      "type": "ArcDisclosure[]",
+      "required": true,
+      "description": "the legal paragraphs above the rule"
+    },
+    {
+      "name": "footnotes",
+      "type": "ArcFootnote[]",
+      "required": true,
+      "description": "the numbered footnotes under it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9b2be6c810f42a8d2a6243ca3b40aa8400d9bb413568932c8ef0a7252f2cc225"
+}

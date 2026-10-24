@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "K2 Space button",
+  "description": "Square-cornered controls: a flat near-black button (lighter on hover, 0.2s), a 56px square arrow button for sliders, and a quiet grey text link with an arrow that lights up on hover.",
+  "category": "button",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "square",
+    "flat",
+    "dark",
+    "arrow",
+    "link",
+    "hover"
+  ],
+  "notes": [
+    "renders an <a> when given href, otherwise a <button>"
+  ],
+  "entry": "k2space-button.tsx",
+  "source": "foundry",
+  "name": "k2space-button",
+  "files": [
+    {
+      "path": "k2space-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface K2spaceButtonProps {\n  /** the label (for arrow buttons, give ariaLabel instead) */\n  children?: ReactNode;\n  /** a link target; without it the control is a <button> */\n  href?: string;\n  /** solid: flat filled block · arrow: 56px square slider control · link: grey text with an arrow */\n  variant?: \"solid\" | \"arrow\" | \"link\";\n  /** which way the arrow points (arrow and link variants; solid shows a small right arrow) */\n  direction?: \"left\" | \"right\";\n  /** the accessible name, needed for arrow buttons */\n  ariaLabel?: string;\n  /** click handler (buttons) */\n  onClick?: () => void;\n  /** disabled state (buttons) */\n  disabled?: boolean;\n  className?: string;\n}\n\n/** Square buttons and quiet links in the K2 Space manner: flat planes, no radius, 0.2s fades. */\nexport function K2spaceButton({ children, href, variant = \"solid\", direction = \"right\", ariaLabel, onClick, disabled, className }: K2spaceButtonProps) {\n  const Icon = direction === \"left\" ? ArrowLeft : ArrowRight;\n  const classes = cn(\n    \"inline-flex items-center justify-center font-sans font-[560] transition-colors duration-200 ease-[ease] motion-reduce:transition-none\",\n    variant === \"solid\" &&\n      \"h-[50px] gap-1.5 bg-primary px-7 text-base/none text-primary-foreground hover:bg-accent lg:h-[4.24vw] lg:px-[2.64vw] lg:text-[max(1rem,1.3227vw)]/none\",\n    variant === \"arrow\" &&\n      \"size-12 bg-primary text-primary-foreground hover:bg-accent disabled:opacity-50 lg:size-[3.9vw] [&>svg]:size-5 lg:[&>svg]:size-[1.6vw]\",\n    variant === \"link\" &&\n      \"gap-2 text-base/none text-muted-foreground hover:text-foreground lg:text-[max(1rem,1.3227vw)]/none [&>svg]:size-[0.9em]\",\n    \"rounded-sm\",\n    className,\n  );\n  const content = (\n    <>\n      {variant !== \"arrow\" && children}\n      {variant === \"solid\" && <ArrowRight aria-hidden className=\"size-[0.85em]\" />}\n      {variant !== \"solid\" && <Icon aria-hidden strokeWidth={1.75} />}\n    </>\n  );\n  if (href) {\n    return (\n      <a href={href} aria-label={ariaLabel} className={classes}>\n        {content}\n      </a>\n    );\n  }\n  return (\n    <button type=\"button\" aria-label={ariaLabel} onClick={onClick} disabled={disabled} className={classes}>\n      {content}\n    </button>\n  );\n}\n\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the label (for arrow buttons, give ariaLabel instead)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "a link target; without it the control is a <button>"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: flat filled block · arrow: 56px square slider control · link: grey text with an arrow"
+    },
+    {
+      "name": "direction",
+      "type": "enum",
+      "required": false,
+      "default": "right",
+      "description": "which way the arrow points (arrow and link variants; solid shows a small right arrow)"
+    },
+    {
+      "name": "ariaLabel",
+      "type": "string",
+      "required": false,
+      "description": "the accessible name, needed for arrow buttons"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false,
+      "description": "click handler (buttons)"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "disabled state (buttons)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bad79d38b6b38bd79791555a506a9e73316380c9ada91cc3b699100bcac8c15f"
+}

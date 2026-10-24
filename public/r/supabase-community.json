@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase community wall",
+  "description": "A centred title, grey line and white button over a wall of white, round-cornered post cards (avatar with a small badge, handle, grey text) in five columns set in an arch, the middle one lowest, the outer ones cut by the page edge and faded out at both sides and the bottom. Cards fade in, sharpen from a blur and rise as they scroll into view, the middle columns rising furthest. Phones show the first two columns.",
+  "category": "testimonials",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "social",
+    "wall",
+    "masonry",
+    "reveal",
+    "blur",
+    "scroll",
+    "fade",
+    "light"
+  ],
+  "notes": [
+    "the reveal is a CSS view timeline (inside @supports), so cards simply show where unsupported or with reduced motion",
+    "posts are dealt across the five columns in turn; around twenty fill the 620px window",
+    "avatars are media slots (round placeholders when empty)"
+  ],
+  "entry": "supabase-community.tsx",
+  "name": "supabase-community",
+  "files": [
+    {
+      "path": "supabase-community.css",
+      "content": "/* Each post card fades in, sharpens from a light blur and rises a little as it enters the\n   window (a CSS view timeline, so it plays backwards when scrolling up). Where view\n   timelines aren't supported, the cards simply show. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .supabase-community-card {\n      animation: supabase-community-reveal linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes supabase-community-reveal {\n  from {\n    opacity: 0;\n    filter: blur(6px);\n    translate: 0 var(--supabase-community-rise, 40px);\n  }\n  to {\n    opacity: 1;\n    filter: blur(0);\n    translate: 0 0;\n  }\n}\n"
+    },
+    {
+      "path": "supabase-community.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseButton } from \"@foundry/supabase-button\";\nimport { SupabaseHeading } from \"@foundry/supabase-heading\";\nimport { SupabasePlaceholder } from \"@foundry/supabase-placeholder\";\nimport \"./supabase-community.css\";\n\nexport interface SupabaseCommunityPost {\n  /** the author's handle, e.g. \"@mara_builds\" */\n  handle: string;\n  /** the post's text (line breaks are kept) */\n  text: string;\n  /** the author's picture (40px, round); empty shows a placeholder disc */\n  avatar?: ReactNode;\n  /** a link to the original post */\n  href?: string;\n}\n\nexport interface SupabaseCommunityProps {\n  title: string;\n  /** one grey line under the title */\n  description?: string;\n  /** the white button under it */\n  cta?: { label: string; href: string };\n  /** the posts; they are dealt across five columns in turn (two show on phones) */\n  posts: SupabaseCommunityPost[];\n  /** a small badge on each avatar, e.g. the network the post came from (an icon) */\n  badge?: ReactNode;\n  className?: string;\n}\n\n// the columns sit lower towards the middle, an arch; their cards rise further as they enter\nconst OFFSETS = [\"mt-0\", \"mt-15\", \"mt-25\", \"mt-15\", \"mt-0\"];\nconst RISES = [40, 60, 100, 60, 40];\n\n/** A centred title over five arched columns of post cards that fade, unblur and rise in, faded out at the edges. */\nexport function SupabaseCommunity({ title, description, cta, posts, badge, className }: SupabaseCommunityProps) {\n  const columns = OFFSETS.map((_, c) => posts.filter((_, i) => i % OFFSETS.length === c));\n  return (\n    <section className={cn(\"overflow-x-clip border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content max-w-page px-gutter pt-20 text-center lg:pt-24\">\n        <SupabaseHeading parts={[{ text: title }]} className=\"text-center\" />\n        {description && <p className=\"mx-auto mt-3 max-w-[20rem] text-base text-muted-foreground sm:max-w-none\">{description}</p>}\n        {cta && (\n          <SupabaseButton href={cta.href} variant=\"outline\" className=\"mt-6 h-[2.125rem] px-3 text-[0.9375rem]\">\n            {cta.label}\n          </SupabaseButton>\n        )}\n      </div>\n\n      {/* justify-center lets the over-wide row spill out evenly on both sides on desktop */}\n      <div className=\"mt-20 flex h-[38.75rem] justify-start overflow-clip mask-x-from-80% mask-x-to-100% mask-b-from-75% mask-b-to-100% lg:justify-center\">\n        <div className=\"-ml-2.5 flex w-max shrink-0 gap-2.5 lg:ml-0\">\n          {columns.map((column, c) => (\n            <ul\n              key={c}\n              className={cn(\"flex w-[11.875rem] flex-col gap-2 lg:w-[17.9375rem]\", OFFSETS[c])}\n              style={{ \"--supabase-community-rise\": `${RISES[c]}px` } as CSSProperties}\n            >\n              {column.map((post) => (\n                <li key={post.handle} className=\"supabase-community-card rounded-2xl border border-border bg-card p-5 text-left lg:p-6 lg:rounded-[1.25rem]\">\n                  <a href={post.href} className=\"block\">\n                    <span className=\"flex items-center gap-3\">\n                      <span className=\"relative size-10 shrink-0\">\n                        {post.avatar ?? <SupabasePlaceholder tone=\"avatar\" />}\n                        {badge && (\n                          <span className=\"absolute -top-1.5 -left-1.5 flex size-5 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-card [&_svg]:size-2.5\">\n                            {badge}\n                          </span>\n                        )}\n                      </span>\n                      <span className=\"truncate text-[0.9375rem] text-foreground\">{post.handle}</span>\n                    </span>\n                    <p className=\"mt-4 text-[0.9375rem] leading-[1.5] whitespace-pre-line text-foreground/75\">{post.text}</p>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-button",
+    "supabase-heading",
+    "supabase-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "description",
+      "type": "string",
+      "required": false,
+      "description": "one grey line under the title"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white button under it"
+    },
+    {
+      "name": "posts",
+      "type": "SupabaseCommunityPost[]",
+      "required": true,
+      "description": "the posts; they are dealt across five columns in turn (two show on phones)"
+    },
+    {
+      "name": "badge",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small badge on each avatar, e.g. the network the post came from (an icon)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d0750aecb01f3134229faa1b8b26d6fc82f3ece0338036c25c16bfac88ae437e"
+}

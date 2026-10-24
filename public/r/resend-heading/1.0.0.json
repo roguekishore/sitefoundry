@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Resend section heading",
+  "description": "An optional 170px app-icon slot, a light 56px grotesk title lit by a white-to-half-white diagonal gradient (an accent phrase can glow violet instead), and a grey lead. Centred or left-aligned.",
+  "category": "text-effect",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "gradient-text",
+    "dark",
+    "minimal",
+    "icon"
+  ],
+  "notes": [
+    "the icon slot shows a glossy placeholder tile until media (a looping video in the original) fills it",
+    "pass the title as a list to choose its desktop line breaks; phones let it wrap"
+  ],
+  "entry": "resend-heading.tsx",
+  "source": "foundry",
+  "name": "resend-heading",
+  "files": [
+    {
+      "path": "resend-heading.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\n\nexport interface ResendHeadingProps {\n  /** the title; a list sets where the lines break on wide screens */\n  title: string | string[];\n  /** words after the title that glow in the accent colour (\"…tonight\") */\n  accent?: string;\n  /** the lead under the title; a list sets its desktop line breaks */\n  text?: ReactNode | ReactNode[];\n  /** show the 170px app-icon slot above the title */\n  tile?: boolean;\n  /** what fills the icon slot (a looping video, an img); empty shows a placeholder tile */\n  media?: ReactNode;\n  align?: \"center\" | \"start\";\n  /** h2 for sections, h1 when it opens a page */\n  as?: \"h1\" | \"h2\";\n  className?: string;\n  /** extra classes for the lead (e.g. its width) */\n  textClassName?: string;\n}\n\n/** Joins lines with breaks that only apply on wide screens. */\nfunction Lines({ lines }: { lines: ReactNode[] }) {\n  return lines.map((line, i) => (\n    <Fragment key={i}>\n      {i > 0 && (\n        <>\n          {\" \"}\n          <br className=\"max-lg:hidden\" />\n        </>\n      )}\n      {line}\n    </Fragment>\n  ));\n}\n\nexport function ResendHeading({\n  title,\n  accent,\n  text,\n  tile = false,\n  media,\n  align = \"center\",\n  as: Tag = \"h2\",\n  className,\n  textClassName,\n}: ResendHeadingProps) {\n  const center = align === \"center\";\n  return (\n    <div className={cn(\"flex flex-col\", center ? \"items-center text-center\" : \"items-start\", className)}>\n      {(tile || media) && (\n        <div className=\"relative mb-2.5 size-[10.625rem] shrink-0\">\n          {media ?? <ResendPlaceholder shape=\"tile\" className=\"absolute inset-3\" />}\n        </div>\n      )}\n      <Tag\n        className={cn(\n          \"font-display text-5xl leading-[1.2] font-normal tracking-[-0.05em] text-balance [word-spacing:0.06em] lg:text-[3.5rem]\",\n          \"bg-linear-to-br from-foreground from-30% to-foreground/50 bg-clip-text pb-1 text-transparent\",\n        )}\n      >\n        <Lines lines={Array.isArray(title) ? title : [title]} />\n        {accent && (\n          <>\n            {\" \"}\n            <span className=\"bg-linear-to-br from-highlight from-20% to-highlight/70 bg-clip-text text-transparent\">{accent}</span>\n          </>\n        )}\n      </Tag>\n      {text && (\n        <p\n          className={cn(\n            \"mt-3 max-w-[40rem] text-base leading-6 text-pretty text-muted-foreground lg:text-lg lg:leading-[1.5]\",\n            Array.isArray(text) && \"lg:max-w-none\",\n            textClassName,\n          )}\n        >\n          <Lines lines={Array.isArray(text) ? text : [text]} />\n        </p>\n      )}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets where the lines break on wide screens"
+    },
+    {
+      "name": "accent",
+      "type": "string",
+      "required": false,
+      "description": "words after the title that glow in the accent colour (\"…tonight\")"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode | ReactNode[]",
+      "required": false,
+      "description": "the lead under the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "tile",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "show the 170px app-icon slot above the title"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "what fills the icon slot (a looping video, an img); empty shows a placeholder tile"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "h2 for sections, h1 when it opens a page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "textClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the lead (e.g. its width)"
+    }
+  ],
+  "hash": "cf75ab89730cfa18854c79b5c0664530720f4b0d616698b95205b5ebf5030568"
+}

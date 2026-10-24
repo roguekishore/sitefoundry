@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Paxos trusted-by marquee",
+  "description": "A slim 74px row under the hero: a small grey 'trusted by' label on the left (desktop) and a slow, endless left-drifting line of customer names set as plain wordmarks, fading out at both edges. The loop takes about 55 seconds on desktop and 20 on phones.",
+  "category": "logos",
+  "site": "paxos",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "minimal",
+    "light",
+    "social-proof"
+  ],
+  "notes": [
+    "names are plain text in the display font; pass ReactNode items for real logos",
+    "the loop stops under reduced motion (the row then wraps)"
+  ],
+  "entry": "paxos-logos.tsx",
+  "name": "paxos-logos",
+  "files": [
+    {
+      "path": "paxos-logos.css",
+      "content": "/* The list is rendered twice side by side; sliding it left by half its width loops seamlessly.\n   Phones run a shorter loop, like the original (19.8 s against 54.6 s at 1440). */\n.paxos-logos-track {\n  animation: paxos-logos-drift 20s linear infinite;\n}\n@media (min-width: 64rem) {\n  .paxos-logos-track {\n    animation-duration: 55s;\n  }\n}\n@keyframes paxos-logos-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n@media (prefers-reduced-motion: reduce) {\n  .paxos-logos-track {\n    animation: none;\n  }\n  .paxos-logos-copy {\n    display: none;\n  }\n}\n"
+    },
+    {
+      "path": "paxos-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./paxos-logos.css\";\n\nexport interface PaxosLogosProps {\n  /** the small grey label on the left (desktop only) */\n  label: ReactNode;\n  /** customer names or logos, in order */\n  items: ReactNode[];\n  className?: string;\n}\n\n/** Thin row of customer names drifting left forever. */\nexport function PaxosLogos({ label, items, className }: PaxosLogosProps) {\n  const list = (copy: boolean) => (\n    <ul aria-hidden={copy || undefined} className={cn(\"flex shrink-0 items-center gap-14 pr-14 lg:gap-28 lg:pr-28\", copy && \"paxos-logos-copy\")}>\n      {items.map((item, i) => (\n        <li key={i} className=\"font-display text-lg font-semibold tracking-[-0.02em] whitespace-nowrap text-foreground/75 lg:text-xl\">\n          {item}\n        </li>\n      ))}\n    </ul>\n  );\n  return (\n    <section className={cn(\"bg-background px-gutter\", className)}>\n      <div className=\"mx-auto flex h-[4.625rem] max-w-page items-center gap-10 lg:px-11\">\n        <p className=\"hidden w-36 shrink-0 text-xs text-muted-foreground lg:block\">{label}</p>\n        <div className=\"min-w-0 flex-1 overflow-clip mask-x-from-85% mask-x-to-100%\">\n          <div className=\"paxos-logos-track flex w-max\">\n            {list(false)}\n            {list(true)}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small grey label on the left (desktop only)"
+    },
+    {
+      "name": "items",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "customer names or logos, in order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a954bf8923cdc0ccea8d768bc88298d7deb632f7f703664d69c01a1f0ce08491"
+}

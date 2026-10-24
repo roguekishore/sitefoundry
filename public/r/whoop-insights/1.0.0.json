@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop insights",
+  "description": "A big display heading and paragraph, then a full-bleed track of tall 3:4 photo cards with 18px corners that snaps card by card with the next one peeking. Each card has a semibold title over a soft haze at the top and a round white plus button in the corner that fades a detail panel over the card (0.5s); small round dots follow the track.",
+  "category": "features",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "carousel",
+    "cards",
+    "scroll-snap",
+    "dots",
+    "popup",
+    "image",
+    "light",
+    "rounded"
+  ],
+  "notes": [
+    "the cards' title haze uses the background colour, so titles stay readable over any photo"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-insights.tsx",
+  "source": "foundry",
+  "name": "whoop-insights",
+  "files": [
+    {
+      "path": "whoop-insights.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopSectionHeading } from \"@foundry/whoop-section-heading\";\nimport { WhoopSnapTrack } from \"@foundry/whoop-snap-track\";\n\nexport interface WhoopInsight {\n  /** the title at the top of the card */\n  title: string;\n  /** the text the plus button reveals over the card */\n  detail: string;\n  /** the photo, filling the card (object-cover); a grey placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface WhoopInsightsProps {\n  /** the big heading above the track */\n  heading: string;\n  /** the paragraph beside or under it */\n  body?: string;\n  /** the cards */\n  items: WhoopInsight[];\n  /** screen-reader labels: the track, each dot (\"Show card\" → \"Show card 2\"), and the plus button's two states */\n  labels: { track: string; dot: string; open: string; close: string };\n  className?: string;\n}\n\nfunction InsightCard({ item, labels }: { item: WhoopInsight; labels: WhoopInsightsProps[\"labels\"] }) {\n  const [open, setOpen] = useState(false);\n  return (\n    <article className=\"group relative aspect-[333/446] overflow-clip rounded-lg\">\n      <div className=\"absolute inset-0 transition-transform duration-250 ease-out group-hover:scale-[1.015] motion-reduce:transition-none *:size-full *:object-cover\">\n        {item.media ?? <WhoopPlaceholder tone=\"photo\" />}\n      </div>\n      <div aria-hidden className=\"absolute inset-x-0 top-0 h-2/5 bg-linear-to-b from-background/70 to-transparent\" />\n      <h3 className=\"relative px-8 pt-7 text-2xl leading-[1.1] font-semibold tracking-[-0.01em] text-foreground\">\n        {item.title}\n      </h3>\n      {/* the detail panel: fades over the card like the original's popup (0.5s) */}\n      <div\n        className={cn(\n          \"absolute inset-0 flex items-end bg-foreground/85 p-8 pb-24 text-background backdrop-blur-sm transition-[opacity,visibility] duration-500 ease-in-out motion-reduce:transition-none\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n      >\n        <p className=\"text-base leading-[1.6]\">{item.detail}</p>\n      </div>\n      <button\n        type=\"button\"\n        aria-label={open ? labels.close : labels.open}\n        aria-expanded={open}\n        onClick={() => setOpen((o) => !o)}\n        className=\"absolute right-[2.125rem] bottom-6 grid size-10 place-items-center rounded-full bg-background text-foreground transition-colors duration-125 ease-in-out hover:bg-muted motion-reduce:transition-none\"\n      >\n        <Plus\n          aria-hidden\n          className={cn(\"size-5 transition-transform duration-300 ease-out motion-reduce:transition-none\", open && \"rotate-45\")}\n          strokeWidth={2}\n        />\n      </button>\n    </article>\n  );\n}\n\n/** Heading, then a snapping track of tall photo cards with reveal-on-plus details. */\nexport function WhoopInsights({ heading, body, items, labels, className }: WhoopInsightsProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground lg:py-24\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <WhoopSectionHeading heading={heading} body={body} />\n      </div>\n      <WhoopSnapTrack\n        className=\"mt-24 lg:mt-20\"\n        slides={items.map((item, i) => (\n          <InsightCard key={i} item={item} labels={labels} />\n        ))}\n        slideClassName=\"w-[20.8rem] lg:w-[24.5rem]\"\n        label={labels.track}\n        dotLabel={labels.dot}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-placeholder",
+    "whoop-section-heading",
+    "whoop-snap-track"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big heading above the track"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph beside or under it"
+    },
+    {
+      "name": "items",
+      "type": "WhoopInsight[]",
+      "required": true,
+      "description": "the cards"
+    },
+    {
+      "name": "labels",
+      "type": "{ track: string; dot: string; open: string; close: string; }",
+      "required": true,
+      "description": "screen-reader labels: the track, each dot (\"Show card\" → \"Show card 2\"), and the plus button's two states"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "29cbdc5544e5d6a29c980922ec8b8e6915b84cfb56d8f02f28411b53ce4cce09"
+}

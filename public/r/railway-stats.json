@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway departures-board stats",
+  "description": "Usage figures on a station departures board: a centred serif heading and grey line over a full-bleed grid of near-black split-flap cells, grey mono capitals for each name and white digits for its figure (one row each on desktops, name and figure on separate rows on phones). The characters flip down into place column by column as the board scrolls in, and the last digits keep flipping like a live counter.",
+  "category": "stats",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "dark",
+    "mono",
+    "split-flap",
+    "board",
+    "scroll-driven",
+    "reveal",
+    "loop",
+    "developer"
+  ],
+  "notes": [
+    "phones show each stat's short figure (falls back to the full one)",
+    "CSS only: the flip-in rides a view() timeline with a per-column offset; all motion is off with reduced motion",
+    "screen readers get a plain list; the cells are hidden from them"
+  ],
+  "entry": "railway-stats.tsx",
+  "source": "foundry",
+  "name": "railway-stats",
+  "files": [
+    {
+      "path": "railway-stats.css",
+      "content": "/* Each character flips down into its cell as the board scrolls in, left to right: the range\n   is a fixed distance into the view, pushed later by 4px per column (an inline variable). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .railway-stats-char {\n      animation: railway-stats-flip linear both;\n      animation-timeline: view();\n      animation-range: entry calc(20px + var(--railway-stats-col, 0px)) entry calc(140px + var(--railway-stats-col, 0px));\n      transform-origin: 50% 50%;\n    }\n  }\n}\n\n@keyframes railway-stats-flip {\n  from { transform: perspective(300px) rotateX(-90deg); opacity: 0; }\n  to { transform: perspective(300px) rotateX(0deg); opacity: 1; }\n}\n\n/* The last two digits of each wide-board figure flip over every few seconds, like a live counter. */\n.railway-stats-tick {\n  animation: railway-stats-tick 4s ease-in-out infinite;\n}\n\n@keyframes railway-stats-tick {\n  0%, 88% { transform: perspective(300px) rotateX(0deg); }\n  94% { transform: perspective(300px) rotateX(-90deg); }\n  100% { transform: perspective(300px) rotateX(0deg); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .railway-stats-tick { animation: none; }\n}\n"
+    },
+    {
+      "path": "railway-stats.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./railway-stats.css\";\n\nexport interface RailwayStat {\n  /** the row's name, shown in grey capitals, e.g. \"users\" */\n  label: string;\n  /** the full figure for wide screens, e.g. \"4,812,906\" */\n  value: string;\n  /** a shorter figure for phones, e.g. \"4.81M\" (defaults to value) */\n  short?: string;\n}\n\nexport interface RailwayStatsProps {\n  /** the serif heading */\n  title: string;\n  /** one grey line under it */\n  lead: string;\n  /** one board row each */\n  stats: RailwayStat[];\n  className?: string;\n}\n\n// Board geometry: 43 cells a row on desktops (the middle 31 hold the text, the rest fill the\n// edges), 30 on phones and tablets, left-aligned so a phone shows about twelve.\nconst WIDE = { cells: 43, labelAt: 9, valueEnd: 33 };\nconst NARROW = { cells: 30, at: 1 };\n\nfunction blankRow(n: number) {\n  return Array.from({ length: n }, () => \"\");\n}\n\nfunction place(row: string[], text: string, start: number) {\n  [...text].forEach((ch, i) => {\n    if (start + i >= 0 && start + i < row.length) row[start + i] = ch;\n  });\n  return row;\n}\n\nfunction wideRows(stats: RailwayStat[]) {\n  const blank = { chars: blankRow(WIDE.cells), labelEnd: 0 };\n  const rows = stats.map((s) => {\n    const chars = place(blankRow(WIDE.cells), s.label.toUpperCase(), WIDE.labelAt);\n    place(chars, s.value, WIDE.valueEnd + 1 - s.value.length);\n    return { chars, labelEnd: WIDE.labelAt + s.label.length };\n  });\n  return [blank, ...rows, blank];\n}\n\nfunction narrowRows(stats: RailwayStat[]) {\n  const rows: { chars: string[]; label: boolean }[] = [{ chars: blankRow(NARROW.cells), label: false }];\n  stats.forEach((s) => {\n    rows.push({ chars: place(blankRow(NARROW.cells), s.label.toUpperCase(), NARROW.at), label: true });\n    rows.push({ chars: place(blankRow(NARROW.cells), s.short ?? s.value, NARROW.at), label: false });\n  });\n  rows.push({ chars: blankRow(NARROW.cells), label: false });\n  return rows;\n}\n\nfunction Cell({ ch, col, grey, tickDelay }: { ch: string; col: number; grey: boolean; tickDelay?: number }) {\n  return (\n    <span className=\"railway-stats-cell relative flex shrink-0 items-center justify-center rounded-sm border border-foreground/5 bg-muted\">\n      {/* the split-flap seam across the middle */}\n      <span className=\"absolute inset-x-0 top-1/2 h-px bg-background/70\" aria-hidden />\n      {ch && (\n        <span\n          className={cn(\"railway-stats-char block\", grey ? \"text-muted-foreground/70\" : \"text-foreground\")}\n          style={{ \"--railway-stats-col\": `${col * 4}px` } as CSSProperties}\n        >\n          <span className={cn(\"block\", tickDelay !== undefined && \"railway-stats-tick\")} style={tickDelay !== undefined ? { animationDelay: `${tickDelay}s` } : undefined}>\n            {ch}\n          </span>\n        </span>\n      )}\n    </span>\n  );\n}\n\n/**\n * A departures-board stats section: a centred serif heading and grey line, then a full-bleed\n * grid of near-black split-flap cells spelling each figure in mono capitals, grey names on\n * the left and white numbers on the right. Characters flip down into place, column by\n * column, as the board scrolls in; the last digits keep ticking.\n */\nexport function RailwayStats({ title, lead, stats, className }: RailwayStatsProps) {\n  const wide = wideRows(stats);\n  const narrow = narrowRows(stats);\n  return (\n    <section className={cn(\"overflow-clip pt-24 pb-28 text-center text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <h2 className=\"mx-auto max-w-[22rem] font-display text-[2.5rem] leading-[1.2] tracking-[-0.01em] text-balance lg:max-w-none\">{title}</h2>\n        <p className=\"mx-auto mt-2.5 max-w-[22rem] text-base leading-7 text-muted-foreground sm:max-w-none lg:mt-1.5\">{lead}</p>\n      </div>\n\n      <div className=\"mt-14 font-mono\" role=\"table\" aria-label={title}>\n        {/* screen readers get a plain list instead of the cells */}\n        <ul className=\"sr-only\">\n          {stats.map((s) => (\n            <li key={s.label}>\n              {s.label}: {s.value}\n            </li>\n          ))}\n        </ul>\n\n        <div className=\"hidden flex-col items-center gap-4 xl:flex\" aria-hidden>\n          {wide.map((r, ri) => (\n            <div key={ri} className=\"flex gap-1 [&_.railway-stats-cell]:h-14 [&_.railway-stats-cell]:w-[2.625rem] [&_.railway-stats-cell]:text-[2.5rem]\">\n              {r.chars.map((ch, ci) => (\n                <Cell key={ci} ch={ch} col={ci} grey={ci < r.labelEnd} tickDelay={ci >= WIDE.valueEnd - 1 && ch !== \"\" ? ri * 0.7 + (ci - WIDE.valueEnd) * 0.3 : undefined} />\n              ))}\n            </div>\n          ))}\n        </div>\n\n        <div className=\"flex flex-col gap-3.5 xl:hidden\" aria-hidden>\n          {narrow.map((r, ri) => (\n            <div key={ri} className=\"flex gap-0.5 [&_.railway-stats-cell]:h-10 [&_.railway-stats-cell]:w-8 [&_.railway-stats-cell]:text-[1.75rem]\">\n              {r.chars.map((ch, ci) => (\n                <Cell key={ci} ch={ch} col={ci} grey={r.label} />\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the serif heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one grey line under it"
+    },
+    {
+      "name": "stats",
+      "type": "RailwayStat[]",
+      "required": true,
+      "description": "one board row each"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c700de99b234fdc9af6195e89659e9e45332fe9d81b6e30501536d9b31cb638b"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Cursor footer",
+  "description": "A panel-coloured footer with five even link columns (a muted heading over plain 14px links on a 30px rhythm), and far below them a bottom row: the copyright and a shield-marked compliance line in muted ink at the left, a three-way light/dark/system segmented pill and a language pill at the right. Two columns on phones, with the bottom row stacked.",
+  "category": "footer",
+  "site": "cursor",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "columns",
+    "light",
+    "flat",
+    "minimal",
+    "pill"
+  ],
+  "notes": [
+    "the theme and language pills are visual only: wire your own handlers if you need them",
+    "up to five columns; phones pair them two by two"
+  ],
+  "entry": "cursor-footer.tsx",
+  "source": "foundry",
+  "name": "cursor-footer",
+  "files": [
+    {
+      "path": "cursor-footer.tsx",
+      "content": "import { ChevronDown, Globe, Monitor, Moon, ShieldCheck, Sun } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CursorFooterColumn {\n  /** the muted column heading */\n  title: string;\n  /** the column's links */\n  links: { label: string; href: string }[];\n}\n\nexport interface CursorFooterProps {\n  /** up to five link columns */\n  columns: CursorFooterColumn[];\n  /** e.g. \"© 2026 Fernwork Labs, Inc.\" */\n  copyright: string;\n  /** the line after the shield, e.g. certifications */\n  compliance?: string;\n  /** accessible names of the system / light / dark buttons, in that order */\n  modeLabels?: [string, string, string];\n  /** which of the three looks pressed */\n  activeMode?: \"system\" | \"light\" | \"dark\";\n  /** the language pill's label */\n  language?: string;\n  className?: string;\n}\n\nconst pill = \"rounded-full bg-secondary\";\n\n/** Five link columns over a bottom row of legal text and two pills. */\nexport function CursorFooter({ columns, copyright, compliance, modeLabels, activeMode = \"system\", language, className }: CursorFooterProps) {\n  const modes = [\n    { key: \"system\", Icon: Monitor },\n    { key: \"light\", Icon: Sun },\n    { key: \"dark\", Icon: Moon },\n  ] as const;\n  return (\n    <footer className={cn(\"bg-card pt-section pb-16 text-foreground lg:pb-8\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter\">\n        <div className=\"grid grid-cols-2 gap-x-4 gap-y-12 lg:grid-cols-5 lg:gap-x-0\">\n          {columns.map((col) => (\n            <div key={col.title}>\n              <h3 className=\"text-[0.9375rem] leading-[1.4] text-muted-foreground lg:text-sm lg:leading-[1.5]\">{col.title}</h3>\n              <ul className=\"mt-2.5 flex flex-col gap-2.5 text-[0.9375rem] leading-[1.4] lg:gap-[0.5625rem] lg:text-sm lg:leading-[1.5]\">\n                {col.links.map((l) => (\n                  <li key={l.label}>\n                    <a\n                      href={l.href}\n                      className=\"transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground/75 motion-reduce:transition-none\"\n                    >\n                      {l.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n        <div className=\"mt-26 flex flex-col gap-11 lg:flex-row lg:items-center lg:justify-between lg:gap-6\">\n          <div className=\"grid grid-cols-[auto_1fr] gap-4 text-[0.9375rem] leading-normal text-muted-foreground lg:flex lg:items-center lg:gap-4 lg:text-sm\">\n            <p className=\"max-lg:max-w-[9em]\">{copyright}</p>\n            {compliance && (\n              <p className=\"flex items-start gap-1 lg:items-center\">\n                <ShieldCheck aria-hidden className=\"mt-1 size-3.5 shrink-0 lg:mt-0\" strokeWidth={1.75} />\n                {compliance}\n              </p>\n            )}\n          </div>\n          <div className=\"flex items-center gap-3.5\">\n            {modeLabels && (\n              <div className={cn(pill, \"flex p-0.5\")}>\n                {modes.map(({ key, Icon }, i) => (\n                  <button\n                    key={key}\n                    type=\"button\"\n                    aria-label={modeLabels[i]}\n                    aria-pressed={activeMode === key}\n                    className={cn(\n                      \"grid h-7 w-9 place-items-center rounded-full text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none lg:h-6 lg:w-8.5\",\n                      activeMode === key && \"bg-accent text-foreground\",\n                    )}\n                  >\n                    <Icon aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n                  </button>\n                ))}\n              </div>\n            )}\n            {language && (\n              <button type=\"button\" className={cn(pill, \"flex h-8 items-center gap-1 px-3 text-[0.9375rem] lg:h-7 lg:text-sm\")}>\n                <Globe aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n                {language}\n                <ChevronDown aria-hidden className=\"size-3.5\" strokeWidth={2} />\n              </button>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "CursorFooterColumn[]",
+      "required": true,
+      "description": "up to five link columns"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "e.g. \"© 2026 Fernwork Labs, Inc.\""
+    },
+    {
+      "name": "compliance",
+      "type": "string",
+      "required": false,
+      "description": "the line after the shield, e.g. certifications"
+    },
+    {
+      "name": "modeLabels",
+      "type": "[string, string, string]",
+      "required": false,
+      "description": "accessible names of the system / light / dark buttons, in that order"
+    },
+    {
+      "name": "activeMode",
+      "type": "enum",
+      "required": false,
+      "default": "system",
+      "description": "which of the three looks pressed"
+    },
+    {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "the language pill's label"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9e267262ee7dbc481811d64397640faab998e71d5d851949d956b69d0589254d"
+}

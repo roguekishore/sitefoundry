@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health footer",
+  "description": "A deep forest footer: a social handle and 'Follow →' link over a wide social-feed slot, a clover rule, then the wordmark with a newsletter pill (bone field, clover button), share icons and a small compliance badge beside three columns of link groups with clover titles, a peach pill and an outlined pill; a second rule and right-aligned small legal links separated by thin bars. On phones it stacks: wordmark, link groups in two columns, pills, newsletter, icons, centred legal.",
+  "category": "footer",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "newsletter",
+    "links",
+    "social",
+    "pill",
+    "minimal"
+  ],
+  "notes": [
+    "a .dark scope: forest in both modes",
+    "the feed slot is a placeholder strip until media is passed in",
+    "social icons come in as nodes (lucide 1.x has no brand icons)"
+  ],
+  "entry": "parsleyhealth-footer.tsx",
+  "name": "parsleyhealth-footer",
+  "files": [
+    {
+      "path": "parsleyhealth-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ShieldCheck } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport { ParsleyhealthPlaceholder } from \"@foundry/parsleyhealth-placeholder\";\nimport { ParsleyhealthWordmark } from \"@foundry/parsleyhealth-wordmark\";\n\nexport interface ParsleyhealthFooterLink {\n  /** the link's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface ParsleyhealthFooterGroup {\n  /** the clover group title */\n  title: string;\n  /** the group's links */\n  links: ParsleyhealthFooterLink[];\n}\n\nexport interface ParsleyhealthFooterProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** the social handle at the top left */\n  handle?: string;\n  /** the \"Follow →\" link at the top right */\n  follow?: ParsleyhealthFooterLink;\n  /** the social feed strip under the handle; a placeholder when empty */\n  feed?: ReactNode;\n  /** link columns on desktop, each a stack of groups (three on the original) */\n  columns: ParsleyhealthFooterGroup[][];\n  /** the two pills (peach fill, outline) */\n  actions?: ParsleyhealthFooterLink[];\n  /** which desktop column the pills sit under */\n  actionsColumn?: number;\n  /** the newsletter form */\n  newsletter?: { title: string; placeholder: string; button: string; inputLabel: string };\n  /** the title over the social icons */\n  shareTitle?: string;\n  /** the social icons */\n  social?: { label: string; href: string; icon: ReactNode }[];\n  /** the small compliance badge after the icons */\n  badge?: string;\n  /** the copyright and address line */\n  legal?: string;\n  /** the small legal links */\n  legalLinks?: ParsleyhealthFooterLink[];\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[1.0312rem] font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none\";\n\nfunction Group({ group }: { group: ParsleyhealthFooterGroup }) {\n  return (\n    <div className=\"break-inside-avoid pb-7 lg:pb-9\">\n      <p className=\"text-[1.1rem] font-medium text-glow lg:text-[1.2375rem]\">{group.title}</p>\n      <ul className=\"mt-3 flex flex-col gap-2 lg:mt-3.5 lg:gap-2\">\n        {group.links.map((link) => (\n          <li key={link.label}>\n            <a href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nfunction Actions({ actions, className }: { actions: ParsleyhealthFooterLink[]; className?: string }) {\n  return (\n    <div className={cn(\"flex w-[12.375rem] flex-col gap-3\", className)}>\n      {actions.map((action, i) => (\n        <ParsleyhealthButton\n          key={action.label}\n          href={action.href}\n          size=\"sm\"\n          variant={i === 0 ? \"highlight\" : \"outline\"}\n          className={cn(\"w-full font-normal\", i > 0 && \"border-highlight text-highlight hover:bg-highlight/10\")}\n        >\n          {action.label}\n        </ParsleyhealthButton>\n      ))}\n    </div>\n  );\n}\n\n/** Forest footer with a feed strip, newsletter and link columns. */\nexport function ParsleyhealthFooter({\n  brand,\n  handle,\n  follow,\n  feed,\n  columns,\n  actions,\n  actionsColumn = 1,\n  newsletter,\n  shareTitle,\n  social,\n  badge,\n  legal,\n  legalLinks,\n  className,\n}: ParsleyhealthFooterProps) {\n  const extras = (\n    <>\n      {newsletter ? (\n        <form className=\"mt-10 lg:mt-11\" action=\"#\">\n          <p className=\"text-[1.1rem] font-medium text-glow lg:text-[1.2375rem]\">{newsletter.title}</p>\n          <div className=\"mt-3 flex h-12 w-full overflow-clip rounded-full lg:mt-4 lg:w-[20.625rem]\">\n            <input\n              type=\"email\"\n              aria-label={newsletter.inputLabel}\n              placeholder={newsletter.placeholder}\n              className=\"min-w-0 flex-1 bg-primary px-4 text-[1.1rem] text-primary-foreground placeholder:text-primary-foreground/80 focus:outline-none\"\n            />\n            <button type=\"submit\" className=\"w-[5.5rem] shrink-0 bg-glow text-[1.1rem] font-medium text-foreground transition-colors duration-150 hover:bg-glow/85\">\n              {newsletter.button}\n            </button>\n          </div>\n        </form>\n      ) : null}\n      {shareTitle ? <p className=\"mt-9 text-[1.1rem] font-medium text-glow lg:mt-10 lg:text-[1.2375rem]\">{shareTitle}</p> : null}\n      {social?.length || badge ? (\n        <div className=\"mt-5 flex items-center gap-6 lg:mt-6 lg:gap-5\">\n          {social?.map((s) => (\n            <a key={s.label} href={s.href} aria-label={s.label} className=\"text-foreground transition-opacity duration-150 hover:opacity-70 [&_svg]:size-6\">\n              {s.icon}\n            </a>\n          ))}\n          {badge ? (\n            <span className=\"ml-auto flex items-center gap-1.5 text-[0.7563rem] leading-tight font-medium tracking-[0.04em] uppercase lg:ml-4\">\n              <ShieldCheck aria-hidden className=\"size-7\" strokeWidth={1.25} />\n              <span className=\"max-w-[5.5rem]\">{badge}</span>\n            </span>\n          ) : null}\n        </div>\n      ) : null}\n    </>\n  );\n\n  return (\n    <footer className={cn(\"dark bg-background px-gutter pt-10 pb-8 text-foreground lg:pt-30 lg:pb-32\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        {handle || follow ? (\n          <div className=\"flex items-center justify-between text-[0.9625rem] font-medium text-accent-foreground\">\n            {handle ? <span>{handle}</span> : <span />}\n            {follow ? (\n              <a href={follow.href} className=\"group inline-flex items-center gap-1.5\">\n                {follow.label}\n                <ArrowRight aria-hidden className=\"size-3.5 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none\" strokeWidth={1.75} />\n              </a>\n            ) : null}\n          </div>\n        ) : null}\n        <div className=\"mt-6 h-[14.8rem] lg:h-[11.5625rem] [&>img]:size-full [&>img]:object-cover\">\n          {feed ?? <ParsleyhealthPlaceholder tone=\"tint\" className=\"bg-foreground/5\" />}\n        </div>\n\n        <div className=\"mt-8 border-t border-border pt-8 lg:mt-14 lg:grid lg:grid-cols-[minmax(0,23.5rem)_minmax(0,1fr)] lg:pt-16\">\n          <div>\n            <ParsleyhealthWordmark brand={brand} size=\"lg\" />\n            <div className=\"max-lg:hidden\">{extras}</div>\n          </div>\n\n          {/* phones: every group in two balanced columns */}\n          <div className=\"mt-8 columns-2 gap-x-6 lg:hidden\">\n            {columns.flat().map((group) => (\n              <Group key={group.title} group={group} />\n            ))}\n          </div>\n          {actions?.length ? <Actions actions={actions} className=\"mt-2 lg:hidden\" /> : null}\n          <div className=\"lg:hidden\">{extras}</div>\n\n          {/* desktop: the columns as given */}\n          <div className=\"hidden grid-cols-[13rem_15.375rem_minmax(0,1fr)] lg:grid\">\n            {columns.map((groups, i) => (\n              <div key={groups[0]?.title ?? i}>\n                {groups.map((group) => (\n                  <Group key={group.title} group={group} />\n                ))}\n                {actions?.length && i === actionsColumn ? <Actions actions={actions} className=\"-mt-3\" /> : null}\n              </div>\n            ))}\n          </div>\n        </div>\n\n        {legal || legalLinks?.length ? (\n          <div className=\"mt-14 border-t border-border pt-8 text-center text-[0.825rem] leading-[1.455] font-medium lg:mt-6 lg:pt-7 lg:text-right lg:text-[0.8938rem]\">\n            {legal ? <p>{legal}</p> : null}\n            {legalLinks?.length ? (\n              <ul className=\"mt-1 flex flex-wrap justify-center gap-y-1 lg:mt-2 lg:justify-end\">\n                {legalLinks.map((link, i) => (\n                  <li key={link.label} className={cn(\"px-2 last:pr-0\", i > 0 && \"border-l border-foreground/50\")}>\n                    <a href={link.href} className=\"transition-colors duration-150 hover:text-accent-foreground\">\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ) : null}\n          </div>\n        ) : null}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button",
+    "parsleyhealth-placeholder",
+    "parsleyhealth-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "handle",
+      "type": "string",
+      "required": false,
+      "description": "the social handle at the top left"
+    },
+    {
+      "name": "follow",
+      "type": "ParsleyhealthFooterLink",
+      "required": false,
+      "description": "the \"Follow →\" link at the top right"
+    },
+    {
+      "name": "feed",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the social feed strip under the handle; a placeholder when empty"
+    },
+    {
+      "name": "columns",
+      "type": "ParsleyhealthFooterGroup[][]",
+      "required": true,
+      "description": "link columns on desktop, each a stack of groups (three on the original)"
+    },
+    {
+      "name": "actions",
+      "type": "ParsleyhealthFooterLink[]",
+      "required": false,
+      "description": "the two pills (peach fill, outline)"
+    },
+    {
+      "name": "actionsColumn",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "which desktop column the pills sit under"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; placeholder: string; button: string; inputLabel: string; }",
+      "required": false,
+      "description": "the newsletter form"
+    },
+    {
+      "name": "shareTitle",
+      "type": "string",
+      "required": false,
+      "description": "the title over the social icons"
+    },
+    {
+      "name": "social",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "description": "the social icons"
+    },
+    {
+      "name": "badge",
+      "type": "string",
+      "required": false,
+      "description": "the small compliance badge after the icons"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": false,
+      "description": "the copyright and address line"
+    },
+    {
+      "name": "legalLinks",
+      "type": "ParsleyhealthFooterLink[]",
+      "required": false,
+      "description": "the small legal links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f4c0232fe7fcd3c3b21478a03d02cb3edb590e468f9aae672afe2a54d85fb349"
+}

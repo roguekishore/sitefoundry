@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Parsley Health carousel arrows",
+  "description": "Round arrow buttons for the site's card carousels (outlined clover ring with a sage arrow, a solid forest disc, or a small sage dot), plus a hook that scrolls a scroll-snap track by one card and reports whether it is at either end and which card is current.",
+  "category": "button",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "arrows",
+    "scroll-snap",
+    "button",
+    "hover"
+  ],
+  "notes": [
+    "the hook needs JavaScript: blocks that use it set hydrate",
+    "scrolls smoothly, or instantly under reduced motion"
+  ],
+  "hydrate": "visible",
+  "entry": "parsleyhealth-carousel.tsx",
+  "name": "parsleyhealth-carousel",
+  "files": [
+    {
+      "path": "parsleyhealth-carousel.tsx",
+      "content": "import { useCallback, useEffect, useState, type RefObject } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ParsleyhealthArrowProps {\n  /** which way it points */\n  direction: \"prev\" | \"next\";\n  /** screen-reader label (e.g. \"Previous\") */\n  label: string;\n  /** ring: 48px clover outline, sage arrow · solid: 48px forest disc · dot: 30px sage disc */\n  variant?: \"ring\" | \"solid\" | \"dot\";\n  /** greyed out (at the end of the track) */\n  disabled?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst variants = {\n  ring: \"size-12 border border-border text-ring hover:border-ring hover:bg-ring/6\",\n  solid: \"size-12 bg-primary text-primary-foreground hover:bg-primary/88\",\n  dot: \"size-[1.875rem] bg-secondary text-secondary-foreground hover:bg-secondary/88\",\n};\n\n/** A round arrow button. */\nexport function ParsleyhealthArrow({ direction, label, variant = \"ring\", disabled, onClick, className }: ParsleyhealthArrowProps) {\n  const Icon = direction === \"prev\" ? ArrowLeft : ArrowRight;\n  return (\n    <button\n      type=\"button\"\n      aria-label={label}\n      disabled={disabled}\n      onClick={onClick}\n      className={cn(\n        \"grid shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] disabled:cursor-default disabled:opacity-40 motion-reduce:transition-none\",\n        variants[variant],\n        className,\n      )}\n    >\n      <Icon aria-hidden className={variant === \"dot\" ? \"size-3.5\" : \"size-6\"} strokeWidth={1.5} />\n    </button>\n  );\n}\n\nexport interface ParsleyhealthCarouselState {\n  /** scroll one card back */\n  prev: () => void;\n  /** scroll one card on */\n  next: () => void;\n  /** the track is scrolled to its start */\n  atStart: boolean;\n  /** the track is scrolled to its end */\n  atEnd: boolean;\n  /** the card nearest the track's snap point */\n  index: number;\n}\n\n/** Drives a horizontal scroll-snap track (its children are the cards). */\nexport function useParsleyhealthCarousel(track: RefObject<HTMLElement | null>): ParsleyhealthCarouselState {\n  const [state, setState] = useState({ atStart: true, atEnd: false, index: 0 });\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    const update = () => {\n      const max = el.scrollWidth - el.clientWidth;\n      const cards = Array.from(el.children) as HTMLElement[];\n      const box = el.getBoundingClientRect();\n      // the snap point: the centre on phones (centred cards), the padded start otherwise\n      const centred = getComputedStyle(cards[0] ?? el).scrollSnapAlign.includes(\"center\");\n      const anchor = centred ? box.left + box.width / 2 : box.left + parseFloat(getComputedStyle(el).scrollPaddingLeft || \"0\");\n      let index = 0;\n      let best = Infinity;\n      cards.forEach((card, i) => {\n        const r = card.getBoundingClientRect();\n        const d = Math.abs((centred ? r.left + r.width / 2 : r.left) - anchor);\n        if (d < best) {\n          best = d;\n          index = i;\n        }\n      });\n      setState({ atStart: el.scrollLeft <= 2, atEnd: el.scrollLeft >= max - 2, index });\n    };\n    update();\n    el.addEventListener(\"scroll\", update, { passive: true });\n    window.addEventListener(\"resize\", update);\n    return () => {\n      el.removeEventListener(\"scroll\", update);\n      window.removeEventListener(\"resize\", update);\n    };\n  }, [track]);\n\n  const step = useCallback(\n    (dir: 1 | -1) => {\n      const el = track.current;\n      if (!el) return;\n      const [a, b] = Array.from(el.children) as HTMLElement[];\n      const width = a && b ? b.offsetLeft - a.offsetLeft : el.clientWidth * 0.8;\n      const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n      el.scrollBy({ left: dir * width, behavior: reduce ? \"auto\" : \"smooth\" });\n    },\n    [track],\n  );\n\n  return { prev: () => step(-1), next: () => step(1), ...state };\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "direction",
+      "type": "enum",
+      "required": true,
+      "description": "which way it points"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label (e.g. \"Previous\")"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "ring",
+      "description": "ring: 48px clover outline, sage arrow · solid: 48px forest disc · dot: 30px sage disc"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "greyed out (at the end of the track)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "43c2599c99d22b58300edeced0b7b82710c8413de6dcea924e7e456f1f209a0a"
+}

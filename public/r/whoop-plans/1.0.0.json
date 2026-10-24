@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop plans",
+  "description": "A black band with a big light heading over membership cards: each a 24px-rounded card washed in its own pastel gradient (silver, sky blue, mauve-cream-mint) with a spaced capital plan name, a centred line, a product shot, a translucent price panel with a struck-through old price and a monthly-payment chip, a navy perk strip, a check-list and black buy and outline buttons. On phones the cards snap in a centred track starting on the middle one with both neighbours peeking; on desktop they sit side by side.",
+  "category": "pricing",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "cards",
+    "dark",
+    "black",
+    "gradient",
+    "pastel",
+    "carousel",
+    "scroll-snap",
+    "dots"
+  ],
+  "notes": [
+    "the band is black in light mode and the card colour in dark mode; the plan cards keep dark text on their pastels",
+    "the perk strip uses the secondary colour (navy in the whoop theme) with its foreground"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-plans.tsx",
+  "source": "foundry",
+  "name": "whoop-plans",
+  "files": [
+    {
+      "path": "whoop-plans.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CircleCheck, ShoppingBag } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopButton } from \"@foundry/whoop-button\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopSectionHeading } from \"@foundry/whoop-section-heading\";\nimport { WhoopSnapTrack } from \"@foundry/whoop-snap-track\";\n\nexport interface WhoopPlan {\n  /** the plan name, shown as spaced capitals */\n  name: string;\n  /** one centred line under the name */\n  tagline: string;\n  /** the product shot (object-contain); a glass placeholder when empty */\n  media?: ReactNode;\n  /** the price as shown, e.g. \"$329.00\" */\n  price: string;\n  /** the old price, struck through (e.g. \"Was $359.00\") */\n  was?: string;\n  /** a small line under the price (e.g. taxes) */\n  priceNote?: string;\n  /** a monthly-payment chip: \"{lead} {amount}{text}\" and a small badge */\n  instalment?: { lead: string; amount: string; text: string; badge: string };\n  /** the line in the coloured strip across the card */\n  perk?: string;\n  /** the line above the list; strong is set in bold after it */\n  intro: { text: string; strong?: string; after?: string };\n  /** what the plan includes */\n  features: string[];\n  /** the black buy button */\n  buy: { label: string; href: string };\n  /** the outline button */\n  more: { label: string; href: string };\n  /** the card's pastel wash */\n  tint: \"silver\" | \"sky\" | \"aurora\";\n}\n\nexport interface WhoopPlansProps {\n  /** the heading above the cards */\n  heading: string;\n  /** the plans, usually three */\n  plans: WhoopPlan[];\n  /** the card shown first on phones (the middle one in the original) */\n  start?: number;\n  /** screen-reader labels of the track and its dots (\"Show plan\" → \"Show plan 2\") */\n  labels: { track: string; dot: string };\n  className?: string;\n}\n\nconst tints = {\n  silver: \"bg-muted bg-linear-241 from-muted from-4% via-card via-50% to-muted/60\",\n  sky: \"bg-muted bg-linear-59 from-muted via-muted via-35% to-chart-1\",\n  aurora: \"bg-chart-4 bg-linear-56 from-chart-2/85 from-1% via-chart-4 via-32% to-chart-3 to-82%\",\n};\n\nfunction PlanCard({ plan }: { plan: WhoopPlan }) {\n  return (\n    <article className={cn(\"flex h-full flex-col overflow-clip rounded-[1.5rem] text-foreground\", tints[plan.tint])}>\n      <header className=\"px-6 pt-10 text-center\">\n        <h3 className=\"pl-[0.25em] font-display text-[2rem] leading-none font-light tracking-[0.25em] uppercase\">\n          {plan.name}\n        </h3>\n        <p className=\"mx-auto mt-3 max-w-[17rem] text-base leading-[1.2]\">{plan.tagline}</p>\n      </header>\n      <div className=\"mx-auto mt-7 aspect-[302/168] w-[94%] *:size-full *:object-contain\">\n        {plan.media ?? <WhoopPlaceholder tone=\"glass\" className=\"rounded-t-lg\" />}\n      </div>\n      <div className=\"bg-card/40 px-4 pt-3 pb-3.5 text-center\">\n        <p className=\"flex items-center justify-center gap-4\">\n          <span className=\"text-2xl font-bold\">{plan.price}</span>\n          {plan.was && (\n            <>\n              <span aria-hidden className=\"h-5 w-px bg-foreground/15\" />\n              <s className=\"text-sm text-muted-foreground\">{plan.was}</s>\n            </>\n          )}\n        </p>\n        {plan.priceNote && <p className=\"mt-3 text-xs text-foreground/70\">{plan.priceNote}</p>}\n        {plan.instalment && (\n          <p className=\"mx-auto mt-2 inline-flex items-center gap-1.5 rounded-sm bg-foreground/10 px-2 py-1 text-xs\">\n            <span>\n              {plan.instalment.lead} <b className=\"font-semibold text-chart-5\">{plan.instalment.amount}</b>\n              {plan.instalment.text}\n            </span>\n            <span className=\"rounded-[0.1875rem] bg-secondary px-1.5 py-0.5 text-[0.625rem] font-semibold text-secondary-foreground\">\n              {plan.instalment.badge}\n            </span>\n          </p>\n        )}\n      </div>\n      {plan.perk && (\n        <p className=\"flex h-[2.625rem] items-center justify-center gap-3 bg-secondary px-4 text-sm font-semibold text-secondary-foreground\">\n          <CircleCheck aria-hidden className=\"size-[1.375rem]\" strokeWidth={1.5} />\n          {plan.perk}\n        </p>\n      )}\n      <div className=\"flex flex-1 flex-col px-4 pt-6 pb-10\">\n        <p className=\"text-[1.0625rem] leading-[1.4]\">\n          {plan.intro.text}\n          {plan.intro.strong && <b className=\"font-bold\"> {plan.intro.strong}</b>}\n          {plan.intro.after}\n        </p>\n        <ul className=\"mt-0.5 space-y-[0.1875rem]\">\n          {plan.features.map((f) => (\n            <li key={f} className=\"flex items-start gap-2.5 text-[1.0625rem] leading-[1.4]\">\n              <CircleCheck aria-hidden className=\"mt-[0.2rem] size-3.5 shrink-0 fill-foreground stroke-card\" strokeWidth={3} />\n              {f}\n            </li>\n          ))}\n        </ul>\n        <div className=\"mt-auto space-y-3 pt-6\">\n          <WhoopButton href={plan.buy.href} shape=\"block\" icon={<ShoppingBag aria-hidden className=\"size-5\" strokeWidth={1.75} />}>\n            {plan.buy.label}\n          </WhoopButton>\n          <WhoopButton href={plan.more.href} shape=\"outline\">\n            {plan.more.label}\n          </WhoopButton>\n        </div>\n      </div>\n    </article>\n  );\n}\n\n/** A black band of pastel membership cards: a centred snapping track on phones, a row on desktop. */\nexport function WhoopPlans({ heading, plans, start = 1, labels, className }: WhoopPlansProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-foreground pt-[3.4rem] pb-[4.25rem] text-background lg:py-24 dark:bg-card dark:text-card-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <WhoopSectionHeading heading={heading} />\n      </div>\n      <WhoopSnapTrack\n        className=\"mt-[5.5rem] lg:mt-16\"\n        slides={plans.map((p) => (\n          <PlanCard key={p.name} plan={p} />\n        ))}\n        slideClassName=\"w-[20.0625rem] lg:w-auto\"\n        align=\"center\"\n        start={start}\n        tone=\"dark\"\n        label={labels.track}\n        dotLabel={labels.dot}\n        trackClassName=\"lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible\"\n        dotsClassName=\"mt-[3.75rem] lg:hidden\"\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-button",
+    "whoop-placeholder",
+    "whoop-section-heading",
+    "whoop-snap-track"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading above the cards"
+    },
+    {
+      "name": "plans",
+      "type": "WhoopPlan[]",
+      "required": true,
+      "description": "the plans, usually three"
+    },
+    {
+      "name": "start",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "the card shown first on phones (the middle one in the original)"
+    },
+    {
+      "name": "labels",
+      "type": "{ track: string; dot: string; }",
+      "required": true,
+      "description": "screen-reader labels of the track and its dots (\"Show plan\" → \"Show plan 2\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8cebfaca1ec46e93f15ef578e35724b627d71c077eb0c3b146474923d366669a"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel closing call to action",
+  "description": "A tall, nearly empty closing band: one centred 56px tight heading and two pill buttons, an ink one and a white ringed one that shows three small round icons, a label and a copy icon. Clicking the white one copies a command and its label fades to a confirmation for a moment. Phones stack the heading on two lines and the buttons under each other.",
+  "category": "cta",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "light",
+    "minimal",
+    "monochrome",
+    "centered",
+    "copy-button"
+  ],
+  "notes": [
+    "needs JavaScript for the copy button (clipboard + label swap); without it the button is inert",
+    "the label fade is CSS and off with reduced motion"
+  ],
+  "entry": "vercel-cta.tsx",
+  "hydrate": "visible",
+  "name": "vercel-cta",
+  "files": [
+    {
+      "path": "vercel-cta.css",
+      "content": "/* The copy button's label fades in when it changes (the span is re-keyed). */\n.vercel-cta-label {\n  animation: vercel-cta-fade 200ms cubic-bezier(0.4, 0, 0.2, 1) both;\n}\n\n@keyframes vercel-cta-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vercel-cta-label { animation: none; }\n}\n"
+    },
+    {
+      "path": "vercel-cta.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { Copy } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelButton } from \"@foundry/vercel-button\";\nimport { VercelHeading } from \"@foundry/vercel-heading\";\nimport \"./vercel-cta.css\";\n\nexport interface VercelCtaProps {\n  /** the centred heading */\n  title: string;\n  /** the ink pill button */\n  primary: { label: string; href: string };\n  /** the white copy button: its label, the text it copies, and what it says once copied */\n  copy?: { label: string; command: string; copiedLabel: string };\n  /** small round icons shown at the start of the copy button (three on the original) */\n  icons?: ReactNode[];\n  className?: string;\n}\n\n/** Tall centred closing band with a heading, an ink pill and a copy-command pill. */\nexport function VercelCta({ title, primary, copy, icons = [], className }: VercelCtaProps) {\n  const [copied, setCopied] = useState(false);\n\n  useEffect(() => {\n    if (!copied) return;\n    const timer = window.setTimeout(() => setCopied(false), 1600);\n    return () => window.clearTimeout(timer);\n  }, [copied]);\n\n  const onCopy = () => {\n    if (!copy) return;\n    navigator.clipboard?.writeText(copy.command).catch(() => {});\n    setCopied(true);\n  };\n\n  return (\n    <section className={cn(\"bg-background px-gutter py-52 text-center text-foreground lg:py-[17rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center\">\n        <VercelHeading className=\"max-w-[9.5em] lg:max-w-none\">{title}</VercelHeading>\n        <div className=\"mt-11 flex flex-col items-center gap-3 lg:mt-10 lg:flex-row\">\n          <VercelButton href={primary.href}>{primary.label}</VercelButton>\n          {copy ? (\n            <VercelButton variant=\"secondary\" onClick={onCopy} className=\"h-[2.625rem] gap-0 ps-2.5 pe-3.5 lg:h-10\">\n              {icons.length ? (\n                <span aria-hidden className=\"me-2.5 flex -space-x-1\">\n                  {icons.map((icon, i) => (\n                    <span key={i} className=\"grid size-5 place-items-center rounded-full bg-card ring-1 ring-border [&_svg]:size-3!\">\n                      {icon}\n                    </span>\n                  ))}\n                </span>\n              ) : null}\n              <span key={copied ? \"copied\" : \"idle\"} aria-live=\"polite\" className=\"vercel-cta-label\">\n                {copied ? copy.copiedLabel : copy.label}\n              </span>\n              <Copy aria-hidden className=\"ms-4 text-muted-foreground\" strokeWidth={1.75} />\n            </VercelButton>\n          ) : null}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-button",
+    "vercel-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred heading"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink pill button"
+    },
+    {
+      "name": "copy",
+      "type": "{ label: string; command: string; copiedLabel: string; }",
+      "required": false,
+      "description": "the white copy button: its label, the text it copies, and what it says once copied"
+    },
+    {
+      "name": "icons",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "small round icons shown at the start of the copy button (three on the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ab796ed4d7f73b64f54fe5a62a8cf0fbca67489a047341fec4f8923fe2cf3856"
+}

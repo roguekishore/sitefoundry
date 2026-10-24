@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo legal footer",
+  "description": "A plain white footer in three layers: six narrow link columns (ink headings, grey links, small arrows on outside links; two-up on phones), then the fine print in two halves under hairlines in 12px grey, then a full-width bar with the company name and year, two legal links and small icon links on the right. Links darken to ink on hover.",
+  "category": "footer",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "legal",
+    "disclaimer",
+    "minimal",
+    "light",
+    "columns"
+  ],
+  "notes": [
+    "social icons are passed in (e.g. lucide icons); the original's brand marks are not reproduced"
+  ],
+  "entry": "ondo-footer.tsx",
+  "name": "ondo-footer",
+  "files": [
+    {
+      "path": "ondo-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OndoFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** shows a small arrow (an outside site) */\n  external?: boolean;\n}\n\nexport interface OndoFooterColumn {\n  /** the column heading */\n  title: string;\n  /** its links */\n  links: OndoFooterLink[];\n}\n\nexport interface OndoFooterProps {\n  /** the link columns (six on the original) */\n  columns: OndoFooterColumn[];\n  /** fine-print paragraphs, left half */\n  legal: string[];\n  /** fine-print notes, right half (e.g. footnotes) */\n  notes?: string[];\n  /** bottom bar: company name and year, e.g. \"Corvane © 2026\" */\n  copyright: string;\n  /** bottom bar: legal links */\n  bottomLinks?: OndoFooterLink[];\n  /** bottom bar: icon links on the right */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  className?: string;\n}\n\nconst link = \"text-muted-foreground transition-colors duration-200 ease-out hover:text-foreground motion-reduce:transition-none\";\n\n/** Link columns, two halves of fine print, and a bottom bar. */\nexport function OndoFooter({ columns, legal, notes, copyright, bottomLinks, socials, className }: OndoFooterProps) {\n  return (\n    <footer className={cn(\"bg-background pt-12 lg:pt-14\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <nav className=\"grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-6 lg:gap-x-4 xl:grid-cols-[repeat(6,11.25rem)] xl:gap-0\">\n          {columns.map((column) => (\n            <div key={column.title}>\n              <h2 className=\"text-base leading-6 font-medium text-foreground\">{column.title}</h2>\n              <ul>\n                {column.links.map((item) => (\n                  <li key={item.label}>\n                    <a href={item.href} className={cn(\"inline-flex items-center gap-1.5 text-base leading-6\", link)}>\n                      {item.label}\n                      {item.external && <ArrowUpRight aria-hidden className=\"size-3.5\" strokeWidth={1.75} />}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </nav>\n        <div className=\"mt-14 grid gap-10 lg:mt-[7.5rem] lg:grid-cols-2 lg:gap-20\">\n          <div className=\"flex flex-col gap-4 border-t border-border pt-7 text-xs leading-[1.32] text-muted-foreground\">\n            {legal.map((paragraph, i) => (\n              <p key={i}>{paragraph}</p>\n            ))}\n          </div>\n          {notes?.length ? (\n            <div className=\"flex flex-col gap-4 border-t border-border pt-7 text-xs leading-[1.32] text-muted-foreground\">\n              {notes.map((note, i) => (\n                <p key={i}>{note}</p>\n              ))}\n            </div>\n          ) : null}\n        </div>\n      </div>\n      <div className=\"mt-24 border-t border-border\">\n        <div className=\"mx-auto flex max-w-page flex-col gap-4 px-gutter py-6 text-sm lg:h-[4.375rem] lg:flex-row lg:items-center lg:gap-8 lg:px-[calc(var(--page-gutter)*2.75)] lg:py-0\">\n          <p className=\"font-medium text-foreground\">{copyright}</p>\n          {bottomLinks?.map((item) => (\n            <a key={item.label} href={item.href} className={link}>\n              {item.label}\n            </a>\n          ))}\n          {socials?.length ? (\n            <ul className=\"flex gap-5 lg:ml-auto\">\n              {socials.map((social) => (\n                <li key={social.label}>\n                  <a href={social.href} aria-label={social.label} className={cn(\"block [&_svg]:size-5\", link)}>\n                    {social.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          ) : null}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "OndoFooterColumn[]",
+      "required": true,
+      "description": "the link columns (six on the original)"
+    },
+    {
+      "name": "legal",
+      "type": "string[]",
+      "required": true,
+      "description": "fine-print paragraphs, left half"
+    },
+    {
+      "name": "notes",
+      "type": "string[]",
+      "required": false,
+      "description": "fine-print notes, right half (e.g. footnotes)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "bottom bar: company name and year, e.g. \"Corvane © 2026\""
+    },
+    {
+      "name": "bottomLinks",
+      "type": "OndoFooterLink[]",
+      "required": false,
+      "description": "bottom bar: legal links"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "description": "bottom bar: icon links on the right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f93106a07e12653a169ef3e0436071dd9adb77e409426e5c2ec340152163b3eb"
+}

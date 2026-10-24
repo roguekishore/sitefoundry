@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reflect header",
+  "description": "An 88px glassy top bar that stays over the page for the whole scroll and lets the hero run underneath: an app-icon tile and name at the left, the nav links inside a centred hairline pill, a text link and a violet button at the right, and a hairline under it that fades out at both ends. Links dim from 90% to 60% ink in 300ms. On phones: icon, button and a menu button that drops the links down (no JavaScript).",
+  "category": "header",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "dark",
+    "glass",
+    "blur",
+    "pill",
+    "violet"
+  ],
+  "notes": [
+    "sticky with a negative bottom margin: put it first at the page's top level and the next section runs under it",
+    "the phone menu is a <details> disclosure, so it works without hydration"
+  ],
+  "entry": "reflect-header.tsx",
+  "source": "foundry",
+  "name": "reflect-header",
+  "files": [
+    {
+      "path": "reflect-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectButton } from \"@foundry/reflect-button\";\n\nexport interface ReflectNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface ReflectHeaderProps {\n  /** the product name next to the icon tile */\n  name: string;\n  /** the glyph inside the violet icon tile (e.g. a lucide icon) */\n  icon: ReactNode;\n  /** where the name links to */\n  homeHref?: string;\n  /** the links inside the centred pill */\n  links: ReflectNavLink[];\n  /** the plain text link at the right (desktop) */\n  signIn?: ReflectNavLink;\n  /** the violet button at the right (phones too) */\n  action: ReflectNavLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[0.9375rem]/6 text-foreground/90 transition-colors duration-300 ease-[cubic-bezier(0.6,0.6,0,1)] hover:text-foreground/60 motion-reduce:transition-none\";\n\n/** The app's icon tile: a violet square with a lilac rim and an inner glow. */\nexport function ReflectIconTile({ icon, className }: { icon: ReactNode; className?: string }) {\n  return (\n    <span\n      aria-hidden\n      className={cn(\n        \"grid size-9 place-items-center rounded-[0.625rem] border border-highlight/40 bg-[radial-gradient(80%_80%_at_50%_30%,color-mix(in_oklab,var(--glow)_75%,var(--primary)),var(--primary))] text-primary-foreground shadow-[inset_0_0_12px_color-mix(in_oklab,var(--foreground)_18%,transparent)] [&_svg]:size-6\",\n        className,\n      )}\n    >\n      {icon}\n    </span>\n  );\n}\n\n/** Glassy top bar: icon and name, links in a pill, sign-in and the violet button. */\nexport function ReflectHeader({ name, icon, homeHref = \"#\", links, signIn, action, menuLabel, className }: ReflectHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"sticky top-0 z-40 -mb-[4.75rem] h-[4.75rem] bg-background/55 text-foreground backdrop-blur-xl lg:-mb-[5.5rem] lg:h-[5.5rem]\",\n        className,\n      )}\n    >\n      <div className=\"relative flex h-full items-center px-5 lg:px-[4.5rem]\">\n        <a href={homeHref} className=\"flex items-center gap-3 text-[1.0625rem]/6 font-medium\">\n          <ReflectIconTile icon={icon} />\n          {name}\n        </a>\n        <nav className=\"absolute left-1/2 hidden h-[2.625rem] -translate-x-1/2 items-center gap-6 rounded-full border border-foreground/10 bg-foreground/[0.02] px-6 lg:flex\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto flex items-center gap-6\">\n          {signIn && (\n            <a href={signIn.href} className={cn(linkClass, \"hidden font-medium text-foreground lg:inline\")}>\n              {signIn.label}\n            </a>\n          )}\n          <ReflectButton href={action.href}>{action.label}</ReflectButton>\n          <details className=\"group lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"-mr-1 grid size-8 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\"\n            >\n              <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.5} />\n              <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.5} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full flex flex-col border-b border-border bg-background/95 px-5 pt-2 pb-6 backdrop-blur-xl\">\n              {[...links, ...(signIn ? [signIn] : [])].map((link) => (\n                <a key={link.label} href={link.href} className={cn(linkClass, \"py-2.5 text-base\")}>\n                  {link.label}\n                </a>\n              ))}\n            </nav>\n          </details>\n        </div>\n        {/* hairline that fades out at both ends */}\n        <span\n          aria-hidden\n          className=\"absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent_5%,var(--border)_25%,var(--border)_75%,transparent_95%)]\"\n        />\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-button"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product name next to the icon tile"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the glyph inside the violet icon tile (e.g. a lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the name links to"
+    },
+    {
+      "name": "links",
+      "type": "ReflectNavLink[]",
+      "required": true,
+      "description": "the links inside the centred pill"
+    },
+    {
+      "name": "signIn",
+      "type": "ReflectNavLink",
+      "required": false,
+      "description": "the plain text link at the right (desktop)"
+    },
+    {
+      "name": "action",
+      "type": "ReflectNavLink",
+      "required": true,
+      "description": "the violet button at the right (phones too)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d567c802d169fbe79162037303ffe617889e8aacc52b9fbaacd0fed0bc5e1614"
+}

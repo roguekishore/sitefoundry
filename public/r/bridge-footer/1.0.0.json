@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bridge footer",
+  "description": "A sparse white footer: the stacked wordmark on the left, two narrow columns of plain links with the current page underlined, a wide gap, then small-print disclosure paragraphs bottom-left and two legal links bottom-right (split to the two edges on phones).",
+  "category": "footer",
+  "site": "bridge",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "minimal",
+    "links",
+    "legal"
+  ],
+  "notes": [
+    "the fine print paragraphs accept links (ReactNode)",
+    "link hover: text greys out over 0.25s"
+  ],
+  "entry": "bridge-footer.tsx",
+  "source": "foundry",
+  "name": "bridge-footer",
+  "files": [
+    {
+      "path": "bridge-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BridgeWordmark } from \"@foundry/bridge-wordmark\";\n\nexport interface BridgeFooterLink {\n  label: string;\n  href: string;\n  /** underlines it as the page you're on */\n  current?: boolean;\n}\n\nexport interface BridgeFooterProps {\n  /** the wordmark: company name, small icon and parent-company tagline */\n  brand: { name: string; href: string; icon?: ReactNode; tagline?: string };\n  /** the link columns (two in the original) */\n  columns: BridgeFooterLink[][];\n  /** the small-print paragraphs; may hold links */\n  finePrint: ReactNode[];\n  /** the two links at the bottom right */\n  legal: { label: string; href: string }[];\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[0.9375rem]/[1.4] tracking-[-0.02em] transition-colors duration-250 hover:text-muted-foreground motion-reduce:transition-none\";\n\n/** Bridge's sparse footer with link columns and small print. */\nexport function BridgeFooter({ brand, columns, finePrint, legal, className }: BridgeFooterProps) {\n  return (\n    <footer className={cn(\"bg-background pt-[6.25rem] pb-12 text-foreground lg:pt-[6.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"grid grid-cols-[8.875rem_6.8rem_1fr] lg:grid-cols-[16.8rem_17.75rem_1fr]\">\n          <BridgeWordmark {...brand} layout=\"stacked\" className=\"self-start\" />\n          {columns.map((col, i) => (\n            <ul key={i} className=\"flex flex-col items-start gap-[1.375rem]\">\n              {col.map((l) => (\n                <li key={l.label} className=\"flex\">\n                  <a\n                    href={l.href}\n                    aria-current={l.current ? \"page\" : undefined}\n                    className={cn(linkClass, l.current && \"border-b border-foreground pb-0.5\")}\n                  >\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n\n        <div className=\"mt-[8.5rem] flex flex-col gap-14 lg:mt-[12.25rem] lg:flex-row lg:items-end lg:justify-between\">\n          <div className=\"flex max-w-[35rem] flex-col gap-4 text-[0.8125rem]/[1.15] tracking-[-0.02em] [&_a]:underline [&_a]:underline-offset-2\">\n            {finePrint.map((p, i) => (\n              <p key={i}>{p}</p>\n            ))}\n          </div>\n          <ul className=\"flex justify-between gap-12 lg:justify-end\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={cn(linkClass, \"text-[0.8125rem]\")}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "bridge-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; tagline?: string | undefined; }",
+      "required": true,
+      "description": "the wordmark: company name, small icon and parent-company tagline"
+    },
+    {
+      "name": "columns",
+      "type": "BridgeFooterLink[][]",
+      "required": true,
+      "description": "the link columns (two in the original)"
+    },
+    {
+      "name": "finePrint",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the small-print paragraphs; may hold links"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the two links at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a3401e77804bdd0b979eea78829ab381fd0b09b7e4ea9dece732a84cd7a3584a"
+}

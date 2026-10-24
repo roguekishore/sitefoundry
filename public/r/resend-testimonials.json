@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend testimonial drift",
+  "description": "A centred lit title and lead over an endless row of graphite quote cards with hairlines that drift slowly to the left and pause while hovered; each card holds a grey quote, a pair of overlapping avatars and a name with role, and fades into the black page at its bottom.",
+  "category": "testimonials",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "marquee",
+    "loop",
+    "dark",
+    "cards",
+    "fade",
+    "hover"
+  ],
+  "notes": [
+    "CSS loop (180s per lap like the original, scaled to the number of cards); off under reduced motion, where the row scrolls by hand",
+    "avatars are media slots: placeholder circles until filled"
+  ],
+  "entry": "resend-testimonials.tsx",
+  "source": "foundry",
+  "name": "resend-testimonials",
+  "files": [
+    {
+      "path": "resend-testimonials.css",
+      "content": "/* The track holds the cards twice; moving it by half its width loops seamlessly. */\n.resend-testimonials-track {\n  animation: resend-testimonials-drift var(--resend-lap, 180s) linear infinite;\n}\n\n@keyframes resend-testimonials-drift {\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .resend-testimonials-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "resend-testimonials.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\nimport \"./resend-testimonials.css\";\n\nexport interface ResendTestimonial {\n  /** the quote, with its quotation marks */\n  quote: string;\n  name: string;\n  role: string;\n  /** the company's logo circle; empty shows a placeholder */\n  companyAvatar?: ReactNode;\n  /** the person's photo circle; empty shows a placeholder */\n  avatar?: ReactNode;\n}\n\nexport interface ResendTestimonialsProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** the lead; a list sets its desktop line breaks */\n  text: string | string[];\n  items: ResendTestimonial[];\n  className?: string;\n}\n\nfunction Card({ item }: { item: ResendTestimonial }) {\n  return (\n    <figure className=\"flex w-[20.5rem] shrink-0 flex-col rounded-lg border border-border bg-linear-to-br from-card to-muted p-8 lg:w-[28rem]\">\n      <blockquote className=\"text-sm leading-[1.75] text-muted-foreground\">\n        <p>{item.quote}</p>\n      </blockquote>\n      <figcaption className=\"mt-6 flex items-start gap-5\">\n        <span className=\"flex shrink-0\">\n          <span className=\"relative size-10 overflow-clip rounded-full\">{item.companyAvatar ?? <ResendPlaceholder shape=\"round\" className=\"size-full\" />}</span>\n          <span className=\"relative -ml-2 size-10 overflow-clip rounded-full\">{item.avatar ?? <ResendPlaceholder shape=\"round\" className=\"size-full\" />}</span>\n        </span>\n        <span>\n          <span className=\"block text-sm leading-6 text-foreground\">{item.name}</span>\n          <span className=\"block text-sm leading-6 text-muted-foreground\">{item.role}</span>\n        </span>\n      </figcaption>\n    </figure>\n  );\n}\n\nexport function ResendTestimonials({ title, text, items, className }: ResendTestimonialsProps) {\n  return (\n    <section className={cn(\"bg-background pt-[calc(var(--section-y)*0.5)] pb-8 text-foreground lg:pt-section lg:pb-16\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading title={title} text={text} />\n      </div>\n      <div className=\"group/track mt-16 h-[20rem] overflow-x-auto overflow-y-clip mask-b-from-30% mask-b-to-80% [scrollbar-width:none] motion-safe:overflow-x-clip lg:mt-24 lg:h-[16.5rem]\">\n        <div\n          className=\"resend-testimonials-track flex w-max items-start gap-8 pr-8 group-hover/track:[animation-play-state:paused]\"\n          style={{ \"--resend-lap\": `${Math.max(60, items.length * 30)}s` } as CSSProperties}\n        >\n          {items.map((item) => (\n            <Card key={item.name} item={item} />\n          ))}\n          <div aria-hidden className=\"contents\">\n            {items.map((item) => (\n              <Card key={item.name} item={item} />\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-heading",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "items",
+      "type": "ResendTestimonial[]",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "41b4275e33c99f2ba662868d503627e73771dc8f4d4aae416b0882bb74d20e89"
+}

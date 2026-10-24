@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space quote",
+  "description": "A window-tall band of full-bleed footage (80% of the window on phones) with a three-line 72px quote centred on it, a small attribution and a square near-black button under it. The footage settles from 115% and blurred to sharp as it scrolls in; the quote and attribution rise 15px into place, the button just after.",
+  "category": "testimonials",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "testimonial",
+    "quote",
+    "dark",
+    "full-bleed",
+    "window-height",
+    "centred",
+    "large-type",
+    "scrubbed",
+    "scale",
+    "blur",
+    "reveal"
+  ],
+  "notes": [
+    "always dark (it carries the `dark` class): light type over footage in either mode",
+    "CSS only; without scroll-timeline support or under reduced motion everything simply shows"
+  ],
+  "entry": "k2space-quote.tsx",
+  "source": "foundry",
+  "name": "k2space-quote",
+  "files": [
+    {
+      "path": "k2space-quote.css",
+      "content": "/* Quote and attribution rise 15px into place as the band comes up; the button follows. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-quote-in {\n      animation: k2space-quote-in linear both;\n      animation-timeline: view();\n      animation-range: entry 80px entry 220px;\n    }\n    .k2space-quote-in-late {\n      animation-range: entry 180px entry 380px;\n    }\n  }\n}\n\n@keyframes k2space-quote-in {\n  from {\n    opacity: 0;\n    transform: translateY(15px);\n  }\n}\n"
+    },
+    {
+      "path": "k2space-quote.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceButton } from \"@foundry/k2space-button\";\nimport { K2spaceMedia } from \"@foundry/k2space-media\";\nimport \"./k2space-quote.css\";\n\nexport interface K2spaceQuoteProps {\n  /** the quote, without quotation marks (they are added) */\n  quote: string;\n  /** who said it, and their role */\n  attribution: string;\n  /** a button under the attribution */\n  action?: { label: string; href: string };\n  /** the full-bleed footage behind it */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** A window-tall footage band with a big centred quote, its source and one button. */\nexport function K2spaceQuote({ quote, attribution, action, media, className }: K2spaceQuoteProps) {\n  return (\n    <section\n      className={cn(\n        \"dark relative isolate flex h-[80svh] items-center justify-center overflow-clip bg-background px-gutter text-center text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:h-svh\",\n        className,\n      )}\n    >\n      <K2spaceMedia media={media} scrub className=\"absolute inset-0 -z-10\" />\n      <div aria-hidden className=\"absolute inset-0 -z-10 bg-background/35\" />\n      <figure className=\"flex flex-col items-center\">\n        <blockquote className=\"k2space-quote-in max-w-[360px] font-display text-[34px]/none font-[560] lg:max-w-[66vw] lg:text-[5.027vw]/[0.9]\">\n          “{quote}”\n        </blockquote>\n        <figcaption className=\"k2space-quote-in mt-9 text-base/none font-[560] lg:mt-[2vw] lg:text-[max(1rem,1.3227vw)]/none\">\n          {attribution}\n        </figcaption>\n        {action && (\n          <K2spaceButton href={action.href} className=\"k2space-quote-in k2space-quote-in-late mt-9 lg:mt-[2.08vw] lg:w-[14vw]\">\n            {action.label}\n          </K2spaceButton>\n        )}\n      </figure>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-button",
+    "k2space-media"
+  ],
+  "props": [
+    {
+      "name": "quote",
+      "type": "string",
+      "required": true,
+      "description": "the quote, without quotation marks (they are added)"
+    },
+    {
+      "name": "attribution",
+      "type": "string",
+      "required": true,
+      "description": "who said it, and their role"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a button under the attribution"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed footage behind it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7ca1ae480085f8c850ae6ef401fac565e327c6c02b76f1122cd094426d7af091"
+}

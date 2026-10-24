@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe header",
+  "description": "A navy announcement strip with one yellow link over a clean white 72px bar: a chunky yellow wordmark, plain navy links (the first opens a small product menu on hover) and a hairline Login button that fills navy on hover. Both stay pinned to the top while the page scrolls; on phones a menu button drops a full-height white panel.",
+  "category": "header",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "pinned",
+    "light",
+    "announcement",
+    "dropdown",
+    "minimal"
+  ],
+  "notes": [
+    "the strip and bar are position: sticky together, so put the block first, directly in the page",
+    "links turn the ring colour (violet in the zoe theme) on hover"
+  ],
+  "hydrate": "load",
+  "entry": "zoe-header.tsx",
+  "name": "zoe-header",
+  "files": [
+    {
+      "path": "zoe-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ChevronDown, Menu, UserRound, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZoeButton } from \"@foundry/zoe-button\";\nimport { ZoeWordmark } from \"@foundry/zoe-wordmark\";\n\nexport interface ZoeHeaderLink {\n  label: string;\n  href: string;\n  /** a small badge after the label (e.g. \"New\") */\n  badge?: string;\n  /** links shown in a small menu under this one (desktop: on hover; phones: listed under it) */\n  children?: ZoeHeaderLink[];\n}\n\nexport interface ZoeHeaderProps {\n  /** brand name for the wordmark, and where it links */\n  brand: { name: string; href: string };\n  /** the navy strip above the bar: plain text, then a yellow link (leave out for no strip) */\n  announcement?: { text: string; link: { label: string; href: string } };\n  /** the bar's links */\n  links: ZoeHeaderLink[];\n  /** the outlined button on the right */\n  login: { label: string; href: string };\n  /** screen-reader labels of the phone menu's open and close buttons */\n  menuLabels: { open: string; close: string };\n  className?: string;\n}\n\nconst navLink =\n  \"transition-colors duration-200 ease-in-out hover:text-ring focus-visible:text-ring motion-reduce:transition-none\";\n\nfunction Badge({ label }: { label: string }) {\n  return (\n    <span className=\"ml-2 rounded-[calc(var(--radius)/3)] bg-primary px-1.5 py-0.5 text-xs font-semibold text-primary-foreground\">\n      {label}\n    </span>\n  );\n}\n\n/** Zoe's pinned strip + white bar, with a hover menu and a phone panel. */\nexport function ZoeHeader({ brand, announcement, links, login, menuLabels, className }: ZoeHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header className={cn(\"sticky top-0 z-40\", className)}>\n      {announcement && (\n        <p className=\"flex min-h-[4.625rem] items-center justify-center bg-foreground px-gutter text-center text-base font-medium text-background lg:min-h-11 dark:bg-card dark:text-card-foreground\">\n          <span>\n            {announcement.text}{\" \"}\n            <a href={announcement.link.href} className=\"font-semibold text-primary hover:underline\">\n              {announcement.link.label}\n            </a>\n          </span>\n        </p>\n      )}\n\n      <div className=\"relative bg-background text-foreground\">\n        <div className=\"mx-auto flex h-[4.5rem] max-w-page items-center px-gutter lg:px-7\">\n          <ZoeWordmark name={brand.name} href={brand.href} />\n\n          <nav className=\"ml-8 hidden lg:block\">\n            <ul className=\"flex items-center gap-6 text-lg\">\n              {links.map((l) =>\n                l.children ? (\n                  <li key={l.label} className=\"group relative\">\n                    <a href={l.href} className={cn(navLink, \"inline-flex items-center gap-1.5\")}>\n                      {l.label}\n                      <ChevronDown\n                        aria-hidden\n                        className=\"size-4 transition-transform duration-300 ease-in-out group-hover:rotate-180 motion-reduce:transition-none\"\n                        strokeWidth={1.5}\n                      />\n                    </a>\n                    {/* the product menu: fades and drops in on hover or keyboard focus */}\n                    <div className=\"invisible absolute top-full -left-4 pt-4 opacity-0 transition-[opacity,translate,visibility] duration-250 ease-out group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none -translate-y-1\">\n                      <ul className=\"min-w-60 rounded-lg bg-popover p-2 text-base text-popover-foreground shadow-[0_10px_40px_0_color-mix(in_oklab,var(--foreground)_10%,transparent)]\">\n                        {l.children.map((c) => (\n                          <li key={c.label}>\n                            <a href={c.href} className={cn(navLink, \"flex items-center rounded-md px-3 py-2.5 hover:bg-card\")}>\n                              {c.label}\n                              {c.badge && <Badge label={c.badge} />}\n                            </a>\n                          </li>\n                        ))}\n                      </ul>\n                    </div>\n                  </li>\n                ) : (\n                  <li key={l.label}>\n                    <a href={l.href} className={navLink}>\n                      {l.label}\n                    </a>\n                  </li>\n                ),\n              )}\n            </ul>\n          </nav>\n\n          <ZoeButton\n            href={login.href}\n            variant=\"outline\"\n            size=\"sm\"\n            icon={<UserRound aria-hidden className=\"size-3.5\" strokeWidth={1.75} />}\n            className=\"ml-auto hidden lg:inline-flex\"\n          >\n            {login.label}\n          </ZoeButton>\n\n          <button\n            type=\"button\"\n            aria-label={open ? menuLabels.close : menuLabels.open}\n            aria-expanded={open}\n            onClick={() => setOpen((o) => !o)}\n            className=\"-mr-2 ml-auto grid size-10 place-items-center text-foreground/60 lg:hidden\"\n          >\n            {open ? (\n              <X aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            ) : (\n              <Menu aria-hidden className=\"size-7\" strokeWidth={1.25} />\n            )}\n          </button>\n        </div>\n\n        {/* phone panel: drops in under the bar and fills the rest of the screen */}\n        <div\n          aria-hidden={!open}\n          className={cn(\n            \"absolute inset-x-0 top-full h-[calc(100svh-9.125rem)] overflow-y-auto border-t bg-background px-gutter pt-4 pb-10 transition-[opacity,translate,visibility] duration-300 ease-in-out motion-reduce:transition-none lg:hidden\",\n            open ? \"visible translate-y-0 opacity-100\" : \"invisible -translate-y-2 opacity-0\",\n          )}\n        >\n          <ul className=\"text-xl\">\n            {links.map((l) => (\n              <li key={l.label} className=\"border-b\">\n                <a href={l.href} tabIndex={open ? 0 : -1} className={cn(navLink, \"block py-4\")}>\n                  {l.label}\n                </a>\n                {l.children && (\n                  <ul className=\"-mt-1 pb-4 text-base\">\n                    {l.children.map((c) => (\n                      <li key={c.label}>\n                        <a href={c.href} tabIndex={open ? 0 : -1} className={cn(navLink, \"flex items-center py-2 pl-4\")}>\n                          {c.label}\n                          {c.badge && <Badge label={c.badge} />}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                )}\n              </li>\n            ))}\n          </ul>\n          <ZoeButton\n            href={login.href}\n            variant=\"outline\"\n            icon={<UserRound aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n            className=\"mt-8 w-full\"\n          >\n            {login.label}\n          </ZoeButton>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "zoe-button",
+    "zoe-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; }",
+      "required": true,
+      "description": "brand name for the wordmark, and where it links"
+    },
+    {
+      "name": "announcement",
+      "type": "{ text: string; link: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the navy strip above the bar: plain text, then a yellow link (leave out for no strip)"
+    },
+    {
+      "name": "links",
+      "type": "ZoeHeaderLink[]",
+      "required": true,
+      "description": "the bar's links"
+    },
+    {
+      "name": "login",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outlined button on the right"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": true,
+      "description": "screen-reader labels of the phone menu's open and close buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a2fd62932f55580b108bb2cf9726bce5501c521e3703cd922938d6d88418af4a"
+}

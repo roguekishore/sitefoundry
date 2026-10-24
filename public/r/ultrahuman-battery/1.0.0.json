@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman battery figure",
+  "description": "A white section with one big battery figure over a product render: 'label — 12 DAYS — label' in a row on desktop (stacked on phones) above a soft glow arc and a render filling the lower half. As it scrolls in, a title fades up and away, the labels slide in from the sides (from above and below on phones), the figure grows from 92% while its digits roll up from zero, and the glow arc sweeps in from the left.",
+  "category": "stats",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "figure",
+    "battery",
+    "light",
+    "minimal",
+    "scroll-driven",
+    "counter",
+    "odometer",
+    "slide-in",
+    "glow"
+  ],
+  "notes": [
+    "window-tall on desktop, content-sized (about 530px) on phones",
+    "CSS scroll-driven; static HTML and reduced motion show the figure (the title only appears while animating)"
+  ],
+  "entry": "ultrahuman-battery.tsx",
+  "name": "ultrahuman-battery",
+  "files": [
+    {
+      "path": "ultrahuman-battery.css",
+      "content": "/* Everything follows the section's view timeline while it scrolls into the window. Static HTML\n   (and reduced motion) shows the finished state: figure and labels in place, the title hidden. */\n.ultrahuman-battery {\n  view-timeline-name: --ultrahuman-battery;\n}\n.ultrahuman-battery-title {\n  opacity: 0;\n  visibility: hidden;\n}\n.ultrahuman-battery-strip {\n  transform: translateY(calc(var(--ultrahuman-battery-digit) * -10%));\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-battery-title {\n      visibility: visible;\n      animation: ultrahuman-battery-title-out linear both;\n      animation-timeline: --ultrahuman-battery;\n      animation-range: entry 45% entry 75%;\n    }\n    .ultrahuman-battery-before,\n    .ultrahuman-battery-after,\n    .ultrahuman-battery-stat,\n    .ultrahuman-battery-strip,\n    .ultrahuman-battery-arc {\n      animation: ultrahuman-battery-before cubic-bezier(0.22, 1, 0.36, 1) both;\n      animation-timeline: --ultrahuman-battery;\n      animation-range: entry 60% entry 100%;\n    }\n    .ultrahuman-battery-after { animation-name: ultrahuman-battery-after; }\n    .ultrahuman-battery-stat { animation-name: ultrahuman-battery-stat; }\n    .ultrahuman-battery-strip { animation-name: ultrahuman-battery-roll; }\n    .ultrahuman-battery-arc {\n      animation-name: ultrahuman-battery-arc;\n      animation-timing-function: linear;\n      animation-range: entry 30% entry 100%;\n    }\n  }\n}\n\n@keyframes ultrahuman-battery-title-out {\n  from { opacity: 1; transform: translateY(0); }\n  to { opacity: 0; transform: translateY(-24px); }\n}\n/* phones: labels come from above and below */\n@keyframes ultrahuman-battery-before {\n  from { opacity: 0; transform: translateY(56px); }\n}\n@keyframes ultrahuman-battery-after {\n  from { opacity: 0; transform: translateY(-56px); }\n}\n@keyframes ultrahuman-battery-stat {\n  from { opacity: 0; transform: scale(0.92); }\n}\n@keyframes ultrahuman-battery-roll {\n  from { transform: translateY(0); }\n}\n@keyframes ultrahuman-battery-arc {\n  from { clip-path: inset(0 100% 0 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n\n/* desktop: labels slide in from the sides */\n@media (min-width: 64rem) {\n  @keyframes ultrahuman-battery-before {\n    from { opacity: 0; transform: translateX(96px); }\n  }\n  @keyframes ultrahuman-battery-after {\n    from { opacity: 0; transform: translateX(-96px); }\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-battery.tsx",
+      "content": "// foundry-allow-text: the 0–9 strips behind each rolling digit are decorative glyphs.\nimport type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport \"./ultrahuman-battery.css\";\n\nexport interface UltrahumanBatteryProps {\n  /** the title shown first, which fades away as the figure arrives */\n  title: string;\n  /** the small label before the figure, e.g. \"Up to\" */\n  before: string;\n  /** the figure itself; its digits roll up from 0 while scrolling in, e.g. \"12\" */\n  value: string;\n  /** the word after the figure, e.g. \"Days\" */\n  unit: string;\n  /** the small label after the figure, e.g. \"Per charge\" */\n  after: string;\n  /** the product render filling the lower half (contain); a placeholder when empty */\n  media?: ReactNode;\n  /** the light-arc art drawn above the render; a soft glow band when empty */\n  arc?: ReactNode;\n  /** describes the render for screen readers when the placeholder shows */\n  mediaLabel?: string;\n  className?: string;\n}\n\nconst strip = Array.from({ length: 10 }, (_, n) => n);\n\n/** One big battery figure over a product render: the title gives way to \"label — figure — label\",\n *  the labels slide in from the sides (from above and below on phones), the figure grows in and\n *  its digits roll up, and a glow arc sweeps in from the left. */\nexport function UltrahumanBattery({ title, before, value, unit, after, media, arc, mediaLabel, className }: UltrahumanBatteryProps) {\n  return (\n    <section className={cn(\"ultrahuman-battery relative flex flex-col overflow-clip bg-background text-foreground lg:h-svh\", className)}>\n      <div className=\"grid place-items-center px-gutter pt-12 lg:absolute lg:inset-x-0 lg:top-[26%] lg:-translate-y-1/2 lg:pt-0\">\n        <h2 className=\"ultrahuman-battery-title text-center text-[1.75rem] leading-[1.18] tracking-[-0.035em] text-balance [grid-area:1/1] lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]\">\n          {title}\n        </h2>\n        <p className=\"flex flex-col items-center gap-4 text-center uppercase [grid-area:1/1] lg:flex-row lg:gap-0\">\n          <span className=\"ultrahuman-battery-before text-sm leading-none tracking-[-0.01em] text-foreground/50 lg:mr-16 lg:text-base\">{before}</span>\n          <span className=\"ultrahuman-battery-stat flex items-baseline text-5xl leading-none tracking-[-0.06em] lg:text-[3.5rem]\">\n            <span className=\"sr-only\">{value}</span>\n            <span aria-hidden className=\"ultrahuman-battery-digits flex\">\n              {value.split(\"\").map((char, i) =>\n                /\\d/.test(char) ? (\n                  <span key={i} className=\"relative inline-block h-[1em] overflow-clip\">\n                    <span className=\"invisible\">{char}</span>\n                    <span\n                      className=\"ultrahuman-battery-strip absolute inset-x-0 top-0 flex flex-col\"\n                      style={{ \"--ultrahuman-battery-digit\": char } as CSSProperties}\n                    >\n                      {strip.map((n) => (\n                        <span key={n} className=\"block h-[1em] text-center\">\n                          {n}\n                        </span>\n                      ))}\n                    </span>\n                  </span>\n                ) : (\n                  <span key={i}>{char}</span>\n                ),\n              )}\n            </span>\n            <span className=\"ml-[0.25em]\">{unit}</span>\n          </span>\n          <span className=\"ultrahuman-battery-after text-sm leading-none tracking-[-0.01em] text-foreground/50 lg:ml-12 lg:text-base\">{after}</span>\n        </p>\n      </div>\n\n      <div className=\"relative mt-11 h-[20rem] lg:absolute lg:inset-x-0 lg:top-[37%] lg:bottom-0 lg:mt-0 lg:h-auto\">\n        <div className=\"ultrahuman-battery-arc absolute top-0 left-1/2 aspect-[460/168] w-[118%] -translate-x-1/2 lg:aspect-[1440/209] lg:w-full\">\n          {arc ?? <UltrahumanPlaceholder tone=\"glow\" />}\n        </div>\n        <div className=\"absolute inset-x-0 bottom-0 aspect-[390/236] lg:aspect-[1450/441]\">\n          {media ?? <UltrahumanPlaceholder tone=\"soft\" label={mediaLabel} />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title shown first, which fades away as the figure arrives"
+    },
+    {
+      "name": "before",
+      "type": "string",
+      "required": true,
+      "description": "the small label before the figure, e.g. \"Up to\""
+    },
+    {
+      "name": "value",
+      "type": "string",
+      "required": true,
+      "description": "the figure itself; its digits roll up from 0 while scrolling in, e.g. \"12\""
+    },
+    {
+      "name": "unit",
+      "type": "string",
+      "required": true,
+      "description": "the word after the figure, e.g. \"Days\""
+    },
+    {
+      "name": "after",
+      "type": "string",
+      "required": true,
+      "description": "the small label after the figure, e.g. \"Per charge\""
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product render filling the lower half (contain); a placeholder when empty"
+    },
+    {
+      "name": "arc",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the light-arc art drawn above the render; a soft glow band when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the render for screen readers when the placeholder shows"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4633bd61d0a20493e4bc253c49ce30e8f891d33e13c58dc7d4460258bc74fbd1"
+}

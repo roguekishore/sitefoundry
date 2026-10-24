@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer footer",
+  "description": "A quiet black link footer: six columns of small groups (white group titles, grey links that turn white on hover, tiny \"new\" tags), two columns on phones, then one low row with the mark, a language picker, social icons, compliance badges, a blue-ticked status line and the copyright.",
+  "category": "footer",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "dark",
+    "minimal",
+    "columns",
+    "hover"
+  ],
+  "notes": [
+    "columns hold groups; on phones the groups re-flow into two balanced columns",
+    "social icons come in as nodes (the demo uses @tabler/icons-react)"
+  ],
+  "entry": "framer-footer.tsx",
+  "name": "framer-footer",
+  "files": [
+    {
+      "path": "framer-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, CircleCheck, Globe } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerMark } from \"@foundry/framer-mark\";\n\nexport interface FramerFooterLink {\n  /** link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** a tiny tag after the link (e.g. \"new\") */\n  badge?: string;\n}\n\nexport interface FramerFooterGroup {\n  /** the white group title */\n  title: string;\n  /** the grey links under it */\n  links: FramerFooterLink[];\n}\n\nexport interface FramerFooterProps {\n  /** the company name (read to screen readers by the mark) */\n  brand: string;\n  /** the mark in the bottom row */\n  mark: ReactNode;\n  /** desktop columns (six on the original), each a stack of groups */\n  columns: FramerFooterGroup[][];\n  /** the language picker's current language */\n  language?: string;\n  /** social links: an icon and a screen-reader label each */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** short compliance badge texts (e.g. \"ISO\", \"SOC 2\") */\n  badges?: string[];\n  /** the blue-ticked status link */\n  status?: { label: string; href: string };\n  /** the copyright line on the far right */\n  copyright: string;\n  className?: string;\n}\n\n/** Six link columns and a low utility row. */\nexport function FramerFooter({ brand, mark, columns, language, socials = [], badges = [], status, copyright, className }: FramerFooterProps) {\n  return (\n    <footer className={cn(\"bg-background px-gutter pt-12 pb-6 text-foreground lg:pt-12 lg:pb-4\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        {/* phones: groups flow into two columns · desktop: the given six columns */}\n        <div className=\"columns-2 gap-x-5 lg:grid lg:grid-cols-6 lg:gap-x-5\">\n          {columns.map((groups, c) => (\n            <div key={c} className=\"contents lg:block\">\n              {groups.map((group) => (\n                <div key={group.title} className=\"mb-7 break-inside-avoid lg:mb-7\">\n                  <h3 className=\"text-sm leading-[1.6875rem] font-medium tracking-[-0.01em] text-foreground\">{group.title}</h3>\n                  <ul>\n                    {group.links.map((link) => (\n                      <li key={link.label}>\n                        <a\n                          href={link.href}\n                          className=\"inline-flex items-center gap-1.5 text-sm leading-[1.6875rem] tracking-[-0.01em] text-muted-foreground transition-colors duration-150 ease-linear hover:text-foreground motion-reduce:transition-none\"\n                        >\n                          {link.label}\n                          {link.badge && (\n                            <span className=\"rounded-sm bg-secondary px-1 py-0.5 text-[0.4375rem] leading-none font-semibold tracking-[0.03em] text-foreground uppercase\">\n                              {link.badge}\n                            </span>\n                          )}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ))}\n            </div>\n          ))}\n        </div>\n\n        <div className=\"mt-8 flex flex-col items-start gap-6 lg:mt-6 lg:flex-row lg:items-center lg:justify-between lg:gap-4\">\n          <FramerMark brand={brand} mark={mark} hideName />\n          {language && (\n            <button type=\"button\" className=\"inline-flex items-center gap-1 text-[0.8125rem] font-medium text-foreground\">\n              <Globe aria-hidden className=\"size-4\" strokeWidth={1.75} />\n              {language}\n              <ChevronDown aria-hidden className=\"size-3.5\" strokeWidth={2} />\n            </button>\n          )}\n          {socials.length > 0 && (\n            <ul className=\"flex items-center gap-5\">\n              {socials.map((s) => (\n                <li key={s.label}>\n                  <a\n                    href={s.href}\n                    aria-label={s.label}\n                    className=\"flex size-5 items-center justify-center text-foreground transition-opacity duration-150 hover:opacity-70 motion-reduce:transition-none [&_svg]:size-5\"\n                  >\n                    {s.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          {badges.length > 0 && (\n            <ul className=\"flex items-center gap-4\">\n              {badges.map((b) => (\n                <li\n                  key={b}\n                  className=\"grid size-6 place-items-center rounded-full border border-muted-foreground/60 text-[0.375rem] leading-none font-bold text-foreground\"\n                >\n                  {b}\n                </li>\n              ))}\n            </ul>\n          )}\n          <div className=\"flex w-full items-center justify-between gap-8 lg:contents\">\n            {status && (\n              <a href={status.href} className=\"inline-flex items-center gap-1.5 text-xs font-medium text-foreground\">\n                <CircleCheck aria-hidden className=\"size-3.5 text-highlight\" strokeWidth={2} />\n                {status.label}\n              </a>\n            )}\n            <span className=\"text-xs font-medium text-foreground\">{copyright}</span>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-mark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name (read to screen readers by the mark)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mark in the bottom row"
+    },
+    {
+      "name": "columns",
+      "type": "FramerFooterGroup[][]",
+      "required": true,
+      "description": "desktop columns (six on the original), each a stack of groups"
+    },
+    {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "the language picker's current language"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "social links: an icon and a screen-reader label each"
+    },
+    {
+      "name": "badges",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "short compliance badge texts (e.g. \"ISO\", \"SOC 2\")"
+    },
+    {
+      "name": "status",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the blue-ticked status link"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line on the far right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3588e51441535904b27c5dbc04df1e7336ce7ed53088318d28a3cfae2f0f1420"
+}

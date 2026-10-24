@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot features",
+  "description": "A pale cyan band framed by hairlines: a centred semibold heading and roomy lede, then three rows that alternate a rounded, dot-textured cyan media card with a column holding a large line icon, a medium-weight title and a short line of copy; it ends on a big handwritten closing line with a cyan brush stroke. On phones each row stacks centred: icon, title, copy, then the card.",
+  "category": "features",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "alternating",
+    "zigzag",
+    "pastel",
+    "cyan",
+    "dots",
+    "script",
+    "light"
+  ],
+  "notes": [
+    "the band is accent at 20% and the cards are solid accent, so it follows the theme's accent colour"
+  ],
+  "entry": "pilot-features.tsx",
+  "source": "foundry",
+  "name": "pilot-features",
+  "files": [
+    {
+      "path": "pilot-features.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PilotBrushNote } from \"@foundry/pilot-brush-note\";\nimport { PilotHeading } from \"@foundry/pilot-heading\";\nimport { PilotPlaceholder } from \"@foundry/pilot-placeholder\";\n\nexport interface PilotFeature {\n  /** a large line icon or small illustration (about 100px) */\n  icon?: ReactNode;\n  /** the feature's title */\n  title: string;\n  /** one or two lines under it */\n  text: string;\n  /** the product screenshot set inside the cyan card; a placeholder panel when empty */\n  media?: ReactNode;\n}\n\nexport interface PilotFeaturesProps {\n  /** the section heading; \\n sets the desktop line breaks */\n  title: string;\n  /** the paragraph under it */\n  lede?: string;\n  /** the rows, alternating card left / card right */\n  items: PilotFeature[];\n  /** the handwritten closing line */\n  note?: string;\n  className?: string;\n}\n\n/** Pilot's 50/50 features: alternating dotted cyan cards and icon-led copy on a pale cyan band. */\nexport function PilotFeatures({ title, lede, items, note, className }: PilotFeaturesProps) {\n  return (\n    <section className={cn(\"bg-accent/20 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-border px-gutter pt-12 pb-16 lg:border-x lg:pt-20 lg:pb-20\">\n        <PilotHeading title={title} lede={lede} className=\"max-w-[40rem] lg:max-w-[50rem]\" />\n\n        <div className=\"mx-auto mt-16 grid max-w-[66.25rem] gap-16 lg:mt-20 lg:gap-10\">\n          {items.map((it, i) => {\n            const flip = i % 2 === 1;\n            return (\n              <div\n                key={it.title}\n                className={cn(\n                  \"grid items-center gap-6 lg:gap-14\",\n                  flip ? \"lg:grid-cols-[minmax(0,1fr)_minmax(0,43rem)]\" : \"lg:grid-cols-[minmax(0,43rem)_minmax(0,1fr)]\",\n                )}\n              >\n                <div className={cn(\"relative order-2 aspect-[342/210] overflow-clip rounded-2xl bg-accent lg:aspect-[688/422]\", !flip && \"lg:order-1\")}>\n                  <div\n                    aria-hidden\n                    className=\"absolute inset-0 bg-[radial-gradient(circle,color-mix(in_oklab,var(--accent-foreground)_28%,transparent)_1px,transparent_1.6px)] bg-[size:1.5625rem_1.5625rem] bg-[position:0.75rem_0.75rem]\"\n                  />\n                  <div className=\"absolute top-[13%] left-[12.5%] h-[74%] w-[70%]\">\n                    {it.media ?? <PilotPlaceholder tone=\"screen\" className=\"size-full rounded-sm\" />}\n                  </div>\n                </div>\n                <div className={cn(\"order-1 text-center lg:max-w-[20rem] lg:text-left\", !flip && \"lg:order-2\")}>\n                  {it.icon && (\n                    <div className=\"mx-auto flex size-20 items-center justify-center text-foreground lg:mx-0 lg:size-32 [&_svg]:size-14 lg:[&_svg]:size-24\">\n                      {it.icon}\n                    </div>\n                  )}\n                  <h3 className=\"mt-3 font-display text-[1.75rem] leading-[1.05] font-medium lg:mt-7 lg:text-[2rem]\">{it.title}</h3>\n                  <p className=\"mx-auto mt-4 max-w-[18rem] text-base leading-6 lg:mx-0 lg:mt-5 lg:max-w-none\">{it.text}</p>\n                </div>\n              </div>\n            );\n          })}\n        </div>\n\n        {note && <PilotBrushNote variant=\"script\" stroke=\"accent\" text={note} className=\"mt-16 lg:mt-28\" />}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "pilot-brush-note",
+    "pilot-heading",
+    "pilot-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading; \\n sets the desktop line breaks"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "items",
+      "type": "PilotFeature[]",
+      "required": true,
+      "description": "the rows, alternating card left / card right"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the handwritten closing line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3463c2a88a2901b46ffbb82edf76d5c4327f6f2d880a997aaac2004515648553"
+}

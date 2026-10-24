@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Galaxy pill button",
+  "description": "Fully rounded pill buttons: a solid one in the primary colour (white on the dark theme) with a trailing arrow that slides half its width on hover, and an outline one whose 1px border takes a signal colour (green, orange or blue) and washes faintly with it on hover.",
+  "category": "button",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "outline",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "hover timing is the original's 0.3s ease-in-out"
+  ],
+  "entry": "galaxy-button.tsx",
+  "name": "galaxy-button",
+  "files": [
+    {
+      "path": "galaxy-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport type GalaxyTone = \"highlight\" | \"chart-1\" | \"chart-2\";\n\nexport interface GalaxyButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** solid: primary fill with a trailing arrow · outline: a 1px coloured ring, no arrow */\n  variant?: \"solid\" | \"outline\";\n  /** the outline's colour: highlight (green), chart-1 (orange) or chart-2 (blue) */\n  tone?: GalaxyTone;\n  /** show the trailing arrow on a solid button (on by default) */\n  arrow?: boolean;\n  /** called on click (only when it renders a button) */\n  onClick?: () => void;\n  className?: string;\n}\n\nconst outlineTones: Record<GalaxyTone, string> = {\n  highlight: \"border-highlight hover:bg-highlight/15\",\n  \"chart-1\": \"border-chart-1 hover:bg-chart-1/15\",\n  \"chart-2\": \"border-chart-2 hover:bg-chart-2/15\",\n};\n\n/** The site's pill: 40px tall, 16px text set solid, 24px side padding. */\nexport function GalaxyButton({ children, href, variant = \"solid\", tone = \"chart-2\", arrow = true, onClick, className }: GalaxyButtonProps) {\n  const classes = cn(\n    \"group inline-flex h-10 shrink-0 items-center justify-center gap-4 rounded-full px-6 font-sans text-base leading-none whitespace-nowrap\",\n    \"transition-[background-color,color,opacity] duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variant === \"solid\" ? \"bg-primary text-primary-foreground hover:bg-primary/85\" : cn(\"border text-foreground\", outlineTones[tone]),\n    className,\n  );\n  const inner = (\n    <>\n      <span>{children}</span>\n      {variant === \"solid\" && arrow && (\n        <ArrowRight\n          aria-hidden\n          className=\"-mr-0.5 size-[1.125rem] transition-transform duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] group-hover:translate-x-1/2 motion-reduce:transition-none\"\n          strokeWidth={2}\n        />\n      )}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" onClick={onClick} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: primary fill with a trailing arrow · outline: a 1px coloured ring, no arrow"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "chart-2",
+      "description": "the outline's colour: highlight (green), chart-1 (orange) or chart-2 (blue)"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the trailing arrow on a solid button (on by default)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false,
+      "description": "called on click (only when it renders a button)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "24a5d64e2edc78f9389805aec9d483f697b19e40fab6fba567476ad19a7a6e04"
+}

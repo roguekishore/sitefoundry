@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway arriving-train CTA",
+  "description": "The closing call to action as a train pulling in: a long dark carriage over a platform slides in from the right as the section scrolls up and stops with its doorway centred; then the two doors slide apart and a bold heading, a grey line and a glowing magenta-violet button fade in behind them.",
+  "category": "cta",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "dark",
+    "scroll-driven",
+    "scrubbed",
+    "reveal",
+    "doors",
+    "glow",
+    "storytelling",
+    "developer"
+  ],
+  "notes": [
+    "carriage and platform are art slots; empty they are plain dark surfaces with hairlines (no drawing)",
+    "CSS only: a view() timeline with entry ranges, so the doors finish opening even when the block is last or alone",
+    "with reduced motion (or no scroll-timeline support) the doors rest open and the copy shows",
+    "best on dark themes"
+  ],
+  "entry": "railway-cta.tsx",
+  "source": "foundry",
+  "name": "railway-cta",
+  "files": [
+    {
+      "path": "railway-cta.css",
+      "content": "/* Resting state (no scroll timelines, or reduced motion): the doors are open and the copy shows. */\n.railway-cta-door-left { translate: -101% 0; }\n.railway-cta-door-right { translate: 101% 0; }\n\n/* The section's own view timeline drives everything. The ranges are \"entry\", which always\n   completes (even for a last section or a block shown alone): the carriage arrives over the\n   first 70% of the section entering, then the doors open over the rest. */\n.railway-cta {\n  view-timeline-name: --railway-cta;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .railway-cta-train {\n      animation: railway-cta-arrive linear both;\n      animation-timeline: --railway-cta;\n      animation-range: entry 0% entry 70%;\n    }\n    .railway-cta-door-left,\n    .railway-cta-door-right,\n    .railway-cta-copy {\n      animation-timing-function: ease-in-out;\n      animation-fill-mode: both;\n      animation-timeline: --railway-cta;\n      animation-range: entry 72% entry 100%;\n    }\n    .railway-cta-door-left { animation-name: railway-cta-door-left; }\n    .railway-cta-door-right { animation-name: railway-cta-door-right; }\n    .railway-cta-copy { animation-name: railway-cta-copy; }\n  }\n}\n\n@keyframes railway-cta-arrive {\n  from { translate: 70vw 0; }\n  to { translate: 0 0; }\n}\n\n@keyframes railway-cta-door-left {\n  from { translate: 0 0; }\n  to { translate: -101% 0; }\n}\n\n@keyframes railway-cta-door-right {\n  from { translate: 0 0; }\n  to { translate: 101% 0; }\n}\n\n@keyframes railway-cta-copy {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "railway-cta.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RailwayButton } from \"@foundry/railway-button\";\nimport \"./railway-cta.css\";\n\nexport interface RailwayCtaProps {\n  /** the heading revealed behind the doors */\n  title: string;\n  /** one grey line under it */\n  lead: string;\n  /** the glowing button */\n  action: { label: string; href: string };\n  /** art for the carriage body (an illustration); a plain dark surface when empty */\n  carriage?: ReactNode;\n  /** art for the platform floor; a plain hairline floor when empty */\n  platform?: ReactNode;\n  className?: string;\n}\n\n/**\n * The closing call to action as an arriving train: a long dark carriage slides in from the\n * right as the section scrolls up, stops with its doorway centred, then the two doors slide\n * apart and the heading, line and glowing button fade in behind them. Below it, a platform.\n */\nexport function RailwayCta({ title, lead, action, carriage, platform, className }: RailwayCtaProps) {\n  return (\n    <section className={cn(\"railway-cta relative overflow-clip text-foreground\", className)}>\n      <div className=\"relative h-[46.5rem]\">\n        <div className=\"railway-cta-train absolute inset-y-0 -inset-x-[100vw]\">\n          <div className=\"absolute inset-0\">\n            {carriage ?? (\n              <div className=\"size-full border-y border-foreground/10 bg-muted\">\n                <div className=\"h-[10.5rem] border-b border-foreground/10 bg-foreground/[0.04]\" />\n                <div className=\"h-[calc(100%-10.5rem)] bg-linear-to-b from-transparent via-glow/10 to-transparent\" />\n              </div>\n            )}\n          </div>\n\n          {/* the doorway: what sits behind the doors, and the doors that slide away */}\n          <div className=\"absolute top-[10.75rem] left-1/2 h-[34.75rem] w-[32.5rem] -translate-x-1/2 rounded-t-2xl border border-foreground/10 p-1.5 lg:w-[43.75rem]\">\n            <div className=\"relative size-full overflow-clip rounded-t-xl bg-background\">\n              <div className=\"railway-cta-copy absolute inset-x-0 top-0 flex flex-col items-center px-gutter pt-20 text-center\">\n                <h2 className=\"max-w-[22rem] text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em] lg:max-w-[28rem]\">{title}</h2>\n                <p className=\"mt-3 max-w-[20rem] text-base leading-6 text-muted-foreground lg:max-w-[26rem]\">{lead}</p>\n                <RailwayButton href={action.href} variant=\"glow\" size=\"md\" className=\"mt-8 px-6\">\n                  {action.label}\n                </RailwayButton>\n              </div>\n              <div className=\"railway-cta-door-left absolute inset-y-0 left-0 w-[calc(50%-0.3rem)] rounded-tl-xl border border-foreground/10 bg-secondary\" aria-hidden />\n              <div className=\"railway-cta-door-right absolute inset-y-0 right-0 w-[calc(50%-0.3rem)] rounded-tr-xl border border-foreground/10 bg-secondary\" aria-hidden />\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <div className=\"relative h-[12.8rem]\" aria-hidden={platform ? undefined : true}>\n        {platform ?? (\n          <div className=\"size-full border-t border-foreground/10\">\n            <div className=\"h-11 border-b border-foreground/10 bg-foreground/[0.02]\" />\n            <div className=\"h-12 border-b border-foreground/10 bg-[radial-gradient(var(--border)_1.5px,transparent_1.5px)] bg-[size:0.75rem_0.75rem]\" />\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "railway-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading revealed behind the doors"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one grey line under it"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the glowing button"
+    },
+    {
+      "name": "carriage",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art for the carriage body (an illustration); a plain dark surface when empty"
+    },
+    {
+      "name": "platform",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art for the platform floor; a plain hairline floor when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9195d614e541aa39f6f0e9dd3b88a7e403b8c3eb62128d4e18642d8fde15c656"
+}

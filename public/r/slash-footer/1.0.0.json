@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash footer",
+  "description": "A tall dark footer: a serif wordmark beside five columns of grey links under white titles (two columns on phones), a row with the copyright, a cookie link, social icons and an outlined app badge over a hairline, then numbered small print paragraphs and an address in dim grey.",
+  "category": "footer",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "legal",
+    "minimal",
+    "columns"
+  ],
+  "notes": [
+    "social and app icons come in as props (lucide or your own)"
+  ],
+  "entry": "slash-footer.tsx",
+  "source": "foundry",
+  "name": "slash-footer",
+  "files": [
+    {
+      "path": "slash-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface SlashFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface SlashFooterProps {\n  /** the company name, set as a serif wordmark */\n  wordmark: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** link groups, each with a white title */\n  groups: { title: string; links: SlashFooterLink[] }[];\n  /** the copyright line */\n  copyright: string;\n  /** a link beside the copyright (\"Cookie settings\") */\n  cookies?: SlashFooterLink;\n  /** social links: an icon each (e.g. from lucide) and an accessible label */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** the app download badge: an icon, a small top line and a bigger second line */\n  app?: { href: string; icon: ReactNode; small: string; big: string };\n  /** numbered footnotes and small print, one paragraph each */\n  legal: ReactNode[];\n  /** the company's name and address lines at the very end */\n  address?: string[];\n  className?: string;\n}\n\nconst link = \"transition-colors duration-150 ease-[cubic-bezier(.4,0,.2,1)] hover:text-foreground motion-reduce:transition-none\";\n\n/** A tall dark footer: wordmark and five link columns, a copyright row with socials and an app badge, then the small print. */\nexport function SlashFooter({ wordmark, homeHref = \"#\", groups, copyright, cookies, socials, app, legal, address, className }: SlashFooterProps) {\n  const badge = app && (\n    <a href={app.href} className={cn(\"flex h-10 items-center gap-2 rounded-lg border border-foreground/15 px-2.5 text-foreground hover:border-foreground/40\", link)}>\n      {app.icon}\n      <span className=\"leading-none\">\n        <span className=\"block text-[0.5625rem] font-medium\">{app.small}</span>\n        <span className=\"block text-[1.0625rem] font-semibold tracking-[-0.02em]\">{app.big}</span>\n      </span>\n    </a>\n  );\n  const social = (\n    <ul className=\"flex items-center gap-6\">\n      {socials.map((s) => (\n        <li key={s.label}>\n          <a href={s.href} aria-label={s.label} className={cn(\"text-foreground hover:text-muted-foreground [&_svg]:size-5\", link)}>\n            {s.icon}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n\n  return (\n    <footer className={cn(\"border-t border-border bg-background pt-8 pb-14 text-foreground lg:pt-10 lg:pb-8\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"lg:flex lg:gap-12\">\n          <a href={homeHref} className={cn(\"font-display text-[1.75rem] leading-none font-medium tracking-[-0.03em] hover:text-muted-foreground lg:text-[1.625rem]\", link)}>\n            {wordmark}\n          </a>\n          <div className=\"mt-10 grid grid-cols-2 gap-x-3 gap-y-14 lg:mt-0 lg:flex-1 lg:grid-cols-5 lg:gap-x-6\">\n            {groups.map((group) => (\n              <nav key={group.title} aria-label={group.title}>\n                <h3 className=\"text-base font-medium tracking-[-0.02em]\">{group.title}</h3>\n                <ul className=\"mt-5 space-y-3.5 lg:mt-5\">\n                  {group.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className={cn(\"text-base leading-[1.4] tracking-[0.005em] text-muted-foreground\", link)}>\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </nav>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-16 flex flex-col gap-6 border-b border-border pb-5 lg:mt-[5.5rem] lg:flex-row-reverse lg:items-center lg:justify-between lg:gap-0\">\n          <div className=\"flex items-center gap-8 lg:flex-row-reverse lg:gap-6\">\n            {badge}\n            {social}\n          </div>\n          <div className=\"flex flex-col gap-4 text-muted-foreground lg:flex-row lg:items-center lg:gap-4\">\n            <p className=\"text-sm tracking-[-0.02em]\">{copyright}</p>\n            {cookies && (\n              <>\n                <span aria-hidden className=\"hidden size-1 rounded-full bg-muted-foreground/50 lg:block\" />\n                <a href={cookies.href} className={cn(\"text-center text-base tracking-[-0.01em] lg:text-left\", link)}>\n                  {cookies.label}\n                </a>\n              </>\n            )}\n          </div>\n        </div>\n\n        <div className=\"mt-6 space-y-6 text-sm leading-[1.5] tracking-[-0.02em] text-muted-foreground/75 [&_a]:font-semibold [&_a]:text-muted-foreground [&_a:hover]:text-foreground\">\n          {legal.map((para, i) => (\n            <p key={i}>{para}</p>\n          ))}\n          {address && (\n            <p>\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </p>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a serif wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "groups",
+      "type": "{ title: string; links: SlashFooterLink[]; }[]",
+      "required": true,
+      "description": "link groups, each with a white title"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "cookies",
+      "type": "SlashFooterLink",
+      "required": false,
+      "description": "a link beside the copyright (\"Cookie settings\")"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links: an icon each (e.g. from lucide) and an accessible label"
+    },
+    {
+      "name": "app",
+      "type": "{ href: string; icon: ReactNode; small: string; big: string; }",
+      "required": false,
+      "description": "the app download badge: an icon, a small top line and a bigger second line"
+    },
+    {
+      "name": "legal",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "numbered footnotes and small print, one paragraph each"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": false,
+      "description": "the company's name and address lines at the very end"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b6c511720f65f16d387aae83ca4b8ef507a5f4000d477e5b94b98870a6ee3267"
+}

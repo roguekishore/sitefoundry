@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ezra footer",
+  "description": "A midnight footer laid out as one full-width row of hairline cells: the co-brand wordmark in the first, then link columns, each under a 34px light serif heading, with 16px cream links on a 32px rhythm and an optional region picker; a tiny centred copyright below. On phones the wordmark centres and each column becomes its own bordered box.",
+  "category": "footer",
+  "site": "ezra",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "grid",
+    "hairline",
+    "serif",
+    "links",
+    "minimal"
+  ],
+  "notes": [
+    "always dark: scopes `dark` and reads the theme's .dark colours",
+    "the cell row spans the window edge to edge, as the original"
+  ],
+  "entry": "ezra-footer.tsx",
+  "source": "foundry",
+  "name": "ezra-footer",
+  "files": [
+    {
+      "path": "ezra-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface EzraFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface EzraFooterColumn {\n  /** the serif heading */\n  title: string;\n  /** its links */\n  links: EzraFooterLink[];\n  /** a region/country picker under the links (shown with a chevron) */\n  region?: EzraFooterLink;\n}\n\nexport interface EzraFooterProps {\n  /** the wordmark in the first cell (e.g. an EzraLockup) */\n  logo: ReactNode;\n  /** accessible name of the wordmark link */\n  logoLabel: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the link columns, one cell each */\n  columns: EzraFooterColumn[];\n  /** the tiny line at the bottom (\"© 2026 Kestrel\") */\n  copyright: string;\n  className?: string;\n}\n\nconst linkClass = \"text-base leading-[2.5] transition-colors duration-200 hover:text-highlight motion-reduce:transition-none lg:leading-[2]\";\n\n/** Midnight footer: a full-width row of hairline cells with serif headings. */\nexport function EzraFooter({ logo, logoLabel, homeHref = \"#\", columns, copyright, className }: EzraFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background pt-8 text-foreground lg:pt-16\", className)}>\n      <div className=\"border-t border-border lg:flex lg:border-b\">\n        <div className=\"flex justify-center pt-8.5 pb-8.5 lg:w-48 lg:shrink-0 xl:w-65 lg:justify-start lg:border-x lg:border-border lg:px-6 lg:pt-8.5 xl:px-7.5\">\n          <a href={homeHref} aria-label={logoLabel} className=\"text-[1.6rem] lg:text-[1.5rem]\">\n            {logo}\n          </a>\n        </div>\n        <ul className=\"mx-gutter lg:mx-0 lg:flex lg:flex-auto\">\n          {columns.map((column) => (\n            <li\n              key={column.title}\n              className=\"-mt-px border border-border px-4.5 pt-6 pb-9 first:mt-0 lg:mt-0 lg:min-w-0 lg:flex-auto lg:border-y-0 lg:border-l-0 lg:px-4 lg:pt-9 lg:pb-16 xl:px-6\"\n            >\n              <h2 className=\"font-display text-[1.8rem] leading-[1.1] font-[350] tracking-[-0.01em] lg:text-[1.7rem] xl:text-[2.15rem]\">{column.title}</h2>\n              <ul className=\"mt-2.5 flex flex-col lg:mt-3.5\">\n                {column.links.map((link) => (\n                  <li key={link.label}>\n                    <a href={link.href} className={linkClass}>\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n              {column.region && (\n                <a href={column.region.href} className={cn(linkClass, \"mt-4 inline-flex items-center gap-8 lg:mt-5\")}>\n                  {column.region.label}\n                  <ChevronDown aria-hidden className=\"size-4.5\" strokeWidth={2.5} />\n                </a>\n              )}\n            </li>\n          ))}\n        </ul>\n      </div>\n      <p className=\"mt-5 border-t border-border py-8 text-center text-xs lg:mt-0 lg:border-t-0 lg:pt-6.5 lg:pb-7\">{copyright}</p>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark in the first cell (e.g. an EzraLockup)"
+    },
+    {
+      "name": "logoLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the wordmark link"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "columns",
+      "type": "EzraFooterColumn[]",
+      "required": true,
+      "description": "the link columns, one cell each"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the tiny line at the bottom (\"© 2026 Kestrel\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "76a570ebf887e661d4d71586ea46961d058b942962cefe770d74b82d3b43aaf1"
+}

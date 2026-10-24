@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "K2 Space media frame",
+  "description": "A stand-in for any photo or video: a square-cornered dark surface with a faint blue light rising from the bottom edge, that crops a real image or video like object-fit cover. With scrub on, its content settles from 115% and a 6px blur to sharp while the frame scrolls into view.",
+  "category": "card",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "placeholder",
+    "media",
+    "frame",
+    "dark",
+    "scrubbed",
+    "scale",
+    "blur",
+    "scroll-driven"
+  ],
+  "notes": [
+    "empty, it is aria-hidden and never draws the subject it replaces",
+    "it carries its own `dark` scope so it reads as footage on a light page too",
+    "the scrub is CSS only (off under reduced motion); pass timeline when the frame sits inside a horizontal scroller"
+  ],
+  "entry": "k2space-media.tsx",
+  "source": "foundry",
+  "name": "k2space-media",
+  "files": [
+    {
+      "path": "k2space-media.css",
+      "content": "/* Scrubbed settle: 115% and 6px blur → 100% and sharp, from the frame's top at ~80% of the\n   window until it nears the top. Uses the frame's own view timeline unless one is named. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-media-scrub {\n      animation: k2space-media-settle linear both;\n      animation-timeline: var(--k2space-media-timeline, view());\n      animation-range: cover 5% cover 50%;\n    }\n  }\n}\n\n@keyframes k2space-media-settle {\n  from {\n    transform: scale(1.15);\n    filter: blur(6px);\n  }\n  to {\n    transform: none;\n    filter: none;\n  }\n}\n"
+    },
+    {
+      "path": "k2space-media.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./k2space-media.css\";\n\nexport interface K2spaceMediaProps {\n  /** a real image or video; it is cropped to the frame like object-fit cover */\n  media?: ReactNode;\n  /** settle the content from 115% and blurred to sharp while the frame scrolls into view */\n  scrub?: boolean;\n  /** a named view timeline to scrub on (e.g. \"--my-row\") instead of the frame's own; needed inside a horizontal scroller */\n  timeline?: string;\n  /** size, aspect ratio, radius and position of the frame */\n  className?: string;\n}\n\n/**\n * A media frame. Filled, it crops whatever it holds; empty, it is a plain dark surface with a\n * soft glow from the bottom edge, never a drawing of the scene it stands in for.\n */\nexport function K2spaceMedia({ media, scrub = false, timeline, className }: K2spaceMediaProps) {\n  return (\n    <div aria-hidden={media ? undefined : true} className={cn(\"dark relative overflow-clip bg-background\", className)}>\n      <div\n        className={cn(\n          \"absolute inset-0\",\n          scrub && \"k2space-media-scrub\",\n          !media && \"bg-muted bg-radial-[ellipse_90%_70%_at_50%_100%] from-glow/22 via-glow/6 to-transparent\",\n          \"[&>img]:absolute [&>img]:inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:absolute [&>video]:inset-0 [&>video]:size-full [&>video]:object-cover\",\n        )}\n        style={timeline ? ({ \"--k2space-media-timeline\": timeline } as CSSProperties) : undefined}\n      >\n        {media}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video; it is cropped to the frame like object-fit cover"
+    },
+    {
+      "name": "scrub",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "settle the content from 115% and blurred to sharp while the frame scrolls into view"
+    },
+    {
+      "name": "timeline",
+      "type": "string",
+      "required": false,
+      "description": "a named view timeline to scrub on (e.g. \"--my-row\") instead of the frame's own; needed inside a horizontal scroller"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, aspect ratio, radius and position of the frame"
+    }
+  ],
+  "hash": "acbaba2748427f4fea8a618af553d899c992303f81616e0d4346dfd6d8031992"
+}

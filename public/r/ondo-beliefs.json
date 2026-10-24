@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo belief statements",
+  "description": "A tall, nearly empty white band that turns over three convictions one at a time: a small label, then a large two-tone statement (ink title, grey supporting line) that cross-fades and lifts in every six seconds, with three numbered 36px circles (the current one filled grey, the others faint rings) to jump between them, bottom-right on desktop and centred on phones.",
+  "category": "features",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "values",
+    "statements",
+    "autoplay",
+    "crossfade",
+    "pagination",
+    "minimal",
+    "light",
+    "typographic"
+  ],
+  "notes": [
+    "autoplay stops under reduced motion; the circles still switch statements"
+  ],
+  "hydrate": "visible",
+  "entry": "ondo-beliefs.tsx",
+  "name": "ondo-beliefs",
+  "files": [
+    {
+      "path": "ondo-beliefs.css",
+      "content": "/* Each new statement fades and lifts in. */\n@media (prefers-reduced-motion: no-preference) {\n  .ondo-beliefs-in {\n    animation: ondo-beliefs-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;\n  }\n}\n\n@keyframes ondo-beliefs-in {\n  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }\n  to { opacity: 1; transform: none; filter: none; }\n}\n"
+    },
+    {
+      "path": "ondo-beliefs.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ondo-beliefs.css\";\n\nexport interface OndoBelief {\n  /** the conviction, in ink */\n  title: string;\n  /** a supporting line, in grey */\n  text: string;\n}\n\nexport interface OndoBeliefsProps {\n  /** the small label (the section's heading) */\n  label: string;\n  /** the statements, shown one at a time */\n  items: OndoBelief[];\n  /** seconds per statement */\n  interval?: number;\n  className?: string;\n}\n\n/** Three convictions, one at a time, with numbered circles. */\nexport function OndoBeliefs({ label, items, interval = 6, className }: OndoBeliefsProps) {\n  const [index, setIndex] = useState(0);\n  const reduce = useReducedMotion();\n  const count = items.length;\n\n  useEffect(() => {\n    if (reduce || count < 2) return;\n    const timer = setTimeout(() => setIndex((i) => (i + 1) % count), interval * 1000);\n    return () => clearTimeout(timer);\n  }, [index, reduce, count, interval]);\n\n  const item = items[index];\n\n  return (\n    <section className={cn(\"bg-background py-section lg:py-[3.75rem]\", className)}>\n      <div className=\"mx-auto flex min-h-[34rem] max-w-page flex-col px-gutter lg:min-h-[48.75rem] lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <h2 className=\"text-sm font-medium text-foreground/70 lg:text-base\">{label}</h2>\n        <div className=\"my-auto py-12\" aria-live=\"polite\">\n          <p key={index} className=\"ondo-beliefs-in max-w-[60rem] font-display text-[2rem] leading-[1.08] font-medium tracking-[-0.03em] lg:text-[3rem] lg:leading-[1.05]\">\n            <span className=\"block text-foreground\">{item.title}</span>\n            <span className=\"block text-foreground/50\">{item.text}</span>\n          </p>\n        </div>\n        <div className=\"flex justify-center gap-2 lg:justify-end\">\n          {items.map((belief, i) => (\n            <button\n              key={belief.title}\n              type=\"button\"\n              aria-label={belief.title}\n              aria-current={i === index || undefined}\n              onClick={() => setIndex(i)}\n              className={cn(\n                \"grid size-9 place-items-center rounded-full text-sm text-muted-foreground transition-colors duration-300 ease-out motion-reduce:transition-none\",\n                i === index ? \"bg-accent\" : \"shadow-[inset_0_0_0_3px_color-mix(in_oklab,var(--foreground)_10%,transparent)] hover:bg-muted\",\n              )}\n            >\n              {String(i + 1).padStart(2, \"0\")}\n            </button>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small label (the section's heading)"
+    },
+    {
+      "name": "items",
+      "type": "OndoBelief[]",
+      "required": true,
+      "description": "the statements, shown one at a time"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds per statement"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ace77fe9480bf3b363315ecbd2601b068c61ec954fd9bed90d39dafcaad9f21c"
+}

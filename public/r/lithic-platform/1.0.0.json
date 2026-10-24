@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic platform tabs",
+  "description": "A centred 32px headline over a big lavender card: copy with amethyst check bullets and a white pill on the left, a stack of three floating white panels in the middle, and a right-aligned list of tab names that steps through on its own. A small ring in the corner fills while each tab is shown, then the next tab fades in. On phones the tabs sit in a 2×2 grid on top.",
+  "category": "features",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "autoplay",
+    "lavender",
+    "light",
+    "progress",
+    "crossfade",
+    "contours"
+  ],
+  "notes": [
+    "uses accent (lavender) for the card and accent-foreground (amethyst) for its ink",
+    "autoplay: each tab shows for `interval` ms, driven by the ring's CSS animation; a click jumps to a tab; no autoplay with reduced motion",
+    "the visual is a media slot per tab; empty, it is three white rounded placeholders the size of the original's floating panels"
+  ],
+  "hydrate": "visible",
+  "entry": "lithic-platform.tsx",
+  "source": "foundry",
+  "name": "lithic-platform",
+  "files": [
+    {
+      "path": "lithic-platform.css",
+      "content": "/* The ring fills over one interval; when its animation ends the block moves to the next tab.\n   The pane fades in whenever the tab changes. */\n.lithic-platform-ring {\n  stroke-dasharray: 100;\n  stroke-dashoffset: 100;\n  animation: lithic-platform-ring var(--lithic-platform-interval, 6000ms) linear forwards;\n}\n.lithic-platform-pane {\n  animation: lithic-platform-fade 0.25s ease both;\n}\n\n@keyframes lithic-platform-ring {\n  to { stroke-dashoffset: 0; }\n}\n@keyframes lithic-platform-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .lithic-platform-ring { animation: none; stroke-dashoffset: 0; }\n  .lithic-platform-pane { animation: none; }\n}\n"
+    },
+    {
+      "path": "lithic-platform.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { CircleCheck } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicButton } from \"@foundry/lithic-button\";\nimport { LithicContours } from \"@foundry/lithic-contours\";\nimport { LithicPlaceholder } from \"@foundry/lithic-placeholder\";\nimport \"./lithic-platform.css\";\n\nexport interface LithicPlatformTab {\n  /** the tab's name in the list */\n  label: string;\n  /** the pane's heading */\n  title: string;\n  /** the pane's paragraph */\n  text: string;\n  /** the checked bullet points */\n  bullets: string[];\n  /** the white pill under the bullets */\n  link: { label: string; href: string };\n  /** the visual in the middle. Three floating placeholders when empty */\n  media?: ReactNode;\n}\n\nexport interface LithicPlatformProps {\n  /** the headline above the card */\n  title: string;\n  /** two to six tabs */\n  tabs: LithicPlatformTab[];\n  /** how long each tab shows before the next, in ms */\n  interval?: number;\n  /** accessible name of the tab list */\n  tabsLabel: string;\n  className?: string;\n}\n\nfunction Stack() {\n  return (\n    <div className=\"flex w-[12.75rem] flex-col items-center gap-2 lg:w-[20.8rem] lg:gap-[0.875rem]\">\n      <LithicPlaceholder tone=\"card\" className=\"aspect-[259/139] w-[78%] rounded-[0.85rem] lg:rounded-[1.35rem]\" />\n      <LithicPlaceholder tone=\"card\" className=\"aspect-[333/77] w-full rounded-[0.85rem] lg:rounded-[1.35rem]\" />\n      <LithicPlaceholder tone=\"card\" className=\"aspect-[259/103] w-[78%] rounded-[0.85rem] lg:rounded-[1.35rem]\" />\n    </div>\n  );\n}\n\n/** Self-advancing product tabs on a lavender card, with a progress ring. */\nexport function LithicPlatform({ title, tabs, interval = 6000, tabsLabel, className }: LithicPlatformProps) {\n  const [active, setActive] = useState(0);\n  const tab = tabs[active] ?? tabs[0];\n  const next = () => setActive((i) => (i + 1) % tabs.length);\n\n  const tabList = (\n    <div role=\"tablist\" aria-label={tabsLabel} className=\"grid grid-cols-2 gap-x-6 gap-y-4 lg:flex lg:flex-col lg:items-end lg:gap-[1.15rem]\">\n      {tabs.map((t, i) => (\n        <button\n          key={t.label}\n          type=\"button\"\n          role=\"tab\"\n          aria-selected={i === active}\n          onClick={() => setActive(i)}\n          className={cn(\n            \"w-fit text-left text-sm/[1.2] font-semibold tracking-[-0.01em] transition-colors duration-200 lg:text-right lg:text-2xl/[1.2] lg:tracking-[-0.02em] motion-reduce:transition-none\",\n            i === active ? \"text-accent-foreground\" : \"text-accent-foreground/45 hover:text-accent-foreground/70\",\n          )}\n        >\n          {t.label}\n        </button>\n      ))}\n    </div>\n  );\n\n  return (\n    <section className={cn(\"bg-background px-gutter pt-12 pb-[4.5rem] text-foreground lg:pt-[4.6rem] lg:pb-[7.4rem]\", className)}>\n      <h2 className=\"mx-auto max-w-[20rem] text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] sm:max-w-none lg:text-[2rem]/[1.2]\">{title}</h2>\n      <div\n        className=\"relative isolate mx-auto mt-6 grid max-w-[74rem] overflow-clip rounded-lg bg-accent px-6 pt-8 pb-14 lg:mt-[2.35rem] lg:h-[31.25rem] lg:grid-cols-[22rem_1fr_auto] lg:items-center lg:gap-10 lg:px-16 lg:py-0\"\n        style={{ \"--lithic-platform-interval\": `${interval}ms` } as CSSProperties}\n      >\n        <LithicContours shape=\"ellipse\" gap={14} at=\"50% 50%\" className=\"-z-10 text-accent-foreground/15 max-lg:top-[45%] max-lg:left-[60%] lg:inset-x-[28%] lg:-inset-y-[10%]\" />\n        <div className=\"lg:order-3\">{tabList}</div>\n        <div key={`text-${active}`} role=\"tabpanel\" className=\"lithic-platform-pane mt-10 lg:order-1 lg:mt-0\">\n          <h3 className=\"font-display text-xl/[1.2] font-semibold tracking-[-0.02em] lg:text-2xl/[1.2]\">{tab.title}</h3>\n          <p className=\"mt-6 max-w-[22rem] text-sm/[1.45] lg:mt-[1.4rem] lg:text-base/[1.4]\">{tab.text}</p>\n          <ul className=\"mt-8 flex flex-col gap-3 lg:mt-[1.9rem] lg:gap-[0.6rem]\">\n            {tab.bullets.map((b) => (\n              <li key={b} className=\"flex items-center gap-2.5 text-base font-semibold text-accent-foreground lg:text-sm\">\n                <CircleCheck aria-hidden className=\"size-5 shrink-0 fill-accent-foreground stroke-accent lg:size-[1.125rem]\" strokeWidth={2} />\n                {b}\n              </li>\n            ))}\n          </ul>\n          <LithicButton href={tab.link.href} variant=\"light\" className=\"mt-10 w-[9.25rem] lg:mt-[2.6rem]\">\n            {tab.link.label}\n          </LithicButton>\n        </div>\n        <div key={`media-${active}`} className=\"lithic-platform-pane mt-16 flex justify-center lg:order-2 lg:mt-0\">\n          {tab.media ?? <Stack />}\n        </div>\n        <svg aria-hidden viewBox=\"0 0 36 36\" className=\"absolute right-5 bottom-8 size-7 -rotate-90 text-accent-foreground lg:right-[2.6rem] lg:bottom-[2.6rem]\">\n          <circle cx=\"18\" cy=\"18\" r=\"15\" fill=\"none\" stroke=\"currentColor\" strokeOpacity={0.15} strokeWidth={4} />\n          <circle\n            key={`ring-${active}`}\n            cx=\"18\"\n            cy=\"18\"\n            r=\"15\"\n            fill=\"none\"\n            stroke=\"currentColor\"\n            strokeWidth={4}\n            strokeLinecap=\"round\"\n            pathLength={100}\n            className=\"lithic-platform-ring\"\n            onAnimationEnd={next}\n          />\n        </svg>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-button",
+    "lithic-contours",
+    "lithic-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline above the card"
+    },
+    {
+      "name": "tabs",
+      "type": "LithicPlatformTab[]",
+      "required": true,
+      "description": "two to six tabs"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6000",
+      "description": "how long each tab shows before the next, in ms"
+    },
+    {
+      "name": "tabsLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the tab list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "93cd91a84f218f20d170df03d13761edef513b43c333c106ef3be0f0244e14e1"
+}

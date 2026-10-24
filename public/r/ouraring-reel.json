@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Oura Ring category reel",
+  "description": "A horizontal reel of tall photo cards running off the right edge: each card has a frosted icon chip top-left, a cream plus button top-right and a light 40px grotesk line over a dark fade at the bottom. Under it a hairline and a bare left arrow beside a dark round right arrow. While the page scrolls the photo inside each card drifts slower than the page (scrubbed parallax); hovering a card zooms its photo a touch.",
+  "category": "features",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "reel",
+    "cards",
+    "photo",
+    "scroll-snap",
+    "parallax",
+    "scrubbed",
+    "hover-zoom",
+    "warm",
+    "light"
+  ],
+  "notes": [
+    "cards are 493×626 on desktop and 312×317 on phones (80% of the screen, the next one peeks in)",
+    "the parallax reads a view timeline named on the section, because the track itself is a horizontal scroll container",
+    "the arrows need JavaScript (hydrate visible); swiping and the scroll-snap work without it",
+    "photo slots are empty warm-ink panels until filled; the cards are dark-scoped so their type stays cream"
+  ],
+  "hydrate": "visible",
+  "entry": "ouraring-reel.tsx",
+  "source": "foundry",
+  "name": "ouraring-reel",
+  "files": [
+    {
+      "path": "ouraring-reel.css",
+      "content": "/* The track starts at the page's content edge and runs to the window's right edge. */\n.ouraring-reel-track {\n  --ouraring-reel-inset: max(var(--page-gutter), calc((100vw - var(--page-width)) / 2 + var(--page-gutter)));\n  padding-inline: var(--ouraring-reel-inset);\n  scroll-padding-inline: var(--ouraring-reel-inset);\n}\n\n/* Scrubbed parallax: the photo inside each card drifts from -78px to +39px (phones) and from\n   -138px to +69px (desktop) while the section crosses the window. The track is a horizontal\n   scroll container, so an anonymous view() would follow it and freeze; the timeline is named\n   on the section instead (its scroller is the page) and read by every photo. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ouraring-reel {\n      view-timeline-name: --ouraring-reel;\n    }\n    .ouraring-reel-drift {\n      --ouraring-reel-from: -78px;\n      --ouraring-reel-to: 39px;\n      animation: ouraring-reel-drift linear both;\n      animation-timeline: --ouraring-reel;\n      animation-range: cover 0% cover 100%;\n    }\n    /* each card's line fades in as the reel enters (same named timeline) */\n    .ouraring-reel-fade {\n      animation: ouraring-reel-fade linear both;\n      animation-timeline: --ouraring-reel;\n      animation-range: entry 120px entry 420px;\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {\n    .ouraring-reel-drift {\n      --ouraring-reel-from: -138px;\n      --ouraring-reel-to: 69px;\n    }\n  }\n}\n\n@keyframes ouraring-reel-drift {\n  from { translate: 0 var(--ouraring-reel-from); }\n  to { translate: 0 var(--ouraring-reel-to); }\n}\n@keyframes ouraring-reel-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "ouraring-reel.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OuraringRoundButton } from \"@foundry/ouraring-button\";\nimport { OuraringMedia } from \"@foundry/ouraring-media\";\nimport \"./ouraring-reel.css\";\n\nexport interface OuraringReelCard {\n  /** the small label in the chip, e.g. \"Rest and Recovery\" */\n  label: string;\n  /** a small line icon before the label (lucide) */\n  icon?: ReactNode;\n  /** the line at the bottom of the card */\n  title: ReactNode;\n  /** where the card (and its plus button) leads */\n  href: string;\n  /** the card's photo (cover) */\n  media?: ReactNode;\n}\n\nexport interface OuraringReelProps {\n  cards: OuraringReelCard[];\n  /** screen-reader labels for the arrows and the plus buttons */\n  labels?: { previous: string; next: string; more: string };\n  className?: string;\n}\n\nexport function OuraringReel({ cards, labels = { previous: \"Previous\", next: \"Next\", more: \"Learn more\" }, className }: OuraringReelProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.querySelector(\"li\");\n    if (!el || !card) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + 24), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"ouraring-reel bg-background pt-[60px] pb-[60px] text-foreground lg:pt-[68px] lg:pb-[72px]\", className)}>\n      <ul\n        ref={track}\n        className=\"ouraring-reel-track flex snap-x snap-mandatory gap-6 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden\"\n      >\n        {cards.map((card, i) => (\n          <li key={i} className=\"dark group relative aspect-[312/317] w-[80vw] max-w-[493px] shrink-0 snap-start overflow-clip rounded-lg bg-background text-foreground lg:aspect-[493/626]\">\n            <div className=\"ouraring-reel-drift absolute inset-x-0 -top-[44px] -bottom-[84px] lg:-top-[74px] lg:-bottom-[144px]\">\n              <OuraringMedia\n                media={card.media}\n                tone=\"deep\"\n                className=\"size-full transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-105 motion-reduce:transition-none\"\n              />\n            </div>\n            <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-b from-transparent to-background/80\" />\n\n            <div className=\"absolute inset-x-6 top-6 flex items-start justify-between gap-3\">\n              <span className=\"flex h-11 items-center gap-3 rounded-full bg-background/40 px-4 text-[12px] tracking-[0.02em] backdrop-blur-md lg:h-[52px] lg:px-6 [&_svg]:size-5\">\n                {card.icon}\n                {card.label}\n              </span>\n              <a\n                href={card.href}\n                aria-label={labels.more}\n                className=\"flex size-11 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-[filter] duration-150 hover:brightness-90 lg:size-[52px]\"\n              >\n                <Plus aria-hidden strokeWidth={1.5} className=\"size-5\" />\n              </a>\n            </div>\n\n            <div className=\"ouraring-reel-fade absolute inset-x-6 bottom-7\">\n              <a href={card.href} className=\"block max-w-[8.6em] text-[28px] leading-none font-[250] tracking-[-0.02em] lg:text-[40px]\">\n                {card.title}\n              </a>\n            </div>\n          </li>\n        ))}\n      </ul>\n\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"mt-8 flex items-center justify-end gap-6 border-t border-border pt-6\">\n          <OuraringRoundButton tone=\"bare\" icon={<ArrowLeft strokeWidth={1.5} />} label={labels.previous} onClick={() => step(-1)} />\n          <OuraringRoundButton icon={<ArrowRight strokeWidth={1.5} />} label={labels.next} onClick={() => step(1)} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ouraring-button",
+    "ouraring-media"
+  ],
+  "props": [
+    {
+      "name": "cards",
+      "type": "OuraringReelCard[]",
+      "required": true
+    },
+    {
+      "name": "labels",
+      "type": "{ previous: string; next: string; more: string; }",
+      "required": false,
+      "default": "{ previous: \"Previous\", next: \"Next\", more: \"Learn more\" }",
+      "description": "screen-reader labels for the arrows and the plus buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8bcd1413abe60cf7b96ad76dbe7f16ad98c6b05c0396b6519d10905b84518bd2"
+}

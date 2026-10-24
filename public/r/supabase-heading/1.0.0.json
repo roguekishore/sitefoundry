@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Supabase two-tone heading",
+  "description": "A medium-weight geometric heading built from phrases in ink, grey or brand green, e.g. an ink line over a grey one. Three sizes (46px hero title, 34px, 22→34px section), with each phrase stacked on its own line always, only on desktop, only on phones, or flowing inline.",
+  "category": "heading",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "typography",
+    "two-tone",
+    "minimal"
+  ],
+  "notes": [
+    "needs a display font (font-display)",
+    "the tones are text-foreground, text-muted-foreground and text-primary"
+  ],
+  "entry": "supabase-heading.tsx",
+  "name": "supabase-heading",
+  "files": [
+    {
+      "path": "supabase-heading.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface SupabaseHeadingPart {\n  /** the words of this phrase */\n  text: ReactNode;\n  /** strong: ink · muted: grey · brand: the primary green */\n  tone?: \"strong\" | \"muted\" | \"brand\";\n}\n\nexport interface SupabaseHeadingProps {\n  /** the phrases, in order; the site's titles pair one ink phrase with one grey (or green) one */\n  parts: SupabaseHeadingPart[];\n  /** the element: h1 for the page title, h2 for sections */\n  as?: \"h1\" | \"h2\";\n  /** title: 34px → 46px (hero) · large: 34px everywhere · section: 22px on phones → 34px */\n  size?: \"title\" | \"large\" | \"section\";\n  /** where each phrase starts a new line: always, from desktop up, on phones only, or never */\n  stack?: \"always\" | \"desktop\" | \"phone\" | \"never\";\n  className?: string;\n}\n\nconst sizes = {\n  title: \"text-[2.125rem] leading-[1.11] lg:text-[2.875rem] lg:leading-[1.1]\",\n  large: \"text-[2.125rem] leading-[1.11]\",\n  section: \"text-[1.375rem] leading-[1.33] lg:text-[2.125rem] lg:leading-[1.11]\",\n};\n\nconst tones = {\n  strong: \"text-foreground\",\n  muted: \"text-muted-foreground\",\n  brand: \"text-primary\",\n};\n\nconst stacks = {\n  always: \"block\",\n  desktop: \"lg:block\",\n  phone: \"block lg:inline\",\n  never: \"\",\n};\n\n/** The site's two-tone title: phrases in ink, grey or green, stacked or flowing. */\nexport function SupabaseHeading({ parts, as: Tag = \"h2\", size = \"section\", stack = \"desktop\", className }: SupabaseHeadingProps) {\n  return (\n    <Tag className={cn(\"font-display font-medium text-balance\", sizes[size], className)}>\n      {parts.map((part, i) => (\n        <span key={i} className={cn(tones[part.tone ?? \"strong\"], stacks[stack])}>\n          {part.text}\n          {i < parts.length - 1 && \" \"}\n        </span>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "parts",
+      "type": "SupabaseHeadingPart[]",
+      "required": true,
+      "description": "the phrases, in order; the site's titles pair one ink phrase with one grey (or green) one"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the element: h1 for the page title, h2 for sections"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "title: 34px → 46px (hero) · large: 34px everywhere · section: 22px on phones → 34px"
+    },
+    {
+      "name": "stack",
+      "type": "enum",
+      "required": false,
+      "default": "desktop",
+      "description": "where each phrase starts a new line: always, from desktop up, on phones only, or never"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8ca9375ce93b1bf2f42cfd84b274337325cb438c5f5800f7e8fc885a9ae1ae73"
+}

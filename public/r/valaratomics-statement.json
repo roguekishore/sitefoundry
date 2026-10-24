@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics statement",
+  "description": "A quiet, window-tall statement on the page grey: a short tight heading and a muted paragraph ending in a bold punchline, centred between two thin gold brackets with chamfered bumps (left and right on desktop, above and below on phones). The text is blurred and faint until it scrolls up into focus.",
+  "category": "text",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "statement",
+    "text",
+    "light",
+    "gold",
+    "bracket",
+    "blur",
+    "focus",
+    "scroll-driven",
+    "scrubbed",
+    "minimal",
+    "window-height"
+  ],
+  "notes": [
+    "the blur-to-focus is a CSS view timeline (no JS) and reaches full focus when the section is near the middle of the window: don't make it the page's last section",
+    "the original's faint lattice texture behind the brackets is left out (artwork)"
+  ],
+  "entry": "valaratomics-statement.tsx",
+  "source": "foundry",
+  "name": "valaratomics-statement",
+  "files": [
+    {
+      "path": "valaratomics-statement.css",
+      "content": "/* The statement starts blurred and faint, and comes into focus as the section scrolls up to\n   the middle of the window (scrubbed, so it blurs again on the way back). Browsers without\n   view timelines, and reduced motion, show it sharp. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .valaratomics-statement-focus {\n      animation: valaratomics-statement-focus linear both;\n      animation-timeline: view();\n      animation-range: cover 10% cover 50%;\n    }\n  }\n}\n\n@keyframes valaratomics-statement-focus {\n  from { opacity: 0.1; filter: blur(14px); }\n  to { opacity: 1; filter: blur(0); }\n}\n"
+    },
+    {
+      "path": "valaratomics-statement.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./valaratomics-statement.css\";\n\nexport interface ValaratomicsStatementProps {\n  /** the short heading */\n  title: string;\n  /** the paragraph under it */\n  body: string;\n  /** words appended to the paragraph in bold (its punchline) */\n  emphasis?: string;\n  className?: string;\n}\n\n/** One gold bracket: a straight line with a chamfered bump pushed outward in its middle. */\nfunction Bracket({ side }: { side: \"top\" | \"bottom\" | \"left\" | \"right\" }) {\n  const vertical = side === \"left\" || side === \"right\";\n  // drawn for the top / left side; the bottom one is turned round, the right one mirrored\n  const d = vertical ? \"M98 0 V34 L2 42 V66 L98 75 V100\" : \"M0 98 H25 L34 2 H57 L66 98 H100\";\n  return (\n    <svg\n      aria-hidden\n      viewBox=\"0 0 100 100\"\n      preserveAspectRatio=\"none\"\n      className={cn(\n        \"pointer-events-none absolute fill-none stroke-primary [stroke-width:2]\",\n        vertical ? \"hidden h-[30.75rem] w-10 lg:block\" : \"h-7 w-[87%] lg:hidden\",\n        side === \"top\" && \"top-[8rem] left-[10%]\",\n        side === \"bottom\" && \"bottom-[8rem] left-[3%] rotate-180\",\n        side === \"left\" && \"top-[calc(50%-2rem)] left-[15.6%] -translate-y-1/2\",\n        side === \"right\" && \"top-[calc(50%-2rem)] right-[18.9%] -translate-y-1/2 -scale-x-100\",\n      )}\n    >\n      <path d={d} vectorEffect=\"non-scaling-stroke\" />\n    </svg>\n  );\n}\n\n/**\n * A quiet, window-tall statement on the page grey: a short heading and paragraph centred\n * between two gold brackets (left and right on desktop, above and below on phones). The text\n * comes into focus from a blur as it scrolls up.\n */\nexport function ValaratomicsStatement({ title, body, emphasis, className }: ValaratomicsStatementProps) {\n  return (\n    <section\n      className={cn(\n        \"relative flex min-h-[43.75rem] items-center justify-center overflow-x-clip bg-background px-gutter py-[13rem] text-foreground lg:min-h-svh lg:py-section\",\n        className,\n      )}\n    >\n      <Bracket side=\"top\" />\n      <Bracket side=\"bottom\" />\n      <Bracket side=\"left\" />\n      <Bracket side=\"right\" />\n      <div className=\"valaratomics-statement-focus mx-auto max-w-[37.5rem] text-center lg:text-left\">\n        <h2 className=\"font-sans text-[2.25rem] leading-[0.9] font-semibold tracking-[-0.03em] lg:text-5xl lg:leading-[0.9]\">\n          {title}\n        </h2>\n        <p className=\"mt-9 text-[1.375rem] leading-[1.1] tracking-[-0.02em] text-foreground/70\">\n          {body}\n          {emphasis && (\n            <>\n              {\" \"}\n              <strong className=\"font-semibold text-foreground\">{emphasis}</strong>\n            </>\n          )}\n        </p>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the short heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "emphasis",
+      "type": "string",
+      "required": false,
+      "description": "words appended to the paragraph in bold (its punchline)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1c7195604a7f2af981a3fe912e50eb315ea56680d0bbfdaed5de4f72080c7225"
+}

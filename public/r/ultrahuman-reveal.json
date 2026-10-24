@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Ultrahuman scroll reveal",
+  "description": "A wrapper that fades its content in and lifts it 24px (or 12px) into place as it scrolls into view, with optional stagger steps. Pure CSS scroll-driven animation.",
+  "category": "text-effect",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger",
+    "css"
+  ],
+  "notes": [
+    "CSS only (animation-timeline: view()); older browsers and reduced motion show content in place",
+    "don't put it inside an overflow-hidden box: use overflow-clip, or the timeline freezes"
+  ],
+  "entry": "ultrahuman-reveal.tsx",
+  "name": "ultrahuman-reveal",
+  "files": [
+    {
+      "path": "ultrahuman-reveal.css",
+      "content": "/* Rise-and-fade on entering view, over a fixed 200px of scroll (so tall cards that start in the\n   first screen aren't left half-faded). The range ends on `entry`, which is always reachable. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-reveal {\n      animation: ultrahuman-reveal-rise cubic-bezier(0.22, 1, 0.36, 1) both;\n      animation-timeline: view();\n      animation-range: entry calc(20px + var(--ultrahuman-reveal-offset, 0px)) entry calc(220px + var(--ultrahuman-reveal-offset, 0px));\n    }\n  }\n}\n\n@keyframes ultrahuman-reveal-rise {\n  from {\n    opacity: 0;\n    transform: translateY(var(--ultrahuman-reveal-rise, 24px));\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-reveal.tsx",
+      "content": "import type { CSSProperties, ElementType, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ultrahuman-reveal.css\";\n\nexport interface UltrahumanRevealProps {\n  children: ReactNode;\n  /** the element to render (div by default) */\n  as?: ElementType;\n  /** how far it rises while fading in: md 24px (headings, cards) · sm 12px (body copy) */\n  rise?: \"sm\" | \"md\";\n  /** stagger step: each step starts the reveal 40px of scroll later */\n  step?: number;\n  className?: string;\n}\n\n/**\n * Fades its children in and lifts them into place as they scroll into view (CSS scroll-driven,\n * no JavaScript). Browsers without scroll timelines, and reduced motion, show it in place.\n */\nexport function UltrahumanReveal({ children, as: Tag = \"div\", rise = \"md\", step = 0, className }: UltrahumanRevealProps) {\n  const style = {\n    \"--ultrahuman-reveal-rise\": rise === \"sm\" ? \"12px\" : \"24px\",\n    \"--ultrahuman-reveal-offset\": `${step * 40}px`,\n  } as CSSProperties;\n  return (\n    <Tag className={cn(\"ultrahuman-reveal\", className)} style={style}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "div",
+      "description": "the element to render (div by default)"
+    },
+    {
+      "name": "rise",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "how far it rises while fading in: md 24px (headings, cards) · sm 12px (body copy)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger step: each step starts the reveal 40px of scroll later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d02f6238c992052dd5cbf3f7de28b24bbc6bba93d1c941c55554019b2b3b1d86"
+}

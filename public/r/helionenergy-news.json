@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy news rows",
+  "description": "A light news list: a bracketed mono eyebrow, a tight two-line uppercase heading with a small intro and an outlined button beside it, then hairline-separated rows on a 12-column grid: headline with a mono date line, a 1.27 picture with 8px corners, a plus mark and summary, and a square arrow button bottom right. Phones stack each row. Pictures settle from 110% on arrival and a fill sweeps across each arrow button with the scroll.",
+  "category": "blog",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "blog",
+    "press",
+    "list",
+    "rows",
+    "hairline",
+    "grid",
+    "light",
+    "zoom",
+    "scroll",
+    "sweep",
+    "editorial"
+  ],
+  "notes": [
+    "media is each row's picture; empty, a placeholder",
+    "headline links underline on hover"
+  ],
+  "entry": "helionenergy-news.tsx",
+  "source": "foundry",
+  "name": "helionenergy-news",
+  "files": [
+    {
+      "path": "helionenergy-news.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HelionenergyArrowButton } from \"@foundry/helionenergy-arrow-button\";\nimport { HelionenergyButton } from \"@foundry/helionenergy-button\";\nimport { HelionenergyEyebrow } from \"@foundry/helionenergy-eyebrow\";\nimport { HelionenergyPlaceholder } from \"@foundry/helionenergy-placeholder\";\n\nexport interface HelionenergyNewsItem {\n  /** the headline */\n  title: ReactNode;\n  /** the date, shown in brackets */\n  date: ReactNode;\n  /** the kind of item (news, press…), shown after the date */\n  kind: ReactNode;\n  /** a short summary */\n  summary: ReactNode;\n  /** where the full story is */\n  href: string;\n  /** the arrow button's label, for screen readers */\n  linkLabel: string;\n  /** the picture (aspect 1.27); empty, a placeholder */\n  media?: ReactNode;\n}\n\nexport interface HelionenergyNewsProps {\n  /** the bracketed mono label over the heading */\n  eyebrow: ReactNode;\n  /** the heading's lines (two on every width) */\n  title: ReactNode[];\n  /** one or two sentences beside the heading */\n  intro: ReactNode;\n  /** the outlined button's text (all news) */\n  ctaLabel: ReactNode;\n  /** where it goes */\n  ctaHref: string;\n  /** the stories, newest first */\n  items: HelionenergyNewsItem[];\n  className?: string;\n}\n\n/**\n * A news list on the light page: a bracketed eyebrow, a tight two-line heading and, beside it, a\n * small intro and an outlined button, over hairline-separated rows. Each row (on a 12-column\n * grid) has the headline and a mono date line, a 1.27 picture with 8px corners, a plus mark and\n * summary, and a square arrow button at the bottom right; phones stack them. Pictures settle\n * from 110% as they arrive and a fill sweeps across each arrow with the scroll.\n */\nexport function HelionenergyNews({ eyebrow, title, intro, ctaLabel, ctaHref, items, className }: HelionenergyNewsProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter pt-section pb-20 text-foreground lg:pb-10\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <HelionenergyEyebrow bracket>{eyebrow}</HelionenergyEyebrow>\n        <div className=\"mt-[1.4rem] grid grid-cols-2 gap-x-5 border-b border-border pb-8 lg:mt-[1.25rem] lg:grid-cols-12 lg:pb-10\">\n          <h2 className=\"font-display text-[clamp(1.275rem,0.981rem+1.208vw,2.068rem)] leading-[1.1] font-medium tracking-[-0.05em] uppercase lg:col-span-4\">\n            {title.map((line, i) => (\n              <span key={i} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h2>\n          <p className=\"text-[0.8125rem] leading-[1.32] tracking-[-0.01em] text-foreground/90 lg:col-span-3 lg:col-start-8 lg:max-w-[19rem]\">\n            {intro}\n          </p>\n          <div className=\"col-start-2 mt-5 lg:col-span-2 lg:col-start-11 lg:row-start-1 lg:mt-0 lg:justify-self-end\">\n            <HelionenergyButton href={ctaHref} className=\"w-[9.6rem]\">\n              {ctaLabel}\n            </HelionenergyButton>\n          </div>\n        </div>\n\n        <ul>\n          {items.map((item, i) => (\n            <li\n              key={i}\n              className=\"flex flex-col border-b border-border pt-10 pb-8 last:border-b-0 lg:grid lg:grid-cols-12 lg:gap-x-5 lg:py-10\"\n            >\n              <div className=\"lg:col-span-4\">\n                <h3 className=\"text-[1.125rem] leading-none tracking-[-0.05em] lg:text-[1.185rem]\">\n                  <a href={item.href} className=\"decoration-1 underline-offset-2 hover:underline\">\n                    {item.title}\n                  </a>\n                </h3>\n                <div className=\"mt-4 flex gap-5 lg:mt-[1.1rem]\">\n                  <HelionenergyEyebrow bracket>{item.date}</HelionenergyEyebrow>\n                  <HelionenergyEyebrow>{item.kind}</HelionenergyEyebrow>\n                </div>\n              </div>\n              <HelionenergyPlaceholder media={item.media} zoom className=\"mt-3.5 aspect-[1.27] w-full rounded-lg lg:col-span-3 lg:col-start-5 lg:mt-0\" />\n              <div className=\"mt-7 flex gap-5 lg:col-span-4 lg:col-start-8 lg:mt-0 lg:flex-col lg:gap-6\">\n                <Plus aria-hidden strokeWidth={1.5} className=\"mt-0.5 size-[0.9375rem] shrink-0 lg:mt-0\" />\n                <p className=\"text-[0.9375rem] leading-[1.35] tracking-[-0.01em] text-foreground/85\">{item.summary}</p>\n              </div>\n              <HelionenergyArrowButton\n                href={item.href}\n                label={item.linkLabel}\n                className=\"mt-1 self-end lg:col-start-12 lg:mt-0 lg:justify-self-end\"\n              />\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "helionenergy-arrow-button",
+    "helionenergy-button",
+    "helionenergy-eyebrow",
+    "helionenergy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the bracketed mono label over the heading"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the heading's lines (two on every width)"
+    },
+    {
+      "name": "intro",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one or two sentences beside the heading"
+    },
+    {
+      "name": "ctaLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the outlined button's text (all news)"
+    },
+    {
+      "name": "ctaHref",
+      "type": "string",
+      "required": true,
+      "description": "where it goes"
+    },
+    {
+      "name": "items",
+      "type": "HelionenergyNewsItem[]",
+      "required": true,
+      "description": "the stories, newest first"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "74afdf3bceebeedc8b428f2f7a9391035b5685ec5dfec993381baf13ff211c59"
+}

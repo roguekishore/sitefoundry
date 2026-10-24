@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex hero",
+  "description": "A bright split hero: a bold geometric headline with two words in violet, a grey lede, a violet text link with a nudging chevron, an email field with the button tucked inside and a consent tick. On the right a wide 3:2 device-shot frame bleeds toward the edge and crossfades between three shots every five seconds while a pill-shaped dot fills underneath. Phones stack it: headline, field, full-width button, then the shot.",
+  "category": "hero",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "split",
+    "email-capture",
+    "carousel",
+    "crossfade",
+    "loop",
+    "violet",
+    "fintech"
+  ],
+  "notes": [
+    "the rotation is made for three slides (CSS only, 15s cycle); with fewer or more, only the first shows",
+    "slides are media slots: leave them out for placeholders",
+    "with reduced motion the first slide stays"
+  ],
+  "entry": "airwallex-hero.tsx",
+  "source": "foundry",
+  "name": "airwallex-hero",
+  "files": [
+    {
+      "path": "airwallex-hero.css",
+      "content": "/* Three shots take turns over a 15s cycle: each holds for ~4.5s, then crossfades (~0.6s)\n   into the next. The dot under the active shot is a wide pill whose fill runs across it;\n   the slides and dots share the cycle through the same negative delays. Without the\n   animation the first slide and first dot show. */\n.airwallex-hero-slide:not(:first-child) {\n  opacity: 0;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .airwallex-hero-rotates .airwallex-hero-slide {\n    animation: airwallex-hero-slide 15s linear infinite both;\n  }\n  .airwallex-hero-rotates .airwallex-hero-dot {\n    animation: airwallex-hero-dot 15s ease-out infinite both;\n  }\n  .airwallex-hero-rotates .airwallex-hero-fill {\n    animation: airwallex-hero-fill 15s linear infinite both;\n  }\n}\n\n@keyframes airwallex-hero-slide {\n  0%, 30% { opacity: 1; }\n  34%, 96% { opacity: 0; }\n  100% { opacity: 1; }\n}\n\n@keyframes airwallex-hero-dot {\n  0%, 31% { width: 2.25rem; }\n  33.4%, 98% { width: 0.5rem; }\n  100% { width: 2.25rem; }\n}\n\n@keyframes airwallex-hero-fill {\n  0% { transform: scaleX(0); opacity: 1; }\n  33% { transform: scaleX(1); opacity: 1; }\n  33.4%, 100% { transform: scaleX(0); opacity: 0; }\n}\n"
+    },
+    {
+      "path": "airwallex-hero.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AirwallexButton } from \"@foundry/airwallex-button\";\nimport { AirwallexPlaceholder } from \"@foundry/airwallex-placeholder\";\nimport \"./airwallex-hero.css\";\n\nexport interface AirwallexHeroProps {\n  /** the headline, in parts; parts marked `accent` are set in violet */\n  title: { text: string; accent?: boolean }[];\n  /** the grey lede under the headline */\n  lede: string;\n  /** the violet text link under the lede (desktop) */\n  tour?: { label: string; href: string };\n  /** where the email form posts */\n  formAction?: string;\n  /** the email field's label, for screen readers */\n  emailLabel: string;\n  /** the field's placeholder */\n  emailPlaceholder: string;\n  /** the button's label */\n  submitLabel: string;\n  /** the consent line beside the tick box; leave out for none */\n  consent?: string;\n  /** the device shots that take turns (made for three); empty for placeholders */\n  slides?: ReactNode[];\n  className?: string;\n}\n\nconst DOT_DELAYS = [\"0s\", \"-10s\", \"-5s\"];\n\n/** Headline, email capture and a rotating device shot. */\nexport function AirwallexHero({\n  title,\n  lede,\n  tour,\n  formAction = \"#\",\n  emailLabel,\n  emailPlaceholder,\n  submitLabel,\n  consent,\n  slides,\n  className,\n}: AirwallexHeroProps) {\n  const shots: ReactNode[] = slides?.length ? slides : [0, 1, 2].map((i) => <AirwallexPlaceholder key={i} className=\"size-full rounded-xl\" />);\n  const rotates = shots.length === 3;\n  const emailId = useId();\n  return (\n    <section className={cn(\"overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-9 px-gutter pt-[3.75rem] pb-5 lg:grid-cols-[minmax(0,31.5rem)_minmax(0,1fr)] lg:items-center lg:gap-12 lg:px-12 lg:pt-12 lg:pb-2\">\n        <div className=\"lg:pb-6\">\n          <h1 className=\"font-display text-2xl leading-[1.3] font-bold tracking-[-0.01em] lg:text-5xl lg:leading-[1.25]\">\n            {title.map((part, i) => (\n              <span key={i} className={part.accent ? \"text-primary\" : undefined}>\n                {part.text}\n              </span>\n            ))}\n          </h1>\n          <p className=\"mt-6 text-base leading-6 text-foreground/80 lg:mt-8 lg:text-xl lg:leading-[1.5]\">{lede}</p>\n          {tour && (\n            <a href={tour.href} className=\"group mt-10 hidden items-center gap-1.5 text-base font-semibold text-primary lg:inline-flex\">\n              {tour.label}\n              <ChevronRight aria-hidden className=\"size-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none\" strokeWidth={2.5} />\n            </a>\n          )}\n          <form action={formAction} className=\"mt-8 flex flex-col gap-4 lg:mt-6 lg:flex-row lg:gap-0 lg:rounded-md lg:border lg:border-border lg:bg-card lg:p-1\">\n            <label className=\"sr-only\" htmlFor={emailId}>\n              {emailLabel}\n            </label>\n            <input\n              id={emailId}\n              type=\"email\"\n              name=\"email\"\n              placeholder={emailPlaceholder}\n              className=\"h-12 min-w-0 rounded-md border border-border bg-muted/60 px-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-2 focus:outline-ring lg:h-10 lg:flex-1 lg:border-0 lg:bg-transparent lg:focus:outline-none\"\n            />\n            <AirwallexButton type=\"submit\" size=\"lg\" className=\"h-10 w-full lg:w-auto\">\n              {submitLabel}\n            </AirwallexButton>\n          </form>\n          {consent && (\n            <label className=\"mt-4 flex items-start gap-2.5 text-xs leading-[1.5] text-muted-foreground lg:text-[0.8125rem]\">\n              <input type=\"checkbox\" name=\"consent\" defaultChecked className=\"mt-0.5 size-4 shrink-0 accent-primary\" />\n              {consent}\n            </label>\n          )}\n        </div>\n        <div className=\"lg:w-[min(50rem,calc(100%+3rem))]\">\n          <div className={cn(\"grid aspect-[10/7] lg:aspect-[3/2]\", rotates && \"airwallex-hero-rotates\")}>\n            {shots.map((shot, i) => (\n              <div key={i} className=\"airwallex-hero-slide [grid-area:1/1]\" style={{ animationDelay: DOT_DELAYS[i] }}>\n                {shot}\n              </div>\n            ))}\n          </div>\n          {rotates && (\n            <div aria-hidden className={cn(\"mt-1.5 hidden items-center justify-center gap-2 lg:flex\", \"airwallex-hero-rotates\")}>\n              {shots.map((_, i) => (\n                <span\n                  key={i}\n                  className={cn(\"airwallex-hero-dot relative h-2 overflow-clip rounded-full bg-input\", i === 0 ? \"w-9\" : \"w-2\")}\n                  style={{ animationDelay: DOT_DELAYS[i] }}\n                >\n                  <span className=\"airwallex-hero-fill absolute inset-0 origin-left scale-x-0 rounded-full bg-muted-foreground/70\" style={{ animationDelay: DOT_DELAYS[i] }} />\n                </span>\n              ))}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "airwallex-button",
+    "airwallex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "{ text: string; accent?: boolean | undefined; }[]",
+      "required": true,
+      "description": "the headline, in parts; parts marked `accent` are set in violet"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": true,
+      "description": "the grey lede under the headline"
+    },
+    {
+      "name": "tour",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the violet text link under the lede (desktop)"
+    },
+    {
+      "name": "formAction",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the email form posts"
+    },
+    {
+      "name": "emailLabel",
+      "type": "string",
+      "required": true,
+      "description": "the email field's label, for screen readers"
+    },
+    {
+      "name": "emailPlaceholder",
+      "type": "string",
+      "required": true,
+      "description": "the field's placeholder"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button's label"
+    },
+    {
+      "name": "consent",
+      "type": "string",
+      "required": false,
+      "description": "the consent line beside the tick box; leave out for none"
+    },
+    {
+      "name": "slides",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "the device shots that take turns (made for three); empty for placeholders"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b372e28cf01e9ba751ca221bf37645af0368c749b5667da8a9723588eaffe3ab"
+}

@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health floating pill",
+  "description": "A forest pill with an arrow fixed near the bottom of the window: full width on phones, centred on desktop. It stays out of sight over the first screen, then fades in and rises 16px as the page is scrolled past it.",
+  "category": "cta",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "floating",
+    "fixed",
+    "pill",
+    "scroll",
+    "fade",
+    "rise"
+  ],
+  "notes": [
+    "position: fixed; put it once per page",
+    "the entrance is a CSS scroll timeline on the page; without support (or with reduced motion) the pill is always shown"
+  ],
+  "entry": "parsleyhealth-floating-cta.tsx",
+  "name": "parsleyhealth-floating-cta",
+  "files": [
+    {
+      "path": "parsleyhealth-floating-cta.css",
+      "content": "/* Hidden over the first screen; fades in and rises 16px between 60% and 90% of a window\n   of page scroll, then stays. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .parsleyhealth-floating-cta {\n      animation: parsleyhealth-floating-cta-in linear both;\n      animation-timeline: scroll(root block);\n      animation-range: 60vh 90vh;\n    }\n  }\n}\n\n@keyframes parsleyhealth-floating-cta-in {\n  from { opacity: 0; translate: 0 1rem; visibility: hidden; }\n  1% { visibility: visible; }\n  to { opacity: 1; translate: 0 0; visibility: visible; }\n}\n"
+    },
+    {
+      "path": "parsleyhealth-floating-cta.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport \"./parsleyhealth-floating-cta.css\";\n\nexport interface ParsleyhealthFloatingCtaProps {\n  /** the pill's text */\n  label: string;\n  /** where it goes */\n  href: string;\n  className?: string;\n}\n\n/** A pill fixed near the bottom of the window that appears once the first screen is scrolled past. */\nexport function ParsleyhealthFloatingCta({ label, href, className }: ParsleyhealthFloatingCtaProps) {\n  return (\n    <div\n      className={cn(\n        \"parsleyhealth-floating-cta pointer-events-none fixed inset-x-4 bottom-6 z-30 flex justify-center lg:bottom-6\",\n        className,\n      )}\n    >\n      <ParsleyhealthButton href={href} arrow className=\"pointer-events-auto max-lg:w-full\">\n        {label}\n      </ParsleyhealthButton>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the pill's text"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where it goes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c3621d39af7679367a30a23dc2b05d5905a9308a40fb94c31fbd67e62c427c87"
+}

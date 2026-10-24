@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reflect team globe",
+  "description": "A centred badge, two-line gradient heading, short lead and a dark button in a field of turning stars between two faint side rules; under them a big globe rises out of the section's bottom edge, its top half showing, with a hairline rim that turns once every 70s. The globe grows from half size and fades in as it enters the window.",
+  "category": "about",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "team",
+    "dark",
+    "globe",
+    "stars",
+    "reveal",
+    "scale",
+    "loop",
+    "rotate"
+  ],
+  "notes": [
+    "media is the globe (a dotted WebGL canvas in the original); empty, a softly lit round surface",
+    "the reveal is a CSS view timeline; browsers without one show the globe at once"
+  ],
+  "entry": "reflect-about.tsx",
+  "source": "foundry",
+  "name": "reflect-about",
+  "files": [
+    {
+      "path": "reflect-about.css",
+      "content": "/* The globe grows from half size and fades in as it rises into the window. */\n@keyframes reflect-about-rise {\n  from { opacity: 0; transform: scale(0.5); }\n  to { opacity: 1; transform: scale(1); }\n}\n/* Its rim turns once every 70s. */\n.reflect-about-rim {\n  animation: reflect-about-turn 70s linear infinite;\n}\n@keyframes reflect-about-turn {\n  to { transform: rotate(360deg); }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .reflect-about-globe {\n      animation: reflect-about-rise cubic-bezier(0.6, 0.6, 0, 1) both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n      transform-origin: 50% 0%;\n    }\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .reflect-about-rim { animation: none; }\n}\n"
+    },
+    {
+      "path": "reflect-about.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectButton } from \"@foundry/reflect-button\";\nimport { ReflectHeading } from \"@foundry/reflect-heading\";\nimport { ReflectMedia } from \"@foundry/reflect-media\";\nimport { ReflectStarfield } from \"@foundry/reflect-starfield\";\nimport \"./reflect-about.css\";\n\nexport interface ReflectAboutProps {\n  eyebrow?: string;\n  /** \"\\n\" breaks the line on desktop only */\n  title: string;\n  /** \"\\n\" breaks the line on desktop only */\n  lead?: string;\n  action?: { label: string; href: string };\n  /** the globe rising from the bottom edge (a dotted WebGL globe in the original); a muted disc when empty */\n  media?: ReactNode;\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** The team: heading and a button, then a globe rising out of the section's bottom edge. */\nexport function ReflectAbout({ eyebrow, title, lead, action, media, mediaLabel, className }: ReflectAboutProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background pt-[5.75rem] text-foreground lg:pt-24\", className)}>\n      <ReflectStarfield size={1300} count={110} seed={59} strength={55} />\n      {/* faint side rules */}\n      <span aria-hidden className=\"absolute top-40 left-[calc(50%-31.25rem)] hidden h-80 w-px bg-[linear-gradient(180deg,transparent,var(--border),transparent)] lg:block\" />\n      <span aria-hidden className=\"absolute top-40 right-[calc(50%-31.25rem)] hidden h-80 w-px bg-[linear-gradient(180deg,transparent,var(--border),transparent)] lg:block\" />\n      <div className=\"relative px-gutter\">\n        <ReflectHeading eyebrow={eyebrow} title={title} lead={lead} leadClassName=\"max-w-[19.5rem] sm:max-w-[28rem]\">\n          {action && (\n            <ReflectButton href={action.href} variant=\"secondary\">\n              {action.label}\n            </ReflectButton>\n          )}\n        </ReflectHeading>\n      </div>\n      <div className=\"relative mt-[4.5rem] h-[22.5rem] lg:mt-[3.75rem]\">\n        <div className=\"reflect-about-globe absolute top-0 left-1/2 size-[44rem] -translate-x-1/2 lg:size-[54.375rem]\">\n          <ReflectMedia\n            tone=\"panel\"\n            label={mediaLabel}\n            className=\"size-full rounded-full bg-[radial-gradient(60%_60%_at_50%_30%,color-mix(in_oklab,var(--foreground)_10%,transparent),color-mix(in_oklab,var(--muted)_60%,transparent)_70%,transparent)]\"\n          >\n            {media}\n          </ReflectMedia>\n          <span aria-hidden className=\"reflect-about-rim absolute -inset-2 rounded-full border border-foreground/15 border-b-transparent border-l-foreground/5\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-button",
+    "reflect-heading",
+    "reflect-media",
+    "reflect-starfield"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "\"\\n\" breaks the line on desktop only"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "\"\\n\" breaks the line on desktop only"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the globe rising from the bottom edge (a dotted WebGL globe in the original); a muted disc when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bb2ce98c708465c0710c306947aaf2bb94b06b5b87c344cd90f36df1d3a0bc7b"
+}

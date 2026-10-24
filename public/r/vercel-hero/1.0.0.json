@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel hero",
+  "description": "A calm, airy monochrome hero as tall as the window: a two-line 64px tight title and two pill buttons on the left, a large artwork slot centred behind everything, three short lines in a narrow right column, and a row of customer wordmarks spread along the bottom. On phones the artwork sits on top, the title and buttons centre and stack, the three lines become one mono line that cycles through them with a quick fade, and the wordmarks run as a slow marquee.",
+  "category": "hero",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "minimal",
+    "monochrome",
+    "marquee",
+    "rotating-text",
+    "logos",
+    "window-height"
+  ],
+  "notes": [
+    "desktop height follows the window (100svh minus the 64px header); phones size to content",
+    "the artwork slot is 1080×720 on desktop and 390×400 on phones; empty, it shows a soft grey haze",
+    "CSS only: the phone line cycle and the marquee are keyframes, off with reduced motion"
+  ],
+  "entry": "vercel-hero.tsx",
+  "name": "vercel-hero",
+  "files": [
+    {
+      "path": "vercel-hero.css",
+      "content": "/* Phones: three lines share one spot and take turns, each fading in over 200ms and staying\n   a third of the 9s cycle. */\n.vercel-hero-line {\n  animation: vercel-hero-cycle 9s linear infinite both;\n}\n.vercel-hero-line:not(:first-child) {\n  opacity: 0;\n}\n\n@keyframes vercel-hero-cycle {\n  0% { opacity: 0; }\n  2.2%, 33.3% { opacity: 1; }\n  33.4%, 100% { opacity: 0; }\n}\n\n/* Phones: the wordmark strip slides left forever (the list is doubled, so -50% loops). */\n@media (max-width: 1023.98px) {\n  .vercel-hero-marquee {\n    animation: vercel-hero-marquee 40s linear infinite;\n  }\n}\n\n@keyframes vercel-hero-marquee {\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vercel-hero-line { animation: none; }\n  .vercel-hero-marquee { animation: none; }\n}\n"
+    },
+    {
+      "path": "vercel-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelButton } from \"@foundry/vercel-button\";\nimport { VercelHeading } from \"@foundry/vercel-heading\";\nimport { VercelPlaceholder } from \"@foundry/vercel-placeholder\";\nimport \"./vercel-hero.css\";\n\nexport interface VercelHeroLogo {\n  /** the company's name, for screen readers */\n  name: string;\n  /** its wordmark (an svg, img or styled text), about 24px tall */\n  logo: ReactNode;\n}\n\nexport interface VercelHeroProps {\n  /** the page title; breaks onto two lines on its own at this width */\n  title: string;\n  /** the ink pill button */\n  primary: { label: string; href: string };\n  /** the white pill button */\n  secondary?: { label: string; href: string };\n  /** three short lines: a list on the right on desktop, one cycling mono line on phones */\n  lines: string[];\n  /** customer wordmarks along the bottom (seven on the original) */\n  logos: VercelHeroLogo[];\n  /** the large artwork behind the hero (image, video, canvas); a soft haze when empty */\n  media?: ReactNode;\n  /** screen-reader label for the artwork placeholder */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Window-tall monochrome hero with centred artwork, side lines and a logo row. */\nexport function VercelHero({ title, primary, secondary, lines, logos, media, mediaLabel, className }: VercelHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"relative flex flex-col overflow-clip bg-background px-gutter text-foreground lg:h-[calc(100svh-4rem)] lg:min-h-[40rem]\",\n        className,\n      )}\n    >\n      <div className=\"relative flex flex-1 flex-col items-center lg:flex-row lg:items-center\">\n        {/* artwork: on top on phones, centred behind everything on desktop */}\n        <div className=\"-mx-gutter h-[25rem] w-[calc(100%+2*var(--page-gutter))] lg:pointer-events-none lg:absolute lg:top-1/2 lg:left-1/2 lg:mx-0 lg:h-[45rem] lg:w-[67.5rem] lg:-translate-x-1/2 lg:-translate-y-1/2\">\n          {media ?? <VercelPlaceholder tone=\"haze\" label={mediaLabel} />}\n        </div>\n\n        <div className=\"relative -mt-6 flex w-full flex-col items-center text-center lg:mt-0 lg:w-auto lg:flex-1 lg:items-start lg:text-left\">\n          <VercelHeading as=\"h1\" size=\"title\" className=\"max-w-[7em] lg:max-w-[6em]\">\n            {title}\n          </VercelHeading>\n\n          {/* phones: one mono line at a time */}\n          <p className=\"mt-4 grid font-mono text-base text-muted-foreground lg:hidden\">\n            {lines.map((line, i) => (\n              <span key={line} className=\"vercel-hero-line [grid-area:1/1]\" style={{ animationDelay: `${i * 3}s` }}>\n                {line}\n              </span>\n            ))}\n          </p>\n\n          <div className=\"mt-7 flex w-full flex-col gap-3 lg:mt-8 lg:w-auto lg:flex-row\">\n            <VercelButton href={primary.href} block className=\"lg:w-auto\">\n              {primary.label}\n            </VercelButton>\n            {secondary ? (\n              <VercelButton href={secondary.href} variant=\"secondary\" block className=\"lg:w-auto\">\n                {secondary.label}\n              </VercelButton>\n            ) : null}\n          </div>\n        </div>\n\n        <ul className=\"relative hidden w-[22.5rem] shrink-0 flex-col text-base leading-8 lg:flex\">\n          {lines.map((line) => (\n            <li key={line}>{line}</li>\n          ))}\n        </ul>\n      </div>\n\n      <div className=\"relative -mx-gutter mt-12 overflow-clip pb-10 max-lg:mask-x-from-85% max-lg:mask-x-to-100% lg:mx-0 lg:mt-0\">\n        <ul className=\"vercel-hero-marquee flex w-max items-center gap-16 lg:w-full lg:justify-between lg:gap-6\">\n          {[0, 1].map((copy) =>\n            logos.map((item) => (\n              <li\n                key={`${copy}-${item.name}`}\n                aria-hidden={copy === 1 ? true : undefined}\n                className={cn(\"flex h-11 shrink-0 items-center text-foreground\", copy === 1 && \"lg:hidden\")}\n              >\n                <span role={copy === 0 ? \"img\" : undefined} aria-label={copy === 0 ? item.name : undefined} className=\"flex items-center\">\n                  {item.logo}\n                </span>\n              </li>\n            )),\n          )}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-button",
+    "vercel-heading",
+    "vercel-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the page title; breaks onto two lines on its own at this width"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink pill button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white pill button"
+    },
+    {
+      "name": "lines",
+      "type": "string[]",
+      "required": true,
+      "description": "three short lines: a list on the right on desktop, one cycling mono line on phones"
+    },
+    {
+      "name": "logos",
+      "type": "VercelHeroLogo[]",
+      "required": true,
+      "description": "customer wordmarks along the bottom (seven on the original)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large artwork behind the hero (image, video, canvas); a soft haze when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the artwork placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8cf09b867d8d17a1f897dac2c4ac8d2aac11f56200be07b923e6028e2ce6ea68"
+}

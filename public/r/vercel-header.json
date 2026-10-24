@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel header",
+  "description": "A quiet 64px sticky bar on the page colour: a small ink mark, four grey 14px nav items (two with chevrons that open small hover menus), and three compact 6px buttons on the right (two white with hairline rings, one ink). A hairline fades in under it as soon as the page scrolls; links darken to ink on hover. Phones get the mark and a two-line menu button that opens a full-width panel.",
+  "category": "header",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "light",
+    "minimal",
+    "monochrome",
+    "dropdown",
+    "scroll-linked"
+  ],
+  "notes": [
+    "position: sticky, so it stays in the page flow and pins at the top",
+    "the hairline under the bar is a CSS scroll timeline (shown always where unsupported)",
+    "the dropdowns and the phone menu are CSS only (hover/focus and a details element)"
+  ],
+  "entry": "vercel-header.tsx",
+  "name": "vercel-header",
+  "files": [
+    {
+      "path": "vercel-header.css",
+      "content": "/* The hairline under the bar fades in over the first 64px of scrolling. */\n@supports (animation-timeline: scroll()) {\n  .vercel-header-bar {\n    animation: vercel-header-line linear both;\n    animation-timeline: scroll(root);\n    animation-range: 0 64px;\n  }\n}\n\n@keyframes vercel-header-line {\n  from { border-bottom-color: transparent; }\n  to { border-bottom-color: var(--border); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .vercel-header-bar { animation: none; }\n}\n"
+    },
+    {
+      "path": "vercel-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, Equal } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelButton } from \"@foundry/vercel-button\";\nimport { VercelMark } from \"@foundry/vercel-mark\";\nimport \"./vercel-header.css\";\n\nexport interface VercelHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** sub-links: turns the item into a small hover menu with a chevron */\n  items?: { label: string; href: string }[];\n}\n\nexport interface VercelHeaderProps {\n  /** the company name (read to screen readers next to the mark) */\n  brand: string;\n  /** the mark (an svg or lucide icon) */\n  mark: ReactNode;\n  /** where the mark links */\n  brandHref?: string;\n  /** nav items after the mark (four on the original) */\n  links: VercelHeaderLink[];\n  /** white ringed buttons before the main one (e.g. book a demo, sign in) */\n  secondary?: { label: string; href: string }[];\n  /** the ink button on the far right */\n  action: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm text-muted-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none\";\n\n/** Sticky page-coloured bar with nav on the left and compact buttons on the right. */\nexport function VercelHeader({ brand, mark, brandHref, links, secondary = [], action, menuLabel, className }: VercelHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"vercel-header-bar sticky top-0 z-50 border-b border-border bg-background px-gutter text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"relative flex h-[calc(4rem-1px)] items-center\">\n        <VercelMark brand={brand} mark={mark} href={brandHref} />\n\n        <nav className=\"ml-8 hidden items-center gap-6 lg:flex\">\n          {links.map((link) =>\n            link.items?.length ? (\n              <div key={link.label} className=\"group relative\">\n                <a href={link.href} className={cn(linkClass, \"inline-flex items-center gap-1 py-5 group-hover:text-foreground\")}>\n                  {link.label}\n                  <ChevronDown\n                    aria-hidden\n                    className=\"size-3 transition-transform duration-200 group-hover:rotate-180 motion-reduce:transition-none\"\n                    strokeWidth={2}\n                  />\n                </a>\n                <div className=\"pointer-events-none invisible absolute top-full -left-3 w-56 rounded-xl bg-popover p-2 opacity-0 shadow-lg shadow-foreground/5 ring-1 ring-border transition-opacity duration-200 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\">\n                  {link.items.map((item) => (\n                    <a key={item.label} href={item.href} className={cn(linkClass, \"block rounded-lg px-3 py-2 hover:bg-muted\")}>\n                      {item.label}\n                    </a>\n                  ))}\n                </div>\n              </div>\n            ) : (\n              <a key={link.label} href={link.href} className={linkClass}>\n                {link.label}\n              </a>\n            ),\n          )}\n        </nav>\n\n        <div className=\"ml-auto hidden items-center gap-2.5 lg:flex\">\n          {secondary.map((item) => (\n            <VercelButton key={item.label} href={item.href} variant=\"secondary\" shape=\"box\">\n              {item.label}\n            </VercelButton>\n          ))}\n          <VercelButton href={action.href} shape=\"box\">\n            {action.label}\n          </VercelButton>\n        </div>\n\n        <details className=\"group ml-auto lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"grid size-8 cursor-pointer list-none place-items-center text-foreground [&::-webkit-details-marker]:hidden\"\n          >\n            <Equal aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full -mx-gutter flex h-[calc(100svh-4rem)] flex-col overflow-y-auto border-t border-border bg-background px-gutter pt-4 pb-8\">\n            <div className=\"flex flex-col gap-3\">\n              {secondary.map((item) => (\n                <VercelButton key={item.label} href={item.href} variant=\"secondary\" shape=\"box\" block className=\"h-10\">\n                  {item.label}\n                </VercelButton>\n              ))}\n              <VercelButton href={action.href} shape=\"box\" block className=\"h-10\">\n                {action.label}\n              </VercelButton>\n            </div>\n            {links.flatMap((link) => [link, ...(link.items ?? [])]).map((link) => (\n              <a key={link.label} href={link.href} className=\"border-b border-border py-3 text-base text-foreground\">\n                {link.label}\n              </a>\n            ))}\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-button",
+    "vercel-mark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name (read to screen readers next to the mark)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mark (an svg or lucide icon)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "description": "where the mark links"
+    },
+    {
+      "name": "links",
+      "type": "VercelHeaderLink[]",
+      "required": true,
+      "description": "nav items after the mark (four on the original)"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "white ringed buttons before the main one (e.g. book a demo, sign in)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink button on the far right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a8d16b5642ebd298b5ab0f8a3f9e2a0a2ce6efd9970e2b6a9ebf5a4cb660e6a0"
+}

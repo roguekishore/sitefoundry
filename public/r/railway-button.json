@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Railway button",
+  "description": "Developer-console buttons with small radii and hairline borders: a muted violet primary with a lighter violet edge, a near-black one, a faint outline, a ghost nav button, and a magenta-to-violet radial button whose glow doubles on hover.",
+  "category": "button",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "dark",
+    "hairline",
+    "glow",
+    "developer"
+  ],
+  "notes": [
+    "made for dark themes; the glow variant mixes the theme's glow and chart-1 colours"
+  ],
+  "entry": "railway-button.tsx",
+  "source": "foundry",
+  "name": "railway-button",
+  "files": [
+    {
+      "path": "railway-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RailwayButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * primary: muted violet with a lighter violet hairline · dark: near-black with a hairline ·\n   * outline: faint fill and a brighter hairline · ghost: no fill until hovered ·\n   * glow: a radial gradient from the glow colour to chart-1 with a soft glow that doubles on hover\n   */\n  variant?: \"primary\" | \"dark\" | \"outline\" | \"ghost\" | \"glow\";\n  /** sm: 36px nav-sized · md: 44px · lg: 58px hero-sized with 20px text */\n  size?: \"sm\" | \"md\" | \"lg\";\n  onClick?: () => void;\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-9 rounded-md px-3 text-sm\",\n  md: \"h-11 rounded-md px-4 text-base\",\n  lg: \"h-[3.625rem] rounded-lg px-6 text-xl\",\n};\n\nconst variants = {\n  primary: \"border border-ring/70 bg-primary text-primary-foreground hover:brightness-110\",\n  dark: \"border border-foreground/20 bg-secondary/90 text-secondary-foreground hover:bg-secondary\",\n  outline: \"border border-foreground/20 bg-foreground/5 text-foreground hover:bg-foreground/10\",\n  ghost: \"text-foreground hover:bg-foreground/5\",\n  // the original's radial gradient: glow at the top centre fading to chart-1 at the edges\n  glow:\n    \"bg-[radial-gradient(73%_138%_at_50%_0%,var(--glow)_50%,var(--chart-1)_100%)] text-primary-foreground shadow-[0_0_6px_0_color-mix(in_oklab,var(--glow)_25%,transparent),0_0_16px_0_color-mix(in_oklab,var(--chart-1)_25%,transparent)] hover:shadow-[0_0_12px_0_color-mix(in_oklab,var(--glow)_50%,transparent),0_0_32px_0_color-mix(in_oklab,var(--chart-1)_50%,transparent)]\",\n};\n\n/** Railway-style button: small radii, hairline borders, quick 150ms colour changes. */\nexport function RailwayButton({ children, href, variant = \"primary\", size = \"md\", onClick, className }: RailwayButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center gap-2 font-medium whitespace-nowrap\",\n    \"transition-[background-color,color,box-shadow,filter] duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    sizes[size],\n    variants[variant],\n    variant === \"glow\" && \"duration-250\",\n    className,\n  );\n  if (href) {\n    return (\n      <a href={href} className={classes}>\n        {children}\n      </a>\n    );\n  }\n  return (\n    <button type=\"button\" onClick={onClick} className={classes}>\n      {children}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: muted violet with a lighter violet hairline · dark: near-black with a hairline ·\noutline: faint fill and a brighter hairline · ghost: no fill until hovered ·\nglow: a radial gradient from the glow colour to chart-1 with a soft glow that doubles on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 36px nav-sized · md: 44px · lg: 58px hero-sized with 20px text"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "61d42bbed1104fc4e2e24b12824c9078c4e9a66782537128cf3ce94ff34ae920"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Lithic contour lines",
+  "description": "A decorative layer of thin concentric rings (or ovals) in the surrounding text colour, softly faded at the edges: the hairline contour texture behind Lithic's tinted and dark panels.",
+  "category": "background",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "pattern",
+    "lines",
+    "rings",
+    "decorative",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only (a repeating radial gradient in currentColor); set the colour and strength with a text class, e.g. text-chart-2/40",
+    "absolutely positioned: put it inside a relative, clipped panel"
+  ],
+  "entry": "lithic-contours.tsx",
+  "source": "foundry",
+  "name": "lithic-contours",
+  "files": [
+    {
+      "path": "lithic-contours.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface LithicContoursProps {\n  /** centre of the rings, as a CSS position (e.g. \"80% 20%\") */\n  at?: string;\n  /** circle, or ellipse (stretched to the box: tall boxes give tall ovals) */\n  shape?: \"circle\" | \"ellipse\";\n  /** distance between rings in px */\n  gap?: number;\n  /** fade the rings out towards the edges of the box (default true) */\n  fade?: boolean;\n  /** position, size and colour (a text-* class sets the line colour) */\n  className?: string;\n}\n\n/** Thin concentric rings in currentColor. Decorative and aria-hidden. */\nexport function LithicContours({ at = \"50% 50%\", shape = \"circle\", gap = 28, fade = true, className }: LithicContoursProps) {\n  const line = `transparent 0 ${gap - 1}px, currentColor ${gap - 1}px ${gap}px`;\n  const style: CSSProperties = {\n    backgroundImage: `repeating-radial-gradient(${shape} at ${at}, ${line})`,\n    ...(fade\n      ? {\n          maskImage: `radial-gradient(${shape} at ${at}, var(--foreground) 25%, transparent 75%)`,\n          WebkitMaskImage: `radial-gradient(${shape} at ${at}, var(--foreground) 25%, transparent 75%)`,\n        }\n      : {}),\n  };\n  return <div aria-hidden className={cn(\"pointer-events-none absolute inset-0\", className)} style={style} />;\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "at",
+      "type": "string",
+      "required": false,
+      "default": "50% 50%",
+      "description": "centre of the rings, as a CSS position (e.g. \"80% 20%\")"
+    },
+    {
+      "name": "shape",
+      "type": "enum",
+      "required": false,
+      "default": "circle",
+      "description": "circle, or ellipse (stretched to the box: tall boxes give tall ovals)"
+    },
+    {
+      "name": "gap",
+      "type": "number",
+      "required": false,
+      "default": "28",
+      "description": "distance between rings in px"
+    },
+    {
+      "name": "fade",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "fade the rings out towards the edges of the box (default true)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "position, size and colour (a text-* class sets the line colour)"
+    }
+  ],
+  "hash": "3d8d5b59e58d36a162061d014fdde4773099ef6cde518b4b99b4abbaafc153da"
+}

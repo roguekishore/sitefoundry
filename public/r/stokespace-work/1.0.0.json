@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stoke Space image links",
+  "description": "A recruiting band: neon-barred label, a wide all-caps heading, then two square-cornered 4:3 images side by side (stacked on phones), each with a light arrow link under it. Images fade in as they scroll into view; links turn the primary colour on hover.",
+  "category": "features",
+  "site": "stokespace",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "two-up",
+    "dark",
+    "reveal",
+    "scroll",
+    "fade",
+    "minimal"
+  ],
+  "notes": [
+    "the fade uses CSS scroll-driven animation; browsers without it show the images at once"
+  ],
+  "entry": "stokespace-work.tsx",
+  "source": "foundry",
+  "name": "stokespace-work",
+  "files": [
+    {
+      "path": "stokespace-work.css",
+      "content": "/* Each image fades in as it comes up into view, over the first 450px of its entry. Browsers\n   without scroll-driven animations (and reduced motion) show the images straight away. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .stokespace-work-media {\n      animation: stokespace-work-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 450px;\n    }\n  }\n}\n\n@keyframes stokespace-work-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "stokespace-work.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StokespaceArrowLink } from \"@foundry/stokespace-arrow-link\";\nimport { StokespaceEyebrow } from \"@foundry/stokespace-eyebrow\";\nimport { StokespaceHeading } from \"@foundry/stokespace-heading\";\nimport { StokespacePlaceholder } from \"@foundry/stokespace-placeholder\";\nimport \"./stokespace-work.css\";\n\nexport interface StokespaceWorkCard {\n  /** the arrow link under the image */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** the 4:3 image */\n  media?: ReactNode;\n}\n\nexport interface StokespaceWorkProps {\n  /** anchor id for the section */\n  id?: string;\n  /** small label above the heading */\n  eyebrow: string;\n  /** which accent the label's bar glows in */\n  eyebrowTone?: \"primary\" | \"highlight\" | \"glow\";\n  /** the heading */\n  title: string;\n  /** the image links (two side by side from 1024px) */\n  cards: StokespaceWorkCard[];\n  className?: string;\n}\n\n/**\n * Two-up image links: a neon-barred label and an all-caps heading, then 4:3 images side by\n * side from 1024px (stacked on phones), each with an arrow link under it. The images fade in\n * as they scroll into view.\n */\nexport function StokespaceWork({ id, eyebrow, eyebrowTone = \"glow\", title, cards, className }: StokespaceWorkProps) {\n  return (\n    <section id={id} className={cn(\"px-gutter py-section\", className)}>\n      <StokespaceEyebrow label={eyebrow} tone={eyebrowTone} />\n      <StokespaceHeading className=\"mt-9 lg:mt-[4.4rem]\">{title}</StokespaceHeading>\n\n      <ul className=\"mt-9 grid gap-x-5 gap-y-11 lg:mt-[4.5rem] lg:grid-cols-2\">\n        {cards.map((card) => (\n          <li key={card.label}>\n            <div className=\"stokespace-work-media aspect-[4/3] [&>img]:size-full [&>img]:object-cover\">\n              {card.media ?? <StokespacePlaceholder />}\n            </div>\n            <StokespaceArrowLink label={card.label} href={card.href} className=\"mt-6 lg:mt-[1.4rem]\" />\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "stokespace-arrow-link",
+    "stokespace-eyebrow",
+    "stokespace-heading",
+    "stokespace-placeholder"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for the section"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small label above the heading"
+    },
+    {
+      "name": "eyebrowTone",
+      "type": "enum",
+      "required": false,
+      "default": "glow",
+      "description": "which accent the label's bar glows in"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "cards",
+      "type": "StokespaceWorkCard[]",
+      "required": true,
+      "description": "the image links (two side by side from 1024px)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "92b6e5d0d9954a5bf0632a5cdc60e11cd6b6bc1f4355a78ab4a4a146d61ccfc1"
+}

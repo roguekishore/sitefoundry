@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Resend code listing",
+  "description": "A quiet monospace listing with right-aligned grey line numbers: keywords and punctuation recede in grey, identifiers stay near-white and strings glow in the accent violet.",
+  "category": "card",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "code",
+    "mono",
+    "syntax",
+    "dark",
+    "minimal",
+    "developer"
+  ],
+  "notes": [
+    "a tiny built-in highlighter (strings, keywords, tags, comments): no highlighting library",
+    "long lines scroll sideways rather than wrap"
+  ],
+  "entry": "resend-code.tsx",
+  "source": "foundry",
+  "name": "resend-code",
+  "files": [
+    {
+      "path": "resend-code.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\nexport interface ResendCodeProps {\n  /** the source, lines split on \\n */\n  code: string;\n  /** number of the first line shown */\n  startLine?: number;\n  /** md: 14/20px (SDK panel) · sm: 12/16px (template window) */\n  size?: \"md\" | \"sm\";\n  className?: string;\n}\n\nconst KEYWORDS = new Set(\n  \"import from export default const let var new async await function return if else for of in while class interface type extends def end do puts require package func use fn let mut pub struct impl val fun object using namespace static void public private try catch throw yield lambda true false null nil None True False\".split(\" \"),\n);\n\n// strings · comments · tags (<Tag or </Tag) · words · anything else\nconst TOKEN = /('(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`)|(\\/\\/.*$|#.*$)|(<\\/?[A-Za-z][\\w.]*|\\/?>)|([A-Za-z_$][\\w$]*)|([^\\sA-Za-z_$'\"`<]+|\\s+|<)/g;\n\nfunction Line({ text }: { text: string }) {\n  const parts: { t: string; c?: string }[] = [];\n  for (const m of text.matchAll(TOKEN)) {\n    const [all, str, comment, tag, word] = m;\n    if (str) parts.push({ t: all, c: \"text-highlight\" });\n    else if (comment) parts.push({ t: all, c: \"text-muted-foreground/60 italic\" });\n    else if (tag) parts.push({ t: all, c: \"text-muted-foreground\" });\n    else if (word) parts.push({ t: all, c: KEYWORDS.has(word) ? \"text-muted-foreground\" : undefined });\n    else parts.push({ t: all, c: /\\S/.test(all) ? \"text-muted-foreground\" : undefined });\n  }\n  return parts.map((p, i) => (p.c ? <span key={i} className={p.c}>{p.t}</span> : p.t));\n}\n\nexport function ResendCode({ code, startLine = 1, size = \"md\", className }: ResendCodeProps) {\n  const lines = code.replace(/\\n$/, \"\").split(\"\\n\");\n  return (\n    <pre\n      className={cn(\n        \"overflow-x-auto font-mono text-foreground [scrollbar-width:none]\",\n        size === \"md\" ? \"text-sm leading-5\" : \"text-xs leading-4\",\n        className,\n      )}\n    >\n      <code className=\"table\">\n        {lines.map((line, i) => (\n          <span key={i} className=\"table-row\">\n            <span aria-hidden className=\"table-cell pr-4 text-right text-muted-foreground/60 select-none\">\n              {startLine + i}\n            </span>\n            <span className=\"table-cell whitespace-pre\">\n              <Line text={line} />\n            </span>\n          </span>\n        ))}\n      </code>\n    </pre>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "code",
+      "type": "string",
+      "required": true,
+      "description": "the source, lines split on \\n"
+    },
+    {
+      "name": "startLine",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "number of the first line shown"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: 14/20px (SDK panel) · sm: 12/16px (template window)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8788190fd8fc14e5b3b76a954d90c46bbb1ed2664accffc7748f03025b7c909e"
+}

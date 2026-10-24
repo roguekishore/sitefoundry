@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Unit arrow circle",
+  "description": "A hairline circle (34px in cards, 44px for carousel controls) holding a thin arrow pointing up-right, left or right. Its outline darkens on hover, or when the card around it (a `group/card`) is hovered; disabled circles fade to half.",
+  "category": "button",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "icon",
+    "arrow",
+    "circle",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "decorative span by default; a link with href, a button with onClick"
+  ],
+  "entry": "unit-arrow-circle.tsx",
+  "source": "foundry",
+  "name": "unit-arrow-circle",
+  "files": [
+    {
+      "path": "unit-arrow-circle.tsx",
+      "content": "import { ArrowLeft, ArrowRight, ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface UnitArrowCircleProps {\n  /** which way the arrow points: up-right (open), left or right (carousel) */\n  direction?: \"up-right\" | \"left\" | \"right\";\n  /** sm: 34px (inside cards) · md: 44px (carousel controls) */\n  size?: \"sm\" | \"md\";\n  /** a link when set; otherwise a decorative circle (or a button when onClick is given) */\n  href?: string;\n  /** makes it a button (carousel controls) */\n  onClick?: () => void;\n  /** screen-reader label (required for links and buttons) */\n  label?: string;\n  /** greys it out (a carousel at its end) */\n  disabled?: boolean;\n  className?: string;\n}\n\nconst icons = { \"up-right\": ArrowUpRight, left: ArrowLeft, right: ArrowRight };\n\n/** The hairline circle with an arrow that sits in the corner of every card. */\nexport function UnitArrowCircle({ direction = \"up-right\", size = \"sm\", href, onClick, label, disabled, className }: UnitArrowCircleProps) {\n  const Icon = icons[direction];\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center rounded-full border border-input text-foreground\",\n    \"transition-[background-color,border-color,opacity] duration-[425ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\",\n    \"hover:border-foreground/60 group-hover/card:border-foreground/60\",\n    size === \"sm\" ? \"size-[2.125rem]\" : \"size-11\",\n    disabled && \"pointer-events-none opacity-50\",\n    className,\n  );\n  const icon = <Icon aria-hidden className={size === \"sm\" ? \"size-3.5\" : \"size-[1.125rem]\"} strokeWidth={1.75} />;\n  if (href) {\n    return (\n      <a href={href} aria-label={label} className={classes}>\n        {icon}\n      </a>\n    );\n  }\n  if (onClick) {\n    return (\n      <button type=\"button\" aria-label={label} onClick={onClick} disabled={disabled} className={classes}>\n        {icon}\n      </button>\n    );\n  }\n  return (\n    <span aria-hidden className={classes}>\n      {icon}\n    </span>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "direction",
+      "type": "enum",
+      "required": false,
+      "default": "up-right",
+      "description": "which way the arrow points: up-right (open), left or right (carousel)"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "sm",
+      "description": "sm: 34px (inside cards) · md: 44px (carousel controls)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "a link when set; otherwise a decorative circle (or a button when onClick is given)"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false,
+      "description": "makes it a button (carousel controls)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label (required for links and buttons)"
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false,
+      "description": "greys it out (a carousel at its end)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d4fafb8fdf2c15db23cc9f2683b0954927c7db46e0deac0e26e1a1f182fb3d71"
+}

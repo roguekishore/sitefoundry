@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo latest-news carousel",
+  "description": "An auto-advancing announcement carousel: one wide charcoal card (24px corners) with a 16px-rounded image on the left and a meta line, headline, serif excerpt and soft 'read more' button on the right, flanked on desktop by slim grey peeks of the neighbouring slides. A small ring fills over six seconds, then the next slide slides in. On phones the card stacks and two pale headline tickers loop underneath.",
+  "category": "blog",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "carousel",
+    "autoplay",
+    "ticker",
+    "marquee",
+    "dark-card",
+    "progress",
+    "minimal"
+  ],
+  "notes": [
+    "media slot: one 570×347 image per slide; a plain surface when empty",
+    "the card forces the theme's dark colours with the dark class",
+    "autoplay stops under reduced motion; the peeks and the ring are buttons/indicators for the next slide",
+    "the excerpt reads var(--ondo-serif) and falls back to the display face in other themes"
+  ],
+  "hydrate": "visible",
+  "entry": "ondo-news.tsx",
+  "name": "ondo-news",
+  "files": [
+    {
+      "path": "ondo-news.css",
+      "content": "/* The ring fills over one slide's time; each new slide's content slides in from the left;\n   the phone tickers loop. Under reduced motion nothing moves (and autoplay is off). */\n@media (prefers-reduced-motion: no-preference) {\n  .ondo-news-ring {\n    animation: ondo-news-ring var(--ondo-news-time, 6s) linear both;\n  }\n  .ondo-news-in {\n    animation: ondo-news-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;\n  }\n  .ondo-news-ticker {\n    animation: ondo-news-ticker var(--ondo-news-loop, 20s) linear infinite;\n  }\n}\n\n@keyframes ondo-news-ring {\n  from { stroke-dashoffset: 1; }\n  to { stroke-dashoffset: 0; }\n}\n\n@keyframes ondo-news-in {\n  from { opacity: 0; transform: translateX(-32px); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes ondo-news-ticker {\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "ondo-news.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoButton } from \"@foundry/ondo-button\";\nimport { OndoPlaceholder } from \"@foundry/ondo-placeholder\";\nimport \"./ondo-news.css\";\n\nexport interface OndoNewsItem {\n  /** e.g. \"Announcement\" */\n  category: string;\n  /** the date as shown */\n  date: string;\n  /** the headline */\n  title: string;\n  /** two or three lines of serif summary */\n  excerpt: string;\n  /** where \"read more\" goes */\n  href: string;\n  /** the 570×347 image. A plain surface when empty */\n  media?: ReactNode;\n}\n\nexport interface OndoNewsProps {\n  /** a heading for screen readers (the original shows none) */\n  heading: string;\n  /** the slides */\n  items: OndoNewsItem[];\n  /** the button text on each slide */\n  readMoreLabel: string;\n  /** headlines for the two phone tickers (the slide titles when empty) */\n  headlines?: string[];\n  /** seconds per slide */\n  interval?: number;\n  /** screen-reader labels for the side peeks */\n  labels?: { prev: string; next: string };\n  className?: string;\n}\n\nconst serif = \"font-[family-name:var(--ondo-serif,var(--typeface-display))]\";\n\n/** Announcement carousel: one wide charcoal card, timed by a filling ring. */\nexport function OndoNews({ heading, items, readMoreLabel, headlines, interval = 6, labels, className }: OndoNewsProps) {\n  const [index, setIndex] = useState(0);\n  const reduce = useReducedMotion();\n  const count = items.length;\n  const item = items[index];\n  const go = (step: number) => setIndex((i) => (i + step + count) % count);\n\n  useEffect(() => {\n    if (reduce || count < 2) return;\n    const timer = setTimeout(() => setIndex((i) => (i + 1) % count), interval * 1000);\n    return () => clearTimeout(timer);\n  }, [index, reduce, count, interval]);\n\n  const ticker = headlines?.length ? headlines : items.map((i) => i.title);\n\n  const ring = (\n    <svg key={`ring-${index}`} aria-hidden viewBox=\"0 0 16 16\" className=\"size-3.5 -rotate-90 text-muted-foreground\">\n      <circle cx=\"8\" cy=\"8\" r=\"6.5\" fill=\"none\" stroke=\"currentColor\" strokeOpacity=\"0.35\" strokeWidth=\"1.5\" />\n      <circle cx=\"8\" cy=\"8\" r=\"6.5\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" pathLength={1} strokeDasharray=\"1\" className=\"ondo-news-ring\" />\n    </svg>\n  );\n\n  return (\n    <section className={cn(\"bg-background pt-12 lg:pt-[18rem]\", className)} style={{ [\"--ondo-news-time\" as string]: `${interval}s` }}>\n      <h2 className=\"sr-only\">{heading}</h2>\n      <div className=\"px-gutter lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <div className=\"mx-auto flex max-w-[84.5rem] items-stretch gap-5\">\n          <button\n            type=\"button\"\n            aria-label={labels?.prev}\n            onClick={() => go(-1)}\n            className=\"hidden w-12 shrink-0 rounded-3xl bg-muted transition-colors duration-200 hover:bg-accent motion-reduce:transition-none lg:block\"\n          />\n          <article className=\"dark relative min-w-0 flex-1 rounded-3xl bg-secondary p-4 text-foreground lg:grid lg:grid-cols-[570fr_582fr] lg:gap-4 lg:p-6\">\n            <div key={`media-${index}`} className=\"ondo-news-in aspect-[570/347] overflow-clip rounded-2xl\">\n              {item.media ?? <OndoPlaceholder tone=\"muted\" className=\"bg-background\" />}\n            </div>\n            <div key={`text-${index}`} className=\"ondo-news-in flex min-h-[11rem] flex-col pt-6 lg:min-h-0 lg:pt-0\">\n              <p className=\"flex items-center gap-2.5 text-sm text-muted-foreground\">\n                <span>{item.category}</span>\n                <span aria-hidden className=\"size-1 rounded-full bg-muted-foreground\" />\n                <span>{item.date}</span>\n              </p>\n              <h3 className=\"mt-2 font-display text-xl leading-[1.05] font-medium tracking-[-0.02em] text-foreground lg:mt-4 lg:pr-10 lg:text-[1.75rem]\">{item.title}</h3>\n              <p className={cn(\"mt-8 line-clamp-3 hidden text-base leading-[1.32] text-foreground/75 lg:block lg:pr-4\", serif)}>{item.excerpt}</p>\n              <OndoButton href={item.href} variant=\"soft\" className=\"mt-auto self-start\">\n                {readMoreLabel}\n              </OndoButton>\n            </div>\n            <div className=\"absolute right-4 bottom-4 lg:top-6 lg:right-6 lg:bottom-auto\">{ring}</div>\n          </article>\n          <button\n            type=\"button\"\n            aria-label={labels?.next}\n            onClick={() => go(1)}\n            className=\"hidden w-12 shrink-0 rounded-3xl bg-muted transition-colors duration-200 hover:bg-accent motion-reduce:transition-none lg:block\"\n          />\n        </div>\n        <div aria-hidden className=\"mt-4 flex flex-col gap-4 lg:hidden\">\n          {[ticker, [...ticker].reverse()].map((row, r) => (\n            <div\n              key={r}\n              /* foundry-allow-colour: the mask only fades the edges */\n              className=\"h-10 overflow-clip rounded-xl bg-muted [mask-image:linear-gradient(90deg,transparent,#000_15%,#000_85%,transparent)]\"\n            >\n              <div\n                className=\"ondo-news-ticker flex h-full w-max items-center\"\n                style={{ [\"--ondo-news-loop\" as string]: r === 0 ? \"20s\" : \"15s\" }}\n              >\n                {[...row, ...row].map((line, i) => (\n                  <span key={i} className=\"pl-12 text-sm font-medium whitespace-nowrap text-foreground/25\">\n                    {line}\n                  </span>\n                ))}\n              </div>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-button",
+    "ondo-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "a heading for screen readers (the original shows none)"
+    },
+    {
+      "name": "items",
+      "type": "OndoNewsItem[]",
+      "required": true,
+      "description": "the slides"
+    },
+    {
+      "name": "readMoreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button text on each slide"
+    },
+    {
+      "name": "headlines",
+      "type": "string[]",
+      "required": false,
+      "description": "headlines for the two phone tickers (the slide titles when empty)"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds per slide"
+    },
+    {
+      "name": "labels",
+      "type": "{ prev: string; next: string; }",
+      "required": false,
+      "description": "screen-reader labels for the side peeks"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e9bd8a2fe3be45959ce348dc908da411219f99e4ba3eeca8b21412307c545e82"
+}

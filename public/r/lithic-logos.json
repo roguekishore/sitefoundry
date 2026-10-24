@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic logo marquee",
+  "description": "A centred 32px line over a single row of customer wordmarks that drifts left forever (45s a lap), its ends fading into the page.",
+  "category": "logos",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "marquee",
+    "loop",
+    "social-proof",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "logos are plain-text names (lithic-textmark); pass your own nodes as `logo` if you have real marks",
+    "CSS only; with reduced motion the row stands still"
+  ],
+  "entry": "lithic-logos.tsx",
+  "source": "foundry",
+  "name": "lithic-logos",
+  "files": [
+    {
+      "path": "lithic-logos.css",
+      "content": "/* The track holds the logo list twice; sliding it by half its width brings the second copy\n   exactly where the first began, so the loop has no seam. */\n.lithic-logos-track {\n  animation: lithic-logos-marquee 45s linear infinite;\n}\n.lithic-logos-window {\n  mask-image: linear-gradient(to right, transparent, var(--foreground) 12%, var(--foreground) 88%, transparent);\n}\n\n@keyframes lithic-logos-marquee {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .lithic-logos-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "lithic-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicTextmark, type LithicTextmarkStyle } from \"@foundry/lithic-textmark\";\nimport \"./lithic-logos.css\";\n\nexport interface LithicLogo {\n  /** the company's name (shown as a text mark when there's no `logo`) */\n  name: string;\n  /** how the text mark is set */\n  variant?: LithicTextmarkStyle;\n  /** a real mark (svg/img) to use instead of the text */\n  logo?: ReactNode;\n}\n\nexport interface LithicLogosProps {\n  /** the line above the row */\n  title: string;\n  /** the customers; eight or more keep the loop full */\n  logos: LithicLogo[];\n  className?: string;\n}\n\nfunction Row({ logos, hidden }: { logos: LithicLogo[]; hidden?: boolean }) {\n  return (\n    <ul aria-hidden={hidden || undefined} className=\"flex shrink-0 items-center gap-16 pr-16\">\n      {logos.map((logo) => (\n        <li key={logo.name} className=\"flex h-10 items-center text-[1.4rem] text-foreground\">\n          {logo.logo ?? <LithicTextmark name={logo.name} variant={logo.variant} />}\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/** \"Trusted by\" row: a headline over a slow, endless strip of wordmarks. */\nexport function LithicLogos({ title, logos, className }: LithicLogosProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background pt-12 pb-16 text-foreground lg:pt-[4.5rem] lg:pb-24\", className)}>\n      <h2 className=\"px-gutter text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.2]\">{title}</h2>\n      <div className=\"lithic-logos-window mx-auto mt-10 max-w-[82.5rem] overflow-clip lg:mt-14\">\n        <div className=\"lithic-logos-track flex w-max\">\n          <Row logos={logos} />\n          <Row logos={logos} hidden />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-textmark"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the line above the row"
+    },
+    {
+      "name": "logos",
+      "type": "LithicLogo[]",
+      "required": true,
+      "description": "the customers; eight or more keep the loop full"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "041040b167903f50be14b3f1f8f36fe230cb0a68cc006b130190e9531f106741"
+}

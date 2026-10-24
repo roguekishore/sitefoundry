@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend deliverability grid",
+  "description": "A glow-framed band with the light pooled towards its end: a left-aligned lit two-line title, then a three-by-three grid of line icons, widely spaced grotesk titles and short grey copy (icon beside the title on phones). Each item rises 20px and fades in as it scrolls into view, column by column.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "grid",
+    "dark",
+    "frame",
+    "glow",
+    "reveal",
+    "scroll-driven",
+    "stagger"
+  ],
+  "notes": [
+    "the reveal is a CSS view() timeline inside @supports; without it (or with reduced motion) everything shows in place"
+  ],
+  "entry": "resend-deliverability.tsx",
+  "source": "foundry",
+  "name": "resend-deliverability",
+  "files": [
+    {
+      "path": "resend-deliverability.css",
+      "content": "/* Each item rises 20px and fades in while it enters the window; later columns start a little later. */\n@media (prefers-reduced-motion: no-preference) {\n  @supports (animation-timeline: view()) {\n    .resend-deliverability-item {\n      animation: resend-deliverability-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--resend-col, 0) * 12%) entry calc(80% + var(--resend-col, 0) * 12%);\n    }\n  }\n}\n\n@keyframes resend-deliverability-rise {\n  from { opacity: 0; transform: translateY(20px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "resend-deliverability.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendFrame } from \"@foundry/resend-frame\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\nimport \"./resend-deliverability.css\";\n\nexport interface ResendDeliverabilityItem {\n  /** a small line icon (lucide) */\n  icon: ReactNode;\n  title: string;\n  /** the copy; may hold underlined links */\n  text: ReactNode;\n}\n\nexport interface ResendDeliverabilityProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** nine items, three per row on wide screens */\n  items: ResendDeliverabilityItem[];\n  className?: string;\n}\n\nexport function ResendDeliverability({ title, items, className }: ResendDeliverabilityProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground lg:px-gutter\", className)}>\n      <ResendFrame glow=\"end\">\n        <div className=\"px-gutter pt-[4.5rem] pb-16 lg:px-6 lg:pt-24 lg:pb-24\">\n          <ResendHeading align=\"start\" title={title} className=\"max-w-[30rem]\" />\n          <ul className=\"mt-12 grid gap-y-14 lg:mt-16 lg:grid-cols-3 lg:gap-x-[4.75rem] lg:gap-y-[5.25rem]\">\n            {items.map((item, i) => (\n              <li\n                key={item.title}\n                className=\"resend-deliverability-item\"\n                style={{ \"--resend-col\": i % 3 } as CSSProperties}\n              >\n                <div className=\"flex items-center gap-3 lg:block\">\n                  <span className=\"flex text-foreground [&_svg]:size-5\">{item.icon}</span>\n                  <h3 className=\"font-display text-xl leading-[1.3] tracking-[0.01em] text-foreground lg:mt-3.5\">{item.title}</h3>\n                </div>\n                <p className=\"mt-4 text-sm leading-[1.6] text-muted-foreground lg:mt-2 [&_a]:text-foreground [&_a]:underline [&_a]:decoration-foreground/40 [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:decoration-foreground\">\n                  {item.text}\n                </p>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </ResendFrame>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-frame",
+    "resend-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "items",
+      "type": "ResendDeliverabilityItem[]",
+      "required": true,
+      "description": "nine items, three per row on wide screens"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "91f0de7f066e4b2af2c3f931f0e75cb7c1ac1ad6b957ae53f300cbf311f9bbe4"
+}

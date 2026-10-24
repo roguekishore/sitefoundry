@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Galaxy split row",
+  "description": "A half-and-half row on a 12-column grid: media on one side (a square video, a 16:9 image, a small centred artwork or a built card) and, vertically centred on the other, an uppercase eyebrow, a big tightly tracked heading, a lead and a white pill button whose arrow slides on hover. Phones stack media first. An optional row of link columns with left rules and nudging chevrons runs underneath.",
+  "category": "features",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "split",
+    "media",
+    "dark",
+    "big-type",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "mediaShape: square (1:1, fills the half), wide (16:9, fills the half), art (a ~300px centred tile), card (your own element, up to 560px, centred)",
+    "narrowText takes the text down to five columns, leaving a wider gap by the media",
+    "reads --galaxy-stretch to narrow the heading when the galaxy theme is on"
+  ],
+  "entry": "galaxy-split.tsx",
+  "name": "galaxy-split",
+  "files": [
+    {
+      "path": "galaxy-split.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GalaxyButton } from \"@foundry/galaxy-button\";\nimport { GalaxyPlaceholder } from \"@foundry/galaxy-placeholder\";\n\nexport interface GalaxySplitLink {\n  /** the link's title */\n  title: string;\n  /** one or two lines under it */\n  text: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface GalaxySplitProps {\n  /** the small uppercase line over the heading */\n  eyebrow?: string;\n  /** the heading */\n  title: string;\n  /** xl: 40px → 72px (feature stories) · lg: 40px → 60px (business lines) */\n  titleSize?: \"xl\" | \"lg\";\n  /** the paragraph under the heading */\n  body?: string;\n  /** the white pill button */\n  action?: { label: string; href: string };\n  /** the media: an <img>, <video>, or (with mediaShape \"card\") any element; a muted placeholder when empty */\n  media?: ReactNode;\n  /** screen-reader text for the placeholder */\n  mediaLabel?: string;\n  /** which half the media takes on desktop (phones always show it first) */\n  mediaSide?: \"left\" | \"right\";\n  /** square · wide (16:9) · art (small centred tile) · card (your element, centred, up to 560px) */\n  mediaShape?: \"square\" | \"wide\" | \"art\" | \"card\";\n  /** keep the text to five columns, away from the media */\n  narrowText?: boolean;\n  /** link columns under the row (four across on desktop, one ruled list on phones) */\n  links?: GalaxySplitLink[];\n  className?: string;\n}\n\nconst shapes = {\n  square: \"aspect-square w-full\",\n  wide: \"aspect-video w-full\",\n  art: \"mx-auto aspect-[9/10] w-40 lg:w-[19rem]\",\n  card: \"mx-auto w-full max-w-[35rem]\",\n};\n\nexport function GalaxySplit({\n  eyebrow,\n  title,\n  titleSize = \"xl\",\n  body,\n  action,\n  media,\n  mediaLabel,\n  mediaSide = \"left\",\n  mediaShape = \"square\",\n  narrowText,\n  links,\n  className,\n}: GalaxySplitProps) {\n  const left = mediaSide === \"left\";\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-8\">\n          <div className={cn(\"lg:col-span-6 lg:row-start-1\", left ? \"lg:col-start-1\" : \"lg:col-start-7\")}>\n            <div className={cn(shapes[mediaShape], mediaShape !== \"card\" && \"overflow-clip\")}>\n              {media ?? <GalaxyPlaceholder label={mediaLabel} className={mediaShape === \"card\" ? \"aspect-[2/1] rounded-2xl\" : undefined} />}\n            </div>\n          </div>\n          <div\n            className={cn(\n              \"lg:row-start-1\",\n              left ? (narrowText ? \"lg:col-span-5 lg:col-start-8\" : \"lg:col-span-6 lg:col-start-7\") : narrowText ? \"lg:col-span-5 lg:col-start-1\" : \"lg:col-span-6 lg:col-start-1\",\n            )}\n          >\n            {eyebrow && <p className=\"mb-3 text-xs leading-[1.5] tracking-[0.1em] uppercase lg:mb-6 lg:text-sm lg:leading-5\">{eyebrow}</p>}\n            <h2\n              className={cn(\n                \"font-display text-[2.5rem] leading-[1.1] font-[560] tracking-[-0.04em] [font-stretch:var(--galaxy-stretch,100%)]\",\n                titleSize === \"xl\" ? \"lg:text-[4.5rem] lg:leading-[1.0555]\" : \"lg:text-[3.75rem] lg:leading-[1.0667]\",\n              )}\n            >\n              {title}\n            </h2>\n            {body && <p className=\"mt-4 text-base leading-6 lg:mt-8 lg:text-lg lg:leading-[1.5]\">{body}</p>}\n            {action && (\n              <GalaxyButton href={action.href} className={body ? \"mt-7 lg:mt-12\" : \"mt-5 lg:mt-8\"}>\n                {action.label}\n              </GalaxyButton>\n            )}\n          </div>\n        </div>\n        {links && links.length > 0 && (\n          <ul className=\"mt-14 flex flex-col gap-7 border-l border-border lg:mt-[5.5rem] lg:grid lg:grid-cols-4 lg:gap-0 lg:border-l-0\">\n            {links.map((link) => (\n              <li key={link.title} className=\"group relative pl-4 lg:border-l lg:border-border lg:px-6\">\n                <a href={link.href} className=\"inline-flex items-center gap-0.5 text-lg leading-7 after:absolute after:inset-0 lg:text-xl\">\n                  {link.title}\n                  <ChevronRight\n                    aria-hidden\n                    className=\"size-4 transition-transform duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] group-hover:translate-x-2.5 motion-reduce:transition-none\"\n                    strokeWidth={2}\n                  />\n                </a>\n                <p className=\"mt-1 text-base leading-6 text-muted-foreground lg:text-lg lg:leading-7\">{link.text}</p>\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "galaxy-button",
+    "galaxy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small uppercase line over the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "titleSize",
+      "type": "enum",
+      "required": false,
+      "default": "xl",
+      "description": "xl: 40px → 72px (feature stories) · lg: 40px → 60px (business lines)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph under the heading"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the white pill button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the media: an <img>, <video>, or (with mediaShape \"card\") any element; a muted placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader text for the placeholder"
+    },
+    {
+      "name": "mediaSide",
+      "type": "enum",
+      "required": false,
+      "default": "left",
+      "description": "which half the media takes on desktop (phones always show it first)"
+    },
+    {
+      "name": "mediaShape",
+      "type": "enum",
+      "required": false,
+      "default": "square",
+      "description": "square · wide (16:9) · art (small centred tile) · card (your element, centred, up to 560px)"
+    },
+    {
+      "name": "narrowText",
+      "type": "boolean",
+      "required": false,
+      "description": "keep the text to five columns, away from the media"
+    },
+    {
+      "name": "links",
+      "type": "GalaxySplitLink[]",
+      "required": false,
+      "description": "link columns under the row (four across on desktop, one ruled list on phones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1f57daf96216c4b19fc9cf6b55bf512a94fda6ef71b2e1e3d4ea3c1edc838760"
+}

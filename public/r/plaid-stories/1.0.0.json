@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid stories",
+  "description": "A customer-story carousel on the pale page: a 48px heading with two round periwinkle-outlined arrow buttons, then a sideways-scrolling row of cards that runs off the right edge, each a 20px-cornered picture, a 30px navy title and a 'read the story' link with a circled arrow. Arrows slide the row one card; hovering a card zooms its picture slightly. A tall quiet gap follows, as in the original.",
+  "category": "testimonials",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-studies",
+    "carousel",
+    "scroll-snap",
+    "light",
+    "hover",
+    "zoom",
+    "fintech"
+  ],
+  "notes": [
+    "media slot per card: a customer photo (420×250 on desktop, 250×149 on phones); the original's wave-line canvas under the row is left to a soft fade"
+  ],
+  "hydrate": "visible",
+  "entry": "plaid-stories.tsx",
+  "source": "foundry",
+  "name": "plaid-stories",
+  "files": [
+    {
+      "path": "plaid-stories.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight, CircleArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlaidPlaceholder } from \"@foundry/plaid-placeholder\";\n\nexport interface PlaidStory {\n  /** the story's headline */\n  title: string;\n  /** where it links to */\n  href: string;\n  /** the photo. A placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface PlaidStoriesProps {\n  /** the heading */\n  title: string;\n  /** the stories */\n  stories: PlaidStory[];\n  /** the link under each card */\n  linkLabel: string;\n  /** screen-reader labels of the arrow buttons */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst arrow =\n  \"grid size-[2.875rem] place-items-center rounded-full border border-chart-3 text-chart-1 transition-colors duration-150 ease-out hover:bg-chart-3/15 motion-reduce:transition-none lg:size-[3.375rem]\";\n\n/** Plaid's story carousel: a snapping row slid by two round arrows. */\nexport function PlaidStories({ title, stories, linkLabel, previousLabel, nextLabel, className }: PlaidStoriesProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const slide = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.querySelector(\"li\");\n    if (!el || !card) return;\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const smooth = !window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + gap), behavior: smooth ? \"smooth\" : \"auto\" });\n  };\n\n  return (\n    <section className={cn(\"bg-background bg-linear-to-b from-background from-60% to-secondary pb-[19rem] text-foreground lg:pb-[22rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col gap-5 px-gutter lg:flex-row lg:items-center lg:justify-between\">\n        <h2 className=\"font-display text-2xl font-medium tracking-[-0.05em] lg:text-5xl lg:tracking-[-0.04em]\">{title}</h2>\n        <div className=\"flex gap-4\">\n          <button type=\"button\" aria-label={previousLabel} onClick={() => slide(-1)} className={arrow}>\n            <ArrowLeft aria-hidden className=\"size-6 lg:size-7\" strokeWidth={1.75} />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} onClick={() => slide(1)} className={arrow}>\n            <ArrowRight aria-hidden className=\"size-6 lg:size-7\" strokeWidth={1.75} />\n          </button>\n        </div>\n      </div>\n\n      <ul\n        ref={track}\n        className=\"mt-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))] scroll-px-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))] pb-4 [scrollbar-width:none] lg:mt-12 lg:gap-10 [&::-webkit-scrollbar]:hidden\"\n      >\n        {stories.map((s) => (\n          <li key={s.title} className=\"w-[15.625rem] shrink-0 snap-start lg:w-[26.25rem]\">\n            <a href={s.href} className=\"group block\">\n              <span className=\"block aspect-[420/250] overflow-clip rounded-[1.25rem]\">\n                <span className=\"block size-full transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none\">\n                  {s.media ?? <PlaidPlaceholder tone=\"photo\" className=\"size-full\" />}\n                </span>\n              </span>\n              <span className=\"mt-4 block font-display text-lg/[1.4] tracking-[-0.03em] lg:mt-8 lg:text-[1.875rem]/[1.2]\">{s.title}</span>\n              <span className=\"mt-4 inline-flex items-center gap-2 text-base text-primary lg:mt-8 lg:text-xl\">\n                <CircleArrowRight aria-hidden className=\"size-5 text-chart-1 transition-colors duration-300 group-hover:fill-chart-3/25 lg:size-6\" strokeWidth={1.5} />\n                {linkLabel}\n              </span>\n            </a>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plaid-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "stories",
+      "type": "PlaidStory[]",
+      "required": true,
+      "description": "the stories"
+    },
+    {
+      "name": "linkLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link under each card"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "af78218ca1712a4f10e868043e89fac5c0f4e0bb1ba703e36ea5fcfe928470fe"
+}

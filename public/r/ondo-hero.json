@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo tunnel hero",
+  "description": "A white hero 125% of the window tall: a two-part headline split around a square media frame made of three concentric rounded squares (a tunnel of nested videos), side by side on desktop and stacked word-frame-word on phones, with a centred serif sentence below. On load the frames shrink in from screen-filling to their nested sizes while the two halves of the headline slide outwards from behind them; a small 'scroll to explore' hint gives way to the sentence, which fades up.",
+  "category": "hero",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "minimal",
+    "split-headline",
+    "load-in",
+    "media",
+    "window-height",
+    "serif"
+  ],
+  "notes": [
+    "media slots: three square frames (outer, middle, inner), e.g. three crops of one video for the tunnel effect; plain surfaces when empty",
+    "height follows the window (125svh)",
+    "the serif sentence reads var(--ondo-serif) and falls back to the display face in other themes"
+  ],
+  "entry": "ondo-hero.tsx",
+  "name": "ondo-hero",
+  "files": [
+    {
+      "path": "ondo-hero.css",
+      "content": "/* Load-in: the three frames start big (filling the window) and shrink to their nested sizes;\n   the headline halves start behind the frame and slide outwards; the hint fades out while the\n   sentence fades up. --ondo-hero-dx / -dy are the slide distances (vertical on phones). */\n.ondo-hero-hint {\n  opacity: 0;\n}\n\n@media (prefers-reduced-motion: no-preference) {\n  .ondo-hero-frame {\n    animation: ondo-hero-shrink 1.15s cubic-bezier(0.65, 0, 0.35, 1) both;\n  }\n  .ondo-hero-word-a {\n    animation: ondo-hero-word-a 1.15s cubic-bezier(0.65, 0, 0.35, 1) both;\n  }\n  .ondo-hero-word-b {\n    animation: ondo-hero-word-b 1.15s cubic-bezier(0.65, 0, 0.35, 1) both;\n  }\n  .ondo-hero-text {\n    animation: ondo-hero-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 1s both;\n  }\n  .ondo-hero-hint {\n    animation: ondo-hero-hint 1.4s ease-out both;\n  }\n}\n\n@keyframes ondo-hero-shrink {\n  from { transform: scale(var(--ondo-hero-from, 2)); }\n  to { transform: none; }\n}\n\n@keyframes ondo-hero-word-a {\n  from { transform: translate(var(--ondo-hero-dx), var(--ondo-hero-dy)); }\n  to { transform: none; }\n}\n\n@keyframes ondo-hero-word-b {\n  from { transform: translate(calc(var(--ondo-hero-dx) * -1), calc(var(--ondo-hero-dy) * -1)); }\n  to { transform: none; }\n}\n\n@keyframes ondo-hero-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n\n@keyframes ondo-hero-hint {\n  0%, 60% { opacity: 1; }\n  100% { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "ondo-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoPlaceholder } from \"@foundry/ondo-placeholder\";\nimport \"./ondo-hero.css\";\n\nexport interface OndoHeroProps {\n  /** the headline's first half, left of (above) the frame */\n  lead: string;\n  /** the headline's second half, right of (below) the frame */\n  trail: string;\n  /** the serif sentence under the frame */\n  text: string;\n  /** a small hint shown while the hero loads in (e.g. \"Scroll to explore\") */\n  hint?: string;\n  /** the three frames, outer to inner (square videos or images). Plain surfaces when empty */\n  frames?: [ReactNode?, ReactNode?, ReactNode?];\n  className?: string;\n}\n\nconst serif = \"font-[family-name:var(--ondo-serif,var(--typeface-display))]\";\n\n// outer, middle, inner: size as a share of the frame, corner radius, the scale they load in\n// from (so all three start about the same screen-filling size), placeholder tone\nconst layers = [\n  {\n    size: \"size-full\",\n    radius: \"rounded-[2rem] xl:rounded-[2.5rem]\",\n    from: \"[--ondo-hero-from:1.9]\",\n    tone: \"muted\" as const,\n  },\n  {\n    size: \"size-[86%]\",\n    radius: \"rounded-[1.75rem] xl:rounded-[2.25rem]\",\n    from: \"[--ondo-hero-from:2.2]\",\n    tone: \"deep\" as const,\n  },\n  {\n    size: \"size-[61%]\",\n    radius: \"rounded-[1.375rem] xl:rounded-[1.75rem]\",\n    from: \"[--ondo-hero-from:2.9]\",\n    tone: \"muted\" as const,\n  },\n];\n\nconst word =\n  \"relative z-0 block font-display text-[2.75rem] leading-[1.1] font-medium tracking-[-0.035em] whitespace-nowrap text-foreground xl:text-[3.5rem]\";\n\n/** Split headline around a nested-frame \"tunnel\", 125% of the window tall. */\nexport function OndoHero({\n  lead,\n  trail,\n  text,\n  hint,\n  frames,\n  className,\n}: OndoHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"relative min-h-[125svh] overflow-x-clip bg-background\",\n        className,\n      )}\n    >\n      <h1 className=\"sr-only\">{`${lead} ${trail}`}</h1>\n      {/* the first window: the stage centred, the sentence at its foot; the band runs on to 125svh */}\n      <div className=\"flex min-h-svh flex-col items-center px-gutter pt-[7.5rem] pb-9 lg:pb-10\">\n        <div className=\"flex w-full flex-1 items-center justify-center\">\n          <div\n            aria-hidden\n            className=\"flex w-full flex-col items-center gap-10 [--ondo-hero-dx:0px] [--ondo-hero-dy:175px] lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-8 lg:[--ondo-hero-dx:260px] lg:[--ondo-hero-dy:0px] xl:gap-12\"\n          >\n            <span className={cn(word, \"ondo-hero-word-a lg:justify-self-end\")}>\n              {lead}\n            </span>\n            <div className=\"relative z-10 grid size-[18.75rem] shrink-0 place-items-center lg:size-[22rem] xl:size-[28.3rem]\">\n              {layers.map((layer, i) => (\n                <div\n                  key={i}\n                  className={cn(\n                    \"ondo-hero-frame absolute overflow-clip [transform-origin:center]\",\n                    layer.size,\n                    layer.radius,\n                    layer.from,\n                    i > 0 &&\n                      \"shadow-[0_0_0_1px_color-mix(in_oklab,var(--background)_35%,transparent)]\",\n                  )}\n                >\n                  {frames?.[i] ?? <OndoPlaceholder tone={layer.tone} />}\n                </div>\n              ))}\n            </div>\n            <span\n              className={cn(word, \"ondo-hero-word-b lg:justify-self-start\")}\n            >\n              {trail}\n            </span>\n          </div>\n        </div>\n        <div className=\"relative mt-10\">\n          {hint && (\n            <p\n              aria-hidden\n              className=\"ondo-hero-hint absolute inset-x-0 bottom-full mb-6 text-center text-xs font-medium text-muted-foreground\"\n            >\n              {hint}\n            </p>\n          )}\n          <p\n            className={cn(\n              \"ondo-hero-text max-w-[22rem] text-center text-base leading-[1.32] text-foreground lg:max-w-[29.5rem] lg:text-xl lg:leading-[1.32]\",\n              serif,\n            )}\n          >\n            {text}\n          </p>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-placeholder"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the headline's first half, left of (above) the frame"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": true,
+      "description": "the headline's second half, right of (below) the frame"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the serif sentence under the frame"
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "required": false,
+      "description": "a small hint shown while the hero loads in (e.g. \"Scroll to explore\")"
+    },
+    {
+      "name": "frames",
+      "type": "[ReactNode?, ReactNode?, ReactNode?]",
+      "required": false,
+      "description": "the three frames, outer to inner (square videos or images). Plain surfaces when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "45a13271fd1917bf2f4a0db543516cc85d609b7962fbc8af1d1015d763e7b472"
+}

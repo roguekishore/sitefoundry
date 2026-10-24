@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman shrinking store header",
+  "description": "A white store header under a one-line notice: menu and four small links on the left, a bold italic wordmark in the centre, region pill, bag and a blue buy button on the right. As the page scrolls the notice slides away and the full-width bar shrinks into a centred, translucent, blurred pill 13px from the top with only the brand mark left. On phones: mark, text buy link, region dot, bag and menu, turning translucent on scroll.",
+  "category": "header",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "floating",
+    "pill",
+    "glass",
+    "blur",
+    "light",
+    "minimal",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the morph is CSS scroll-driven (scroll(root)): no JavaScript; without support or with reduced motion it stays a full-width bar",
+    "sticky, and takes its own height (32px notice + 45/57px bar) in the flow",
+    "the menu is a native details element"
+  ],
+  "entry": "ultrahuman-header.tsx",
+  "name": "ultrahuman-header",
+  "files": [
+    {
+      "path": "ultrahuman-header.css",
+      "content": "/* Everything here follows the page's own scroll position (scroll(root)) over the first 100px:\n   no JavaScript. Phones: the bar turns translucent. Desktop: the notice slides up out of view\n   and the bar shrinks into a 1280px pill 13px from the top, keeping only the brand mark. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-header-bar {\n      animation: ultrahuman-header-glass linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 100px;\n    }\n\n    @media (min-width: 64rem) {\n      .ultrahuman-header-notice {\n        animation: ultrahuman-header-notice linear both;\n        animation-timeline: scroll(root);\n        animation-range: 0px 100px;\n      }\n      .ultrahuman-header-bar {\n        animation-name: ultrahuman-header-pill;\n      }\n      .ultrahuman-header-word {\n        animation: ultrahuman-header-word linear both;\n        animation-timeline: scroll(root);\n        animation-range: 0px 60px;\n      }\n    }\n  }\n}\n\n@keyframes ultrahuman-header-glass {\n  to {\n    background-color: color-mix(in oklab, var(--background) 72%, transparent);\n    backdrop-filter: blur(16px);\n  }\n}\n\n@keyframes ultrahuman-header-notice {\n  to { transform: translateY(-100%); }\n}\n\n@keyframes ultrahuman-header-pill {\n  from {\n    max-width: 100%;\n    border-radius: 0;\n  }\n  to {\n    max-width: var(--page-width);\n    border-radius: 999px;\n    padding-inline: 1.5rem 0.75rem;\n    transform: translateY(-1.1875rem);\n    background-color: color-mix(in oklab, var(--background) 80%, transparent);\n    backdrop-filter: blur(16px);\n    box-shadow:\n      0 2px 10px color-mix(in oklab, var(--foreground) 5%, transparent),\n      0 1px 2px color-mix(in oklab, var(--foreground) 4%, transparent);\n  }\n}\n\n@keyframes ultrahuman-header-word {\n  from { max-width: 14rem; }\n  to {\n    opacity: 0;\n    max-width: 0;\n    margin-left: -0.625rem;\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight, Globe, Hexagon, Menu, ShoppingBag } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport \"./ultrahuman-header.css\";\n\nexport interface UltrahumanHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface UltrahumanHeaderProps {\n  /** the company name, set as the centred wordmark (and read to screen readers on phones) */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the brand mark shown before the name, and alone once the bar has shrunk (an icon or svg) */\n  mark?: ReactNode;\n  /** the notice line above the bar on desktop */\n  notice: string;\n  /** a shorter notice for phones (falls back to notice) */\n  noticeShort?: string;\n  /** the underlined link after the notice */\n  noticeLink?: UltrahumanHeaderLink;\n  /** the nav items shown on desktop, left of the wordmark (four on the original) */\n  links: UltrahumanHeaderLink[];\n  /** extra items listed only in the menu panel */\n  menuLinks?: UltrahumanHeaderLink[];\n  /** the buy button on the right (a plain text link on phones) */\n  action: UltrahumanHeaderLink;\n  /** the region code in the locale pill, e.g. \"UK\" */\n  locale: string;\n  /** where the bag icon links */\n  cartHref?: string;\n  /** screen-reader labels for the icon buttons */\n  labels?: { menu?: string; cart?: string; locale?: string };\n  className?: string;\n}\n\n/**\n * The store header: a one-line notice over a white bar. While the page scrolls the notice slides\n * away and, on desktop, the bar shrinks into a centred, translucent pill with only the mark showing.\n */\nexport function UltrahumanHeader({\n  brand,\n  brandHref = \"#\",\n  mark,\n  notice,\n  noticeShort,\n  noticeLink,\n  links,\n  menuLinks = [],\n  action,\n  locale,\n  cartHref = \"#\",\n  labels = {},\n  className,\n}: UltrahumanHeaderProps) {\n  const markNode = mark ?? <Hexagon strokeWidth={2.5} />;\n  return (\n    <header className={cn(\"pointer-events-none sticky top-0 z-50\", className)}>\n      <div className=\"ultrahuman-header-notice pointer-events-auto flex h-8 items-center justify-center bg-background px-gutter text-[0.8125rem] leading-none tracking-[-0.01em] text-foreground lg:text-xs\">\n        <p className=\"truncate\">\n          <span className=\"lg:hidden\">{noticeShort ?? notice}</span>\n          <span className=\"hidden lg:inline\">{notice}</span>\n          {noticeLink && (\n            <a href={noticeLink.href} className=\"ml-1.5 hidden underline underline-offset-2 lg:inline\">\n              {noticeLink.label}\n            </a>\n          )}\n        </p>\n        {noticeLink && (\n          <a href={noticeLink.href} aria-label={noticeLink.label} className=\"ml-1 shrink-0 lg:hidden\">\n            <ChevronRight aria-hidden className=\"size-4\" strokeWidth={2.25} />\n          </a>\n        )}\n      </div>\n\n      <div className=\"ultrahuman-header-bar pointer-events-auto relative mx-auto flex h-[2.8125rem] max-w-full items-center gap-3 border-b border-foreground/8 bg-background px-4 text-foreground lg:h-[3.5625rem] lg:gap-0 lg:border-transparent lg:px-12\">\n        <details className=\"group order-last lg:order-first\">\n          <summary aria-label={labels.menu} className=\"grid size-6 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\">\n            <Menu aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full flex flex-col border-t border-foreground/8 bg-background px-gutter py-4 shadow-[0_12px_24px_color-mix(in_oklab,var(--foreground)_6%,transparent)] lg:inset-x-6 lg:mt-2 lg:rounded-lg lg:px-8\">\n            {[...links, ...menuLinks].map((link) => (\n              <a key={link.label} href={link.href} className=\"py-2.5 text-lg tracking-[-0.02em] text-foreground transition-colors duration-[220ms] hover:text-foreground/60\">\n                {link.label}\n              </a>\n            ))}\n          </nav>\n        </details>\n\n        <nav className=\"ml-11 hidden items-center gap-10 lg:flex\">\n          {links.map((link) => (\n            <a\n              key={link.label}\n              href={link.href}\n              className=\"text-[0.8125rem] tracking-[-0.01em] text-foreground transition-colors duration-[220ms] ease-out hover:text-foreground/60 motion-reduce:transition-none\"\n            >\n              {link.label}\n            </a>\n          ))}\n        </nav>\n\n        <a\n          href={brandHref}\n          className=\"order-first flex items-center gap-2.5 text-foreground lg:absolute lg:left-1/2 lg:order-none lg:-translate-x-1/2\"\n        >\n          <span aria-hidden className=\"flex [&_svg]:size-[1.375rem] lg:[&_svg]:size-5\">\n            {markNode}\n          </span>\n          <span className=\"ultrahuman-header-word inline-block overflow-clip whitespace-nowrap text-[1.3125rem] leading-none font-black tracking-[0.02em] uppercase italic max-lg:sr-only\">\n            {brand}\n          </span>\n        </a>\n\n        <div className=\"ml-auto flex items-center gap-3 lg:gap-0\">\n          <a href={action.href} className=\"text-sm tracking-[-0.01em] text-foreground lg:hidden\">\n            {action.label}\n          </a>\n          <a\n            href=\"#\"\n            aria-label={labels.locale}\n            className=\"flex size-7 items-center justify-center gap-1.5 rounded-full border border-foreground/10 text-[0.8125rem] font-medium transition-colors hover:bg-foreground/4 lg:h-7 lg:w-auto lg:px-1.5 lg:pr-2\"\n          >\n            <Globe aria-hidden className=\"size-4 text-foreground/70\" strokeWidth={1.75} />\n            <span className=\"hidden lg:inline\">{locale}</span>\n          </a>\n          <a href={cartHref} aria-label={labels.cart} className=\"grid size-6 place-items-center lg:mr-6 lg:ml-10\">\n            <ShoppingBag aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </a>\n          <UltrahumanButton href={action.href} className=\"hidden min-w-0 px-6 text-[0.8125rem] lg:inline-flex\">\n            {action.label}\n          </UltrahumanButton>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the centred wordmark (and read to screen readers on phones)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the brand mark shown before the name, and alone once the bar has shrunk (an icon or svg)"
+    },
+    {
+      "name": "notice",
+      "type": "string",
+      "required": true,
+      "description": "the notice line above the bar on desktop"
+    },
+    {
+      "name": "noticeShort",
+      "type": "string",
+      "required": false,
+      "description": "a shorter notice for phones (falls back to notice)"
+    },
+    {
+      "name": "noticeLink",
+      "type": "UltrahumanHeaderLink",
+      "required": false,
+      "description": "the underlined link after the notice"
+    },
+    {
+      "name": "links",
+      "type": "UltrahumanHeaderLink[]",
+      "required": true,
+      "description": "the nav items shown on desktop, left of the wordmark (four on the original)"
+    },
+    {
+      "name": "menuLinks",
+      "type": "UltrahumanHeaderLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "extra items listed only in the menu panel"
+    },
+    {
+      "name": "action",
+      "type": "UltrahumanHeaderLink",
+      "required": true,
+      "description": "the buy button on the right (a plain text link on phones)"
+    },
+    {
+      "name": "locale",
+      "type": "string",
+      "required": true,
+      "description": "the region code in the locale pill, e.g. \"UK\""
+    },
+    {
+      "name": "cartHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the bag icon links"
+    },
+    {
+      "name": "labels",
+      "type": "{ menu?: string; cart?: string; locale?: string | undefined; } | undefined",
+      "required": false,
+      "default": "{}",
+      "description": "screen-reader labels for the icon buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "41da344b8bfbc105c52e39fd2f38648bdf6770c316069530226a292317e9f677"
+}

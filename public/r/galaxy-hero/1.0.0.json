@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Galaxy hero",
+  "description": "A centred statement on black: a huge, tightly tracked two-line headline (four lines on phones) with small square art tiles set inline between the words and one word in a signal colour, an 18px lead below, and two outlined pill buttons ringed in orange and blue. A full-bleed backdrop slot sits behind it all.",
+  "category": "hero",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "centered",
+    "big-type",
+    "inline-media",
+    "outline",
+    "minimal"
+  ],
+  "notes": [
+    "the backdrop slot is meant for an animated starfield or canvas; empty, it shows a faint glow wash low in the hero",
+    "give phones their own line breaks with mobileLines; desktop uses lines",
+    "reads --galaxy-stretch to narrow the headline when the galaxy theme is on"
+  ],
+  "entry": "galaxy-hero.tsx",
+  "name": "galaxy-hero",
+  "files": [
+    {
+      "path": "galaxy-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GalaxyButton, type GalaxyTone } from \"@foundry/galaxy-button\";\nimport { GalaxyPlaceholder } from \"@foundry/galaxy-placeholder\";\n\n/** A piece of a headline line: words (optionally in a signal colour) or an inline art tile. */\nexport type GalaxyHeroPart =\n  | {\n      /** the words, spaces included */\n      text: string;\n      /** colour these words: highlight (green), chart-1 (orange), chart-2 (blue) */\n      tone?: GalaxyTone;\n    }\n  | {\n      /** an inline square art tile about one letter-height tall */\n      tile: true;\n      /** the art (an <img> or small <video>); a muted tile when empty */\n      media?: ReactNode;\n    };\n\nexport interface GalaxyHeroAction {\n  /** the button text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** the ring colour */\n  tone: GalaxyTone;\n}\n\nexport interface GalaxyHeroProps {\n  /** the headline on desktop, one array of parts per line */\n  lines: GalaxyHeroPart[][];\n  /** the headline on phones (other line breaks); falls back to lines */\n  mobileLines?: GalaxyHeroPart[][];\n  /** the paragraph under the headline */\n  lead: string;\n  /** the outlined pills (two on the original) */\n  actions: GalaxyHeroAction[];\n  /** the full-bleed backdrop (canvas, video); a faint glow wash when empty */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nconst tones: Record<GalaxyTone, string> = {\n  highlight: \"text-highlight\",\n  \"chart-1\": \"text-chart-1\",\n  \"chart-2\": \"text-chart-2\",\n};\n\nfunction Headline({ lines, className }: { lines: GalaxyHeroPart[][]; className?: string }) {\n  return (\n    <span className={className}>\n      {lines.map((line, i) => (\n        <span key={i} className=\"block\">\n          {line.map((part, j) =>\n            \"tile\" in part ? (\n              <span\n                key={j}\n                aria-hidden\n                className=\"mx-[0.14em] inline-block size-[0.8em] translate-y-[0.06em] overflow-clip rounded-md align-baseline lg:size-[1em] lg:translate-y-[0.14em]\"\n              >\n                {part.media ?? <GalaxyPlaceholder />}\n              </span>\n            ) : (\n              <span key={j} className={part.tone && tones[part.tone]}>\n                {part.text}\n              </span>\n            ),\n          )}\n        </span>\n      ))}\n    </span>\n  );\n}\n\nexport function GalaxyHero({ lines, mobileLines, lead, actions, backdrop, className }: GalaxyHeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"absolute inset-0 -z-10\">{backdrop ?? <GalaxyPlaceholder tone=\"glow\" />}</div>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter pt-10 pb-14 text-center lg:pt-[5.25rem] lg:pb-24\">\n        <h1 className=\"font-display text-[2.875rem] leading-none font-[560] tracking-[-0.04em] [font-stretch:var(--galaxy-stretch,100%)] lg:text-[6rem] lg:leading-[1.04]\">\n          <Headline lines={mobileLines ?? lines} className=\"lg:hidden\" />\n          <Headline lines={lines} className=\"max-lg:hidden\" />\n        </h1>\n        <p className=\"mt-6 max-w-[40rem] text-base leading-6 lg:mt-8 lg:text-lg lg:leading-[1.5]\">{lead}</p>\n        <div className=\"mt-8 flex flex-wrap justify-center gap-4 lg:mt-12 lg:gap-6\">\n          {actions.map((action) => (\n            <GalaxyButton key={action.label} href={action.href} variant=\"outline\" tone={action.tone}>\n              {action.label}\n            </GalaxyButton>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "galaxy-button",
+    "galaxy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "lines",
+      "type": "GalaxyHeroPart[][]",
+      "required": true,
+      "description": "the headline on desktop, one array of parts per line"
+    },
+    {
+      "name": "mobileLines",
+      "type": "GalaxyHeroPart[][]",
+      "required": false,
+      "description": "the headline on phones (other line breaks); falls back to lines"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the headline"
+    },
+    {
+      "name": "actions",
+      "type": "GalaxyHeroAction[]",
+      "required": true,
+      "description": "the outlined pills (two on the original)"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed backdrop (canvas, video); a faint glow wash when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3b8a159cc3125693f2f555baedc241fb69b572992c627947e650717b660b5999"
+}

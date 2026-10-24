@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Hermeus media slot",
+  "description": "A square-cornered media slot: a real image or video fills it like object-fit: cover. Empty, it is plainly a placeholder in one of three looks: a flat grey surface (photos), a deeper grey (film), or a soft light pooled on the band itself (cut-out renders that sit on the page colour).",
+  "category": "card",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video",
+    "flat",
+    "square",
+    "grey"
+  ],
+  "notes": [
+    "size it from outside (aspect-*, h-full, absolute inset-0); it fills its box",
+    "the grey looks are mixed from the foreground, so they show on any band"
+  ],
+  "entry": "hermeus-media.tsx",
+  "source": "foundry",
+  "name": "hermeus-media",
+  "files": [
+    {
+      "path": "hermeus-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface HermeusMediaProps {\n  /** a real image or video; it is stretched to cover the slot. Empty: a plain placeholder */\n  media?: ReactNode;\n  /** what the slot will show, for screen readers (only used while it is empty) */\n  label?: string;\n  /**\n   * the empty look: \"flat\" a grey surface (photos), \"deep\" a darker grey (film),\n   * \"soft\" a soft light on the band's own colour (cut-out renders)\n   */\n  look?: \"flat\" | \"deep\" | \"soft\";\n  className?: string;\n}\n\nconst looks = {\n  flat: \"bg-foreground/12\",\n  deep: \"bg-foreground/40\",\n  soft: \"bg-[radial-gradient(55%_65%_at_62%_52%,color-mix(in_oklab,var(--glow)_75%,transparent),transparent_72%)]\",\n};\n\n/** A square-cornered media slot; empty, a token-grey placeholder. */\nexport function HermeusMedia({ media, label, look = \"flat\", className }: HermeusMediaProps) {\n  return (\n    <div\n      role={media ? undefined : \"img\"}\n      aria-label={media ? undefined : label}\n      className={cn(\n        \"relative overflow-clip\",\n        !media && looks[look],\n        \"[&>img]:absolute [&>img]:inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:absolute [&>video]:inset-0 [&>video]:size-full [&>video]:object-cover\",\n        className,\n      )}\n    >\n      {media}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video; it is stretched to cover the slot. Empty: a plain placeholder"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "what the slot will show, for screen readers (only used while it is empty)"
+    },
+    {
+      "name": "look",
+      "type": "enum",
+      "required": false,
+      "default": "flat",
+      "description": "the empty look: \"flat\" a grey surface (photos), \"deep\" a darker grey (film),\n\"soft\" a soft light on the band's own colour (cut-out renders)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b091885acd954719d278f791f092e179b28b72209ecf1350c86141983d764103"
+}

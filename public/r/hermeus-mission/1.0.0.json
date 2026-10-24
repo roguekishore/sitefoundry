@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hermeus mission",
+  "description": "A mid-grey band: the index label and hairline, then one huge bold amber word at the left and a short statement paragraph in the right half (stacked on phones). As it scrolls in, the label and paragraph fade up with the scroll and the word's letters rise one after another out of a clip line.",
+  "category": "features",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "about",
+    "mission",
+    "statement",
+    "display",
+    "amber",
+    "grey",
+    "split-text",
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "stagger"
+  ],
+  "notes": [
+    "CSS scroll-driven animation; without support, and under reduced motion, everything shows in place",
+    "best with a short single word as the title"
+  ],
+  "entry": "hermeus-mission.tsx",
+  "source": "foundry",
+  "name": "hermeus-mission",
+  "files": [
+    {
+      "path": "hermeus-mission.css",
+      "content": "/* The big word: a view timeline on the heading; each letter rises from below its clip line\n   (~1.2em) into place, staggered 30px of scroll apart, starting 80px after the heading enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hermeus-mission-title {\n      view-timeline-name: --hermeus-mission-title;\n    }\n    .hermeus-mission-char {\n      animation: hermeus-mission-rise linear both;\n      animation-timeline: --hermeus-mission-title;\n      animation-range:\n        entry calc(80px + var(--hermeus-mission-i) * 30px)\n        entry calc(340px + var(--hermeus-mission-i) * 30px);\n    }\n  }\n}\n\n@keyframes hermeus-mission-rise {\n  from { translate: 0 120%; }\n  to { translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "hermeus-mission.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HermeusReveal } from \"@foundry/hermeus-reveal\";\nimport { HermeusSectionLabel } from \"@foundry/hermeus-section-label\";\nimport \"./hermeus-mission.css\";\n\nexport interface HermeusMissionProps {\n  /** the section's number, e.g. \"01\" */\n  index: string;\n  /** the section's name in the label row */\n  label: string;\n  /** the one huge amber word */\n  title: string;\n  /** the statement paragraph */\n  body: string;\n  className?: string;\n}\n\n/** Grey band with a huge amber word left and a statement right; letters rise in on scroll. */\nexport function HermeusMission({ index, label, title, body, className }: HermeusMissionProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-secondary pt-[clamp(1.375rem,9.81vw-1.02rem,7.8rem)] pb-[clamp(2.25rem,0.19rem+8.48vw,7.8rem)] text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <HermeusSectionLabel index={index} label={label} />\n        <div className=\"mt-[clamp(1.25rem,0.6rem+1.6vw,2.2rem)] grid gap-x-5 gap-y-[clamp(2rem,1.5rem+1vw,2.5rem)] lg:grid-cols-2\">\n          <p\n            className=\"hermeus-mission-title -mb-[0.1em] overflow-clip pb-[0.1em] font-display text-[clamp(3.16rem,2.195rem+3.97vw,5.77rem)]/none font-bold tracking-[-0.03em] text-primary\"\n          >\n            <span className=\"sr-only\">{title}</span>\n            {Array.from(title).map((ch, i) => (\n              <span\n                key={i}\n                aria-hidden\n                className=\"hermeus-mission-char inline-block\"\n                style={{ \"--hermeus-mission-i\": i } as CSSProperties}\n              >\n                {ch}\n              </span>\n            ))}\n          </p>\n          <HermeusReveal>\n            <p className=\"text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.3] text-pretty\">{body}</p>\n          </HermeusReveal>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hermeus-reveal",
+    "hermeus-section-label"
+  ],
+  "props": [
+    {
+      "name": "index",
+      "type": "string",
+      "required": true,
+      "description": "the section's number, e.g. \"01\""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the section's name in the label row"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the one huge amber word"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the statement paragraph"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1563051e8d46df2ef25f46c59fe846c4c53273a4f755c4c946487e7a5f0af110"
+}

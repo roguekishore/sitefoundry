@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway footer",
+  "description": "A quiet dark footer: one or two announcement cards with a violet title ending on the left, six link groups in a 3×2 grid on the right and small compliance marks below, then a hairline and a bottom row with the brand mark, a green mono status line and the copyright. Phones get two link columns and a centred bottom row.",
+  "category": "footer",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "status",
+    "mono",
+    "minimal",
+    "developer"
+  ],
+  "notes": [
+    "the featured cards and badges show from lg up, as on the original"
+  ],
+  "entry": "railway-footer.tsx",
+  "source": "foundry",
+  "name": "railway-footer",
+  "files": [
+    {
+      "path": "railway-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface RailwayFooterFeature {\n  /** bold start of the card's title */\n  title: string;\n  /** the violet end of the title */\n  accent?: string;\n  text: string;\n  /** the underlined link at the end of the text */\n  link: { label: string; href: string };\n}\n\nexport interface RailwayFooterGroup {\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface RailwayFooterProps {\n  /** small label above the featured cards */\n  featuredLabel: string;\n  /** one or two announcement cards (desktop only) */\n  featured: RailwayFooterFeature[];\n  /** six link groups, laid out three across on desktops and two on phones */\n  groups: RailwayFooterGroup[];\n  /** small compliance marks under the cards (desktop only): text or images */\n  badges?: ReactNode[];\n  /** the brand mark in the bottom row */\n  mark?: ReactNode;\n  /** the green mono status line, e.g. \"All systems normal\" */\n  status?: { label: string; href: string };\n  /** the copyright line */\n  copyright: string;\n  className?: string;\n}\n\n/**\n * A quiet dark footer: announcement cards with a violet title ending on the left, six link\n * groups in a 3×2 grid on the right, compliance marks, then a hairline and a bottom row with\n * the brand mark, a green mono status line and the copyright. Phones get two link columns\n * and a centred bottom row.\n */\nexport function RailwayFooter({ featuredLabel, featured, groups, badges, mark, status, copyright, className }: RailwayFooterProps) {\n  return (\n    <footer className={cn(\"text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[74rem] px-12 pt-14 pb-20 lg:px-gutter lg:pb-24 xl:px-0\">\n        <div className=\"lg:grid lg:grid-cols-[minmax(0,24.8rem)_minmax(0,41rem)] lg:justify-between lg:gap-12\">\n          <div className=\"hidden flex-col lg:flex\">\n            <p className=\"text-sm font-semibold\">{featuredLabel}</p>\n            <ul className=\"mt-6 grid gap-4\">\n              {featured.map((f) => (\n                <li key={f.title} className=\"rounded-xl border border-border bg-card/60 px-6 py-5 text-sm leading-5\">\n                  <p className=\"font-semibold\">\n                    {f.title} {f.accent && <span className=\"text-ring\">{f.accent}</span>}\n                  </p>\n                  <p className=\"mt-1 text-muted-foreground\">\n                    {f.text}{\" \"}\n                    <a href={f.link.href} className=\"underline underline-offset-2 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n                      {f.link.label}\n                    </a>\n                  </p>\n                </li>\n              ))}\n            </ul>\n            {badges && badges.length > 0 && (\n              <ul className=\"mt-auto flex items-center gap-4 pt-16 text-muted-foreground\">\n                {badges.map((badge, i) => (\n                  <li key={i}>{badge}</li>\n                ))}\n              </ul>\n            )}\n          </div>\n\n          <div className=\"grid grid-cols-2 gap-x-8 gap-y-12 lg:grid-cols-3 lg:gap-x-6 lg:gap-y-16\">\n            {groups.map((group) => (\n              <div key={group.title}>\n                <p className=\"text-sm font-semibold\">{group.title}</p>\n                <ul className=\"mt-5 grid gap-3\">\n                  {group.links.map((link) => (\n                    <li key={link.label} className=\"leading-5\">\n                      <a href={link.href} className=\"text-sm leading-5 text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-12 flex flex-col items-center gap-5 border-t border-border pt-8 text-center lg:flex-row lg:gap-8 lg:text-left\">\n          {mark && <span className=\"flex size-8 items-center justify-center [&_svg]:size-8\">{mark}</span>}\n          {status && (\n            <a href={status.href} className=\"flex items-center gap-1 font-mono text-[0.8125rem] text-chart-2 transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none\">\n              {status.label}\n              <ArrowUpRight className=\"size-3.5 text-muted-foreground\" />\n            </a>\n          )}\n          <p className=\"text-[0.8125rem] text-muted-foreground lg:ml-auto\">{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "featuredLabel",
+      "type": "string",
+      "required": true,
+      "description": "small label above the featured cards"
+    },
+    {
+      "name": "featured",
+      "type": "RailwayFooterFeature[]",
+      "required": true,
+      "description": "one or two announcement cards (desktop only)"
+    },
+    {
+      "name": "groups",
+      "type": "RailwayFooterGroup[]",
+      "required": true,
+      "description": "six link groups, laid out three across on desktops and two on phones"
+    },
+    {
+      "name": "badges",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "small compliance marks under the cards (desktop only): text or images"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the brand mark in the bottom row"
+    },
+    {
+      "name": "status",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the green mono status line, e.g. \"All systems normal\""
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c33fa4b98be6c56f334294913d161c2cc15f522a544fe3c2365381a0ce4c919b"
+}

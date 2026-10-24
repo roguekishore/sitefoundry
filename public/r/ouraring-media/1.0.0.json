@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Oura Ring media slot",
+  "description": "A media slot that fills its box: a real image or video (cover-fitted) when given, otherwise a plain placeholder surface, warm sand for light pictures or warm ink for dark ones.",
+  "category": "card",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "warm"
+  ],
+  "notes": [
+    "the deep tone scopes itself dark (class dark), so it stays a dark panel under any theme and mode",
+    "size, corners and position come from the className the block passes"
+  ],
+  "entry": "ouraring-media.tsx",
+  "source": "foundry",
+  "name": "ouraring-media",
+  "files": [
+    {
+      "path": "ouraring-media.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OuraringMediaProps {\n  /** an <img> or <video>; it is stretched to the box and cover-fitted */\n  media?: ReactNode;\n  /** placeholder colour when empty: warm (sand, for light photos) or deep (warm ink, for dark photos and screens) */\n  tone?: \"warm\" | \"deep\";\n  /** fit for a given image or video */\n  fit?: \"cover\" | \"contain\";\n  className?: string;\n}\n\n/** Fills its box with the given media, or a token-coloured placeholder surface. */\nexport function OuraringMedia({ media, tone = \"warm\", fit = \"cover\", className }: OuraringMediaProps) {\n  if (media) {\n    return (\n      <div\n        className={cn(\n          \"[&>img]:size-full [&>video]:size-full\",\n          fit === \"cover\" ? \"[&>img]:object-cover [&>video]:object-cover\" : \"[&>img]:object-contain [&>video]:object-contain\",\n          className,\n        )}\n      >\n        {media}\n      </div>\n    );\n  }\n  return (\n    <div\n      aria-hidden\n      className={cn(\n        tone === \"warm\" ? \"bg-linear-to-br from-secondary via-muted to-secondary\" : \"dark bg-linear-to-br from-muted via-card to-background\",\n        className,\n      )}\n    />\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "an <img> or <video>; it is stretched to the box and cover-fitted"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "warm",
+      "description": "placeholder colour when empty: warm (sand, for light photos) or deep (warm ink, for dark photos and screens)"
+    },
+    {
+      "name": "fit",
+      "type": "enum",
+      "required": false,
+      "default": "cover",
+      "description": "fit for a given image or video"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "20343a6056d43025a39caefc1bdb008cd0a4daec7d421a5f1c5f9900e12edcbb"
+}

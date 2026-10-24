@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer story ticker",
+  "description": "A two-line title with a small button over an edge-to-edge ticker of tall black hairline cards, each with a customer name centred and a \"Read story →\" link at its foot; the row glides left without end and a card lifts to a dark-grey fill on hover.",
+  "category": "testimonials",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-studies",
+    "dark",
+    "marquee",
+    "ticker",
+    "loop",
+    "hover"
+  ],
+  "notes": [
+    "the ticker is CSS (list rendered twice); with reduced motion it becomes a row you can scroll sideways",
+    "customer names are plain text in the display face; pass `mark` for a real logo"
+  ],
+  "entry": "framer-stories.tsx",
+  "name": "framer-stories",
+  "files": [
+    {
+      "path": "framer-stories.css",
+      "content": "/* The card list is rendered twice; sliding by half the track loops without a seam. */\n.framer-stories-track {\n  animation: framer-stories-slide 60s linear infinite;\n}\n.framer-stories-track:hover {\n  animation-play-state: paused;\n}\n\n@keyframes framer-stories-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .framer-stories-track { animation: none; }\n  .framer-stories-copy { display: none; }\n  .framer-stories-viewport { overflow-x: auto; }\n}\n"
+    },
+    {
+      "path": "framer-stories.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerArrowLink } from \"@foundry/framer-arrow-link\";\nimport { FramerButton } from \"@foundry/framer-button\";\nimport { FramerSectionHead } from \"@foundry/framer-heading\";\nimport \"./framer-stories.css\";\n\nexport interface FramerStory {\n  /** the customer's name, shown as a wordmark in the card's middle */\n  name: string;\n  /** a real logo instead of the text wordmark */\n  mark?: ReactNode;\n  /** the link at the card's foot */\n  link: { label: string; href: string };\n}\n\nexport interface FramerStoriesProps {\n  /** section title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** the small dark button on the right (below the title on phones) */\n  action: { label: string; href: string };\n  /** the cards in the ticker (five or more fill a wide screen) */\n  stories: FramerStory[];\n  className?: string;\n}\n\n/** Edge-to-edge ticker of customer-story cards. */\nexport function FramerStories({ title, action, stories, className }: FramerStoriesProps) {\n  return (\n    <section className={cn(\"bg-background py-15 text-foreground lg:py-[6.75rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:box-content\">\n        <FramerSectionHead\n          title={title}\n          actions={\n            <FramerButton href={action.href} variant=\"secondary\">\n              {action.label}\n            </FramerButton>\n          }\n        />\n      </div>\n\n      <div className=\"framer-stories-viewport mt-12 overflow-x-clip lg:mt-11\">\n        <div className=\"framer-stories-track flex w-max\">\n          {[0, 1].map((copy) => (\n            <ul\n              key={copy}\n              aria-hidden={copy === 1 || undefined}\n              className={cn(\"flex shrink-0 gap-2.5 pr-2.5\", copy === 1 && \"framer-stories-copy\")}\n            >\n              {stories.map((story) => (\n                <li\n                  key={story.name}\n                  className=\"relative flex h-80 w-[15.625rem] flex-col items-center rounded-[calc(var(--radius)*2.5)] border border-border bg-background px-5 pb-6 transition-colors duration-300 hover:bg-card motion-reduce:transition-none lg:h-[28.75rem] lg:w-[22.5rem] lg:pb-9\"\n                >\n                  <div className=\"flex flex-1 items-center\">\n                    {story.mark ? (\n                      <span role=\"img\" aria-label={story.name}>\n                        {story.mark}\n                      </span>\n                    ) : (\n                      <span className=\"font-display text-[1.75rem] font-semibold tracking-[-0.03em] whitespace-nowrap lg:text-[2.375rem]\">\n                        {story.name}\n                      </span>\n                    )}\n                  </div>\n                  <FramerArrowLink\n                    href={story.link.href}\n                    label={story.link.label}\n                    className=\"text-[0.9375rem] after:absolute after:inset-0 lg:text-lg\"\n                    tabIndex={copy === 1 ? -1 : undefined}\n                  />\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-arrow-link",
+    "framer-button",
+    "framer-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the small dark button on the right (below the title on phones)"
+    },
+    {
+      "name": "stories",
+      "type": "FramerStory[]",
+      "required": true,
+      "description": "the cards in the ticker (five or more fill a wide screen)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a205f42721fdc00cc7cb0f680b7fd59cfa7f6b19899b79da5b74666ea119d0de"
+}

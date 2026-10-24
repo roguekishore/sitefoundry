@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ezra member stories",
+  "description": "A midnight band with a 34px light serif heading, then one wide slide at a time: a large photo on the left and a cream panel on the right with an 18px medium quote, a small 12px story and the member's name. Two grey round arrow buttons under it slide the row (500ms ease). On phones the photo sits over the panel.",
+  "category": "testimonials",
+  "site": "ezra",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "slider",
+    "carousel",
+    "dark",
+    "quote",
+    "serif",
+    "photo"
+  ],
+  "notes": [
+    "always dark: the band scopes `dark` and reads the theme's .dark colours; the quote panel is the inverse (foreground on background)",
+    "the photo is a media slot (aspect 794/538 on desktop, 351/238 on phones)",
+    "the arrows need JavaScript; without it the first slide shows"
+  ],
+  "hydrate": "visible",
+  "entry": "ezra-stories.tsx",
+  "source": "foundry",
+  "name": "ezra-stories",
+  "files": [
+    {
+      "path": "ezra-stories.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EzraPlaceholder } from \"@foundry/ezra-placeholder\";\n\nexport interface EzraStory {\n  /** the short pull quote, in quotation marks */\n  quote: string;\n  /** the longer story under it */\n  story: string;\n  /** the member's name and age (\"Dana · 41\") */\n  name: string;\n  /** the member's photo (an <img> filling its box, object-cover); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface EzraStoriesProps {\n  /** the serif heading over the slider */\n  title: string;\n  /** the slides, one shown at a time */\n  stories: EzraStory[];\n  /** accessible names of the arrow buttons */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst arrowClass =\n  \"grid size-12 place-items-center rounded-full bg-muted-foreground text-background transition-colors duration-200 hover:bg-foreground motion-reduce:transition-none\";\n\n/** A dark band of member stories: photo + cream quote panel, one slide at a time. */\nexport function EzraStories({ title, stories, previousLabel, nextLabel, className }: EzraStoriesProps) {\n  const [index, setIndex] = useState(0);\n  const count = stories.length;\n  const go = (step: number) => setIndex((i) => (i + step + count) % count);\n\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content max-w-page px-gutter pt-16 pb-16 lg:pt-[5.5rem] lg:pb-22\">\n        <h2 className=\"max-w-[33rem] font-display text-[2rem] leading-[1.25] font-[350] tracking-[-0.01em] lg:text-[2.15rem] lg:leading-[1.17]\">\n          {title}\n        </h2>\n        <div className=\"mt-4 overflow-clip lg:mt-7\">\n          <ul\n            className=\"flex transition-transform duration-500 ease-[ease] motion-reduce:transition-none\"\n            style={{ transform: `translateX(-${index * 100}%)` }}\n          >\n            {stories.map((story, i) => (\n              <li\n                key={story.name}\n                aria-hidden={i !== index}\n                inert={i !== index}\n                className=\"flex w-full shrink-0 flex-col lg:flex-row\"\n              >\n                <div className=\"relative aspect-[351/238] bg-background lg:aspect-auto lg:min-h-[33.6rem] lg:w-[63%]\">\n                  {story.media ?? <EzraPlaceholder className=\"absolute inset-0\" />}\n                </div>\n                <div className=\"flex flex-1 flex-col justify-center bg-foreground px-6 py-10 text-background lg:px-8 lg:py-12\">\n                  <p className=\"text-lg leading-[1.5] font-medium lg:px-0.5 lg:leading-[1.67]\">{story.quote}</p>\n                  <p className=\"mt-10 text-xs leading-[1.83] lg:mt-12\">{story.story}</p>\n                  <p className=\"mt-10 text-sm lg:mt-12\">{story.name}</p>\n                </div>\n              </li>\n            ))}\n          </ul>\n        </div>\n        {count > 1 && (\n          <div className=\"mt-4 flex gap-4 lg:mt-8.5\">\n            <button type=\"button\" aria-label={previousLabel} onClick={() => go(-1)} className={arrowClass}>\n              <ChevronLeft aria-hidden className=\"size-5\" strokeWidth={2.5} />\n            </button>\n            <button type=\"button\" aria-label={nextLabel} onClick={() => go(1)} className={arrowClass}>\n              <ChevronRight aria-hidden className=\"size-5\" strokeWidth={2.5} />\n            </button>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "ezra-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the serif heading over the slider"
+    },
+    {
+      "name": "stories",
+      "type": "EzraStory[]",
+      "required": true,
+      "description": "the slides, one shown at a time"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "84181b8f34873f4eac1b469ee66a2f6eec8749ee1963753d8162e8761ac450b7"
+}

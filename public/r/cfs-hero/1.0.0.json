@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs hero",
+  "description": "A full-window photo hero: a large light grotesk statement low on the left, and below it up to three short pillars (an orange dot, a monospace label, a small paragraph) on a four-column grid; the first dot is filled and pulses. The content fades in on load; as the hero scrolls away the photo slowly grows (to 105%) and the pillars fade out.",
+  "category": "hero",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "full-bleed",
+    "photo",
+    "dark",
+    "light-type",
+    "mono",
+    "grid",
+    "pulse",
+    "load-in",
+    "scroll",
+    "scrubbed",
+    "parallax",
+    "fade"
+  ],
+  "notes": [
+    "sized by the window (100svh); the media slot covers it like object-fit: cover",
+    "a `dark` subtree: white type over the photo; leaves room at the top for cfs-header in overlay mode",
+    "the scroll effects use CSS scroll timelines and are skipped where unsupported or with reduced motion"
+  ],
+  "entry": "cfs-hero.tsx",
+  "source": "foundry",
+  "name": "cfs-hero",
+  "files": [
+    {
+      "path": "cfs-hero.css",
+      "content": "/* Load: the whole content fades in over 500ms. */\n@media (prefers-reduced-motion: no-preference) {\n  .cfs-hero-in {\n    animation: cfs-hero-fade 500ms ease both;\n  }\n  /* The active pillar's dot pulses every two seconds. */\n  .cfs-hero-dot-active {\n    animation: cfs-hero-pulse 2s ease-in-out infinite;\n  }\n}\n\n@keyframes cfs-hero-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes cfs-hero-pulse {\n  0%, 100% { transform: scale(1); }\n  50% { transform: scale(0.7); }\n}\n\n/* Scrubbed while the hero leaves the window: the photo grows 1 → 1.05 over the whole exit,\n   the pillars fade out over the first half (half a screen of scrolling). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .cfs-hero {\n      view-timeline-name: --cfs-hero;\n    }\n    .cfs-hero-media,\n    .cfs-hero-pillars {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: --cfs-hero;\n    }\n    .cfs-hero-media {\n      animation-name: cfs-hero-grow;\n      animation-range: exit 0% exit 100%;\n    }\n    .cfs-hero-pillars {\n      animation-name: cfs-hero-out;\n      animation-range: exit 0% exit 50%;\n    }\n  }\n}\n\n@keyframes cfs-hero-grow {\n  from { transform: scale(1); }\n  to { transform: scale(1.05); }\n}\n@keyframes cfs-hero-out {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "cfs-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./cfs-hero.css\";\n\nexport interface CfsHeroPillar {\n  /** short monospace label, e.g. \"Build small\" */\n  label: string;\n  /** one or two sentences under it */\n  text: string;\n}\n\nexport interface CfsHeroProps {\n  /** the big statement (wraps to about three lines on wide screens) */\n  title: string;\n  /** up to three pillars shown under the title */\n  pillars: CfsHeroPillar[];\n  /** which pillar's dot is filled (and pulses); default 0 */\n  activeIndex?: number;\n  /** the background photo or video; covers the hero. Empty: a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Full-window photo hero with a light statement and three dotted pillars. */\nexport function CfsHero({ title, pillars, activeIndex = 0, media, className }: CfsHeroProps) {\n  return (\n    <section className={cn(\"cfs-hero dark relative flex h-svh min-h-[40rem] flex-col overflow-clip bg-background text-foreground\", className)}>\n      <div\n        className={cn(\n          \"cfs-hero-media absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n          !media && \"bg-muted\",\n        )}\n      >\n        {media}\n      </div>\n      {/* a soft scrim at the bottom keeps the white type readable on any photo */}\n      <div aria-hidden className=\"absolute inset-0 bg-gradient-to-t from-background/60 via-background/10 to-transparent\" />\n\n      <div className=\"cfs-hero-in relative mx-auto mt-auto w-full max-w-page px-gutter pb-10 lg:pb-[3.25rem]\">\n        <h1 className=\"max-w-[13em] font-display text-[clamp(2.125rem,4.383vw,3.945rem)] leading-[1.2] font-[350]\">{title}</h1>\n\n        <ul className=\"cfs-hero-pillars mt-[2.875rem] grid gap-y-9 lg:mt-[3.25rem] lg:grid-cols-4 lg:gap-x-5\">\n          {pillars.map((pillar, i) => (\n            <li key={pillar.label}>\n              <p className=\"flex items-center gap-[7px] font-mono text-sm leading-[1.2]\">\n                <span\n                  aria-hidden\n                  className={cn(\n                    \"size-3 shrink-0 rounded-full border border-primary\",\n                    i === activeIndex ? \"cfs-hero-dot-active bg-primary\" : \"bg-transparent\",\n                  )}\n                />\n                {pillar.label}\n              </p>\n              <p className=\"mt-3 max-w-[18.75rem] text-sm leading-[1.5] lg:mt-[1.375rem]\">{pillar.text}</p>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big statement (wraps to about three lines on wide screens)"
+    },
+    {
+      "name": "pillars",
+      "type": "CfsHeroPillar[]",
+      "required": true,
+      "description": "up to three pillars shown under the title"
+    },
+    {
+      "name": "activeIndex",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which pillar's dot is filled (and pulses); default 0"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the background photo or video; covers the hero. Empty: a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8159545f0b79b7920b47f396495eb10952bed7e1f01b4be005a2c33b0cda4baa"
+}

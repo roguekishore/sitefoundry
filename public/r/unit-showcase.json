@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit customer carousel",
+  "description": "A one-line heading with two round arrow buttons at the right, over a sideways track of pale, nearly square-cornered company cards that runs off the right edge of the window: a bold wordmark with a hairline arrow circle, a two-line description and a large rounded brand-colour tile at the foot. The arrows glide the track one card at a time and fade to half when there's nowhere to go; on phones the track is swiped.",
+  "category": "testimonials",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "case-studies",
+    "cards",
+    "light",
+    "scroll-snap",
+    "minimal",
+    "fintech",
+    "logos"
+  ],
+  "notes": [
+    "media slot per card: the brand tile (295×199, rounded); empty placeholders rotate through chart tones and the foreground",
+    "the track aligns its first card with the page content and bleeds off the right"
+  ],
+  "hydrate": "visible",
+  "entry": "unit-showcase.tsx",
+  "source": "foundry",
+  "name": "unit-showcase",
+  "files": [
+    {
+      "path": "unit-showcase.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitArrowCircle } from \"@foundry/unit-arrow-circle\";\nimport { UnitPlaceholder, type UnitPlaceholderTone } from \"@foundry/unit-placeholder\";\n\nexport interface UnitShowcaseCard {\n  /** the company's name, set like a wordmark */\n  company: string;\n  /** what they built, one or two lines */\n  description: string;\n  /** where the card links to */\n  href: string;\n  /** the brand tile at the foot (295×199 on desktop); a coloured placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface UnitShowcaseProps {\n  /** the heading at the left of the controls */\n  heading: string;\n  /** the cards, overflowing to the right */\n  cards: UnitShowcaseCard[];\n  /** screen-reader labels of the two arrows */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\nconst tiles: UnitPlaceholderTone[] = [\"chart-4\", \"solid\", \"chart-5\", \"chart-2\", \"chart-1\", \"chart-3\"];\n\n/** A heading with round prev/next arrows over a sideways track of tinted company cards that runs off the right edge. */\nexport function UnitShowcase({ heading, cards, previousLabel, nextLabel, className }: UnitShowcaseProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [edge, setEdge] = useState({ start: true, end: false });\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    const update = () => setEdge({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth > el.scrollWidth - 4 });\n    update();\n    el.addEventListener(\"scroll\", update, { passive: true });\n    window.addEventListener(\"resize\", update);\n    return () => {\n      el.removeEventListener(\"scroll\", update);\n      window.removeEventListener(\"resize\", update);\n    };\n  }, []);\n\n  const move = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.firstElementChild as HTMLElement | null;\n    if (!el || !card) return;\n    const reduced = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.offsetWidth + 20), behavior: reduced ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-background font-sans text-foreground\", className)}>\n      <div className=\"mx-auto flex max-w-page items-center justify-between gap-6 px-gutter pt-4 lg:pt-10\">\n        <h2 className=\"max-w-[22rem] font-display text-[1.640625rem] leading-[1.12] tracking-[-0.02em] lg:max-w-none lg:text-[2.5rem]\">{heading}</h2>\n        <div className=\"hidden shrink-0 gap-3 lg:flex\">\n          <UnitArrowCircle direction=\"left\" size=\"md\" label={previousLabel} onClick={() => move(-1)} disabled={edge.start} />\n          <UnitArrowCircle direction=\"right\" size=\"md\" label={nextLabel} onClick={() => move(1)} disabled={edge.end} />\n        </div>\n      </div>\n\n      <ul\n        ref={track}\n        className=\"mt-7 flex snap-x snap-mandatory gap-5 overflow-x-auto pr-gutter pb-16 pl-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))] [scrollbar-width:none] lg:mt-[4.5rem] lg:pb-36 [&::-webkit-scrollbar]:hidden\"\n        style={{ scrollPaddingInline: \"max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)))\" }}\n      >\n        {cards.map((c, i) => (\n          <li key={c.company} className=\"w-[19.75rem] shrink-0 snap-start lg:w-[21.9375rem]\">\n            <a href={c.href} className=\"group/card flex h-full flex-col rounded-[0.25rem] bg-muted p-5 lg:p-7\">\n              <div className=\"flex items-center justify-between gap-4\">\n                <span className=\"text-[1.375rem] leading-none font-bold tracking-[-0.03em] lg:text-[1.5rem]\">{c.company}</span>\n                <UnitArrowCircle />\n              </div>\n              <p className=\"mt-6 text-[1.09375rem] leading-[1.25] tracking-[-0.01em] lg:mt-7 lg:text-[1.375rem] lg:leading-[1.23]\">{c.description}</p>\n              <div className=\"mt-auto pt-12 lg:pt-14\">\n                <div className=\"aspect-[295/199] overflow-clip rounded-lg\">\n                  {c.media ?? <UnitPlaceholder tone={tiles[i % tiles.length]} className=\"size-full transition-transform duration-[1025ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] group-hover/card:scale-[1.03] motion-reduce:transition-none\" />}\n                </div>\n              </div>\n            </a>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-arrow-circle",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading at the left of the controls"
+    },
+    {
+      "name": "cards",
+      "type": "UnitShowcaseCard[]",
+      "required": true,
+      "description": "the cards, overflowing to the right"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels of the two arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a2f3cb6f9cd87da59e3f874dc2454f109026df155f0221258137603bc431e342"
+}

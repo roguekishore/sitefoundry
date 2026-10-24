@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reflect hero",
+  "description": "A centred night-sky opening: pill badge, a 72px gradient-filled heading, a muted lead, a violet and a dark button and a line of small print; below, a glowing horizon with two hairline orbit rings (with square beads) that turn slowly in opposite directions inside a turning starfield, and the app window rising out of it in a double hairline frame that fades away at the bottom, with a round glass play button that swells on hover. On phones the heading wraps to two lines, the buttons stack and the window becomes a tall phone-shaped crop.",
+  "category": "hero",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "space",
+    "glow",
+    "violet",
+    "orbit",
+    "stars",
+    "loop",
+    "rotate",
+    "gradient-text",
+    "app-window",
+    "video"
+  ],
+  "notes": [
+    "backdrop (16:9 light effect, a looping video in the original) and screen (1198×748 desktop, 350×658 phone) are media slots; empty, they are a glow wash and a muted panel",
+    "designed for a dark theme: on light themes the glow reads as a soft lilac wash",
+    "rings and stars are CSS loops and stop under reduced motion"
+  ],
+  "entry": "reflect-hero.tsx",
+  "source": "foundry",
+  "name": "reflect-hero",
+  "files": [
+    {
+      "path": "reflect-hero.css",
+      "content": "/* The two orbit rings behind the app window turn once every 100s, opposite ways. */\n.reflect-hero-orbit {\n  animation: reflect-hero-orbit 100s linear infinite;\n}\n.reflect-hero-orbit-reverse {\n  animation-direction: reverse;\n}\n\n/* The app window fades out towards its bottom edge. */\n.reflect-hero-window-fade {\n  mask-image: linear-gradient(180deg, var(--foreground) 50%, transparent 92%);\n}\n\n@keyframes reflect-hero-orbit {\n  to { transform: rotate(360deg); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .reflect-hero-orbit { animation: none; }\n}\n"
+    },
+    {
+      "path": "reflect-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectButton } from \"@foundry/reflect-button\";\nimport { ReflectHeading } from \"@foundry/reflect-heading\";\nimport { ReflectMedia } from \"@foundry/reflect-media\";\nimport { ReflectStarfield } from \"@foundry/reflect-starfield\";\nimport \"./reflect-hero.css\";\n\nexport interface ReflectHeroAction {\n  label: string;\n  href: string;\n}\n\nexport interface ReflectHeroProps {\n  /** the pill above the heading */\n  eyebrow?: string;\n  /** a small icon inside the pill */\n  eyebrowIcon?: ReactNode;\n  eyebrowHref?: string;\n  /** the opening line; \"\\n\" breaks it on desktop only */\n  title: string;\n  /** one or two lines under the heading */\n  lead: string;\n  /** the violet button */\n  primaryAction: ReflectHeroAction;\n  /** the dark button next to it */\n  secondaryAction?: ReflectHeroAction;\n  /** small print under the buttons */\n  note?: string;\n  /** the light effect behind the app window (a looping video in the original); a glow wash when empty */\n  backdrop?: ReactNode;\n  /** the app screenshot inside the window (1.6:1 on desktop, a tall phone crop on phones) */\n  screen?: ReactNode;\n  /** accessible names of the empty placeholders */\n  backdropLabel?: string;\n  screenLabel?: string;\n  /** the round play button over the window (opens a film in the original) */\n  play?: ReflectHeroAction;\n  className?: string;\n}\n\n/** A ring with four small square beads, turning slowly. */\nfunction Orbit({ className, reverse }: { className: string; reverse?: boolean }) {\n  const bead = \"absolute size-1.5 rounded-[2px] border border-foreground/25 bg-background\";\n  return (\n    <div\n      aria-hidden\n      className={cn(\n        \"reflect-hero-orbit absolute top-0 left-1/2 rounded-full border border-foreground/[0.07]\",\n        reverse && \"reflect-hero-orbit-reverse\",\n        className,\n      )}\n    >\n      <span className={cn(bead, \"top-0 left-1/2 -translate-1/2\")} />\n      <span className={cn(bead, \"top-[14.6%] left-[14.6%] -translate-1/2\")} />\n      <span className={cn(bead, \"top-[14.6%] right-[14.6%] translate-x-1/2 -translate-y-1/2\")} />\n      <span className={cn(bead, \"top-1/2 right-0 translate-x-1/2 -translate-y-1/2\")} />\n      <span className={cn(bead, \"top-1/2 left-0 -translate-1/2\")} />\n    </div>\n  );\n}\n\n/** Centred heading and buttons over a glowing horizon, then the app window rising out of it. */\nexport function ReflectHero({\n  eyebrow,\n  eyebrowIcon,\n  eyebrowHref,\n  title,\n  lead,\n  primaryAction,\n  secondaryAction,\n  note,\n  backdrop,\n  screen,\n  backdropLabel,\n  screenLabel,\n  play,\n  className,\n}: ReflectHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"relative isolate overflow-clip bg-background text-foreground\",\n        // the faint violet light at the top of the page\n        \"bg-[radial-gradient(60%_40%_at_50%_0%,color-mix(in_oklab,var(--glow)_9%,transparent),transparent)]\",\n        className,\n      )}\n    >\n      <div className=\"relative z-10 px-gutter pt-[6.75rem] lg:pt-[10.875rem]\">\n        <ReflectHeading\n          as=\"h1\"\n          size=\"hero\"\n          eyebrow={eyebrow}\n          eyebrowIcon={eyebrowIcon}\n          eyebrowHref={eyebrowHref}\n          title={title}\n          lead={lead}\n          leadClassName=\"max-w-[20.5rem] sm:max-w-[33.5rem]\"\n        >\n          <div className=\"flex flex-col items-center gap-3 sm:flex-row\">\n            <ReflectButton href={primaryAction.href}>{primaryAction.label}</ReflectButton>\n            {secondaryAction && (\n              <ReflectButton href={secondaryAction.href} variant=\"secondary\">\n                {secondaryAction.label}\n              </ReflectButton>\n            )}\n          </div>\n        </ReflectHeading>\n        {note && <p className=\"mx-auto mt-6 text-center text-sm/5 text-muted-foreground lg:mt-4 lg:text-[0.9375rem]/6\">{note}</p>}\n      </div>\n\n      <div className=\"relative -mb-[4.875rem] mt-[7.5rem] px-2.5 lg:mt-[14.5rem] lg:px-gutter\">\n        {/* horizon: the light behind the window, the orbit rings and the stars, centred on its top edge */}\n        <div aria-hidden={!backdrop} className=\"pointer-events-none absolute inset-x-0 top-0\">\n          <ReflectMedia\n            tone=\"glow\"\n            label={backdropLabel}\n            className=\"absolute top-0 left-1/2 aspect-video w-[60rem] -translate-1/2 bg-[radial-gradient(20%_26%_at_50%_50%,color-mix(in_oklab,var(--glow)_85%,var(--foreground)),color-mix(in_oklab,var(--glow)_50%,transparent)_50%,color-mix(in_oklab,var(--glow)_12%,transparent)_80%,transparent)] lg:w-[90rem]\"\n          >\n            {backdrop}\n          </ReflectMedia>\n          <div className=\"absolute top-[2.875rem] left-1/2 size-[50.625rem] -translate-1/2\">\n            <Orbit className=\"top-[12.25rem] size-[26.25rem] -translate-x-1/2\" />\n            <Orbit reverse className=\"size-[50.625rem] -translate-x-1/2\" />\n            <ReflectStarfield size={760} count={70} seed={3} className=\"rounded-full\" />\n          </div>\n        </div>\n\n        {/* the app window: a hairline frame with an 8px inner gutter */}\n        <div className=\"reflect-hero-window-fade relative mx-auto max-w-[76rem] rounded-[1.5rem] border border-foreground/10 bg-background/60 p-2.5 shadow-[inset_0_0_0_8px_color-mix(in_oklab,var(--foreground)_3%,transparent)] lg:p-2\">\n          <ReflectMedia\n            tone=\"panel\"\n            label={screenLabel}\n            className=\"aspect-[350/658] rounded-2xl border border-border bg-card sm:aspect-[1198/748]\"\n          >\n            {screen}\n          </ReflectMedia>\n        </div>\n        {play && (\n          <a\n            href={play.href}\n            aria-label={play.label}\n            className=\"group absolute top-[14.3rem] left-1/2 grid size-[5.5rem] -translate-x-1/2 place-items-center lg:top-[15.3rem] lg:size-28\"\n          >\n            <span className=\"absolute inset-0 rounded-full border border-foreground/10 bg-foreground/[0.06] transition-all duration-300 ease-in-out group-hover:scale-[1.07] motion-reduce:transition-none\" />\n            <span className=\"relative grid size-16 place-items-center rounded-full bg-background/80 text-foreground transition-all duration-300 ease-in-out group-hover:scale-[1.2] motion-reduce:transition-none lg:size-20\">\n              <Play aria-hidden className=\"size-5 fill-current\" />\n            </span>\n          </a>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-button",
+    "reflect-heading",
+    "reflect-media",
+    "reflect-starfield"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the pill above the heading"
+    },
+    {
+      "name": "eyebrowIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon inside the pill"
+    },
+    {
+      "name": "eyebrowHref",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the opening line; \"\\n\" breaks it on desktop only"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "one or two lines under the heading"
+    },
+    {
+      "name": "primaryAction",
+      "type": "ReflectHeroAction",
+      "required": true,
+      "description": "the violet button"
+    },
+    {
+      "name": "secondaryAction",
+      "type": "ReflectHeroAction",
+      "required": false,
+      "description": "the dark button next to it"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "small print under the buttons"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the light effect behind the app window (a looping video in the original); a glow wash when empty"
+    },
+    {
+      "name": "screen",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the app screenshot inside the window (1.6:1 on desktop, a tall phone crop on phones)"
+    },
+    {
+      "name": "backdropLabel",
+      "type": "string",
+      "required": false,
+      "description": "accessible names of the empty placeholders"
+    },
+    {
+      "name": "screenLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "play",
+      "type": "ReflectHeroAction",
+      "required": false,
+      "description": "the round play button over the window (opens a film in the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ebdacae07e10d1ba86f24653978c3ca53d52426fb53e383422efd502dc3f4d8f"
+}

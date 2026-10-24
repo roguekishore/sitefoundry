@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Castelion lines",
+  "description": "Text set line by line, each line in its own mask: as the text scrolls into view every line slides up out of its mask one after another (or, in the fade variant, rises 28px and fades in). Lines flow together on phones and break where you split them on desktop.",
+  "category": "text-effect",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "split-lines",
+    "mask",
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "stagger"
+  ],
+  "notes": [
+    "pure CSS scroll-driven animation (view timeline); browsers without it, and reduced motion, show the text in place",
+    "each entry of `lines` is one desktop line; on phones the entries flow and wrap freely"
+  ],
+  "entry": "castelion-lines.tsx",
+  "source": "foundry",
+  "name": "castelion-lines",
+  "files": [
+    {
+      "path": "castelion-lines.css",
+      "content": "/* Each line is a clipping box; its inner text slides up out of it while the line scrolls into\n   view (over a fixed 280px of scroll, each line 40px later than the one above). The fade\n   variant rises 28px and fades in instead, without clipping. */\n.castelion-lines-line {\n  view-timeline-name: --castelion-line;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-lines-inner {\n      animation: castelion-lines-rise linear both;\n      animation-timeline: --castelion-line;\n      animation-range: entry calc(var(--castelion-line-i, 0) * 40px) entry calc(280px + var(--castelion-line-i, 0) * 40px);\n    }\n    .castelion-lines[data-variant=\"fade\"] .castelion-lines-inner {\n      animation-name: castelion-lines-fade;\n    }\n  }\n}\n\n@keyframes castelion-lines-rise {\n  from { transform: translateY(110%); }\n  to { transform: none; }\n}\n\n@keyframes castelion-lines-fade {\n  from { opacity: 0; transform: translateY(28px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-lines.tsx",
+      "content": "import { Fragment, type CSSProperties, type ElementType } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./castelion-lines.css\";\n\nexport interface CastelionLinesProps {\n  /** the text, one entry per desktop line (phones let the entries flow and wrap) */\n  lines: string[];\n  /** the element to render, e.g. \"h2\" or \"p\" */\n  as?: ElementType;\n  /** mask: each line slides up out of a clip (titles) · fade: each line rises 28px and fades in (copy) */\n  variant?: \"mask\" | \"fade\";\n  /** where the stagger starts counting, to continue it from text above */\n  startIndex?: number;\n  className?: string;\n}\n\n/** Text revealed line by line as it scrolls into view. */\nexport function CastelionLines({ lines, as: Tag = \"p\", variant = \"mask\", startIndex = 0, className }: CastelionLinesProps) {\n  return (\n    <Tag className={cn(\"castelion-lines\", className)} data-variant={variant}>\n      {lines.map((line, i) => (\n        <Fragment key={i}>\n          {i > 0 && <br className=\"max-lg:hidden\" />}\n          {i > 0 && \" \"}\n          <span\n            className={cn(\n              \"castelion-lines-line inline-block align-top\",\n              variant === \"mask\" && \"-mb-[0.14em] overflow-clip pb-[0.14em]\",\n              variant === \"fade\" && \"max-lg:inline\",\n            )}\n            style={{ \"--castelion-line-i\": startIndex + i } as CSSProperties}\n          >\n            <span className={cn(\"castelion-lines-inner block\", variant === \"fade\" && \"max-lg:inline\")}>{line}</span>\n          </span>\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lines",
+      "type": "string[]",
+      "required": true,
+      "description": "the text, one entry per desktop line (phones let the entries flow and wrap)"
+    },
+    {
+      "name": "as",
+      "type": "ElementType",
+      "required": false,
+      "default": "p",
+      "description": "the element to render, e.g. \"h2\" or \"p\""
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "mask",
+      "description": "mask: each line slides up out of a clip (titles) · fade: each line rises 28px and fades in (copy)"
+    },
+    {
+      "name": "startIndex",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "where the stagger starts counting, to continue it from text above"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "15749105726d2c692017caa00eb047dd85c09edc6ee0a302070f5f868815e86d"
+}

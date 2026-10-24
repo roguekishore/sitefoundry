@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash insights track",
+  "description": "A left-aligned serif heading with an italic word and a grey line, two small round arrow buttons on the right, and a sideways track of article cards that starts on the page column and runs out to the window edge: a 16:9 thumbnail with 8px corners (a gentle zoom on hover), a warm category with a dot and small-caps date, a two-line 20px headline and a grey reading time.",
+  "category": "gallery",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "articles",
+    "carousel",
+    "scroll-snap",
+    "dark",
+    "serif",
+    "hover"
+  ],
+  "notes": [
+    "the track swipes and snaps without JavaScript; the arrows need it (hydrate)",
+    "category text uses the theme's glow colour"
+  ],
+  "hydrate": "visible",
+  "entry": "slash-insights.tsx",
+  "source": "foundry",
+  "name": "slash-insights",
+  "files": [
+    {
+      "path": "slash-insights.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashHeading, type SlashHeadingPart } from \"@foundry/slash-heading\";\nimport { SlashPlaceholder } from \"@foundry/slash-placeholder\";\n\nexport interface SlashArticle {\n  /** the category, in the warm accent */\n  category: string;\n  /** the date, set in small caps */\n  date: string;\n  /** the headline (two lines at most) */\n  title: string;\n  /** the reading time line (\"≈ 4 minute read\") */\n  readTime: string;\n  /** where it links */\n  href: string;\n  /** the 16:9 thumbnail; a dim surface stands in when empty */\n  image?: ReactNode;\n}\n\nexport interface SlashInsightsProps {\n  /** the heading, as runs; `{ italic: \"modern\" }` sets a run in italic */\n  heading: SlashHeadingPart[];\n  /** the grey line under it */\n  sub?: string;\n  /** the articles in the track */\n  articles: SlashArticle[];\n  /** accessible names of the arrow buttons */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** A serif heading with round arrow buttons over a sideways track of article cards that runs out to the window edge. */\nexport function SlashInsights({ heading, sub, articles, prevLabel, nextLabel, className }: SlashInsightsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.querySelector(\"li\");\n    if (!el || !card) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + 32), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n  const arrow = \"grid size-9 place-items-center rounded-full bg-secondary text-foreground transition-colors duration-150 hover:bg-accent lg:size-9\";\n\n  return (\n    <section className={cn(\"bg-background pt-section pb-24 text-foreground lg:pt-[calc(var(--section-y)*2.4)] lg:pb-56\", className)}>\n      <div className=\"mx-auto flex max-w-page items-end justify-between gap-8 px-gutter\">\n        <SlashHeading parts={heading} sub={sub} size=\"md\" align=\"left\" headingClassName=\"max-w-[16rem] lg:max-w-none\" />\n        <div className=\"mb-14 hidden gap-5 lg:flex\">\n          <button type=\"button\" aria-label={prevLabel} onClick={() => step(-1)} className={cn(arrow, \"opacity-50\")}>\n            <ChevronLeft aria-hidden className=\"size-4\" strokeWidth={1.75} />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} onClick={() => step(1)} className={arrow}>\n            <ChevronRight aria-hidden className=\"size-4\" strokeWidth={1.75} />\n          </button>\n        </div>\n      </div>\n      <ul\n        ref={track}\n        className=\"mt-6 flex snap-x snap-mandatory gap-8 overflow-x-auto pr-gutter [scrollbar-width:none] lg:mt-10 [&::-webkit-scrollbar]:hidden\"\n        style={{\n          paddingLeft: \"max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)))\",\n          scrollPaddingLeft: \"max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)))\",\n        }}\n      >\n        {articles.map((article) => (\n          <li key={article.title} className=\"w-[20rem] shrink-0 snap-start lg:w-[21.25rem]\">\n            <a href={article.href} className=\"group block\">\n              <span className=\"relative block aspect-[340/192] overflow-clip rounded-md\">\n                <span className=\"absolute inset-0 transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transition-none\">\n                  {article.image ?? <SlashPlaceholder tone=\"dim\" className=\"absolute inset-0\" />}\n                </span>\n              </span>\n              <span className=\"mt-4 flex items-center gap-2 text-[0.8125rem] font-medium tracking-[0.01em]\">\n                <span className=\"text-glow\">{article.category}</span>\n                <span aria-hidden className=\"size-1 rounded-full bg-muted-foreground\" />\n                <span className=\"tracking-[0.04em] text-muted-foreground uppercase\">{article.date}</span>\n              </span>\n              <span className=\"mt-2.5 line-clamp-2 text-xl leading-[1.4] tracking-[-0.03em] transition-colors duration-150 group-hover:text-foreground/80\">{article.title}</span>\n              <span className=\"mt-3 block text-sm tracking-[-0.01em] text-muted-foreground\">{article.readTime}</span>\n            </a>\n          </li>\n        ))}\n      </ul>\n      <div className=\"mx-auto mt-6 flex max-w-page justify-end gap-5 px-gutter lg:hidden\">\n        <button type=\"button\" aria-label={prevLabel} onClick={() => step(-1)} className={cn(arrow, \"opacity-50\")}>\n          <ChevronLeft aria-hidden className=\"size-4\" strokeWidth={1.75} />\n        </button>\n        <button type=\"button\" aria-label={nextLabel} onClick={() => step(1)} className={arrow}>\n          <ChevronRight aria-hidden className=\"size-4\" strokeWidth={1.75} />\n        </button>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-heading",
+    "slash-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs; `{ italic: \"modern\" }` sets a run in italic"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "articles",
+      "type": "SlashArticle[]",
+      "required": true,
+      "description": "the articles in the track"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47ea03b5a118c6e2a9a41596541f66aeff094fda79aa426e773500b1ba74e3db"
+}

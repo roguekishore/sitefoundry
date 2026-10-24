@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Ondo two-tone heading",
+  "description": "The site's section heading: a small medium-weight label above, then a tightly tracked heading whose first line is ink and second line a mid-grey, at 40px on phones and 60px on desktop (or a 20/30px size). Fades up 40px as it enters view.",
+  "category": "text",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "two-tone",
+    "minimal",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "the reveal is a CSS scroll-driven animation: browsers without it show the heading in place"
+  ],
+  "entry": "ondo-heading.tsx",
+  "name": "ondo-heading",
+  "files": [
+    {
+      "path": "ondo-heading.css",
+      "content": "/* Fades up 40px while its top enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ondo-heading-reveal {\n      animation: ondo-heading-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes ondo-heading-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ondo-heading.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./ondo-heading.css\";\n\nexport interface OndoHeadingProps {\n  /** the first line, in ink */\n  lead: string;\n  /** an optional second line, in grey */\n  trail?: string;\n  /** a small label above the heading */\n  eyebrow?: string;\n  /** display: 40 → 60px · title: 20 → 30px */\n  size?: \"display\" | \"title\";\n  /** text alignment */\n  align?: \"left\" | \"center\";\n  /** the heading level */\n  as?: \"h1\" | \"h2\" | \"h3\";\n  /** fade up as it scrolls into view */\n  reveal?: boolean;\n  className?: string;\n}\n\n/** Label + two-tone heading, the way every section on the site opens. */\nexport function OndoHeading({ lead, trail, eyebrow, size = \"display\", align = \"left\", as: Tag = \"h2\", reveal = true, className }: OndoHeadingProps) {\n  return (\n    <div className={cn(align === \"center\" && \"text-center\", reveal && \"ondo-heading-reveal\", className)}>\n      {eyebrow && <p className=\"mb-6 text-sm font-medium text-foreground/70 lg:mb-8 lg:text-base\">{eyebrow}</p>}\n      <Tag\n        className={cn(\n          \"font-display font-medium text-foreground\",\n          size === \"display\"\n            ? \"text-[2.5rem] leading-[1.05] tracking-[-0.035em] lg:text-[3.75rem] lg:leading-[1.05]\"\n            : \"text-xl leading-[1.3] tracking-[-0.02em] lg:text-[1.875rem] lg:leading-[1.2]\",\n        )}\n      >\n        <span className=\"block\">{lead}</span>\n        {trail && <span className=\"block text-foreground/50\">{trail}</span>}\n      </Tag>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the first line, in ink"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": false,
+      "description": "an optional second line, in grey"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "a small label above the heading"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "display",
+      "description": "display: 40 → 60px · title: 20 → 30px"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "left",
+      "description": "text alignment"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the heading level"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "fade up as it scrolls into view"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "12210b5b3b86cf3349bc73f7d996b6ccc449e6e69e8f2162199d6d7ec9eb3aef"
+}

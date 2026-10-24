@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid network",
+  "description": "A pale two-column section: on the left a zig-zag column of white app notifications (coloured icon tile, app name, time, one-line message) alternating with small picture chips under long soft shadows; on the right a 70px navy heading, a 24px grey paragraph and a 2×2 grid of big light serif figures in a purple gradient that count up as they come into view, each over a 30px tight navy label. On phones the text and stacked figures come first, then rows of a notification beside a chip peeking in from the edge.",
+  "category": "stats",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "counter",
+    "count-up",
+    "notifications",
+    "feed",
+    "light",
+    "serif",
+    "gradient-text",
+    "fintech"
+  ],
+  "notes": [
+    "media slots: the picture chips (238×83, 13px corners); the original's moving wave-line canvas behind the feed is left out",
+    "figures use var(--typeface-serif, Georgia); the count runs after hydration (static HTML shows the final numbers)"
+  ],
+  "hydrate": "visible",
+  "entry": "plaid-network.tsx",
+  "source": "foundry",
+  "name": "plaid-network",
+  "files": [
+    {
+      "path": "plaid-network.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport type { LucideIcon } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AnchorageCount } from \"@foundry/anchorage-count\";\nimport { PlaidPlaceholder } from \"@foundry/plaid-placeholder\";\n\nexport interface PlaidNetworkNote {\n  /** the app sending it */\n  app: string;\n  /** when, e.g. \"2m ago\" */\n  time: string;\n  /** the one-line message */\n  message: string;\n  /** the icon on the coloured tile */\n  icon: LucideIcon;\n}\n\nexport interface PlaidNetworkStat {\n  /** the figure as shown, e.g. \"3 in 5\", \"31%\", \"9,400\"; the first number in it counts up */\n  value: string;\n  /** the label under it */\n  label: string;\n}\n\nexport interface PlaidNetworkProps {\n  /** the big heading */\n  title: string;\n  /** the grey paragraph under it */\n  body: string;\n  /** the figures (four fill the 2×2 grid) */\n  stats: PlaidNetworkStat[];\n  /** the notifications in the feed (three or four) */\n  notes: PlaidNetworkNote[];\n  /** pictures for the chips between notifications; one more chip than notes is drawn, placeholders where missing */\n  chips?: ReactNode[];\n  className?: string;\n}\n\n// Where each feed item sits from the left edge on desktop (chip, note, chip, note…): the zig-zag.\nconst desktopOffsets = [\"ml-[3.625rem]\", \"ml-[9.0625rem]\", \"ml-[13.5rem]\", \"ml-[10.8125rem]\", \"ml-[7.1875rem]\", \"ml-[10.8125rem]\", \"ml-[1.8125rem]\"];\n// The tiles take turns between the theme's bright colours.\nconst tiles = [\"bg-glow\", \"bg-chart-4\", \"bg-chart-1\", \"bg-highlight\"];\n\nfunction Note({ note, index, className }: { note: PlaidNetworkNote; index: number; className?: string }) {\n  const Icon = note.icon;\n  return (\n    <div className={cn(\"flex items-center gap-3 rounded-[0.8125rem] border border-border bg-card p-2.5 shadow-[0_14px_22px_-8px] shadow-foreground/12 lg:p-3.5\", className)}>\n      <span className={cn(\"grid size-11 shrink-0 place-items-center rounded-[0.625rem] text-card lg:size-[3.375rem]\", tiles[index % tiles.length])}>\n        <Icon aria-hidden className=\"size-6 lg:size-7\" strokeWidth={2} />\n      </span>\n      <span className=\"min-w-0 flex-1\">\n        <span className=\"flex justify-between gap-3 text-[0.6875rem] text-muted-foreground lg:text-[0.8125rem]\">\n          <span>{note.app}</span>\n          <span>{note.time}</span>\n        </span>\n        <span className=\"block truncate text-base text-primary lg:text-xl\">{note.message}</span>\n      </span>\n    </div>\n  );\n}\n\nfunction Chip({ media, className }: { media?: ReactNode; className?: string }) {\n  return (\n    <div className={cn(\"h-16 w-[11.5rem] overflow-clip rounded-[0.8125rem] shadow-[0_14px_22px_-8px] shadow-foreground/15 lg:h-[5.1875rem] lg:w-[14.875rem]\", className)}>\n      {media ?? <PlaidPlaceholder tone=\"photo\" className=\"size-full\" />}\n    </div>\n  );\n}\n\n/** Plaid's network section: a notification feed beside counted-up figures. */\nexport function PlaidNetwork({ title, body, stats, notes, chips = [], className }: PlaidNetworkProps) {\n  // chip, note, chip, note … chip\n  const feed: ReactNode[] = [];\n  notes.forEach((note, i) => {\n    feed.push(<Chip key={`c${i}`} media={chips[i]} />);\n    feed.push(<Note key={`n${i}`} note={note} index={i} className=\"w-[19.9375rem]\" />);\n  });\n  feed.push(<Chip key=\"clast\" media={chips[notes.length]} />);\n\n  return (\n    <section className={cn(\"overflow-clip bg-background pb-20 text-foreground lg:pb-24\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] px-gutter lg:grid-cols-2 lg:gap-x-5\">\n        {/* desktop feed: a zig-zag column pinned to the page's left edge */}\n        <div className=\"hidden lg:block lg:ml-[calc(min(0px,(var(--page-width)-100vw)/2)-var(--page-gutter))]\">\n          <ul className=\"flex flex-col gap-[4.375rem] pt-px\">\n            {feed.map((item, i) => (\n              <li key={i} className={desktopOffsets[i % desktopOffsets.length]}>\n                {item}\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"lg:pt-[9.5rem] lg:pl-[1.125rem]\">\n          <h2 className=\"font-display lg:max-w-[31rem] text-[1.875rem]/[1.22] font-medium tracking-[-0.05em] lg:text-[4.375rem]/[1.2] lg:tracking-[-0.035em]\">{title}</h2>\n          <p className=\"mt-6 max-w-[30.5rem] text-lg/[1.5] text-foreground/75 lg:mt-8 lg:text-2xl/[1.5]\">{body}</p>\n          <dl className=\"mt-12 grid gap-y-9 lg:mt-[8.75rem] lg:grid-cols-[18.75rem_1fr] lg:gap-y-[5.25rem]\">\n            {stats.map((s) => (\n              <div key={s.label} className=\"flex flex-col-reverse justify-end\">\n                <dt className=\"mt-0.5 max-w-[18rem] font-display text-lg/[0.94] font-medium tracking-[-0.045em] lg:mt-5 lg:max-w-[13.5rem] lg:text-[1.875rem]/[0.94] lg:tracking-[-0.03em]\">\n                  {s.label}\n                </dt>\n                <dd className=\"bg-linear-[254deg] from-chart-1 to-chart-2 bg-clip-text font-[family-name:var(--typeface-serif,Georgia,serif)] text-[2.5rem]/[1.1] font-light tracking-[-0.04em] text-transparent lg:text-[4.375rem]/[1.1]\">\n                  <AnchorageCount value={s.value} from={0.45} />\n                </dd>\n              </div>\n            ))}\n          </dl>\n        </div>\n\n        {/* phone feed: a notification beside a chip peeking in from the right */}\n        <ul className=\"-mx-gutter mt-24 flex flex-col gap-10 lg:hidden\">\n          {notes.map((note, i) => (\n            <li key={i} className=\"flex items-center gap-12\">\n              <Note note={note} index={i} className=\"w-[16.25rem] shrink-0 rounded-l-none border-l-0\" />\n              <Chip media={chips[i]} className=\"shrink-0\" />\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "anchorage-count",
+    "foundry-utils",
+    "plaid-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the grey paragraph under it"
+    },
+    {
+      "name": "stats",
+      "type": "PlaidNetworkStat[]",
+      "required": true,
+      "description": "the figures (four fill the 2×2 grid)"
+    },
+    {
+      "name": "notes",
+      "type": "PlaidNetworkNote[]",
+      "required": true,
+      "description": "the notifications in the feed (three or four)"
+    },
+    {
+      "name": "chips",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "pictures for the chips between notifications; one more chip than notes is drawn, placeholders where missing"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "57345bfa2464718b435e068339cce1cce3662be4a54089f975b3418bb6c2ce00"
+}

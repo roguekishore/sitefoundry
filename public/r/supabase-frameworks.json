@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase framework code tabs",
+  "description": "A split section: a two-tone title on the left whose ink word is the chosen framework, and on the right a white code card with a row of six equal icon tabs over a 13px monospace snippet, coloured purple for keywords, amber for strings and green for names, with a small round 'guide' pill under it. Clicking a tab swaps the snippet, the pill and the title's word; icons darken on hover.",
+  "category": "features",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "code",
+    "tabs",
+    "developer",
+    "split",
+    "light",
+    "minimal",
+    "mono"
+  ],
+  "notes": [
+    "needs JavaScript for the tabs (hydrate visible); without it the first framework shows",
+    "code comes in as plain text; a tiny built-in highlighter colours it with chart-1 (keywords), chart-2 (names), chart-3 (strings)",
+    "long lines scroll sideways inside the card on phones"
+  ],
+  "hydrate": "visible",
+  "entry": "supabase-frameworks.tsx",
+  "name": "supabase-frameworks",
+  "files": [
+    {
+      "path": "supabase-frameworks.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseHeading } from \"@foundry/supabase-heading\";\n\nexport interface SupabaseFramework {\n  /** the framework's name: the tab's label for screen readers and the title's ink word */\n  name: string;\n  /** the tab's icon (20px) */\n  icon: ReactNode;\n  /** the snippet, as plain text; keywords, strings and names are coloured for you */\n  code: string;\n  /** the small pill under the code */\n  docs?: { label: string; href: string };\n}\n\nexport interface SupabaseFrameworksProps {\n  /** the grey start of the title; the chosen framework's name follows in ink */\n  lead: string;\n  /** one tab per framework (six fill the row) */\n  frameworks: SupabaseFramework[];\n  className?: string;\n}\n\nconst KEYWORDS = new Set([\n  \"import\", \"from\", \"export\", \"default\", \"function\", \"const\", \"let\", \"var\", \"return\", \"await\", \"async\",\n  \"new\", \"if\", \"else\", \"for\", \"of\", \"in\", \"class\", \"extends\", \"def\", \"fn\", \"use\", \"pub\", \"final\", \"void\",\n]);\n\n// one token at a time: strings, words, arrows, or a single other character\nconst TOKEN = /('[^'\\n]*'|\"[^\"\\n]*\"|`[^`\\n]*`|[A-Za-z_$][\\w$]*|=>|\\s+|.)/g;\n\n/** Colours a snippet with the theme's chart tokens: keywords, strings, member names, punctuation. */\nfunction highlight(code: string) {\n  const out: ReactNode[] = [];\n  let previous = \"\";\n  let i = 0;\n  for (const [token] of code.matchAll(TOKEN)) {\n    let tone: string | undefined;\n    if (/^['\"`]/.test(token)) tone = \"text-chart-3\";\n    else if (KEYWORDS.has(token) || token === \"=>\") tone = \"text-chart-1\";\n    else if (/^[A-Za-z_$]/.test(token) && (previous === \".\" || /^[A-Z][A-Z0-9_]+$/.test(token))) tone = \"text-chart-2\";\n    else if (/^[{}()[\\].,;:=<>/*+|&?!-]$/.test(token)) tone = \"text-muted-foreground/70\";\n    out.push(tone ? <span key={i} className={tone}>{token}</span> : token);\n    if (!/^\\s+$/.test(token)) previous = token;\n    i += 1;\n  }\n  return out;\n}\n\n/** A two-tone title on the left and a code card on the right: a row of framework icon tabs over a coloured snippet. */\nexport function SupabaseFrameworks({ lead, frameworks, className }: SupabaseFrameworksProps) {\n  const [active, setActive] = useState(0);\n  const current = frameworks[active] ?? frameworks[0];\n  return (\n    <section className={cn(\"border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content grid max-w-page grid-cols-1 gap-6 px-gutter py-section lg:grid-cols-2 lg:gap-0 lg:py-24\">\n        <SupabaseHeading parts={[{ text: lead, tone: \"muted\" }, { text: current?.name }]} />\n\n        <div className=\"overflow-clip rounded-xl border border-border bg-card\">\n          <div role=\"tablist\" className=\"grid grid-flow-col auto-cols-fr border-b border-border\">\n            {frameworks.map((framework, i) => (\n              <button\n                key={framework.name}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={i === active}\n                aria-label={framework.name}\n                onClick={() => setActive(i)}\n                className={cn(\n                  \"flex h-[3.75rem] items-center justify-center border-l border-border first:border-l-0 [&_svg]:size-5\",\n                  \"transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n                  i === active ? \"text-foreground\" : \"text-muted-foreground hover:bg-accent/60 hover:text-foreground\",\n                )}\n              >\n                {framework.icon}\n              </button>\n            ))}\n          </div>\n          <div className=\"relative px-6 pt-6 pb-4\">\n            <pre className=\"overflow-x-auto font-mono text-[0.8125rem] leading-[1.7] text-foreground\">\n              <code>{current && highlight(current.code)}</code>\n            </pre>\n            {current?.docs && (\n              <div className=\"mt-1 flex justify-end\">\n                <a\n                  href={current.docs.href}\n                  className=\"inline-flex h-[1.875rem] items-center gap-1.5 rounded-full border border-border bg-card px-3 text-[0.8125rem] text-foreground/80 transition-colors duration-150 hover:bg-accent hover:text-foreground\"\n                >\n                  {current.docs.label}\n                  <ArrowUpRight className=\"size-3.5\" />\n                </a>\n              </div>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the grey start of the title; the chosen framework's name follows in ink"
+    },
+    {
+      "name": "frameworks",
+      "type": "SupabaseFramework[]",
+      "required": true,
+      "description": "one tab per framework (six fill the row)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2162cda1b060a2f6243f1679a3527d31221f4ead6a2254f93710e612e5a7f7ad"
+}

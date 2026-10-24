@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid footer",
+  "description": "A deep navy footer with 40px top corners: a large icon mark on the left and up to four columns of link groups (mint-white bold headings, white 16px links) that wrap into a second row, then social icons and a legal row with the copyright, a region picker with a pin and a privacy-choices link with a small toggle badge. Two columns on phones.",
+  "category": "footer",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "navy",
+    "links",
+    "columns",
+    "rounded"
+  ],
+  "notes": [
+    "set `overlap` when it follows plaid-contact: it then pulls up 2.5rem so its rounded corners sit over the gradient",
+    "the surface is the foreground colour deepened with primary in light mode and the card colour in dark mode"
+  ],
+  "entry": "plaid-footer.tsx",
+  "source": "foundry",
+  "name": "plaid-footer",
+  "files": [
+    {
+      "path": "plaid-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check, ChevronDown, MapPin, X, type LucideIcon } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlaidWordmark } from \"@foundry/plaid-wordmark\";\n\nexport interface PlaidFooterGroup {\n  /** the bold heading */\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface PlaidFooterProps {\n  /** the mark at the top left */\n  brand: { name: string; href: string; icon: LucideIcon };\n  /** the link groups: four to a row on desktop, two on phones */\n  groups: PlaidFooterGroup[];\n  /** social links, each with its icon */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** the copyright line */\n  copyright: string;\n  /** the region picker */\n  region: { label: string; href: string };\n  /** the privacy-choices link with its toggle badge */\n  privacy: { label: string; href: string };\n  /** pull up over the band before it, so the rounded corners show that band */\n  overlap?: boolean;\n  className?: string;\n}\n\nconst heading = \"text-[color-mix(in_oklab,var(--highlight)_22%,var(--background))]\";\n\n/** Plaid's navy footer. */\nexport function PlaidFooter({ brand, groups, socials, copyright, region, privacy, overlap = false, className }: PlaidFooterProps) {\n  return (\n    <footer\n      className={cn(\n        \"relative rounded-t-[calc(var(--radius)+1rem)] bg-[color-mix(in_oklab,var(--foreground)_55%,var(--primary))] text-background dark:bg-card dark:text-foreground\",\n        overlap && \"-mt-10\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[65.125rem] px-13 pt-12 pb-20 lg:px-0 lg:pt-[5.5rem] lg:pb-24\">\n        <div className=\"lg:grid lg:grid-cols-[12.9375rem_1fr]\">\n          <PlaidWordmark {...brand} markOnly className=\"self-start\" />\n          <div className=\"mt-10 grid grid-cols-2 gap-x-6 gap-y-10 lg:mt-0 lg:grid-cols-4 lg:gap-x-0 lg:gap-y-[2.875rem]\">\n            {groups.map((g) => (\n              <div key={g.title}>\n                <h3 className={cn(\"text-base font-semibold\", heading, \"dark:text-highlight\")}>{g.title}</h3>\n                <ul className=\"mt-2.5 lg:mt-2\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"text-base/6 transition-colors duration-100 ease-in-out hover:text-highlight motion-reduce:transition-none\">\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        <ul className=\"mt-16 flex gap-4 lg:mt-[7.5rem]\">\n          {socials.map((s) => (\n            <li key={s.label}>\n              <a href={s.href} aria-label={s.label} className=\"grid size-8 place-items-center transition-colors duration-100 hover:text-highlight [&_svg]:size-8\">\n                {s.icon}\n              </a>\n            </li>\n          ))}\n        </ul>\n        <div className=\"mt-6 flex flex-col gap-4 text-base lg:flex-row lg:items-center lg:gap-[2.1rem]\">\n          <span>{copyright}</span>\n          <a href={region.href} className=\"inline-flex items-center gap-2 font-semibold transition-colors duration-100 hover:text-highlight\">\n            <MapPin aria-hidden className=\"size-5\" strokeWidth={1.75} />\n            {region.label}\n            <ChevronDown aria-hidden className=\"size-4\" />\n          </a>\n          <a href={privacy.href} className=\"inline-flex items-center gap-2 font-semibold transition-colors duration-100 hover:text-highlight\">\n            {privacy.label}\n            <span aria-hidden className=\"inline-flex h-5 items-center gap-0.5 rounded-full bg-glow px-1.5 text-background\">\n              <Check className=\"size-3\" strokeWidth={3} />\n              <X className=\"size-3\" strokeWidth={3} />\n            </span>\n          </a>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plaid-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon: LucideIcon; }",
+      "required": true,
+      "description": "the mark at the top left"
+    },
+    {
+      "name": "groups",
+      "type": "PlaidFooterGroup[]",
+      "required": true,
+      "description": "the link groups: four to a row on desktop, two on phones"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links, each with its icon"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "region",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the region picker"
+    },
+    {
+      "name": "privacy",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the privacy-choices link with its toggle badge"
+    },
+    {
+      "name": "overlap",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "pull up over the band before it, so the rounded corners show that band"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a0100e9d9f5b991dfac001f1696b27733f1e3909344dd4ee2ff95fdc33e2d157"
+}

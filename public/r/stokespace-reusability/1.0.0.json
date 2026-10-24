@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stoke Space reusability",
+  "description": "A feature section: a neon-barred label beside an extra-wide all-caps heading, a full-width 7:3 image, then a 4:5 image next to a hairline list of rows. Rows rest at 30% ink, come to full ink on hover, and a thin plus slides each one open (turning to a minus).",
+  "category": "features",
+  "site": "stokespace",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "accordion",
+    "dark",
+    "hairline",
+    "wide",
+    "uppercase",
+    "minimal",
+    "hover",
+    "two-column"
+  ],
+  "notes": [
+    "needs JavaScript for opening rows; rows render closed (or the defaultOpen one) without it",
+    "media slots: a wide 7:3 image and a tall 4:5 image, both cropped like object-cover"
+  ],
+  "hydrate": "visible",
+  "entry": "stokespace-reusability.tsx",
+  "source": "foundry",
+  "name": "stokespace-reusability",
+  "files": [
+    {
+      "path": "stokespace-reusability.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StokespaceEyebrow } from \"@foundry/stokespace-eyebrow\";\nimport { StokespaceHeading } from \"@foundry/stokespace-heading\";\nimport { StokespacePlaceholder } from \"@foundry/stokespace-placeholder\";\n\nexport interface StokespaceReusabilityItem {\n  /** row title */\n  title: string;\n  /** the text shown when the row is open */\n  body: string;\n}\n\nexport interface StokespaceReusabilityProps {\n  /** anchor id for the section */\n  id?: string;\n  /** small label above the heading */\n  eyebrow: string;\n  /** which accent the label's bar glows in */\n  eyebrowTone?: \"primary\" | \"highlight\" | \"glow\";\n  /** the section heading */\n  title: string;\n  /** the wide image (16:9 phones, 7:3 from 1024px) */\n  wideMedia?: ReactNode;\n  /** the tall 4:5 image beside the list */\n  tallMedia?: ReactNode;\n  /** the expandable rows */\n  items: StokespaceReusabilityItem[];\n  /** which row starts open (none by default) */\n  defaultOpen?: number;\n  className?: string;\n}\n\nconst ease = \"duration-400 ease-[cubic-bezier(0.77,0,0.175,1)]\";\nconst fill = \"[&>img]:size-full [&>img]:object-cover\";\n\n/**\n * Label + wide all-caps heading (from the second quarter on desktop), a full-width 7:3 image,\n * then a 4:5 image beside a hairline list of expandable rows. Rows sit at 30% ink and come\n * to full ink on hover; a thin plus opens a row (its body slides open, the plus turns to a\n * minus).\n */\nexport function StokespaceReusability({\n  id,\n  eyebrow,\n  eyebrowTone = \"primary\",\n  title,\n  wideMedia,\n  tallMedia,\n  items,\n  defaultOpen,\n  className,\n}: StokespaceReusabilityProps) {\n  const [open, setOpen] = useState<number | undefined>(defaultOpen);\n\n  return (\n    <section id={id} className={cn(\"px-gutter py-section\", className)}>\n      <div className=\"grid lg:grid-cols-4 lg:gap-x-5\">\n        <StokespaceEyebrow label={eyebrow} tone={eyebrowTone} className=\"self-start justify-self-start\" />\n        <StokespaceHeading className=\"mt-[2.1rem] lg:col-span-3 lg:mt-0\">{title}</StokespaceHeading>\n      </div>\n\n      <div className={cn(\"mt-9 aspect-video lg:mt-16 lg:aspect-[7/3]\", fill)}>{wideMedia ?? <StokespacePlaceholder />}</div>\n\n      <div className=\"mt-10 grid gap-x-5 lg:mt-20 lg:grid-cols-2\">\n        <div className={cn(\"aspect-[4/5]\", fill)}>{tallMedia ?? <StokespacePlaceholder />}</div>\n\n        <ul className=\"mt-5 border-b border-border lg:mt-0 lg:w-[85%] lg:self-start\">\n          {items.map((item, i) => {\n            const isOpen = open === i;\n            return (\n              <li key={item.title} className=\"group/item border-t border-border\">\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  onClick={() => setOpen(isOpen ? undefined : i)}\n                  className={cn(\n                    \"flex w-full items-center justify-between gap-6 pt-6 pb-6 text-left transition-colors duration-350 ease-[cubic-bezier(0.165,0.84,0.44,1)] lg:pt-7 lg:pb-[3.25rem]\",\n                    isOpen ? \"text-foreground\" : \"text-foreground/30 hover:text-foreground\",\n                  )}\n                >\n                  <span className=\"block text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:leading-[1.2]\">\n                    {item.title}\n                  </span>\n                  <span aria-hidden className=\"relative size-4 shrink-0 lg:-my-2 lg:size-8\">\n                    <span className=\"absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-current\" />\n                    <span\n                      className={cn(\n                        \"absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-current transition-transform motion-reduce:transition-none\",\n                        ease,\n                        isOpen && \"rotate-90\",\n                      )}\n                    />\n                  </span>\n                </button>\n                <div\n                  className={cn(\n                    \"grid transition-[grid-template-rows] motion-reduce:transition-none\",\n                    ease,\n                    isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\",\n                  )}\n                >\n                  <div className=\"min-h-0 overflow-hidden\">\n                    <p className=\"pr-10 pb-6 text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:pb-10 lg:leading-[1.2]\">\n                      {item.body}\n                    </p>\n                  </div>\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stokespace-eyebrow",
+    "stokespace-heading",
+    "stokespace-placeholder"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id for the section"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small label above the heading"
+    },
+    {
+      "name": "eyebrowTone",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "which accent the label's bar glows in"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "wideMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the wide image (16:9 phones, 7:3 from 1024px)"
+    },
+    {
+      "name": "tallMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall 4:5 image beside the list"
+    },
+    {
+      "name": "items",
+      "type": "StokespaceReusabilityItem[]",
+      "required": true,
+      "description": "the expandable rows"
+    },
+    {
+      "name": "defaultOpen",
+      "type": "number",
+      "required": false,
+      "description": "which row starts open (none by default)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "84f04d96c0d13db0ed315f143059e39cdb0ed9fb563716659262328322944226"
+}

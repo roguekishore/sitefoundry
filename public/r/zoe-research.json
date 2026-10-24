@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe research slider",
+  "description": "A centred semibold heading over a swipeable row of big warm-cream article cards (600px, 24px radius) that runs off the right edge: a photo across the top, a large light-weight title, a short summary and a navy button. A full-width hairline progress bar and two round chevron buttons sit underneath.",
+  "category": "features",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "carousel",
+    "slider",
+    "cards",
+    "articles",
+    "cream",
+    "light",
+    "progress"
+  ],
+  "notes": [
+    "the slider needs JavaScript for its progress bar and arrows (hydrate visible); swiping works without it"
+  ],
+  "hydrate": "visible",
+  "entry": "zoe-research.tsx",
+  "name": "zoe-research",
+  "files": [
+    {
+      "path": "zoe-research.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZoeButton } from \"@foundry/zoe-button\";\nimport { ZoeHeading } from \"@foundry/zoe-heading\";\nimport { ZoePlaceholder } from \"@foundry/zoe-placeholder\";\nimport { ZoeSlider } from \"@foundry/zoe-slider\";\n\nexport interface ZoeResearchCard {\n  /** the article's title */\n  title: string;\n  /** a two- or three-line summary */\n  summary: string;\n  /** the navy button */\n  cta: { label: string; href: string };\n  /** the photo (object-cover); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface ZoeResearchProps {\n  /** the heading above the row */\n  title: string;\n  /** the cards, in order */\n  cards: ZoeResearchCard[];\n  /** screen-reader names for the row and its buttons */\n  labels: { region: string; prev: string; next: string };\n  className?: string;\n}\n\n/** Zoe's research article slider. */\nexport function ZoeResearch({ title, cards, labels, className }: ZoeResearchProps) {\n  return (\n    <section className={cn(\"py-24\", className)}>\n      <ZoeHeading title={title} className=\"mx-auto max-w-page px-gutter\" />\n      <ZoeSlider\n        className=\"mt-12\"\n        label={labels.region}\n        prevLabel={labels.prev}\n        nextLabel={labels.next}\n        slideClassName=\"w-[min(37.5rem,calc(100vw-3rem))]\"\n        trackClassName=\"items-start px-gutter scroll-px-gutter lg:px-8 lg:scroll-px-8\"\n        controlsClassName=\"mt-16 lg:mt-24\"\n        slides={cards.map((c) => (\n          <article key={c.title} className=\"overflow-clip rounded-2xl bg-card text-card-foreground\">\n            <div className=\"relative aspect-[600/465] *:absolute *:inset-0 *:size-full *:object-cover\">\n              {c.media ?? <ZoePlaceholder tone=\"photo\" />}\n            </div>\n            <div className=\"p-6\">\n              <h3 className=\"font-display text-[2.125rem] leading-[1.05] font-light tracking-[-0.02em] lg:text-[2.5rem]\">\n                {c.title}\n              </h3>\n              <p className=\"mt-5 text-lg leading-[1.2]\">{c.summary}</p>\n              <ZoeButton href={c.cta.href} variant=\"ink\" className=\"mt-5 w-full sm:w-auto\">\n                {c.cta.label}\n              </ZoeButton>\n            </div>\n          </article>\n        ))}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zoe-button",
+    "zoe-heading",
+    "zoe-placeholder",
+    "zoe-slider"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading above the row"
+    },
+    {
+      "name": "cards",
+      "type": "ZoeResearchCard[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "labels",
+      "type": "{ region: string; prev: string; next: string; }",
+      "required": true,
+      "description": "screen-reader names for the row and its buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1a3425024fdc25b9791160158edfc461e69869594ca3aea46632222c7e8743ff"
+}

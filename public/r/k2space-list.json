@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space numbered list",
+  "description": "Full-width numbered rows in alternating near-black and black bands: a 47.6px number and title on the left, a short 19px paragraph from two thirds of the width, about 230px tall each; phones put the number and title on one line with the paragraph below. A quiet grey link with an arrow closes the list. Each row fades in and rises 15px as it enters.",
+  "category": "features",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "list",
+    "numbered",
+    "features",
+    "dark",
+    "bands",
+    "alternating",
+    "minimal",
+    "reveal"
+  ],
+  "notes": [
+    "CSS only; without scroll-timeline support or under reduced motion the rows simply show"
+  ],
+  "entry": "k2space-list.tsx",
+  "source": "foundry",
+  "name": "k2space-list",
+  "files": [
+    {
+      "path": "k2space-list.css",
+      "content": "/* Each row's number, title and paragraph fade in and rise 15px together as the row enters. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-list-row {\n      view-timeline: --k2space-list-row block;\n    }\n    .k2space-list-in {\n      animation: k2space-list-in linear both;\n      animation-timeline: --k2space-list-row;\n      animation-range: entry 60px entry 200px;\n    }\n  }\n}\n\n@keyframes k2space-list-in {\n  from {\n    opacity: 0;\n    transform: translateY(15px);\n  }\n}\n"
+    },
+    {
+      "path": "k2space-list.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceButton } from \"@foundry/k2space-button\";\nimport \"./k2space-list.css\";\n\nexport interface K2spaceListItem {\n  /** the row number as shown (\"01\") */\n  number: string;\n  /** the row title */\n  title: string;\n  /** one short paragraph */\n  body: string;\n}\n\nexport interface K2spaceListProps {\n  /** the rows, in order */\n  items: K2spaceListItem[];\n  /** a quiet link under the list */\n  link?: { label: string; href: string };\n  className?: string;\n}\n\n/** Numbered rows in alternating near-black and black bands, paragraphs from two thirds across. */\nexport function K2spaceList({ items, link, className }: K2spaceListProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground [font-stretch:var(--k2space-stretch,100%)]\", className)}>\n      <ol>\n        {items.map((item, i) => (\n          <li\n            key={i}\n            className={cn(\n              \"k2space-list-row px-gutter pt-[30px] pb-16 lg:grid lg:grid-cols-[8.06vw_1fr_30.8vw] lg:pt-[1.75vw] lg:pb-[8.8vw]\",\n              i % 2 === 0 ? \"bg-secondary text-secondary-foreground\" : \"bg-background\",\n            )}\n          >\n            <p className=\"font-display text-[28px]/none font-[560] lg:contents lg:text-[3.307vw]/none\">\n              <span className=\"k2space-list-in inline-block lg:block\">{item.number}</span>{\" \"}\n              <span className=\"k2space-list-in ml-1.5 inline-block lg:ml-0 lg:block\">{item.title}</span>\n            </p>\n            <p className=\"k2space-list-in mt-[38px] text-base/none font-[560] lg:mt-0 lg:max-w-[30vw] lg:text-[max(1rem,1.3227vw)]/none\">\n              {item.body}\n            </p>\n          </li>\n        ))}\n      </ol>\n      {link && (\n        <div className=\"px-gutter pt-[27px] pb-[13px] lg:pt-[1.88vw] lg:pb-[0.8vw] lg:pl-[66.74vw]\">\n          <K2spaceButton variant=\"link\" href={link.href}>\n            {link.label}\n          </K2spaceButton>\n        </div>\n      )}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-button"
+  ],
+  "props": [
+    {
+      "name": "items",
+      "type": "K2spaceListItem[]",
+      "required": true,
+      "description": "the rows, in order"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a quiet link under the list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a190979deae7c669bebf00c93d50976bf79a44efd2fc54ed4f761cacd18d85de"
+}

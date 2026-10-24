@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health conditions carousel",
+  "description": "A light serif title with a sage pill and two round arrow buttons on the left, and a row of clover-outlined cards (16px corners) that runs off the right edge of the window: a round thumbnail, a medium forest title, a grey list of symptoms and an underlined link with an arrow at the foot. The track scrolls by one card per arrow press and snaps; on hover a card's outline darkens and its thumbnail grows 5%. On phones the title centres above the track and the arrows sit beside the pill below it.",
+  "category": "features",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "carousel",
+    "cards",
+    "outline",
+    "scroll-snap",
+    "hover",
+    "serif",
+    "light"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows (hydrate: visible); the track still scrolls by touch or trackpad without it",
+    "thumbnails are 90px round slots; empty, a soft placeholder stands in"
+  ],
+  "hydrate": "visible",
+  "entry": "parsleyhealth-conditions.tsx",
+  "name": "parsleyhealth-conditions",
+  "files": [
+    {
+      "path": "parsleyhealth-conditions.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport { ParsleyhealthArrow, useParsleyhealthCarousel } from \"@foundry/parsleyhealth-carousel\";\nimport { ParsleyhealthHeading } from \"@foundry/parsleyhealth-heading\";\nimport { ParsleyhealthPlaceholder } from \"@foundry/parsleyhealth-placeholder\";\n\nexport interface ParsleyhealthCondition {\n  /** the condition area */\n  title: string;\n  /** the symptoms or conditions it covers */\n  text: string;\n  /** the link at the foot of the card */\n  link: { label: string; href: string };\n  /** the round thumbnail (an img, sized to fill); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface ParsleyhealthConditionsProps {\n  /** the title */\n  title: string;\n  /** the pill under the title */\n  action?: { label: string; href: string };\n  /** the cards */\n  items: ParsleyhealthCondition[];\n  /** screen-reader labels of the arrows */\n  prevLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\n/** Title and arrows beside a card track that bleeds off the right edge. */\nexport function ParsleyhealthConditions({ title, action, items, prevLabel, nextLabel, className }: ParsleyhealthConditionsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const { prev, next, atStart, atEnd } = useParsleyhealthCarousel(track);\n\n  const arrows = (\n    <div className=\"flex shrink-0 gap-4\">\n      <ParsleyhealthArrow direction=\"prev\" label={prevLabel ?? \"\"} disabled={atStart} onClick={prev} />\n      <ParsleyhealthArrow direction=\"next\" label={nextLabel ?? \"\"} disabled={atEnd} onClick={next} />\n    </div>\n  );\n\n  return (\n    <section\n      className={cn(\n        \"overflow-clip bg-background py-[calc(var(--section-y)*0.55)] lg:pt-section lg:pb-[calc(var(--section-y)*1.27)]\",\n        // desktop: the left edge lines up with the page column, the right runs to the window edge\n        \"lg:pl-[max(var(--page-gutter),calc((100%-var(--page-width))/2))]\",\n        className,\n      )}\n    >\n      <div className=\"grid grid-cols-[minmax(0,1fr)] items-stretch gap-10 lg:grid-cols-[24.25rem_minmax(0,1fr)] lg:gap-12\">\n        <div className=\"flex flex-col px-gutter lg:px-0 lg:pt-12\">\n          <ParsleyhealthHeading title={title} align=\"phone-center\" titleClassName=\"mx-auto max-w-[18rem] lg:mx-0 lg:max-w-[24rem]\" />\n          {action ? (\n            <ParsleyhealthButton href={action.href} variant=\"secondary\" size=\"sm\" arrow className=\"mt-12 self-start max-lg:hidden\">\n              {action.label}\n            </ParsleyhealthButton>\n          ) : null}\n          <div className=\"mt-auto hidden justify-end pt-12 lg:flex\">{arrows}</div>\n        </div>\n\n        <div>\n          <ul\n            ref={track}\n            className=\"flex snap-x snap-mandatory scroll-px-gutter gap-6 overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] lg:scroll-px-0 lg:px-0 [&::-webkit-scrollbar]:hidden\"\n          >\n            {items.map((item) => (\n              <li\n                key={item.title}\n                className=\"group flex h-[22.5rem] w-[18.75rem] shrink-0 snap-start flex-col rounded-xl border border-border p-6 transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-primary motion-reduce:transition-none lg:h-[26.125rem] lg:w-[20.75rem]\"\n              >\n                <div className=\"size-[3.75rem] overflow-clip rounded-full lg:size-[5.625rem] [&>img]:size-full [&>img]:object-cover\">\n                  <div className=\"size-full transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-105 motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover\">\n                    {item.media ?? <ParsleyhealthPlaceholder />}\n                  </div>\n                </div>\n                <h3 className=\"mt-6 text-[1.2375rem] leading-[1.273] font-medium text-primary lg:mt-7 lg:text-[1.4438rem]\">{item.title}</h3>\n                <p className=\"mt-4 text-[1.1688rem] leading-[1.409] text-foreground/75 lg:text-[1.2375rem] lg:leading-[1.455]\">{item.text}</p>\n                <a\n                  href={item.link.href}\n                  className=\"group/link mt-auto inline-flex items-center gap-2.5 self-start pl-0.5 text-[0.9625rem] text-ring\"\n                >\n                  <span className=\"underline decoration-1 underline-offset-[0.3rem]\">{item.link.label}</span>\n                  <ArrowRight\n                    aria-hidden\n                    className=\"size-4 transition-transform duration-200 group-hover/link:translate-x-1 motion-reduce:transition-none\"\n                    strokeWidth={1.5}\n                  />\n                </a>\n              </li>\n            ))}\n            {/* a little room after the last card */}\n            <li aria-hidden className=\"w-px shrink-0 lg:w-12\" />\n          </ul>\n          <div className=\"mt-8 flex items-center gap-4 px-gutter lg:hidden\">\n            {arrows}\n            {action ? (\n              <ParsleyhealthButton href={action.href} variant=\"secondary\" size=\"sm\" arrow className=\"flex-1\">\n                {action.label}\n              </ParsleyhealthButton>\n            ) : null}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button",
+    "parsleyhealth-carousel",
+    "parsleyhealth-heading",
+    "parsleyhealth-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the pill under the title"
+    },
+    {
+      "name": "items",
+      "type": "ParsleyhealthCondition[]",
+      "required": true,
+      "description": "the cards"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader labels of the arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c76cab0b3e0aa1e4794f07021ef2d035b46b1fe51053181f38da677ac665ebeb"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic header",
+  "description": "A plain white top bar: bold caps wordmark, four medium-weight nav links beside it, a quiet text link and a small dark pill on the right. On phones the links fold into a burger that drops a full-width panel (no JavaScript: a details disclosure).",
+  "category": "header",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "light",
+    "minimal",
+    "pill",
+    "fintech"
+  ],
+  "notes": [
+    "65px tall on desktop, 72px on phones; not sticky, as the original"
+  ],
+  "entry": "lithic-header.tsx",
+  "source": "foundry",
+  "name": "lithic-header",
+  "files": [
+    {
+      "path": "lithic-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicButton } from \"@foundry/lithic-button\";\n\nexport interface LithicNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface LithicHeaderProps {\n  /** the company name, set as a bold caps wordmark */\n  wordmark: string;\n  /** a small mark before the wordmark (e.g. a lucide icon) */\n  mark?: ReactNode;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the main links, beside the wordmark on desktop */\n  links: LithicNavLink[];\n  /** the quiet text link on the right (\"Contact us\") */\n  secondary?: LithicNavLink;\n  /** the dark pill on the right (\"Dashboard\") */\n  action: LithicNavLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm font-semibold text-foreground transition-colors duration-300 ease-[cubic-bezier(.215,.61,.355,1)] hover:text-foreground/70 motion-reduce:transition-none\";\n\n/** The top bar: wordmark and links left, a text link and a dark pill right. */\nexport function LithicHeader({ wordmark, mark, homeHref = \"#\", links, secondary, action, menuLabel, className }: LithicHeaderProps) {\n  return (\n    <header className={cn(\"relative z-20 bg-background text-foreground\", className)}>\n      <div className=\"mx-auto flex h-18 max-w-[82.5rem] items-center gap-8 px-gutter lg:h-[4.0625rem]\">\n        <a href={homeHref} className=\"flex items-center gap-1.5 text-[1.1rem] font-extrabold tracking-[-0.02em] uppercase\">\n          {mark}\n          {wordmark}\n        </a>\n        <nav className=\"hidden items-center gap-8 lg:flex\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto flex items-center gap-8\">\n          {secondary && (\n            <a href={secondary.href} className={cn(linkClass, \"hidden lg:inline\")}>\n              {secondary.label}\n            </a>\n          )}\n          <LithicButton href={action.href} variant=\"dark\" arrow={false} className=\"px-[1.125rem]\">\n            {action.label}\n          </LithicButton>\n          <details className=\"group lg:hidden\">\n            <summary aria-label={menuLabel} className=\"-mr-1 grid size-8 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\">\n              <Menu aria-hidden className=\"size-7 group-open:hidden\" strokeWidth={1.5} />\n              <X aria-hidden className=\"hidden size-7 group-open:block\" strokeWidth={1.5} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full flex flex-col border-b border-border bg-background px-gutter pt-2 pb-6\">\n              {[...links, ...(secondary ? [secondary] : [])].map((link) => (\n                <a key={link.label} href={link.href} className={cn(linkClass, \"border-b border-border py-4 text-base\")}>\n                  {link.label}\n                </a>\n              ))}\n            </nav>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-button"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a bold caps wordmark"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the wordmark (e.g. a lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "LithicNavLink[]",
+      "required": true,
+      "description": "the main links, beside the wordmark on desktop"
+    },
+    {
+      "name": "secondary",
+      "type": "LithicNavLink",
+      "required": false,
+      "description": "the quiet text link on the right (\"Contact us\")"
+    },
+    {
+      "name": "action",
+      "type": "LithicNavLink",
+      "required": true,
+      "description": "the dark pill on the right (\"Dashboard\")"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "10fe9ab279760021dfe5d7a50b29bed9f4d37ad7634ed6f39a5d9a5d9c74db2c"
+}

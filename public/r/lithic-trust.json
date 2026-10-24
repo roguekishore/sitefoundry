@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic trust bento",
+  "description": "Four faint-bronze cards with 24px corners in two unequal rows (wide + narrow, then narrow + wide): a medium heading in each, dark-bronze sub-lines, rows of partner names, a round badge slot, and faint contour rings in two corners. One column on phones.",
+  "category": "features",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "light",
+    "warm",
+    "logos",
+    "contours",
+    "trust"
+  ],
+  "notes": [
+    "takes exactly four cards: desktop places 1 and 2 on the first row, 4 then 3 on the second (the phone order is 1, 2, 3, 4)",
+    "partner names are text marks; the badge is a media slot (112px circle placeholder)"
+  ],
+  "entry": "lithic-trust.tsx",
+  "source": "foundry",
+  "name": "lithic-trust",
+  "files": [
+    {
+      "path": "lithic-trust.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicContours } from \"@foundry/lithic-contours\";\nimport { LithicPlaceholder } from \"@foundry/lithic-placeholder\";\nimport { LithicTextmark, type LithicTextmarkStyle } from \"@foundry/lithic-textmark\";\n\nexport interface LithicTrustMark {\n  /** the partner's name, set as a text mark */\n  name: string;\n  variant?: LithicTextmarkStyle;\n}\n\nexport interface LithicTrustCard {\n  /** the card's heading */\n  title: string;\n  /** the dark-bronze line under it */\n  text?: string;\n  /** partner names along the bottom */\n  marks?: LithicTrustMark[];\n  /** show a round badge on the right (desktop): `true` for a placeholder, or the badge itself */\n  badge?: ReactNode | true;\n  /** faint contour rings in the top-right corner */\n  contours?: boolean;\n}\n\nexport interface LithicTrustProps {\n  /** four cards, in phone order */\n  cards: [LithicTrustCard, LithicTrustCard, LithicTrustCard, LithicTrustCard];\n  className?: string;\n}\n\nfunction Card({ card, wide, className }: { card: LithicTrustCard; wide: boolean; className?: string }) {\n  const badge = card.badge === true ? <LithicPlaceholder tone=\"ink\" className=\"size-28 rounded-full bg-foreground shadow-none\" /> : card.badge;\n  return (\n    <div className={cn(\"relative isolate flex overflow-clip rounded-lg bg-muted p-6 text-foreground lg:h-[13.75rem] lg:p-10\", className)}>\n      {card.contours && <LithicContours at=\"62% -10%\" gap={11} className=\"-z-10 text-highlight/30 lg:left-[40%]\" />}\n      <div className=\"flex min-w-0 flex-1 flex-col justify-between gap-6\">\n        <div>\n          <h3 className={cn(\"font-display text-xl/[1.2] font-semibold tracking-[-0.02em] lg:max-w-[14rem] lg:text-xl/[1.2]\", !card.marks && \"lg:max-w-[15rem]\")}>\n            {card.title}\n          </h3>\n          {card.text && <p className=\"mt-6 max-w-[14rem] text-sm/[1.4] font-semibold text-highlight max-lg:max-w-[20rem] lg:mt-6 lg:text-base/[1.4]\">{card.text}</p>}\n        </div>\n        {card.marks && (\n          <ul className={cn(\"grid grid-cols-2 items-center gap-x-6 gap-y-5 lg:flex lg:gap-12\", wide && card.marks.length > 3 ? \"lg:justify-between\" : \"max-lg:flex max-lg:gap-8\")}>\n            {card.marks.map((mark) => (\n              <li key={mark.name} className=\"text-base text-foreground lg:text-lg\">\n                <LithicTextmark name={mark.name} variant={mark.variant} />\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n      {badge && <div className=\"hidden shrink-0 items-center pl-6 lg:flex\">{badge}</div>}\n    </div>\n  );\n}\n\n/** Proof in four warm cards: networks, compliance, investors, uptime. */\nexport function LithicTrust({ cards, className }: LithicTrustProps) {\n  const [a, b, c, d] = cards;\n  return (\n    <section className={cn(\"bg-background px-gutter\", className)}>\n      <div className=\"mx-auto grid max-w-[74rem] gap-6\">\n        <div className=\"grid gap-6 lg:grid-cols-[702fr_458fr]\">\n          <Card card={a} wide />\n          <Card card={b} wide={false} />\n        </div>\n        <div className=\"grid gap-6 lg:grid-cols-[380fr_780fr]\">\n          <Card card={c} wide className=\"lg:order-2\" />\n          <Card card={d} wide={false} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-contours",
+    "lithic-placeholder",
+    "lithic-textmark"
+  ],
+  "props": [
+    {
+      "name": "cards",
+      "type": "[LithicTrustCard, LithicTrustCard, LithicTrustCard, LithicTrustCard]",
+      "required": true,
+      "description": "four cards, in phone order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "496a1e4aaa69dfa1f416e5a23d1b11e70a37713835b4aac40ebfb3fb55e2e1f4"
+}

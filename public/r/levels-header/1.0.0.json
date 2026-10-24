@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels fixed header",
+  "description": "A 73px near-black bar at 85% with a blur, fixed over the top of the page: tracked-capital wordmark on the left, four quiet white nav items centred (one opening a small dropdown on hover), a Login link and a small white button on the right. Phones get a round outlined menu button that opens a dark panel. Links brighten from 80% to full white over 150ms.",
+  "category": "header",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "fixed",
+    "dark",
+    "blur",
+    "translucent",
+    "dropdown",
+    "minimal"
+  ],
+  "notes": [
+    "position: fixed, so it overlays whatever comes first (the hero leaves room for it); pass className=\"sticky\" to keep it in flow",
+    "it is a .dark scope: white text and button in both modes",
+    "the phone menu and the dropdown are CSS only (details element and hover)"
+  ],
+  "entry": "levels-header.tsx",
+  "name": "levels-header",
+  "files": [
+    {
+      "path": "levels-header.tsx",
+      "content": "import { ChevronDown, Equal } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsButton } from \"@foundry/levels-button\";\nimport { LevelsWordmark } from \"@foundry/levels-wordmark\";\n\nexport interface LevelsHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** sub-links: turns the item into a small hover dropdown with a chevron */\n  items?: { label: string; href: string }[];\n}\n\nexport interface LevelsHeaderProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the centred nav items (four on the original) */\n  links: LevelsHeaderLink[];\n  /** the quiet text link before the button (e.g. sign in) */\n  secondary?: { label: string; href: string };\n  /** the small white button on the right */\n  action: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm text-foreground/80 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none\";\n\n/** Fixed, translucent ink bar with centred nav. */\nexport function LevelsHeader({ brand, brandHref = \"#\", links, secondary, action, menuLabel, className }: LevelsHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"dark fixed inset-x-0 top-0 z-50 border-b border-foreground/10 bg-background/85 px-gutter text-foreground backdrop-blur-md\",\n        className,\n      )}\n    >\n      <div className=\"relative mx-auto flex h-[4.5rem] max-w-[calc(var(--page-width)+5rem)] items-center\">\n        <LevelsWordmark brand={brand} href={brandHref} />\n\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 lg:flex\">\n          {links.map((link) =>\n            link.items?.length ? (\n              <div key={link.label} className=\"group relative\">\n                <a href={link.href} className={cn(linkClass, \"inline-flex items-center gap-1 py-6 group-hover:text-foreground\")}>\n                  {link.label}\n                  <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.75} />\n                </a>\n                <div className=\"pointer-events-none invisible absolute top-full left-1/2 w-52 -translate-x-1/2 rounded-lg border border-border bg-card p-2 opacity-0 transition-opacity duration-150 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\">\n                  {link.items.map((item) => (\n                    <a key={item.label} href={item.href} className={cn(linkClass, \"block rounded-md px-3 py-2 hover:bg-foreground/5\")}>\n                      {item.label}\n                    </a>\n                  ))}\n                </div>\n              </div>\n            ) : (\n              <a key={link.label} href={link.href} className={linkClass}>\n                {link.label}\n              </a>\n            ),\n          )}\n        </nav>\n\n        <div className=\"ml-auto hidden items-center gap-3 lg:flex\">\n          {secondary ? (\n            <a href={secondary.href} className={cn(linkClass, \"px-1\")}>\n              {secondary.label}\n            </a>\n          ) : null}\n          <LevelsButton href={action.href} size=\"sm\">\n            {action.label}\n          </LevelsButton>\n        </div>\n\n        <details className=\"group ml-auto lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"grid size-10 cursor-pointer list-none place-items-center rounded-full border border-foreground/15 text-foreground [&::-webkit-details-marker]:hidden\"\n          >\n            <Equal aria-hidden className=\"size-5\" strokeWidth={1.75} />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full -mx-gutter flex flex-col border-t border-foreground/10 bg-background px-gutter pt-2 pb-6\">\n            {links.flatMap((link) => [link, ...(link.items ?? [])]).map((link) => (\n              <a key={link.label} href={link.href} className=\"border-b border-foreground/10 py-4 text-base text-foreground/86\">\n                {link.label}\n              </a>\n            ))}\n            {secondary ? (\n              <a href={secondary.href} className=\"py-4 text-base text-foreground/86\">\n                {secondary.label}\n              </a>\n            ) : null}\n            <LevelsButton href={action.href} block className=\"mt-2\">\n              {action.label}\n            </LevelsButton>\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-button",
+    "levels-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "LevelsHeaderLink[]",
+      "required": true,
+      "description": "the centred nav items (four on the original)"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the quiet text link before the button (e.g. sign in)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the small white button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8f051077578f7ee56222b714ab3ec8117ed0fce20a3608ea8338951c7cb013bc"
+}

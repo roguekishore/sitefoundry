@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs cookie notice",
+  "description": "A small deep-navy notice card pinned to the bottom-right corner (full width on phones) with a soft drop shadow: an orange spaced-capitals eyebrow trailing a hairline, a short light title, a line of small text with an orange policy link, and two square buttons (outlined decline, orange accept that turns white on hover). It slides up and fades in on load while an orange bar grows across its top edge.",
+  "category": "banner",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "banner",
+    "cookie",
+    "consent",
+    "notice",
+    "fixed",
+    "dark",
+    "navy",
+    "mono",
+    "load-in",
+    "slide",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "fixed to the window by default (fixed={false} keeps it in the flow); either button hides it for this visit",
+    "a `dark` subtree on the theme's background colour (the deep navy in cfs-theme)"
+  ],
+  "hydrate": "idle",
+  "entry": "cfs-cookie-notice.tsx",
+  "source": "foundry",
+  "name": "cfs-cookie-notice",
+  "files": [
+    {
+      "path": "cfs-cookie-notice.css",
+      "content": "/* Load: the card slides up 24px and fades in (420ms) while the orange top bar grows from\n   the left (560ms). */\n@media (prefers-reduced-motion: no-preference) {\n  .cfs-cookie-notice {\n    animation: cfs-cookie-notice-in 420ms cubic-bezier(0.215, 0.61, 0.355, 1) both;\n  }\n  .cfs-cookie-notice-bar {\n    transform-origin: left;\n    animation: cfs-cookie-notice-bar 560ms cubic-bezier(0.215, 0.61, 0.355, 1) both;\n  }\n}\n\n@keyframes cfs-cookie-notice-in {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n@keyframes cfs-cookie-notice-bar {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n"
+    },
+    {
+      "path": "cfs-cookie-notice.tsx",
+      "content": "import { useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./cfs-cookie-notice.css\";\n\nexport interface CfsCookieNoticeProps {\n  /** the small orange spaced-capitals label, e.g. \"Privacy notice\" */\n  eyebrow: string;\n  /** the short title */\n  title: string;\n  /** one sentence about what is stored */\n  text: string;\n  /** the policy link after the sentence */\n  policyLink: { label: string; href: string };\n  /** the outlined button's text */\n  declineLabel: string;\n  /** the orange button's text */\n  acceptLabel: string;\n  /** called with the visitor's choice; the card hides either way */\n  onChoice?: (accepted: boolean) => void;\n  /** pin to the window's bottom-right corner; default true */\n  fixed?: boolean;\n  className?: string;\n}\n\nconst ease = \"transition-colors duration-150 ease-[cubic-bezier(0.455,0.03,0.515,0.955)] motion-reduce:transition-none\";\n\n/** Navy consent card with a growing orange top bar and two square buttons. */\nexport function CfsCookieNotice({\n  eyebrow,\n  title,\n  text,\n  policyLink,\n  declineLabel,\n  acceptLabel,\n  onChoice,\n  fixed = true,\n  className,\n}: CfsCookieNoticeProps) {\n  const [open, setOpen] = useState(true);\n  if (!open) return null;\n\n  const choose = (accepted: boolean) => {\n    setOpen(false);\n    onChoice?.(accepted);\n  };\n\n  return (\n    <aside\n      aria-label={eyebrow}\n      className={cn(\n        \"cfs-cookie-notice dark z-40 bg-background px-5 pt-5 pb-4 text-foreground shadow-[0_18px_42px_color-mix(in_oklab,var(--background)_70%,transparent)]\",\n        fixed ? \"fixed inset-x-[7px] bottom-2 sm:inset-x-auto sm:right-[25px] sm:bottom-[25px] sm:w-80\" : \"relative w-full max-w-80\",\n        className,\n      )}\n    >\n      <span aria-hidden className=\"cfs-cookie-notice-bar absolute inset-x-0 top-0 h-[3px] bg-primary\" />\n      <p className=\"flex items-center gap-2.5 font-mono text-[10px] tracking-[1.8px] text-primary uppercase\">\n        {eyebrow}\n        <span aria-hidden className=\"h-px flex-1 bg-border\" />\n      </p>\n      <p className=\"mt-3 font-display text-base leading-[1.5] font-light\">{title}</p>\n      <p className=\"mt-1 text-[12.5px] leading-[1.5] text-foreground/85\">\n        {text}{\" \"}\n        <a href={policyLink.href} className={cn(\"border-b border-primary/50 text-primary hover:border-foreground hover:text-foreground\", ease)}>\n          {policyLink.label}\n        </a>\n        .\n      </p>\n      <div className=\"mt-4 grid grid-cols-2 gap-2\">\n        <button\n          type=\"button\"\n          onClick={() => choose(false)}\n          className={cn(\n            \"h-[30px] border border-border font-mono text-[10px] tracking-[1.6px] text-muted-foreground uppercase hover:border-foreground hover:text-foreground\",\n            ease,\n          )}\n        >\n          {declineLabel}\n        </button>\n        <button\n          type=\"button\"\n          onClick={() => choose(true)}\n          className={cn(\n            \"h-[30px] border border-primary bg-primary font-mono text-[10px] tracking-[1.6px] text-background uppercase hover:border-foreground hover:bg-foreground\",\n            ease,\n          )}\n        >\n          {acceptLabel}\n        </button>\n      </div>\n    </aside>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small orange spaced-capitals label, e.g. \"Privacy notice\""
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the short title"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "one sentence about what is stored"
+    },
+    {
+      "name": "policyLink",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the policy link after the sentence"
+    },
+    {
+      "name": "declineLabel",
+      "type": "string",
+      "required": true,
+      "description": "the outlined button's text"
+    },
+    {
+      "name": "acceptLabel",
+      "type": "string",
+      "required": true,
+      "description": "the orange button's text"
+    },
+    {
+      "name": "onChoice",
+      "type": "((accepted: boolean) => void)",
+      "required": false,
+      "description": "called with the visitor's choice; the card hides either way"
+    },
+    {
+      "name": "fixed",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "pin to the window's bottom-right corner; default true"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e18193f5e52cdb4834fc9b3a042c0dfa2ff3bc21a9f4bc332c8242eafa9decd9"
+}

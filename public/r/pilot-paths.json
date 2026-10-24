@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot paths (three ways in)",
+  "description": "A saturated violet band: a centred white heading over a square-cornered split, a tall white card on the left (title, copy, violet pill, and a portrait slot rising from a big dotted butter-yellow disc) and, on the right, an aubergine card with an outlined pill and a pink wash in its corner over a pale lilac card with violet text and pink-underlined inline links. Ends on white closing lines with a pink brush stroke. Stacks on phones.",
+  "category": "cta",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "split",
+    "cards",
+    "violet",
+    "yellow",
+    "pink",
+    "pill",
+    "dots"
+  ],
+  "notes": [
+    "the band is the theme's primary colour; the dark card is secondary, the light card glow at 15% over the page colour"
+  ],
+  "entry": "pilot-paths.tsx",
+  "source": "foundry",
+  "name": "pilot-paths",
+  "files": [
+    {
+      "path": "pilot-paths.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PilotBrushNote } from \"@foundry/pilot-brush-note\";\nimport { PilotButton } from \"@foundry/pilot-button\";\nimport { PilotLines } from \"@foundry/pilot-heading\";\nimport { PilotPlaceholder } from \"@foundry/pilot-placeholder\";\n\n/** a run of text, or an inline link */\nexport type PilotRichPart = string | { label: string; href: string };\n\nexport interface PilotPathsProps {\n  /** the heading; \\n sets the desktop line break */\n  title: string;\n  /** the tall white card with the yellow disc */\n  main: { title: string; text: string; cta: { label: string; href: string }; media?: ReactNode };\n  /** the aubergine card */\n  explore: { title: string; text: string; cta: { label: string; href: string }; art?: ReactNode };\n  /** the pale lilac card; its text may hold inline links */\n  begin: { title: string; text: PilotRichPart[] };\n  /** the white closing lines; \\n starts a new paragraph */\n  note?: string;\n  className?: string;\n}\n\nconst dots =\n  \"bg-[radial-gradient(circle,color-mix(in_oklab,var(--highlight-foreground)_18%,transparent)_1px,transparent_1.5px)] bg-[size:1.5625rem_1.5625rem]\";\n\n/** Pilot's three ways in: a white card, an aubergine card and a lilac card on the violet band. */\nexport function PilotPaths({ title, main, explore, begin, note, className }: PilotPathsProps) {\n  return (\n    <section className={cn(\"bg-primary text-primary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-primary-foreground/15 pt-16 pb-16 lg:border-x lg:pt-[7.5rem] lg:pb-28\">\n        <h2 className=\"mx-auto max-w-[40rem] px-gutter text-center font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]\">\n          <PilotLines text={title} />\n        </h2>\n\n        <div className=\"mx-gutter mt-14 grid lg:mx-0 lg:mt-20 lg:grid-cols-2\">\n          <div className=\"relative flex flex-col overflow-clip bg-card text-card-foreground lg:min-h-[33.75rem]\">\n            <div className=\"relative z-10 p-6 lg:p-10\">\n              <h3 className=\"font-display text-2xl leading-[1.2] font-medium lg:text-[2rem]\">{main.title}</h3>\n              <p className=\"mt-4 max-w-[23rem] text-base leading-6\">{main.text}</p>\n              <PilotButton href={main.cta.href} variant=\"solid\" size=\"sm\" className=\"mt-6 lg:mt-10\">\n                {main.cta.label}\n              </PilotButton>\n            </div>\n            <div className=\"relative mt-auto ml-auto h-36 w-[60%] lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[62%] lg:w-auto\">\n              <div aria-hidden className={cn(\"absolute top-0 -right-[30%] -left-[5%] aspect-square rounded-full bg-highlight lg:right-[-10%] lg:left-[5.5%]\", dots)} />\n              <div className=\"absolute right-[12%] bottom-0 aspect-[340/396] w-[45%] lg:right-[17%] lg:h-[110%] lg:w-auto\">\n                {main.media ?? <PilotPlaceholder tone=\"photo\" className=\"size-full rounded-t-[45%]\" />}\n              </div>\n            </div>\n          </div>\n\n          <div className=\"flex flex-col\">\n            <div className=\"relative flex-1 overflow-clip bg-secondary p-6 text-secondary-foreground lg:min-h-[23.125rem] lg:p-10\">\n              {explore.art ? (\n                <div className=\"absolute right-0 bottom-0 aspect-[345/190] w-[70%] lg:w-[54%]\">{explore.art}</div>\n              ) : (\n                <div\n                  aria-hidden\n                  className=\"absolute inset-0 bg-[radial-gradient(60%_50%_at_100%_100%,color-mix(in_oklab,var(--glow)_45%,transparent),transparent)]\"\n                />\n              )}\n              <div className=\"relative\">\n                <h3 className=\"font-display text-2xl leading-[1.2] font-medium lg:text-[2rem]\">{explore.title}</h3>\n                <p className=\"mt-4 max-w-[23rem] text-base leading-6\">{explore.text}</p>\n                <PilotButton href={explore.cta.href} variant=\"outline-light\" size=\"sm\" className=\"mt-6 mb-28 lg:mt-10 lg:mb-0\">\n                  {explore.cta.label}\n                </PilotButton>\n              </div>\n            </div>\n            <div className=\"bg-background\">\n              <div className=\"bg-glow/15 p-6 text-primary lg:min-h-[10.625rem] lg:px-10 lg:pt-12\">\n                <h3 className=\"font-display text-xl leading-[1.2] font-medium lg:text-2xl\">{begin.title}</h3>\n                <p className=\"mt-3 max-w-[25rem] text-sm leading-[1.5] tracking-[0.01em]\">\n                  {begin.text.map((part, i) =>\n                    typeof part === \"string\" ? (\n                      <span key={i}>{part}</span>\n                    ) : (\n                      <a key={i} href={part.href} className=\"underline decoration-glow underline-offset-4 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\">\n                        {part.label}\n                      </a>\n                    ),\n                  )}\n                </p>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        {note && <PilotBrushNote stroke=\"glow\" text={note} className=\"mx-auto mt-14 max-w-[54rem] px-gutter lg:mt-28\" />}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "pilot-brush-note",
+    "pilot-button",
+    "pilot-heading",
+    "pilot-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n sets the desktop line break"
+    },
+    {
+      "name": "main",
+      "type": "{ title: string; text: string; cta: { label: string; href: string; }; media?: ReactNode; }",
+      "required": true,
+      "description": "the tall white card with the yellow disc"
+    },
+    {
+      "name": "explore",
+      "type": "{ title: string; text: string; cta: { label: string; href: string; }; art?: ReactNode; }",
+      "required": true,
+      "description": "the aubergine card"
+    },
+    {
+      "name": "begin",
+      "type": "{ title: string; text: PilotRichPart[]; }",
+      "required": true,
+      "description": "the pale lilac card; its text may hold inline links"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the white closing lines; \\n starts a new paragraph"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9bbf7445bc34147e2fdd28f4e4c400ed56fcca9e11cdf44badb4eedce626b01e"
+}

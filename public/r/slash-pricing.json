@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash pricing",
+  "description": "A left-aligned serif heading with an italic first word over a full hairline, then two open plan columns with no boxes: plan name, a big 48px price with a grey period, a grey line, a full-width pill button (hairline for the free plan, solid white for the featured one) and a list of thin ticks with dimmer prices after a dash; the featured plan's ticks are gold.",
+  "category": "pricing",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "dark",
+    "serif",
+    "minimal",
+    "pill",
+    "list"
+  ],
+  "notes": [
+    "a 960px column, narrower than the page, as the original"
+  ],
+  "entry": "slash-pricing.tsx",
+  "source": "foundry",
+  "name": "slash-pricing",
+  "files": [
+    {
+      "path": "slash-pricing.tsx",
+      "content": "import { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashButton } from \"@foundry/slash-button\";\nimport { SlashHeading, type SlashHeadingPart } from \"@foundry/slash-heading\";\n\nexport interface SlashPlanLine {\n  /** what is included (\"Same-day transfers\") */\n  label: string;\n  /** its price or detail, shown dimmer after a dash (\"— $0\") */\n  value?: string;\n}\n\nexport interface SlashPlan {\n  /** the plan's name */\n  name: string;\n  /** the price (\"$0\") */\n  price: string;\n  /** the period after it (\"/month\") */\n  period: string;\n  /** one line on who it is for */\n  description: string;\n  /** the button */\n  cta: { label: string; href: string };\n  /** the featured plan gets the solid white button and gold ticks */\n  featured?: boolean;\n  /** what it includes */\n  lines: SlashPlanLine[];\n}\n\nexport interface SlashPricingProps {\n  /** the heading, as runs; `{ italic: \"Clear\" }` sets a run in italic */\n  heading: SlashHeadingPart[];\n  /** the plans, side by side */\n  plans: SlashPlan[];\n  className?: string;\n}\n\n/** A left-aligned serif heading over a hairline, then plans in open columns: name, big price, line, pill button and a ticked list. */\nexport function SlashPricing({ heading, plans, className }: SlashPricingProps) {\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]\", className)}>\n      <div className=\"mx-auto max-w-[calc(60rem+2*var(--page-gutter))] px-gutter\">\n        <SlashHeading parts={heading} size=\"md\" align=\"left\" headingClassName=\"max-w-[22rem] lg:max-w-[38rem]\" />\n        <hr className=\"mt-8 border-border lg:mt-10\" />\n        <div className=\"mt-12 flex flex-col gap-20 lg:mt-16 lg:flex-row lg:justify-between lg:gap-12\">\n          {plans.map((plan) => (\n            <div key={plan.name} className=\"lg:w-[24rem]\">\n              <h3 className=\"text-lg tracking-[-0.02em] lg:text-xl\">{plan.name}</h3>\n              <p className=\"mt-3 flex items-baseline gap-1.5\">\n                <span className=\"text-[2.75rem] leading-none tracking-[-0.03em] lg:text-5xl\">{plan.price}</span>\n                <span className=\"text-base tracking-[-0.02em] text-muted-foreground\">{plan.period}</span>\n              </p>\n              <p className=\"mt-5 max-w-[20rem] text-[0.9375rem] leading-[1.45] tracking-[-0.02em] text-muted-foreground lg:mt-6 lg:text-lg lg:leading-[1.5]\">{plan.description}</p>\n              <SlashButton href={plan.cta.href} variant={plan.featured ? \"solid\" : \"outline\"} className=\"mt-6 w-full\">\n                {plan.cta.label}\n              </SlashButton>\n              <ul className=\"mt-7 space-y-3 lg:mt-8\">\n                {plan.lines.map((line) => (\n                  <li key={line.label} className=\"flex items-center gap-2.5 text-[0.9375rem] tracking-[-0.02em]\">\n                    <Check aria-hidden strokeWidth={1.75} className={cn(\"size-3.5 shrink-0\", plan.featured ? \"text-highlight\" : \"text-foreground\")} />\n                    <span>\n                      {line.label}\n                      {line.value && <span className=\"text-muted-foreground\"> {line.value}</span>}\n                    </span>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-button",
+    "slash-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs; `{ italic: \"Clear\" }` sets a run in italic"
+    },
+    {
+      "name": "plans",
+      "type": "SlashPlan[]",
+      "required": true,
+      "description": "the plans, side by side"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6c237c3d2dba71559d65e586e274a36aabae100f8923ba379dbe3cd6614e384e"
+}

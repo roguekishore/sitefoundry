@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex header",
+  "description": "A sticky two-tier top: a pale lavender announcement strip with a dismiss cross, then an 80px white nav with a bold wordmark, four medium links, a teal language chip, a violet Log in, an outline demo button and a violet filled button. On phones the nav is 56px with a small filled button and a burger that drops a full-width panel.",
+  "category": "header",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "light",
+    "announcement",
+    "violet",
+    "fintech"
+  ],
+  "notes": [
+    "the whole header is position: sticky; put it first in the page",
+    "no JavaScript: the announcement closes through a hidden checkbox and the phone menu is a details disclosure"
+  ],
+  "entry": "airwallex-header.tsx",
+  "source": "foundry",
+  "name": "airwallex-header",
+  "files": [
+    {
+      "path": "airwallex-header.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { Globe, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AirwallexButton } from \"@foundry/airwallex-button\";\nimport { AirwallexWordmark } from \"@foundry/airwallex-wordmark\";\n\nexport interface AirwallexLink {\n  label: string;\n  href: string;\n}\n\nexport interface AirwallexAnnouncement {\n  /** a small picture before the text (an icon or a 24px image) */\n  icon?: ReactNode;\n  /** the message */\n  text: string;\n  /** the underlined link after the message */\n  link?: AirwallexLink;\n  /** accessible name of the close cross */\n  closeLabel: string;\n}\n\nexport interface AirwallexHeaderProps {\n  /** the strip above the nav; leave out for none */\n  announcement?: AirwallexAnnouncement;\n  /** the company name */\n  wordmark: string;\n  /** the small mark before the name (e.g. a lucide icon) */\n  mark?: ReactNode;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the main links beside the wordmark (desktop) */\n  links: AirwallexLink[];\n  /** the language chip's label (\"EN\") */\n  language?: string;\n  /** the violet text link (\"Log in\") */\n  login?: AirwallexLink;\n  /** the outline button (\"See demo\") */\n  demo?: AirwallexLink;\n  /** the filled button, also shown on phones (\"Get started\") */\n  action: AirwallexLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-base font-semibold text-foreground/75 transition-colors duration-250 ease-out hover:text-primary motion-reduce:transition-none\";\n\n/** Announcement strip and nav, stuck to the top together. */\nexport function AirwallexHeader({\n  announcement,\n  wordmark,\n  mark,\n  homeHref = \"#\",\n  links,\n  language,\n  login,\n  demo,\n  action,\n  menuLabel,\n  className,\n}: AirwallexHeaderProps) {\n  const closeId = useId();\n  return (\n    <header className={cn(\"sticky top-0 z-40 text-foreground\", className)}>\n      {announcement && (\n        <>\n          <input id={closeId} type=\"checkbox\" className=\"peer sr-only\" aria-hidden tabIndex={-1} />\n          <div className=\"relative bg-accent text-accent-foreground peer-checked:hidden\">\n            <div className=\"mx-auto flex min-h-[3.0625rem] max-w-page items-center gap-3 py-2 pr-12 pl-4 lg:min-h-10 lg:justify-center lg:px-12 lg:py-1.5\">\n              {announcement.icon && <span className=\"shrink-0 [&_svg]:size-6 [&>img]:size-6\">{announcement.icon}</span>}\n              <p className=\"text-sm leading-[1.5] lg:leading-5\">\n                {announcement.text}{\" \"}\n                {announcement.link && (\n                  <a\n                    href={announcement.link.href}\n                    className=\"bg-[linear-gradient(currentColor,currentColor)] bg-size-[100%_1px] bg-bottom-left bg-no-repeat font-semibold text-primary transition-[background-size] duration-200 ease-out hover:bg-size-[100%_2px] motion-reduce:transition-none\"\n                  >\n                    {announcement.link.label}\n                  </a>\n                )}\n              </p>\n            </div>\n            <label\n              htmlFor={closeId}\n              aria-label={announcement.closeLabel}\n              className=\"absolute top-1/2 right-4 grid size-6 -translate-y-1/2 cursor-pointer place-items-center lg:right-6\"\n            >\n              <X aria-hidden className=\"size-4\" strokeWidth={2.5} />\n            </label>\n          </div>\n        </>\n      )}\n      <div className=\"relative bg-background\">\n        <div className=\"mx-auto flex h-14 max-w-page items-center gap-12 px-gutter lg:h-20 lg:gap-10 lg:px-12 xl:gap-12\">\n          <AirwallexWordmark name={wordmark} mark={mark} href={homeHref} />\n          <nav className=\"hidden items-center gap-8 lg:flex xl:gap-12\">\n            {links.map((link) => (\n              <a key={link.label} href={link.href} className={linkClass}>\n                {link.label}\n              </a>\n            ))}\n          </nav>\n          <div className=\"ml-auto flex items-center gap-4 lg:gap-2\">\n            {language && (\n              <span className=\"mr-6 hidden items-center gap-2 text-base font-semibold text-foreground/75 xl:flex\">\n                <span className=\"grid h-5 w-7 place-items-center rounded-sm bg-chart-5 text-card\">\n                  <Globe aria-hidden className=\"size-3.5\" strokeWidth={2.25} />\n                </span>\n                {language}\n              </span>\n            )}\n            {login && (\n              <AirwallexButton href={login.href} variant=\"text\" className=\"mr-4 hidden xl:inline-flex\">\n                {login.label}\n              </AirwallexButton>\n            )}\n            {demo && (\n              <AirwallexButton href={demo.href} variant=\"outline\" className=\"hidden lg:inline-flex\">\n                {demo.label}\n              </AirwallexButton>\n            )}\n            <AirwallexButton href={action.href} size=\"sm\" className=\"lg:h-10 lg:px-4 lg:text-base\">\n              {action.label}\n            </AirwallexButton>\n            <details className=\"group lg:hidden\">\n              <summary aria-label={menuLabel} className=\"grid size-8 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\">\n                <Menu aria-hidden className=\"size-7 group-open:hidden\" strokeWidth={2.25} />\n                <X aria-hidden className=\"hidden size-7 group-open:block\" strokeWidth={2.25} />\n              </summary>\n              <nav className=\"absolute inset-x-0 top-full flex flex-col border-y border-border bg-background px-gutter pt-2 pb-6\">\n                {[...links, ...(login ? [login] : []), ...(demo ? [demo] : [])].map((link) => (\n                  <a key={link.label} href={link.href} className={cn(linkClass, \"border-b border-border py-4\")}>\n                    {link.label}\n                  </a>\n                ))}\n              </nav>\n            </details>\n          </div>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "airwallex-button",
+    "airwallex-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "announcement",
+      "type": "AirwallexAnnouncement",
+      "required": false,
+      "description": "the strip above the nav; leave out for none"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the company name"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small mark before the name (e.g. a lucide icon)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "AirwallexLink[]",
+      "required": true,
+      "description": "the main links beside the wordmark (desktop)"
+    },
+    {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "the language chip's label (\"EN\")"
+    },
+    {
+      "name": "login",
+      "type": "AirwallexLink",
+      "required": false,
+      "description": "the violet text link (\"Log in\")"
+    },
+    {
+      "name": "demo",
+      "type": "AirwallexLink",
+      "required": false,
+      "description": "the outline button (\"See demo\")"
+    },
+    {
+      "name": "action",
+      "type": "AirwallexLink",
+      "required": true,
+      "description": "the filled button, also shown on phones (\"Get started\")"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e34cd3108b69ed889ebd843e00d3da467af77221211081745290be2a01747c73"
+}

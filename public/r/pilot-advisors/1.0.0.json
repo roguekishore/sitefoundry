@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot advisors",
+  "description": "A white band with a centred heading and lede over three hairline-framed columns, one per advisor: the name and their background set on flat highlighter-style tags (lime, butter yellow, cyan), a two-paragraph quote, and a cut-out portrait in the bottom-right corner over a soft diagonal tint of the same colour. Ends on a violet statement with a violet brush stroke. On phones the columns stack in one bordered box.",
+  "category": "testimonials",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "team",
+    "testimonials",
+    "advisors",
+    "grid",
+    "hairlines",
+    "pastel",
+    "tags",
+    "light"
+  ],
+  "notes": [
+    "tag colours are chart-4 (lime), highlight (yellow) and accent (cyan)"
+  ],
+  "entry": "pilot-advisors.tsx",
+  "source": "foundry",
+  "name": "pilot-advisors",
+  "files": [
+    {
+      "path": "pilot-advisors.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PilotBrushNote } from \"@foundry/pilot-brush-note\";\nimport { PilotHeading } from \"@foundry/pilot-heading\";\n\nconst tones = {\n  lime: { tag: \"bg-chart-4 text-foreground\", tint: \"from-chart-4\", slot: \"bg-chart-4\" },\n  sun: { tag: \"bg-highlight text-highlight-foreground\", tint: \"from-highlight/40\", slot: \"bg-highlight/50\" },\n  sky: { tag: \"bg-accent text-accent-foreground\", tint: \"from-accent/40\", slot: \"bg-accent/50\" },\n};\n\nexport interface PilotAdvisor {\n  /** their name, on the big tag */\n  name: string;\n  /** their background, on the small tag under it */\n  role: string;\n  /** what they say; \\n\\n starts a new paragraph */\n  quote: string;\n  /** the colour of their tags and tint */\n  tone: keyof typeof tones;\n  /** a cut-out portrait for the bottom-right corner; a tinted placeholder when empty */\n  portrait?: ReactNode;\n}\n\nexport interface PilotAdvisorsProps {\n  /** the heading; \\n sets the desktop line breaks */\n  title: string;\n  /** the paragraph under it */\n  lede?: string;\n  /** the advisors, three across on desktop */\n  advisors: PilotAdvisor[];\n  /** the violet closing statement */\n  note?: string;\n  className?: string;\n}\n\n/** Pilot's advisors: three framed columns with highlighter tags, a quote and a portrait. */\nexport function PilotAdvisors({ title, lede, advisors, note, className }: PilotAdvisorsProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-border pt-16 pb-16 lg:border-x lg:pt-[7.5rem] lg:pb-28\">\n        <PilotHeading title={title} lede={lede} className=\"max-w-[45rem] px-gutter\" />\n\n        <ul className=\"mx-gutter mt-14 grid border border-border lg:mx-0 lg:mt-24 lg:grid-cols-3 lg:border-x-0\">\n          {advisors.map((a, i) => {\n            const t = tones[a.tone];\n            return (\n              <li\n                key={a.name}\n                className={cn(\n                  \"relative flex flex-col bg-linear-to-t to-transparent to-45% pt-6 lg:min-h-[41.75rem]\",\n                  t.tint,\n                  i > 0 && \"border-t border-border lg:border-t-0 lg:border-l\",\n                )}\n              >\n                <div className=\"px-6\">\n                  <p className={cn(\"inline-block px-1.5 py-1 text-2xl leading-[1.2]\", t.tag)}>{a.name}</p>\n                  <p className={cn(\"block max-w-[17.5rem] px-1.5 py-1.5 text-sm leading-[1.3] tracking-[0.02em]\", t.tag)}>{a.role}</p>\n                  <div className=\"mt-6 space-y-6 text-lg leading-[1.55] lg:max-w-[20rem] lg:text-xl lg:leading-[1.3]\">\n                    {a.quote.split(\"\\n\\n\").map((p) => (\n                      <p key={p}>{p}</p>\n                    ))}\n                  </div>\n                </div>\n                <div className=\"mt-auto ml-auto w-[70%] pt-8 lg:w-[63%]\">\n                  {a.portrait ?? <div aria-hidden className={cn(\"aspect-[269/228] rounded-t-[45%]\", t.slot)} />}\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n\n        {note && <PilotBrushNote stroke=\"primary\" text={note} className=\"mx-auto mt-14 max-w-[47rem] px-gutter text-primary lg:mt-24\" />}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "pilot-brush-note",
+    "pilot-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n sets the desktop line breaks"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph under it"
+    },
+    {
+      "name": "advisors",
+      "type": "PilotAdvisor[]",
+      "required": true,
+      "description": "the advisors, three across on desktop"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the violet closing statement"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "201735d09dd2926a080cafb4133dcd50b5f6c895ee4fd6eee8664a2cd23be323"
+}

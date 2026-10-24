@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot case studies",
+  "description": "A deep aubergine band: a small uppercase eyebrow, a big white heading and two outlined round arrow buttons, then a sideways track of wide square-cornered cards bleeding off the right edge. Each card is a white panel with a title and a three-step timeline (problem, what we built, the result as a quote) threaded on a thin vertical line with dots, a violet pill and an outlined pill, beside a tall photo washed in violet with the customer's name on it. Swipe or step with the arrows; snaps card by card. Ends on a white statement with a violet brush stroke.",
+  "category": "testimonials",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-study",
+    "carousel",
+    "scroll-snap",
+    "timeline",
+    "dark",
+    "violet"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows only; the track swipes and snaps without it",
+    "the band is the theme's secondary colour (aubergine in pilot-theme); on phones the photo is hidden"
+  ],
+  "hydrate": "visible",
+  "entry": "pilot-cases.tsx",
+  "source": "foundry",
+  "name": "pilot-cases",
+  "files": [
+    {
+      "path": "pilot-cases.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight, Play } from \"lucide-react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PilotBrushNote } from \"@foundry/pilot-brush-note\";\nimport { PilotButton } from \"@foundry/pilot-button\";\nimport { PilotLines } from \"@foundry/pilot-heading\";\nimport { PilotPlaceholder } from \"@foundry/pilot-placeholder\";\n\nexport interface PilotCaseStep {\n  /** the small uppercase label, e.g. \"The problem\" */\n  label: string;\n  /** the text under it */\n  text: string;\n}\n\nexport interface PilotCase {\n  /** the card's title */\n  title: string;\n  /** the problem and what was built */\n  steps: PilotCaseStep[];\n  /** the last step: the customer's words, set larger, with a violet dot and label */\n  result: PilotCaseStep;\n  /** the violet pill */\n  story: { label: string; href: string };\n  /** the outlined pill with a play icon; leave out to hide it */\n  video?: { label: string; href: string };\n  /** the customer's name on the photo */\n  customer: string;\n  /** the photo beside the panel; a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface PilotCasesProps {\n  /** the small uppercase line above the heading */\n  eyebrow?: string;\n  /** the heading; \\n sets the desktop line break */\n  title: string;\n  /** the cards, in order along the track */\n  cases: PilotCase[];\n  /** the white closing statement */\n  note?: string;\n  /** screen-reader labels for the arrow buttons */\n  prevLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\n/** Pilot's case-study carousel: timeline cards with a photo, on the aubergine band. */\nexport function PilotCases({ eyebrow, title, cases, note, prevLabel = \"Previous\", nextLabel = \"Next\", className }: PilotCasesProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const reduce = useReducedMotion();\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    if (!el) return;\n    const first = el.querySelector(\"li\");\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const by = first ? first.getBoundingClientRect().width + gap : el.clientWidth * 0.8;\n    el.scrollBy({ left: dir * by, behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  const arrows = (\n    <div className=\"flex gap-2\">\n      {([-1, 1] as const).map((d) => (\n        <button\n          key={d}\n          type=\"button\"\n          aria-label={d < 0 ? prevLabel : nextLabel}\n          onClick={() => step(d)}\n          className=\"flex size-10 items-center justify-center rounded-full border border-secondary-foreground transition-colors duration-100 hover:bg-secondary-foreground hover:text-secondary motion-reduce:transition-none\"\n        >\n          {d < 0 ? <ChevronLeft aria-hidden className=\"size-5\" strokeWidth={1.5} /> : <ChevronRight aria-hidden className=\"size-5\" strokeWidth={1.5} />}\n        </button>\n      ))}\n    </div>\n  );\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-secondary text-secondary-foreground\", className)}>\n      <div className=\"mx-auto max-w-page border-secondary-foreground/10 pt-16 pb-16 lg:border-x lg:pt-[7.5rem] lg:pb-28\">\n        <div className=\"flex items-end justify-between gap-8 px-gutter lg:px-[1.5625rem] lg:pr-20\">\n          <div>\n            {eyebrow && <p className=\"mb-4 text-xs leading-[1.5] font-bold tracking-[0.1em] uppercase\">{eyebrow}</p>}\n            <h2 className=\"font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[2.5rem]\">\n              <PilotLines text={title} />\n            </h2>\n          </div>\n          <div className=\"hidden shrink-0 lg:block\">{arrows}</div>\n        </div>\n\n        <ul\n          ref={track}\n          className=\"mt-14 flex snap-x snap-mandatory scroll-px-6 gap-4 overflow-x-auto px-6 [scrollbar-width:none] lg:mt-20 lg:mr-[calc((100vw-min(100vw,var(--page-width)))/-2)] lg:scroll-px-0 lg:gap-14 lg:px-0 [&::-webkit-scrollbar]:hidden\"\n        >\n          {cases.map((c) => (\n            <li key={c.title} className=\"flex w-[calc(100vw-3.75rem)] max-w-[22rem] shrink-0 snap-start lg:w-[66.5rem] lg:max-w-none\">\n              <div className=\"relative flex flex-1 flex-col bg-card px-6 pt-6 pb-6 text-card-foreground lg:min-h-[44.75rem] lg:px-14 lg:pt-14 lg:pb-14\">\n                <span aria-hidden className=\"absolute top-[8rem] bottom-0 left-[1.875rem] w-px bg-card-foreground lg:top-[8.5rem] lg:left-[3.875rem]\" />\n                <h3 className=\"font-display text-[1.75rem] leading-[1.05] font-medium lg:max-w-[32rem] lg:text-[2rem]\">{c.title}</h3>\n                <ol className=\"mt-10 grid gap-7 pl-[1.875rem] lg:max-w-[28.5rem]\">\n                  {[...c.steps, c.result].map((s, i, all) => {\n                    const last = i === all.length - 1;\n                    return (\n                      <li key={s.label} className=\"relative\">\n                        <span\n                          aria-hidden\n                          className={cn(\n                            \"absolute top-1 -left-[1.8125rem] size-2.5 rounded-full\",\n                            last ? \"bg-primary\" : \"bg-card-foreground\",\n                          )}\n                        />\n                        <p className={cn(\"text-xs leading-[1.5] font-bold tracking-[0.12em] uppercase\", last ? \"text-primary\" : \"text-muted-foreground\")}>{s.label}</p>\n                        <p className={cn(\"mt-2.5\", last ? \"text-lg leading-[1.55] font-medium lg:text-xl lg:leading-[1.3]\" : \"text-base leading-6\")}>{s.text}</p>\n                      </li>\n                    );\n                  })}\n                </ol>\n                <div className=\"mt-auto flex flex-col gap-2.5 pt-14 pl-[1.875rem] sm:flex-row sm:gap-4\">\n                  <PilotButton href={c.story.href} variant=\"solid\" size=\"sm\">\n                    {c.story.label}\n                  </PilotButton>\n                  {c.video && (\n                    <PilotButton href={c.video.href} variant=\"outline\" size=\"sm\" icon={<Play aria-hidden className=\"fill-current\" />}>\n                      {c.video.label}\n                    </PilotButton>\n                  )}\n                </div>\n              </div>\n              <div className=\"relative hidden w-[22.5rem] shrink-0 items-center justify-center lg:flex\">\n                {c.media ?? <PilotPlaceholder tone=\"photo\" className=\"absolute inset-0 bg-secondary from-primary/45 via-secondary/60 to-glow/25\" />}\n                <div aria-hidden className=\"absolute inset-0 bg-primary/35 mix-blend-multiply\" />\n                <p className=\"relative font-display text-[2rem] font-semibold tracking-[-0.02em] text-primary-foreground\">{c.customer}</p>\n              </div>\n            </li>\n          ))}\n        </ul>\n\n        <div className=\"mt-14 flex justify-center lg:hidden\">{arrows}</div>\n\n        {note && <PilotBrushNote stroke=\"primary\" text={note} className=\"mx-auto mt-12 max-w-[47rem] px-gutter lg:mt-24\" />}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "pilot-brush-note",
+    "pilot-button",
+    "pilot-heading",
+    "pilot-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small uppercase line above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \\n sets the desktop line break"
+    },
+    {
+      "name": "cases",
+      "type": "PilotCase[]",
+      "required": true,
+      "description": "the cards, in order along the track"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "the white closing statement"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": false,
+      "default": "Previous",
+      "description": "screen-reader labels for the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false,
+      "default": "Next"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8d9463fcbec30c43ada54c75c2dcd930993a0d83815f8562f70926b87a215400"
+}

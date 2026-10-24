@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics footer",
+  "description": "A black footer about a window tall: a giant extra-wide caps call on the left, big mono link rows with thin arrows on the right, then small links spread across a row, an outlined pill and icons, dim legal lines, and a large glowing brand mark centred underneath. It sits sticky at the bottom so the page slides away to uncover it, and the mark fades in over the last stretch of scroll.",
+  "category": "footer",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "wide",
+    "caps",
+    "mono",
+    "glow",
+    "reveal",
+    "sticky",
+    "scroll-driven",
+    "links"
+  ],
+  "notes": [
+    "the uncover effect needs the page's main to be `relative z-10` with a background, and the footer as its next sibling",
+    "always black (a `dark` scope); the empty mark slot is a radial glow in the theme's --glow (white here)",
+    "the mark fade is a CSS scroll timeline on the page scroll (no JS)"
+  ],
+  "entry": "valaratomics-footer.tsx",
+  "source": "foundry",
+  "name": "valaratomics-footer",
+  "files": [
+    {
+      "path": "valaratomics-footer.css",
+      "content": "/* The glowing mark fades in over the last stretch of the page's scroll, as the footer is\n   uncovered. Without scroll timelines (or with reduced motion) it simply shows. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .valaratomics-footer-mark {\n      animation: valaratomics-footer-mark linear both;\n      animation-timeline: scroll(root);\n      animation-range: calc(100% - 36rem) 100%;\n    }\n  }\n}\n\n@keyframes valaratomics-footer-mark {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "valaratomics-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./valaratomics-footer.css\";\n\nexport interface ValaratomicsFooterLink {\n  /** link text (shown uppercase in the mono face) */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface ValaratomicsFooterSocial {\n  /** accessible name, e.g. \"Newsletter\" */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** the icon (e.g. a lucide icon) */\n  icon: ReactNode;\n}\n\nexport interface ValaratomicsFooterProps {\n  /** the giant caps call, one string per line (e.g. [\"Join\", \"the crew\"]) */\n  title: string[];\n  /** the big link rows with arrows */\n  actions: ValaratomicsFooterLink[];\n  /** the arrow at the end of each row (e.g. lucide MoveRight) */\n  arrow?: ReactNode;\n  /** the small links spread across one row */\n  links: ValaratomicsFooterLink[];\n  /** the outlined pill before the icons, e.g. a press-kit link */\n  badge?: ValaratomicsFooterLink;\n  /** icon links after the pill */\n  socials?: ValaratomicsFooterSocial[];\n  /** the line in white at the bottom left (centred at the very bottom on phones) */\n  tagline: string;\n  /** the dim copyright line */\n  copyright: string;\n  /** the dim line at the bottom right */\n  rights?: string;\n  /** the big glowing brand mark centred below (an image); empty shows a soft glow */\n  mark?: ReactNode;\n  className?: string;\n}\n\n/**\n * A black footer about a window tall: a giant extra-wide caps call on the left, big mono link\n * rows with arrows on the right, then small links, a pill and icons, the legal lines, and a\n * large glowing mark centred underneath that fades in as the page lifts off it. Put it after\n * a `relative z-10` main to have the page slide away and uncover it (it is sticky at the\n * bottom, underneath).\n */\nexport function ValaratomicsFooter({\n  title,\n  actions,\n  arrow,\n  links,\n  badge,\n  socials = [],\n  tagline,\n  copyright,\n  rights,\n  mark,\n  className,\n}: ValaratomicsFooterProps) {\n  return (\n    <footer\n      className={cn(\n        \"dark sticky bottom-0 isolate flex min-h-[min(52rem,100svh)] flex-col overflow-clip bg-background text-foreground\",\n        className,\n      )}\n    >\n      <div\n        aria-hidden={!mark}\n        className=\"valaratomics-footer-mark pointer-events-none absolute bottom-0 left-1/2 -z-10 aspect-[1000/890] w-[min(62.5rem,170%)] -translate-x-1/2 translate-y-[18%] lg:translate-y-[24%] [&>*]:size-full [&_img]:object-contain\"\n      >\n        {mark ?? (\n          <div className=\"size-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--glow)_85%,transparent)_0%,color-mix(in_oklab,var(--glow)_30%,transparent)_30%,transparent_72%)]\" />\n        )}\n      </div>\n\n      <div className=\"mx-auto grid w-full max-w-page flex-1 grid-rows-[auto_auto_1fr] gap-y-12 px-gutter pt-[1.75rem] pb-5 lg:grid-cols-12 lg:grid-rows-none lg:flex-none lg:gap-x-[2vw] lg:pt-10\">\n        <div className=\"max-lg:contents lg:col-span-7 lg:flex lg:flex-col\">\n          <h2 className=\"font-display text-[2.625rem] leading-[0.88] font-black uppercase [font-stretch:var(--valaratomics-stretch,100%)] lg:col-span-7 lg:text-[5.3125rem] lg:leading-[0.88]\">\n            {title.map((line) => (\n              <span key={line} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h2>\n          <div className=\"self-end text-center font-mono text-base leading-none uppercase max-lg:row-start-3 max-lg:w-full lg:mt-auto lg:self-start lg:text-left\">\n            <p>{tagline}</p>\n            <p className=\"mt-4 text-foreground/40\">{copyright}</p>\n          </div>\n        </div>\n\n        <div className=\"lg:col-span-5 lg:col-start-8\">\n          <ul className=\"flex flex-col gap-[1.875rem] lg:gap-[2.125rem]\">\n            {actions.map((a) => (\n              <li key={a.href}>\n                <a\n                  href={a.href}\n                  className=\"group flex items-center justify-between font-mono text-lg leading-none uppercase transition-colors duration-150 hover:text-primary lg:text-2xl lg:leading-none\"\n                >\n                  <span>{a.label}</span>\n                  {arrow && (\n                    <span\n                      aria-hidden\n                      className=\"transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transition-none [&_svg]:size-7 [&_svg]:stroke-[1.5]\"\n                    >\n                      {arrow}\n                    </span>\n                  )}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <ul className=\"mt-12 flex justify-between font-mono text-base leading-none uppercase lg:mt-[5.25rem]\">\n            {links.map((l) => (\n              <li key={l.href}>\n                <a href={l.href} className=\"transition-colors duration-150 hover:text-primary\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {(badge || socials.length > 0) && (\n            <div className=\"mt-5 flex items-center gap-6 lg:justify-end\">\n              {badge && (\n                <a\n                  href={badge.href}\n                  className=\"rounded-[5px] border border-foreground px-3 py-1.5 font-sans text-sm leading-none font-semibold uppercase transition-colors duration-150 hover:border-primary hover:text-primary\"\n                >\n                  {badge.label}\n                </a>\n              )}\n              {socials.map((s) => (\n                <a\n                  key={s.href}\n                  href={s.href}\n                  aria-label={s.label}\n                  className=\"transition-colors duration-150 hover:text-primary [&_svg]:size-6\"\n                >\n                  {s.icon}\n                </a>\n              ))}\n            </div>\n          )}\n          {rights && (\n            <p className=\"mt-5 hidden text-right font-mono text-base leading-none text-foreground/40 uppercase lg:block\">{rights}</p>\n          )}\n        </div>\n\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the giant caps call, one string per line (e.g. [\"Join\", \"the crew\"])"
+    },
+    {
+      "name": "actions",
+      "type": "ValaratomicsFooterLink[]",
+      "required": true,
+      "description": "the big link rows with arrows"
+    },
+    {
+      "name": "arrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the arrow at the end of each row (e.g. lucide MoveRight)"
+    },
+    {
+      "name": "links",
+      "type": "ValaratomicsFooterLink[]",
+      "required": true,
+      "description": "the small links spread across one row"
+    },
+    {
+      "name": "badge",
+      "type": "ValaratomicsFooterLink",
+      "required": false,
+      "description": "the outlined pill before the icons, e.g. a press-kit link"
+    },
+    {
+      "name": "socials",
+      "type": "ValaratomicsFooterSocial[]",
+      "required": false,
+      "default": "[]",
+      "description": "icon links after the pill"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "the line in white at the bottom left (centred at the very bottom on phones)"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the dim copyright line"
+    },
+    {
+      "name": "rights",
+      "type": "string",
+      "required": false,
+      "description": "the dim line at the bottom right"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the big glowing brand mark centred below (an image); empty shows a soft glow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "adf3e2baaa806a6447c8d4f79f088b021346ac7f52f9e4d995ed83ace153ec5b"
+}

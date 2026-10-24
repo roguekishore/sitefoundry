@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Unit button",
+  "description": "A fully rounded pill in one regular weight: solid black (white inside dark bands) or a hairline outline. A small chevron sits after the label; on hover it slips away and an arrow slides in from the left while the fill softens to 80% or the outline darkens, over 0.425s on a sharp ease-out.",
+  "category": "button",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "pill",
+    "minimal",
+    "flat",
+    "hover",
+    "arrow"
+  ],
+  "notes": [
+    "solid uses the primary token, so inside a `dark` island it turns white with black text",
+    "md is 36px tall on phones and 42px from 1024px; sm is the 40px header pill"
+  ],
+  "entry": "unit-button.tsx",
+  "source": "foundry",
+  "name": "unit-button",
+  "files": [
+    {
+      "path": "unit-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface UnitButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** solid: filled pill in the primary colour · outline: hairline pill on the page */\n  variant?: \"solid\" | \"outline\";\n  /** md: 36px on phones, 42px from desktop (section CTAs) · sm: 40px at every width (header) */\n  size?: \"sm\" | \"md\";\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst ease = \"duration-[425ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\nconst sizes = {\n  sm: \"h-10 gap-2.5 pr-4 pl-4 text-sm\",\n  md: \"h-9 gap-2.5 pr-3.5 pl-3.5 text-[0.8125rem] lg:h-[2.625rem] lg:pr-5 lg:pl-5 lg:text-sm\",\n};\n\n/** The pill button: a chevron at rest that hands over to an arrow sliding in from the left on hover. */\nexport function UnitButton({ children, href, variant = \"solid\", size = \"md\", type = \"button\", className }: UnitButtonProps) {\n  const classes = cn(\n    \"group/btn inline-flex shrink-0 items-center justify-center rounded-full leading-none whitespace-nowrap\",\n    \"transition-[background-color,border-color]\",\n    ease,\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variant === \"solid\"\n      ? \"bg-primary text-primary-foreground hover:bg-primary/80\"\n      : \"border border-input bg-transparent text-foreground hover:border-foreground/60 hover:bg-background/20\",\n    sizes[size],\n    className,\n  );\n  const inner = (\n    <>\n      <span>{children}</span>\n      <span aria-hidden className=\"relative inline-flex size-3 items-center justify-center\">\n        <ChevronRight className={cn(\"absolute size-3 transition-[opacity,transform] group-hover/btn:translate-x-1 group-hover/btn:opacity-0\", ease)} strokeWidth={2} />\n        <ArrowRight className={cn(\"absolute size-3 -translate-x-2 opacity-0 transition-[opacity,transform] group-hover/btn:translate-x-0 group-hover/btn:opacity-100\", ease)} strokeWidth={2} />\n      </span>\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: filled pill in the primary colour · outline: hairline pill on the page"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: 36px on phones, 42px from desktop (section CTAs) · sm: 40px at every width (header)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "efc4b64dbd800646eead85edea94cd2574c0e6ad4c103b66592b7bab3a7790c0"
+}

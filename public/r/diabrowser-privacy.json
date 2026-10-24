@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser privacy",
+  "description": "A quiet trust panel: a wide box with a dotted outline and small icons notched into its top and bottom edges, a two-line serif heading split by a strip of grey setting chips (mono label, coloured dot, on/off value box) that runs past both edges and drifts sideways as you scroll, then centred grey text and a grey pill link whose arrow nudges right on hover. Fades in on entering view.",
+  "category": "features",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "privacy",
+    "security",
+    "trust",
+    "chips",
+    "toggles",
+    "marquee",
+    "drift",
+    "scrubbed",
+    "dotted",
+    "serif",
+    "cream",
+    "minimal"
+  ],
+  "notes": [
+    "the chip strip is repeated three times and clipped by the box; it drifts about 70px across the section's pass (CSS view timeline)",
+    "dots alternate the theme's glow and highlight colours"
+  ],
+  "entry": "diabrowser-privacy.tsx",
+  "source": "foundry",
+  "name": "diabrowser-privacy",
+  "files": [
+    {
+      "path": "diabrowser-privacy.css",
+      "content": "/* The box fades in as it enters the window; the strip of setting chips drifts left as the\n   section passes by (scrubbed with the scroll, so it drifts back on the way up). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .diabrowser-privacy-fade {\n      animation: diabrowser-privacy-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 200px;\n    }\n    .diabrowser-privacy-drift {\n      animation: diabrowser-privacy-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes diabrowser-privacy-fade {\n  from { opacity: 0; }\n}\n\n@keyframes diabrowser-privacy-drift {\n  from { translate: 24px 0; }\n  to { translate: -48px 0; }\n}\n"
+    },
+    {
+      "path": "diabrowser-privacy.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { DiabrowserButton } from \"@foundry/diabrowser-button\";\nimport { DiabrowserHeading } from \"@foundry/diabrowser-heading\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-privacy.css\";\n\nexport interface DiabrowserPrivacyChip {\n  /** the setting's name, in mono */\n  label: string;\n  /** whether it shows the on or the off value */\n  on: boolean;\n}\n\nexport interface DiabrowserPrivacyProps {\n  /** the heading line above the chip strip */\n  headingTop: ReactNode;\n  /** the heading line below the chip strip */\n  headingBottom: ReactNode;\n  /** the settings shown as chips in a strip that runs past both edges */\n  chips: DiabrowserPrivacyChip[];\n  /** the words in each chip's value box */\n  values?: { on: string; off: string };\n  /** paragraphs under the heading */\n  body: string[];\n  /** the grey pill link at the end */\n  link: { label: string; href: string };\n  /** the icon on the box's top edge (a lock) */\n  topIcon?: ReactNode;\n  /** the icon on the box's bottom edge (your symbol) */\n  bottomIcon?: ReactNode;\n  className?: string;\n}\n\n/** A dotted-outline privacy panel: a two-line serif heading split by a drifting strip of setting chips, centred text and a pill link. */\nexport function DiabrowserPrivacy({ headingTop, headingBottom, chips, values = { on: \"On\", off: \"Off\" }, body, link, topIcon, bottomIcon, className }: DiabrowserPrivacyProps) {\n  // three runs of the chips, so the strip overfills the widest box while it drifts\n  const strip = [0, 1, 2].flatMap((run) => chips.map((chip, i) => ({ ...chip, key: `${run}-${i}`, copy: run !== 1 })));\n\n  return (\n    <section className={cn(\"bg-background px-gutter py-section text-foreground\", className)}>\n      <div className=\"diabrowser-privacy-fade relative mx-auto max-w-page rounded-xl border border-dotted border-foreground/50 pt-[70px] pb-[72px] text-center\">\n        {topIcon && (\n          <span className=\"absolute top-0 left-1/2 flex h-10 w-[78px] -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-background text-foreground [&_svg]:size-7\">\n            {topIcon}\n          </span>\n        )}\n\n        <DiabrowserHeading>{headingTop}</DiabrowserHeading>\n\n        <div className=\"mt-5 flex justify-center overflow-clip\" aria-label={chips.map((c) => `${c.label}: ${c.on ? values.on : values.off}`).join(\", \")}>\n          <ul className=\"diabrowser-privacy-drift flex w-max shrink-0 gap-5\" aria-hidden>\n            {strip.map((chip, i) => (\n              <li key={chip.key} className=\"flex h-[34px] shrink-0 items-center gap-3 rounded-full bg-secondary pr-[6px] pl-4\">\n                <span className={cn(\"size-2 rounded-full\", i % 2 ? \"bg-highlight\" : \"bg-glow\")} />\n                <span className=\"font-mono text-[15px] leading-none tracking-[-0.01em] text-foreground/85\">{chip.label}</span>\n                <span className=\"rounded-[3px] bg-card px-1.5 py-[3px] text-[15px] leading-4 text-foreground/85\">{chip.on ? values.on : values.off}</span>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <DiabrowserHeading as=\"p\" className=\"mt-[22px]\">\n          {headingBottom}\n        </DiabrowserHeading>\n\n        <div className=\"mx-auto mt-[44px] flex max-w-[690px] flex-col gap-2 px-6 text-[16px] leading-6 tracking-[0.005em] text-foreground/65 lg:text-[20px] lg:leading-[30px]\">\n          {body.map((p) => (\n            <p key={p}>{p}</p>\n          ))}\n        </div>\n\n        <DiabrowserButton tone=\"soft\" size=\"sm\" href={link.href} icon={<ArrowRight strokeWidth={1.75} />} className=\"mt-10 gap-3 px-6 text-foreground\">\n          {link.label}\n        </DiabrowserButton>\n\n        {bottomIcon && (\n          <span className=\"absolute bottom-0 left-1/2 flex h-10 w-[78px] -translate-x-1/2 translate-y-1/2 items-center justify-center bg-background text-foreground [&_svg]:size-7\">\n            {bottomIcon}\n          </span>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "diabrowser-button",
+    "diabrowser-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "headingTop",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the heading line above the chip strip"
+    },
+    {
+      "name": "headingBottom",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the heading line below the chip strip"
+    },
+    {
+      "name": "chips",
+      "type": "DiabrowserPrivacyChip[]",
+      "required": true,
+      "description": "the settings shown as chips in a strip that runs past both edges"
+    },
+    {
+      "name": "values",
+      "type": "{ on: string; off: string; }",
+      "required": false,
+      "default": "{ on: \"On\", off: \"Off\" }",
+      "description": "the words in each chip's value box"
+    },
+    {
+      "name": "body",
+      "type": "string[]",
+      "required": true,
+      "description": "paragraphs under the heading"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the grey pill link at the end"
+    },
+    {
+      "name": "topIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the icon on the box's top edge (a lock)"
+    },
+    {
+      "name": "bottomIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the icon on the box's bottom edge (your symbol)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d8e06531267144f87dc8c62c0e35111777a650fac04f91d9eaeb7c95a422045d"
+}

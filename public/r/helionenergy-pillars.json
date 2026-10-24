@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy stacking pillars",
+  "description": "A centred uppercase heading over rows of a bracketed mono label with a short line, a 16:9 picture with 8px corners and a few small sentences. Phones stack each row centred. On desktop the heading sticks near the top and every row sticks mid-window so the next slides up over it: the covered picture shrinks to 92% and lifts while its words fade, and the new row's words fade up 20px.",
+  "category": "features",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "values",
+    "stack",
+    "sticky",
+    "pinned",
+    "scroll",
+    "scrubbed",
+    "scale",
+    "reveal",
+    "editorial",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "pure CSS: sticky rows plus view timelines on hidden sensor spans; desktop only (phones get a plain stack)",
+    "the desktop stack is about 3.1 windows tall (row spacing in svh); its fades are timed for a window around 900px and shift slightly on others",
+    "without scroll timelines or with reduced motion the rows still stack over each other, just without the fades and shrink",
+    "media is each row's photo or film; empty, a placeholder"
+  ],
+  "entry": "helionenergy-pillars.tsx",
+  "source": "foundry",
+  "name": "helionenergy-pillars",
+  "files": [
+    {
+      "path": "helionenergy-pillars.css",
+      "content": "/* Desktop stack. Each row is `sticky` at the same spot, so the next row slides over it. A\n   sticky row barely moves while stuck, so its motion runs on a \"sensor\": an invisible\n   span at the row's resting place (rows sit 76.67svh apart, the sensor is that tall) whose\n   view timeline is shared with its sibling row through `timeline-scope` on the list.\n\n   Sensor geometry, for a ~900px window: entry 85% = the row reaches its sticky spot;\n   contain 0% = the next row starts to enter; exit 55% = the next row has arrived on top\n   (shorter windows shift these a few percent). */\n.helionenergy-pillars-list {\n  timeline-scope: var(--hp-scope);\n}\n.helionenergy-pillars-sensor {\n  view-timeline-name: var(--hp-name);\n  view-timeline-axis: block;\n}\n\n@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n  @supports (animation-timeline: view()) {\n    /* the covered picture shrinks to 92% and lifts 40px */\n    .helionenergy-pillars-media {\n      animation-name: var(--hp-media-anim);\n      animation-timeline: var(--hp-tl);\n      animation-range: contain 0% exit 55%;\n      animation-fill-mode: both;\n      animation-timing-function: linear;\n    }\n    /* words fade up 20px as their row arrives, and fade out as the next one comes */\n    .helionenergy-pillars-text {\n      animation-name: var(--hp-text-anim);\n      animation-timeline: var(--hp-tl);\n      animation-range: var(--hp-text-range);\n      animation-fill-mode: var(--hp-text-fill);\n      animation-timing-function: linear;\n    }\n  }\n}\n\n@keyframes helionenergy-pillars-shrink {\n  to {\n    transform: translateY(-40px) scale(0.92);\n  }\n}\n\n@keyframes helionenergy-pillars-in {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n}\n\n@keyframes helionenergy-pillars-out {\n  to {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-pillars.tsx",
+      "content": "import { Fragment, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HelionenergyEyebrow } from \"@foundry/helionenergy-eyebrow\";\nimport { HelionenergyHeading } from \"@foundry/helionenergy-heading\";\nimport { HelionenergyPlaceholder } from \"@foundry/helionenergy-placeholder\";\nimport \"./helionenergy-pillars.css\";\n\nexport interface HelionenergyPillar {\n  /** the bracketed mono label */\n  label: ReactNode;\n  /** one short line under it */\n  lead: ReactNode;\n  /** a few sentences, set small (beside the picture on desktop, under it on phones) */\n  body: ReactNode;\n  /** the 16:9 photo or film; empty, a placeholder */\n  media?: ReactNode;\n}\n\nexport interface HelionenergyPillarsProps {\n  /** the heading's lines (broken on desktop only) */\n  title: ReactNode[];\n  /** the stacked rows, three in the original */\n  items: HelionenergyPillar[];\n  /** an id for the section, e.g. for a skip link to land on */\n  id?: string;\n  className?: string;\n}\n\n/** Per row: which sensor timeline drives it, and whether it shrinks/fades away (all but the last). */\nfunction rowMotion(i: number, n: number): CSSProperties {\n  const last = i === n - 1;\n  return {\n    \"--hp-tl\": `--helionenergy-pillars-${i}`,\n    \"--hp-media-anim\": last ? \"none\" : \"helionenergy-pillars-shrink\",\n    \"--hp-text-anim\": last ? \"helionenergy-pillars-in\" : \"helionenergy-pillars-in, helionenergy-pillars-out\",\n    \"--hp-text-range\": last ? \"entry 30% entry 85%\" : \"entry 30% entry 85%, contain 0% contain 100%\",\n    \"--hp-text-fill\": last ? \"backwards\" : \"backwards, forwards\",\n  } as CSSProperties;\n}\n\n/**\n * A centred uppercase heading over a stack of rows: a bracketed mono label and a short line, a\n * 16:9 picture with 8px corners, and a few small sentences. Phones stack each row centred. On\n * desktop the heading sticks near the top and each row (label left, picture centre, text right)\n * sticks mid-window, so the next one slides up over it: the covered picture shrinks to 92% and\n * lifts while its words fade out, and the new row's words fade up 20px.\n */\nexport function HelionenergyPillars({ title, items, id, className }: HelionenergyPillarsProps) {\n  const n = items.length;\n  return (\n    <section\n      id={id}\n      className={cn(\"helionenergy-pillars relative bg-background px-gutter pt-[4.5rem] pb-[5.25rem] text-foreground lg:pt-[calc(114.4svh-16.875rem)] lg:pb-[31.9svh]\", className)}\n    >\n      <div className=\"lg:absolute lg:inset-x-0 lg:top-[7.5rem] lg:bottom-[88.9svh] lg:px-gutter\">\n        <HelionenergyHeading lines={title} className=\"text-center lg:sticky lg:top-[5.9rem]\" />\n      </div>\n\n      <div\n        role=\"list\"\n        className=\"helionenergy-pillars-list relative mx-auto mt-[5.2rem] flex max-w-page flex-col gap-[5.4rem] lg:mt-0 lg:block\"\n        style={{ \"--hp-scope\": items.map((_, i) => `--helionenergy-pillars-${i}`).join(\", \") } as CSSProperties}\n      >\n        {items.map((item, i) => (\n          <Fragment key={i}>\n            <span\n              aria-hidden\n              className=\"helionenergy-pillars-sensor absolute inset-x-0 h-[76.67svh] max-lg:hidden\"\n              style={{ top: `${(i * 76.67).toFixed(2)}svh`, \"--hp-name\": `--helionenergy-pillars-${i}` } as CSSProperties}\n            />\n            <div\n              role=\"listitem\"\n              className=\"grid justify-items-center text-center lg:sticky lg:top-[calc(50svh-8.75rem)] lg:mb-[calc(76.67svh-22.875rem)] lg:h-[22.875rem] lg:grid-cols-[1fr_minmax(0,40.5rem)_1fr] lg:items-center lg:justify-items-stretch lg:text-left lg:last:mb-0\"\n              style={rowMotion(i, n)}\n            >\n              <div className=\"helionenergy-pillars-text flex flex-col items-center lg:items-start lg:pl-[3.56rem]\">\n                <HelionenergyEyebrow bracket>{item.label}</HelionenergyEyebrow>\n                <p className=\"mt-[1.6rem] max-w-[9.75rem] text-[clamp(0.9375rem,0.845rem+0.378vw,1.186rem)] leading-[1.17] tracking-[-0.01em] text-balance text-foreground/90 lg:mt-7 lg:max-w-[11rem]\">\n                  {item.lead}\n                </p>\n              </div>\n              <HelionenergyPlaceholder\n                media={item.media}\n                className=\"helionenergy-pillars-media mt-8 aspect-[1.77] w-full rounded-lg lg:mt-0\"\n              />\n              <p className=\"helionenergy-pillars-text mt-6 max-w-[18.75rem] text-[0.8125rem] leading-[1.38] tracking-[-0.01em] text-foreground/85 lg:mt-0 lg:max-w-[13.25rem] lg:pl-[4.8rem] lg:box-content\">\n                {item.body}\n              </p>\n            </div>\n          </Fragment>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "helionenergy-eyebrow",
+    "helionenergy-heading",
+    "helionenergy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the heading's lines (broken on desktop only)"
+    },
+    {
+      "name": "items",
+      "type": "HelionenergyPillar[]",
+      "required": true,
+      "description": "the stacked rows, three in the original"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "an id for the section, e.g. for a skip link to land on"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9a05a66e4d517afc0593423650296fd7b5738d02e8688ef03c8d846c922aa631"
+}

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid header",
+  "description": "A floating, translucent white pill nav fixed near the top: a small capitals wordmark, evenly spaced links (some with chevrons) that take a faint white wash on hover, a periwinkle outline 'log in' and a near-black rainbow-rimmed CTA. On phones the pill shrinks to the mark and a menu button that opens a rounded panel. It fades and rises out of the way while scrolling down and comes back on scrolling up.",
+  "category": "header",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "pill",
+    "floating",
+    "glass",
+    "fixed",
+    "hide-on-scroll",
+    "light"
+  ],
+  "notes": [
+    "position: fixed; the first block under it (the hero) leaves room for it",
+    "best over a coloured or gradient hero: the pill is translucent white"
+  ],
+  "hydrate": "load",
+  "entry": "plaid-header.tsx",
+  "source": "foundry",
+  "name": "plaid-header",
+  "files": [
+    {
+      "path": "plaid-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { ChevronDown, Menu, X, type LucideIcon } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PlaidButton } from \"@foundry/plaid-button\";\nimport { PlaidWordmark } from \"@foundry/plaid-wordmark\";\n\nexport interface PlaidHeaderLink {\n  label: string;\n  href: string;\n  /** shows a chevron: the link stands for a menu */\n  menu?: boolean;\n}\n\nexport interface PlaidHeaderProps {\n  /** the wordmark */\n  brand: { name: string; href: string; icon: LucideIcon };\n  /** the links in the middle of the pill (hidden on phones, listed in the menu panel instead) */\n  links: PlaidHeaderLink[];\n  /** the outlined 'log in' link */\n  login: { label: string; href: string };\n  /** the near-black call to action */\n  cta: { label: string; href: string };\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Plaid's floating pill nav; hides while scrolling down, returns on scrolling up. */\nexport function PlaidHeader({ brand, links, login, cta, menuLabel, className }: PlaidHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (y > 120 && y > last + 2) setHidden(true);\n      else if (y < last - 2 || y <= 120) setHidden(false);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  return (\n    <header\n      className={cn(\n        \"fixed inset-x-0 top-6 z-50 px-[0.8125rem] transition-[opacity,translate] duration-300 ease-out motion-reduce:transition-none lg:px-gutter\",\n        hidden && !open && \"pointer-events-none -translate-y-10 opacity-0\",\n        className,\n      )}\n    >\n      <nav className=\"relative mx-auto flex h-14 max-w-[70.625rem] items-center rounded-full bg-card/70 pr-3 pl-6 text-primary backdrop-blur-md lg:h-[4.4375rem] lg:pr-5\">\n        <PlaidWordmark {...brand} />\n        <ul className=\"mx-6 hidden flex-1 items-center justify-evenly lg:flex\">\n          {links.map((l) => (\n            <li key={l.label}>\n              <a\n                href={l.href}\n                className=\"inline-flex items-center gap-1 rounded-full px-3 py-2 text-base font-medium transition-colors duration-150 ease-out hover:bg-background/50 motion-reduce:transition-none\"\n              >\n                {l.label}\n                {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={2} />}\n              </a>\n            </li>\n          ))}\n        </ul>\n        <div className=\"ml-auto hidden items-center gap-[1.125rem] lg:flex\">\n          <PlaidButton href={login.href} variant=\"outline\" size=\"md\">\n            {login.label}\n          </PlaidButton>\n          <PlaidButton href={cta.href} size=\"md\">\n            {cta.label}\n          </PlaidButton>\n        </div>\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((o) => !o)}\n          className=\"ml-auto grid size-11 place-items-center rounded-full transition-colors duration-150 hover:bg-background/50 lg:hidden\"\n        >\n          {open ? <X aria-hidden className=\"size-6\" /> : <Menu aria-hidden className=\"size-6\" />}\n        </button>\n\n        {open && (\n          <div className=\"absolute inset-x-0 top-[calc(100%+0.5rem)] rounded-[1.75rem] bg-card p-6 shadow-[0_20px_40px_-16px] shadow-foreground/25 lg:hidden\">\n            <ul className=\"flex flex-col\">\n              {links.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className=\"flex items-center justify-between border-b border-border py-3 text-lg font-medium\">\n                    {l.label}\n                    {l.menu && <ChevronDown aria-hidden className=\"size-4 -rotate-90\" />}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <div className=\"mt-5 flex gap-3\">\n              <PlaidButton href={login.href} variant=\"outline\" size=\"md\" className=\"flex-1\">\n                {login.label}\n              </PlaidButton>\n              <PlaidButton href={cta.href} size=\"md\" className=\"flex-1\">\n                {cta.label}\n              </PlaidButton>\n            </div>\n          </div>\n        )}\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "plaid-button",
+    "plaid-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon: LucideIcon; }",
+      "required": true,
+      "description": "the wordmark"
+    },
+    {
+      "name": "links",
+      "type": "PlaidHeaderLink[]",
+      "required": true,
+      "description": "the links in the middle of the pill (hidden on phones, listed in the menu panel instead)"
+    },
+    {
+      "name": "login",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outlined 'log in' link"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the near-black call to action"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "321924a7b6181c7808dfd40178d44418be9aeb7ed3f2138ccc9c5e61599ef9d7"
+}

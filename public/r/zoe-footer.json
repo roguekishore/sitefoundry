@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe footer",
+  "description": "A deep plum footer opened by a hairline: 'follow us' with social icons on the left, then small link groups (company, address, legal, resources) in columns, and a bottom row with the copyright and a region picker. Groups stack on phones.",
+  "category": "footer",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "plum",
+    "dark",
+    "band",
+    "minimal",
+    "columns"
+  ],
+  "notes": [
+    "the band is the secondary colour; it carries on from zoe-explore",
+    "groups flow into three columns after the 'follow us' one; give a group stackWithNext to put the next group under it"
+  ],
+  "entry": "zoe-footer.tsx",
+  "name": "zoe-footer",
+  "files": [
+    {
+      "path": "zoe-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ZoeFooterGroup {\n  /** the group's small bold heading */\n  title: string;\n  /** links (leave out for a plain-text group such as an address) */\n  links?: { label: string; href: string }[];\n  /** plain lines of text (e.g. an address) */\n  lines?: string[];\n  /** put the next group in the same column, under this one */\n  stackWithNext?: boolean;\n}\n\nexport interface ZoeFooterProps {\n  /** the line above the social icons */\n  followLabel: string;\n  /** social links as icons (e.g. lucide icons at size-6) */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** the link groups, in order */\n  groups: ZoeFooterGroup[];\n  /** the copyright line */\n  copyright: string;\n  /** the region picker on the right: a label and an optional flag or icon before it */\n  region?: { label: string; icon?: ReactNode };\n  className?: string;\n}\n\nconst link = \"transition-opacity duration-200 ease-in-out hover:opacity-70 motion-reduce:transition-none\";\n\nfunction Group({ group }: { group: ZoeFooterGroup }) {\n  return (\n    <div>\n      <h3 className=\"text-sm font-semibold\">{group.title}</h3>\n      {group.links && (\n        <ul className=\"mt-4 space-y-4 text-sm leading-[1.2] opacity-90\">\n          {group.links.map((l) => (\n            <li key={l.label}>\n              <a href={l.href} className={link}>\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      )}\n      {group.lines && (\n        <p className=\"mt-4 text-sm leading-[1.2] opacity-90\">\n          {group.lines.map((line) => (\n            <span key={line} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </p>\n      )}\n    </div>\n  );\n}\n\n/** Zoe's plum footer. */\nexport function ZoeFooter({ followLabel, socials, groups, copyright, region, className }: ZoeFooterProps) {\n  // fold groups marked stackWithNext together into one column\n  const columns: ZoeFooterGroup[][] = [];\n  groups.forEach((g, i) => {\n    if (i > 0 && groups[i - 1].stackWithNext) columns[columns.length - 1].push(g);\n    else columns.push([g]);\n  });\n\n  return (\n    <footer className={cn(\"bg-secondary pb-24 text-secondary-foreground lg:pb-36\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"border-t border-secondary-foreground/25 pt-24 lg:pt-12\">\n          <div className=\"flex flex-col gap-10 lg:grid lg:grid-cols-[1.6fr_1fr_1.3fr_1fr] lg:gap-6 xl:grid-cols-[27rem_13.5rem_20.25rem_1fr] xl:gap-0\">\n            <div>\n              <p className=\"-mt-1 text-lg font-light\">{followLabel}</p>\n              <ul className=\"mt-3 flex gap-3\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className={cn(link, \"grid size-6 place-items-center\")}>\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n            {columns.map((col) => (\n              <div key={col[0].title} className=\"flex flex-col gap-10 lg:max-w-[12rem] lg:gap-8\">\n                {col.map((g) => (\n                  <Group key={g.title} group={g} />\n                ))}\n              </div>\n            ))}\n          </div>\n\n          <div className=\"mt-16 flex items-center justify-between gap-6 border-t border-secondary-foreground/25 pt-6 text-sm font-medium lg:mt-12\">\n            <p>{copyright}</p>\n            {region && (\n              <button type=\"button\" className={cn(link, \"inline-flex items-center gap-1.5\")}>\n                {region.icon}\n                {region.label}\n                <ChevronDown aria-hidden className=\"ml-1 size-4\" strokeWidth={1.5} />\n              </button>\n            )}\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "followLabel",
+      "type": "string",
+      "required": true,
+      "description": "the line above the social icons"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links as icons (e.g. lucide icons at size-6)"
+    },
+    {
+      "name": "groups",
+      "type": "ZoeFooterGroup[]",
+      "required": true,
+      "description": "the link groups, in order"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "region",
+      "type": "{ label: string; icon?: ReactNode; }",
+      "required": false,
+      "description": "the region picker on the right: a label and an optional flag or icon before it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "46bd1832b6c28a5df1d69d68a3978578adfed635ce31c5f72545396bf2ebde19"
+}

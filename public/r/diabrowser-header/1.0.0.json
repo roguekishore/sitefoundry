@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser header",
+  "description": "A floating, fixed pill header in translucent near-white with a hairline. Desktop: a compact centred pill (symbol plus three quiet links that brighten on hover), and a second waitlist pill that fades and grows in at the top right once the hero is scrolled away. Phones: a full-width rounded bar with the wordmark and a thin plus that turns into a cross and opens the links.",
+  "category": "header",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "pill",
+    "floating",
+    "fixed",
+    "translucent",
+    "blur",
+    "minimal",
+    "scroll-reveal"
+  ],
+  "notes": [
+    "fixed and takes no height: the hero runs underneath it",
+    "the phone menu is a plain details element: no JavaScript",
+    "the top-right pill appears between 380px and 450px of page scroll (CSS scroll timeline); it always shows where scroll timelines are unsupported"
+  ],
+  "entry": "diabrowser-header.tsx",
+  "source": "foundry",
+  "name": "diabrowser-header",
+  "files": [
+    {
+      "path": "diabrowser-header.css",
+      "content": "/* Desktop: the waitlist pill at the top right shows up once the hero has mostly scrolled\n   away, with a quick fade and a small grow (the original toggles it at ~450px over 350ms;\n   here it is tied to the same scroll distance). Without scroll timelines it simply shows. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .diabrowser-header-cta {\n      animation: diabrowser-header-cta linear both;\n      animation-timeline: scroll(root);\n      animation-range: 380px 450px;\n    }\n  }\n}\n\n@keyframes diabrowser-header-cta {\n  from { opacity: 0; scale: 0.95; visibility: hidden; }\n  1% { visibility: visible; }\n  to { opacity: 1; scale: 1; visibility: visible; }\n}\n\n/* the phone menu's plus turns into a cross when open */\n.diabrowser-header-menu[open] .diabrowser-header-plus {\n  rotate: 45deg;\n}\n.diabrowser-header-menu > summary::-webkit-details-marker {\n  display: none;\n}\n"
+    },
+    {
+      "path": "diabrowser-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { DiabrowserButton } from \"@foundry/diabrowser-button\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-header.css\";\n\nexport interface DiabrowserNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface DiabrowserHeaderProps {\n  /** the wordmark (shown on phones, and on desktop when there is no mark) */\n  logo: ReactNode;\n  /** a small symbol before the wordmark; desktop shows the symbol alone */\n  mark?: ReactNode;\n  /** where the logo links */\n  logoHref?: string;\n  /** the links in the centred pill */\n  nav: DiabrowserNavLink[];\n  /** the waitlist pill that appears at the top right once the hero is scrolled away (desktop), and closes the phone menu */\n  cta?: DiabrowserNavLink;\n  /** screen-reader label of the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\n/** A floating, fixed pill header: full width on phones with a plus menu, centred and compact on desktop. */\nexport function DiabrowserHeader({ logo, mark, logoHref = \"/\", nav, cta, menuLabel = \"Menu\", className }: DiabrowserHeaderProps) {\n  return (\n    <header className={cn(\"pointer-events-none fixed inset-x-0 top-[14px] z-50 px-[10px] lg:top-7\", className)}>\n      {/* phones: a full-width pill with a plus that opens the links below it */}\n      <details className=\"diabrowser-header-menu pointer-events-auto rounded-[20px] border border-border bg-popover/90 text-popover-foreground backdrop-blur-md lg:hidden\">\n        <summary className=\"flex h-[50px] cursor-pointer list-none items-center justify-between pr-4 pl-5\">\n          <a href={logoHref} className=\"flex items-center gap-1.5 font-display text-[26px] leading-none tracking-[-0.04em] [&_svg]:size-6\">\n            {mark}\n            {logo}\n          </a>\n          <span className=\"diabrowser-header-plus flex size-7 items-center justify-center transition-[rotate] duration-300 motion-reduce:transition-none [&_svg]:size-7\" aria-label={menuLabel}>\n            <Plus strokeWidth={1.25} />\n          </span>\n        </summary>\n        <nav className=\"flex flex-col gap-1 px-5 pt-2 pb-5\">\n          {nav.map((link) => (\n            <a key={link.label} href={link.href} className=\"py-2 text-[20px] leading-6 text-foreground/80\">\n              {link.label}\n            </a>\n          ))}\n          {cta && (\n            <DiabrowserButton href={cta.href} className=\"mt-3 w-full\">\n              {cta.label}\n            </DiabrowserButton>\n          )}\n        </nav>\n      </details>\n\n      {/* desktop: the centred pill */}\n      <nav className=\"pointer-events-auto mx-auto hidden h-[52px] w-fit items-center gap-4 rounded-lg border border-border bg-popover/90 px-[14px] text-popover-foreground backdrop-blur-md lg:flex\">\n        <a\n          href={logoHref}\n          className=\"flex items-center gap-1.5 font-display text-[24px] leading-none tracking-[-0.04em] transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-70 [&_svg]:size-6\"\n        >\n          {mark ?? logo}\n          {mark && <span className=\"sr-only\">{logo}</span>}\n        </a>\n        <ul className=\"flex items-center gap-4\">\n          {nav.map((link) => (\n            <li key={link.label}>\n              <a\n                href={link.href}\n                className=\"text-[16px] leading-5 tracking-[0.01em] opacity-70 transition-opacity duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-100\"\n              >\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n\n      {cta && (\n        <div className=\"diabrowser-header-cta pointer-events-auto absolute top-0 right-[10px] hidden lg:block\">\n          <DiabrowserButton tone=\"outline\" href={cta.href} className=\"h-12 rounded-lg px-6\">\n            {cta.label}\n          </DiabrowserButton>\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "diabrowser-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (shown on phones, and on desktop when there is no mark)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small symbol before the wordmark; desktop shows the symbol alone"
+    },
+    {
+      "name": "logoHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the logo links"
+    },
+    {
+      "name": "nav",
+      "type": "DiabrowserNavLink[]",
+      "required": true,
+      "description": "the links in the centred pill"
+    },
+    {
+      "name": "cta",
+      "type": "DiabrowserNavLink",
+      "required": false,
+      "description": "the waitlist pill that appears at the top right once the hero is scrolled away (desktop), and closes the phone menu"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "24db4739046406fe3e81767aaa264317ea70a995d224a0b0a4b4321801e2572d"
+}

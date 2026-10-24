@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo floating header",
+  "description": "A black navigation bar that floats over the page: on desktop a centred 792px bar 12px from the top with 8px corners and a huge soft shadow, holding a wordmark, four quiet nav items and a pale 'launch' button; on phones a full-width bar with the mark, the button and a menu that drops down. On load the bar opens out from its middle and its items slide in from the left.",
+  "category": "header",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "floating",
+    "sticky",
+    "dark",
+    "minimal",
+    "load-in",
+    "shadow"
+  ],
+  "notes": [
+    "the bar forces the theme's dark colours with the dark class, so it stays black on a light page",
+    "takes no height in the flow (it overlays the next section, like a fixed bar): give the first section top room",
+    "the phone menu is a native details element: no JavaScript"
+  ],
+  "entry": "ondo-header.tsx",
+  "name": "ondo-header",
+  "files": [
+    {
+      "path": "ondo-header.css",
+      "content": "/* On load the bar opens from its middle, then its contents slide in from the left. */\n@media (prefers-reduced-motion: no-preference) {\n  .ondo-header-bar {\n    animation: ondo-header-open 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;\n  }\n  .ondo-header-items {\n    animation: ondo-header-items 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;\n  }\n}\n\n@keyframes ondo-header-open {\n  from { clip-path: inset(0 42% 0 42% round var(--radius)); }\n  to { clip-path: inset(0 0 0 0 round var(--radius)); }\n}\n\n@keyframes ondo-header-items {\n  from { opacity: 0; transform: translateX(-40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ondo-header.tsx",
+      "content": "import { Menu, Orbit } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoButton } from \"@foundry/ondo-button\";\nimport \"./ondo-header.css\";\n\nexport interface OndoHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface OndoHeaderProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the nav items (four on the original) */\n  links: OndoHeaderLink[];\n  /** the pale button on the right */\n  action: OndoHeaderLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\n/** Floating black nav bar; overlays the section below it. */\nexport function OndoHeader({ brand, brandHref = \"#\", links, action, menuLabel, className }: OndoHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-50 h-0 lg:top-3\", className)}>\n      <div className=\"dark lg:px-gutter\">\n        <div className=\"ondo-header-bar relative mx-auto flex h-[3.625rem] items-center bg-background px-gutter text-foreground lg:max-w-[49.5rem] lg:rounded-lg lg:pr-[0.875rem] lg:pl-7 lg:shadow-[0_9px_80px_color-mix(in_oklab,var(--glow)_7%,transparent),0_2px_18px_color-mix(in_oklab,var(--glow)_5%,transparent),0_0.6px_5px_color-mix(in_oklab,var(--glow)_3%,transparent)]\">\n          <div className=\"ondo-header-items flex w-full items-center\">\n            <a href={brandHref} className=\"flex items-center gap-2 text-foreground\">\n              <Orbit aria-hidden className=\"size-7\" strokeWidth={1.75} />\n              <span className=\"text-[1.375rem] font-medium tracking-[-0.03em] max-lg:sr-only\">{brand}</span>\n            </a>\n            <nav className=\"mx-auto hidden items-center gap-4 lg:flex\">\n              {links.map((link) => (\n                <a\n                  key={link.label}\n                  href={link.href}\n                  className=\"rounded-lg px-4 py-2 text-sm font-medium text-foreground transition-colors duration-[250ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-foreground/10 motion-reduce:transition-none\"\n                >\n                  {link.label}\n                </a>\n              ))}\n            </nav>\n            <OndoButton href={action.href} className=\"ml-auto rounded-md text-sm lg:ml-0\">\n              {action.label}\n            </OndoButton>\n            <details className=\"group ml-5 lg:hidden\">\n              <summary aria-label={menuLabel} className=\"grid size-6 cursor-pointer list-none place-items-center text-foreground [&::-webkit-details-marker]:hidden\">\n                <Menu aria-hidden className=\"size-5\" strokeWidth={1.5} />\n              </summary>\n              <nav className=\"absolute inset-x-0 top-full flex flex-col border-t border-border bg-background px-gutter py-4\">\n                {links.map((link) => (\n                  <a key={link.label} href={link.href} className=\"py-3 text-lg font-medium text-foreground\">\n                    {link.label}\n                  </a>\n                ))}\n              </nav>\n            </details>\n          </div>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "OndoHeaderLink[]",
+      "required": true,
+      "description": "the nav items (four on the original)"
+    },
+    {
+      "name": "action",
+      "type": "OndoHeaderLink",
+      "required": true,
+      "description": "the pale button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "470e4df13482dafab23eb7c5b462087b7e9fa5fbb22c6dbc098ef08945b287d8"
+}

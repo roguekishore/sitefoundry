@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Galaxy footer",
+  "description": "A tall black footer in two halves: on the left the mark and five link groups under small uppercase headings on a two-column grid, social icons and an uppercase copyright line; on the right two latest-article cards, a podcast row with a square cover, and blocks of small uppercase, widely tracked legal text with white inline links. Phones stack it all, groups indented beside the mark.",
+  "category": "footer",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "links",
+    "editorial",
+    "uppercase",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "legal paragraphs take parts so single phrases can be links",
+    "social icons are passed in (lucide or your own svgs)"
+  ],
+  "entry": "galaxy-footer.tsx",
+  "name": "galaxy-footer",
+  "files": [
+    {
+      "path": "galaxy-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Hexagon } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GalaxyPostCard, type GalaxyPostCardProps } from \"@foundry/galaxy-post-card\";\n\nexport interface GalaxyFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface GalaxyFooterGroup {\n  /** the small uppercase heading */\n  title: string;\n  /** the links under it */\n  links: GalaxyFooterLink[];\n}\n\nexport interface GalaxyFooterSocial {\n  /** the network's name, for screen readers */\n  label: string;\n  /** the profile link */\n  href: string;\n  /** the icon */\n  icon: ReactNode;\n}\n\n/** A run of legal text; a part with href becomes a white link. */\nexport interface GalaxyFooterLegalPart {\n  /** the words */\n  text: string;\n  /** make these words a link */\n  href?: string;\n}\n\nexport interface GalaxyFooterProps {\n  /** the brand's mark, top left; a lucide hexagon when empty */\n  mark?: ReactNode;\n  /** screen-reader name for the mark's link */\n  brandLabel: string;\n  /** where the mark links */\n  brandHref?: string;\n  /** link groups; the first sits beside the mark on desktop, the rest flow two to a row */\n  groups: GalaxyFooterGroup[];\n  /** social profile links */\n  socials?: GalaxyFooterSocial[];\n  /** the heading over the article cards */\n  postsTitle?: string;\n  /** two article cards */\n  posts?: GalaxyPostCardProps[];\n  /** the heading over the podcast row */\n  podcastTitle?: string;\n  /** one card shown as a row with a square cover */\n  podcast?: GalaxyPostCardProps;\n  /** the copyright line */\n  copyright: string;\n  /** an underlined link after the copyright (e.g. cookie settings) */\n  copyrightLink?: GalaxyFooterLink;\n  /** legal paragraphs, each a list of parts */\n  legal?: GalaxyFooterLegalPart[][];\n  className?: string;\n}\n\nconst linkHover = \"transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground motion-reduce:transition-none\";\nconst kicker = \"text-xs leading-[1.5] tracking-[0.1em] uppercase lg:text-sm lg:leading-5\";\n\nexport function GalaxyFooter({\n  mark,\n  brandLabel,\n  brandHref = \"#\",\n  groups,\n  socials,\n  postsTitle,\n  posts,\n  podcastTitle,\n  podcast,\n  copyright,\n  copyrightLink,\n  legal,\n  className,\n}: GalaxyFooterProps) {\n  return (\n    <footer className={cn(\"bg-background pt-6 pb-16 text-foreground lg:pt-12 lg:pb-20\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-x-8 px-gutter lg:grid-cols-2\">\n        {/* left: mark + groups + socials */}\n        <div>\n          <div className=\"grid grid-cols-[3.5rem_1fr] gap-y-8 lg:grid-cols-2 lg:gap-x-8 lg:gap-y-14\">\n            <a href={brandHref} aria-label={brandLabel} className=\"row-start-1 size-8 transition-opacity duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:opacity-60 motion-reduce:transition-none [&_svg]:size-full\">\n              {mark ?? <Hexagon aria-hidden strokeWidth={2.25} />}\n            </a>\n            {groups.map((group, i) => (\n              <div key={group.title} className={cn(\"col-start-2 lg:col-start-auto\", i === 0 && \"row-start-1\")}>\n                <h2 className={cn(kicker, \"lg:pt-0.5\")}>{group.title}</h2>\n                <ul className=\"mt-4 flex flex-col\">\n                  {group.links.map((link) => (\n                    <li key={link.label}>\n                      <a href={link.href} className={cn(\"text-base leading-7\", linkHover)}>\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n          {socials && socials.length > 0 && (\n            <ul className=\"mt-12 flex items-center gap-4 max-lg:pl-14 lg:mt-20\">\n              {socials.map((social) => (\n                <li key={social.label}>\n                  <a href={social.href} aria-label={social.label} className={cn(\"grid size-[1.625rem] place-items-center [&_svg]:size-5\", linkHover)}>\n                    {social.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n        </div>\n\n        {/* right: latest posts + podcast */}\n        <div className=\"mt-10 lg:mt-0\">\n          {postsTitle && <h2 className={kicker}>{postsTitle}</h2>}\n          {posts && posts.length > 0 && (\n            <div className=\"mt-4 grid gap-7 sm:grid-cols-2 lg:mt-6 lg:gap-x-[2.375rem]\">\n              {posts.map((post) => (\n                <GalaxyPostCard key={post.title} framed {...post} />\n              ))}\n            </div>\n          )}\n          {podcastTitle && <h2 className={cn(kicker, \"mt-8 lg:mt-14\")}>{podcastTitle}</h2>}\n          {podcast && <GalaxyPostCard framed {...podcast} layout=\"row\" className=\"mt-6 lg:mt-12\" />}\n        </div>\n\n        {/* bottom row: copyright | legal */}\n        <p className=\"mt-10 text-xs leading-[1.5] tracking-[0.1em] uppercase lg:mt-12 lg:text-sm lg:leading-5\">\n          {copyright}{\" \"}\n          {copyrightLink && (\n            <a href={copyrightLink.href} className={cn(\"underline underline-offset-2\", linkHover)}>\n              {copyrightLink.label}\n            </a>\n          )}\n        </p>\n        {legal && legal.length > 0 && (\n          <div className=\"mt-8 flex flex-col gap-6 text-xs leading-[1.5] lg:text-sm lg:leading-5 tracking-[0.1em] text-muted-foreground uppercase lg:mt-12 lg:gap-6 [&>p:last-child]:mt-5\">\n            {legal.map((paragraph, i) => (\n              <p key={i}>\n                {paragraph.map((part, j) =>\n                  part.href ? (\n                    <a key={j} href={part.href} className={cn(\"text-foreground\", linkHover)}>\n                      {part.text}\n                    </a>\n                  ) : (\n                    <span key={j}>{part.text}</span>\n                  ),\n                )}\n              </p>\n            ))}\n          </div>\n        )}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "galaxy-post-card"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the brand's mark, top left; a lucide hexagon when empty"
+    },
+    {
+      "name": "brandLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name for the mark's link"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the mark links"
+    },
+    {
+      "name": "groups",
+      "type": "GalaxyFooterGroup[]",
+      "required": true,
+      "description": "link groups; the first sits beside the mark on desktop, the rest flow two to a row"
+    },
+    {
+      "name": "socials",
+      "type": "GalaxyFooterSocial[]",
+      "required": false,
+      "description": "social profile links"
+    },
+    {
+      "name": "postsTitle",
+      "type": "string",
+      "required": false,
+      "description": "the heading over the article cards"
+    },
+    {
+      "name": "posts",
+      "type": "GalaxyPostCardProps[]",
+      "required": false,
+      "description": "two article cards"
+    },
+    {
+      "name": "podcastTitle",
+      "type": "string",
+      "required": false,
+      "description": "the heading over the podcast row"
+    },
+    {
+      "name": "podcast",
+      "type": "any",
+      "required": false,
+      "description": "one card shown as a row with a square cover"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "copyrightLink",
+      "type": "GalaxyFooterLink",
+      "required": false,
+      "description": "an underlined link after the copyright (e.g. cookie settings)"
+    },
+    {
+      "name": "legal",
+      "type": "GalaxyFooterLegalPart[][]",
+      "required": false,
+      "description": "legal paragraphs, each a list of parts"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "61ff3f5aa715647e46977f982fd698e122c92e01ea2721a665bde0fa920ad1b9"
+}

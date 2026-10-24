@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel recently shipped",
+  "description": "A two-column bento of new products under a big tight heading: one tall card on the left and two 280px cards stacked on the right, all hairline-bordered with 6px corners on the page colour. Each card has a 24px title and a short grey line at its bottom-left, with artwork either tucked into the bottom-right corner or filling the right side and fading out towards the text. Borders darken slightly on hover. Phones stack the cards.",
+  "category": "features",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "light",
+    "minimal",
+    "monochrome",
+    "hover"
+  ],
+  "notes": [
+    "the first card is the tall one on desktop; up to three cards",
+    "media per card: corner (a small square, a blue wash when empty) or side (right side, a grey panel fading left when empty)",
+    "the hover border change is inferred from the original's CSS, not seen in a capture"
+  ],
+  "entry": "vercel-shipped.tsx",
+  "name": "vercel-shipped",
+  "files": [
+    {
+      "path": "vercel-shipped.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelHeading } from \"@foundry/vercel-heading\";\nimport { VercelPlaceholder } from \"@foundry/vercel-placeholder\";\n\nexport interface VercelShippedCard {\n  /** the product's name */\n  title: string;\n  /** one short line about it */\n  description: string;\n  /** where the card links */\n  href: string;\n  /** corner: a small square in the bottom-right · side: the right side, fading towards the text */\n  mediaPlacement?: \"corner\" | \"side\";\n  /** the card's artwork (image, video, canvas); a placeholder when empty */\n  media?: ReactNode;\n  /** screen-reader label for the artwork placeholder */\n  mediaLabel?: string;\n}\n\nexport interface VercelShippedProps {\n  /** the big heading */\n  title: string;\n  /** up to three cards; the first is the tall one on desktop */\n  cards: VercelShippedCard[];\n  className?: string;\n}\n\n/** Bento of new products: one tall card and two stacked ones. */\nexport function VercelShipped({ title, cards, className }: VercelShippedProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-16 text-foreground lg:pt-[12.5rem] lg:pb-0\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <VercelHeading>{title}</VercelHeading>\n        <ul className=\"mt-12 grid gap-5 lg:mt-20 lg:grid-cols-2 lg:grid-rows-[17.5rem_17.5rem]\">\n          {cards.map((card, i) => {\n            const corner = (card.mediaPlacement ?? (i === 0 ? \"corner\" : \"side\")) === \"corner\";\n            return (\n              <li key={card.title} className={cn(i === 0 ? \"min-h-[27rem] lg:row-span-2 lg:min-h-0\" : \"min-h-[12.5rem] lg:min-h-0\")}>\n                <a\n                  href={card.href}\n                  className=\"group relative flex size-full flex-col justify-end overflow-clip rounded-lg border border-border p-5 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:border-foreground/20 motion-reduce:transition-none\"\n                >\n                  <div\n                    className={cn(\n                      \"absolute\",\n                      corner ? \"right-0 bottom-0 size-60 lg:size-28\" : \"inset-y-0 right-0 w-[70%] lg:w-[68%]\",\n                    )}\n                  >\n                    {card.media ?? <VercelPlaceholder tone={corner ? \"wash\" : \"side\"} label={card.mediaLabel} />}\n                  </div>\n                  <div className=\"relative max-w-[18rem]\">\n                    <h3 className=\"text-2xl leading-[1.1] font-medium tracking-[-0.05em]\">{card.title}</h3>\n                    <p className=\"mt-2 text-sm text-muted-foreground\">{card.description}</p>\n                  </div>\n                </a>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-heading",
+    "vercel-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big heading"
+    },
+    {
+      "name": "cards",
+      "type": "VercelShippedCard[]",
+      "required": true,
+      "description": "up to three cards; the first is the tall one on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4ad94491a6de35a91c33b16f4d5384c42a55bcb83dc4deb473acc477b1425c5c"
+}

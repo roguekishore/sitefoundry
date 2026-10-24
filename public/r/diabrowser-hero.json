@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser hero",
+  "description": "A window-tall hero washed in sunlit gold: a white, tightly tracked serif statement near the top, the product's name set enormous in the same serif behind a wide browser window that rises over its lower half, and a cream arc curving up from the bottom edge with a long black waitlist pill. On desktop the window slides up 140px as you start to scroll.",
+  "category": "hero",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "window-height",
+    "full-bleed",
+    "yellow",
+    "gold",
+    "serif",
+    "wordmark",
+    "arc",
+    "product-shot",
+    "parallax",
+    "scrubbed"
+  ],
+  "notes": [
+    "sized by the window (100svh, at least 600px); the window placeholder is cropped by the fold like the original",
+    "backdrop and media are placeholders for a photo/canvas and a product clip",
+    "the headline and name are light type scoped with the dark class: they need a mid-to-deep highlight colour behind them",
+    "leaves ~90px at the top for the fixed diabrowser-header",
+    "docked: hides its own arc bar from lg when diabrowser-waitlist-dock wraps the page"
+  ],
+  "entry": "diabrowser-hero.tsx",
+  "source": "foundry",
+  "name": "diabrowser-hero",
+  "files": [
+    {
+      "path": "diabrowser-hero.css",
+      "content": "/* Placeholder light for the backdrop photo: butter-yellow pools drifting over gold. */\n.diabrowser-hero-backdrop {\n  background:\n    radial-gradient(38% 30% at 22% 18%, var(--glow), transparent 70%),\n    radial-gradient(30% 26% at 78% 30%, var(--glow), transparent 70%),\n    radial-gradient(45% 35% at 60% 85%, color-mix(in oklab, var(--glow) 70%, transparent), transparent 70%),\n    var(--highlight);\n}\n\n/* Desktop: the browser window slides up 140px over the first 450px of scroll, as the page\n   starts to move (scrubbed, so it reverses on the way back). */\n@supports (animation-timeline: scroll()) {\n  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n    .diabrowser-hero-window {\n      transform-origin: bottom;\n      animation: diabrowser-hero-lift linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 450px;\n    }\n  }\n}\n\n@keyframes diabrowser-hero-lift {\n  to { translate: 0 -140px; }\n}\n"
+    },
+    {
+      "path": "diabrowser-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { DiabrowserWaitlistBar, type DiabrowserWaitlistBarProps } from \"@foundry/diabrowser-waitlist-bar\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-hero.css\";\n\nexport interface DiabrowserHeroProps {\n  /** the one-line statement over the light (break it for phones with <br className=\"lg:hidden\" />) */\n  headline: ReactNode;\n  /** the giant name set behind the window, in capitals */\n  wordmark: string;\n  /** the browser window (a product clip or screenshot); empty shows a plain placeholder */\n  media?: ReactNode;\n  /** the full-bleed backdrop (photo or canvas, cropped like object-fit cover); empty shows a gold-and-butter gradient */\n  backdrop?: ReactNode;\n  /** the waitlist CTA and its small print, on the cream arc at the bottom */\n  cta: DiabrowserWaitlistBarProps[\"cta\"];\n  /** small print under the CTA */\n  note?: ReactNode;\n  /** set when a diabrowser-waitlist-dock wraps the page: from lg the dock's bar takes over and the hero's own bar hides */\n  docked?: boolean;\n  className?: string;\n}\n\n/** A window-tall golden hero: white serif statement, a giant name, and a browser window rising out of a cream arc. */\nexport function DiabrowserHero({ headline, wordmark, media, backdrop, cta, note, docked = false, className }: DiabrowserHeroProps) {\n  return (\n    <section className={cn(\"relative h-svh min-h-[600px] overflow-clip bg-highlight\", className)}>\n      <div className=\"absolute inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n        {backdrop ?? <div className=\"diabrowser-hero-backdrop size-full\" />}\n      </div>\n\n      <div className=\"relative flex flex-col items-center px-4 pt-[100px] text-center lg:pt-[104px]\">\n        {/* the dark scope keeps this type light on the gold in both modes */}\n        <h1 className=\"dark font-display text-[36px] leading-[38px] font-[420] tracking-[-0.045em] text-foreground lg:text-[54px] lg:leading-[60px]\">\n          {headline}\n        </h1>\n        <p\n          aria-hidden\n          className=\"dark mt-[96px] font-display text-[34vw] leading-[0.72] font-[380] tracking-[-0.04em] whitespace-nowrap text-foreground uppercase lg:mt-[100px] lg:text-[23vw] xl:text-[330px]\"\n        >\n          {wordmark}\n        </p>\n        <div className=\"diabrowser-hero-window relative z-10 -mt-[8vw] w-full lg:-mt-[104px] lg:w-[min(1115px,100%)]\">\n          <div className=\"aspect-[1115/793] overflow-hidden rounded-[6px] border border-card/70 bg-card shadow-[0_24px_60px_-30px_color-mix(in_oklab,var(--foreground)_35%,transparent)] lg:rounded-xl [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n            {media}\n          </div>\n        </div>\n      </div>\n\n      <DiabrowserWaitlistBar cta={cta} note={note} className={cn(\"absolute inset-x-0 bottom-0 z-20\", docked && \"lg:hidden\")} />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "diabrowser-waitlist-bar",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the one-line statement over the light (break it for phones with <br className=\"lg:hidden\" />)"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": true,
+      "description": "the giant name set behind the window, in capitals"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the browser window (a product clip or screenshot); empty shows a plain placeholder"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed backdrop (photo or canvas, cropped like object-fit cover); empty shows a gold-and-butter gradient"
+    },
+    {
+      "name": "cta",
+      "type": "DiabrowserWaitlistBarProps",
+      "required": true,
+      "description": "the waitlist CTA and its small print, on the cream arc at the bottom"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small print under the CTA"
+    },
+    {
+      "name": "docked",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "set when a diabrowser-waitlist-dock wraps the page: from lg the dock's bar takes over and the hero's own bar hides"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "460ef6bdc1a5e4bcbf0c0f8de8bfd83b13c6a1414abbc50cc51e66e624120f97"
+}

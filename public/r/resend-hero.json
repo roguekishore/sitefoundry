@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend hero",
+  "description": "A black, window-tall hero: a pill badge whose thin rainbow rim slowly turns, a huge two-line display-serif title lit white to half-white, a grey lead and a graphite button beside a text link, with a 3D-object slot to the right and a faint light wash from the top corner. Phones stack the object on top and centre everything, buttons full width.",
+  "category": "hero",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "serif",
+    "gradient-text",
+    "glow",
+    "rainbow-border",
+    "loop",
+    "fullscreen"
+  ],
+  "notes": [
+    "fills the window height from lg up (min-h-svh); content-sized on phones like the original",
+    "object and backdrop are media slots (a WebGL scene and a light-streak image in the original): placeholders until filled",
+    "the title reads --resend-serif from the resend theme, falling back to the display face elsewhere"
+  ],
+  "entry": "resend-hero.tsx",
+  "source": "foundry",
+  "name": "resend-hero",
+  "files": [
+    {
+      "path": "resend-hero.css",
+      "content": "/* The badge's rim: a conic rainbow square behind the pill turns once every 30s. */\n.resend-hero-rim {\n  animation: resend-hero-spin 30s linear infinite;\n}\n\n@keyframes resend-hero-spin {\n  to { rotate: 360deg; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .resend-hero-rim { animation: none; }\n}\n"
+    },
+    {
+      "path": "resend-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendButton } from \"@foundry/resend-button\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\nimport \"./resend-hero.css\";\n\nexport interface ResendHeroProps {\n  /** the pill above the title, with a turning rainbow rim */\n  badge?: { label: string; href: string };\n  /** the title; each entry is a line on wide screens */\n  title: string[];\n  /** the lead; each entry is a line on wide screens */\n  text: string[];\n  /** the graphite button */\n  primary: { label: string; href: string };\n  /** the plain text link beside it */\n  secondary?: { label: string; href: string };\n  /** the 3D object at the right (on top on phones); empty shows a placeholder */\n  object?: ReactNode;\n  /** the full-bleed backdrop behind everything (cover); empty shows a soft light wash */\n  backdrop?: ReactNode;\n  className?: string;\n}\n\nexport function ResendHero({ badge, title, text, primary, secondary, object, backdrop, className }: ResendHeroProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background text-foreground lg:flex lg:min-h-svh lg:items-center\", className)}>\n      <div aria-hidden className=\"absolute inset-0 -z-10\">\n        {backdrop ?? (\n          <div className=\"size-full bg-linear-to-bl from-foreground/[0.09] via-foreground/[0.02] via-35% to-transparent to-60%\" />\n        )}\n      </div>\n\n      <div className=\"mx-auto flex w-full max-w-page flex-col items-center px-gutter pb-8 lg:flex-row lg:items-center lg:justify-between lg:pb-20 lg:pl-[calc(var(--page-gutter)+4rem)]\">\n        <div className=\"order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left\">\n          {badge && (\n            <a href={badge.href} className=\"group/badge relative inline-flex overflow-clip rounded-full p-px\">\n              <span\n                aria-hidden\n                className=\"resend-hero-rim absolute top-1/2 left-1/2 aspect-square w-[300%] -translate-1/2 bg-conic from-chart-5/70 via-highlight/70 via-50% to-chart-3/70\"\n              />\n              <span className=\"relative flex h-[1.875rem] items-center gap-1.5 rounded-full bg-background/95 px-3 text-sm text-foreground transition-colors duration-200 group-hover/badge:bg-background/80\">\n                {badge.label}\n                <ChevronRight aria-hidden className=\"size-3.5 opacity-70\" strokeWidth={2} />\n              </span>\n            </a>\n          )}\n          <h1 className=\"mt-9 bg-linear-to-br from-foreground from-30% to-foreground/50 bg-clip-text pb-2 font-[family-name:var(--resend-serif,var(--typeface-display))] text-[4rem] leading-none font-normal tracking-[-0.035em] text-transparent lg:mt-10 lg:text-[6rem]\">\n            {title.map((line, i) => (\n              <span key={i} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h1>\n          <p className=\"mt-5 max-w-[29rem] text-base leading-7 text-muted-foreground lg:mt-1 lg:max-w-none lg:text-lg lg:leading-[1.5]\">\n            {text.map((line, i) => (\n              <span key={i} className=\"lg:block\">\n                {line}\n                {i < text.length - 1 && \" \"}\n              </span>\n            ))}\n          </p>\n          <div className=\"mt-8 flex w-full flex-col gap-4 lg:mt-8 lg:w-auto lg:flex-row lg:items-center\">\n            <ResendButton href={primary.href} className=\"w-full lg:w-auto\">\n              {primary.label}\n            </ResendButton>\n            {secondary && (\n              <ResendButton href={secondary.href} variant=\"ghost\">\n                {secondary.label}\n              </ResendButton>\n            )}\n          </div>\n        </div>\n\n        <div className=\"relative order-1 size-[14rem] shrink-0 lg:order-2 lg:-mr-8 lg:h-[31.375rem] lg:w-[37rem]\">\n          {object ?? <ResendPlaceholder className=\"absolute inset-0 rounded-2xl\" />}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-button",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the pill above the title, with a turning rainbow rim"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the title; each entry is a line on wide screens"
+    },
+    {
+      "name": "text",
+      "type": "string[]",
+      "required": true,
+      "description": "the lead; each entry is a line on wide screens"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the graphite button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the plain text link beside it"
+    },
+    {
+      "name": "object",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the 3D object at the right (on top on phones); empty shows a placeholder"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed backdrop behind everything (cover); empty shows a soft light wash"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a4d23fb3a715e087ec7a2bc1d43c0549171ac3fbefda4223f96cdb3a397a0a8c"
+}

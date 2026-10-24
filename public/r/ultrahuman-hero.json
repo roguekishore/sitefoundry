@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman product hero",
+  "description": "A window-tall product panel inset 10px from the edges with rounded top corners, its photo or video fading into the white page at the bottom. A small uppercase product name, a short 48px headline, one line of copy and two pills (blue buy, translucent glass) sit left-middle on desktop and centred at the top on phones; the copy and then the buttons rise and fade in on load.",
+  "category": "hero",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "product",
+    "light",
+    "photo",
+    "full-height",
+    "fade",
+    "load-in",
+    "minimal",
+    "glass"
+  ],
+  "notes": [
+    "95% of the window tall on phones, 100% on desktop",
+    "CSS load-in (600ms), off under reduced motion; dark ink over a light photo, so pass a light image"
+  ],
+  "entry": "ultrahuman-hero.tsx",
+  "name": "ultrahuman-hero",
+  "files": [
+    {
+      "path": "ultrahuman-hero.css",
+      "content": "/* Load-in: the copy group, then the button row 100ms later, rise 24px and fade in over 600ms. */\n.ultrahuman-hero-copy,\n.ultrahuman-hero-actions {\n  animation: ultrahuman-hero-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) both;\n}\n.ultrahuman-hero-actions {\n  animation-delay: 100ms;\n}\n\n@keyframes ultrahuman-hero-rise {\n  from {\n    opacity: 0;\n    transform: translateY(24px);\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ultrahuman-hero-copy,\n  .ultrahuman-hero-actions {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport \"./ultrahuman-hero.css\";\n\nexport interface UltrahumanHeroProps {\n  /** small uppercase product name above the headline */\n  eyebrow: string;\n  /** the short headline */\n  title: string;\n  /** one line under the headline */\n  body: string;\n  /** the blue buy button */\n  primary: { label: string; href: string };\n  /** the translucent second button */\n  secondary?: { label: string; href: string };\n  /** the photo or video filling the panel (cover); a placeholder when empty */\n  media?: ReactNode;\n  /** describes the photo for screen readers when the placeholder shows */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** A window-tall product panel inset 10px with rounded top corners, fading into the white page at\n *  the bottom. Copy sits left-middle on desktop, centred at the top on phones, and rises in on load. */\nexport function UltrahumanHero({ eyebrow, title, body, primary, secondary, media, mediaLabel, className }: UltrahumanHeroProps) {\n  return (\n    <section className={cn(\"bg-background px-2.5\", className)}>\n      <div className=\"relative isolate flex h-[95svh] flex-col items-center overflow-clip rounded-t-lg text-center text-foreground lg:h-svh lg:items-start lg:justify-center lg:text-left\">\n        <div className=\"absolute inset-0 -z-10\">{media ?? <UltrahumanPlaceholder tone=\"warm\" label={mediaLabel} />}</div>\n        <div aria-hidden className=\"absolute inset-x-0 bottom-0 -z-10 h-[24%] bg-[linear-gradient(transparent,color-mix(in_oklab,var(--background)_45%,transparent)_55%,var(--background))]\" />\n\n        <div className=\"ultrahuman-hero-copy px-5 pt-14 lg:px-[7.5rem] lg:pt-0\">\n          <p className=\"text-[0.8125rem] leading-none tracking-[0.01em] uppercase lg:text-lg\">{eyebrow}</p>\n          <h1 className=\"mt-2.5 text-[1.875rem] leading-[1.1] tracking-[-0.03em] lg:mt-2 lg:text-5xl lg:leading-[1.15] lg:tracking-[-0.04em]\">{title}</h1>\n          <p className=\"mt-3 text-[0.9375rem] leading-[1.25rem] tracking-[-0.0175em] lg:mt-3.5 lg:text-base\">{body}</p>\n        </div>\n        <div className=\"ultrahuman-hero-actions mt-7 flex gap-2 px-5 lg:mt-7 lg:gap-4 lg:px-[7.5rem]\">\n          <UltrahumanButton href={primary.href}>{primary.label}</UltrahumanButton>\n          {secondary && (\n            <UltrahumanButton href={secondary.href} variant=\"glass\">\n              {secondary.label}\n            </UltrahumanButton>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button",
+    "ultrahuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small uppercase product name above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the short headline"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "one line under the headline"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the blue buy button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the translucent second button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo or video filling the panel (cover); a placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the photo for screen readers when the placeholder shows"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1d65d92831e63cb3bf45f51647c71687d9c449112cc7345de4c682aef2c4f42c"
+}

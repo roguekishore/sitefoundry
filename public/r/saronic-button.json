@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Saronic mono button",
+  "description": "A 48px (or 32px) small-radius button with a mono capital label and a thin arrow, turn-down arrow or external-link icon: sonar-lime, a translucent veil for over media, or a 10% ink tint for lime surfaces. On hover it grows 2%, the label rolls up and back in from below, and the arrow nudges right.",
+  "category": "button",
+  "site": "saronic",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "mono",
+    "uppercase",
+    "lime",
+    "hover",
+    "roll"
+  ],
+  "notes": [
+    "CSS only; the grow, roll and nudge are off under reduced motion",
+    "optional shortLabel shows below md (e.g. Specs for Specifications)"
+  ],
+  "entry": "saronic-button.tsx",
+  "source": "foundry",
+  "name": "saronic-button",
+  "files": [
+    {
+      "path": "saronic-button.css",
+      "content": "/* Label roll on hover: the label slides up and out (0.3s), then comes back in from below\n   (0.6s, starting at 0.3s). The second animation has no backwards fill so it doesn't hold\n   the label below during its delay. */\n@media (prefers-reduced-motion: no-preference) {\n  .saronic-button:hover .saronic-button-label > span {\n    animation-name: saronic-button-out, saronic-button-in;\n    animation-duration: 0.3s, 0.6s;\n    animation-delay: 0s, 0.3s;\n    animation-timing-function: cubic-bezier(0.25, 0.25, 0, 1);\n    animation-fill-mode: forwards, forwards;\n  }\n}\n\n@keyframes saronic-button-out {\n  from { transform: translateY(0); }\n  to { transform: translateY(-140%); }\n}\n\n@keyframes saronic-button-in {\n  from { transform: translateY(140%); }\n  to { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "saronic-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, CornerRightDown, SquareArrowOutUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./saronic-button.css\";\n\nconst variants = {\n  /** the sonar-lime fill used for every main action */\n  primary: \"bg-primary text-primary-foreground\",\n  /** a translucent veil, for buttons over photos and video */\n  secondary: \"bg-secondary text-secondary-foreground backdrop-blur-sm\",\n  /** a 10% ink tint, for buttons sitting on a lime surface */\n  tint: \"bg-primary-foreground/10 text-primary-foreground\",\n} as const;\n\nconst icons = {\n  arrow: ArrowRight,\n  down: CornerRightDown,\n  external: SquareArrowOutUpRight,\n} as const;\n\nexport interface SaronicButtonProps {\n  /** the label; set in mono capitals */\n  children: ReactNode;\n  /** a shorter label for phones (e.g. \"Specs\" for \"Specifications\") */\n  shortLabel?: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** primary (lime), secondary (veil over media) or tint (on a lime surface) */\n  variant?: keyof typeof variants;\n  /** the icon after the label: arrow, down (a turn-down arrow, for in-page jumps), external, or none */\n  icon?: keyof typeof icons | \"none\";\n  /** md: the 48px button · sm: the 32px chip used in the announcement bar */\n  size?: \"md\" | \"sm\";\n  /** opens in a new tab */\n  external?: boolean;\n  onClick?: () => void;\n  className?: string;\n}\n\n/**\n * The original's small-radius mono button. On hover it grows 2% (0.25s ease), its label\n * slides up out of view and back in from below, and the arrow nudges 2px to the right.\n */\nexport function SaronicButton({\n  children,\n  shortLabel,\n  href,\n  variant = \"primary\",\n  icon = \"arrow\",\n  size = \"md\",\n  external,\n  onClick,\n  className,\n}: SaronicButtonProps) {\n  const Icon = icon === \"none\" ? null : icons[icon];\n  const classes = cn(\n    \"saronic-button group inline-flex shrink-0 items-center justify-between rounded-lg font-mono leading-none tracking-[0.06em] whitespace-nowrap uppercase\",\n    \"transition-transform duration-250 ease-[ease] hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    size === \"md\" ? \"h-12 gap-5 px-6 text-xs\" : \"h-8 gap-3 px-3 text-xs\",\n    variants[variant],\n    className,\n  );\n  const inner = (\n    <>\n      <span className=\"saronic-button-label inline-flex overflow-clip py-1\">\n        {shortLabel ? (\n          <>\n            <span className=\"md:hidden\">{shortLabel}</span>\n            <span className=\"max-md:hidden\">{children}</span>\n          </>\n        ) : (\n          <span>{children}</span>\n        )}\n      </span>\n      {Icon && (\n        <Icon\n          aria-hidden\n          strokeWidth={1.5}\n          className=\"size-[1.125rem] shrink-0 transition-transform duration-250 ease-[ease] group-hover:translate-x-0.5 motion-reduce:transition-none\"\n        />\n      )}\n    </>\n  );\n  return href ? (\n    <a\n      href={href}\n      className={classes}\n      onClick={onClick}\n      target={external ? \"_blank\" : undefined}\n      rel={external ? \"noreferrer\" : undefined}\n    >\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label; set in mono capitals"
+    },
+    {
+      "name": "shortLabel",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a shorter label for phones (e.g. \"Specs\" for \"Specifications\")"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary (lime), secondary (veil over media) or tint (on a lime surface)"
+    },
+    {
+      "name": "icon",
+      "type": "enum",
+      "required": false,
+      "default": "arrow",
+      "description": "the icon after the label: arrow, down (a turn-down arrow, for in-page jumps), external, or none"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "md: the 48px button · sm: the 32px chip used in the announcement bar"
+    },
+    {
+      "name": "external",
+      "type": "boolean",
+      "required": false,
+      "description": "opens in a new tab"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7a5092347d4761b5f0d3e00083799e14d1719429bbb5fc30218b60d39ab774e3"
+}

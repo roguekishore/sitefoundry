@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Paxos asset cards",
+  "description": "A centred title and grey lead over a row of four tall near-white cards with thin hairlines and 8px corners: each opens with a coloured icon disc and a bold ticker, then a 24px name, a short slate description and a 'learn more ›' link pinned to the bottom. A full-width banner card below pairs one sentence with an outline pill. Cards stack on phones; links fade on hover.",
+  "category": "features",
+  "site": "paxos",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "grid",
+    "four-up",
+    "minimal",
+    "light",
+    "fintech",
+    "tokens",
+    "hover"
+  ],
+  "notes": [
+    "each card's disc colour is a token name (chart-1…chart-5, primary, glow, highlight)"
+  ],
+  "entry": "paxos-assets.tsx",
+  "name": "paxos-assets",
+  "files": [
+    {
+      "path": "paxos-assets.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PaxosButton } from \"@foundry/paxos-button\";\nimport { PaxosHeading } from \"@foundry/paxos-heading\";\n\nexport interface PaxosAsset {\n  /** the short ticker set bold next to the disc */\n  ticker: string;\n  /** an icon inside the coloured disc (e.g. a lucide icon) */\n  icon: ReactNode;\n  /** the disc's colour, as a token name */\n  tone?: \"chart-1\" | \"chart-2\" | \"chart-3\" | \"chart-4\" | \"chart-5\" | \"primary\" | \"glow\" | \"highlight\";\n  /** the asset's full name */\n  name: string;\n  /** two or three lines about it */\n  description: ReactNode;\n  /** the text link at the bottom */\n  link: { label: string; href: string };\n}\n\nexport interface PaxosAssetsProps {\n  /** the section title */\n  title: ReactNode;\n  /** grey lead under the title */\n  lead?: ReactNode;\n  /** the cards (four on the original) */\n  assets: PaxosAsset[];\n  /** the wide card under the row: one sentence and an outline pill */\n  banner?: { text: ReactNode; action: { label: string; href: string } };\n  className?: string;\n}\n\nconst discs = {\n  \"chart-1\": \"bg-chart-1\",\n  \"chart-2\": \"bg-chart-2\",\n  \"chart-3\": \"bg-chart-3\",\n  \"chart-4\": \"bg-chart-4\",\n  \"chart-5\": \"bg-chart-5\",\n  primary: \"bg-primary\",\n  glow: \"bg-glow\",\n  highlight: \"bg-highlight\",\n};\n\n/** Four tall ticker cards and a verification banner. */\nexport function PaxosAssets({ title, lead, assets, banner, className }: PaxosAssetsProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-16 lg:pt-10 lg:pb-[6.25rem]\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <PaxosHeading title={title} lead={lead} />\n        <ul className=\"mt-10 grid gap-2.5 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4\">\n          {assets.map((asset) => (\n            <li\n              key={asset.ticker}\n              className=\"flex min-h-[18rem] flex-col rounded-lg border border-border bg-card px-5 pt-[2.4rem] pb-[2.6rem] lg:min-h-[22.5rem]\"\n            >\n              <p className=\"flex items-center gap-2\">\n                <span\n                  aria-hidden\n                  className={cn(\n                    \"grid size-[2.625rem] place-items-center rounded-full text-background [&>svg]:size-6\",\n                    discs[asset.tone ?? \"primary\"],\n                  )}\n                >\n                  {asset.icon}\n                </span>\n                <span className=\"font-sans text-[2.1rem]/none font-bold tracking-[-0.02em] text-foreground\">{asset.ticker}</span>\n              </p>\n              <h3 className=\"mt-8 font-display text-xl/[1.05] font-normal tracking-[-0.02em] text-foreground lg:mt-[2.35rem] lg:text-2xl/[1.25]\">\n                {asset.name}\n              </h3>\n              <p className=\"mt-2.5 text-[0.9rem]/[1.35] tracking-[-0.01em] text-accent-foreground lg:mt-3 lg:text-base/[1.45]\">\n                {asset.description}\n              </p>\n              <a\n                href={asset.link.href}\n                className=\"mt-auto inline-flex items-center gap-1.5 self-start pt-10 text-xs text-foreground transition-colors duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-muted-foreground motion-reduce:transition-none lg:text-base\"\n              >\n                {asset.link.label}\n                <ChevronRight aria-hidden className=\"size-3.5\" strokeWidth={2} />\n              </a>\n            </li>\n          ))}\n        </ul>\n        {banner ? (\n          <div className=\"mt-2.5 flex items-center justify-between gap-6 rounded-lg border border-border bg-card px-[1.875rem] py-[1.9rem] lg:py-[1.75rem]\">\n            <p className=\"max-w-[10rem] font-display text-xl/[1.05] tracking-[-0.02em] text-foreground sm:max-w-none lg:text-2xl/[1.25]\">\n              {banner.text}\n            </p>\n            <PaxosButton href={banner.action.href} variant=\"outline\">\n              {banner.action.label}\n            </PaxosButton>\n          </div>\n        ) : null}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "paxos-button",
+    "paxos-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "grey lead under the title"
+    },
+    {
+      "name": "assets",
+      "type": "PaxosAsset[]",
+      "required": true,
+      "description": "the cards (four on the original)"
+    },
+    {
+      "name": "banner",
+      "type": "{ text: ReactNode; action: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the wide card under the row: one sentence and an outline pill"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "66f4b6f4f5d2093e874bfc254ff63dacb934898c7fc6ed921f50c049d93e0dff"
+}

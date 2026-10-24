@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle AI suite band",
+  "description": "A full-width deep violet band with faint pixel squares in its corners: a centred white eyebrow, headline, paragraph and outline button, then a two-column grid pairing translucent feature cards (icon tile, title, small pill, text, a media frame) with powder panels holding a built chat exchange — question bubbles, an answer card with three figure tiles, or a review table with two buttons. Closes with a hairline-framed strip of text and two buttons. Everything stacks on phones.",
+  "category": "features",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "ai",
+    "chat",
+    "dark",
+    "violet",
+    "bento",
+    "two-column",
+    "pixels",
+    "fintech"
+  ],
+  "notes": [
+    "the band is primary-coloured with primary-foreground text; best with a dark brand colour",
+    "the chat bubbles and review table are real text from props; the feature cards' media slots are placeholders until filled",
+    "flagged rows in the review table use the chart-5 colour"
+  ],
+  "entry": "puzzle-ai-suite.tsx",
+  "source": "foundry",
+  "name": "puzzle-ai-suite",
+  "files": [
+    {
+      "path": "puzzle-ai-suite.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PuzzleButton } from \"@foundry/puzzle-button\";\nimport { PuzzleHeading } from \"@foundry/puzzle-heading\";\nimport { PuzzlePixels } from \"@foundry/puzzle-pixels\";\nimport { PuzzlePlaceholder } from \"@foundry/puzzle-placeholder\";\n\nexport interface PuzzleSuiteMessage {\n  /** you: a tinted bubble on the right · reply: a white card on the left */\n  from: \"you\" | \"reply\";\n  text: string;\n  /** small figure tiles under a reply */\n  figures?: { label: string; value: string }[];\n}\n\nexport interface PuzzleSuiteReview {\n  /** the bold line at the top of the table */\n  summary: string;\n  /** the mint status pill at its right */\n  status: string;\n  /** the table rows */\n  rows: { name: string; note: string; amount: string; flagged?: boolean }[];\n  /** two buttons: the first solid, the second outlined */\n  actions: { label: string; href: string }[];\n  /** the small line under the card */\n  footnote?: string;\n}\n\nexport interface PuzzleSuiteFeature {\n  /** a lucide icon for the tile */\n  icon: ReactNode;\n  /** violet or green icon tile and question bubbles */\n  tone?: \"violet\" | \"green\";\n  title: string;\n  /** the small outlined pill after the title, e.g. \"Ask\" */\n  tag: string;\n  text: string;\n  /** the media frame in the feature card; empty shows a placeholder */\n  media?: ReactNode;\n  /** the frame's width ÷ height (1.13 for the first, 1.4 for the second in the original) */\n  mediaRatio?: number;\n  /** the exchange shown in the panel beside the card */\n  messages: PuzzleSuiteMessage[];\n  /** a review table after the messages */\n  review?: PuzzleSuiteReview;\n}\n\nexport interface PuzzleAiSuiteProps {\n  eyebrow?: string;\n  title: ReactNode;\n  text?: ReactNode;\n  /** the outline button under the heading */\n  cta?: { label: string; href: string };\n  /** one row per feature: card + panel */\n  features: PuzzleSuiteFeature[];\n  /** the framed strip at the bottom */\n  strip?: {\n    /** the bold lead-in */\n    lead: string;\n    text: string;\n    /** outline then violet */\n    actions: { label: string; href: string }[];\n  };\n  className?: string;\n}\n\nconst tile = { violet: \"bg-secondary\", green: \"bg-glow\" };\nconst bubble = { violet: \"bg-secondary/45\", green: \"bg-glow/15\" };\n\nfunction Panel({ feature }: { feature: PuzzleSuiteFeature }) {\n  const tone = feature.tone ?? \"violet\";\n  return (\n    <div className=\"flex flex-col justify-center gap-3.5 rounded-[calc(var(--radius)*1.8)] bg-background p-[1.125rem] text-foreground lg:gap-4 lg:p-8\">\n      {feature.messages.map((m) =>\n        m.from === \"you\" ? (\n          <p\n            key={m.text}\n            className={cn(\n              \"ml-auto max-w-[17.5rem] rounded-[0.8rem_0.8rem_0.2rem_0.8rem] px-3.5 py-2.5 text-sm/[1.45] lg:max-w-[27rem] lg:px-4 lg:py-3 lg:text-base/[1.5]\",\n              bubble[tone],\n            )}\n          >\n            {m.text}\n          </p>\n        ) : (\n          <div key={m.text} className=\"max-w-[32rem] rounded-[calc(var(--radius)*0.75)] bg-card p-3.5 text-card-foreground lg:p-4\">\n            <p className=\"text-sm/[1.6] lg:text-[0.9375rem]/[1.55]\">{m.text}</p>\n            {m.figures && (\n              <dl className=\"mt-3 grid grid-cols-3 gap-1.5 lg:gap-2\">\n                {m.figures.map((f) => (\n                  <div key={f.label} className=\"rounded-[calc(var(--radius)/2)] bg-background px-2 py-2.5 lg:px-2.5\">\n                    <dt className=\"text-[0.8125rem]/none text-muted-foreground lg:text-[0.6875rem]/none\">{f.label}</dt>\n                    <dd className=\"mt-2 text-sm/none lg:text-[0.9375rem]/none\">{f.value}</dd>\n                  </div>\n                ))}\n              </dl>\n            )}\n          </div>\n        ),\n      )}\n      {feature.review && (\n        <>\n          <div className=\"rounded-[calc(var(--radius)*0.75)] bg-card p-3.5 text-card-foreground lg:p-4\">\n            <div className=\"flex items-start justify-between gap-3 border-b border-border pb-4 lg:items-center\">\n              <p className=\"text-sm/[1.5] font-medium lg:text-[0.9375rem]\">{feature.review.summary}</p>\n              <span className=\"shrink-0 rounded-full bg-glow/20 px-2 py-1 text-xs/none font-medium text-foreground/75\">{feature.review.status}</span>\n            </div>\n            <ul className=\"divide-y divide-border\">\n              {feature.review.rows.map((r) => (\n                <li key={r.name} className=\"grid grid-cols-[1fr_auto] gap-x-4 gap-y-1 py-3 text-sm lg:flex lg:items-center lg:py-3.5 lg:text-[0.9375rem]\">\n                  <span className=\"lg:mr-auto\">{r.name}</span>\n                  <span className={cn(\"text-right\", r.flagged ? \"text-chart-5\" : \"text-muted-foreground\")}>{r.note}</span>\n                  <span className=\"lg:ml-3\">{r.amount}</span>\n                </li>\n              ))}\n            </ul>\n            <div className=\"mt-2 flex flex-col items-start gap-2 lg:flex-row lg:gap-2.5\">\n              {feature.review.actions.map((a, i) => (\n                <PuzzleButton key={a.label} href={a.href} variant={i === 0 ? \"card\" : \"outline\"} className=\"h-12 px-6 text-lg lg:h-[3.375rem]\">\n                  {a.label}\n                </PuzzleButton>\n              ))}\n            </div>\n          </div>\n          {feature.review.footnote && <p className=\"text-sm text-muted-foreground lg:text-xs\">{feature.review.footnote}</p>}\n        </>\n      )}\n    </div>\n  );\n}\n\n/** The violet AI band: features paired with chat panels. */\nexport function PuzzleAiSuite({ eyebrow, title, text, cta, features, strip, className }: PuzzleAiSuiteProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-primary text-primary-foreground\", className)}>\n      <PuzzlePixels className=\"absolute -top-2 -right-24 [--pixel:3rem] lg:-right-10 lg:[--pixel:2.6rem]\" />\n      <PuzzlePixels pattern=\"block\" className=\"absolute top-[45%] -left-16 [--pixel:3.5rem]\" />\n      <PuzzlePixels pattern=\"step\" className=\"absolute right-0 bottom-24 [--pixel:3rem] lg:bottom-0\" />\n      <PuzzlePixels pattern=\"stair\" className=\"absolute bottom-0 left-8 [--pixel:3rem] lg:left-16\" />\n\n      <div className=\"relative mx-auto max-w-page px-gutter pt-[6.25rem] pb-12 lg:pt-[8.25rem] lg:pb-12\">\n        <PuzzleHeading tone=\"inverse\" eyebrow={eyebrow} title={title} text={text} className=\"lg:max-w-[57rem]\" />\n        {cta && (\n          <div className=\"mt-8 flex justify-center lg:mt-10\">\n            <PuzzleButton href={cta.href} variant=\"outline-on-dark\" className=\"h-12 w-full text-lg sm:w-auto lg:h-[3.4375rem] lg:px-8\">\n              {cta.label}\n            </PuzzleButton>\n          </div>\n        )}\n\n        <div className=\"mt-11 grid gap-[1.375rem] lg:mt-14 lg:grid-cols-2 lg:gap-x-[3.375rem] lg:gap-y-[3.375rem]\">\n          {features.map((f) => (\n            <div key={f.title} className=\"contents\">\n              <article className=\"flex flex-col rounded-[calc(var(--radius)*1.8)] border border-primary-foreground/12 bg-primary-foreground/5 p-[1.375rem] lg:p-9\">\n                <div className=\"flex items-center gap-2 lg:gap-2.5\">\n                  <span\n                    className={cn(\n                      \"flex size-9 items-center justify-center rounded-[calc(var(--radius)*0.6)] text-foreground lg:size-11 dark:text-background [&_svg]:size-[1.125rem] lg:[&_svg]:size-5\",\n                      tile[f.tone ?? \"violet\"],\n                    )}\n                  >\n                    {f.icon}\n                  </span>\n                  <h3 className=\"font-display text-2xl/none font-normal lg:text-[1.75rem]/none\">{f.title}</h3>\n                  <span className=\"rounded-full border border-primary-foreground/25 px-2 py-1.5 text-xs/none text-primary-foreground/80 lg:px-2.5 lg:py-2 lg:text-[0.8125rem]/none\">{f.tag}</span>\n                </div>\n                <p className=\"mt-4 text-base/[1.6] text-primary-foreground/75 lg:mt-5 lg:text-[1.0125rem]/[1.65]\">{f.text}</p>\n                <div className=\"mt-4 overflow-clip rounded-[calc(var(--radius)*0.45)] lg:mt-5\" style={{ aspectRatio: f.mediaRatio ?? 1.13 }}>\n                  {f.media ?? <PuzzlePlaceholder tone=\"powder\" className=\"size-full\" />}\n                </div>\n              </article>\n              <Panel feature={f} />\n            </div>\n          ))}\n        </div>\n\n        {strip && (\n          <div className=\"mt-11 flex flex-col gap-4 rounded-[calc(var(--radius)*1.8)] border border-primary-foreground/12 p-[1.625rem] lg:mt-14 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:px-8 lg:py-8\">\n            <p className=\"text-base/[1.6] text-primary-foreground/75\">\n              <strong className=\"font-semibold text-primary-foreground\">{strip.lead}</strong> {strip.text}\n            </p>\n            <div className=\"flex flex-col gap-2 lg:flex-row lg:gap-2.5\">\n              {strip.actions.map((a, i) => (\n                <PuzzleButton\n                  key={a.label}\n                  href={a.href}\n                  variant={i === 0 ? \"outline-on-dark\" : \"violet\"}\n                  className=\"h-12 text-lg lg:h-[3.4375rem] lg:px-8\"\n                >\n                  {a.label}\n                </PuzzleButton>\n              ))}\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "puzzle-button",
+    "puzzle-heading",
+    "puzzle-pixels",
+    "puzzle-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline button under the heading"
+    },
+    {
+      "name": "features",
+      "type": "PuzzleSuiteFeature[]",
+      "required": true,
+      "description": "one row per feature: card + panel"
+    },
+    {
+      "name": "strip",
+      "type": "{ lead: string; text: string; actions: { label: string; href: string; }[]; }",
+      "required": false,
+      "description": "the framed strip at the bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ceec0c9994670e8a5d3cc06dff08c6d4c2e6fc52940259e32e6cbc014acffdc5"
+}

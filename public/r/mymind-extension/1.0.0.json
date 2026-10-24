@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind extension",
+  "description": "A big centred two-line serif headline and a short slate paragraph over a wide product picture with a thin tangerine top edge, ringed by four soft-coloured category pills that sit half on and half off it, then a disc-and-capitals play link that warms to tangerine on hover.",
+  "category": "features",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "showcase",
+    "serif",
+    "pills",
+    "tags",
+    "light",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "the picture is a media slot; the pills are built (labels and colours as props)"
+  ],
+  "entry": "mymind-extension.tsx",
+  "source": "foundry",
+  "name": "mymind-extension",
+  "files": [
+    {
+      "path": "mymind-extension.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindMedia } from \"@foundry/mymind-media\";\nimport { MymindPlayLink } from \"@foundry/mymind-play-link\";\n\n/** fill colour of a category pill */\nexport type MymindPillTone = \"chart-2\" | \"chart-3\" | \"chart-4\" | \"highlight\";\n\nconst pillTones: Record<MymindPillTone, string> = {\n  \"chart-2\": \"bg-chart-2 text-primary-foreground\",\n  \"chart-3\": \"bg-chart-3 text-foreground/80\",\n  \"chart-4\": \"bg-chart-4 text-primary-foreground\",\n  highlight: \"bg-highlight/70 text-primary-foreground\",\n};\n\n/** where each of the (up to four) pills sits over the picture, in % of its box */\nconst pillSpots = [\n  \"left-[34%] top-[-3.5%]\",\n  \"left-[3%] top-[10.5%]\",\n  \"left-[61%] top-[27%]\",\n  \"left-[18%] top-[64.5%]\",\n];\n\nexport interface MymindExtensionProps {\n  /** headline lines (each starts a new line on desktop) */\n  title: string[];\n  /** paragraph under the headline */\n  text: string;\n  /** the product picture; empty shows a placeholder */\n  media?: ReactNode;\n  /** up to four category pills floating over the picture */\n  pills: { label: string; tone: MymindPillTone }[];\n  /** the play link under the picture */\n  link: { label: string; href: string };\n  className?: string;\n}\n\n/** Headline, paragraph and a pill-ringed product picture. */\nexport function MymindExtension({ title, text, media, pills, link, className }: MymindExtensionProps) {\n  return (\n    <section className={cn(\"bg-background pt-20 pb-16 text-foreground lg:pt-[6.5rem] lg:pb-[5rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter text-center\">\n        <h2 className=\"font-display text-[3rem] leading-[0.96] font-[350] tracking-[-0.045em] lg:text-[6rem] lg:leading-[0.9]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"lg:block\">\n              {line}{\" \"}\n            </span>\n          ))}\n        </h2>\n        <p className=\"mt-9 max-w-[22rem] text-lg leading-[1.6] text-muted-foreground lg:mt-9 lg:max-w-[26rem] lg:text-[1.125rem] lg:leading-[1.6]\">{text}</p>\n\n        <div className=\"relative mt-12 w-full max-w-[14.5rem] lg:mt-[5.75rem] lg:max-w-[52.75rem]\">\n          <MymindMedia className=\"aspect-[1.366] w-full rounded-[4px] border-t-2 border-primary/70 bg-muted/60 shadow-[0_20px_40px_-20px_color-mix(in_oklab,var(--muted-foreground)_25%,transparent)]\">\n            {media}\n          </MymindMedia>\n          {pills.slice(0, 4).map((p, i) => (\n            <span\n              key={p.label}\n              className={cn(\n                \"absolute hidden h-11 items-center rounded-full px-5 font-[family-name:var(--mymind-round,var(--typeface-body))] text-xl whitespace-nowrap lg:flex\",\n                pillTones[p.tone],\n                pillSpots[i],\n              )}\n            >\n              {p.label}\n            </span>\n          ))}\n        </div>\n\n        <MymindPlayLink href={link.href} className=\"mt-14 lg:mt-[4.5rem]\">\n          {link.label}\n        </MymindPlayLink>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-media",
+    "mymind-play-link"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "headline lines (each starts a new line on desktop)"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "paragraph under the headline"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product picture; empty shows a placeholder"
+    },
+    {
+      "name": "pills",
+      "type": "{ label: string; tone: MymindPillTone; }[]",
+      "required": true,
+      "description": "up to four category pills floating over the picture"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the play link under the picture"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ebc5514bf9a93dc3564a836130697f5e6e7e9682fde6a9d4ac7bde857848d40b"
+}

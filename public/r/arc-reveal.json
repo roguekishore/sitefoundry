@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Arc reveal",
+  "description": "A wrapper that fades its contents in and lifts them 15px as they scroll into view, with an optional stagger step so a row of cards arrives one after another. Pure CSS scroll-driven animation.",
+  "category": "motion",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "motion",
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "stagger"
+  ],
+  "notes": [
+    "needs CSS scroll-driven animations; elsewhere (and with reduced motion) the content simply shows",
+    "don't put it inside an overflow-hidden box: use overflow-clip for crops"
+  ],
+  "entry": "arc-reveal.tsx",
+  "source": "foundry",
+  "name": "arc-reveal",
+  "files": [
+    {
+      "path": "arc-reveal.css",
+      "content": "/* Fade in and rise 15px while the box enters the window, tied to the scroll: done after the\n   first 220px of entry, so anything starting in the first screen is already shown. Each\n   stagger step starts 40px later. The step comes in as --arc-reveal-step. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .arc-reveal {\n      animation: arc-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--arc-reveal-step, 0) * 40px) entry calc(220px + var(--arc-reveal-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes arc-reveal-rise {\n  from { opacity: 0; transform: translateY(15px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "arc-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./arc-reveal.css\";\n\nexport interface ArcRevealProps {\n  children: ReactNode;\n  /** stagger position in a row (0, 1, 2…): each step starts the fade 40px of scroll later */\n  step?: number;\n  className?: string;\n}\n\n/** Wraps anything that should fade in and rise 15px as it scrolls into view (CSS only). */\nexport function ArcReveal({ children, step = 0, className }: ArcRevealProps) {\n  return (\n    <div className={cn(\"arc-reveal\", className)} style={{ \"--arc-reveal-step\": step } as CSSProperties}>\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position in a row (0, 1, 2…): each step starts the fade 40px of scroll later"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f767056f7ae3b6d0383c7eea7f3e231ea5cd7182a9cc788b293c551a63f37b22"
+}

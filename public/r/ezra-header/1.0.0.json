@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ezra header",
+  "description": "A cream top bar that sticks to the top of the window: a co-brand wordmark on the left; four plain 16px links, a person-icon sign-in link and a terracotta pill on the right. On phones the links fold into a burger that drops a full-width cream panel (a details disclosure, no JavaScript).",
+  "category": "header",
+  "site": "ezra",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "light",
+    "cream",
+    "pill",
+    "minimal"
+  ],
+  "notes": [
+    "90px tall on desktop, 70px on phones; sticky for the whole page, as the original"
+  ],
+  "entry": "ezra-header.tsx",
+  "source": "foundry",
+  "name": "ezra-header",
+  "files": [
+    {
+      "path": "ezra-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu, UserRound, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EzraButton } from \"@foundry/ezra-button\";\n\nexport interface EzraNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface EzraHeaderProps {\n  /** the wordmark on the left (e.g. an EzraLockup) */\n  logo: ReactNode;\n  /** accessible name of the wordmark link */\n  logoLabel: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the plain links on the right */\n  links: EzraNavLink[];\n  /** the sign-in link, shown with a person icon */\n  signIn?: EzraNavLink;\n  /** the terracotta pill */\n  action: EzraNavLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass = \"text-base text-foreground transition-colors duration-200 hover:text-primary motion-reduce:transition-none\";\n\n/** The sticky cream top bar: wordmark left, links + sign-in + pill right. */\nexport function EzraHeader({ logo, logoLabel, homeHref = \"#\", links, signIn, action, menuLabel, className }: EzraHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-30 bg-background text-foreground\", className)}>\n      <div className=\"mx-auto flex h-17.5 max-w-page items-center gap-5 px-gutter lg:h-22.5 lg:box-content\">\n        <a href={homeHref} aria-label={logoLabel} className=\"flex items-center text-[1.375rem] lg:-mt-2 lg:text-[1.5rem]\">\n          {logo}\n        </a>\n        <nav className=\"ml-auto hidden items-center gap-5 lg:flex\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          ))}\n          {signIn && (\n            <a href={signIn.href} className={cn(linkClass, \"flex items-center gap-1.5\")}>\n              <UserRound aria-hidden className=\"size-4.5\" strokeWidth={1.5} />\n              {signIn.label}\n            </a>\n          )}\n        </nav>\n        <EzraButton href={action.href} className=\"hidden lg:inline-flex\">\n          {action.label}\n        </EzraButton>\n        <details className=\"group ml-auto lg:hidden\">\n          <summary aria-label={menuLabel} className=\"-mr-1 grid size-8 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\">\n            <Menu aria-hidden className=\"size-5.5 group-open:hidden\" strokeWidth={2.25} />\n            <X aria-hidden className=\"hidden size-5.5 group-open:block\" strokeWidth={2} />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full flex flex-col gap-1 border-b border-border bg-background px-gutter pt-2 pb-6\">\n            {[...links, ...(signIn ? [signIn] : [])].map((link) => (\n              <a key={link.label} href={link.href} className={cn(linkClass, \"border-b border-border py-3.5\")}>\n                {link.label}\n              </a>\n            ))}\n            <EzraButton href={action.href} className=\"mt-5 self-start\">\n              {action.label}\n            </EzraButton>\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "ezra-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark on the left (e.g. an EzraLockup)"
+    },
+    {
+      "name": "logoLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the wordmark link"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "EzraNavLink[]",
+      "required": true,
+      "description": "the plain links on the right"
+    },
+    {
+      "name": "signIn",
+      "type": "EzraNavLink",
+      "required": false,
+      "description": "the sign-in link, shown with a person icon"
+    },
+    {
+      "name": "action",
+      "type": "EzraNavLink",
+      "required": true,
+      "description": "the terracotta pill"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a102a999da5fac84f0ffb5051b1dafd9cf15bb4d0bd1a193a9d069f3d6c08d7d"
+}

@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space header",
+  "description": "A transparent fixed bar over the hero: a thin wide-set wordmark left, four quiet links across the middle and a live mission clock right that ticks every second (T+ days, hours, minutes, seconds / mission name). Phones get the wordmark and a two-line menu button that opens a black panel of large links. As soon as the page scrolls, the bar fades out and lifts away (scroll 80–180px).",
+  "category": "header",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "transparent",
+    "dark",
+    "clock",
+    "ticker",
+    "fade-out",
+    "scrubbed",
+    "minimal"
+  ],
+  "notes": [
+    "fixed to the window and overlaying the first section: put it before a window-tall hero",
+    "the fade-out is CSS scroll-driven (off under reduced motion, where the bar simply stays)",
+    "needs JavaScript for the clock and the phone menu"
+  ],
+  "hydrate": "load",
+  "entry": "k2space-header.tsx",
+  "source": "foundry",
+  "name": "k2space-header",
+  "files": [
+    {
+      "path": "k2space-header.css",
+      "content": "/* The bar fades out and lifts 59px over the first 80–180px of page scroll, then stays hidden. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-header {\n      animation: k2space-header-leave linear both;\n      animation-timeline: scroll(root block);\n      animation-range: 80px 180px;\n    }\n  }\n}\n\n@keyframes k2space-header-leave {\n  to {\n    opacity: 0;\n    transform: translateY(-59px);\n    visibility: hidden;\n  }\n}\n"
+    },
+    {
+      "path": "k2space-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceWordmark, type K2spaceWordmarkProps } from \"@foundry/k2space-wordmark\";\nimport \"./k2space-header.css\";\n\nexport interface K2spaceHeaderLink {\n  /** the link text */\n  label: string;\n  href: string;\n}\n\nexport interface K2spaceMissionClock {\n  /** when the mission started (ISO date-time); the clock counts up from here */\n  since: string;\n  /** the mission or spacecraft name shown after the time */\n  name: string;\n}\n\nexport interface K2spaceHeaderProps {\n  /** the wordmark (two words around an orbit icon) */\n  brand: K2spaceWordmarkProps;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the links across the middle (desktop) and in the phone menu */\n  links: K2spaceHeaderLink[];\n  /** the live elapsed-time readout on the right (desktop) */\n  clock?: K2spaceMissionClock;\n  /** the accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** \"T+12d 04h 09m 31s\" from a start time; a fixed-width readout */\nfunction elapsed(since: string, now: number) {\n  const total = Math.max(0, Math.floor((now - Date.parse(since)) / 1000));\n  const pad = (n: number) => String(n).padStart(2, \"0\");\n  const d = Math.floor(total / 86400);\n  const h = Math.floor((total % 86400) / 3600);\n  const m = Math.floor((total % 3600) / 60);\n  const s = total % 60;\n  return `T+${d}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;\n}\n\n/**\n * A transparent fixed bar: wordmark left, links in the middle, a mission clock ticking on the\n * right. Phones show a two-line menu button. The whole bar fades out and lifts as soon as the\n * page scrolls (CSS scroll timeline).\n */\nexport function K2spaceHeader({ brand, brandHref = \"/\", links, clock, menuLabel, className }: K2spaceHeaderProps) {\n  const [now, setNow] = useState<number | null>(null);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!clock) return;\n    setNow(Date.now());\n    const id = window.setInterval(() => setNow(Date.now()), 1000);\n    return () => window.clearInterval(id);\n  }, [clock]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <header\n      className={cn(\n        \"k2space-header dark fixed inset-x-0 top-0 z-40 font-sans font-[560] text-foreground [font-stretch:var(--k2space-stretch,100%)]\",\n        className,\n      )}\n    >\n      <div className=\"flex h-[72px] items-center justify-between px-gutter lg:grid lg:h-[7.2vw] lg:grid-cols-[31.3vw_1fr_auto] lg:items-center\">\n        <a href={brandHref} className=\"transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none\">\n          <K2spaceWordmark {...brand} className={cn(\"text-[15px] lg:text-[1.2vw]\", brand.className)} />\n        </a>\n\n        <nav className=\"max-lg:hidden\">\n          <ul className=\"flex gap-[4.5vw] text-[max(1rem,1.3227vw)]/none\">\n            {links.map((link, i) => (\n              <li key={i}>\n                <a href={link.href} className=\"transition-opacity duration-200 ease-[ease] hover:opacity-80 motion-reduce:transition-none\">\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        {clock && (\n          <p className=\"text-[max(1rem,1.3227vw)]/none tabular-nums max-lg:hidden\">\n            <span>{now !== null ? elapsed(clock.since, now) : null}</span>\n            <span aria-hidden> / </span>\n            {clock.name}\n          </p>\n        )}\n\n        <button\n          type=\"button\"\n          aria-label={menuLabel}\n          aria-expanded={open}\n          onClick={() => setOpen((v) => !v)}\n          className=\"relative h-3 w-10 lg:hidden\"\n        >\n          <span className={cn(\"absolute inset-x-0 top-0 h-px bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"translate-y-[5.5px] rotate-[20deg]\")} />\n          <span className={cn(\"absolute inset-x-0 bottom-0 h-px bg-current transition-transform duration-300 motion-reduce:transition-none\", open && \"-translate-y-[5.5px] -rotate-[20deg]\")} />\n        </button>\n      </div>\n\n      <div className={cn(\"bg-background px-gutter pt-6 pb-10 lg:hidden\", open ? \"block\" : \"hidden\")}>\n        <ul className=\"flex flex-col gap-5 font-display text-[34px]/none font-[560]\">\n          {links.map((link, i) => (\n            <li key={i}>\n              <a href={link.href} onClick={() => setOpen(false)} className=\"transition-opacity duration-200 hover:opacity-80 motion-reduce:transition-none\">\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "K2spaceWordmarkProps",
+      "required": true,
+      "description": "the wordmark (two words around an orbit icon)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "K2spaceHeaderLink[]",
+      "required": true,
+      "description": "the links across the middle (desktop) and in the phone menu"
+    },
+    {
+      "name": "clock",
+      "type": "K2spaceMissionClock",
+      "required": false,
+      "description": "the live elapsed-time readout on the right (desktop)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "504715ecd3783e23c832d803c02e39843917d66c283f9686d68fa4567a5057c8"
+}

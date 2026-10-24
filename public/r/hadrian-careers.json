@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hadrian careers box",
+  "description": "A hiring call to action in a 1px white box: a band across the top where a wide gold uppercase slogan loops leftward with faded edges, then a tight heading, a short paragraph and a solid gold mono button; an image fades in from the left across the right half (behind the copy on phones).",
+  "category": "cta",
+  "site": "hadrian",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "careers",
+    "dark",
+    "navy",
+    "gold",
+    "marquee",
+    "loop",
+    "hairline",
+    "boxed",
+    "industrial"
+  ],
+  "notes": [
+    "the marquee is a CSS loop; it stops under reduced motion",
+    "the image's left fade is the page colour, so it melts into any theme's background"
+  ],
+  "entry": "hadrian-careers.tsx",
+  "source": "foundry",
+  "name": "hadrian-careers",
+  "files": [
+    {
+      "path": "hadrian-careers.css",
+      "content": "/* The slogan band: two identical runs side by side, the track slides one run's width to the\n   left and starts over, so the loop has no seam. */\n.hadrian-careers-track {\n  animation: hadrian-careers-loop var(--hadrian-loop, 30s) linear infinite;\n}\n\n@keyframes hadrian-careers-loop {\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .hadrian-careers-track { animation: none; }\n}\n"
+    },
+    {
+      "path": "hadrian-careers.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HadrianButton } from \"@foundry/hadrian-button\";\nimport { HadrianPlaceholder } from \"@foundry/hadrian-placeholder\";\nimport \"./hadrian-careers.css\";\n\nexport interface HadrianCareersProps {\n  /** anchor id */\n  id?: string;\n  /** the slogan that loops across the top band (shown uppercase) */\n  slogan: string;\n  /** the heading */\n  title: string;\n  /** a short paragraph */\n  text: string;\n  /** the gold button */\n  action: { label: string; href: string };\n  /** image on the right half (behind the copy on phones), object-cover; a placeholder when empty */\n  media?: ReactNode;\n  /** seconds for the slogan to travel one run */\n  loopSeconds?: number;\n  className?: string;\n}\n\nconst RUN = [0, 1, 2, 3];\n\n/** Boxed hiring call to action with a looping slogan band. */\nexport function HadrianCareers({ id, slogan, title, text, action, media, loopSeconds = 30, className }: HadrianCareersProps) {\n  const run = (hidden: boolean) => (\n    <div aria-hidden={hidden || undefined} className=\"flex shrink-0\">\n      {RUN.map((i) => (\n        <span key={i} aria-hidden={i > 0 || undefined} className=\"shrink-0 pr-[1.875rem] lg:pr-[3.125rem]\">\n          {slogan}\n        </span>\n      ))}\n    </div>\n  );\n  return (\n    <section id={id} className={cn(\"relative bg-background py-16 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"border border-foreground\">\n          <div className=\"relative overflow-clip border-b border-foreground py-[1.625rem] lg:py-[1.875rem]\">\n            <div\n              className=\"hadrian-careers-track flex w-max font-display text-[0.9375rem] leading-[1.25] font-semibold text-primary uppercase lg:text-xl\"\n              style={{ \"--hadrian-loop\": `${loopSeconds}s` } as CSSProperties}\n            >\n              {run(false)}\n              {run(true)}\n            </div>\n            <div aria-hidden className=\"absolute inset-y-0 left-0 w-12 bg-linear-to-r from-background to-transparent lg:w-20\" />\n            <div aria-hidden className=\"absolute inset-y-0 right-0 w-12 bg-linear-to-l from-background to-transparent lg:w-20\" />\n          </div>\n          <div className=\"relative isolate flex flex-col px-6 py-10 lg:min-h-[23.9375rem] lg:p-10\">\n            <div className=\"absolute inset-0 -z-10 lg:left-1/2 [&>img]:size-full [&>img]:object-cover\">\n              {media ?? <HadrianPlaceholder />}\n              <div aria-hidden className=\"absolute inset-0 bg-linear-to-r from-background via-background/40 to-transparent\" />\n            </div>\n            <h2 className=\"max-w-[19rem] text-[1.875rem] leading-none font-medium tracking-[-0.035em] [word-spacing:-0.06em] lg:max-w-none lg:text-[2.25rem] lg:font-normal\">{title}</h2>\n            <p className=\"mt-4 max-w-[18rem] text-lg leading-[1.2] tracking-[-0.02em] lg:mt-[1.125rem] lg:max-w-[32rem] lg:text-xl lg:leading-[1.07]\">\n              {text}\n            </p>\n            <HadrianButton\n              label={action.label}\n              href={action.href}\n              variant=\"solid\"\n              className=\"mt-10 h-10 self-start lg:mt-auto lg:h-11\"\n            />\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hadrian-button",
+    "hadrian-placeholder"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id"
+    },
+    {
+      "name": "slogan",
+      "type": "string",
+      "required": true,
+      "description": "the slogan that loops across the top band (shown uppercase)"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "a short paragraph"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the gold button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "image on the right half (behind the copy on phones), object-cover; a placeholder when empty"
+    },
+    {
+      "name": "loopSeconds",
+      "type": "number",
+      "required": false,
+      "default": "30",
+      "description": "seconds for the slogan to travel one run"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dd2dd4cc0700f811c0165f966ef4dc7388fef80eb31dd8b38a228c7492e5e7c5"
+}

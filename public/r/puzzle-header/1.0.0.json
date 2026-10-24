@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle header",
+  "description": "A pinned two-tier header: a lavender announcement strip with a bold lead-in, a link and a close cross, over a powder nav bar with a green-tiled wordmark, chevroned menu links that turn violet on hover, an ink demo button, a soft violet trial button and a sign-in link. On phones: wordmark, the violet button and a burger that opens a full-width link panel.",
+  "category": "header",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "announcement",
+    "light",
+    "violet",
+    "friendly"
+  ],
+  "notes": [
+    "sticks to the top of the page (position: sticky), so put it directly in the page container",
+    "no JavaScript: the strip closes through a hidden checkbox, the phone menu is a native <details>"
+  ],
+  "entry": "puzzle-header.tsx",
+  "source": "foundry",
+  "name": "puzzle-header",
+  "files": [
+    {
+      "path": "puzzle-header.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PuzzleButton } from \"@foundry/puzzle-button\";\n\nexport interface PuzzleHeaderLink {\n  label: string;\n  href: string;\n  /** shows a chevron, as for items that open a menu */\n  menu?: boolean;\n}\n\nexport interface PuzzleHeaderProps {\n  /** the lavender strip above the nav; leave out for none */\n  announcement?: {\n    /** the bold lead-in, e.g. \"New:\" */\n    lead: string;\n    /** the sentence after it */\n    text: string;\n    /** a shorter sentence for phones; the long one is used when left out */\n    shortText?: string;\n    /** the bold link at the end (shown from tablet up) */\n    link: { label: string; href: string };\n  };\n  /** screen-reader label for the strip's close cross */\n  closeLabel: string;\n  /** the wordmark: a name with a small icon on a green tile */\n  brand: { name: string; href: string; icon?: ReactNode };\n  /** the centre nav links (desktop) */\n  links: PuzzleHeaderLink[];\n  /** the ink button (desktop) */\n  demo: { label: string; href: string };\n  /** the soft violet button (always shown) */\n  trial: { label: string; href: string };\n  /** the plain link at the far right (desktop) */\n  signIn: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Puzzle's sticky header: announcement strip over the nav bar. */\nexport function PuzzleHeader({ announcement, closeLabel, brand, links, demo, trial, signIn, menuLabel, className }: PuzzleHeaderProps) {\n  const id = useId();\n  return (\n    <header className={cn(\"sticky top-0 z-40 text-foreground\", className)}>\n      {announcement && (\n        <div className=\"bg-background has-[:checked]:hidden\">\n          <div className=\"relative flex h-[2.625rem] items-center bg-secondary/55 pr-12 pl-8 text-sm lg:h-[2.875rem] lg:justify-center lg:px-14 lg:text-[0.9375rem]\">\n            <input id={id} type=\"checkbox\" className=\"peer sr-only\" />\n            <a href={announcement.link.href} className=\"truncate\">\n              <strong className=\"font-semibold\">{announcement.lead}</strong>{\" \"}\n              {announcement.shortText ? (\n                <>\n                  <span className=\"sm:hidden\">{announcement.shortText}</span>\n                  <span className=\"hidden sm:inline\">{announcement.text}</span>\n                </>\n              ) : (\n                announcement.text\n              )}{\" \"}\n              <span className=\"hidden font-semibold sm:inline\">{announcement.link.label}</span>\n              <ArrowRight aria-hidden className=\"ml-0.5 inline size-4 align-[-0.15em]\" strokeWidth={2} />\n            </a>\n            <label\n              htmlFor={id}\n              aria-label={closeLabel}\n              className=\"absolute top-1/2 right-4 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full peer-focus-visible:outline-2 peer-focus-visible:outline-ring lg:right-4\"\n            >\n              <X aria-hidden className=\"size-5\" strokeWidth={1.75} />\n            </label>\n          </div>\n        </div>\n      )}\n\n      <nav className=\"relative border-b border-border bg-background\">\n        <div className=\"mx-auto flex h-[4.3rem] max-w-page items-center justify-between gap-6 px-4 lg:h-[4.5625rem] lg:px-[3.25rem]\">\n          <a href={brand.href} className=\"flex shrink-0 items-center gap-2.5 font-display text-lg/none font-semibold tracking-[-0.01em] lg:gap-3 lg:text-2xl/none\">\n            {brand.icon && (\n              <span className=\"flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.6)] bg-glow text-foreground lg:size-10 dark:text-background [&_svg]:size-4 lg:[&_svg]:size-5\">\n                {brand.icon}\n              </span>\n            )}\n            {brand.name}\n          </a>\n\n          <ul className=\"hidden items-center gap-6 xl:flex\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a\n                  href={l.href}\n                  className=\"flex items-center gap-1 text-sm transition-colors duration-300 hover:text-highlight motion-reduce:transition-none\"\n                >\n                  {l.label}\n                  {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.75} />}\n                </a>\n              </li>\n            ))}\n          </ul>\n\n          <div className=\"flex items-center gap-2.5\">\n            <PuzzleButton href={demo.href} size=\"sm\" className=\"hidden px-[1.875rem] xl:inline-flex\">\n              {demo.label}\n            </PuzzleButton>\n            <PuzzleButton href={trial.href} variant=\"violet\" size=\"sm\" className=\"px-[1.875rem]\">\n              {trial.label}\n            </PuzzleButton>\n            <a href={signIn.href} className=\"ml-1 hidden text-sm transition-colors duration-300 hover:text-highlight motion-reduce:transition-none xl:inline\">\n              {signIn.label}\n            </a>\n\n            <details className=\"group xl:hidden\">\n              <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n                <Menu aria-hidden className=\"size-8 group-open:hidden\" strokeWidth={1.5} />\n                <X aria-hidden className=\"hidden size-7 group-open:block\" strokeWidth={1.5} />\n              </summary>\n              <div className=\"absolute inset-x-0 top-full max-h-[calc(100svh-7rem)] overflow-y-auto border-b border-border bg-background px-gutter pt-2 pb-6\">\n                <ul className=\"divide-y divide-border\">\n                  {links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className=\"flex items-center justify-between py-4 text-lg\">\n                        {l.label}\n                        {l.menu && <ChevronDown aria-hidden className=\"size-5 text-muted-foreground\" strokeWidth={1.5} />}\n                      </a>\n                    </li>\n                  ))}\n                  <li>\n                    <a href={signIn.href} className=\"block py-4 text-lg\">\n                      {signIn.label}\n                    </a>\n                  </li>\n                </ul>\n                <PuzzleButton href={demo.href} className=\"mt-4 w-full\">\n                  {demo.label}\n                </PuzzleButton>\n              </div>\n            </details>\n          </div>\n        </div>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "puzzle-button"
+  ],
+  "props": [
+    {
+      "name": "announcement",
+      "type": "{ lead: string; text: string; shortText?: string; link: { label: string; href: string; }; }",
+      "required": false,
+      "description": "the lavender strip above the nav; leave out for none"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the strip's close cross"
+    },
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the wordmark: a name with a small icon on a green tile"
+    },
+    {
+      "name": "links",
+      "type": "PuzzleHeaderLink[]",
+      "required": true,
+      "description": "the centre nav links (desktop)"
+    },
+    {
+      "name": "demo",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ink button (desktop)"
+    },
+    {
+      "name": "trial",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the soft violet button (always shown)"
+    },
+    {
+      "name": "signIn",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the plain link at the far right (desktop)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "55c40d6efdca3c80669c8496b39fcba7ed59b5deca8005218702c6ce396a6cb3"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase customer stories",
+  "description": "Customer stories as a 480px row of rounded colour strips: one wide open card (a pink-to-orange gradient here) with the customer's mark, name, a grey tagline and a large white quote with its author at the bottom, beside four narrow dark strips (navy, teal, near-black, blue) showing only their marks. Hovering or focusing a strip smoothly widens it into the open card while the others narrow. Phones stack them: a tall open card over 64px strips.",
+  "category": "testimonials",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-studies",
+    "accordion",
+    "expand",
+    "hover",
+    "gradient",
+    "colourful",
+    "light"
+  ],
+  "notes": [
+    "CSS only: flex-grow transitions on hover and focus-within; the first story is open by default",
+    "each strip is a dark scope (the theme's .dark tokens), so it stays dark on a light page; the sunset gradient uses chart-4 → chart-5",
+    "the author's portrait is a media slot (round placeholder when empty)"
+  ],
+  "entry": "supabase-stories.tsx",
+  "name": "supabase-stories",
+  "files": [
+    {
+      "path": "supabase-stories.css",
+      "content": "/* A CSS-only accordion: every story shares the row (flex-grow 1, basis 0) and the open one\n   takes --supabase-stories-grow shares. Hovering or focusing another story opens it instead.\n   Phones stack the stories in a column of fixed height, so 5.5 shares give 64px strips;\n   desktop's 10 shares give 76px strips beside a 752px card in a 1088px row. */\n.supabase-stories-row {\n  --supabase-stories-grow: 5.5;\n}\n@media (min-width: 64rem) {\n  .supabase-stories-row {\n    --supabase-stories-grow: 10;\n  }\n}\n\n.supabase-stories-item {\n  flex: 1 1 0;\n  transition: flex-grow 500ms cubic-bezier(0.22, 1, 0.36, 1);\n}\n.supabase-stories-item[data-open] {\n  flex-grow: var(--supabase-stories-grow);\n}\n.supabase-stories-row:hover .supabase-stories-item,\n.supabase-stories-row:focus-within .supabase-stories-item {\n  flex-grow: 1;\n}\n.supabase-stories-row .supabase-stories-item:hover,\n.supabase-stories-row .supabase-stories-item:focus-within {\n  flex-grow: var(--supabase-stories-grow);\n}\n\n/* the story text shows only in the open item */\n.supabase-stories-body {\n  opacity: 0;\n  transition: opacity 300ms ease 100ms;\n}\n.supabase-stories-item[data-open] .supabase-stories-body {\n  opacity: 1;\n}\n.supabase-stories-row:hover .supabase-stories-body,\n.supabase-stories-row:focus-within .supabase-stories-body {\n  opacity: 0;\n}\n.supabase-stories-row .supabase-stories-item:hover .supabase-stories-body,\n.supabase-stories-row .supabase-stories-item:focus-within .supabase-stories-body {\n  opacity: 1;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .supabase-stories-item,\n  .supabase-stories-body {\n    transition: none;\n  }\n}\n"
+    },
+    {
+      "path": "supabase-stories.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseHeading, type SupabaseHeadingPart } from \"@foundry/supabase-heading\";\nimport { SupabasePlaceholder } from \"@foundry/supabase-placeholder\";\nimport \"./supabase-stories.css\";\n\nexport interface SupabaseStory {\n  /** the customer's name, shown in the open card and read to screen readers */\n  name: string;\n  /** the customer's mark (32px, shown in every state) */\n  logo: ReactNode;\n  /** one grey line under the name */\n  tagline: string;\n  /** the quote, large, at the bottom of the open card */\n  quote: string;\n  /** who said it */\n  person: { name: string; avatar?: ReactNode };\n  /** the link at the very bottom */\n  link: { label: string; href: string };\n  /** the card's colour: sunset (pink→orange gradient), ink (navy), deep (teal), night (near black), glow (blue) */\n  tone?: \"sunset\" | \"ink\" | \"deep\" | \"night\" | \"glow\";\n}\n\nexport interface SupabaseStoriesProps {\n  /** the two-tone title (grey phrase, then ink) */\n  title: SupabaseHeadingPart[];\n  /** the underlined link beside (desktop) or under (phones) the title */\n  link?: { label: string; href: string };\n  /** the stories; the first is open until another is hovered or focused (five fill the row) */\n  stories: SupabaseStory[];\n  className?: string;\n}\n\n// every tone is a dark scope, so text and borders inside use the theme's dark tokens\nconst tones = {\n  sunset: \"bg-linear-to-b from-chart-4 to-chart-5\",\n  ink: \"bg-background bg-linear-to-b from-glow/25 to-glow/20\",\n  deep: \"bg-secondary\",\n  night: \"bg-background\",\n  glow: \"bg-linear-to-bl from-glow/80 to-glow\",\n};\n\n/** Customer stories as a row of colour strips: one open card with a big quote, the rest narrow; hover opens another. */\nexport function SupabaseStories({ title, link, stories, className }: SupabaseStoriesProps) {\n  return (\n    <section className={cn(\"border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content max-w-page px-gutter py-24\">\n        <div className=\"lg:flex lg:items-end lg:justify-between lg:gap-8\">\n          <SupabaseHeading parts={title} stack=\"always\" />\n          {link && (\n            <a href={link.href} className=\"mt-4 inline-block text-sm text-foreground/80 underline underline-offset-2 transition-colors duration-150 hover:text-foreground lg:mt-0 lg:shrink-0\">\n              {link.label}\n            </a>\n          )}\n        </div>\n\n        <ul className=\"supabase-stories-row mt-16 flex h-[39.875rem] flex-col gap-2 lg:h-[30rem] lg:flex-row\">\n          {stories.map((story, i) => (\n            <li\n              key={story.name}\n              data-open={i === 0 ? \"\" : undefined}\n              className={cn(\"supabase-stories-item dark relative min-h-0 min-w-0 overflow-clip rounded-md text-foreground\", tones[story.tone ?? \"ink\"])}\n            >\n              <div className=\"flex h-full w-[min(42rem,calc(100vw-3rem))] flex-col px-5 py-4 lg:w-[45rem] lg:p-[1.375rem] lg:pt-8\">\n                <span className=\"flex size-8 shrink-0 items-center justify-center [&_svg]:size-8\" role=\"img\" aria-label={story.name}>\n                  {story.logo}\n                </span>\n                <div className=\"supabase-stories-body flex flex-1 flex-col lg:px-2.5\">\n                  <p className=\"mt-2 text-sm font-medium lg:mt-6\">{story.name}</p>\n                  <p className=\"mt-0.5 text-xs leading-4 text-foreground/65 lg:mt-2\">{story.tagline}</p>\n                  <blockquote className=\"mt-2 max-w-[33rem] font-display text-lg leading-[1.36] font-medium lg:mt-auto lg:text-[1.375rem]\">{story.quote}</blockquote>\n                  <p className=\"mt-4 flex items-center gap-2.5 text-xs text-foreground/70 lg:mt-4\">\n                    <span className=\"size-6 shrink-0 lg:size-7\">{story.person.avatar ?? <SupabasePlaceholder tone=\"avatar\" />}</span>\n                    {story.person.name}\n                  </p>\n                  <a href={story.link.href} className=\"mt-6 self-start text-xs text-foreground/75 underline underline-offset-2 transition-colors duration-150 hover:text-foreground lg:mt-10 lg:mb-6\">\n                    {story.link.label}\n                  </a>\n                </div>\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-heading",
+    "supabase-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "SupabaseHeadingPart[]",
+      "required": true,
+      "description": "the two-tone title (grey phrase, then ink)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the underlined link beside (desktop) or under (phones) the title"
+    },
+    {
+      "name": "stories",
+      "type": "SupabaseStory[]",
+      "required": true,
+      "description": "the stories; the first is open until another is hovered or focused (five fill the row)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "da4624949a07494cd52bf63d31ce834c94dc1e3c61e31c56184d77a6d48a0da1"
+}

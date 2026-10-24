@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Cursor header",
+  "description": "A flat 52px top bar in the page's paper colour that stays on top for the whole scroll: a bold wordmark at the left, five plain nav links centred on the page, and at the right a text sign-in, a hairline outline pill and an ink pill. Links fade to 75% ink on hover. On phones: wordmark, sign-in and a three-line menu button that drops the links down in a panel (no JavaScript).",
+  "category": "header",
+  "site": "cursor",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "minimal",
+    "flat",
+    "pill"
+  ],
+  "notes": [
+    "sticky: put it at the top level of the page so it stays for the whole scroll",
+    "the phone menu is a <details> disclosure, so it works without hydration"
+  ],
+  "entry": "cursor-header.tsx",
+  "source": "foundry",
+  "name": "cursor-header",
+  "files": [
+    {
+      "path": "cursor-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CursorButton } from \"@foundry/cursor-button\";\n\nexport interface CursorNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface CursorHeaderProps {\n  /** the wordmark on the left (e.g. an icon and the name in bold capitals) */\n  logo: ReactNode;\n  /** accessible name of the wordmark link */\n  logoLabel: string;\n  /** where the wordmark links to */\n  homeHref?: string;\n  /** the nav links centred on the page */\n  links: CursorNavLink[];\n  /** the plain text link at the right (shown on phones too) */\n  signIn?: CursorNavLink;\n  /** the hairline outline pill */\n  secondaryAction?: CursorNavLink;\n  /** the ink pill */\n  action: CursorNavLink;\n  /** accessible name of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground/75 motion-reduce:transition-none\";\n\n/** The paper top bar: wordmark left, links centred, sign-in and two pills right. */\nexport function CursorHeader({ logo, logoLabel, homeHref = \"#\", links, signIn, secondaryAction, action, menuLabel, className }: CursorHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-40 bg-background text-foreground\", className)}>\n      <div className=\"relative mx-auto flex h-14 max-w-[calc(var(--page-width)+2*var(--page-gutter))] items-center px-gutter lg:h-[3.25rem]\">\n        <a href={homeHref} aria-label={logoLabel} className=\"flex items-center\">\n          {logo}\n        </a>\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 lg:flex\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto flex items-center gap-2\">\n          {signIn && (\n            <a href={signIn.href} className={cn(linkClass, \"mr-1 max-lg:mr-3\")}>\n              {signIn.label}\n            </a>\n          )}\n          {secondaryAction && (\n            <CursorButton href={secondaryAction.href} variant=\"outline\" size=\"sm\" className=\"hidden lg:inline-flex\">\n              {secondaryAction.label}\n            </CursorButton>\n          )}\n          <CursorButton href={action.href} size=\"sm\" className=\"hidden lg:inline-flex\">\n            {action.label}\n          </CursorButton>\n          <details className=\"group lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"-mr-1.5 grid size-9 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\"\n            >\n              <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.5} />\n              <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.5} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full flex flex-col border-b border-border bg-background px-gutter pt-2 pb-6\">\n              {links.map((link) => (\n                <a key={link.label} href={link.href} className={cn(linkClass, \"py-2.5 text-base\")}>\n                  {link.label}\n                </a>\n              ))}\n              <div className=\"mt-4 flex gap-2\">\n                {secondaryAction && (\n                  <CursorButton href={secondaryAction.href} variant=\"outline\" size=\"lg\" className=\"flex-1\">\n                    {secondaryAction.label}\n                  </CursorButton>\n                )}\n                <CursorButton href={action.href} size=\"lg\" className=\"flex-1\">\n                  {action.label}\n                </CursorButton>\n              </div>\n            </nav>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "cursor-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark on the left (e.g. an icon and the name in bold capitals)"
+    },
+    {
+      "name": "logoLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the wordmark link"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "CursorNavLink[]",
+      "required": true,
+      "description": "the nav links centred on the page"
+    },
+    {
+      "name": "signIn",
+      "type": "CursorNavLink",
+      "required": false,
+      "description": "the plain text link at the right (shown on phones too)"
+    },
+    {
+      "name": "secondaryAction",
+      "type": "CursorNavLink",
+      "required": false,
+      "description": "the hairline outline pill"
+    },
+    {
+      "name": "action",
+      "type": "CursorNavLink",
+      "required": true,
+      "description": "the ink pill"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "be149684b7d4e67e6b74a19a44a2d68a2292f578ba4374a864851c5de7d3b7cd"
+}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Varda footer",
+  "description": "A navy footer framed by the page grid's dashed side hairlines: icon and wide wordmark, small uppercase dusty-blue labels over the address and contact lines, a row of line icons for socials; link groups in two columns from the middle (one column holds two groups); a dashed rule, then small copyright and legal links. Links underline on hover.",
+  "category": "footer",
+  "site": "varda",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "navy",
+    "hairline",
+    "dashed",
+    "grid",
+    "minimal"
+  ],
+  "notes": [
+    "best on dark themes; labels use muted-foreground, hairlines border"
+  ],
+  "entry": "varda-footer.tsx",
+  "source": "foundry",
+  "name": "varda-footer",
+  "files": [
+    {
+      "path": "varda-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface VardaFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface VardaFooterDetail {\n  /** small uppercase label, e.g. \"Address\" */\n  label: string;\n  /** the lines under it */\n  lines: string[];\n  /** makes the lines a link (e.g. mailto:) */\n  href?: string;\n}\n\nexport interface VardaFooterSocial {\n  /** the network's name, for screen readers */\n  label: string;\n  href: string;\n  /** a 24px line icon */\n  icon: ReactNode;\n}\n\nexport interface VardaFooterGroup {\n  /** small uppercase label over the links */\n  title: string;\n  links: VardaFooterLink[];\n}\n\nexport interface VardaFooterProps {\n  /** the wordmark, set in wide capitals */\n  name: string;\n  /** the brand glyph before the wordmark */\n  icon: ReactNode;\n  homeHref?: string;\n  /** label + lines blocks under the logo (address, contact) */\n  details: VardaFooterDetail[];\n  /** social icon links */\n  socials: VardaFooterSocial[];\n  /** link columns; each column stacks one or more groups */\n  columns: VardaFooterGroup[][];\n  /** the small line at the bottom left */\n  copyright: string;\n  /** small links at the bottom right */\n  legal: VardaFooterLink[];\n  className?: string;\n}\n\nconst label = \"block text-[0.8rem]/[1.5] tracking-[0.05em] text-muted-foreground uppercase lg:text-[0.863rem]\";\nconst link = \"underline-offset-4 hover:underline\";\n\n/** Navy footer inside dashed side hairlines: logo, details and socials, link columns, legal row. */\nexport function VardaFooter({ name, icon, homeHref = \"#\", details, socials, columns, copyright, legal, className }: VardaFooterProps) {\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-gutter border-x border-dashed border-border px-[calc(var(--page-gutter)+0.0625rem)] pt-[calc(var(--page-gutter)*2)] pb-[calc(var(--page-gutter)*2.4)]\">\n        <div className=\"mx-auto max-w-page\">\n          <div className=\"grid gap-10 lg:grid-cols-2 lg:gap-6\">\n            <div>\n              <a href={homeHref} className=\"inline-flex items-center gap-3.5\">\n                <span aria-hidden className=\"[&_svg]:size-10 lg:[&_svg]:size-[2.625rem]\">\n                  {icon}\n                </span>\n                <span className=\"text-[1.75rem]/none font-extrabold tracking-[0.06em] uppercase lg:text-[1.875rem]\">{name}</span>\n              </a>\n              <dl className=\"mt-6 flex flex-col gap-4 lg:mt-7 lg:gap-3.5\">\n                {details.map((d) => (\n                  <div key={d.label}>\n                    <dt className={label}>{d.label}</dt>\n                    <dd className=\"mt-1 text-base/6 font-semibold lg:max-w-[16.5rem] lg:text-[1.079rem]/[1.5]\">\n                      {d.href ? (\n                        <a href={d.href} className={cn(link, \"transition-colors hover:text-card\")}>\n                          {d.lines.join(\" \")}\n                        </a>\n                      ) : (\n                        d.lines.join(\" \")\n                      )}\n                    </dd>\n                  </div>\n                ))}\n              </dl>\n              <ul className=\"mt-6 flex gap-6\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className=\"block opacity-100 transition-opacity hover:opacity-70 [&_svg]:size-6\">\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n\n            <div className=\"grid grid-cols-2 gap-6 lg:pt-1\">\n              {columns.map((groups, i) => (\n                <div key={i} className=\"flex flex-col gap-10 lg:gap-7\">\n                  {groups.map((g) => (\n                    <div key={g.title}>\n                      <h2 className={label}>{g.title}</h2>\n                      <ul className=\"mt-2 flex flex-col gap-2 lg:mt-2 lg:gap-[1.0625rem]\">\n                        {g.links.map((l) => (\n                          <li key={l.label}>\n                            <a href={l.href} className={cn(link, \"block text-base/6 font-semibold lg:text-[1.063rem]/none\")}>\n                              {l.label}\n                            </a>\n                          </li>\n                        ))}\n                      </ul>\n                    </div>\n                  ))}\n                </div>\n              ))}\n            </div>\n          </div>\n\n          <div className=\"mt-12 flex flex-col gap-3 border-t border-dashed border-border pt-6 text-[0.8rem]/[1.5] font-medium lg:mt-12 lg:flex-row lg:items-center lg:justify-between lg:pt-8\">\n            <p>{copyright}</p>\n            <ul className=\"flex flex-wrap gap-x-5 gap-y-2\">\n              {legal.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className={link}>\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set in wide capitals"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the brand glyph before the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#"
+    },
+    {
+      "name": "details",
+      "type": "VardaFooterDetail[]",
+      "required": true,
+      "description": "label + lines blocks under the logo (address, contact)"
+    },
+    {
+      "name": "socials",
+      "type": "VardaFooterSocial[]",
+      "required": true,
+      "description": "social icon links"
+    },
+    {
+      "name": "columns",
+      "type": "VardaFooterGroup[][]",
+      "required": true,
+      "description": "link columns; each column stacks one or more groups"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the small line at the bottom left"
+    },
+    {
+      "name": "legal",
+      "type": "VardaFooterLink[]",
+      "required": true,
+      "description": "small links at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "92de391d54197a0d3c39218d7841cab66618711cf7cab075db5ef6c89c51c5bc"
+}

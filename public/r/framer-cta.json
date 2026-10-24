@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer prompt CTA",
+  "description": "A centred closing title over a dark rounded prompt box whose placeholder text types itself out, holds, clears and moves on to the next idea, with a model label and a round send button, a row of small suggestion chips and a quiet \"start without\" link. On phones: the title, one white button and a dark panel with a soft blue glow rim.",
+  "category": "cta",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "prompt",
+    "ai",
+    "dark",
+    "centered",
+    "typing",
+    "glow",
+    "loop"
+  ],
+  "notes": [
+    "needs JavaScript for the typing loop (`hydrate: visible`); static HTML and reduced motion show the first prompt",
+    "the phone glow panel is a media slot (`media`)"
+  ],
+  "hydrate": "visible",
+  "entry": "framer-cta.tsx",
+  "name": "framer-cta",
+  "files": [
+    {
+      "path": "framer-cta.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { ArrowRight, ArrowUp } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerButton } from \"@foundry/framer-button\";\nimport { FramerHeading } from \"@foundry/framer-heading\";\nimport { FramerPlaceholder } from \"@foundry/framer-placeholder\";\n\nexport interface FramerCtaProps {\n  /** the centred closing title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** example prompts the box types out in turn */\n  prompts: string[];\n  /** screen-reader label for the prompt box */\n  promptLabel: string;\n  /** the small model label at the box's foot */\n  model?: string;\n  /** screen-reader label for the send button */\n  sendLabel: string;\n  /** suggestion chips under the box */\n  chips?: { label: string; href: string }[];\n  /** the quiet link under the chips */\n  secondary?: { label: string; href: string };\n  /** the white button shown instead of the prompt box on phones */\n  action: { label: string; href: string };\n  /** the phone panel under the button; empty shows a glowing placeholder */\n  media?: ReactNode;\n  /** screen-reader label for that placeholder */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Types each prompt, holds it, erases it, then moves to the next. */\nfunction useTypedPrompt(prompts: string[]) {\n  const [text, setText] = useState(prompts[0] ?? \"\");\n  const key = prompts.join(\"\\u0000\");\n  useEffect(() => {\n    if (!prompts.length || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    let p = 0;\n    let i = 0;\n    let erasing = false;\n    let timer: ReturnType<typeof setTimeout>;\n    const tick = () => {\n      const full = prompts[p];\n      if (!erasing) {\n        i += 1;\n        setText(full.slice(0, i));\n        if (i >= full.length) {\n          erasing = true;\n          timer = setTimeout(tick, 2200);\n          return;\n        }\n        timer = setTimeout(tick, 45);\n      } else {\n        i -= 1;\n        setText(full.slice(0, i));\n        if (i <= 0) {\n          erasing = false;\n          p = (p + 1) % prompts.length;\n          timer = setTimeout(tick, 500);\n          return;\n        }\n        timer = setTimeout(tick, 15);\n      }\n    };\n    setText(\"\");\n    timer = setTimeout(tick, 600);\n    return () => clearTimeout(timer);\n    // eslint-disable-next-line react-hooks/exhaustive-deps\n  }, [key]);\n  return text;\n}\n\n/** Centred title over a self-typing prompt box. */\nexport function FramerCta({\n  title,\n  prompts,\n  promptLabel,\n  model,\n  sendLabel,\n  chips = [],\n  secondary,\n  action,\n  media,\n  mediaLabel,\n  className,\n}: FramerCtaProps) {\n  const typed = useTypedPrompt(prompts);\n  return (\n    <section className={cn(\"bg-background px-gutter pt-24 pb-14 text-foreground lg:pt-30 lg:pb-38\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center text-center\">\n        <FramerHeading size=\"title\">{title}</FramerHeading>\n\n        {/* phones: a button and a glowing panel */}\n        <FramerButton href={action.href} className=\"mt-4 h-[2.125rem] px-3.5 text-sm lg:hidden\">\n          {action.label}\n        </FramerButton>\n        {/* the padding leaves room for the glow, which the fade mask would otherwise cut off */}\n        <div className=\"mt-6 h-56 w-full max-w-[23.5rem] mask-b-from-55% mask-b-to-100% px-6 pt-8 lg:hidden\">\n          {media ?? <FramerPlaceholder tone=\"glow\" label={mediaLabel} className=\"rounded-2xl\" />}\n        </div>\n\n        {/* desktop: the prompt box */}\n        <form className=\"mt-9 hidden w-full max-w-[36.25rem] flex-col rounded-[1.125rem] border border-input bg-secondary p-2.5 text-left lg:flex\">\n          <textarea\n            aria-label={promptLabel}\n            placeholder={typed}\n            rows={5}\n            className=\"h-[7.5rem] w-full resize-none bg-transparent text-[0.8125rem] leading-5 tracking-[0.01em] text-foreground outline-none placeholder:text-muted-foreground/80\"\n          />\n          <div className=\"mt-2 flex items-center justify-between border-t border-input pt-2.5\">\n            <span className=\"text-xs text-muted-foreground\">{model}</span>\n            <button\n              type=\"submit\"\n              aria-label={sendLabel}\n              className=\"grid size-5 place-items-center rounded-full bg-muted-foreground/60 text-background transition-colors duration-150 hover:bg-foreground motion-reduce:transition-none\"\n            >\n              <ArrowUp aria-hidden className=\"size-3.5\" strokeWidth={2.5} />\n            </button>\n          </div>\n        </form>\n        {chips.length > 0 && (\n          <ul className=\"mt-2.5 hidden flex-wrap justify-center gap-2.5 lg:flex\">\n            {chips.map((chip) => (\n              <li key={chip.label}>\n                <a\n                  href={chip.href}\n                  className=\"inline-flex h-6 items-center rounded-md border border-input bg-secondary px-2.5 text-xs tracking-[0.01em] text-muted-foreground transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\"\n                >\n                  {chip.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        )}\n        {secondary && (\n          <a\n            href={secondary.href}\n            className=\"group mt-12 hidden items-center gap-0.5 text-xs text-foreground lg:inline-flex\"\n          >\n            {secondary.label}\n            <ArrowRight\n              aria-hidden\n              className=\"size-3 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none\"\n              strokeWidth={2}\n            />\n          </a>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-button",
+    "framer-heading",
+    "framer-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred closing title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "prompts",
+      "type": "string[]",
+      "required": true,
+      "description": "example prompts the box types out in turn"
+    },
+    {
+      "name": "promptLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the prompt box"
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "required": false,
+      "description": "the small model label at the box's foot"
+    },
+    {
+      "name": "sendLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the send button"
+    },
+    {
+      "name": "chips",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "suggestion chips under the box"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the quiet link under the chips"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the white button shown instead of the prompt box on phones"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the phone panel under the button; empty shows a glowing placeholder"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for that placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3ab91e53c0eb404dd306b2302c799e5eaa07a1d2d28051d2a023824ca1fc040a"
+}

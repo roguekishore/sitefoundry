@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health two plans band",
+  "description": "A deep forest band with a centred eyebrow and light serif title over two square-cornered ivory plan cards side by side, one wide and one narrow. The wide card runs a six-step timeline of clover dots on a hairline, then its price, an ochre note, small print and a forest pill, with the description at the bottom right; the narrow card stacks description, a rule, price and an outlined pill. On phones the cards stack and the timeline turns vertical.",
+  "category": "pricing",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "cards",
+    "timeline",
+    "dark-band",
+    "serif",
+    "pill"
+  ],
+  "notes": [
+    "the band is bg-primary and the cards bg-background, so in dark mode the band turns bone with forest cards",
+    "description takes nodes, so an underlined link can sit inside it"
+  ],
+  "entry": "parsleyhealth-plans.tsx",
+  "name": "parsleyhealth-plans",
+  "files": [
+    {
+      "path": "parsleyhealth-plans.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport { ParsleyhealthHeading } from \"@foundry/parsleyhealth-heading\";\n\nexport interface ParsleyhealthPlan {\n  /** small capitals above the plan name */\n  eyebrow?: string;\n  /** the plan name */\n  title: string;\n  /** what the plan is (may hold an underlined link) */\n  description: ReactNode;\n  /** what is included, shown as a timeline of dots (the wide card) */\n  steps?: string[];\n  /** the price line, e.g. \"$140/month\" */\n  price: string;\n  /** small text after the price, e.g. \"· $260/month without insurance\" */\n  priceAside?: string;\n  /** the ochre line under the price */\n  note?: string;\n  /** the small grey print under that */\n  fineprint?: string;\n  /** the plan's pill */\n  action: { label: string; href: string };\n  /** filled (forest) or outlined pill */\n  actionVariant?: \"primary\" | \"outline\";\n}\n\nexport interface ParsleyhealthPlansProps {\n  /** small capitals above the title */\n  eyebrow?: string;\n  /** the band's title */\n  title: string;\n  /** the plans: the first with steps is drawn wide (about 7 to 3 on desktop) */\n  plans: ParsleyhealthPlan[];\n  className?: string;\n}\n\nfunction Steps({ steps }: { steps: string[] }) {\n  return (\n    <ol className=\"flex flex-col gap-6 lg:grid lg:grid-cols-6 lg:gap-0\">\n      {steps.map((step, i) => (\n        <li key={step} className=\"relative flex items-center gap-5 lg:block lg:pr-4\">\n          {/* hairline to the next dot: vertical on phones, horizontal on desktop */}\n          <span\n            aria-hidden\n            className={cn(\n              \"absolute top-[0.6875rem] left-[0.3125rem] h-[calc(100%+1.5rem)] w-px bg-primary/80 lg:top-[0.3125rem] lg:left-0 lg:h-px lg:w-full\",\n              i === steps.length - 1 && \"max-lg:hidden\",\n            )}\n          />\n          <span aria-hidden className=\"relative block size-2.5 shrink-0 rounded-full bg-glow lg:mb-4 lg:size-[0.6875rem]\" />\n          <span className=\"text-[0.9625rem] leading-[1.409] lg:block lg:text-[1.0312rem]\">{step}</span>\n        </li>\n      ))}\n    </ol>\n  );\n}\n\nfunction Price({ plan }: { plan: ParsleyhealthPlan }) {\n  return (\n    <div>\n      <p className=\"text-[1.3063rem] leading-[1.455] text-primary lg:text-[1.4438rem]\">\n        {plan.price}\n        {plan.priceAside ? <span className=\"text-[0.9625rem] text-muted-foreground\"> {plan.priceAside}</span> : null}\n      </p>\n      {plan.note ? <p className=\"mt-1 text-[1.1rem] leading-[1.455] text-highlight lg:text-[1.1688rem]\">{plan.note}</p> : null}\n      {plan.fineprint ? <p className=\"mt-1 text-[0.9625rem] leading-[1.455] text-muted-foreground\">{plan.fineprint}</p> : null}\n    </div>\n  );\n}\n\n/** Two plan cards on the forest band. */\nexport function ParsleyhealthPlans({ eyebrow, title, plans, className }: ParsleyhealthPlansProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-primary px-gutter py-[calc(var(--section-y)*0.55)] text-primary-foreground lg:py-section\",\n        className,\n      )}\n    >\n      <ParsleyhealthHeading eyebrow={eyebrow} title={title} align=\"center\" tone=\"inherit\" />\n      <div className=\"mx-auto mt-8 grid max-w-page gap-6 lg:mt-21 lg:grid-cols-[7fr_3fr] lg:gap-3\">\n        {plans.map((plan) => {\n          const wide = Boolean(plan.steps?.length);\n          return (\n            <article\n              key={plan.title}\n              className={cn(\n                \"flex flex-col bg-background p-6 text-foreground\",\n                wide ? \"lg:grid lg:grid-cols-[1.2fr_1fr] lg:gap-x-12 lg:p-14\" : \"lg:p-10\",\n              )}\n            >\n              <ParsleyhealthHeading\n                eyebrow={plan.eyebrow}\n                title={plan.title}\n                size=\"card\"\n                as=\"h3\"\n                className={cn(\"[&>p]:text-foreground\", wide && \"lg:col-span-2\")}\n                titleClassName=\"max-w-[13rem] lg:max-w-none\"\n              />\n              <div\n                className={cn(\n                  \"mt-8 text-[1.1rem] leading-[1.364] [&_a]:text-ring [&_a]:underline [&_a]:underline-offset-4\",\n                  wide ? \"lg:col-start-2 lg:row-start-3 lg:mt-0 lg:self-end lg:pb-1\" : \"lg:mt-11 lg:text-[1.0312rem] lg:leading-[1.318]\",\n                )}\n              >\n                {plan.description}\n              </div>\n              {wide ? (\n                <div className=\"mt-8 lg:col-span-2 lg:row-start-2 lg:mt-14 lg:mb-16\">\n                  <Steps steps={plan.steps ?? []} />\n                </div>\n              ) : null}\n              <div className={cn(\"mt-8 border-t border-foreground/12 pt-8\", wide ? \"lg:col-start-1 lg:row-start-3 lg:mt-0 lg:border-0 lg:pt-0\" : \"lg:mt-auto\")}>\n                <Price plan={plan} />\n                <ParsleyhealthButton\n                  href={plan.action.href}\n                  variant={plan.actionVariant ?? \"primary\"}\n                  block={wide ? \"phone\" : true}\n                  className={cn(\"mt-6\", wide && \"lg:w-70\")}\n                >\n                  {plan.action.label}\n                </ParsleyhealthButton>\n              </div>\n            </article>\n          );\n        })}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button",
+    "parsleyhealth-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the band's title"
+    },
+    {
+      "name": "plans",
+      "type": "ParsleyhealthPlan[]",
+      "required": true,
+      "description": "the plans: the first with steps is drawn wide (about 7 to 3 on desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2e60fe3d11e224dfc901d6a2bce1a7423ecffb5b2056587c6b4dc4a1b9804864"
+}

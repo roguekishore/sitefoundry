@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Plaid developers",
+  "description": "A deep indigo-navy panel with 40px corners and a soft periwinkle glow around it: a centred two-line 70px white headline, a short line, a cyan-to-periwinkle pill and a near-black rainbow-rimmed pill, then a near-black code window flush with the panel's bottom: an endpoint path over a hairline, numbered lines with function names in cyan and numbers in yellow, long lines cut with an ellipsis.",
+  "category": "cta",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "developers",
+    "code",
+    "api",
+    "dark",
+    "glow",
+    "mono",
+    "rounded",
+    "fintech"
+  ],
+  "notes": [
+    "the original's moving wave-line canvas behind the window is reduced to a soft periwinkle light at the bottom of the panel",
+    "the panel is the foreground colour deepened with primary in light mode, the card colour in dark mode; the code window is primary (background in dark mode)"
+  ],
+  "entry": "plaid-developers.tsx",
+  "source": "foundry",
+  "name": "plaid-developers",
+  "files": [
+    {
+      "path": "plaid-developers.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { PlaidButton } from \"@foundry/plaid-button\";\n\nexport interface PlaidCodeSegment {\n  /** the text of this piece of the line */\n  text: string;\n  /** fn: a function or type name (cyan) · num: a number (yellow) · plain (default) */\n  tone?: \"fn\" | \"num\" | \"plain\";\n}\n\nexport interface PlaidDevelopersProps {\n  /** the white headline (two short lines) */\n  title: string;\n  /** the line under it */\n  subtitle: string;\n  /** the cyan-to-periwinkle pill */\n  primary: { label: string; href: string };\n  /** the near-black rainbow-rimmed pill */\n  secondary: { label: string; href: string };\n  /** the endpoint shown in the code window's header */\n  endpoint: string;\n  /** the code, one array of segments per line (an empty array is an empty line) */\n  code: PlaidCodeSegment[][];\n  className?: string;\n}\n\nconst tones = { fn: \"text-glow\", num: \"text-chart-5\", plain: \"\" };\n\n/** Plaid's developer panel: a glowing indigo card that ends in a code window. */\nexport function PlaidDevelopers({ title, subtitle, primary, secondary, endpoint, code, className }: PlaidDevelopersProps) {\n  return (\n    <section className={cn(\"bg-background pt-16 pb-14 lg:pt-[12rem] lg:pb-[12.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"relative isolate overflow-clip rounded-[calc(var(--radius)+1rem)] bg-[color-mix(in_oklab,var(--foreground)_40%,var(--primary))] bg-linear-to-b from-chart-1/20 via-chart-1/25 to-chart-3/50 text-center text-background shadow-[0_0_70px] shadow-chart-3/70 dark:bg-card dark:text-foreground\">\n          <div className=\"px-6 pt-10 lg:pt-[4.75rem]\">\n            <h2 className=\"mx-auto max-w-[16rem] font-display text-[1.875rem]/[1.12] font-medium tracking-[-0.05em] lg:max-w-[50rem] lg:text-[4.375rem]/[1.12] lg:tracking-[-0.045em]\">\n              {title}\n            </h2>\n            <p className=\"mx-auto mt-10 max-w-[15rem] text-base/6 opacity-90 lg:mt-12 lg:max-w-none lg:text-xl\">{subtitle}</p>\n            <div className=\"mt-6 flex flex-col items-center gap-7 lg:mt-8 lg:flex-row lg:justify-center lg:gap-7\">\n              <PlaidButton href={primary.href} variant=\"sky\" className=\"w-[12.25rem] lg:w-auto\">\n                {primary.label}\n              </PlaidButton>\n              <PlaidButton href={secondary.href} className=\"w-[12.25rem] lg:w-auto\">\n                {secondary.label}\n              </PlaidButton>\n            </div>\n          </div>\n\n          <div className=\"mx-auto mt-9 w-[calc(100%-4rem)] max-w-[55.625rem] rounded-t-[1rem] bg-primary text-left font-mono text-primary-foreground/85 dark:bg-background dark:text-foreground/85 lg:mt-10 lg:w-[calc(100%-6rem)] lg:rounded-t-lg\">\n            <div className=\"border-b border-glow/40 px-4 py-4 text-[0.6875rem] lg:px-11 lg:py-6 lg:text-2xl\">{endpoint}</div>\n            <div className=\"grid grid-cols-[2.25rem_1fr] lg:grid-cols-[6.5rem_1fr]\">\n              <ol aria-hidden className=\"border-r border-glow/40 py-4 pl-4 text-[0.625rem]/[1.875rem] lg:py-6 lg:pl-11 lg:text-2xl/[3.25rem]\">\n                {code.map((_, i) => (\n                  <li key={i}>{i + 1}</li>\n                ))}\n              </ol>\n              <pre className=\"min-w-0 overflow-clip py-5 pr-4 pl-4 text-[0.625rem]/[1.125rem] lg:py-8 lg:pr-14 lg:pl-11 lg:text-[1.6875rem]/[2.52rem]\">\n                {code.map((line, i) => (\n                  <code key={i} className=\"block truncate\">\n                    {line.length === 0 ? \" \" : line.map((s, j) => (\n                      <span key={j} className={tones[s.tone ?? \"plain\"]}>\n                        {s.text}\n                      </span>\n                    ))}\n                  </code>\n                ))}\n              </pre>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "plaid-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the white headline (two short lines)"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": true,
+      "description": "the line under it"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the cyan-to-periwinkle pill"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the near-black rainbow-rimmed pill"
+    },
+    {
+      "name": "endpoint",
+      "type": "string",
+      "required": true,
+      "description": "the endpoint shown in the code window's header"
+    },
+    {
+      "name": "code",
+      "type": "PlaidCodeSegment[][]",
+      "required": true,
+      "description": "the code, one array of segments per line (an empty array is an empty line)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9bd17cd59604527234db70f1e458afadf619110c94de80d0de67be1425d40954"
+}

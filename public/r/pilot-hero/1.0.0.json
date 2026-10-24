@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot hero",
+  "description": "A deep aubergine hero with a faint ledger grid on its right side and a violet glow in the bottom corner: a star rating row, a big semibold two-line headline, a wide product media slot, a butter-yellow pill with a pink mono link, then a mono 'trusted by' label over a row of customer names (some with a pink handwritten 'case study' tag). Left-aligned on phones, centred on desktop.",
+  "category": "hero",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "grid-lines",
+    "glow",
+    "logos",
+    "rating",
+    "pill",
+    "yellow",
+    "fintech"
+  ],
+  "notes": [
+    "the band is the theme's secondary colour (aubergine in pilot-theme) with secondary-foreground text",
+    "the grid lines and glow are CSS backgrounds; the product media is a placeholder until filled"
+  ],
+  "entry": "pilot-hero.tsx",
+  "source": "foundry",
+  "name": "pilot-hero",
+  "files": [
+    {
+      "path": "pilot-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, Star } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PilotButton } from \"@foundry/pilot-button\";\nimport { PilotLines } from \"@foundry/pilot-heading\";\nimport { PilotPlaceholder } from \"@foundry/pilot-placeholder\";\n\nexport interface PilotHeroLogo {\n  /** the customer's name, set as a plain wordmark */\n  name: string;\n  /** a case-study link: makes the name a link and shows the tag under it */\n  href?: string;\n  /** the small handwritten tag under the name, e.g. \"Case study\" */\n  tag?: string;\n  /** the face the name is set in, so the row doesn't look like one company */\n  face?: \"sans\" | \"serif\" | \"mono\";\n}\n\nexport interface PilotHeroProps {\n  /** the review score row above the headline; leave out to hide it */\n  rating?: { score: string; count: string; stars?: number; source: string };\n  /** the headline; \\n sets the desktop line break */\n  title: string;\n  /** an optional paragraph under the headline */\n  lede?: string;\n  /** the yellow pill */\n  cta: { label: string; href: string };\n  /** a pink uppercase mono link beside the pill */\n  link?: { label: string; href: string };\n  /** the product picture (a screenshot composite); a placeholder when empty */\n  media?: ReactNode;\n  /** the mono line over the customer names */\n  logosLabel: string;\n  /** the customer names */\n  logos: PilotHeroLogo[];\n  className?: string;\n}\n\nconst faces = {\n  sans: \"font-display font-semibold tracking-[-0.03em]\",\n  serif: \"font-[family-name:var(--typeface-serif,Georgia)] font-semibold tracking-[-0.02em]\",\n  mono: \"font-mono font-bold tracking-[-0.04em] uppercase text-lg\",\n};\n\n/** Pilot's hero: rating, headline, product, yellow CTA and a customer row on the dark band. */\nexport function PilotHero({ rating, title, lede, cta, link, media, logosLabel, logos, className }: PilotHeroProps) {\n  const stars = rating?.stars ?? 5;\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-secondary text-secondary-foreground\", className)}>\n      {/* the ledger grid on the right and the violet glow bottom-right */}\n      <div\n        aria-hidden\n        className=\"absolute inset-y-0 right-0 -z-10 hidden w-[42%] bg-[linear-gradient(to_right,color-mix(in_oklab,var(--secondary-foreground)_9%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--secondary-foreground)_9%,transparent)_1px,transparent_1px)] bg-[size:5.75rem_3.125rem] [mask-image:linear-gradient(to_bottom,black_55%,transparent_82%)] lg:block\"\n      />\n      <div\n        aria-hidden\n        className=\"absolute inset-0 -z-20 bg-[radial-gradient(70%_60%_at_100%_100%,color-mix(in_oklab,var(--primary)_55%,transparent),transparent)]\"\n      />\n\n      <div className=\"mx-auto max-w-page px-gutter pt-12 pb-14 lg:pt-20 lg:pb-12\">\n        <div className=\"lg:text-center\">\n          {rating && (\n            <p className=\"mb-5 flex items-center gap-3 text-base font-medium lg:justify-center lg:text-lg\">\n              <span className=\"flex size-6 items-center justify-center rounded-full bg-glow text-xs font-bold text-secondary\">{rating.source}</span>\n              <span className=\"flex gap-1\" role=\"img\" aria-label={`${rating.score} / 5`}>\n                {Array.from({ length: stars }, (_, i) => (\n                  <Star key={i} aria-hidden className=\"size-4 fill-highlight text-highlight\" strokeWidth={1.5} />\n                ))}\n              </span>\n              <span>\n                {rating.score} {rating.count}\n              </span>\n            </p>\n          )}\n          <h1 className=\"font-display text-[2.25rem] leading-[1.05] font-bold tracking-[-0.02em] lg:text-[3.5rem] lg:leading-[1.12] lg:tracking-[-0.01em]\">\n            <PilotLines text={title} />\n          </h1>\n          {lede && <p className=\"mt-5 max-w-[42rem] text-base leading-[1.6] text-secondary-foreground/90 lg:mx-auto lg:text-xl lg:leading-normal\">{lede}</p>}\n        </div>\n\n        <div className=\"mx-auto mt-10 max-w-[50rem] lg:mt-12\">\n          {media ?? <PilotPlaceholder tone=\"on-dark\" className=\"aspect-[342/324] w-full rounded-2xl lg:aspect-[800/389]\" />}\n        </div>\n\n        <div className=\"mt-10 flex flex-col items-start gap-6 lg:mt-12 lg:flex-row lg:items-center lg:justify-center lg:gap-8\">\n          <PilotButton href={cta.href} variant=\"sun\" size=\"lg\">\n            {cta.label}\n          </PilotButton>\n          {link && (\n            <a\n              href={link.href}\n              className=\"inline-flex items-center gap-1 border-b border-glow pb-0.5 font-mono text-base text-glow uppercase transition-opacity duration-150 hover:opacity-75 motion-reduce:transition-none\"\n            >\n              {link.label}\n              <ArrowRight aria-hidden className=\"size-4\" strokeWidth={2} />\n            </a>\n          )}\n        </div>\n\n        <div className=\"mt-16 lg:mt-24\">\n          <p className=\"text-center font-mono text-xs leading-[1.5] tracking-[0.06em] text-secondary-foreground/80 uppercase lg:text-left\">\n            {logosLabel}\n          </p>\n          <ul className=\"mt-6 flex flex-wrap items-start justify-center gap-x-9 gap-y-5 lg:mt-7 lg:flex-nowrap lg:justify-between\">\n            {logos.map((l) => {\n              const name = <span className={cn(\"block text-[1.375rem] leading-none whitespace-nowrap\", faces[l.face ?? \"sans\"])}>{l.name}</span>;\n              const tag = l.tag && (\n                <span className=\"mt-0.5 block pl-1 font-[family-name:var(--typeface-script,cursive)] text-sm leading-none text-glow opacity-70 transition-opacity duration-150 group-hover:opacity-100 motion-reduce:transition-none\">\n                  {l.tag}\n                </span>\n              );\n              return (\n                <li key={l.name}>\n                  {l.href ? (\n                    <a href={l.href} className=\"group block\">\n                      {name}\n                      {tag}\n                    </a>\n                  ) : (\n                    <>\n                      {name}\n                      {tag}\n                    </>\n                  )}\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "pilot-button",
+    "pilot-heading",
+    "pilot-placeholder"
+  ],
+  "props": [
+    {
+      "name": "rating",
+      "type": "{ score: string; count: string; stars?: number; source: string; }",
+      "required": false,
+      "description": "the review score row above the headline; leave out to hide it"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline; \\n sets the desktop line break"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "an optional paragraph under the headline"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the yellow pill"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "a pink uppercase mono link beside the pill"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product picture (a screenshot composite); a placeholder when empty"
+    },
+    {
+      "name": "logosLabel",
+      "type": "string",
+      "required": true,
+      "description": "the mono line over the customer names"
+    },
+    {
+      "name": "logos",
+      "type": "PilotHeroLogo[]",
+      "required": true,
+      "description": "the customer names"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e8ef904e4925b0b1f0ee77c5a8c1911bcc87eadb31927c12adb09ec201b97805"
+}

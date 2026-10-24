@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Slash section heading",
+  "description": "A large high-contrast serif heading (88, 64 or 52px on desktop, 36px on phones) with one run set in italic, tight lines, and a soft grey sub-line under it; centred or left-aligned.",
+  "category": "text-effect",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "serif",
+    "italic",
+    "editorial",
+    "luxury",
+    "minimal"
+  ],
+  "notes": [
+    "needs a display serif with a real italic (font-display)"
+  ],
+  "entry": "slash-heading.tsx",
+  "source": "foundry",
+  "name": "slash-heading",
+  "files": [
+    {
+      "path": "slash-heading.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\n/** A run of heading text: plain, or set in the serif's italic. */\nexport type SlashHeadingPart = string | { italic: string };\n\nconst sizes = {\n  /** 88px desktop headline (36px on phones) */\n  xl: \"text-[2.25rem] leading-[1] lg:text-[5.5rem] lg:leading-[1.06]\",\n  /** 64px desktop headline */\n  lg: \"text-[2.25rem] leading-[1] lg:text-[4rem] lg:leading-[1.03]\",\n  /** 52px desktop headline */\n  md: \"text-[2.25rem] leading-[1.125] lg:text-[3.25rem] lg:leading-[1.125]\",\n} as const;\n\nexport interface SlashHeadingProps {\n  /** the heading, as runs; `{ italic: \"strong\" }` sets a run in italic */\n  parts: SlashHeadingPart[];\n  /** the grey line under it */\n  sub?: string;\n  /** size step */\n  size?: keyof typeof sizes;\n  /** centred (product sections) or left (customers, pricing, FAQ) */\n  align?: \"center\" | \"left\";\n  /** heading level */\n  as?: \"h1\" | \"h2\" | \"h3\";\n  /** extra classes on the heading itself (e.g. a max width that sets the line break) */\n  headingClassName?: string;\n  className?: string;\n}\n\n/** Renders the runs of a heading, italic where asked. */\nexport function SlashHeadingText({ parts }: { parts: SlashHeadingPart[] }) {\n  return (\n    <>\n      {parts.map((part, i) =>\n        typeof part === \"string\" ? <span key={i}>{part}</span> : <em key={i} className=\"italic\">{part.italic}</em>,\n      )}\n    </>\n  );\n}\n\n/** A display-serif section heading with an optional italic run and a grey sub-line. */\nexport function SlashHeading({ parts, sub, size = \"lg\", align = \"center\", as: Tag = \"h2\", headingClassName, className }: SlashHeadingProps) {\n  return (\n    <div className={cn(align === \"center\" ? \"mx-auto text-center\" : \"text-left\", className)}>\n      <Tag\n        className={cn(\n          sizes[size],\n          \"font-display font-normal tracking-[-0.02em] text-foreground\",\n          align === \"center\" && \"mx-auto\",\n          headingClassName,\n        )}\n      >\n        <SlashHeadingText parts={parts} />\n      </Tag>\n      {sub && (\n        <p\n          className={cn(\n            \"mt-4 text-base leading-[1.375] tracking-[-0.02em] text-pretty text-foreground/70 lg:mt-6 lg:text-xl lg:leading-[1.375]\",\n            align === \"center\" && \"mx-auto max-w-[35rem]\",\n            align === \"left\" && \"max-w-[40rem]\",\n          )}\n        >\n          {sub}\n        </p>\n      )}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "parts",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs; `{ italic: \"strong\" }` sets a run in italic"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "size step"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "centred (product sections) or left (customers, pricing, FAQ)"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "heading level"
+    },
+    {
+      "name": "headingClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes on the heading itself (e.g. a max width that sets the line break)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ac50f36991acd33efa5ba3c0caca3e353de8c8d2946ab5a64410cbd2af9e100d"
+}
