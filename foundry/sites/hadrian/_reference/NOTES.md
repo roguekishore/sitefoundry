@@ -92,3 +92,18 @@ by scroll velocity). Built as a plain CSS loop.
   static HTML shows the sample times.
 - **Gutters**: `--page-gutter` 1rem on phones, 3.75rem from 1024px (theme media query); the
   hero frame uses its own 1rem / 1.5rem as the original does.
+
+## Comparison round 1
+
+Page height 3462 vs 3459 (1440), 3393 vs 3417 (390). Sections line up within a few px apart
+from those below.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark 147px wide vs 130 | 194 vs 175, a touch heavy | hides at 814/868px vs 396/423 (threshold 0.47 window missed the first half-screen sample) | yes: smaller wordmark, semibold, hides past 0.4 window |
+| hero | – | Hanken's word spaces wider than Söhne's; subtitle wrapped to 2 lines (copy longer) | words start fading at 814/868 vs 396/423; subtitle (desktop) half-gone at 420 vs gone | yes: −0.035em tracking, −0.06em word spacing; shorter subtitle; fade from 25svh, subtitle 10–40svh |
+| hero | pinned 5 half-screens vs 7–8 | same | sticky ends with `main`, the original's fixed layer lasts to the footer; looks the same (all later sections are opaque) | no (no visible difference) |
+| platform | 815 vs 805 tall | 1028 vs 1028 | reveal 0→1, 32px, 394–814 | – |
+| model | 844 vs 839 | 661 vs 692: card copy one line shorter each | – | yes: card copy lengthened to the original's 3/3/4 lines |
+| careers | 485 vs 543: 48px padding vs 64; heading is medium (500) on phones; body narrower (5 lines); button 40px tall; marquee caps ~10% narrower than Breit | 597 vs 591 | marquee loop ✓ | yes: py-16, medium heading on phones, narrower body, taller button, marquee 15px / 20px |
+| footer | 405 vs 386; mono links are 16px on phones; wordmark too big/heavy | 277 vs 248: 13px too low, rows 13px too far apart | hover gold ✓ | yes: padding and gaps, 16px links, wordmark 2.25rem semibold |

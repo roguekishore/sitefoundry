@@ -39,7 +39,7 @@ export function HadrianHero({ title, text, actions = [], media, pinned = true, c
       )}
     >
       <div className="mx-auto w-full max-w-page px-gutter lg:grid lg:grid-cols-12 lg:gap-x-6">
-        <h1 className="font-sans text-[1.875rem] leading-none font-normal tracking-[-0.03em] lg:col-span-7 lg:text-[4.5rem]">
+        <h1 className="font-sans text-[1.875rem] leading-none font-normal tracking-[-0.035em] [word-spacing:-0.06em] lg:col-span-7 lg:text-[4.5rem]">
           {title.map((line) => (
             <span key={line} className="block">
               {line.split(" ").map((word, w) => {

@@ -74,7 +74,7 @@ export function HadrianHeader({
   menuLabel,
   closeLabel,
   links,
-  hideAfter = 0.47,
+  hideAfter = 0.4,
   className,
 }: HadrianHeaderProps) {
   const [hidden, setHidden] = useState(false);
@@ -102,7 +102,7 @@ export function HadrianHeader({
       )}
     >
       <div className="mx-auto grid h-[4.75rem] max-w-page grid-cols-[1fr_auto] items-center px-gutter md:grid-cols-[1fr_auto_1fr] lg:h-[6.25rem]">
-        <HadrianWordmark name={brand} href={homeHref} className="text-[1.875rem] lg:text-[2.5rem]" />
+        <HadrianWordmark name={brand} href={homeHref} className="text-[1.625rem] lg:text-[2.25rem]" />
         {clocks.length > 0 && (
           <p className="hidden h-[1.625rem] items-center divide-x divide-foreground border border-foreground font-mono text-xs leading-[1.5] whitespace-nowrap uppercase md:flex [&>span]:flex [&>span]:h-full [&>span]:items-center">
             {clocks.map((c) => (

@@ -32,7 +32,7 @@ export function HadrianPlatform({ id, eyebrow, text, media, className }: Hadrian
             <div className="border-b border-primary px-5 pt-7 pb-6 lg:border-r lg:border-b-0 lg:p-8 lg:pt-10">
               <HadrianEyebrow label={eyebrow} className="lg:max-w-[16rem]" />
             </div>
-            <p className="px-5 pt-7 pb-6 text-lg leading-[1.2] tracking-[-0.02em] lg:col-span-3 lg:px-8 lg:pt-8 lg:pb-9 lg:text-[1.875rem] lg:leading-[1.07]">
+            <p className="px-5 pt-7 pb-6 text-lg leading-[1.2] tracking-[-0.02em] lg:col-span-3 lg:px-8 lg:pt-8 lg:pb-9 lg:text-[1.875rem] lg:leading-[1.07] lg:[word-spacing:-0.04em]">
               {text}
             </p>
           </div>
