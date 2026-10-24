@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop athletes",
+  "description": "A big display heading and paragraph over a two-row wall of small landscape photo cards with 11px corners, each carrying a person's name in bold and their role in white with a tiny round plus. On phones the two rows scroll sideways together, snapping column by column with the next column peeking; on desktop they settle into a four-by-two grid. Photos zoom in a touch on hover.",
+  "category": "testimonials",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "people",
+    "ambassadors",
+    "cards",
+    "grid",
+    "scroll-snap",
+    "image",
+    "light",
+    "rounded",
+    "hover"
+  ],
+  "notes": [
+    "names sit on the photos in the background colour, over a shade placeholder that darkens with the theme's foreground"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-athletes.tsx",
+  "source": "foundry",
+  "name": "whoop-athletes",
+  "files": [
+    {
+      "path": "whoop-athletes.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopSectionHeading } from \"@foundry/whoop-section-heading\";\nimport { WhoopSnapTrack } from \"@foundry/whoop-snap-track\";\n\nexport interface WhoopAthlete {\n  /** the person's name */\n  name: string;\n  /** what they're known for */\n  role: string;\n  /** where the card links */\n  href: string;\n  /** their photo, filling the card (object-cover); a shade placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface WhoopAthletesProps {\n  /** the big heading */\n  heading: string;\n  /** the paragraph beside or under it */\n  body?: string;\n  /** the people, filled column by column in pairs (eight make a 4 × 2 grid on desktop) */\n  people: WhoopAthlete[];\n  /** screen-reader name of the track */\n  label: string;\n  className?: string;\n}\n\nfunction AthleteCard({ person }: { person: WhoopAthlete }) {\n  return (\n    <a href={person.href} className=\"group relative block aspect-[229/150] overflow-clip rounded-[0.6875rem]\">\n      <div className=\"absolute inset-0 transition-transform duration-250 ease-out group-hover:scale-[1.015] motion-reduce:transition-none *:size-full *:object-cover\">\n        {person.media ?? <WhoopPlaceholder tone=\"shade\" />}\n      </div>\n      <div className=\"relative flex h-full flex-col justify-center pr-10 pl-2.5 text-background\">\n        <p className=\"text-2xl leading-none font-semibold tracking-[-0.01em]\">{person.name}</p>\n        <p className=\"mt-1 text-sm leading-[1.6] text-background/85\">{person.role}</p>\n      </div>\n      <span\n        aria-hidden\n        className=\"absolute top-9 right-2.5 grid size-5 place-items-center rounded-full bg-background text-foreground transition-transform duration-250 ease-out group-hover:scale-110 motion-reduce:transition-none\"\n      >\n        <Plus className=\"size-3\" strokeWidth={2.5} />\n      </span>\n    </a>\n  );\n}\n\n/** Heading, then a two-row wall of people cards. */\nexport function WhoopAthletes({ heading, body, people, label, className }: WhoopAthletesProps) {\n  // pair the people into columns of two: the rows scroll together on phones\n  const columns: WhoopAthlete[][] = [];\n  for (let i = 0; i < people.length; i += 2) columns.push(people.slice(i, i + 2));\n\n  return (\n    <section className={cn(\"bg-background py-section text-foreground lg:py-24\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <WhoopSectionHeading heading={heading} body={body} />\n      </div>\n      <WhoopSnapTrack\n        className=\"mt-12 lg:mt-16\"\n        slides={columns.map((col, i) => (\n          <div key={i} className=\"grid gap-4 lg:gap-6\">\n            {col.map((p) => (\n              <AthleteCard key={p.name} person={p} />\n            ))}\n          </div>\n        ))}\n        slideClassName=\"w-[14.3rem] lg:w-auto\"\n        trackClassName=\"gap-4 lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible\"\n        label={label}\n        dotLabel=\"\"\n        showDots={false}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-placeholder",
+    "whoop-section-heading",
+    "whoop-snap-track"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph beside or under it"
+    },
+    {
+      "name": "people",
+      "type": "WhoopAthlete[]",
+      "required": true,
+      "description": "the people, filled column by column in pairs (eight make a 4 × 2 grid on desktop)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the track"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a77e1816371ec486ebc3c3f7e489dc20bc356e11938dfb428b5c3024178437e9"
+}

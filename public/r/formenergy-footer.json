@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Form Energy footer",
+  "description": "A black footer in four columns: a large white wordmark over a two-line tagline, a spaced mono MENU heading over medium white links, a CONTACT column with a light address and two bold emails, and small square social buttons outlined in orange. A dark hairline divides it from a mono legal row split by thin orange rules, with the copyright at the right. Phones centre and stack everything. Links and icons turn orange on hover.",
+  "category": "footer",
+  "site": "formenergy",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "black",
+    "columns",
+    "mono",
+    "social",
+    "orange",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "a .dark scope: black under any theme",
+    "social icons come in as nodes (e.g. lucide icons); give each a label for screen readers"
+  ],
+  "entry": "formenergy-footer.tsx",
+  "source": "foundry",
+  "name": "formenergy-footer",
+  "files": [
+    {
+      "path": "formenergy-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FormenergyWordmark } from \"@foundry/formenergy-wordmark\";\n\ninterface FooterLink {\n  /** link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface FormenergyFooterProps {\n  /** wordmark: the larger first word */\n  brand: string;\n  /** wordmark: the smaller tracked word under it */\n  brandSuffix?: string;\n  /** the tagline under the wordmark, one entry per line on desktop */\n  taglineLines: string[];\n  /** heading over the menu links (shown uppercase) */\n  menuTitle: string;\n  /** the menu links */\n  menu: FooterLink[];\n  /** heading over the contact column (shown uppercase) */\n  contactTitle: string;\n  /** postal address, one entry per line */\n  addressLines: string[];\n  /** email links under the address */\n  emails: FooterLink[];\n  /** square social buttons */\n  social: { label: string; href: string; icon: ReactNode }[];\n  /** legal links in the bottom row, split by thin orange rules */\n  legal: FooterLink[];\n  /** copyright line at the bottom right */\n  copyright: string;\n  className?: string;\n}\n\nconst hover = \"transition-colors duration-300 hover:text-primary motion-reduce:transition-none\";\n\n/** Black four-column footer with mono headings, orange-outlined social squares and a legal row. */\nexport function FormenergyFooter({\n  brand,\n  brandSuffix,\n  taglineLines,\n  menuTitle,\n  menu,\n  contactTitle,\n  addressLines,\n  emails,\n  social,\n  legal,\n  copyright,\n  className,\n}: FormenergyFooterProps) {\n  const heading = \"font-mono text-[0.6rem] leading-none font-bold tracking-[0.2em] uppercase lg:text-sm lg:tracking-[0.143em]\";\n  return (\n    <footer className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[3.75rem] pb-[3.3rem] lg:pt-[5.75rem] lg:pb-[3.4rem]\">\n        <div className=\"grid justify-items-center gap-y-[2.4rem] text-center lg:grid-cols-[383fr_281fr_428fr_164fr] lg:justify-items-start lg:px-2.5 lg:text-left\">\n          <div className=\"flex flex-col items-center lg:items-start\">\n            <FormenergyWordmark name={brand} suffix={brandSuffix} className=\"text-[2.6rem] lg:text-[3.1rem]\" />\n            <p className=\"mt-[2.4rem] text-lg leading-[1.4] font-medium lg:mt-[3.6rem] lg:text-[1.75rem] lg:leading-[1.32]\">\n              {taglineLines.map((line, i) => (\n                <span key={i} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </p>\n          </div>\n\n          <nav aria-label={menuTitle}>\n            <p className={heading}>{menuTitle}</p>\n            <ul className=\"mt-[2.4rem] flex flex-col gap-[1.2rem] leading-none lg:mt-[2.6rem] lg:gap-[1.28rem]\">\n              {menu.map((link) => (\n                <li key={link.label}>\n                  <a href={link.href} className={cn(\"text-base leading-none font-medium lg:text-xl\", hover)}>\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n\n          <div>\n            <p className={heading}>{contactTitle}</p>\n            <address className=\"mt-[2.4rem] text-base leading-[1.4] font-light not-italic lg:mt-[2.6rem] lg:text-xl\">\n              {addressLines.map((line, i) => (\n                <span key={i} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </address>\n            <ul className=\"mt-4 flex flex-col gap-[1.3rem] leading-none lg:mt-[0.9rem] lg:gap-[1.45rem]\">\n              {emails.map((email) => (\n                <li key={email.label}>\n                  <a href={email.href} className={cn(\"text-base leading-none font-medium lg:text-xl\", hover)}>\n                    {email.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n\n          <ul className=\"flex max-w-[8rem] flex-wrap content-start justify-start gap-2.5 lg:max-w-[10.25rem] lg:justify-self-end\">\n            {social.map((item) => (\n              <li key={item.label}>\n                <a\n                  href={item.href}\n                  aria-label={item.label}\n                  className=\"flex size-9 items-center justify-center rounded-[5px] border border-primary transition-colors duration-300 hover:text-primary motion-reduce:transition-none lg:size-12 [&_svg]:size-4 lg:[&_svg]:size-5\"\n                >\n                  {item.icon}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"mt-[3.4rem] border-t border-border pt-[2.6rem] lg:mt-[6.5rem] lg:flex lg:items-center lg:justify-between lg:pt-[2.6rem]\">\n          <ul className=\"flex flex-col items-center lg:flex-row lg:gap-0\">\n            {legal.map((link, i) => (\n              <li key={link.label} className={cn(\"lg:px-[1.1rem] lg:first:pl-2\", i > 0 && \"lg:border-l lg:border-primary\")}>\n                <a href={link.href} className={cn(\"font-mono text-[0.9rem] leading-[1.9rem] font-medium lg:text-sm\", hover)}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <p className=\"mt-[2.9rem] text-center font-mono text-[0.6rem] leading-none font-medium lg:mt-0 lg:text-xs\">{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "formenergy-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark: the larger first word"
+    },
+    {
+      "name": "brandSuffix",
+      "type": "string",
+      "required": false,
+      "description": "wordmark: the smaller tracked word under it"
+    },
+    {
+      "name": "taglineLines",
+      "type": "string[]",
+      "required": true,
+      "description": "the tagline under the wordmark, one entry per line on desktop"
+    },
+    {
+      "name": "menuTitle",
+      "type": "string",
+      "required": true,
+      "description": "heading over the menu links (shown uppercase)"
+    },
+    {
+      "name": "menu",
+      "type": "FooterLink[]",
+      "required": true,
+      "description": "the menu links"
+    },
+    {
+      "name": "contactTitle",
+      "type": "string",
+      "required": true,
+      "description": "heading over the contact column (shown uppercase)"
+    },
+    {
+      "name": "addressLines",
+      "type": "string[]",
+      "required": true,
+      "description": "postal address, one entry per line"
+    },
+    {
+      "name": "emails",
+      "type": "FooterLink[]",
+      "required": true,
+      "description": "email links under the address"
+    },
+    {
+      "name": "social",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "square social buttons"
+    },
+    {
+      "name": "legal",
+      "type": "FooterLink[]",
+      "required": true,
+      "description": "legal links in the bottom row, split by thin orange rules"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "copyright line at the bottom right"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9d7da15ba9fd1b383b2159b01cb2a29059fc15ad5577ec58aa3784b78251b841"
+}

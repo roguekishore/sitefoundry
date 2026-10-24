@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy floating header",
+  "description": "A barless floating header: on desktop a centred group of the brand mark, a 40px navy pill of uppercase mono links and a white Careers pill beside it; on phones the mark left and a white 34px menu square right that opens a navy panel of links. The mark fades out over the first 300px of scrolling; links dim to 60% on hover (0.2s ease-out).",
+  "category": "header",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "floating",
+    "pill",
+    "navy",
+    "mono",
+    "uppercase",
+    "scroll",
+    "fade",
+    "minimal"
+  ],
+  "notes": [
+    "position=\"fixed\" (default) floats over the page with no background of its own; use \"static\" in previews",
+    "the mark is light (secondary-foreground) to sit on a dark hero; it fades away with a CSS scroll timeline",
+    "the phone menu is a <details> element: no JavaScript"
+  ],
+  "entry": "helionenergy-header.tsx",
+  "source": "foundry",
+  "name": "helionenergy-header",
+  "files": [
+    {
+      "path": "helionenergy-header.css",
+      "content": "/* The brand mark fades away over the first 300px the page scrolls (it only reads over the\n   hero), and stays gone. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .helionenergy-header-mark {\n      animation: helionenergy-header-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 300px;\n    }\n  }\n}\n\n@keyframes helionenergy-header-fade {\n  to {\n    opacity: 0;\n    visibility: hidden;\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./helionenergy-header.css\";\n\nexport interface HelionenergyHeaderLink {\n  /** the link text (set in uppercase mono) */\n  label: ReactNode;\n  href: string;\n}\n\nexport interface HelionenergyHeaderProps {\n  /** the brand mark (an icon), shown left of the nav; it fades out once the page scrolls */\n  mark: ReactNode;\n  /** the brand's name, for screen readers */\n  brandLabel: string;\n  /** where the mark links */\n  brandHref?: string;\n  /** the links in the navy pill */\n  links: HelionenergyHeaderLink[];\n  /** the white pill after them (e.g. careers) */\n  cta: HelionenergyHeaderLink;\n  /** the phone menu button's label, for screen readers */\n  menuLabel: string;\n  /** fade the mark out over the first 300px of scrolling */\n  fadeMark?: boolean;\n  /** \"fixed\" floats over the page (the original); \"static\" sits in the flow (for previews) */\n  position?: \"fixed\" | \"static\";\n  className?: string;\n}\n\n/**\n * A floating header with no bar: on desktop a centred group of the brand mark, a navy pill of\n * uppercase mono links and a white pill for the main call to action; on phones the mark on the\n * left and a white menu square on the right, opening a navy panel. The mark fades out as the\n * page scrolls; links dim to 60% on hover (0.2s ease-out).\n */\nexport function HelionenergyHeader({\n  mark,\n  brandLabel,\n  brandHref = \"/\",\n  links,\n  cta,\n  menuLabel,\n  fadeMark = true,\n  position = \"fixed\",\n  className,\n}: HelionenergyHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"inset-x-0 top-0 z-50 h-14 px-gutter font-mono text-sm/none tracking-[-0.01em] uppercase lg:h-[3.125rem]\",\n        position === \"fixed\" ? \"fixed\" : \"relative\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto flex h-full max-w-page items-center justify-between lg:items-start lg:justify-center lg:pt-2.5\">\n        <a\n          href={brandHref}\n          aria-label={brandLabel}\n          className={cn(\n            \"flex size-8 items-center justify-center text-secondary-foreground lg:mr-[1.3rem] lg:size-10 [&>svg]:size-full lg:[&>svg]:size-[1.875rem]\",\n            fadeMark && \"helionenergy-header-mark\",\n          )}\n        >\n          {mark}\n        </a>\n\n        <nav className=\"flex gap-1 max-lg:hidden\">\n          <ul className=\"flex h-10 items-center rounded-sm bg-secondary px-1 text-secondary-foreground\">\n            {links.map((link, i) => (\n              <li key={i}>\n                <a\n                  href={link.href}\n                  className=\"flex h-10 items-center px-5 transition-opacity duration-200 ease-out hover:opacity-60 motion-reduce:transition-none\"\n                >\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <a\n            href={cta.href}\n            className=\"flex h-10 items-center rounded-sm bg-card px-4 text-card-foreground transition-opacity duration-200 ease-out hover:opacity-80 motion-reduce:transition-none\"\n          >\n            {cta.label}\n          </a>\n        </nav>\n\n        <details className=\"group/menu lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"flex size-[2.125rem] cursor-pointer list-none items-center justify-center rounded-sm bg-card text-card-foreground [&::-webkit-details-marker]:hidden\"\n          >\n            <Menu aria-hidden strokeWidth={1.75} className=\"size-4\" />\n          </summary>\n          <div className=\"absolute inset-x-gutter top-full hidden rounded-sm bg-secondary p-2 text-secondary-foreground group-open/menu:block\">\n            <ul className=\"flex flex-col\">\n              {[...links, cta].map((link, i) => (\n                <li key={i}>\n                  <a href={link.href} className=\"flex px-3 py-3.5 transition-opacity duration-200 ease-out hover:opacity-60\">\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the brand mark (an icon), shown left of the nav; it fades out once the page scrolls"
+    },
+    {
+      "name": "brandLabel",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name, for screen readers"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the mark links"
+    },
+    {
+      "name": "links",
+      "type": "HelionenergyHeaderLink[]",
+      "required": true,
+      "description": "the links in the navy pill"
+    },
+    {
+      "name": "cta",
+      "type": "HelionenergyHeaderLink",
+      "required": true,
+      "description": "the white pill after them (e.g. careers)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the phone menu button's label, for screen readers"
+    },
+    {
+      "name": "fadeMark",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "fade the mark out over the first 300px of scrolling"
+    },
+    {
+      "name": "position",
+      "type": "enum",
+      "required": false,
+      "default": "fixed",
+      "description": "\"fixed\" floats over the page (the original); \"static\" sits in the flow (for previews)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "210e4ad3536231cf15d6787e5d41e317e0d4b3e886cbad2bad5c159b77fbe644"
+}

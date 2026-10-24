@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic services panel",
+  "description": "A tall black panel with 24px corners: a two-line headline, a bold white lead and a grey paragraph on the left, a device render bleeding off the top-right corner, then a centred headline over glassy white/10 cards (two wide with gold arrow links, three narrow) that brighten on hover and rise into view as you scroll. Gold contour rings drift behind. Centred and stacked on phones.",
+  "category": "features",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "panel",
+    "cards",
+    "glass",
+    "reveal",
+    "scroll",
+    "hover",
+    "contours",
+    "gold"
+  ],
+  "notes": [
+    "the panel always reads the theme's .dark colours (black, white ink, highlight = gold)",
+    "cards fade and rise 24px on entering view (CSS scroll-driven; static where unsupported or with reduced motion)",
+    "the render is a media slot (736×524); empty, a dim rounded placeholder",
+    "on a page whose own background is black (dark mode), the panel has no visible edge"
+  ],
+  "entry": "lithic-services.tsx",
+  "source": "foundry",
+  "name": "lithic-services",
+  "files": [
+    {
+      "path": "lithic-services.css",
+      "content": "/* Each card fades in and rises 24px as it enters the window, finishing 200px after its top\n   edge appears; cards later in a row start a little later. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .lithic-services-card {\n      animation: lithic-services-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--lithic-services-step, 0) * 40px) entry calc(200px + var(--lithic-services-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes lithic-services-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "lithic-services.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicArrowLink } from \"@foundry/lithic-arrow-link\";\nimport { LithicContours } from \"@foundry/lithic-contours\";\nimport { LithicPlaceholder } from \"@foundry/lithic-placeholder\";\nimport \"./lithic-services.css\";\n\nexport interface LithicService {\n  /** a small icon before the title (e.g. a lucide icon); drawn in the gold highlight */\n  icon?: ReactNode;\n  /** the card's title */\n  title: string;\n  /** a bold white opening sentence */\n  lead?: string;\n  /** the grey body text after it */\n  text: string;\n  /** an arrow link at the bottom (wide cards have one) */\n  link?: { label: string; href: string };\n}\n\nexport interface LithicServicesProps {\n  /** the headline at the top left */\n  title: string;\n  /** the bold white lead under it */\n  lead: string;\n  /** the grey paragraph */\n  text: string;\n  /** the headline above the cards */\n  cardsTitle: string;\n  /** the first row: two wide cards */\n  primary: LithicService[];\n  /** the second row: three narrow cards */\n  secondary: LithicService[];\n  /** the device render at the top right. A placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\nfunction Card({ service, step }: { service: LithicService; step: number }) {\n  return (\n    <article\n      className={cn(\n        \"lithic-services-card rounded-lg border border-border bg-foreground/10 p-6 lg:p-10\",\n        service.link && \"transition-colors duration-200 ease-out hover:bg-foreground/20 motion-reduce:transition-none\",\n      )}\n      style={{ \"--lithic-services-step\": step } as CSSProperties}\n    >\n      <h3 className=\"flex items-center gap-3 font-display text-base/[1.2] font-semibold tracking-[-0.01em] lg:text-xl/[1.2]\">\n        {service.icon && <span className=\"shrink-0 text-highlight [&>svg]:size-5\">{service.icon}</span>}\n        {service.title}\n      </h3>\n      <p className=\"mt-6 text-sm/[1.6] tracking-[0.01em] text-muted-foreground\">\n        {service.lead && <strong className=\"font-semibold text-foreground\">{service.lead} </strong>}\n        {service.text}\n      </p>\n      {service.link && (\n        <LithicArrowLink href={service.link.href} tone=\"highlight\" className=\"mt-8 text-sm\">\n          {service.link.label}\n        </LithicArrowLink>\n      )}\n    </article>\n  );\n}\n\n/** The managed-services panel: intro with a device render, then a grid of glassy cards. */\nexport function LithicServices({ title, lead, text, cardsTitle, primary, secondary, media, className }: LithicServicesProps) {\n  return (\n    <section className={cn(\"px-gutter lg:px-6\", className)}>\n      <div className=\"dark relative isolate overflow-clip rounded-lg bg-background pt-14 pb-14 text-foreground lg:pt-[7.4rem] lg:pb-[7.5rem]\">\n        <LithicContours at=\"45% 30%\" gap={40} className=\"-z-10 text-highlight/25\" />\n        <div className=\"mx-auto max-w-page px-8 lg:px-gutter\">\n          <div className=\"grid lg:grid-cols-2\">\n            <div className=\"text-center lg:text-left\">\n              <h2 className=\"mx-auto max-w-[16rem] font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:mx-0 lg:max-w-[25rem] lg:text-[2rem]/[1.2]\">{title}</h2>\n              <p className=\"mx-auto mt-5 max-w-[15rem] text-sm/[1.6] font-semibold tracking-[0.01em] lg:mx-0 lg:mt-12 lg:max-w-[26rem] lg:text-base/[1.75]\">{lead}</p>\n              <p className=\"mx-auto mt-4 max-w-[17rem] text-sm/[1.4] tracking-[0.01em] text-muted-foreground lg:mx-0 lg:mt-10 lg:max-w-[30rem] lg:text-sm/[1.6]\">{text}</p>\n            </div>\n          </div>\n          <div className=\"-mr-8 mt-12 ml-auto aspect-[736/524] w-[110%] lg:absolute lg:top-16 lg:right-0 lg:m-0 lg:w-[40%] lg:max-w-[46rem]\">\n            {media ?? <LithicPlaceholder tone=\"dim\" className=\"size-full rounded-l-[2.5rem]\" />}\n          </div>\n          <h2 className=\"mx-auto mt-16 max-w-[16rem] text-center font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:mt-[10.25rem] lg:max-w-[22rem] lg:text-[2rem]/[1.2]\">\n            {cardsTitle}\n          </h2>\n          <div className=\"mt-8 grid gap-4 lg:mt-11 lg:gap-8\">\n            <div className=\"grid gap-4 lg:grid-cols-2 lg:gap-8\">\n              {primary.map((s, i) => (\n                <Card key={s.title} service={s} step={i} />\n              ))}\n            </div>\n            <div className=\"grid gap-4 lg:grid-cols-3 lg:gap-8\">\n              {secondary.map((s, i) => (\n                <Card key={s.title} service={s} step={i} />\n              ))}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-arrow-link",
+    "lithic-contours",
+    "lithic-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline at the top left"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the bold white lead under it"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the grey paragraph"
+    },
+    {
+      "name": "cardsTitle",
+      "type": "string",
+      "required": true,
+      "description": "the headline above the cards"
+    },
+    {
+      "name": "primary",
+      "type": "LithicService[]",
+      "required": true,
+      "description": "the first row: two wide cards"
+    },
+    {
+      "name": "secondary",
+      "type": "LithicService[]",
+      "required": true,
+      "description": "the second row: three narrow cards"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the device render at the top right. A placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b5254553d243fcef8c9794b38f887f541e3c095a9c7381b43f1842cf0d28b9d1"
+}

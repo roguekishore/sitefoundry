@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Saronic fleet cards",
+  "description": "A product line-up on pale paper: a section heading with a lime button at the right, then 8px-radius photo cards with a soft shadow, a dark fade at the foot, the product's name in big light type and a mono turn-arrow link. Two 4:3 cards and a full-width panorama on desktop, one column on phones. Hover deepens the shadow, grows the photo 3% and rolls the link text.",
+  "category": "features",
+  "site": "saronic",
+  "license": "proprietary",
+  "tags": [
+    "products",
+    "cards",
+    "gallery",
+    "light",
+    "photo",
+    "shadow",
+    "hover",
+    "zoom",
+    "roll",
+    "mono"
+  ],
+  "notes": [
+    "cards carry the `dark` class so names stay light over photos in either mode",
+    "mark one vessel `wide` for the full-row panorama; empty media are placeholders",
+    "CSS only; hover motion is off under reduced motion"
+  ],
+  "entry": "saronic-fleet.tsx",
+  "source": "foundry",
+  "name": "saronic-fleet",
+  "files": [
+    {
+      "path": "saronic-fleet.css",
+      "content": "/* Card depth from the dark scope's ink (var(--card) on a `dark` element is the ink colour):\n   a 1px ledge plus a soft 24px shadow, deepening on hover (0.4s). */\n.saronic-fleet-card {\n  box-shadow:\n    0 1px 0 color-mix(in oklab, var(--card) 5%, transparent),\n    0 8px 24px color-mix(in oklab, var(--card) 10%, transparent);\n  transition: box-shadow 0.4s cubic-bezier(0.25, 0.25, 0, 1);\n}\n.saronic-fleet-card:hover {\n  box-shadow:\n    0 2px 0 color-mix(in oklab, var(--card) 8%, transparent),\n    0 14px 36px color-mix(in oklab, var(--card) 20%, transparent);\n}\n\n/* The link text rolls on hover: out upwards (0.3s), back in from below (0.6s from 0.3s). */\n@media (prefers-reduced-motion: no-preference) {\n  .saronic-fleet-card:hover .saronic-fleet-link > span {\n    animation-name: saronic-fleet-out, saronic-fleet-in;\n    animation-duration: 0.3s, 0.6s;\n    animation-delay: 0s, 0.3s;\n    animation-timing-function: cubic-bezier(0.25, 0.25, 0, 1);\n    animation-fill-mode: forwards, forwards;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .saronic-fleet-card { transition: none; }\n}\n\n@keyframes saronic-fleet-out {\n  from { transform: translateY(0); }\n  to { transform: translateY(-140%); }\n}\n\n@keyframes saronic-fleet-in {\n  from { transform: translateY(140%); }\n  to { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "saronic-fleet.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CornerDownRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SaronicPlaceholder } from \"@foundry/saronic-placeholder\";\nimport { SaronicSectionHeading } from \"@foundry/saronic-section-heading\";\nimport \"./saronic-fleet.css\";\n\nexport interface SaronicVessel {\n  /** the vessel's name, set big over the photo */\n  name: ReactNode;\n  /** the small mono link text under the name (\"View details\") */\n  linkLabel: ReactNode;\n  href: string;\n  /** the vessel's photo; empty it is a placeholder */\n  media?: ReactNode;\n  /** spans the full row on tablets and up (a 2.33:1 panorama instead of 4:3) */\n  wide?: boolean;\n}\n\nexport interface SaronicFleetProps {\n  /** the mono caption above the title */\n  eyebrow?: ReactNode;\n  /** the section title */\n  title: ReactNode;\n  /** the large paragraph under the title */\n  lead?: ReactNode;\n  /** a button at the right of the title (under it on phones) */\n  action?: ReactNode;\n  /** the vessel cards, in reading order */\n  vessels: SaronicVessel[];\n  /** the section's anchor id */\n  id?: string;\n  className?: string;\n}\n\n/**\n * The fleet section on pale paper: a section heading with a lime button at the right, then\n * photo cards with a dark fade at the foot, the vessel's name in big light type and a mono\n * \"view details\" link. Two 4:3 cards side by side and a full-width panorama on desktop; one\n * column on phones. Hovering a card deepens its shadow, grows the photo 3% and rolls the link.\n */\nexport function SaronicFleet({ eyebrow, title, lead, action, vessels, id, className }: SaronicFleetProps) {\n  return (\n    <section id={id} className={cn(\"bg-background px-gutter py-section text-foreground lg:py-[calc(var(--section-y)*2)]\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <SaronicSectionHeading eyebrow={eyebrow} title={title} lead={lead} action={action} />\n        <ul className=\"mt-16 grid gap-4 md:grid-cols-2\">\n          {vessels.map((vessel, i) => (\n            <li key={i} className={cn(vessel.wide && \"md:col-span-2\")}>\n              <a\n                href={vessel.href}\n                className={cn(\n                  \"saronic-fleet-card group dark relative flex aspect-[4/3] flex-col justify-end overflow-clip rounded-xl p-6 text-foreground lg:p-10\",\n                  vessel.wide && \"md:aspect-[1280/549]\",\n                )}\n              >\n                <SaronicPlaceholder\n                  media={vessel.media}\n                  className=\"absolute inset-0 transition-transform duration-400 ease-[cubic-bezier(0.25,0.25,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100\"\n                />\n                <span aria-hidden className=\"absolute inset-0 bg-linear-to-b from-transparent from-45% to-card/55\" />\n                <span className=\"relative font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]\">\n                  {vessel.name}\n                </span>\n                <span className=\"relative mt-3 flex items-center gap-2 font-mono text-xs/[1.5] tracking-[0.06em] uppercase\">\n                  <CornerDownRight aria-hidden strokeWidth={1.5} className=\"size-3.5 shrink-0 -translate-y-0.5\" />\n                  <span className=\"saronic-fleet-link inline-flex overflow-clip\">\n                    <span>{vessel.linkLabel}</span>\n                  </span>\n                </span>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "saronic-placeholder",
+    "saronic-section-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the mono caption above the title"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large paragraph under the title"
+    },
+    {
+      "name": "action",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a button at the right of the title (under it on phones)"
+    },
+    {
+      "name": "vessels",
+      "type": "SaronicVessel[]",
+      "required": true,
+      "description": "the vessel cards, in reading order"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "the section's anchor id"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a8f02bf03b552a3617db918b393e29066a184421d59caa736fdfc63c97839bf7"
+}

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash security accordion",
+  "description": "A centred serif heading and grey line over two columns: an art panel with 12px corners on the left and, on the right, a borderless accordion of 20px points with thin chevrons; one point is open at a time and its text slides open while the chevron flips. On phones the open point carries its art inside it.",
+  "category": "features",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "accordion",
+    "security",
+    "dark",
+    "serif",
+    "split",
+    "interactive"
+  ],
+  "notes": [
+    "needs JavaScript for the accordion (hydrate); static HTML shows the first point open",
+    "a little wider than the page column, as the original"
+  ],
+  "hydrate": "visible",
+  "entry": "slash-security.tsx",
+  "source": "foundry",
+  "name": "slash-security",
+  "files": [
+    {
+      "path": "slash-security.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashHeading, type SlashHeadingPart } from \"@foundry/slash-heading\";\nimport { SlashPlaceholder } from \"@foundry/slash-placeholder\";\n\nexport interface SlashSecurityItem {\n  /** the point (\"Strong sign-in\") */\n  title: string;\n  /** the explanation shown when it is open */\n  body: ReactNode;\n  /** its art (desktop: in the panel on the left; phones: inside the open item); a soft wash stands in when empty */\n  media?: ReactNode;\n}\n\nexport interface SlashSecurityProps {\n  /** the heading, as runs */\n  heading: SlashHeadingPart[];\n  /** the grey line under it */\n  sub?: string;\n  /** the points, one open at a time (the first starts open) */\n  items: SlashSecurityItem[];\n  className?: string;\n}\n\nfunction Art({ media, className }: { media?: ReactNode; className?: string }) {\n  return (\n    <div className={cn(\"relative overflow-clip rounded-xl border border-border bg-linear-[201deg] from-card from-14% to-popover\", className)}>\n      {media ?? <SlashPlaceholder tone=\"card\" className=\"absolute inset-0\" />}\n    </div>\n  );\n}\n\n/** A centred serif heading over an art panel (left) and a borderless accordion of security points (right). */\nexport function SlashSecurity({ heading, sub, items, className }: SlashSecurityProps) {\n  const [open, setOpen] = useState(0);\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]\", className)}>\n      <div className=\"mx-auto max-w-[calc(76rem+2*var(--page-gutter))] px-gutter\">\n        <SlashHeading parts={heading} sub={sub} size=\"md\" />\n        <div className=\"mt-12 grid gap-10 lg:mt-[4.5rem] lg:grid-cols-[30rem_1fr] lg:gap-[5.4rem]\">\n          <Art media={items[open]?.media} className=\"hidden aspect-[480/444] lg:block\" />\n          <ul className=\"lg:-mt-3\">\n            {items.map((item, i) => {\n              const isOpen = i === open;\n              return (\n                <li key={item.title}>\n                  <button\n                    type=\"button\"\n                    aria-expanded={isOpen}\n                    onClick={() => setOpen(isOpen ? -1 : i)}\n                    className=\"flex w-full items-center justify-between gap-6 py-4 text-left text-base font-medium tracking-[-0.03em] transition-colors duration-150 hover:text-muted-foreground lg:py-[1.375rem] lg:text-xl\"\n                  >\n                    {item.title}\n                    <ChevronDown\n                      aria-hidden\n                      strokeWidth={1.5}\n                      className={cn(\"size-4 shrink-0 transition-transform duration-200 motion-reduce:transition-none lg:mr-2 lg:size-5\", isOpen && \"rotate-180\")}\n                    />\n                  </button>\n                  <div className={cn(\"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none\", isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}>\n                    <div className=\"min-h-0 overflow-hidden\">\n                      <div className=\"pb-6 text-base leading-[1.4] tracking-[-0.02em] text-foreground/70 lg:max-w-[37rem] lg:pb-7 lg:text-lg lg:leading-[1.5] [&_a]:underline [&_a]:underline-offset-2 [&_a]:transition-colors [&_a:hover]:text-foreground\">\n                        {item.body}\n                      </div>\n                      <Art media={item.media} className=\"mb-6 aspect-[350/324] lg:hidden\" />\n                    </div>\n                  </div>\n                </li>\n              );\n            })}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-heading",
+    "slash-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "items",
+      "type": "SlashSecurityItem[]",
+      "required": true,
+      "description": "the points, one open at a time (the first starts open)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e7f7742619cf25054f9cd030336ee4b660ea0a12e97ce0d29036f71ae3906cc4"
+}

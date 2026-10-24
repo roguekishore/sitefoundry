@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Arc footer",
+  "description": "A white five-column footer: a bold lowercase wordmark, three columns of bold group headings over warm-grey links (a column can stack two groups), and a newsletter column with a hairline email field and a full-width filled button; then a hairline and a 12px legal row with copyright, links and social icons on the right. On phones the link columns pair up two by two. Links darken on hover.",
+  "category": "footer",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "minimal",
+    "newsletter",
+    "columns",
+    "fintech",
+    "hover"
+  ],
+  "notes": [
+    "the newsletter form has no handler: wire its action up yourself"
+  ],
+  "entry": "arc-footer.tsx",
+  "source": "foundry",
+  "name": "arc-footer",
+  "files": [
+    {
+      "path": "arc-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ArcButton } from \"@foundry/arc-button\";\n\nexport interface ArcFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface ArcFooterGroup {\n  /** the bold group heading */\n  title: string;\n  links: ArcFooterLink[];\n}\n\nexport interface ArcFooterProps {\n  /** the wordmark, set bold in the display face */\n  brand: { name: string; href: string };\n  /** link columns; each inner list is one column, and a column can stack several groups */\n  columns: ArcFooterGroup[][];\n  /** the newsletter column */\n  newsletter: { title: string; placeholder: string; button: string; inputLabel: string };\n  /** the copyright line */\n  copyright: string;\n  /** the small legal links in the bottom row */\n  legal: ArcFooterLink[];\n  /** the social icons at the bottom right (an icon and a screen-reader label each) */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  className?: string;\n}\n\n/** Arc's white footer: wordmark, three link columns and a newsletter form, then a hairline and a legal row. */\nexport function ArcFooter({ brand, columns, newsletter, copyright, legal, socials, className }: ArcFooterProps) {\n  const linkClass = \"transition-colors duration-200 ease-[ease] hover:text-foreground motion-reduce:transition-none\";\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[3.25rem] pb-12 lg:pt-[4.5rem] lg:pb-[7.5rem]\">\n        <div className=\"grid grid-cols-2 gap-x-6 gap-y-14 lg:grid-cols-5 lg:gap-x-[3.875rem]\">\n          <a href={brand.href} className=\"col-span-2 font-display text-[2rem]/none font-bold tracking-[-0.05em] lg:col-span-1 lg:text-[2.625rem]\">\n            {brand.name}\n          </a>\n          {columns.map((column, i) => (\n            <div key={i} className={cn(\"space-y-11\", i === columns.length - 1 && columns.length % 2 === 1 && \"col-span-2 lg:col-span-1\")}>\n              {column.map((group) => (\n                <div key={group.title}>\n                  <h3 className=\"text-xs font-bold lg:text-[0.9375rem]\">{group.title}</h3>\n                  <ul className=\"mt-4 space-y-2 text-xs/[1.5] text-muted-foreground lg:mt-6 lg:text-[0.9375rem]/[1.5]\">\n                    {group.links.map((l) => (\n                      <li key={l.label}>\n                        <a href={l.href} className={linkClass}>\n                          {l.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ))}\n            </div>\n          ))}\n          <form className=\"col-span-2 lg:col-span-1\" action=\"#\">\n            <h3 className=\"text-[0.875rem] font-bold lg:text-[0.9375rem]\">{newsletter.title}</h3>\n            <label className=\"mt-4 block\">\n              <span className=\"sr-only\">{newsletter.inputLabel}</span>\n              <input\n                type=\"email\"\n                placeholder={newsletter.placeholder}\n                className=\"h-9 w-full rounded-sm border border-border bg-background px-3.5 text-[0.8125rem] placeholder:text-muted-foreground focus:border-input focus:outline-none\"\n              />\n            </label>\n            <ArcButton type=\"submit\" size=\"full\" className=\"mt-3 text-xs font-bold\">\n              {newsletter.button}\n            </ArcButton>\n          </form>\n        </div>\n\n        <div className=\"mt-12 flex flex-col gap-4 border-t border-border pt-7 text-xs text-muted-foreground lg:mt-20 lg:flex-row lg:items-center lg:gap-12 lg:pt-11\">\n          <p>{copyright}</p>\n          <ul className=\"flex flex-wrap gap-x-8 gap-y-2\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className={linkClass}>\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          <ul className=\"flex items-center gap-4 text-foreground lg:ml-auto\">\n            {socials.map((s) => (\n              <li key={s.label}>\n                <a href={s.href} aria-label={s.label} className=\"flex size-5 items-center justify-center transition-opacity duration-200 hover:opacity-70 motion-reduce:transition-none [&_svg]:size-[1.125rem]\">\n                  {s.icon}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "arc-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; }",
+      "required": true,
+      "description": "the wordmark, set bold in the display face"
+    },
+    {
+      "name": "columns",
+      "type": "ArcFooterGroup[][]",
+      "required": true,
+      "description": "link columns; each inner list is one column, and a column can stack several groups"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; placeholder: string; button: string; inputLabel: string; }",
+      "required": true,
+      "description": "the newsletter column"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "ArcFooterLink[]",
+      "required": true,
+      "description": "the small legal links in the bottom row"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "the social icons at the bottom right (an icon and a screen-reader label each)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2ed4d61d7e26063d38fe6c09a985184de668a76092ceb46446b45ea815809a7f"
+}

@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hadrian hero",
+  "description": "A window-tall navy hero that stays pinned while the page slides over it: a big tight two-line grotesk heading with a short line beside it, then a wide media frame with a sky-blue hairline, rounded top and machined 45° chamfers at its foot, holding two square outline buttons. Words fade in one by one on load; as you scroll they fade out and sink.",
+  "category": "hero",
+  "site": "hadrian",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "navy",
+    "pinned",
+    "sticky",
+    "chamfer",
+    "hairline",
+    "load-in",
+    "stagger",
+    "scroll-driven",
+    "fade",
+    "industrial"
+  ],
+  "notes": [
+    "pinned with position: sticky for the length of its parent; the blocks after it must be opaque (the Hadrian blocks are) so they cover it",
+    "the scroll fade-out reads the page's scroll (scroll(root)), so it expects to be the first section",
+    "the frame is a clip-path; media placed in it is cropped to the chamfered shape (cover)",
+    "CSS only; with reduced motion everything shows at once and stays put"
+  ],
+  "entry": "hadrian-hero.tsx",
+  "source": "foundry",
+  "name": "hadrian-hero",
+  "files": [
+    {
+      "path": "hadrian-hero.css",
+      "content": "/* Load: each heading word fades in, ~80ms after the one before; the line beside it follows.\n   Scroll: once the page has moved a quarter of a screen, the words fade out and sink (15px on\n   phones, 36px on desktop), done one screen (phones) or 1.5 screens (desktop) later. The\n   outer spans carry the scroll animation and the inner ones the load-in, so the two never\n   fight over opacity. */\n.hadrian-hero-word {\n  animation: hadrian-hero-in 500ms cubic-bezier(0.4, 0, 0.2, 1) both;\n  animation-delay: calc(var(--hadrian-i, 0) * 80ms + 150ms);\n}\n.hadrian-hero-lede {\n  animation: hadrian-hero-in 300ms cubic-bezier(0.4, 0, 0.2, 1) both;\n  animation-delay: var(--hadrian-delay, 600ms);\n}\n\n@keyframes hadrian-hero-in {\n  from { opacity: 0; }\n}\n\n@supports (animation-timeline: scroll()) {\n  .hadrian-hero-sink,\n  .hadrian-hero-fade {\n    animation: hadrian-hero-sink linear both;\n    animation-timeline: scroll(root);\n    animation-range: 25svh 97svh;\n    --hadrian-sink: 15px;\n  }\n  @media (min-width: 64rem) {\n    .hadrian-hero-sink {\n      animation-range: 25svh 140svh;\n      --hadrian-sink: 36px;\n    }\n    /* on desktop the side line goes almost at once, as the bar slides away */\n    .hadrian-hero-fade {\n      animation-range: 10svh 40svh;\n    }\n  }\n}\n\n@keyframes hadrian-hero-sink {\n  to { opacity: 0; transform: translateY(var(--hadrian-sink, 0)); }\n}\n\n/* The frame: rounded top, both bottom corners cut at an angle. Outer box = the hairline\n   colour, inner box (1px in) = the media, both clipped to the same shape. */\n.hadrian-hero-frame,\n.hadrian-hero-frame > .hadrian-hero-media {\n  --hadrian-cut-y: 5.5rem;\n  --hadrian-cut-x: 1.5625rem;\n  clip-path: polygon(\n    0 0,\n    100% 0,\n    100% calc(100% - var(--hadrian-cut-y)),\n    calc(100% - var(--hadrian-cut-x)) 100%,\n    var(--hadrian-cut-x) 100%,\n    0 calc(100% - var(--hadrian-cut-y))\n  );\n}\n@media (min-width: 64rem) {\n  .hadrian-hero-frame,\n  .hadrian-hero-frame > .hadrian-hero-media {\n    --hadrian-cut-x: 5.9375rem;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .hadrian-hero-word,\n  .hadrian-hero-lede,\n  .hadrian-hero-sink,\n  .hadrian-hero-fade {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "hadrian-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HadrianButton } from \"@foundry/hadrian-button\";\nimport { HadrianPlaceholder } from \"@foundry/hadrian-placeholder\";\nimport \"./hadrian-hero.css\";\n\nexport interface HadrianHeroAction {\n  /** button text (shown uppercase) */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** a small trailing icon, e.g. a thin arrow */\n  icon?: ReactNode;\n}\n\nexport interface HadrianHeroProps {\n  /** the heading, one string per line (two short lines read best) */\n  title: string[];\n  /** one short line beside the heading on desktop, under it on phones */\n  text?: string;\n  /** up to two buttons sitting in the foot of the frame */\n  actions?: HadrianHeroAction[];\n  /** the frame's media (a video or image filling it, object-cover); a placeholder when empty */\n  media?: ReactNode;\n  /** stay pinned behind the following sections (sticky); off = scrolls away normally */\n  pinned?: boolean;\n  className?: string;\n}\n\n/** Window-tall hero: staggered two-line heading, chamfered media frame with two buttons. */\nexport function HadrianHero({ title, text, actions = [], media, pinned = true, className }: HadrianHeroProps) {\n  let n = 0;\n  return (\n    <section\n      className={cn(\n        \"flex h-svh min-h-[34rem] flex-col overflow-clip bg-background pt-[11rem] pb-[2.625rem] text-foreground lg:min-h-[40rem] lg:pt-[11.75rem]\",\n        pinned ? \"sticky top-0\" : \"relative\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto w-full max-w-page px-gutter lg:grid lg:grid-cols-12 lg:gap-x-6\">\n        <h1 className=\"font-sans text-[1.875rem] leading-none font-normal tracking-[-0.035em] [word-spacing:-0.06em] lg:col-span-7 lg:text-[4.5rem]\">\n          {title.map((line) => (\n            <span key={line} className=\"block\">\n              {line.split(\" \").map((word, w) => {\n                const i = n++;\n                return (\n                  <span key={w}>\n                    {w > 0 && \" \"}\n                    <span className=\"hadrian-hero-sink inline-block\">\n                      <span className=\"hadrian-hero-word inline-block\" style={{ \"--hadrian-i\": i } as CSSProperties}>\n                        {word}\n                      </span>\n                    </span>\n                  </span>\n                );\n              })}\n            </span>\n          ))}\n        </h1>\n        {text && (\n          <div className=\"hadrian-hero-fade mt-[1.375rem] lg:col-span-4 lg:col-start-8 lg:mt-1\">\n            <p\n              className=\"hadrian-hero-lede max-w-[20rem] text-lg leading-[1.2] tracking-[-0.02em] lg:max-w-none lg:text-xl lg:leading-[1.07]\"\n              style={{ \"--hadrian-delay\": `${n * 80 + 250}ms` } as CSSProperties}\n            >\n              {text}\n            </p>\n          </div>\n        )}\n      </div>\n      <div className=\"mx-auto mt-[2.25rem] flex min-h-0 w-full max-w-page flex-1 px-4 lg:mt-10 lg:px-6\">\n        <div className=\"hadrian-hero-frame relative flex-1 rounded-t-lg bg-highlight\">\n          <div className=\"hadrian-hero-media absolute inset-px overflow-clip rounded-t-[calc(var(--radius)-1px)] bg-background [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n            {media ?? <HadrianPlaceholder />}\n          </div>\n          {actions.length > 0 && (\n            <div className=\"absolute inset-x-[1.8125rem] bottom-[1.9375rem] flex flex-col gap-2 lg:inset-x-[8.875rem] lg:bottom-[1.875rem] lg:flex-row lg:gap-4\">\n              {actions.slice(0, 2).map((a) => (\n                <HadrianButton key={a.href} label={a.label} href={a.href} icon={a.icon} size=\"lg\" className=\"lg:flex-1\" />\n              ))}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hadrian-button",
+    "hadrian-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the heading, one string per line (two short lines read best)"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "one short line beside the heading on desktop, under it on phones"
+    },
+    {
+      "name": "actions",
+      "type": "HadrianHeroAction[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to two buttons sitting in the foot of the frame"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the frame's media (a video or image filling it, object-cover); a placeholder when empty"
+    },
+    {
+      "name": "pinned",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "stay pinned behind the following sections (sticky); off = scrolls away normally"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "770f5476f2892df195d5ecd84609971bbfa9942d1946392b0f3fbdb049a40e51"
+}

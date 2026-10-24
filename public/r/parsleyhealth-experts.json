@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health clinicians section",
+  "description": "A wide light serif title and a lead with an underlined sage link, then a short checklist with thin check marks and a clinician's name in small bold capitals; a cut-out portrait stands on the section's bottom edge to the right. Beige band on desktop, ivory on phones (where a rule follows the lead and the portrait tucks into the bottom-right corner). On entering view the text rises 16px and fades in, and the portrait scales up from 96% as it fades in.",
+  "category": "features",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "team",
+    "checklist",
+    "portrait",
+    "serif",
+    "beige",
+    "reveal",
+    "scale",
+    "fade",
+    "scroll"
+  ],
+  "notes": [
+    "media is the cut-out portrait, bottom-aligned like object-fit: contain; empty, a faint placeholder stands in",
+    "the reveals are CSS view timelines; without support, or with reduced motion, all shows in place"
+  ],
+  "entry": "parsleyhealth-experts.tsx",
+  "name": "parsleyhealth-experts",
+  "files": [
+    {
+      "path": "parsleyhealth-experts.css",
+      "content": "/* Text: rise 16px and fade in. Portrait: scale up from 96% and fade in, a little later. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .parsleyhealth-experts-text {\n      animation: parsleyhealth-experts-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 280px;\n    }\n    .parsleyhealth-experts-portrait {\n      transform-origin: 50% 100%;\n      animation: parsleyhealth-experts-scale linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 320px;\n    }\n  }\n}\n\n@keyframes parsleyhealth-experts-rise {\n  from { opacity: 0; translate: 0 1rem; }\n  to { opacity: 1; translate: 0 0; }\n}\n\n@keyframes parsleyhealth-experts-scale {\n  from { opacity: 0; scale: 0.96; }\n  to { opacity: 1; scale: 1; }\n}\n"
+    },
+    {
+      "path": "parsleyhealth-experts.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthHeading } from \"@foundry/parsleyhealth-heading\";\nimport { ParsleyhealthPlaceholder } from \"@foundry/parsleyhealth-placeholder\";\nimport \"./parsleyhealth-experts.css\";\n\nexport interface ParsleyhealthExpertsProps {\n  /** the title */\n  title: string;\n  /** the lead under it (may hold an underlined link) */\n  lead: ReactNode;\n  /** the checklist */\n  points: string[];\n  /** the clinician pictured */\n  person?: { name: string; role: string };\n  /** the cut-out portrait (an img with a clear background); a placeholder when empty */\n  media?: ReactNode;\n  /** screen-reader label of the placeholder */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Title, lead and checklist with a cut-out portrait on the bottom edge. */\nexport function ParsleyhealthExperts({ title, lead, points, person, media, mediaLabel, className }: ParsleyhealthExpertsProps) {\n  return (\n    <section className={cn(\"overflow-clip bg-background px-gutter pt-8 lg:bg-card lg:px-10 lg:pt-20\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+10rem)]\">\n        <div className=\"parsleyhealth-experts-text\">\n          <ParsleyhealthHeading title={title} titleClassName=\"max-w-[20rem] lg:max-w-none\" />\n          <div className=\"mt-6 max-w-[56rem] border-b border-foreground/15 pb-9 text-[1.1rem] leading-[1.5] text-foreground lg:mt-8 lg:border-0 lg:pb-0 lg:text-[1.4438rem] lg:leading-[1.455] [&_a]:text-ring [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4\">\n            {lead}\n          </div>\n        </div>\n\n        <div className=\"grid grid-cols-[minmax(0,1fr)_9.5rem] gap-x-4 lg:grid-cols-2 lg:gap-x-16\">\n          <div className=\"parsleyhealth-experts-text flex flex-col pt-8 pb-10 lg:pt-14 lg:pb-20\">\n            <ul className=\"flex flex-col gap-6 text-[1.0312rem] leading-[1.409] text-primary lg:max-w-[32rem] lg:gap-4 lg:text-[1.1rem] lg:leading-[1.5]\">\n              {points.map((point) => (\n                <li key={point} className=\"flex gap-2.5 lg:gap-3\">\n                  <Check aria-hidden className=\"mt-1 size-3.5 shrink-0 text-ring\" strokeWidth={1.5} />\n                  <span>{point}</span>\n                </li>\n              ))}\n            </ul>\n            {person ? (\n              <p className=\"mt-10 text-[0.9625rem] leading-tight text-primary lg:mt-auto lg:pt-16\">\n                <span className=\"block font-semibold uppercase\">{person.name}</span>\n                <span className=\"mt-0.5 block text-[0.8938rem] lg:text-[0.9625rem]\">{person.role}</span>\n              </p>\n            ) : null}\n          </div>\n          <div className=\"parsleyhealth-experts-portrait -mr-gutter flex items-end justify-end self-end lg:mr-0 lg:justify-center\">\n            <div className=\"h-[16rem] w-[10rem] lg:aspect-[609/442] lg:h-auto lg:w-full lg:max-w-[38rem] [&>img]:size-full [&>img]:object-contain [&>img]:object-bottom\">\n              {media ?? <ParsleyhealthPlaceholder tone=\"tint\" label={mediaLabel} />}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-heading",
+    "parsleyhealth-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the lead under it (may hold an underlined link)"
+    },
+    {
+      "name": "points",
+      "type": "string[]",
+      "required": true,
+      "description": "the checklist"
+    },
+    {
+      "name": "person",
+      "type": "{ name: string; role: string; }",
+      "required": false,
+      "description": "the clinician pictured"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the cut-out portrait (an img with a clear background); a placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label of the placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c43eab4b72bb885306c4b9262625e03d55cdf73f4c5f853573f54d3fcc1f8228"
+}

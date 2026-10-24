@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics press grid",
+  "description": "On a white band: a heading over a grid of square grey tiles (three across, stacked on phones), each with a tight headline at the top, the publication's masthead near the bottom and a faint mono READ MORE with a thin arrow. Hovering a tile tints it, darkens READ MORE and nudges the arrow; a solid black SHOW MORE button reveals the rest.",
+  "category": "testimonials",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "press",
+    "news",
+    "grid",
+    "tiles",
+    "light",
+    "mono",
+    "hover",
+    "load-more",
+    "minimal"
+  ],
+  "notes": [
+    "the SHOW MORE button needs JavaScript; static HTML shows the first `initialCount` tiles",
+    "publication names are set as small wide-caps mastheads; pass an img as `source` for a real logo"
+  ],
+  "hydrate": "visible",
+  "entry": "valaratomics-press.tsx",
+  "source": "foundry",
+  "name": "valaratomics-press",
+  "files": [
+    {
+      "path": "valaratomics-press.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ValaratomicsButton } from \"@foundry/valaratomics-button\";\n\nexport interface ValaratomicsPressItem {\n  /** the article's headline */\n  headline: string;\n  /** the publication's name (set as a small masthead), or its logo */\n  source: ReactNode;\n  /** link to the article */\n  href: string;\n}\n\nexport interface ValaratomicsPressProps {\n  /** the section heading */\n  title: string;\n  /** the articles */\n  items: ValaratomicsPressItem[];\n  /** the mono link text at the bottom of each tile, e.g. \"Read more\" */\n  readLabel: string;\n  /** the arrow after it (e.g. lucide MoveRight) */\n  arrow?: ReactNode;\n  /** how many tiles show before the \"show more\" button */\n  initialCount?: number;\n  /** the \"show more\" button's text */\n  moreLabel: string;\n  className?: string;\n}\n\n/**\n * On a white band: a heading, then a grid of square grey tiles (3 across, stacked on phones),\n * each with a headline at the top, the publication's masthead near the bottom and a faint\n * mono READ MORE with an arrow that darkens and nudges on hover. A solid black button shows\n * the rest.\n */\nexport function ValaratomicsPress({\n  title,\n  items,\n  readLabel,\n  arrow,\n  initialCount = 9,\n  moreLabel,\n  className,\n}: ValaratomicsPressProps) {\n  const [all, setAll] = useState(false);\n  const shown = all ? items : items.slice(0, initialCount);\n\n  return (\n    <section className={cn(\"bg-card px-gutter py-section text-card-foreground\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <h2 className=\"font-sans text-[2.625rem] leading-[0.9] font-semibold tracking-[-0.03em] lg:text-5xl lg:leading-[0.9]\">\n          {title}\n        </h2>\n        <ul className=\"mt-9 grid gap-5 lg:mt-[8.75rem] lg:grid-cols-3\">\n          {shown.map((item) => (\n            <li key={item.headline}>\n              <a\n                href={item.href}\n                className=\"group relative flex min-h-[17.5rem] flex-col rounded-[1px] bg-muted px-[1.3125rem] pt-[1.5625rem] pb-[1.5rem] transition-colors duration-150 hover:bg-foreground/[0.06] lg:aspect-square lg:min-h-0\"\n              >\n                <h3 className=\"max-w-[17rem] text-2xl leading-none tracking-[-0.05em] lg:max-w-[21rem] lg:text-[1.875rem] lg:leading-none\">\n                  {item.headline}\n                </h3>\n                <div className=\"mt-auto pt-16 font-display text-base leading-none font-black tracking-[-0.01em] text-foreground/70 uppercase [font-stretch:var(--valaratomics-stretch,100%)] [&_img]:h-12 [&_img]:w-auto\">\n                  {item.source}\n                </div>\n                <div className=\"mt-12 flex items-center justify-between font-mono text-[1.375rem] leading-none uppercase opacity-30 transition-opacity duration-150 group-hover:opacity-100 motion-reduce:transition-none lg:mt-[3.25rem]\">\n                  <span>{readLabel}</span>\n                  {arrow && (\n                    <span\n                      aria-hidden\n                      className=\"transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transition-none [&_svg]:size-7 [&_svg]:stroke-[1.25]\"\n                    >\n                      {arrow}\n                    </span>\n                  )}\n                </div>\n              </a>\n            </li>\n          ))}\n        </ul>\n        {!all && items.length > initialCount && (\n          <div className=\"mt-9 flex justify-center lg:mt-[9rem]\">\n            <ValaratomicsButton label={moreLabel} variant=\"solid\" onClick={() => setAll(true)} className=\"w-[11.25rem] px-0\" />\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "valaratomics-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "items",
+      "type": "ValaratomicsPressItem[]",
+      "required": true,
+      "description": "the articles"
+    },
+    {
+      "name": "readLabel",
+      "type": "string",
+      "required": true,
+      "description": "the mono link text at the bottom of each tile, e.g. \"Read more\""
+    },
+    {
+      "name": "arrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the arrow after it (e.g. lucide MoveRight)"
+    },
+    {
+      "name": "initialCount",
+      "type": "number",
+      "required": false,
+      "default": "9",
+      "description": "how many tiles show before the \"show more\" button"
+    },
+    {
+      "name": "moreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the \"show more\" button's text"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "13b0046b6bfd14f34c87f233d415c91dda1f677874ec445dc6ac9a2e04863cbb"
+}

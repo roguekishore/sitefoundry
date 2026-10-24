@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Castelion media slot",
+  "description": "A media slot that fills its box: a real image or video covers it like object-fit: cover; empty, it is a plain token surface: flat muted, a dusk wash (muted into the warm glow) for film, or a sky wash (navy into the highlight blue) for photo cards.",
+  "category": "card",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "media",
+    "placeholder",
+    "image",
+    "video",
+    "flat"
+  ],
+  "notes": [
+    "size and round it from outside (aspect-*, size-full, rounded-lg)"
+  ],
+  "entry": "castelion-placeholder.tsx",
+  "source": "foundry",
+  "name": "castelion-placeholder",
+  "files": [
+    {
+      "path": "castelion-placeholder.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CastelionPlaceholderProps {\n  /** a real image or video; it is stretched to cover the slot. Empty: a plain token surface */\n  media?: ReactNode;\n  /** muted: flat surface · dusk: muted into the warm glow (film) · sky: navy into the highlight blue (photo cards) */\n  tone?: \"muted\" | \"dusk\" | \"sky\";\n  /** what the slot will show, for screen readers (only used while it is empty) */\n  label?: string;\n  className?: string;\n}\n\nconst tones = {\n  muted: \"bg-muted\",\n  dusk: \"bg-muted bg-[linear-gradient(180deg,var(--muted)_0%,color-mix(in_oklab,var(--glow)_60%,var(--muted))_100%)]\",\n  sky: \"bg-secondary bg-[linear-gradient(180deg,var(--secondary)_0%,var(--highlight)_100%)]\",\n};\n\n/** A media slot; empty, a token-coloured surface standing in for the picture. */\nexport function CastelionPlaceholder({ media, tone = \"muted\", label, className }: CastelionPlaceholderProps) {\n  return (\n    <div\n      role={media ? undefined : \"img\"}\n      aria-label={media ? undefined : label}\n      className={cn(\n        \"relative block overflow-clip\",\n        !media && tones[tone],\n        \"[&>img]:absolute [&>img]:inset-0 [&>img]:size-full [&>img]:object-cover [&>video]:absolute [&>video]:inset-0 [&>video]:size-full [&>video]:object-cover\",\n        className,\n      )}\n    >\n      {media}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video; it is stretched to cover the slot. Empty: a plain token surface"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "muted",
+      "description": "muted: flat surface · dusk: muted into the warm glow (film) · sky: navy into the highlight blue (photo cards)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "what the slot will show, for screen readers (only used while it is empty)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b9af422c10fdee5d6cd7ed9dcc13b949f1c14a039cc45f036a61e6bbc5aad25f"
+}

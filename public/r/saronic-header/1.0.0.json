@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Saronic header",
+  "description": "A 64px sticky header with a bold wordmark left and mono capital links plus a two-line menu button right. Over a dark hero it is transparent with light text; once the hero has scrolled away it turns into a pale bar with ink text, a hairline under it and one down its centre (0.3s). The menu opens a dark panel of destinations with one-line descriptions.",
+  "category": "header",
+  "site": "saronic",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "transparent",
+    "overlay",
+    "mono",
+    "uppercase",
+    "hairline",
+    "menu"
+  ],
+  "notes": [
+    "`overlay` is for pages that open on a dark full-bleed hero: it pulls the hero up under the bar (-mb-16) and stays transparent until the window height minus solidOffset has scrolled",
+    "without `overlay` it is the solid pale bar from the start",
+    "needs JavaScript for the scroll switch and the menu"
+  ],
+  "hydrate": "load",
+  "entry": "saronic-header.tsx",
+  "source": "foundry",
+  "name": "saronic-header",
+  "files": [
+    {
+      "path": "saronic-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface SaronicHeaderLink {\n  /** the link text */\n  label: ReactNode;\n  href: string;\n}\n\nexport interface SaronicMenuItem {\n  /** the destination's name */\n  title: ReactNode;\n  /** one line about it */\n  description?: ReactNode;\n  href: string;\n}\n\nexport interface SaronicHeaderProps {\n  /** the company name, set as a bold wordmark */\n  brand: string;\n  /** a small mark before the name (an icon) */\n  mark?: ReactNode;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** mono links before the menu button (desktop only), split by a thin bar */\n  links?: SaronicHeaderLink[];\n  /** the menu button's text */\n  menuLabel: ReactNode;\n  /** the menu button's text while open */\n  closeLabel: ReactNode;\n  /** what the menu panel lists */\n  menu: SaronicMenuItem[];\n  /** sit transparent over a dark hero (light text) until it has scrolled away, then turn solid */\n  overlay?: boolean;\n  /** with overlay: hide the wordmark on desktop while over the hero (the hero shows a giant one) */\n  hideBrandOverHero?: boolean;\n  /** with overlay: turn solid once the page has scrolled the window height minus this many px */\n  solidOffset?: number;\n  className?: string;\n}\n\n/**\n * A 64px sticky header. Over the hero it is transparent with light text; once the hero has\n * scrolled away it becomes a pale bar with ink text, a hairline under it and one down its\n * centre (0.3s). Wordmark left; mono links and a two-line menu button right. The menu opens a\n * dark panel of destinations under the bar.\n */\nexport function SaronicHeader({\n  brand,\n  mark,\n  brandHref = \"/\",\n  links = [],\n  menuLabel,\n  closeLabel,\n  menu,\n  overlay = false,\n  hideBrandOverHero = false,\n  solidOffset = 128,\n  className,\n}: SaronicHeaderProps) {\n  const [scrolled, setScrolled] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!overlay) return;\n    const update = () => setScrolled(window.scrollY >= window.innerHeight - solidOffset);\n    update();\n    window.addEventListener(\"scroll\", update, { passive: true });\n    window.addEventListener(\"resize\", update);\n    return () => {\n      window.removeEventListener(\"scroll\", update);\n      window.removeEventListener(\"resize\", update);\n    };\n  }, [overlay, solidOffset]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  const solid = !overlay || scrolled || open;\n\n  return (\n    <header\n      className={cn(\n        \"sticky top-0 z-40 h-16 border-b font-mono text-xs/none tracking-[0.06em] uppercase\",\n        \"transition-[background-color,border-color,color] duration-300 ease-[ease] motion-reduce:transition-none\",\n        overlay && \"-mb-16\",\n        solid ? \"border-border bg-background text-foreground\" : \"dark border-transparent bg-transparent text-foreground\",\n        className,\n      )}\n    >\n      <span\n        aria-hidden\n        className={cn(\n          \"absolute inset-y-0 left-1/2 w-px bg-border transition-opacity duration-300 motion-reduce:transition-none\",\n          solid ? \"opacity-100\" : \"opacity-0\",\n        )}\n      />\n      <div className=\"relative flex h-full items-center justify-between px-6\">\n        <a\n          href={brandHref}\n          className={cn(\n            \"flex items-center gap-1.5 font-display text-[1.3rem]/none font-extrabold tracking-[0.01em] normal-case transition-opacity duration-300 motion-reduce:transition-none\",\n            hideBrandOverHero && !solid && \"lg:pointer-events-none lg:opacity-0\",\n          )}\n        >\n          {mark && <span className=\"inline-flex [&>svg]:size-6\">{mark}</span>}\n          <span className=\"uppercase\">{brand}</span>\n        </a>\n        <nav className=\"flex items-center\">\n          {links.map((link, i) => (\n            <span key={i} className=\"flex items-center max-lg:hidden\">\n              <a href={link.href} className=\"transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none\">\n                {link.label}\n              </a>\n              <span aria-hidden className=\"mx-6 h-3 w-px bg-current opacity-70\" />\n            </span>\n          ))}\n          <button\n            type=\"button\"\n            aria-expanded={open}\n            onClick={() => setOpen((v) => !v)}\n            className=\"flex items-center gap-5 uppercase transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none\"\n          >\n            <span>{open ? closeLabel : menuLabel}</span>\n            <span aria-hidden className=\"relative block h-2.5 w-[1.625rem]\">\n              <span\n                className={cn(\n                  \"absolute inset-x-0 top-0 h-px bg-current transition-transform duration-300 motion-reduce:transition-none\",\n                  open && \"translate-y-[4.5px] rotate-[20deg]\",\n                )}\n              />\n              <span\n                className={cn(\n                  \"absolute inset-x-0 bottom-0 h-px bg-current transition-transform duration-300 motion-reduce:transition-none\",\n                  open && \"-translate-y-[4.5px] -rotate-[20deg]\",\n                )}\n              />\n            </span>\n          </button>\n        </nav>\n      </div>\n      {open && (\n        <div className=\"dark absolute inset-x-0 top-full border-b border-border bg-card text-card-foreground normal-case\">\n          <ul className=\"grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3\">\n            {menu.map((item, i) => (\n              <li key={i} className=\"bg-card\">\n                <a\n                  href={item.href}\n                  className=\"group flex h-full flex-col gap-3 p-6 opacity-70 transition-opacity duration-300 hover:opacity-100 focus:opacity-100 motion-reduce:transition-none lg:p-10\"\n                >\n                  <span className=\"font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em]\">{item.title}</span>\n                  {item.description && (\n                    <span className=\"font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase\">{item.description}</span>\n                  )}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      )}\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a bold wordmark"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small mark before the name (an icon)"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "SaronicHeaderLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "mono links before the menu button (desktop only), split by a thin bar"
+    },
+    {
+      "name": "menuLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the menu button's text"
+    },
+    {
+      "name": "closeLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the menu button's text while open"
+    },
+    {
+      "name": "menu",
+      "type": "SaronicMenuItem[]",
+      "required": true,
+      "description": "what the menu panel lists"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "sit transparent over a dark hero (light text) until it has scrolled away, then turn solid"
+    },
+    {
+      "name": "hideBrandOverHero",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "with overlay: hide the wordmark on desktop while over the hero (the hero shows a giant one)"
+    },
+    {
+      "name": "solidOffset",
+      "type": "number",
+      "required": false,
+      "default": "128",
+      "description": "with overlay: turn solid once the page has scrolled the window height minus this many px"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "294b7b29ef527ea27c07bf02de2077a1ace8b37530b9c54e02adba02cb4c96ce"
+}

@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Saronic footer",
+  "description": "An ink footer built as a grid of hairline cells. Desktop: a narrow first column (a big mark that tints on hover, a careers cell with a lime button, the address and legal lines), then two wide columns of huge grey links that brighten on hover, the last with social icons and a mono X / Y readout that follows the pointer. Phones: one merged link list first, then careers, address, the mark and a centred copyright.",
+  "category": "footer",
+  "site": "saronic",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "ink",
+    "grid",
+    "hairline",
+    "big-links",
+    "mono",
+    "pointer",
+    "hover"
+  ],
+  "notes": [
+    "always dark (it carries the `dark` class) and uses the theme's card colour as its ground",
+    "the pointer readout needs JavaScript; without it the chips show a dash",
+    "made for two link groups (one per wide column on desktop)"
+  ],
+  "hydrate": "visible",
+  "entry": "saronic-footer.tsx",
+  "source": "foundry",
+  "name": "saronic-footer",
+  "files": [
+    {
+      "path": "saronic-footer.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SaronicButton } from \"@foundry/saronic-button\";\n\nexport interface SaronicFooterLink {\n  /** the link text */\n  label: ReactNode;\n  href: string;\n}\n\nexport interface SaronicFooterGroup {\n  /** the mono caption over the group (desktop) */\n  title: ReactNode;\n  links: SaronicFooterLink[];\n}\n\nexport interface SaronicSocialLink {\n  /** the network's name, for screen readers */\n  label: string;\n  href: string;\n  /** its icon */\n  icon: ReactNode;\n}\n\nexport interface SaronicFooterProps {\n  /** a big mark shown in its own cell (an icon) */\n  mark?: ReactNode;\n  /** where the mark links */\n  markHref?: string;\n  /** screen-reader label for the mark's link */\n  markLabel?: string;\n  /** two link groups: one column each on desktop, one merged list on phones */\n  groups: SaronicFooterGroup[];\n  /** the caption over the merged list on phones (\"More\") */\n  mobileTitle: ReactNode;\n  /** the caption over the social icons */\n  socialTitle?: ReactNode;\n  social?: SaronicSocialLink[];\n  /** the careers cell: caption, invitation and button */\n  join?: { eyebrow: ReactNode; text: ReactNode; cta: { label: ReactNode; href: string; external?: boolean } };\n  /** the address cell's line (\"Built in …\") */\n  place?: ReactNode;\n  /** small links under it (privacy…) */\n  legal?: SaronicFooterLink[];\n  /** the copyright line */\n  copyright?: ReactNode;\n  /** labels for the live pointer readout chips (desktop); leave out to hide it */\n  readout?: { x: string; y: string };\n  /** a small glyph at the bottom-right corner (desktop) */\n  cornerGlyph?: ReactNode;\n  className?: string;\n}\n\n/**\n * The ink footer, a grid of hairline cells. Desktop: a narrow first column (a big mark that\n * tints on hover, a careers cell with a lime button, the address and legal lines), then two\n * wide columns of huge grey links that brighten on hover, the last with social icons and a\n * mono X / Y readout that follows the pointer. Phones: one merged link list first, then\n * careers, address, the mark and the copyright, centred.\n */\nexport function SaronicFooter({\n  mark,\n  markHref = \"/\",\n  markLabel,\n  groups,\n  mobileTitle,\n  socialTitle,\n  social = [],\n  join,\n  place,\n  legal = [],\n  copyright,\n  readout,\n  cornerGlyph,\n  className,\n}: SaronicFooterProps) {\n  const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);\n\n  useEffect(() => {\n    if (!readout) return;\n    setPointer({ x: Math.round(window.innerWidth / 2), y: Math.round(window.innerHeight / 2) });\n    const onMove = (e: PointerEvent) => setPointer({ x: Math.round(e.clientX), y: Math.round(e.clientY) });\n    window.addEventListener(\"pointermove\", onMove, { passive: true });\n    return () => window.removeEventListener(\"pointermove\", onMove);\n  }, [readout]);\n\n  const caption = \"font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase\";\n  const fade = \"opacity-50 transition-opacity duration-200 hover:opacity-75 motion-reduce:transition-none\";\n\n  return (\n    <footer className={cn(\"dark bg-card text-card-foreground\", className)}>\n      <div className=\"grid lg:grid-cols-[25fr_37.5fr_37.5fr]\">\n        {/* link groups: one list on phones, a column each on desktop */}\n        <div className=\"order-1 px-4 pt-10 pb-10 lg:contents\">\n          <p className={cn(caption, \"lg:hidden\")}>{mobileTitle}</p>\n          {groups.map((group, i) => {\n            const last = i === groups.length - 1;\n            return (\n              <div\n                key={i}\n                className={cn(\n                  \"lg:relative lg:row-span-3 lg:row-start-1 lg:border-l lg:border-border lg:p-10 lg:pb-32\",\n                  i === 0 ? \"mt-5 lg:col-start-2\" : \"mt-2 lg:col-start-3\",\n                  \"lg:mt-0\",\n                )}\n              >\n                <p className={cn(caption, \"max-lg:hidden\")}>{group.title}</p>\n                <ul className=\"space-y-2 lg:mt-[4.625rem] lg:space-y-6\">\n                  {group.links.map((link, j) => (\n                    <li key={j}>\n                      <a href={link.href} className={cn(\"font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]\", fade)}>\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n                {last && social.length > 0 && (\n                  <div className=\"mt-14 lg:mt-[4.5rem]\">\n                    {socialTitle && <p className={caption}>{socialTitle}</p>}\n                    <ul className=\"mt-5 flex items-center gap-4\">\n                      {social.map((s, k) => (\n                        <li key={k}>\n                          <a href={s.href} aria-label={s.label} className={cn(\"flex [&>svg]:size-10\", fade)}>\n                            {s.icon}\n                          </a>\n                        </li>\n                      ))}\n                    </ul>\n                  </div>\n                )}\n                {last && (readout || cornerGlyph) && (\n                  <div className=\"absolute inset-x-10 bottom-10 hidden items-end justify-between lg:flex\">\n                    {readout ? (\n                      <p aria-hidden className=\"flex gap-1 font-mono text-xs/none tracking-[0.06em] text-muted-foreground uppercase tabular-nums\">\n                        <span className=\"bg-accent px-2 py-1.5\">\n                          {readout.x} = {pointer ? pointer.x : \"—\"}\n                        </span>\n                        <span className=\"bg-accent px-2 py-1.5\">\n                          {readout.y} = {pointer ? pointer.y : \"—\"}\n                        </span>\n                      </p>\n                    ) : (\n                      <span />\n                    )}\n                    {cornerGlyph && <span aria-hidden className=\"flex [&>svg]:size-7\">{cornerGlyph}</span>}\n                  </div>\n                )}\n              </div>\n            );\n          })}\n        </div>\n\n        {/* careers cell */}\n        {join && (\n          <div className=\"order-2 border-t border-border px-4 py-10 lg:col-start-1 lg:row-start-2 lg:p-10\">\n            <p className={caption}>{join.eyebrow}</p>\n            <p className=\"mt-4 max-w-[13.5rem] text-lg/[1.33] font-medium tracking-[-0.02em] [word-spacing:-0.08em] lg:mt-5 lg:max-w-[17rem] lg:text-[1.375rem]/[1.33]\">{join.text}</p>\n            <SaronicButton href={join.cta.href} icon=\"external\" external={join.cta.external} className=\"mt-10 min-w-55\">\n              {join.cta.label}\n            </SaronicButton>\n          </div>\n        )}\n\n        {/* address and legal */}\n        {(place || legal.length > 0 || copyright) && (\n          <div className=\"order-3 border-t border-border px-4 py-10 lg:col-start-1 lg:row-start-3 lg:p-10\">\n            {place && <p className=\"text-lg/[1.33] font-medium tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[1.375rem]/[1.33]\">{place}</p>}\n            {legal.length > 0 && (\n              <ul className=\"mt-6 space-y-2 lg:mt-7\">\n                {legal.map((link, i) => (\n                  <li key={i}>\n                    <a href={link.href} className=\"text-base/[1.5] opacity-50 transition-opacity hover:opacity-75 motion-reduce:transition-none\">\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {copyright && <p className=\"mt-6 text-base/[1.5] opacity-70 max-lg:hidden\">{copyright}</p>}\n          </div>\n        )}\n\n        {/* the mark */}\n        {mark && (\n          <a\n            href={markHref}\n            aria-label={markLabel}\n            className=\"order-4 flex items-center justify-center border-t border-border py-20 transition-colors hover:bg-accent motion-reduce:transition-none lg:col-start-1 lg:row-start-1 lg:border-t-0 lg:py-[4.375rem] [&>svg]:size-40\"\n          >\n            {mark}\n          </a>\n        )}\n\n        {copyright && <p className=\"order-5 px-4 pb-10 text-center text-base/[1.5] opacity-70 lg:hidden\">{copyright}</p>}\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "saronic-button"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a big mark shown in its own cell (an icon)"
+    },
+    {
+      "name": "markHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the mark links"
+    },
+    {
+      "name": "markLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the mark's link"
+    },
+    {
+      "name": "groups",
+      "type": "SaronicFooterGroup[]",
+      "required": true,
+      "description": "two link groups: one column each on desktop, one merged list on phones"
+    },
+    {
+      "name": "mobileTitle",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the caption over the merged list on phones (\"More\")"
+    },
+    {
+      "name": "socialTitle",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the caption over the social icons"
+    },
+    {
+      "name": "social",
+      "type": "SaronicSocialLink[]",
+      "required": false,
+      "default": "[]"
+    },
+    {
+      "name": "join",
+      "type": "{ eyebrow: ReactNode; text: ReactNode; cta: { label: ReactNode; href: string; external?: boolean; }; }",
+      "required": false,
+      "description": "the careers cell: caption, invitation and button"
+    },
+    {
+      "name": "place",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the address cell's line (\"Built in …\")"
+    },
+    {
+      "name": "legal",
+      "type": "SaronicFooterLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "small links under it (privacy…)"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the copyright line"
+    },
+    {
+      "name": "readout",
+      "type": "{ x: string; y: string; }",
+      "required": false,
+      "description": "labels for the live pointer readout chips (desktop); leave out to hide it"
+    },
+    {
+      "name": "cornerGlyph",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small glyph at the bottom-right corner (desktop)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0f546295ad75cb085a1f9b435313da48cdd7e4def2d538b172191ce12156e673"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex solutions cards",
+  "description": "A centred eyebrow, headline and intro over five tall saturated gradient cards (orange, violet-magenta, blue-purple, teal-blue, magenta-red), each with an icon and bold white title, a short line, an arrow and a product shot peeking up from the bottom edge. Cards rise into place as they scroll into view and lift a touch with a soft shadow on hover. A row of five on desktop, a stack on phones.",
+  "category": "features",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "gradient",
+    "vivid",
+    "reveal",
+    "scroll",
+    "hover",
+    "light"
+  ],
+  "notes": [
+    "card gradients come from the theme's highlight, primary and chart colours (see airwallex-gradient)",
+    "the reveal is CSS scroll-driven; browsers without it show the cards in place"
+  ],
+  "entry": "airwallex-solutions.tsx",
+  "source": "foundry",
+  "name": "airwallex-solutions",
+  "files": [
+    {
+      "path": "airwallex-solutions.css",
+      "content": "/* Cards rise 32px and fade in as they enter the window; on desktop, where they enter\n   together, each starts 40px of scroll after the one before. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .airwallex-solutions-card {\n      animation: airwallex-solutions-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 220px;\n    }\n    @media (min-width: 64rem) {\n      .airwallex-solutions-card {\n        animation-range: entry calc(var(--airwallex-i, 0) * 40px) entry calc(220px + var(--airwallex-i, 0) * 40px);\n      }\n    }\n  }\n}\n\n@keyframes airwallex-solutions-rise {\n  from { opacity: 0; translate: 0 32px; }\n  to { opacity: 1; translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "airwallex-solutions.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { gradientClass, type AirwallexTone } from \"@foundry/airwallex-gradient\";\nimport { AirwallexHeading } from \"@foundry/airwallex-heading\";\nimport { AirwallexPlaceholder } from \"@foundry/airwallex-placeholder\";\nimport \"./airwallex-solutions.css\";\n\nexport interface AirwallexSolution {\n  /** the card's bold title */\n  title: string;\n  /** one short line under it */\n  description: string;\n  /** where the card links to */\n  href: string;\n  /** the icon before the title (a lucide icon works) */\n  icon?: ReactNode;\n  /** the card's gradient */\n  tone: AirwallexTone;\n  /** the product shot peeking up from the bottom; empty for a placeholder */\n  media?: ReactNode;\n  /** accessible label for the arrow */\n  linkLabel?: string;\n}\n\nexport interface AirwallexSolutionsProps {\n  /** the grey caps line above the headline */\n  eyebrow?: string;\n  /** the headline */\n  title: string;\n  /** the paragraph under the headline */\n  intro?: string;\n  /** five cards fill the desktop row */\n  items: AirwallexSolution[];\n  className?: string;\n}\n\n/** Heading and a row of gradient product cards. */\nexport function AirwallexSolutions({ eyebrow, title, intro, items, className }: AirwallexSolutionsProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[4.5rem] pb-14 lg:px-12 lg:pt-24 lg:pb-[8.25rem]\">\n        <AirwallexHeading eyebrow={eyebrow} title={title} intro={intro} gap=\"lg\" className=\"max-w-[21rem] lg:max-w-none\" />\n        <ul className=\"mt-12 grid gap-2 lg:mt-20 lg:grid-cols-5 lg:gap-4\">\n          {items.map((item, i) => (\n            <li key={item.title} className=\"airwallex-solutions-card\" style={{ \"--airwallex-i\": i } as CSSProperties}>\n              <a\n                href={item.href}\n                aria-label={item.linkLabel}\n                className={cn(\n                  \"group flex h-[21rem] flex-col items-center overflow-clip rounded-[1rem] px-6 pt-11 text-center text-primary-foreground lg:h-[22.25rem] lg:px-4 lg:pt-10\",\n                  \"transition-[scale,box-shadow] duration-300 ease-out hover:scale-[1.01] hover:shadow-[0_2px_12px_0_color-mix(in_oklab,var(--foreground)_12%,transparent)] motion-reduce:transition-none\",\n                  gradientClass(item.tone),\n                )}\n              >\n                <span className=\"flex items-center gap-2.5 font-display text-base font-bold lg:text-xl [&_svg]:size-6 lg:[&_svg]:size-8\">\n                  {item.icon}\n                  {item.title}\n                </span>\n                <span className=\"mt-3 max-w-[11rem] text-sm leading-[1.25] lg:mt-2.5 lg:text-[0.9375rem]\">{item.description}</span>\n                <ArrowRight aria-hidden className=\"mt-4 size-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none lg:mt-5\" strokeWidth={2.5} />\n                <span className=\"mt-auto block w-[13rem] max-w-full lg:w-full\">\n                  {item.media ?? <AirwallexPlaceholder tone=\"frost\" className=\"aspect-[4/3] w-full rounded-t-md\" />}\n                </span>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "airwallex-gradient",
+    "airwallex-heading",
+    "airwallex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the grey caps line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "the paragraph under the headline"
+    },
+    {
+      "name": "items",
+      "type": "AirwallexSolution[]",
+      "required": true,
+      "description": "five cards fill the desktop row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "78501e0e59628fc2131a17a1112429654159975f07b75aa0508f63a030a7b578"
+}

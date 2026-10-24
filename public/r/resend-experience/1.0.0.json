@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend developer-experience pair",
+  "description": "A left-aligned lit title and lead over two lit, fading feature cards. One shows a sandbox send bar above a monospace log where a fresh response line fades in on top every couple of seconds; the other a webhook timeline where a new event (status chip, time, address and subject chips) slides down into place and pushes the older ones down.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "dark",
+    "developer",
+    "live-feed",
+    "loop",
+    "glow",
+    "fade"
+  ],
+  "notes": [
+    "the feeds tick only while on screen and stop under reduced motion; static HTML shows the full lists",
+    "uses motion/react for the push-down layout animation"
+  ],
+  "hydrate": "visible",
+  "entry": "resend-experience.tsx",
+  "source": "foundry",
+  "name": "resend-experience",
+  "files": [
+    {
+      "path": "resend-experience.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { AnimatePresence, motion, useInView, useReducedMotion } from \"motion/react\";\nimport { ChevronDown, Clock } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendFeatureCard } from \"@foundry/resend-feature-card\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\n\ntype Tone = \"success\" | \"info\" | \"danger\" | \"warning\";\n\nconst tones: Record<Tone, string> = {\n  success: \"bg-chart-2/12 text-chart-2\",\n  info: \"bg-chart-1/20 text-chart-1\",\n  danger: \"bg-destructive/18 text-destructive\",\n  warning: \"bg-chart-3/14 text-chart-3\",\n};\n\nexport interface ResendWebhookEvent {\n  /** the status chip (Delivered, Opened…) */\n  status: string;\n  tone: Tone;\n  /** the icon in the square at the left of the timeline */\n  icon: ReactNode;\n  /** when it happened */\n  time: string;\n  /** label/value pairs, one list per line (\"to\" [address] \"with subject\" [subject]) */\n  rows: { label: string; value: string; icon?: ReactNode }[][];\n}\n\nexport interface ResendCardText {\n  /** a small line icon above the title */\n  icon?: ReactNode;\n  title: string;\n  text: ReactNode;\n  link?: { label: string; href: string };\n}\n\nexport interface ResendExperienceProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** the lead; a list sets its desktop line breaks */\n  text: ReactNode | ReactNode[];\n  /** the sandbox card: its send bar, the log lines and its copy */\n  sandbox: ResendCardText & {\n    /** the status chip in the send bar */\n    status: string;\n    /** the address in the send bar */\n    address: string;\n    /** the send button's label and icon */\n    send: { label: string; icon?: ReactNode };\n    /** response lines; a new one fades in on top every 2s */\n    lines: string[];\n  };\n  /** the webhook card: its events and its copy */\n  webhooks: ResendCardText & {\n    /** timeline events; a new one slides in on top every 3s */\n    events: ResendWebhookEvent[];\n  };\n  className?: string;\n}\n\n/** Cycles a list: every `every` ms the last item re-enters at the top. Keys follow each\n    item instance, so the others glide down instead of re-rendering. */\nfunction useFeed<T>(items: T[], every: number) {\n  const ref = useRef<HTMLUListElement>(null);\n  const inView = useInView(ref, { margin: \"0px 0px -10% 0px\" });\n  const reduce = useReducedMotion();\n  const [step, setStep] = useState(0);\n  useEffect(() => {\n    if (!inView || reduce || items.length < 2) return;\n    const id = window.setInterval(() => setStep((s) => s + 1), every);\n    return () => window.clearInterval(id);\n  }, [inView, reduce, every, items.length]);\n  const n = items.length;\n  const visible = items.map((_, k) => {\n    const seq = k - step;\n    return { key: seq, item: items[((seq % n) + n) % n] };\n  });\n  return { ref, visible };\n}\n\nfunction SandboxVisual({ status, address, send, lines }: ResendExperienceProps[\"sandbox\"]) {\n  const { ref, visible } = useFeed(lines, 2000);\n  return (\n    <div className=\"flex h-full flex-col items-center px-3 pt-10 lg:px-1.5 lg:pt-[6.75rem]\">\n      <div className=\"flex h-11 w-full max-w-[25.6rem] items-center gap-2 rounded-lg border border-border bg-card/50 pr-1.5 pl-2\">\n        <span className={cn(\"hidden h-7 items-center rounded-md px-2 text-xs sm:flex\", tones.success)}>{status}</span>\n        <span className=\"flex min-w-0 items-center gap-1 text-base text-foreground\">\n          <span className=\"truncate\">{address}</span>\n          <ChevronDown aria-hidden className=\"size-4 shrink-0 opacity-70\" strokeWidth={1.75} />\n        </span>\n        <span className=\"ml-auto flex h-8 items-center gap-1.5 rounded-full border border-border bg-background px-3 text-base text-foreground [&_svg]:size-3.5\">\n          {send.icon}\n          {send.label}\n        </span>\n      </div>\n      <ul ref={ref} className=\"mt-10 w-full space-y-0 overflow-clip font-mono text-base leading-8 tracking-[0.06em] text-muted-foreground lg:mt-14\">\n        <AnimatePresence initial={false} mode=\"popLayout\">\n          {visible.map(({ key, item }) => (\n            <motion.li\n              key={key}\n              layout\n              initial={{ opacity: 0 }}\n              animate={{ opacity: 1 }}\n              exit={{ opacity: 0 }}\n              transition={{ duration: 0.65, ease: \"easeOut\" }}\n              className=\"truncate whitespace-pre\"\n            >\n              {item}\n            </motion.li>\n          ))}\n        </AnimatePresence>\n      </ul>\n    </div>\n  );\n}\n\nfunction Chip({ children, icon }: { children: ReactNode; icon?: ReactNode }) {\n  return (\n    <span className=\"inline-flex h-[1.625rem] items-center gap-1.5 rounded-md border border-border bg-background px-1.5 text-sm text-foreground [&_svg]:size-3.5\">\n      {icon}\n      {children}\n    </span>\n  );\n}\n\nfunction WebhookVisual({ events }: { events: ResendWebhookEvent[] }) {\n  const { ref, visible } = useFeed(events, 3000);\n  return (\n    <ul ref={ref} className=\"h-full overflow-clip px-6 pt-12 lg:px-8\">\n      <AnimatePresence initial={false} mode=\"popLayout\">\n        {visible.map(({ key, item }) => (\n          <motion.li\n            key={key}\n            layout\n            initial={{ opacity: 0.3, y: -48 }}\n            animate={{ opacity: 1, y: 0 }}\n            exit={{ opacity: 0 }}\n            transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}\n            className=\"grid grid-cols-[2.25rem_1fr] gap-x-6 lg:gap-x-12\"\n          >\n            <div className=\"flex flex-col items-center\">\n              <span className=\"flex size-9 items-center justify-center rounded-lg border border-border bg-card text-foreground [&_svg]:size-[1.125rem]\">\n                {item.icon}\n              </span>\n              <span aria-hidden className=\"w-px flex-1 bg-border\" />\n            </div>\n            <div className=\"pb-8\">\n              <div className=\"flex h-9 items-center gap-6 lg:gap-12\">\n                <span className={cn(\"flex h-7 items-center rounded-md px-2 text-xs\", tones[item.tone])}>{item.status}</span>\n                <span className=\"flex items-center gap-1.5 text-xs text-muted-foreground\">\n                  <Clock aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n                  {item.time}\n                </span>\n              </div>\n              {item.rows.map((row, r) => (\n                <p key={r} className=\"mt-3 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-muted-foreground\">\n                  {row.map((part) => (\n                    <span key={part.label} className=\"contents\">\n                      <span>{part.label}</span>\n                      <Chip icon={part.icon}>{part.value}</Chip>\n                    </span>\n                  ))}\n                </p>\n              ))}\n            </div>\n          </motion.li>\n        ))}\n      </AnimatePresence>\n    </ul>\n  );\n}\n\nexport function ResendExperience({ title, text, sandbox, webhooks, className }: ResendExperienceProps) {\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading align=\"start\" title={title} text={text} className=\"max-lg:items-center max-lg:text-center\" textClassName=\"lg:max-w-none\" />\n        <div className=\"mt-12 grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-8\">\n          <ResendFeatureCard visual={<SandboxVisual {...sandbox} />} icon={sandbox.icon} title={sandbox.title} text={sandbox.text} link={sandbox.link} />\n          <ResendFeatureCard visual={<WebhookVisual events={webhooks.events} />} icon={webhooks.icon} title={webhooks.title} text={webhooks.text} link={webhooks.link} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-feature-card",
+    "resend-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode | ReactNode[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "sandbox",
+      "type": "ResendCardText & { status: string; address: string; send: { label: string; icon?: ReactNode; }; lines: string[]; }",
+      "required": true,
+      "description": "the sandbox card: its send bar, the log lines and its copy"
+    },
+    {
+      "name": "webhooks",
+      "type": "ResendCardText & { events: ResendWebhookEvent[]; }",
+      "required": true,
+      "description": "the webhook card: its events and its copy"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "607adfe056b48b0bf8ad9b3e6bf5e72b4b84670eeeaf04805ee328425efbe4f2"
+}

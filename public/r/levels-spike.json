@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels problem and chart card",
+  "description": "A white section: on the left an eyebrow, a big medium-weight title, a long grey paragraph and a green arrow link; on the right (below on phones) a tall softly shadowed card with 30px corners, a pale green wash, a chart slot, a tiny tracked caption and a wrap of pill chips. Clicking a chip turns it ink-black and swaps the chart; chips brighten and their border darkens on hover.",
+  "category": "features",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "chart",
+    "tabs",
+    "chips",
+    "card",
+    "light",
+    "soft-shadow",
+    "interactive"
+  ],
+  "notes": [
+    "one chart per choice; the selected one shows. Empty: a pale wash placeholder of the chart's size",
+    "chip switching needs JavaScript (hydrate: visible); without it the first chart shows",
+    "the original's spike grows on entering view inside its chart; that motion belongs to the chart you pass in"
+  ],
+  "hydrate": "visible",
+  "entry": "levels-spike.tsx",
+  "name": "levels-spike",
+  "files": [
+    {
+      "path": "levels-spike.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsHeading } from \"@foundry/levels-heading\";\nimport { LevelsLink } from \"@foundry/levels-link\";\nimport { LevelsPlaceholder } from \"@foundry/levels-placeholder\";\n\nexport interface LevelsSpikeChoice {\n  /** the chip's text */\n  label: string;\n  /** the chart shown while this chip is selected; fills the chart area. Empty: a placeholder */\n  chart?: ReactNode;\n}\n\nexport interface LevelsSpikeProps {\n  /** small tracked capitals above the title */\n  eyebrow?: string;\n  /** the section title */\n  title: ReactNode;\n  /** the long grey paragraph */\n  lead?: ReactNode;\n  /** the green arrow link under the paragraph */\n  link?: { label: string; href: string };\n  /** the tiny caption above the chips */\n  caption?: string;\n  /** the chips; the first starts selected */\n  choices: LevelsSpikeChoice[];\n  /** screen-reader label for the chart placeholder */\n  chartLabel?: string;\n  className?: string;\n}\n\n/** Text beside a tall chart card whose chips swap the chart. */\nexport function LevelsSpike({ eyebrow, title, lead, link, caption, choices, chartLabel, className }: LevelsSpikeProps) {\n  const [active, setActive] = useState(0);\n  const current = choices[active];\n\n  return (\n    <section className={cn(\"bg-background px-gutter py-[calc(var(--section-y)*0.75)] lg:py-section\", className)}>\n      <div className=\"mx-auto grid max-w-page items-center gap-y-14 lg:grid-cols-[minmax(0,1fr)_34.125rem] lg:gap-x-14\">\n        <div>\n          <LevelsHeading eyebrow={eyebrow} title={title} />\n          {lead ? (\n            <p className=\"mt-6 max-w-[37.5rem] text-lg leading-8 text-pretty text-muted-foreground lg:mt-4\">{lead}</p>\n          ) : null}\n          {link ? (\n            <LevelsLink href={link.href} className=\"mt-10 lg:mt-12\">\n              {link.label}\n            </LevelsLink>\n          ) : null}\n        </div>\n\n        <div className=\"relative h-[37.5rem] overflow-clip rounded-[calc(var(--radius)+1.25rem)] border border-border bg-[radial-gradient(circle_at_12%_15%,color-mix(in_oklab,var(--highlight)_10%,transparent),transparent_28%),radial-gradient(circle_at_88%_80%,color-mix(in_oklab,var(--highlight)_8%,transparent),transparent_30%),linear-gradient(to_bottom,var(--background),var(--secondary))] shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--highlight)_35%,transparent)]\">\n          <div className=\"absolute inset-x-1 top-[10%] bottom-0\">\n            {current?.chart ?? <LevelsPlaceholder tone=\"wash\" label={chartLabel} className=\"rounded-t-[calc(var(--radius)+0.5rem)]\" />}\n          </div>\n          <div className=\"absolute inset-x-0 bottom-0 flex flex-col items-center bg-linear-to-b from-secondary/0 via-secondary/90 via-40% to-secondary px-6 pt-16 pb-8\">\n            {caption ? (\n              <p className=\"text-center text-[0.6875rem] leading-[1.5] font-semibold tracking-[0.16em] text-muted-foreground uppercase\">\n                {caption}\n              </p>\n            ) : null}\n            <div role=\"tablist\" className=\"mt-3 flex flex-wrap justify-center gap-x-3 gap-y-3\">\n              {choices.map((choice, i) => (\n                <button\n                  key={choice.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={i === active}\n                  onClick={() => setActive(i)}\n                  className={cn(\n                    \"h-[2.375rem] rounded-full border px-[0.875rem] text-sm font-medium\",\n                    \"transition duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n                    i === active\n                      ? \"border-foreground bg-foreground text-background\"\n                      : \"border-foreground/6 bg-background/92 text-foreground/80 hover:border-foreground/15 hover:bg-background\",\n                  )}\n                >\n                  {choice.label}\n                </button>\n              ))}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-heading",
+    "levels-link",
+    "levels-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small tracked capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the long grey paragraph"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the green arrow link under the paragraph"
+    },
+    {
+      "name": "caption",
+      "type": "string",
+      "required": false,
+      "description": "the tiny caption above the chips"
+    },
+    {
+      "name": "choices",
+      "type": "LevelsSpikeChoice[]",
+      "required": true,
+      "description": "the chips; the first starts selected"
+    },
+    {
+      "name": "chartLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the chart placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "292736e5a428f168a66b4a834ee1ee10160049ebc563ec5e44f61bff6bce4558"
+}

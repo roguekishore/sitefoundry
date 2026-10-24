@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit platform tour",
+  "description": "A pinned tour on white: on the left a big three-line heading, a hairline pill and three tabs, each with a thin grey left line; on the right a wide dark panel with a coloured glow along its foot, holding a translucent settings card of ticked boxes and small switches. On desktop the stage sticks under the header for about one and a half windows while the scroll fills each tab's line top to bottom and crossfades the card to the next tab's settings. On phones the panel sits above a sideways row of tabs that advance on a five-second timer.",
+  "category": "features",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "pinned",
+    "sticky",
+    "scroll",
+    "progress",
+    "crossfade",
+    "dark-panel",
+    "glow",
+    "fintech"
+  ],
+  "notes": [
+    "the dark panel is a `dark` island, so it stays dark in light mode and uses each theme's dark tokens",
+    "media slot: the panel backdrop (a blurred colour image in the original); empty shows glow washes",
+    "desktop pinning is CSS sticky; tab choice and line fills follow the scroll through motion's useScroll; with reduced motion nothing pins and tabs change on click"
+  ],
+  "hydrate": "visible",
+  "entry": "unit-platform.tsx",
+  "source": "foundry",
+  "name": "unit-platform",
+  "files": [
+    {
+      "path": "unit-platform.css",
+      "content": "/* Phones and tablets: the active tab's left line fills top to bottom over one tab's time;\n   when it finishes the block moves to the next tab (onAnimationEnd). Desktop lines follow\n   the scroll instead (set from JavaScript), so this one is hidden there. */\n.unit-platform-fill {\n  transform-origin: center top;\n  animation: unit-platform-fill var(--unit-platform-time, 5s) linear both;\n}\n\n@keyframes unit-platform-fill {\n  from { transform: scaleY(0); }\n  to { transform: scaleY(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .unit-platform-fill { animation: none; }\n}\n\n/* Desktop: the section is as tall as one window plus half a window per tab, and its stage\n   sticks under the 64px header while the tabs are told by the scroll. */\n@media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n  .unit-platform {\n    height: calc(100svh + var(--unit-platform-n) * 50svh);\n  }\n  .unit-platform-stage {\n    position: sticky;\n    top: 4rem;\n  }\n}\n"
+    },
+    {
+      "path": "unit-platform.tsx",
+      "content": "import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitButton } from \"@foundry/unit-button\";\nimport \"./unit-platform.css\";\n\nexport interface UnitPlatformOption {\n  /** the row's label */\n  label: string;\n  /** whether it's ticked / switched on */\n  on: boolean;\n  /** check: a ticked box · toggle: a small switch */\n  control?: \"check\" | \"toggle\";\n}\n\nexport interface UnitPlatformTab {\n  /** the tab's title */\n  title: string;\n  /** one or two lines under it */\n  body: string;\n  /** the rows of the settings card shown in the dark panel */\n  options: UnitPlatformOption[];\n}\n\nexport interface UnitPlatformProps {\n  /** the heading (three short lines on desktop) */\n  heading: string;\n  /** the outline pill under it */\n  cta?: { label: string; href: string };\n  /** two to four tabs, told in scroll order on desktop and on a timer on phones */\n  tabs: UnitPlatformTab[];\n  /** the dark panel's backdrop (a blurred colour image in the original); a glow wash when empty */\n  backdrop?: ReactNode;\n  /** seconds per tab on phones */\n  seconds?: number;\n  className?: string;\n}\n\nconst ease = \"duration-[625ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\n/** Desktop progress line of tab k: fills while the scroll crosses its slice of the pinned stretch. */\nfunction ScrollLine({ progress, k, n }: { progress: MotionValue<number>; k: number; n: number }) {\n  const scaleY = useTransform(progress, [k / n, (k + 1) / n], [0, 1], { clamp: true });\n  return <motion.span aria-hidden className=\"absolute inset-y-0 -left-px hidden w-px origin-top bg-foreground lg:block lg:motion-reduce:hidden\" style={{ scaleY }} />;\n}\n\nfunction Control({ on, control = \"check\" }: Pick<UnitPlatformOption, \"on\" | \"control\">) {\n  if (control === \"toggle\") {\n    return (\n      <span aria-hidden className={cn(\"relative flex h-4 w-[1.875rem] shrink-0 items-center rounded-full\", on ? \"bg-background\" : \"bg-foreground/15\")}>\n        <span className={cn(\"absolute size-3 rounded-full bg-foreground\", on ? \"right-0.5\" : \"left-0.5\")} />\n      </span>\n    );\n  }\n  return (\n    <span aria-hidden className=\"flex size-[1.125rem] shrink-0 items-center justify-center rounded-[0.1875rem] border border-foreground/25\">\n      {on && <Check className=\"size-2.5\" strokeWidth={2.5} />}\n    </span>\n  );\n}\n\n/** A pinned tour: heading, pill and tabs with filling left lines on one side, a dark glowing panel whose settings card changes per tab on the other. */\nexport function UnitPlatform({ heading, cta, tabs, backdrop, seconds = 5, className }: UnitPlatformProps) {\n  const n = tabs.length;\n  const [active, setActive] = useState(0);\n  const section = useRef<HTMLElement>(null);\n  const row = useRef<HTMLDivElement>(null);\n  const reduced = useReducedMotion();\n  const { scrollYProgress } = useScroll({ target: section, offset: [\"start 64px\", \"end end\"] });\n\n  // desktop: the pinned stretch picks the tab\n  useMotionValueEvent(scrollYProgress, \"change\", (p) => {\n    if (reduced || !window.matchMedia(\"(min-width: 64rem)\").matches) return;\n    const k = Math.min(n - 1, Math.max(0, Math.floor(p * n)));\n    setActive((a) => (a === k ? a : k));\n  });\n\n  // phones: keep the active tab in view in the sideways row (without scrolling the page)\n  useEffect(() => {\n    const el = row.current;\n    const tab = el?.children[active] as HTMLElement | undefined;\n    if (el && tab && el.scrollWidth > el.clientWidth) {\n      el.scrollTo({ left: Math.max(0, el.scrollLeft + tab.getBoundingClientRect().left - el.getBoundingClientRect().left), behavior: reduced ? \"auto\" : \"smooth\" });\n    }\n  }, [active, reduced]);\n\n  const pick = (k: number) => {\n    const el = section.current;\n    if (el && !reduced && window.matchMedia(\"(min-width: 64rem)\").matches) {\n      // scroll to the middle of tab k's slice; the scroll then sets it\n      const top = el.getBoundingClientRect().top + window.scrollY - 64;\n      const stretch = el.offsetHeight - window.innerHeight + 64;\n      window.scrollTo({ top: top + ((k + 0.5) / n) * stretch, behavior: \"smooth\" });\n    } else {\n      setActive(k);\n    }\n  };\n\n  return (\n    <section\n      ref={section}\n      className={cn(\"unit-platform relative bg-background font-sans text-foreground\", className)}\n      style={{ \"--unit-platform-n\": n, \"--unit-platform-time\": `${seconds}s` } as CSSProperties}\n    >\n      <div className=\"unit-platform-stage mx-auto grid max-w-page gap-4 px-gutter pt-16 pb-16 lg:grid-cols-[minmax(0,1fr)_60%] lg:gap-0 lg:pt-20 lg:pb-36\">\n        <div className=\"contents lg:block\">\n          <div className=\"order-1\">\n            <h2 className=\"max-w-[22rem] font-display text-[1.640625rem] leading-[1.15] tracking-[-0.02em] lg:max-w-[23rem] lg:text-[2.5rem] lg:leading-[1.1]\">{heading}</h2>\n            {cta && (\n              <UnitButton href={cta.href} variant=\"outline\" className=\"mt-4 lg:mt-6 lg:h-11\">\n                {cta.label}\n              </UnitButton>\n            )}\n          </div>\n\n          <div ref={row} role=\"tablist\" className=\"order-3 -mr-gutter flex snap-x gap-6 overflow-x-auto pt-2 [scrollbar-width:none] lg:mt-20 lg:mr-0 lg:flex-col lg:gap-6 lg:overflow-visible lg:pt-0\">\n            {tabs.map((t, k) => (\n              <button\n                key={t.title}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={k === active}\n                onClick={() => pick(k)}\n                className=\"relative w-[85%] shrink-0 snap-start border-l border-border pl-4 text-left lg:w-auto lg:max-w-[22rem]\"\n              >\n                <ScrollLine progress={scrollYProgress} k={k} n={n} />\n                {k === active && (\n                  <span\n                    key={`fill-${active}`}\n                    aria-hidden\n                    className=\"unit-platform-fill absolute inset-y-0 -left-px w-px bg-foreground lg:hidden lg:motion-reduce:block\"\n                    onAnimationEnd={() => setActive((a) => (a + 1) % n)}\n                  />\n                )}\n                <span className=\"block text-[1.09375rem] leading-[1.25] tracking-[-0.01em] lg:text-lg\">{t.title}</span>\n                <span className=\"mt-1.5 block text-[0.875rem] leading-[1.45] text-muted-foreground lg:mt-2 lg:text-base lg:leading-[1.4]\">{t.body}</span>\n              </button>\n            ))}\n          </div>\n        </div>\n\n        {/* the dark panel: a dark island, whatever the page's mode */}\n        <div className=\"dark relative isolate order-2 mt-2 grid overflow-clip rounded-lg bg-background p-3.5 text-foreground lg:mt-0 lg:aspect-[770/576] lg:place-items-center lg:p-16\">\n          <div aria-hidden className=\"absolute inset-0 -z-10\">\n            {backdrop ?? (\n              <div className=\"size-full bg-[radial-gradient(60%_45%_at_30%_100%,color-mix(in_oklab,var(--glow)_45%,transparent),transparent),radial-gradient(45%_40%_at_75%_100%,color-mix(in_oklab,var(--chart-1)_40%,transparent),transparent),radial-gradient(70%_35%_at_50%_100%,color-mix(in_oklab,var(--highlight)_25%,transparent),transparent)]\" />\n            )}\n          </div>\n          {tabs.map((t, k) => (\n            <ul\n              key={t.title}\n              role=\"tabpanel\"\n              aria-hidden={k !== active}\n              className={cn(\n                \"col-start-1 row-start-1 w-full self-center rounded-lg bg-foreground/20 px-[1.125rem] backdrop-blur-sm transition-[opacity,visibility] lg:max-w-[25rem] lg:px-5\",\n                ease,\n                k === active ? \"opacity-100\" : \"pointer-events-none invisible opacity-0\",\n              )}\n            >\n              {t.options.map((o) => (\n                <li key={o.label} className=\"flex h-12 items-center justify-between gap-4 border-b border-foreground/10 text-[0.8125rem] last:border-0 lg:h-[3.4375rem] lg:text-sm\">\n                  {o.label}\n                  <Control on={o.on} control={o.control} />\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-button"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the heading (three short lines on desktop)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the outline pill under it"
+    },
+    {
+      "name": "tabs",
+      "type": "UnitPlatformTab[]",
+      "required": true,
+      "description": "two to four tabs, told in scroll order on desktop and on a timer on phones"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the dark panel's backdrop (a blurred colour image in the original); a glow wash when empty"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "5",
+      "description": "seconds per tab on phones"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "60e66bae6e95ea4c72b37c9effbc9dabc9a31542b37f8e15ed7eb2b9a1ba5970"
+}

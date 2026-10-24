@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle FAQ",
+  "description": "A white band with a centred headline, a pair of tabs (the active one a solid ink pill), and a roomy list of questions with a grey chevron at the right of each; a question opens its answer smoothly as the chevron turns down. Same single column on phones.",
+  "category": "faq",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "tabs",
+    "light",
+    "minimal",
+    "white"
+  ],
+  "notes": [
+    "needs JavaScript for the tabs and opening answers (hydrate visible)",
+    "with one group the tabs are hidden"
+  ],
+  "hydrate": "visible",
+  "entry": "puzzle-faq.tsx",
+  "source": "foundry",
+  "name": "puzzle-faq",
+  "files": [
+    {
+      "path": "puzzle-faq.tsx",
+      "content": "import { useId, useState, type ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PuzzleFaqGroup {\n  /** the tab label */\n  label: string;\n  items: { question: string; answer: ReactNode }[];\n}\n\nexport interface PuzzleFaqProps {\n  title: string;\n  /** one tab per group */\n  groups: PuzzleFaqGroup[];\n  className?: string;\n}\n\n/** Tabbed questions that open one at a time. */\nexport function PuzzleFaq({ title, groups, className }: PuzzleFaqProps) {\n  const [tab, setTab] = useState(0);\n  const [open, setOpen] = useState<number | null>(null);\n  const id = useId();\n  const group = groups[tab] ?? groups[0];\n\n  return (\n    <section className={cn(\"bg-card text-card-foreground\", className)}>\n      <div className=\"mx-auto max-w-[63.5rem] px-gutter pt-10 pb-16 lg:pt-[3.25rem] lg:pb-20\">\n        <h2 className=\"text-center font-display text-[1.75rem]/[1.2] font-medium lg:text-4xl/[1.2]\">{title}</h2>\n        {groups.length > 1 && (\n          <div role=\"tablist\" className=\"mt-8 flex justify-center gap-1 lg:mt-14\">\n            {groups.map((g, i) => (\n              <button\n                key={g.label}\n                type=\"button\"\n                role=\"tab\"\n                aria-selected={i === tab}\n                onClick={() => {\n                  setTab(i);\n                  setOpen(null);\n                }}\n                className={cn(\n                  \"rounded-[calc(var(--radius)*0.6)] px-3 py-1.5 text-sm transition-colors duration-300 motion-reduce:transition-none lg:py-3 lg:text-base\",\n                  i === tab ? \"lg:bg-foreground lg:text-background text-foreground/80\" : \"text-muted-foreground hover:text-foreground\",\n                )}\n              >\n                {g.label}\n              </button>\n            ))}\n          </div>\n        )}\n        <ul className=\"mt-6 lg:mt-9\">\n          {group.items.map((item, i) => {\n            const isOpen = open === i;\n            return (\n              <li key={item.question}>\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  aria-controls={`${id}-${i}`}\n                  onClick={() => setOpen(isOpen ? null : i)}\n                  className=\"flex w-full items-center justify-between gap-6 py-6 text-left text-lg/[1.55] lg:py-[2.0625rem] lg:text-lg/[1.4]\"\n                >\n                  {item.question}\n                  <ChevronRight\n                    aria-hidden\n                    className={cn(\"size-6 shrink-0 text-muted-foreground/70 transition-transform duration-300 motion-reduce:transition-none\", isOpen && \"rotate-90\")}\n                    strokeWidth={1.75}\n                  />\n                </button>\n                <div\n                  id={`${id}-${i}`}\n                  className={cn(\"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none\", isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}\n                >\n                  <div className=\"min-h-0 overflow-hidden\">\n                    <div className=\"max-w-[48rem] pb-6 text-base/[1.65] text-muted-foreground\">{item.answer}</div>\n                  </div>\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "groups",
+      "type": "PuzzleFaqGroup[]",
+      "required": true,
+      "description": "one tab per group"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c1defa53bc62742102b69cd8c4fbd8e1389f4531a388517600bf937670dd95dc"
+}

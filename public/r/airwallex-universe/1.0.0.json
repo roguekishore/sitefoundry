@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex product universe",
+  "description": "A graphite band: a centred white headline and line, then a pill tab bar whose active tab fills with the product's saturated gradient. Each tab opens a panel with a caps eyebrow, a big medium-weight statement, an outline video pill and a tall phone shot on the left, and a bento of three rounded graphite cards (one wide, two square-ish) on the right. Hovering a card grows its arrow into a Learn more label. On phones the tabs become an accordion of pills; the open one shows its cards in a sideways swipe row.",
+  "category": "features",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "accordion",
+    "bento",
+    "dark",
+    "gradient",
+    "hover",
+    "carousel"
+  ],
+  "notes": [
+    "always dark: the section carries `dark`, so it reads the theme's dark colours on a light page",
+    "needs JavaScript to switch tabs (hydrate: visible); the static HTML shows the first tab",
+    "three cards per tab fill the bento: the first is the wide one"
+  ],
+  "hydrate": "visible",
+  "entry": "airwallex-universe.tsx",
+  "source": "foundry",
+  "name": "airwallex-universe",
+  "files": [
+    {
+      "path": "airwallex-universe.css",
+      "content": "/* A new panel settles in: a short fade and an 8px rise. */\n@media (prefers-reduced-motion: no-preference) {\n  .airwallex-universe-panel {\n    animation: airwallex-universe-in 0.3s ease-out both;\n  }\n}\n\n@keyframes airwallex-universe-in {\n  from { opacity: 0; translate: 0 8px; }\n  to { opacity: 1; translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "airwallex-universe.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowRight, ChevronDown, CirclePlay } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { gradientClass, type AirwallexTone } from \"@foundry/airwallex-gradient\";\nimport { AirwallexHeading } from \"@foundry/airwallex-heading\";\nimport { AirwallexPlaceholder } from \"@foundry/airwallex-placeholder\";\nimport \"./airwallex-universe.css\";\n\nexport interface AirwallexUniverseCard {\n  /** the grey caps line (\"Multi-currency\") */\n  eyebrow: string;\n  /** what it does, one or two lines */\n  title: string;\n  /** where the card links to */\n  href: string;\n  /** the shot on the card; empty for a placeholder */\n  media?: ReactNode;\n}\n\nexport interface AirwallexUniverseTab {\n  /** the tab's label */\n  label: string;\n  /** the gradient the active tab fills with */\n  tone: AirwallexTone;\n  /** the caps line over the big statement (desktop) */\n  eyebrow: string;\n  /** the big statement on the left (desktop) */\n  title: string;\n  /** the outline pill under the statement */\n  video?: { label: string; href: string };\n  /** the tall phone shot on the left; empty for a placeholder */\n  phone?: ReactNode;\n  /** three cards: the first is the wide one */\n  cards: AirwallexUniverseCard[];\n}\n\nexport interface AirwallexUniverseProps {\n  /** the headline */\n  title: string;\n  /** the line under it */\n  intro?: string;\n  /** one tab per product */\n  tabs: AirwallexUniverseTab[];\n  /** the label the arrow grows into on hover (\"Learn more\") */\n  moreLabel: string;\n  className?: string;\n}\n\nfunction CardText({ card, moreLabel }: { card: AirwallexUniverseCard; moreLabel: string }) {\n  return (\n    <>\n      <p className=\"text-sm font-semibold tracking-[0.06em] text-muted-foreground uppercase\">{card.eyebrow}</p>\n      <p className=\"mt-3 text-lg leading-[1.5] font-semibold text-foreground\">{card.title}</p>\n      <span className=\"mt-3 inline-flex items-center gap-2 text-base font-medium text-foreground/80\">\n        <span className=\"max-w-0 overflow-clip whitespace-nowrap opacity-0 transition-[max-width,opacity] duration-300 ease-out group-hover:max-w-32 group-hover:opacity-100 motion-reduce:transition-none\">\n          {moreLabel}\n        </span>\n        <ArrowRight aria-hidden className=\"size-4\" strokeWidth={2.5} />\n      </span>\n    </>\n  );\n}\n\n/** Tabs (desktop) or accordion (phones) over a bento of product cards. */\nexport function AirwallexUniverse({ title, intro, tabs, moreLabel, className }: AirwallexUniverseProps) {\n  const [open, setOpen] = useState(0);\n  const active = tabs[open] ?? tabs[0];\n  if (!active) return null;\n  const [wide, ...rest] = active.cards;\n  return (\n    <section className={cn(\"dark bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-20 pb-20 lg:px-12 lg:pt-[5.75rem] lg:pb-10\">\n        <AirwallexHeading title={title} intro={intro} className=\"max-w-[22rem] lg:max-w-none [&_p]:lg:mt-7\" />\n\n        {/* desktop: a pill tab bar and one panel */}\n        <div role=\"tablist\" className=\"mx-auto mt-16 hidden w-fit items-center gap-10 rounded-full bg-card lg:flex\">\n          {tabs.map((tab, i) => (\n            <button\n              key={tab.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === open}\n              onClick={() => setOpen(i)}\n              className={cn(\n                \"h-12 cursor-pointer rounded-full px-6 text-xl font-semibold text-foreground transition-colors duration-300\",\n                i === open ? gradientClass(tab.tone) : \"hover:text-foreground/70\",\n              )}\n            >\n              {tab.label}\n            </button>\n          ))}\n        </div>\n        <div key={`panel-${open}`} role=\"tabpanel\" className=\"airwallex-universe-panel mt-10 hidden grid-cols-[17.75rem_minmax(0,1fr)] gap-6.5 lg:grid\">\n          <div className=\"flex flex-col pt-8\">\n            <p className=\"text-sm font-bold tracking-[0.06em] uppercase\">{active.eyebrow}</p>\n            <h3 className=\"mt-5 font-display text-[2.375rem] leading-[1.25] font-semibold\">{active.title}</h3>\n            {active.video && (\n              <a\n                href={active.video.href}\n                className=\"mt-6 inline-flex h-9 w-fit items-center gap-1.5 rounded-full border border-foreground/80 px-4 text-base font-semibold transition-colors duration-250 hover:bg-foreground/10 motion-reduce:transition-none\"\n              >\n                {active.video.label}\n                <CirclePlay aria-hidden className=\"size-4\" strokeWidth={2} />\n              </a>\n            )}\n            <div className=\"mt-8\">{active.phone ?? <AirwallexPlaceholder tone=\"dim\" className=\"aspect-[284/550] w-full rounded-[2.75rem]\" />}</div>\n          </div>\n          <div className=\"grid grid-cols-2 content-start gap-6\">\n            {wide && (\n              <a href={wide.href} className=\"group col-span-2 flex h-[29.875rem] items-center gap-8 rounded-[1rem] bg-card px-8\">\n                <div className=\"w-[22.5rem] shrink-0\">\n                  <CardText card={wide} moreLabel={moreLabel} />\n                </div>\n                <div className=\"min-w-0 flex-1\">{wide.media ?? <AirwallexPlaceholder tone=\"dim\" className=\"aspect-[570/280] w-full rounded-lg\" />}</div>\n              </a>\n            )}\n            {rest.map((card) => (\n              <a key={card.eyebrow} href={card.href} className=\"group flex h-[29.875rem] flex-col rounded-[1rem] bg-card\">\n                <div className=\"px-8 pt-12\">{card.media ?? <AirwallexPlaceholder tone=\"dim\" className=\"aspect-[506/242] w-full rounded-lg\" />}</div>\n                <div className=\"mt-10 px-8 pb-12\">\n                  <CardText card={card} moreLabel={moreLabel} />\n                </div>\n              </a>\n            ))}\n          </div>\n        </div>\n\n        {/* phones: an accordion of pills; the open one shows a swipe row of cards */}\n        <div className=\"mt-14 flex flex-col gap-4 lg:hidden\">\n          {tabs.map((tab, i) => {\n            const isOpen = i === open;\n            return (\n              <div key={tab.label}>\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  onClick={() => setOpen(isOpen ? -1 : i)}\n                  className={cn(\n                    \"flex h-[3.125rem] w-full cursor-pointer items-center justify-between rounded-full px-10 text-lg font-semibold text-foreground\",\n                    isOpen ? gradientClass(tab.tone) : \"bg-card\",\n                  )}\n                >\n                  {tab.label}\n                  <ChevronDown aria-hidden className={cn(\"size-4 transition-transform duration-300 motion-reduce:transition-none\", isOpen && \"rotate-180\")} strokeWidth={2.5} />\n                </button>\n                {isOpen && (\n                  <ul className=\"airwallex-universe-panel -mx-gutter mt-10 mb-10 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-gutter px-gutter [scrollbar-width:none]\">\n                    {tab.cards.map((card) => (\n                      <li key={card.eyebrow} className=\"w-[15.5rem] shrink-0 snap-start\">\n                        <a href={card.href} className=\"group flex h-full flex-col rounded-[1rem] bg-card px-6 pt-6 pb-8\">\n                          {card.media ?? <AirwallexPlaceholder tone=\"dim\" className=\"aspect-[2/1] w-full rounded-md\" />}\n                          <div className=\"mt-6\">\n                            <CardText card={card} moreLabel={moreLabel} />\n                          </div>\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                )}\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "airwallex-gradient",
+    "airwallex-heading",
+    "airwallex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": false,
+      "description": "the line under it"
+    },
+    {
+      "name": "tabs",
+      "type": "AirwallexUniverseTab[]",
+      "required": true,
+      "description": "one tab per product"
+    },
+    {
+      "name": "moreLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label the arrow grows into on hover (\"Learn more\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b07fc1d72166854fd0aefb858e1285e5a4b10a9daebb7f5cb4a5d506a2e14dd5"
+}

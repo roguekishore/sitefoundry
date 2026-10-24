@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway hero",
+  "description": "A framed, faintly navy hero panel over full-panel art: a big centred book-serif headline, one quiet line with an underlined link, a violet and a near-black button, then a near-black app window whose pill tab bar overlaps its bottom edge. The tabs take turns on their own with a violet progress fill sweeping across the active one; the art drifts sideways as the hero scrolls away.",
+  "category": "hero",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "dark",
+    "serif",
+    "framed",
+    "tabs",
+    "autoplay",
+    "product-shot",
+    "parallax",
+    "developer"
+  ],
+  "notes": [
+    "background and each tab's media are slots; empty ones show a soft gradient and a near-black window",
+    "the app window and tabs show from tablets up; phones get the headline and buttons only, like the original",
+    "needs JavaScript for the auto-advancing tabs (hydrate: load); reduced motion keeps the first tab"
+  ],
+  "hydrate": "load",
+  "entry": "railway-hero.tsx",
+  "source": "foundry",
+  "name": "railway-hero",
+  "files": [
+    {
+      "path": "railway-hero.css",
+      "content": "/* The active tab's progress fill sweeps left to right over the tab's turn. */\n.railway-hero-fill {\n  animation: railway-hero-fill linear both;\n}\n\n@keyframes railway-hero-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n/* The art behind the hero drifts sideways a little as the hero scrolls away. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .railway-hero-art {\n      animation: railway-hero-drift linear both;\n      animation-timeline: --railway-hero;\n      animation-range: cover 40% cover 100%;\n    }\n  }\n}\n.railway-hero {\n  view-timeline-name: --railway-hero;\n}\n\n@keyframes railway-hero-drift {\n  from { translate: -1.5rem 0; }\n  to { translate: 0 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .railway-hero-fill { animation: none; }\n}\n"
+    },
+    {
+      "path": "railway-hero.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RailwayButton } from \"@foundry/railway-button\";\nimport { RailwayPanel } from \"@foundry/railway-panel\";\nimport \"./railway-hero.css\";\n\nexport interface RailwayHeroTab {\n  label: string;\n  /** a small lucide icon before the label */\n  icon?: ReactNode;\n  /** what the app window shows while this tab is active (a screenshot or video); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface RailwayHeroProps {\n  /** the serif headline */\n  title: string;\n  /** one line under it; may contain an underlined link */\n  lead: ReactNode;\n  /** call-to-action links: the first is violet, the rest near-black */\n  actions: { label: string; href: string }[];\n  /** the art behind everything (an illustration or photo, cropped like object-fit: cover); a soft gradient when empty */\n  background?: ReactNode;\n  /** the pill tabs under the app window; they take turns automatically */\n  tabs: RailwayHeroTab[];\n  /** screen-reader name of the tab list */\n  tabsLabel: string;\n  /** milliseconds each tab stays active before the next one */\n  interval?: number;\n  className?: string;\n}\n\n/**\n * Framed hero: a big centred serif line over a full-panel art slot, two buttons, then (from\n * tablets up) a near-black app window whose tab pill bar overlaps its bottom edge and steps\n * through the tabs with a filling progress highlight.\n */\nexport function RailwayHero({ title, lead, actions, background, tabs, tabsLabel, interval = 5000, className }: RailwayHeroProps) {\n  const [active, setActive] = useState(0);\n\n  // Step to the next tab after `interval`; clicking a tab restarts the wait. Off with reduced motion.\n  useEffect(() => {\n    if (tabs.length < 2 || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    const timer = window.setTimeout(() => setActive((i) => (i + 1) % tabs.length), interval);\n    return () => window.clearTimeout(timer);\n  }, [active, interval, tabs.length]);\n\n  return (\n    <section className={cn(\"railway-hero px-gutter pb-4 text-foreground\", className)}>\n      <RailwayPanel tint=\"chart-5\">\n        <div className=\"railway-hero-art absolute inset-y-0 -inset-x-16\" aria-hidden={background ? undefined : true}>\n          {background ?? (\n            <div className=\"size-full bg-linear-to-b from-chart-5/15 via-glow/10 to-chart-2/20\">\n              <div className=\"size-full bg-[radial-gradient(45%_40%_at_8%_80%,color-mix(in_oklab,var(--chart-3)_22%,transparent),transparent)]\" />\n            </div>\n          )}\n        </div>\n\n        <div className=\"relative flex flex-col items-center px-4 pt-24 pb-12 text-center lg:pt-[7.75rem] lg:pb-11\">\n          <h1 className=\"max-w-[20rem] font-display text-[2.5rem] leading-[1.15] font-medium tracking-[-0.01em] text-balance sm:max-w-none lg:text-[3.375rem] lg:leading-[1.2]\">\n            {title}\n          </h1>\n          <p className=\"mt-6 max-w-[19rem] text-lg leading-7 text-foreground/80 sm:max-w-none lg:text-xl\">{lead}</p>\n          <div className=\"mt-8 flex flex-wrap justify-center gap-3\">\n            {actions.map((action, i) => (\n              <RailwayButton key={action.label} href={action.href} size=\"lg\" variant={i === 0 ? \"primary\" : \"dark\"}>\n                {action.label}\n              </RailwayButton>\n            ))}\n          </div>\n\n          <div className=\"relative mt-24 hidden w-full max-w-[66.375rem] md:block\">\n            <div className=\"aspect-[1062/755] overflow-clip rounded-lg border border-border bg-muted shadow-[0_-12px_127px_0_color-mix(in_oklab,var(--chart-5)_22%,transparent)]\">\n              {tabs[active]?.media}\n            </div>\n            <div\n              role=\"tablist\"\n              aria-label={tabsLabel}\n              className=\"absolute -bottom-5 left-1/2 flex -translate-x-1/2 items-center rounded-lg border border-border bg-muted p-1\"\n            >\n              {tabs.map((tab, i) => (\n                <div key={tab.label} className=\"flex items-center\">\n                  {i > 0 && <span className=\"mx-1.5 h-4 w-px bg-border\" aria-hidden />}\n                  <button\n                    type=\"button\"\n                    role=\"tab\"\n                    aria-selected={i === active}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"relative flex h-[2.125rem] items-center gap-2 overflow-clip rounded-md px-3.5 text-[0.9375rem] whitespace-nowrap transition-colors duration-150 motion-reduce:transition-none [&_svg]:size-4 [&_svg]:shrink-0\",\n                      i === active ? \"bg-primary/60 text-foreground\" : \"text-muted-foreground hover:text-foreground\",\n                    )}\n                  >\n                    {i === active && (\n                      <span\n                        key={active}\n                        className=\"railway-hero-fill absolute inset-0 origin-left bg-primary/55 motion-reduce:hidden\"\n                        style={{ animationDuration: `${interval}ms` }}\n                        aria-hidden\n                      />\n                    )}\n                    <span className=\"relative flex items-center gap-2\">\n                      {tab.icon}\n                      {tab.label}\n                    </span>\n                  </button>\n                </div>\n              ))}\n            </div>\n          </div>\n        </div>\n      </RailwayPanel>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "railway-button",
+    "railway-panel"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the serif headline"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": true,
+      "description": "one line under it; may contain an underlined link"
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "call-to-action links: the first is violet, the rest near-black"
+    },
+    {
+      "name": "background",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the art behind everything (an illustration or photo, cropped like object-fit: cover); a soft gradient when empty"
+    },
+    {
+      "name": "tabs",
+      "type": "RailwayHeroTab[]",
+      "required": true,
+      "description": "the pill tabs under the app window; they take turns automatically"
+    },
+    {
+      "name": "tabsLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the tab list"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "5000",
+      "description": "milliseconds each tab stays active before the next one"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9fed60d35c2fa7d07c287ae303114e547c493df3e7aa44b0541f3663db04a312"
+}

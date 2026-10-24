@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Framer media placeholder",
+  "description": "Plain stand-ins for media on a black page: a #171717 well, a #111 panel, either one optionally fading into the page towards its right or bottom edge like the original's UI shots, or a panel with a soft blue glow rim. Nothing is drawn inside.",
+  "category": "media",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "placeholder",
+    "media",
+    "dark",
+    "fade",
+    "glow"
+  ],
+  "notes": [
+    "fills the box it is given; radius, border and size come from the parent or className",
+    "pass children to show real media inside"
+  ],
+  "entry": "framer-placeholder.tsx",
+  "name": "framer-placeholder",
+  "files": [
+    {
+      "path": "framer-placeholder.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface FramerPlaceholderProps {\n  /** well: muted surface (media inside cards) · panel: card surface (windows, side panels) ·\n   *  glow: card surface with a soft blue rim of light */\n  tone?: \"well\" | \"panel\" | \"glow\";\n  /** fade into the page towards one edge, as the original's cropped UI shots do */\n  fade?: \"none\" | \"right\" | \"bottom\" | \"both\";\n  /** what the slot will hold, read to screen readers (e.g. \"Product video\") */\n  label?: string;\n  /** real media to show instead of the empty surface */\n  children?: ReactNode;\n  className?: string;\n}\n\nconst tones = {\n  well: \"bg-muted\",\n  panel: \"bg-card\",\n  glow: \"bg-card ring-2 ring-glow shadow-[0_0_3rem_0.5rem_color-mix(in_oklab,var(--glow)_70%,transparent),inset_0_0_2rem_color-mix(in_oklab,var(--glow)_35%,transparent)]\",\n};\n\nconst fades = {\n  none: \"\",\n  right: \"mask-r-from-55% mask-r-to-100%\",\n  bottom: \"mask-b-from-55% mask-b-to-100%\",\n  both: \"mask-r-from-60% mask-r-to-100% mask-b-from-60% mask-b-to-100%\",\n};\n\n/** Stands in for media: a plain surface in the theme's colours. */\nexport function FramerPlaceholder({ tone = \"well\", fade = \"none\", label, children, className }: FramerPlaceholderProps) {\n  return (\n    <div\n      role={label ? \"img\" : undefined}\n      aria-label={label}\n      aria-hidden={label ? undefined : true}\n      className={cn(\"size-full overflow-clip\", tones[tone], fades[fade], className)}\n    >\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "well",
+      "description": "well: muted surface (media inside cards) · panel: card surface (windows, side panels) ·\nglow: card surface with a soft blue rim of light"
+    },
+    {
+      "name": "fade",
+      "type": "enum",
+      "required": false,
+      "default": "none",
+      "description": "fade into the page towards one edge, as the original's cropped UI shots do"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "what the slot will hold, read to screen readers (e.g. \"Product video\")"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "real media to show instead of the empty surface"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "29899156acfbb004947ed1b214d7b026cccecd3dfcf9bafe9df5283802e4d63b"
+}

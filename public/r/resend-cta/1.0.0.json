@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend closing call",
+  "description": "A centred two-line display-serif title lit white to half-white and a graphite button with a chevron; on desktop a giant, barely-there wordmark spans the page width beneath it, cropped by the band's bottom edge, and fades in as it scrolls into view.",
+  "category": "cta",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "dark",
+    "serif",
+    "gradient-text",
+    "wordmark",
+    "reveal",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the wordmark is SVG text stretched to the page width (desktop only); its fade is a CSS view() timeline",
+    "the title reads --resend-serif from the resend theme, falling back to the display face elsewhere"
+  ],
+  "entry": "resend-cta.tsx",
+  "source": "foundry",
+  "name": "resend-cta",
+  "files": [
+    {
+      "path": "resend-cta.css",
+      "content": "/* The giant wordmark fades in while it enters the window. */\n@media (prefers-reduced-motion: no-preference) {\n  @supports (animation-timeline: view()) {\n    .resend-cta-wordmark {\n      animation: resend-cta-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes resend-cta-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "resend-cta.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ResendButton } from \"@foundry/resend-button\";\nimport \"./resend-cta.css\";\n\nexport interface ResendCtaProps {\n  /** the title; each entry is a line on wide screens */\n  title: string[];\n  /** the graphite button */\n  action: { label: string; href: string };\n  /** a giant faint wordmark under the button, cropped by the band's edge (desktop only) */\n  wordmark?: string;\n  className?: string;\n}\n\nexport function ResendCta({ title, action, wordmark, className }: ResendCtaProps) {\n  return (\n    <section className={cn(\"bg-background pt-12 text-foreground lg:pt-24\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter pb-[4.5rem] text-center lg:pb-0\">\n        <h2 className=\"bg-linear-to-br from-foreground from-30% to-foreground/50 bg-clip-text pb-2 font-[family-name:var(--resend-serif,var(--typeface-display))] text-[4rem] leading-none font-normal tracking-[-0.035em] text-balance text-transparent lg:text-[4.8rem]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"lg:block\">\n              {line}\n              {i < title.length - 1 && \" \"}\n            </span>\n          ))}\n        </h2>\n        <ResendButton href={action.href} chevron className=\"mt-10 w-full lg:mt-9 lg:w-auto\">\n          {action.label}\n        </ResendButton>\n        {wordmark && (\n          <div aria-hidden className=\"resend-cta-wordmark mt-24 hidden w-full lg:block\">\n            <svg viewBox=\"0 0 1000 150\" className=\"block w-full fill-foreground/[0.06]\">\n              <text\n                x=\"0\"\n                y=\"235\"\n                textLength=\"1000\"\n                lengthAdjust=\"spacingAndGlyphs\"\n                className=\"font-display\"\n                style={{ fontSize: 300, fontWeight: 700, letterSpacing: \"-0.04em\" }}\n              >\n                {wordmark}\n              </text>\n            </svg>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the title; each entry is a line on wide screens"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the graphite button"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": false,
+      "description": "a giant faint wordmark under the button, cropped by the band's edge (desktop only)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "75432d693ba1e96146d67204ff03093c19d4d16c69e3cfad122a5fa6128c7bc3"
+}

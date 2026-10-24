@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash tools bento",
+  "description": "An 88px centred two-line serif heading with an italic word over rows of dark slate cards in uneven widths (narrow–wide–narrow, then two halves), each with art on top and one sentence led by a white phrase. Stacked on phones.",
+  "category": "features",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "dark",
+    "serif",
+    "asymmetric"
+  ],
+  "notes": [
+    "card widths come from each card's weight; art slots show a soft wash when empty"
+  ],
+  "entry": "slash-tools.tsx",
+  "source": "foundry",
+  "name": "slash-tools",
+  "files": [
+    {
+      "path": "slash-tools.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashFeatureCard } from \"@foundry/slash-feature-card\";\nimport { SlashHeading, type SlashHeadingPart } from \"@foundry/slash-heading\";\n\nexport interface SlashTool {\n  /** the white lead-in (\"Sub-accounts.\") */\n  title: string;\n  /** the grey rest of the sentence */\n  body: string;\n  /** the card's art; a soft wash stands in when empty */\n  media?: ReactNode;\n  /** share of the row's width on desktop (cards in a row split it by weight; default 1) */\n  weight?: number;\n}\n\nexport interface SlashToolsRow {\n  /** the cards in this row */\n  cards: SlashTool[];\n  /** height of the art area in this row on desktop (CSS length) */\n  mediaHeight?: string;\n}\n\nexport interface SlashToolsProps {\n  /** the heading, as runs; `{ italic: \"clever\" }` sets a run in italic */\n  heading: SlashHeadingPart[];\n  /** the grey line under it */\n  sub?: string;\n  /** rows of cards, each split by weight on desktop */\n  rows: SlashToolsRow[];\n  className?: string;\n}\n\n/** A big centred serif heading over rows of dark tool cards of uneven widths. */\nexport function SlashTools({ heading, sub, rows, className }: SlashToolsProps) {\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <SlashHeading parts={heading} sub={sub} size=\"xl\" headingClassName=\"max-w-[18rem] lg:max-w-[36rem]\" />\n        <div className=\"mt-12 flex flex-col gap-4 lg:mt-12 lg:gap-3\">\n          {rows.map((row, r) => (\n            <div key={r} className=\"flex flex-col gap-4 lg:flex-row lg:gap-3\">\n              {row.cards.map((card) => (\n                <SlashFeatureCard\n                  key={card.title}\n                  layout=\"inline\"\n                  title={card.title}\n                  body={card.body}\n                  media={card.media}\n                  mediaHeight={row.mediaHeight ?? \"16.5rem\"}\n                  mediaHeightSm=\"15rem\"\n                  style={{ [\"--slash-tools-weight\" as string]: card.weight ?? 1 }}\n                  className=\"lg:min-w-0 lg:basis-0 lg:grow-(--slash-tools-weight)\"\n                />\n              ))}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-feature-card",
+    "slash-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs; `{ italic: \"clever\" }` sets a run in italic"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "rows",
+      "type": "SlashToolsRow[]",
+      "required": true,
+      "description": "rows of cards, each split by weight on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "90f259f2458e2336266e7a065803765d678334efe7a27c0f755a25af61d8b2a6"
+}

@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash FAQ",
+  "description": "A 64px serif heading with a grey line ending in an underlined link on the left, and on the right a list of 24px questions divided by hairlines with thin chevrons; a question slides open its answer and flips its chevron, one at a time. Stacked on phones with 16px questions.",
+  "category": "faq",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "faq",
+    "accordion",
+    "dark",
+    "serif",
+    "split",
+    "minimal",
+    "interactive"
+  ],
+  "notes": [
+    "needs JavaScript for the accordion (hydrate); static HTML shows the questions closed"
+  ],
+  "hydrate": "visible",
+  "entry": "slash-faq.tsx",
+  "source": "foundry",
+  "name": "slash-faq",
+  "files": [
+    {
+      "path": "slash-faq.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashHeadingText, type SlashHeadingPart } from \"@foundry/slash-heading\";\n\nexport interface SlashFaqItem {\n  /** the question */\n  question: string;\n  /** the answer */\n  answer: ReactNode;\n}\n\nexport interface SlashFaqProps {\n  /** the heading, as runs */\n  heading: SlashHeadingPart[];\n  /** the grey line under it, before the link */\n  sub?: string;\n  /** the underlined link that ends the line (\"Write to us\") */\n  link?: { label: string; href: string };\n  /** the questions; none starts open */\n  items: SlashFaqItem[];\n  className?: string;\n}\n\n/** A serif heading on the left and a ruled list of questions on the right that open one at a time. */\nexport function SlashFaq({ heading, sub, link, items, className }: SlashFaqProps) {\n  const [open, setOpen] = useState(-1);\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground lg:pt-[calc(var(--section-y)*2+1.75rem)]\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-10 px-gutter lg:grid-cols-[1fr_40rem] lg:gap-12\">\n        <div>\n          <h2 className=\"max-w-[20rem] font-display text-[2.25rem] leading-[1.03] font-normal tracking-[-0.01em] lg:max-w-[27rem] lg:text-[4rem]\">\n            <SlashHeadingText parts={heading} />\n          </h2>\n          {(sub || link) && (\n            <p className=\"mt-5 max-w-[24rem] text-base leading-[1.4] tracking-[-0.02em] text-foreground/70 lg:mt-6 lg:text-xl\">\n              {sub}{\" \"}\n              {link && (\n                <a href={link.href} className=\"underline underline-offset-4 transition-colors duration-150 hover:text-foreground\">\n                  {link.label}\n                </a>\n              )}\n            </p>\n          )}\n        </div>\n        <ul>\n          {items.map((item, i) => {\n            const isOpen = i === open;\n            return (\n              <li key={item.question} className=\"border-b border-border last:border-b-0\">\n                <button\n                  type=\"button\"\n                  aria-expanded={isOpen}\n                  onClick={() => setOpen(isOpen ? -1 : i)}\n                  className=\"flex w-full items-center justify-between gap-6 py-4 text-left text-base font-medium tracking-[-0.03em] transition-colors duration-150 hover:text-muted-foreground lg:py-[1.4rem] lg:text-2xl lg:tracking-[-0.02em]\"\n                >\n                  {item.question}\n                  <ChevronDown\n                    aria-hidden\n                    strokeWidth={1.5}\n                    className={cn(\"size-4 shrink-0 transition-transform duration-200 motion-reduce:transition-none lg:mr-2\", isOpen && \"rotate-180\")}\n                  />\n                </button>\n                <div className={cn(\"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none\", isOpen ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\")}>\n                  <div className=\"min-h-0 overflow-hidden\">\n                    <div className=\"max-w-[36rem] pb-6 text-base leading-[1.5] tracking-[-0.02em] text-foreground/70 lg:text-lg\">{item.answer}</div>\n                  </div>\n                </div>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it, before the link"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the underlined link that ends the line (\"Write to us\")"
+    },
+    {
+      "name": "items",
+      "type": "SlashFaqItem[]",
+      "required": true,
+      "description": "the questions; none starts open"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4482b847e9b02762f8586a4cf0f2b3c980efdf93ee054c11e53c343be2119513"
+}

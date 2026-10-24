@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Pilot button",
+  "description": "A pill button set in uppercase monospace: butter-yellow that turns violet on hover, solid violet that darkens, or a 1px outline (light on dark bands, violet on light) that fills on hover. Optional leading icon.",
+  "category": "button",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "mono",
+    "uppercase",
+    "yellow",
+    "violet",
+    "outline",
+    "hover"
+  ],
+  "notes": [
+    "outline-light is meant for dark bands (it uses the secondary-foreground colour)"
+  ],
+  "entry": "pilot-button.tsx",
+  "source": "foundry",
+  "name": "pilot-button",
+  "files": [
+    {
+      "path": "pilot-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PilotButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * sun: yellow fill → violet on hover · solid: violet fill → darker ·\n   * outline-light: light outline on dark bands → light fill · outline: violet outline → violet fill\n   */\n  variant?: \"sun\" | \"solid\" | \"outline-light\" | \"outline\";\n  /** sm: 42px (cards) · md: 44px (header) · lg: 48px (hero) */\n  size?: \"sm\" | \"md\" | \"lg\";\n  /** a small icon before the label (e.g. a play triangle) */\n  icon?: ReactNode;\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst variants = {\n  sun: \"border-highlight bg-highlight text-highlight-foreground duration-200 hover:border-primary hover:bg-primary hover:text-primary-foreground\",\n  solid: \"border-primary bg-primary text-primary-foreground duration-100 hover:border-secondary hover:bg-secondary hover:text-secondary-foreground\",\n  \"outline-light\":\n    \"border-secondary-foreground bg-transparent text-secondary-foreground duration-100 hover:bg-secondary-foreground hover:text-secondary\",\n  outline: \"border-primary bg-transparent text-primary duration-100 hover:bg-primary hover:text-primary-foreground\",\n};\n\nconst sizes = {\n  sm: \"h-[2.625rem] px-5 text-base\",\n  md: \"h-11 px-4 text-base\",\n  lg: \"h-12 px-6 text-lg\",\n};\n\n/** Pilot's pill: uppercase Space Mono, a flat fill or 1px outline, colours swap on hover. */\nexport function PilotButton({ children, href, variant = \"solid\", size = \"md\", icon, type = \"button\", className }: PilotButtonProps) {\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center gap-2 rounded-full border font-mono leading-none whitespace-nowrap uppercase\",\n    \"transition-colors ease-in-out motion-reduce:transition-none [&_svg]:size-3.5\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variants[variant],\n    sizes[size],\n    className,\n  );\n  const inner = (\n    <>\n      {icon}\n      {children}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "sun: yellow fill → violet on hover · solid: violet fill → darker ·\noutline-light: light outline on dark bands → light fill · outline: violet outline → violet fill"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 42px (cards) · md: 44px (header) · lg: 48px (hero)"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon before the label (e.g. a play triangle)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7e6d6cf3f18de9b73dc1cefbebe15ea1398db35299716645e439fbcff5973a69"
+}

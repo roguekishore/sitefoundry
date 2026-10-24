@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser features",
+  "description": "A calm feature bento on cream under a centred serif heading: transparent cards with 20px corners and a fine dark outline, set 7/5 then 5/7 then 7/5 on desktop and stacked on phones. Each holds a small uppercase tag in a white pill, a light 20px paragraph, and a product shot sitting on the bottom edge that fades out into the card. Cards fade in as they enter the window.",
+  "category": "features",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "cards",
+    "outline",
+    "pill",
+    "screenshots",
+    "fade",
+    "reveal",
+    "cream",
+    "minimal"
+  ],
+  "notes": [
+    "set wide on the first card of rows 1 and 3 and the second of row 2 for the original's zig-zag",
+    "media per card is a placeholder for a product shot; cards are at least 630px tall on desktop"
+  ],
+  "entry": "diabrowser-features.tsx",
+  "source": "foundry",
+  "name": "diabrowser-features",
+  "files": [
+    {
+      "path": "diabrowser-features.css",
+      "content": "/* Each card fades in over the first 200px of entering the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .diabrowser-features-fade {\n      animation: diabrowser-features-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 200px;\n    }\n  }\n}\n\n@keyframes diabrowser-features-fade {\n  from { opacity: 0; }\n}\n\n/* the product shot melts into the card towards the bottom edge */\n.diabrowser-features-media {\n  mask-image: linear-gradient(to bottom, var(--foreground) 62%, transparent);\n}\n"
+    },
+    {
+      "path": "diabrowser-features.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { DiabrowserHeading } from \"@foundry/diabrowser-heading\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-features.css\";\n\nexport interface DiabrowserFeatureCard {\n  /** the small uppercase tag in the white pill */\n  label: string;\n  /** two to four lines of plain description */\n  body: string;\n  /** wide cards take 7 of 12 columns on desktop, the others 5; alternate them per row */\n  wide?: boolean;\n  /** the product shot at the bottom of the card; empty shows a placeholder */\n  media?: ReactNode;\n  /** CSS aspect ratio of the shot (defaults: 558 / 362 wide, 318 / 399 narrow) */\n  mediaAspect?: string;\n}\n\nexport interface DiabrowserFeaturesProps {\n  /** the centred serif heading */\n  heading: ReactNode;\n  /** the cards, in reading order */\n  cards: DiabrowserFeatureCard[];\n  className?: string;\n}\n\n/** A bento of hairline-outlined cards (7/5 and 5/7 rows): a pill tag, a paragraph, and a product shot fading out at the bottom. */\nexport function DiabrowserFeatures({ heading, cards, className }: DiabrowserFeaturesProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"diabrowser-features-fade px-gutter\">\n        <DiabrowserHeading>{heading}</DiabrowserHeading>\n      </div>\n      <div className=\"px-gutter\">\n        <div className=\"mx-auto mt-[60px] grid max-w-page grid-cols-1 gap-[10px] lg:mt-[82px] lg:grid-cols-12 lg:gap-5\">\n          {cards.map((card) => (\n            <article\n              key={card.label}\n              className={cn(\n                \"diabrowser-features-fade flex flex-col overflow-clip rounded-2xl border border-foreground/30 px-[30px] pt-[30px] lg:min-h-[630px]\",\n                card.wide ? \"lg:col-span-7\" : \"lg:col-span-5\",\n              )}\n            >\n              <p className=\"-ml-1 inline-flex h-[30px] w-fit items-center rounded-full bg-card px-3 text-[12px] leading-none tracking-[0.11em] text-foreground/80 uppercase\">\n                {card.label}\n              </p>\n              <p className=\"mt-[18px] text-[16px] leading-6 tracking-[0.005em] text-pretty text-foreground/75 lg:mt-5 lg:text-[20px] lg:leading-[30px]\">\n                {card.body}\n              </p>\n              <div className=\"mt-auto flex justify-center pt-[30px] lg:pt-[52px]\">\n                <div\n                  className={cn(\n                    \"diabrowser-features-media w-full overflow-hidden rounded-t-lg bg-muted [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n                    card.wide ? \"lg:max-w-[558px]\" : \"lg:max-w-[318px]\",\n                  )}\n                  style={{ aspectRatio: card.mediaAspect ?? (card.wide ? \"558 / 362\" : \"318 / 399\") }}\n                >\n                  {card.media}\n                </div>\n              </div>\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "diabrowser-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the centred serif heading"
+    },
+    {
+      "name": "cards",
+      "type": "DiabrowserFeatureCard[]",
+      "required": true,
+      "description": "the cards, in reading order"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fa611e0bf0acf53030694b91e99aefb9f3f212e8502b32c7713252b1c657efcb"
+}

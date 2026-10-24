@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Bridge header",
+  "description": "A see-through header that sticks to the top and blurs whatever scrolls behind it: wordmark left, a centred row of plain links with small chevrons and a thin divider, and an ink-outlined 'request a demo' button right. On phones the wordmark stacks over its tagline and a mono 'Menu' label with a two-line icon opens a full-width panel.",
+  "category": "header",
+  "site": "bridge",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "blur",
+    "translucent",
+    "light",
+    "minimal",
+    "mono"
+  ],
+  "notes": [
+    "sticks to the top (position: sticky), so it needs to sit directly in the page container",
+    "88px tall on phones, 70px from lg; a hero meant to run behind it pulls itself up by that much (bridge-hero's underHeader)",
+    "the phone menu is a native <details>; no JavaScript"
+  ],
+  "entry": "bridge-header.tsx",
+  "source": "foundry",
+  "name": "bridge-header",
+  "files": [
+    {
+      "path": "bridge-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { BridgeButton } from \"@foundry/bridge-button\";\nimport { BridgeWordmark } from \"@foundry/bridge-wordmark\";\n\nexport interface BridgeHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron, as for items that open a menu */\n  menu?: boolean;\n  /** draws the thin vertical divider before this link */\n  dividerBefore?: boolean;\n}\n\nexport interface BridgeHeaderProps {\n  /** the wordmark: company name, small icon and parent-company tagline */\n  brand: { name: string; href: string; icon?: ReactNode; tagline?: string };\n  /** the centred nav links */\n  links: BridgeHeaderLink[];\n  /** the outlined button on the right */\n  action: { label: string; href: string };\n  /** the word beside the phone menu icon, e.g. \"Menu\" */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Bridge's sticky, translucent, blurred header. */\nexport function BridgeHeader({ brand, links, action, menuLabel, className }: BridgeHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-40 bg-background/25 text-foreground backdrop-blur-lg\", className)}>\n      <nav className=\"mx-auto flex h-[5.5rem] max-w-page items-center justify-between gap-6 px-gutter lg:h-[4.375rem]\">\n        <BridgeWordmark {...brand} layout=\"responsive\" />\n\n        <ul className=\"hidden items-center gap-10 lg:flex\">\n          {links.map((l) => (\n            <li key={l.label} className=\"flex items-center gap-10\">\n              {l.dividerBefore && <span aria-hidden className=\"h-3.5 w-px bg-muted-foreground/60\" />}\n              <a\n                href={l.href}\n                className=\"flex items-center gap-2 text-[0.9375rem]/none tracking-[-0.02em]\"\n              >\n                {l.label}\n                {l.menu && <ChevronDown aria-hidden className=\"size-3\" strokeWidth={1.5} />}\n              </a>\n            </li>\n          ))}\n        </ul>\n\n        <BridgeButton href={action.href} variant=\"ghost\" className=\"hidden lg:inline-flex\">\n          {action.label}\n        </BridgeButton>\n\n        <details className=\"group lg:hidden\">\n          <summary className=\"flex cursor-pointer list-none items-center gap-3 font-mono text-[0.9375rem]/none tracking-[-0.02em] [&::-webkit-details-marker]:hidden\">\n            {menuLabel}\n            <span aria-hidden className=\"flex w-6 flex-col gap-[0.3125rem]\">\n              <span className=\"h-px w-full bg-foreground transition-transform duration-250 group-open:translate-y-[3px] group-open:rotate-12 motion-reduce:transition-none\" />\n              <span className=\"h-px w-full bg-foreground transition-transform duration-250 group-open:-translate-y-[3px] group-open:-rotate-12 motion-reduce:transition-none\" />\n            </span>\n          </summary>\n          <div className=\"absolute inset-x-0 top-full max-h-[calc(100svh-5.5rem)] overflow-y-auto border-b border-border bg-background px-gutter pt-2 pb-8\">\n            <ul className=\"divide-y divide-border\">\n              {links.map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className=\"flex items-center justify-between py-4 text-[1.375rem]/none tracking-[-0.03em]\">\n                    {l.label}\n                    {l.menu && <ChevronDown aria-hidden className=\"size-4\" strokeWidth={1.5} />}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <BridgeButton href={action.href} variant=\"ghost\" className=\"mt-6 w-full\">\n              {action.label}\n            </BridgeButton>\n          </div>\n        </details>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "bridge-button",
+    "bridge-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; tagline?: string | undefined; }",
+      "required": true,
+      "description": "the wordmark: company name, small icon and parent-company tagline"
+    },
+    {
+      "name": "links",
+      "type": "BridgeHeaderLink[]",
+      "required": true,
+      "description": "the centred nav links"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outlined button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "the word beside the phone menu icon, e.g. \"Menu\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "958b2d3315acf2c3dfa49f0664d333059db0c5e34172ced4f9076cd266ce2712"
+}

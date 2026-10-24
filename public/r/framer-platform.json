@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer platform bento",
+  "description": "A two-line title and grey sub-line over a hairline bento: one rounded black panel split by 1px lines into tall, wide and small cells, each holding a dark UI shot that fades out towards its edge and a white \"Name →\" label in its bottom-left corner. Three columns on desktop, one on phones.",
+  "category": "features",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "dark",
+    "hairline",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "cell sizes: tall (1×2), wide (2×2), small (1×1) on a 3-column grid of 240px rows; on phones tall and wide cells are 480px, small ones 320px",
+    "each cell's media is a slot; empty it shows a placeholder placed like the original's shot (inset, bleeding off the right, or filling the cell)"
+  ],
+  "entry": "framer-platform.tsx",
+  "name": "framer-platform",
+  "files": [
+    {
+      "path": "framer-platform.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerArrowLink } from \"@foundry/framer-arrow-link\";\nimport { FramerSectionHead } from \"@foundry/framer-heading\";\nimport { FramerPlaceholder } from \"@foundry/framer-placeholder\";\n\nexport interface FramerPlatformCell {\n  /** the label in the bottom-left corner (an arrow follows it) */\n  label: string;\n  /** where the label links */\n  href: string;\n  /** tall: 1 column × 2 rows · wide: 2 columns × 2 rows · small: 1 × 1 */\n  size: \"tall\" | \"wide\" | \"small\";\n  /** small cells only: 240px tall on phones instead of 320px */\n  compact?: boolean;\n  /** how the media sits: inset (margins all round) · bleed (runs off the right edge) · full (fills the cell) */\n  fit?: \"inset\" | \"bleed\" | \"full\";\n  /** the cell's UI shot or art; empty shows a placeholder */\n  media?: ReactNode;\n  /** screen-reader label for the placeholder */\n  mediaLabel?: string;\n}\n\nexport interface FramerPlatformProps {\n  /** section title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** one or two grey lines under the title */\n  subtitle?: string;\n  /** the bento cells, in reading order (nine on the original) */\n  cells: FramerPlatformCell[];\n  className?: string;\n}\n\nconst sizes = {\n  tall: \"h-[30rem] lg:h-auto lg:row-span-2\",\n  wide: \"h-[30rem] lg:h-auto lg:col-span-2 lg:row-span-2\",\n  small: \"h-80 lg:h-auto\",\n};\n\nconst fits = {\n  inset: { box: \"inset-x-8 top-10 bottom-20 lg:inset-x-12 lg:top-12\", fade: \"bottom\" as const },\n  bleed: { box: \"top-10 right-0 bottom-20 left-8 lg:top-12 lg:left-12\", fade: \"both\" as const },\n  full: { box: \"inset-0\", fade: \"bottom\" as const },\n};\n\n/** Hairline bento of product areas. */\nexport function FramerPlatform({ title, subtitle, cells, className }: FramerPlatformProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-15 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <FramerSectionHead title={title} subtitle={subtitle} subtitleClassName=\"max-w-[12.5rem] sm:max-w-[26rem]\" />\n\n        <div className=\"mt-10 grid grid-cols-1 gap-px overflow-clip rounded-[calc(var(--radius)*2.5)] border border-border bg-border lg:mt-10 lg:auto-rows-[15rem] lg:grid-cols-3\">\n          {cells.map((cell) => {\n            const fit = fits[cell.fit ?? \"inset\"];\n            return (\n              <div key={cell.label} className={cn(\"relative flex items-end overflow-clip bg-background p-6\", sizes[cell.size], cell.compact && \"h-60\")}>\n                <div className={cn(\"absolute\", fit.box)}>\n                  {cell.media ?? (\n                    <FramerPlaceholder\n                      tone=\"panel\"\n                      fade={fit.fade}\n                      label={cell.mediaLabel}\n                      className={cell.fit === \"full\" ? \"\" : \"rounded-2xl\"}\n                    />\n                  )}\n                </div>\n                <FramerArrowLink href={cell.href} label={cell.label} size=\"lg\" className=\"relative\" />\n              </div>\n            );\n          })}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-arrow-link",
+    "framer-heading",
+    "framer-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "one or two grey lines under the title"
+    },
+    {
+      "name": "cells",
+      "type": "FramerPlatformCell[]",
+      "required": true,
+      "description": "the bento cells, in reading order (nine on the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3731f2dc57b26871809317a32527ec33ea9534b3de41ad77e890d7a9b4b26ced"
+}

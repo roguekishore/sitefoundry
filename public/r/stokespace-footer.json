@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Stoke Space footer",
+  "description": "A black footer on a 12-column grid: a light 'get in touch' line and a frosted contact button left, compact link columns right, then a giant edge-to-edge wordmark beside a small badge and a tracked uppercase address. A dusk gradient (blue to violet to magenta to orange) rises from below as the footer scrolls in; the contact button's border shimmers while hovered.",
+  "category": "footer",
+  "site": "stokespace",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "gradient",
+    "glow",
+    "wordmark",
+    "scroll",
+    "scrubbed",
+    "shimmer",
+    "minimal"
+  ],
+  "notes": [
+    "best as the page's last section: the gradient finishes rising when the page reaches its end",
+    "the rise uses CSS scroll-driven animation; browsers without it show the gradient in place",
+    "badge slot: 80×43 (a flag or seal)"
+  ],
+  "entry": "stokespace-footer.tsx",
+  "source": "foundry",
+  "name": "stokespace-footer",
+  "files": [
+    {
+      "path": "stokespace-footer.css",
+      "content": "/* The dusk glow behind the footer: transparent at its top, through blue and violet into\n   magenta and orange at the bottom. It rises into place (46% of its height) while the\n   footer scrolls in, finishing as the page reaches its end. */\n.stokespace-footer-glow {\n  background: linear-gradient(\n    to bottom,\n    transparent 0%,\n    color-mix(in oklab, var(--chart-4) 30%, transparent) 16%,\n    color-mix(in oklab, var(--glow) 55%, transparent) 30%,\n    color-mix(in oklab, var(--highlight) 80%, transparent) 46%,\n    color-mix(in oklab, var(--primary) 85%, transparent) 64%\n  );\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .stokespace-footer-glow {\n      animation: stokespace-footer-rise linear both;\n      animation-timeline: --stokespace-footer;\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes stokespace-footer-rise {\n  from { transform: translateY(46%); }\n  to { transform: none; }\n}\n\n/* Contact button: a bright streak travels along the 1px border, only while hovered. */\n.stokespace-footer-shimmer::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  border-radius: inherit;\n  padding: 1px;\n  background: linear-gradient(\n      90deg,\n      transparent,\n      color-mix(in oklab, var(--foreground) 70%, transparent),\n      transparent\n    )\n    -100% 0 / 50% 100% no-repeat;\n  mask:\n    linear-gradient(var(--foreground) 0 0) content-box exclude,\n    linear-gradient(var(--foreground) 0 0);\n  animation: stokespace-footer-shimmer 4s linear infinite paused;\n  pointer-events: none;\n}\n.stokespace-footer-shimmer:hover::before,\n.stokespace-footer-shimmer:focus-visible::before {\n  animation-play-state: running;\n}\n\n@keyframes stokespace-footer-shimmer {\n  to { background-position: 200% 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .stokespace-footer-shimmer::before { animation: none; }\n}\n"
+    },
+    {
+      "path": "stokespace-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { StokespacePlaceholder } from \"@foundry/stokespace-placeholder\";\nimport { StokespaceWordmark } from \"@foundry/stokespace-wordmark\";\nimport \"./stokespace-footer.css\";\n\nexport interface StokespaceFooterLink {\n  /** link text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** opens another site: adds a small up-right arrow */\n  external?: boolean;\n}\n\nexport interface StokespaceFooterProps {\n  /** the \"get in touch\" line */\n  contactTitle: string;\n  /** the contact button */\n  contact: { label: string; href: string };\n  /** up to three link columns */\n  columns: StokespaceFooterLink[][];\n  /** the legal links (their own column) */\n  legal: StokespaceFooterLink[];\n  /** company name for the giant wordmark */\n  brand: string;\n  /** address lines, shown small and uppercase */\n  address: string[];\n  /** contact e-mail under the address */\n  email?: string;\n  /** the small 80×43 badge above the address (a flag or seal) */\n  badge?: ReactNode;\n  className?: string;\n}\n\nconst ease = \"duration-350 ease-[cubic-bezier(0.165,0.84,0.44,1)]\";\n\nfunction FooterLink({ link }: { link: StokespaceFooterLink }) {\n  return (\n    <a\n      href={link.href}\n      {...(link.external ? { target: \"_blank\", rel: \"noreferrer\" } : {})}\n      className={cn(\"inline-flex items-center gap-1 text-base leading-6 font-light tracking-[-0.02em] transition-colors hover:text-primary\", ease)}\n    >\n      {link.label}\n      {link.external && <ArrowUpRight aria-hidden strokeWidth={1.5} className=\"size-3.5\" />}\n    </a>\n  );\n}\n\n/**\n * Footer. Desktop: \"get in touch\" and a frosted contact button on the left, link columns from\n * the 8th of 12 columns, then a giant wordmark across the left with a badge and a small\n * uppercase address beside it. Phones: links first, then the contact row, badge, and a small\n * wordmark with the address. A dusk gradient rises up behind the bottom as the footer scrolls\n * in; the contact button's border shimmers on hover.\n */\nexport function StokespaceFooter({\n  contactTitle,\n  contact,\n  columns,\n  legal,\n  brand,\n  address,\n  email,\n  badge,\n  className,\n}: StokespaceFooterProps) {\n  return (\n    <footer className={cn(\"relative overflow-clip px-gutter pt-section pb-5 [view-timeline-name:--stokespace-footer]\", className)}>\n      <div aria-hidden className=\"stokespace-footer-glow pointer-events-none absolute inset-x-0 top-[44%] h-full\" />\n\n      <div className=\"relative grid grid-cols-3 gap-x-2 pt-section lg:grid-cols-12 lg:gap-x-5\">\n        {columns.slice(0, 3).map((col, i) => (\n          <ul key={i} className={cn(\"flex flex-col lg:row-start-1\", [\"lg:col-start-8\", \"lg:col-start-9\", \"lg:col-start-10\"][i])}>\n            {col.map((link) => (\n              <li key={link.label}>\n                <FooterLink link={link} />\n              </li>\n            ))}\n          </ul>\n        ))}\n        <ul className=\"col-span-3 mt-16 flex flex-col lg:col-span-2 lg:col-start-11 lg:row-start-1 lg:mt-0\">\n          {legal.map((link) => (\n            <li key={link.label}>\n              <FooterLink link={link} />\n            </li>\n          ))}\n        </ul>\n\n        <div className=\"col-span-3 mt-28 flex items-center justify-between lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:flex-col lg:items-start lg:justify-start lg:gap-14\">\n          <p className=\"text-[length:clamp(1.25rem,1.018rem+0.952vw,1.875rem)] leading-none font-light tracking-[-0.04em]\">{contactTitle}</p>\n          <a\n            href={contact.href}\n            className=\"stokespace-footer-shimmer group relative inline-flex h-[3.2rem] w-34 items-center justify-center gap-2 rounded-lg bg-foreground/5 text-sm font-light backdrop-blur-xl lg:h-[2.625rem] lg:w-auto lg:gap-5 lg:px-2.5 lg:text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)]\"\n          >\n            <span>{contact.label}</span>\n            <ArrowRight\n              aria-hidden\n              strokeWidth={1.5}\n              className={cn(\"size-[1em] transition-transform group-hover:translate-x-[0.15em] motion-reduce:transition-none\", ease)}\n            />\n          </a>\n        </div>\n      </div>\n\n      <div className=\"relative mt-5 grid grid-cols-2 items-end gap-x-5 lg:mt-35 lg:grid-cols-12\">\n        <div className=\"col-span-2 h-[2.6875rem] w-20 lg:col-span-2 lg:col-start-8 lg:row-start-1 lg:self-start [&>img]:size-full [&>img]:object-cover\">\n          {badge ?? <StokespacePlaceholder />}\n        </div>\n        <div className=\"mt-9 w-[8.5rem] lg:col-span-7 lg:col-start-1 lg:row-start-1 lg:mt-0 lg:w-[96%]\">\n          <StokespaceWordmark name={brand} fit />\n        </div>\n        <address className=\"mt-9 justify-self-end text-[length:clamp(0.5625rem,0.506rem+0.23vw,0.714rem)] leading-[1.4] font-normal tracking-[0.25em] not-italic uppercase lg:col-span-2 lg:col-start-8 lg:row-start-1 lg:mt-0 lg:self-end lg:justify-self-start lg:tracking-[0.12em]\">\n          {address.map((line) => (\n            <span key={line} className=\"block\">\n              {line}\n            </span>\n          ))}\n          {email && (\n            <a href={`mailto:${email}`} className=\"block transition-opacity hover:opacity-70\">\n              {email}\n            </a>\n          )}\n        </address>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "stokespace-placeholder",
+    "stokespace-wordmark"
+  ],
+  "props": [
+    {
+      "name": "contactTitle",
+      "type": "string",
+      "required": true,
+      "description": "the \"get in touch\" line"
+    },
+    {
+      "name": "contact",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the contact button"
+    },
+    {
+      "name": "columns",
+      "type": "StokespaceFooterLink[][]",
+      "required": true,
+      "description": "up to three link columns"
+    },
+    {
+      "name": "legal",
+      "type": "StokespaceFooterLink[]",
+      "required": true,
+      "description": "the legal links (their own column)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "company name for the giant wordmark"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "address lines, shown small and uppercase"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "required": false,
+      "description": "contact e-mail under the address"
+    },
+    {
+      "name": "badge",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small 80×43 badge above the address (a flag or seal)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f084a83fedbf6173e3cb2570551c582e15a1225ff004958a5bbdca60c5bb3ee2"
+}

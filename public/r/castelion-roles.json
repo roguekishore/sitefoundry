@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion roles",
+  "description": "A navy band listing open roles: a big bold title and one line of copy on the left, and on the right a fixed-height scroll box of tall cards outlined in 2px cream with 4px corners (role in bold, place in bold below), cut off at the band's foot. Beside the box runs a thin cream rail with a small dart that travels down it as the list scrolls. Cards tint on hover.",
+  "category": "features",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "careers",
+    "jobs",
+    "list",
+    "scroll-box",
+    "rail",
+    "outline",
+    "navy",
+    "cream",
+    "split-lines",
+    "reveal",
+    "scroll-timeline",
+    "hover",
+    "poster"
+  ],
+  "notes": [
+    "the band is bg-secondary in a dark scope; it has no bottom padding (the list runs to its foot), like the original",
+    "the list scrolls natively (wheel, touch, keyboard); the rail's dart follows it with a CSS scroll timeline and stays at the top without support"
+  ],
+  "entry": "castelion-roles.tsx",
+  "source": "foundry",
+  "name": "castelion-roles",
+  "files": [
+    {
+      "path": "castelion-roles.css",
+      "content": "/* The rail's dart follows the list's own scroll position (a named scroll timeline shared with\n   the sibling rail through timeline-scope). The intro copy fades up as it enters. */\n.castelion-roles-body {\n  timeline-scope: --castelion-roles;\n}\n.castelion-roles-list {\n  scroll-timeline: --castelion-roles y;\n  scrollbar-width: none;\n}\n.castelion-roles-list::-webkit-scrollbar {\n  display: none;\n}\n\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-roles-dart {\n      animation: castelion-roles-travel linear both;\n      animation-timeline: --castelion-roles;\n    }\n    .castelion-roles-intro {\n      animation: castelion-roles-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 300px;\n    }\n  }\n}\n\n@keyframes castelion-roles-travel {\n  from { top: 0; }\n  to { top: calc(100% - 2.75rem); }\n}\n@keyframes castelion-roles-fade {\n  from { opacity: 0; transform: translateY(32px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-roles.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport \"./castelion-roles.css\";\n\nexport interface CastelionRole {\n  /** the role's name */\n  title: string;\n  /** where it is based */\n  location: string;\n  /** link to the posting */\n  href: string;\n}\n\nexport interface CastelionRolesProps {\n  /** the band's title, one entry per desktop line */\n  title: string[];\n  /** one line of copy under the title */\n  intro: string;\n  /** the roles, as outlined cards in the scroll box */\n  roles: CastelionRole[];\n  /** screen-reader name of the scroll box, e.g. \"Open roles\" */\n  listLabel: string;\n  className?: string;\n}\n\n/** Navy band: title left, a scroll box of outlined role cards right, with a dart on a rail. */\nexport function CastelionRoles({ title, intro, roles, listLabel, className }: CastelionRolesProps) {\n  return (\n    <section className={cn(\"dark bg-secondary text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page px-gutter lg:grid-cols-[1fr_auto] lg:gap-10 lg:pt-[2.3rem]\">\n        <div>\n          <CastelionLines\n            as=\"h2\"\n            lines={title}\n            className=\"font-display text-[clamp(1.8125rem,1.279rem+2.19vw,3.25rem)]/[1.29] font-bold tracking-[0.02em]\"\n          />\n          <p className=\"castelion-roles-intro mt-3 text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-medium lg:mt-4\">{intro}</p>\n        </div>\n\n        <div className=\"castelion-roles-body mt-9 flex gap-3.5 lg:mt-0 lg:ml-auto lg:w-[41.25rem] lg:gap-[3.75rem]\">\n          <ul\n            aria-label={listLabel}\n            tabIndex={0}\n            className=\"castelion-roles-list grid h-[21.875rem] min-w-0 flex-1 snap-y snap-mandatory content-start gap-4 overflow-y-auto overscroll-y-contain lg:h-[24.5rem]\"\n          >\n            {roles.map((role) => (\n              <li key={role.href + role.title} className=\"snap-start\">\n                <a\n                  href={role.href}\n                  className=\"flex min-h-[9.375rem] flex-col justify-between gap-6 rounded-lg border-2 border-border px-8 py-6 transition-colors duration-500 ease-[ease] hover:bg-foreground/8 motion-reduce:transition-none lg:min-h-[11.7rem] lg:px-[3.25rem] lg:py-[2.375rem]\"\n                >\n                  <span className=\"font-display text-[clamp(1.125rem,1.032rem+0.381vw,1.375rem)]/[1.1] font-bold tracking-[0.02em]\">\n                    {role.title}\n                  </span>\n                  <span className=\"text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-bold\">{role.location}</span>\n                </a>\n              </li>\n            ))}\n          </ul>\n          {/* the rail and its dart */}\n          <div aria-hidden className=\"relative w-2.5 shrink-0\">\n            <span className=\"absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-foreground/80\" />\n            <svg viewBox=\"0 0 10 44\" className=\"castelion-roles-dart absolute top-0 left-0 h-11 w-2.5 fill-foreground\">\n              <path d=\"M4 44V18L0 21v-2.5L4 14v-2.5C4 10 4.6 0 5 0s1 10 1 11.5V14l4 4.5V21l-4-3v26z\" />\n            </svg>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-lines",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the band's title, one entry per desktop line"
+    },
+    {
+      "name": "intro",
+      "type": "string",
+      "required": true,
+      "description": "one line of copy under the title"
+    },
+    {
+      "name": "roles",
+      "type": "CastelionRole[]",
+      "required": true,
+      "description": "the roles, as outlined cards in the scroll box"
+    },
+    {
+      "name": "listLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the scroll box, e.g. \"Open roles\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a8cc351cab329bd19ecd0c5ea6162197eaefa06f3b3b9902780c3574bb3dff82"
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Helion Energy media frame",
+  "description": "A stand-in for any photo or video: a flat muted surface with a soft glow wash rising from the bottom, taking its size, ratio and radius from the caller, or cropping a real image or video like object-fit cover. Optionally the contents settle from 110% to 100% as the frame scrolls into view.",
+  "category": "card",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "placeholder",
+    "media",
+    "frame",
+    "flat",
+    "minimal",
+    "zoom",
+    "scroll",
+    "reveal"
+  ],
+  "notes": [
+    "empty, it is aria-hidden and never draws the subject it replaces",
+    "tone=\"film\" scopes itself `dark`, so it stays a dark surface on any page (for footage under light text)",
+    "the zoom is a CSS view timeline; off under reduced motion and where scroll timelines are missing"
+  ],
+  "entry": "helionenergy-placeholder.tsx",
+  "source": "foundry",
+  "name": "helionenergy-placeholder",
+  "files": [
+    {
+      "path": "helionenergy-placeholder.css",
+      "content": "/* The frame's contents settle from 110% to 100% while the frame enters the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .helionenergy-placeholder-zoom {\n      animation: helionenergy-placeholder-settle linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes helionenergy-placeholder-settle {\n  from {\n    transform: scale(1.1);\n  }\n  to {\n    transform: scale(1);\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-placeholder.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./helionenergy-placeholder.css\";\n\nexport interface HelionenergyPlaceholderProps {\n  /** a real image or video to show; it is cropped to the frame like object-fit: cover */\n  media?: ReactNode;\n  /** \"light\": a muted surface; \"film\": always a dark surface (for footage under light text) */\n  tone?: \"light\" | \"film\";\n  /** zoom the contents from 110% to 100% as the frame scrolls into view */\n  zoom?: boolean;\n  /** size, aspect ratio, radius and position of the frame */\n  className?: string;\n}\n\n/**\n * A media frame. Filled, it crops whatever it holds; empty, it is a flat muted surface with a\n * soft glow wash rising from the bottom edge, never a drawing of the subject it stands in for.\n * With `zoom`, the inside eases from 110% to 100% while the frame enters the window.\n */\nexport function HelionenergyPlaceholder({ media, tone = \"light\", zoom = false, className }: HelionenergyPlaceholderProps) {\n  return (\n    <div\n      aria-hidden={media ? undefined : true}\n      className={cn(\"relative overflow-clip\", tone === \"film\" ? \"dark bg-card\" : \"bg-muted\", className)}\n    >\n      <div\n        className={cn(\n          \"absolute inset-0\",\n          !media && \"bg-linear-to-t from-glow/12 to-transparent\",\n          \"[&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\",\n          zoom && \"helionenergy-placeholder-zoom\",\n        )}\n      >\n        {media}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a real image or video to show; it is cropped to the frame like object-fit: cover"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "\"light\": a muted surface; \"film\": always a dark surface (for footage under light text)"
+    },
+    {
+      "name": "zoom",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "zoom the contents from 110% to 100% as the frame scrolls into view"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, aspect ratio, radius and position of the frame"
+    }
+  ],
+  "hash": "578cb72727090da17debc430b9796487ef2861e7c8f4dcbd0496239361501bdc"
+}

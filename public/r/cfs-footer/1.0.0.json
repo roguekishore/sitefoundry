@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs footer",
+  "description": "A navy footer band: a centred light call to action, a row of a monospace 'follow' label, orange social icons, a short rule and a ring-arrow link, then a hairline and four columns (a large orange mark, address and legal lines, labelled contact emails, and site links) in monospace with orange underlines that turn white on hover. Everything centres and stacks on phones.",
+  "category": "footer",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "navy",
+    "mono",
+    "centered",
+    "cta",
+    "social",
+    "columns",
+    "underline",
+    "hairline",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "a `dark` subtree on the theme's card colour (navy in cfs-theme)",
+    "the mark and the social icons are props (lucide icons in the demo)"
+  ],
+  "entry": "cfs-footer.tsx",
+  "source": "foundry",
+  "name": "cfs-footer",
+  "files": [
+    {
+      "path": "cfs-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CfsRingLink } from \"@foundry/cfs-ring-link\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CfsFooterLink {\n  /** the link's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface CfsFooterContact {\n  /** a small heading such as \"Press\"; leave out for a lone link */\n  label?: string;\n  /** the email or page link under it */\n  link: CfsFooterLink;\n}\n\nexport interface CfsFooterProps {\n  /** the big centred call to action */\n  call: string;\n  /** the label before the social icons, e.g. \"Follow us\" */\n  followLabel: string;\n  /** social links: an icon each, with an accessible label */\n  socials: { label: string; href: string; icon: ReactNode }[];\n  /** the ring-arrow link at the end of the row */\n  cta: CfsFooterLink;\n  /** the large mark in the first column (an icon or logo, ~105px) */\n  mark?: ReactNode;\n  /** company name and address, one line each */\n  address: string[];\n  /** the copyright / trademark paragraph */\n  legal: string;\n  /** labelled contacts in the third column */\n  contacts: CfsFooterContact[];\n  /** site links in the last column */\n  links: CfsFooterLink[];\n  className?: string;\n}\n\nconst underline =\n  \"border-b border-primary transition-colors duration-150 ease-[cubic-bezier(0.455,0.03,0.515,0.955)] hover:border-foreground motion-reduce:transition-none\";\n\n/** Navy footer: centred call, social row, hairline, then mark/address/contacts/links. */\nexport function CfsFooter({ call, followLabel, socials, cta, mark, address, legal, contacts, links, className }: CfsFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-card pt-section pb-24 text-foreground lg:pt-[calc(var(--section-y)*1.5)] lg:pb-[8.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex flex-col items-center text-center\">\n          <h2 className=\"font-display text-[clamp(1.875rem,3.2vw,2.886rem)] leading-[1.2] font-[350]\">{call}</h2>\n\n          <div className=\"mt-10 flex flex-col items-center lg:flex-row\">\n            <p className=\"font-mono text-sm leading-[1.2]\">{followLabel}</p>\n            <ul className=\"mt-5 flex items-center gap-5 lg:mt-0 lg:ml-5\">\n              {socials.map((social) => (\n                <li key={social.label}>\n                  <a\n                    href={social.href}\n                    aria-label={social.label}\n                    className=\"block text-primary transition-colors duration-150 hover:text-foreground motion-reduce:transition-none [&_svg]:size-[22px]\"\n                  >\n                    {social.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <span aria-hidden className=\"mt-[1.875rem] h-px w-[12.8rem] bg-primary/60 lg:mx-5 lg:mt-0 lg:w-[50px] lg:bg-foreground/30\" />\n            <CfsRingLink {...cta} className=\"mt-10 lg:mt-0\" />\n          </div>\n        </div>\n\n        <hr className=\"mt-[3.75rem] border-border lg:mt-[6.25rem]\" />\n\n        <div className=\"mt-[3.75rem] grid justify-items-center gap-y-[3.75rem] text-center font-mono text-sm leading-[2] lg:grid-cols-[232fr_463fr_463fr_212fr] lg:justify-items-start lg:gap-y-0 lg:text-left\">\n          <div className=\"text-primary [&_svg]:size-[105px]\">{mark}</div>\n\n          <div className=\"max-w-[26rem] lg:max-w-[27.5rem]\">\n            <p>\n              {address.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </p>\n            <p className=\"mt-7\">{legal}</p>\n          </div>\n\n          <ul className=\"flex flex-col gap-5\">\n            {contacts.map((contact) => (\n              <li key={contact.link.label}>\n                {contact.label && <p>{contact.label}</p>}\n                <a href={contact.link.href} className={underline}>\n                  {contact.link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n\n          <ul>\n            {links.map((link) => (\n              <li key={link.label}>\n                <a href={link.href} className={underline}>\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "cfs-ring-link",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "call",
+      "type": "string",
+      "required": true,
+      "description": "the big centred call to action"
+    },
+    {
+      "name": "followLabel",
+      "type": "string",
+      "required": true,
+      "description": "the label before the social icons, e.g. \"Follow us\""
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": true,
+      "description": "social links: an icon each, with an accessible label"
+    },
+    {
+      "name": "cta",
+      "type": "CfsFooterLink",
+      "required": true,
+      "description": "the ring-arrow link at the end of the row"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large mark in the first column (an icon or logo, ~105px)"
+    },
+    {
+      "name": "address",
+      "type": "string[]",
+      "required": true,
+      "description": "company name and address, one line each"
+    },
+    {
+      "name": "legal",
+      "type": "string",
+      "required": true,
+      "description": "the copyright / trademark paragraph"
+    },
+    {
+      "name": "contacts",
+      "type": "CfsFooterContact[]",
+      "required": true,
+      "description": "labelled contacts in the third column"
+    },
+    {
+      "name": "links",
+      "type": "CfsFooterLink[]",
+      "required": true,
+      "description": "site links in the last column"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "99bd5a50f4db30ad1b39d7e5e185072176a3cc8ca79389b717aa5b822c82d072"
+}

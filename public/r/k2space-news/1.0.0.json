@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space news",
+  "description": "A \"recent news\" row: a 47.6px title with two square arrow buttons, over a swipeable row of near-black cards (598×370 at 1440) that run off the right edge. Each card has the publication's name in bold top-left, a small grey date top-right, the headline low down and a quiet grey \"read\" link that lights up when the card is hovered. The title rises 15px into view.",
+  "category": "testimonials",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "press",
+    "cards",
+    "slider",
+    "carousel",
+    "dark",
+    "scroll-snap",
+    "arrows",
+    "hover",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "publications are plain text names, never logos",
+    "the row is a native scroll-snap scroller (swipe on phones); the arrows need JavaScript"
+  ],
+  "hydrate": "visible",
+  "entry": "k2space-news.tsx",
+  "source": "foundry",
+  "name": "k2space-news",
+  "files": [
+    {
+      "path": "k2space-news.css",
+      "content": "/* The title rises 15px into view. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-news-in {\n      animation: k2space-news-in linear both;\n      animation-timeline: view();\n      animation-range: entry 60px entry 200px;\n    }\n  }\n}\n\n@keyframes k2space-news-in {\n  from {\n    opacity: 0;\n    transform: translateY(15px);\n  }\n}\n"
+    },
+    {
+      "path": "k2space-news.tsx",
+      "content": "import { useRef } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceButton } from \"@foundry/k2space-button\";\nimport \"./k2space-news.css\";\n\nexport interface K2spaceNewsItem {\n  /** the publication's name (set as bold text, never a logo) */\n  publication: string;\n  /** the date as shown */\n  date: string;\n  /** the headline */\n  title: string;\n  /** the article */\n  href: string;\n}\n\nexport interface K2spaceNewsProps {\n  /** the section title */\n  title: string;\n  /** the cards, newest first */\n  items: K2spaceNewsItem[];\n  /** the link text inside each card */\n  readLabel: string;\n  /** accessible names of the arrow buttons */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** A title with arrows over a scroll-snap row of near-black press cards. */\nexport function K2spaceNews({ title, items, readLabel, previousLabel, nextLabel, className }: K2spaceNewsProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const step = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.firstElementChild as HTMLElement | null;\n    if (!el || !card) return;\n    const gap = parseFloat(getComputedStyle(el).columnGap) || 0;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.offsetWidth + gap), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <section\n      className={cn(\"bg-background pt-[170px] pb-5 text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[14.6vw] lg:pb-[1.45vw]\", className)}\n    >\n      <div className=\"flex items-start justify-between gap-6 px-gutter\">\n        <h2 className=\"k2space-news-in font-display text-[34px]/none font-[560] lg:text-[3.307vw]/none\">{title}</h2>\n        <div className=\"flex shrink-0 gap-1 max-lg:hidden\">\n          <K2spaceButton variant=\"arrow\" direction=\"left\" ariaLabel={previousLabel} onClick={() => step(-1)} />\n          <K2spaceButton variant=\"arrow\" ariaLabel={nextLabel} onClick={() => step(1)} />\n        </div>\n      </div>\n\n      <div\n        ref={track}\n        className=\"mt-8 flex snap-x snap-mandatory scroll-px-gutter gap-5 overflow-x-auto overscroll-x-contain px-gutter [scrollbar-width:none] lg:mt-[4.2vw] lg:gap-[1.32vw] [&::-webkit-scrollbar]:hidden\"\n      >\n        {items.map((item, i) => (\n          <a\n            key={i}\n            href={item.href}\n            className=\"group flex h-[225px] w-[75.6vw] max-w-[420px] shrink-0 snap-start flex-col rounded-sm bg-card p-[18px] text-card-foreground lg:h-[25.7vw] lg:w-[41.5vw] lg:max-w-none lg:p-[1.74vw] lg:pt-[1.6vw]\"\n          >\n            <span className=\"flex items-start justify-between gap-4\">\n              <span className=\"font-display text-2xl/none font-bold tracking-[-0.02em] lg:text-[2.2vw]/none\">{item.publication}</span>\n              <span className=\"pt-1 text-xs/none font-[560] text-card-foreground/60 lg:pt-[0.4vw] lg:text-[max(0.75rem,0.926vw)]/none\">{item.date}</span>\n            </span>\n            <span className=\"mt-auto text-base/none font-[560] lg:text-[1.852vw]/none\">{item.title}</span>\n            <span className=\"mt-[22px] inline-flex items-center gap-1.5 text-base/none font-[560] text-muted-foreground transition-colors duration-200 ease-[ease] group-hover:text-foreground motion-reduce:transition-none lg:mt-[2.4vw] lg:text-[max(1rem,1.3227vw)]/none\">\n              {readLabel}\n              <ArrowRight aria-hidden strokeWidth={1.75} className=\"size-[0.9em]\" />\n            </span>\n          </a>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-button"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "items",
+      "type": "K2spaceNewsItem[]",
+      "required": true,
+      "description": "the cards, newest first"
+    },
+    {
+      "name": "readLabel",
+      "type": "string",
+      "required": true,
+      "description": "the link text inside each card"
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0611cd30ef4910db8fa0497066e52c07dad941fc539db9cafdc97949287d8cf4"
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion careers call",
+  "description": "A navy band split in two: on the left a stack of three huge bold cream phrases that light up one at a time as you scroll (the others dim to 40%), each sliding out of its mask; on the right a bold call-to-join title, a short justified paragraph and a full-width red button that flips to cream with a navy outline on hover. The right column fades up as it scrolls in.",
+  "category": "cta",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "careers",
+    "navy",
+    "cream",
+    "red",
+    "big-type",
+    "highlight",
+    "scrubbed",
+    "split-lines",
+    "reveal",
+    "hover",
+    "poster"
+  ],
+  "notes": [
+    "the band is bg-secondary in a dark scope",
+    "scroll-driven CSS: without support, or with reduced motion, all three phrases show at full strength"
+  ],
+  "entry": "castelion-careers-call.tsx",
+  "source": "foundry",
+  "name": "castelion-careers-call",
+  "files": [
+    {
+      "path": "castelion-careers-call.css",
+      "content": "/* The phrases take turns: each brightens from 40% to full and dims again over its own slice of\n   the list's pass through the window. The right column fades up 83px as it enters. */\n.castelion-careers-call-list {\n  view-timeline-name: --castelion-careers;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-careers-call-list .castelion-lines-line {\n      animation: castelion-careers-call-light linear both;\n      animation-timeline: --castelion-careers;\n      animation-range:\n        cover calc(18% + var(--castelion-line-i, 0) * 16%)\n        cover calc(42% + var(--castelion-line-i, 0) * 16%);\n    }\n    .castelion-careers-call-aside {\n      animation: castelion-careers-call-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 340px;\n    }\n  }\n}\n\n@keyframes castelion-careers-call-light {\n  0%, 100% { opacity: 0.4; }\n  50% { opacity: 1; }\n}\n@keyframes castelion-careers-call-rise {\n  from { opacity: 0; transform: translateY(83px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-careers-call.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { CastelionButton } from \"@foundry/castelion-button\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport \"./castelion-careers-call.css\";\n\nexport interface CastelionCareersCallProps {\n  /** the big phrases on the left, one per line; they light up in turn */\n  phrases: string[];\n  /** the call-to-join title, one entry per desktop line */\n  title: string[];\n  /** the short paragraph under it */\n  body: string;\n  /** the button's text */\n  ctaLabel: string;\n  /** where the button goes */\n  ctaHref: string;\n  className?: string;\n}\n\n/** Navy band: huge phrases that light up in turn, and a join-us column with a red button. */\nexport function CastelionCareersCall({ phrases, title, body, ctaLabel, ctaHref, className }: CastelionCareersCallProps) {\n  return (\n    <section className={cn(\"dark bg-secondary text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-12 px-gutter pt-[3.75rem] pb-14 lg:grid-cols-[1fr_19.875rem] lg:items-center lg:gap-10 lg:py-[8.875rem] lg:pr-[calc(var(--page-gutter)+2.4rem)]\">\n        <div className=\"castelion-careers-call-list\">\n          <CastelionLines\n            as=\"p\"\n            lines={phrases}\n            className=\"font-display text-[clamp(2.625rem,1.6rem+4.19vw,5.375rem)]/[1.31] font-bold tracking-[0.02em]  max-lg:[&_.castelion-lines-line]:block\"\n          />\n        </div>\n        <div className=\"castelion-careers-call-aside\">\n          <h2 className=\"font-display text-[clamp(1.8125rem,1.279rem+2.19vw,3.25rem)]/[1.1] font-bold tracking-[0.02em]\">\n            {title.map((line, i) => (\n              <span key={i}>\n                {i > 0 && <br className=\"max-lg:hidden\" />}\n                {i > 0 && \" \"}\n                {line}\n              </span>\n            ))}\n          </h2>\n          <p className=\"mt-6 text-justify text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-medium lg:mt-8\">{body}</p>\n          <CastelionButton label={ctaLabel} href={ctaHref} variant=\"invert\" className=\"mt-8 w-full\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-button",
+    "castelion-lines",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "phrases",
+      "type": "string[]",
+      "required": true,
+      "description": "the big phrases on the left, one per line; they light up in turn"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the call-to-join title, one entry per desktop line"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the short paragraph under it"
+    },
+    {
+      "name": "ctaLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button's text"
+    },
+    {
+      "name": "ctaHref",
+      "type": "string",
+      "required": true,
+      "description": "where the button goes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4838cf6e4121b067ecc92e625b9a305ef81fadd001bcba03672ec385a8de2188"
+}

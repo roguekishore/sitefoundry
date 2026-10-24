@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle services",
+  "description": "A centred opener (big monospace eyebrow, two-line headline, soft paragraph) over two equal plan cards — one white, one pale violet — each with a monospace label, title, paragraph, tick list and small print; then a centred sub-heading and a row of four white project cards with a monospace label, a two-line title and a short paragraph. All stack on phones.",
+  "category": "features",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "services",
+    "cards",
+    "two-up",
+    "four-up",
+    "light",
+    "violet",
+    "mono",
+    "minimal"
+  ],
+  "notes": [
+    "the second plan card uses the accent surface"
+  ],
+  "entry": "puzzle-services.tsx",
+  "source": "foundry",
+  "name": "puzzle-services",
+  "files": [
+    {
+      "path": "puzzle-services.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PuzzleHeading } from \"@foundry/puzzle-heading\";\n\nexport interface PuzzleServicePlan {\n  /** the monospace label, e.g. \"Light-touch\" */\n  label: string;\n  title: string;\n  text: string;\n  points: string[];\n  /** the small print under the list */\n  note?: string;\n  /** accent: the pale violet surface */\n  tone?: \"card\" | \"accent\";\n}\n\nexport interface PuzzleServiceProject {\n  label: string;\n  title: string;\n  text: string;\n}\n\nexport interface PuzzleServicesProps {\n  eyebrow?: string;\n  title: ReactNode;\n  text?: ReactNode;\n  /** two plans */\n  plans: PuzzleServicePlan[];\n  /** the heading over the projects row */\n  projectsTitle?: string;\n  /** four one-off projects */\n  projects: PuzzleServiceProject[];\n  className?: string;\n}\n\nconst label = \"font-mono text-sm/5 tracking-[0.06em] text-muted-foreground uppercase\";\n\n/** Two service plans, then a row of one-off projects. */\nexport function PuzzleServices({ eyebrow, title, text, plans, projectsTitle, projects, className }: PuzzleServicesProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-14 pb-16 lg:pt-[4.25rem] lg:pb-[4.5rem]\">\n        <PuzzleHeading eyebrow={eyebrow} eyebrowSize=\"lg\" title={title} text={text} className=\"max-w-[30rem] lg:max-w-[40rem]\" />\n\n        <div className=\"mt-11 grid gap-3.5 lg:mt-14 lg:grid-cols-2 lg:gap-[1.125rem]\">\n          {plans.map((p) => (\n            <article\n              key={p.title}\n              className={cn(\"rounded-lg px-6 pt-7 pb-6 lg:px-8 lg:pt-8 lg:pb-8\", p.tone === \"accent\" ? \"bg-accent text-accent-foreground\" : \"bg-card text-card-foreground\")}\n            >\n              <p className={label}>{p.label}</p>\n              <h3 className=\"mt-3 font-display text-2xl/[1.3] font-medium lg:mt-4 lg:text-[1.75rem]/[1.3]\">{p.title}</h3>\n              <p className=\"mt-4 text-[0.9375rem]/[1.6] lg:mt-5\">{p.text}</p>\n              <ul className=\"mt-4 flex flex-col gap-2 text-[0.9375rem]/[1.5] lg:mt-5 lg:gap-3\">\n                {p.points.map((pt) => (\n                  <li key={pt} className=\"flex gap-2\">\n                    <Check aria-hidden className=\"mt-1 size-3.5 shrink-0 text-muted-foreground\" strokeWidth={1.5} />\n                    {pt}\n                  </li>\n                ))}\n              </ul>\n              {p.note && <p className=\"mt-5 text-sm/[1.6] text-muted-foreground lg:mt-6 lg:text-xs\">{p.note}</p>}\n            </article>\n          ))}\n        </div>\n\n        {projectsTitle && (\n          <h3 className=\"mx-auto mt-12 max-w-[21rem] text-center font-display text-2xl/[1.3] font-medium text-balance sm:max-w-none lg:mt-[4.25rem] lg:text-[1.75rem]/[1.3]\">\n            {projectsTitle}\n          </h3>\n        )}\n        <ul className=\"mt-6 grid gap-3.5 sm:grid-cols-2 lg:mt-7 lg:grid-cols-4 lg:gap-[1.125rem]\">\n          {projects.map((p) => (\n            <li key={p.title} className=\"rounded-lg bg-card px-6 pt-7 pb-6 text-card-foreground lg:min-h-[17.6rem] lg:px-8 lg:pt-9 lg:pb-8\">\n              <p className={label}>{p.label}</p>\n              <h4 className=\"mt-4 font-display text-xl/[1.6] font-medium lg:mt-4 lg:text-[1.375rem]/[1.65]\">{p.title}</h4>\n              <p className=\"mt-3 text-[0.9375rem]/[1.6] lg:mt-5\">{p.text}</p>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "puzzle-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "plans",
+      "type": "PuzzleServicePlan[]",
+      "required": true,
+      "description": "two plans"
+    },
+    {
+      "name": "projectsTitle",
+      "type": "string",
+      "required": false,
+      "description": "the heading over the projects row"
+    },
+    {
+      "name": "projects",
+      "type": "PuzzleServiceProject[]",
+      "required": true,
+      "description": "four one-off projects"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ebbace5c98aa623f514d58e919ce8e70392a714ac10c362fd4a620a0ead11b52"
+}

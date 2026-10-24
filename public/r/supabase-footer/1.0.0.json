@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase footer",
+  "description": "A long, light developer footer: a centred trust row (an ink lead, a green link, three checked compliance badges) over a hairline that fades out at both ends; then the large wordmark, a row of social icons and a small newsletter form on the left beside six columns of grey 14px links under ink titles; a bottom bar with the copyright and a small icon. Phones stack the left column over two-up link columns.",
+  "category": "footer",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "newsletter",
+    "light",
+    "minimal",
+    "trust",
+    "developer"
+  ],
+  "notes": [
+    "links darken to ink on hover (150ms)",
+    "the trust badges' notes are hidden on phones, as on the original"
+  ],
+  "entry": "supabase-footer.tsx",
+  "name": "supabase-footer",
+  "files": [
+    {
+      "path": "supabase-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseButton } from \"@foundry/supabase-button\";\n\nexport interface SupabaseFooterColumn {\n  title: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface SupabaseFooterProps {\n  /** the wordmark, shown large at the top left */\n  logo: ReactNode;\n  /** the trust row above the footer: an ink lead, a green link and checked badges */\n  trust?: {\n    lead: string;\n    link?: { label: string; href: string };\n    /** each badge: an ink name and a grey note after it (the note is hidden on phones) */\n    badges: { name: string; note?: string }[];\n  };\n  /** social links as icons (22px) */\n  socials?: { label: string; icon: ReactNode; href: string }[];\n  /** the newsletter form under the socials */\n  newsletter?: { text: string; placeholder: string; button: string; action?: string };\n  /** the link columns: six sit in a row on desktop, two per row on phones */\n  columns: SupabaseFooterColumn[];\n  /** the small line at the bottom left */\n  copyright: string;\n  /** something small for the bottom right, e.g. a theme switch */\n  end?: ReactNode;\n  className?: string;\n}\n\n/** A light footer: a trust row over a fading hairline, the wordmark with socials and a newsletter, six link columns, a bottom bar. */\nexport function SupabaseFooter({ logo, trust, socials, newsletter, columns, copyright, end, className }: SupabaseFooterProps) {\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      {trust && (\n        <div className=\"relative\">\n          <div className=\"mx-auto box-content grid max-w-[57rem] grid-cols-2 gap-6 px-gutter py-8 text-[0.9375rem] lg:flex lg:items-center lg:justify-between lg:py-9\">\n            <p className=\"flex flex-col gap-3 lg:flex-row lg:gap-2\">\n              <span className=\"font-[450] text-foreground\">{trust.lead}</span>\n              {trust.link && (\n                <a href={trust.link.href} className=\"text-primary transition-colors duration-150 hover:text-foreground\">\n                  {trust.link.label}\n                </a>\n              )}\n            </p>\n            <ul className=\"flex flex-col gap-2 lg:flex-row lg:gap-8\">\n              {trust.badges.map((badge) => (\n                <li key={badge.name} className=\"flex items-center gap-2\">\n                  <Check className=\"size-3.5 shrink-0\" strokeWidth={2} />\n                  <span className=\"text-foreground\">{badge.name}</span>\n                  {badge.note && <span className=\"hidden text-muted-foreground lg:inline\">{badge.note}</span>}\n                </li>\n              ))}\n            </ul>\n          </div>\n          <div className=\"mx-auto h-px max-w-[calc(var(--page-width)+14rem)] bg-linear-to-r from-transparent via-border to-transparent\" />\n        </div>\n      )}\n\n      <div className=\"mx-auto box-content max-w-page px-gutter pt-16 lg:pt-24\">\n        <div className=\"grid gap-16 lg:grid-cols-[19.6875rem_1fr] lg:gap-0\">\n          <div>\n            <a href=\"/\" className=\"inline-flex text-foreground\">\n              {logo}\n            </a>\n            {socials && (\n              <ul className=\"mt-8 flex gap-5 lg:mt-9\">\n                {socials.map((social) => (\n                  <li key={social.label}>\n                    <a\n                      href={social.href}\n                      aria-label={social.label}\n                      className=\"flex text-foreground/75 transition-colors duration-150 hover:text-foreground [&_svg]:size-[1.375rem]\"\n                    >\n                      {social.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n            {newsletter && (\n              <form action={newsletter.action} className=\"mt-8 lg:mt-10 lg:max-w-60\">\n                <label className=\"block text-sm text-muted-foreground lg:text-[0.9375rem]\">\n                  {newsletter.text}\n                  <input\n                    type=\"email\"\n                    name=\"email\"\n                    placeholder={newsletter.placeholder}\n                    className=\"mt-2 block h-8 w-full rounded-md border border-input bg-muted/50 px-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring lg:h-[2.125rem]\"\n                  />\n                </label>\n                <SupabaseButton type=\"submit\" size=\"sm\" className=\"mt-2\">\n                  {newsletter.button}\n                </SupabaseButton>\n              </form>\n            )}\n          </div>\n\n          <div className=\"grid grid-cols-2 gap-x-4 gap-y-16 lg:grid-cols-6 lg:gap-x-0\">\n            {columns.map((column) => (\n              <div key={column.title} className=\"lg:pr-4\">\n                <h3 className=\"text-[0.9375rem] font-medium text-foreground\">{column.title}</h3>\n                <ul className=\"mt-4 grid gap-2\">\n                  {column.links.map((link) => (\n                    <li key={link.label}>\n                      <a href={link.href} className=\"block text-sm leading-5 text-muted-foreground transition-colors duration-150 hover:text-foreground\">\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-28 flex items-center justify-between border-t border-border pt-9 pb-24 lg:mt-32\">\n          <p className=\"text-xs text-muted-foreground\">{copyright}</p>\n          {end}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-button"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark, shown large at the top left"
+    },
+    {
+      "name": "trust",
+      "type": "{ lead: string; link?: { label: string; href: string; }; badges: { name: string; note?: string; }[]; } | undefined",
+      "required": false,
+      "description": "the trust row above the footer: an ink lead, a green link and checked badges"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; icon: ReactNode; href: string; }[]",
+      "required": false,
+      "description": "social links as icons (22px)"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ text: string; placeholder: string; button: string; action?: string; }",
+      "required": false,
+      "description": "the newsletter form under the socials"
+    },
+    {
+      "name": "columns",
+      "type": "SupabaseFooterColumn[]",
+      "required": true,
+      "description": "the link columns: six sit in a row on desktop, two per row on phones"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the small line at the bottom left"
+    },
+    {
+      "name": "end",
+      "type": "ReactNode",
+      "required": false,
+      "description": "something small for the bottom right, e.g. a theme switch"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "edf0d229978af3f2653694439032c7ffe68395cc5e6b4af6a66f7a612ac51673"
+}

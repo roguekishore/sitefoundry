@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser tour",
+  "description": "A scroll-told product tour on cream under a centred serif heading. Desktop: a numbered list pinned at 20% of the window on the left, where the step whose screenshot crosses the middle of the window turns dark, gains a thin black bar and opens its paragraph (the others sit grey and closed), beside a column of large, softly shadowed screenshot frames. Phones: each frame followed by its mono number, serif title and text. Heading and frames fade in on entering view.",
+  "category": "features",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tour",
+    "steps",
+    "sticky",
+    "pinned",
+    "accordion",
+    "scroll",
+    "reveal",
+    "screenshots",
+    "serif",
+    "cream",
+    "minimal"
+  ],
+  "notes": [
+    "needs JavaScript for the active step (an IntersectionObserver): static HTML shows step 1 open",
+    "media per item is a placeholder for a screenshot; mediaAspect sets the frame shape (760 / 562 by default)",
+    "the pinned list needs the page itself to scroll (no overflow-hidden ancestors)"
+  ],
+  "hydrate": "visible",
+  "entry": "diabrowser-tour.tsx",
+  "source": "foundry",
+  "name": "diabrowser-tour",
+  "files": [
+    {
+      "path": "diabrowser-tour.css",
+      "content": "/* Reveals on entering view: the heading and each frame fade in; on phones each item's text\n   also rises 20px. Each finishes over the first 200px of the element entering the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .diabrowser-tour-fade,\n    .diabrowser-tour-rise {\n      animation: diabrowser-tour-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 200px;\n    }\n    .diabrowser-tour-rise {\n      animation-name: diabrowser-tour-rise;\n    }\n  }\n}\n\n@keyframes diabrowser-tour-fade {\n  from { opacity: 0; }\n}\n\n@keyframes diabrowser-tour-rise {\n  from { opacity: 0; translate: 0 20px; }\n}\n"
+    },
+    {
+      "path": "diabrowser-tour.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { DiabrowserFrame } from \"@foundry/diabrowser-frame\";\nimport { DiabrowserHeading } from \"@foundry/diabrowser-heading\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-tour.css\";\n\nexport interface DiabrowserTourItem {\n  /** short serif title */\n  title: string;\n  /** two or three sentences, shown under the title when the item is active */\n  body: string;\n  /** the screenshot for this item; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface DiabrowserTourProps {\n  /** the centred serif heading over the tour */\n  heading: ReactNode;\n  /** the steps, numbered 01, 02… in order */\n  items: DiabrowserTourItem[];\n  /** CSS aspect ratio of the screenshots */\n  mediaAspect?: string;\n  className?: string;\n}\n\nconst number = (i: number) => String(i + 1).padStart(2, \"0\");\n\n/**\n * A scroll-told product tour. Desktop: a numbered list pinned on the left (the item whose\n * screenshot is in the middle of the window is dark, marked with a bar and opened) beside a\n * column of framed screenshots. Phones: each screenshot followed by its number, title and text.\n */\nexport function DiabrowserTour({ heading, items, mediaAspect = \"760 / 562\", className }: DiabrowserTourProps) {\n  const [active, setActive] = useState(0);\n  const frames = useRef<(HTMLDivElement | null)[]>([]);\n\n  useEffect(() => {\n    // the screenshot crossing the middle band of the window decides the active item\n    const observer = new IntersectionObserver(\n      (entries) => {\n        for (const entry of entries) {\n          if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.index));\n        }\n      },\n      { rootMargin: \"-45% 0px -45% 0px\" },\n    );\n    for (const el of frames.current) if (el) observer.observe(el);\n    return () => observer.disconnect();\n  }, [items.length]);\n\n  return (\n    <section className={cn(\"bg-background pt-5 text-foreground lg:pt-[10px] lg:pb-[50px]\", className)}>\n      <div className=\"diabrowser-tour-fade px-gutter\">\n        <DiabrowserHeading>{heading}</DiabrowserHeading>\n      </div>\n\n      <div className=\"mx-auto mt-[44px] max-w-[1440px] px-3 lg:mt-[50px] lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-x-12 lg:pr-[110px] lg:pl-[30px] xl:grid-cols-[minmax(0,1fr)_760px]\">\n        {/* desktop: the pinned list */}\n        <div className=\"hidden lg:block\">\n          <ol className=\"sticky top-[20vh] flex flex-col gap-[42px] pt-6\">\n            {items.map((item, i) => {\n              const on = i === active;\n              return (\n                <li key={item.title} className=\"relative pl-6\">\n                  <span\n                    aria-hidden\n                    className={cn(\n                      \"absolute inset-y-0 left-0 w-[2px] bg-foreground transition-opacity duration-300 motion-reduce:transition-none\",\n                      on ? \"opacity-100\" : \"opacity-0\",\n                    )}\n                  />\n                  <p className=\"font-mono text-[11px] leading-[14px] text-muted-foreground\">{number(i)}</p>\n                  <h3\n                    className={cn(\n                      \"mt-[11px] max-w-[400px] font-display text-[24px] leading-[30px] font-[420] tracking-[-0.03em] transition-colors duration-300 motion-reduce:transition-none\",\n                      on ? \"text-foreground\" : \"text-foreground/45\",\n                    )}\n                  >\n                    {item.title}\n                  </h3>\n                  <div\n                    className={cn(\n                      \"grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n                      on ? \"grid-rows-[1fr] opacity-100\" : \"grid-rows-[0fr] opacity-0\",\n                    )}\n                  >\n                    <div className=\"min-h-0 overflow-hidden\">\n                      <p className=\"max-w-[290px] pt-[10px] text-[14px] leading-5 tracking-[-0.005em] text-foreground/80\">{item.body}</p>\n                    </div>\n                  </div>\n                </li>\n              );\n            })}\n          </ol>\n        </div>\n\n        {/* the screenshots (and, on phones, each one's text) */}\n        <div className=\"flex flex-col gap-[60px] lg:gap-[62px]\">\n          {items.map((item, i) => (\n            <div\n              key={item.title}\n              data-index={i}\n              ref={(el) => {\n                frames.current[i] = el;\n              }}\n            >\n              <div className=\"diabrowser-tour-fade\">\n                <DiabrowserFrame media={item.media} aspect={mediaAspect} />\n              </div>\n              <div className=\"diabrowser-tour-rise mt-7 px-[3px] lg:hidden\">\n                <p className=\"font-mono text-[12px] leading-4 text-muted-foreground\">{number(i)}</p>\n                <h3 className=\"mt-[13px] font-display text-[24px] leading-[30px] font-[420] tracking-[-0.03em]\">{item.title}</h3>\n                <p className=\"mt-[14px] text-[16px] leading-6 tracking-[0.005em] text-foreground/90\">{item.body}</p>\n              </div>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "diabrowser-frame",
+    "diabrowser-heading",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the centred serif heading over the tour"
+    },
+    {
+      "name": "items",
+      "type": "DiabrowserTourItem[]",
+      "required": true,
+      "description": "the steps, numbered 01, 02… in order"
+    },
+    {
+      "name": "mediaAspect",
+      "type": "string",
+      "required": false,
+      "default": "760 / 562",
+      "description": "CSS aspect ratio of the screenshots"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b870b6f7030a9845246bc7e7b3c3137c357b41f96a1dd4d05e1e24f1e1fd9793"
+}

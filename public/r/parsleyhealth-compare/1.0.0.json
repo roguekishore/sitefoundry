@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health comparison table",
+  "description": "A centred eyebrow and light serif title over a calm comparison table: a wide column of row labels, three rival columns and the company's own column filled in mint, each row a thin rule apart, with thin check and cross marks or short medium-weight words. On phones the label column and the third rival drop out and each label sits small at the top of the mint cell.",
+  "category": "pricing",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "comparison",
+    "table",
+    "checklist",
+    "mint",
+    "serif",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "a cell value of true draws a check, false a cross, and text shows as a word or two; phones show the first two rivals"
+  ],
+  "entry": "parsleyhealth-compare.tsx",
+  "name": "parsleyhealth-compare",
+  "files": [
+    {
+      "path": "parsleyhealth-compare.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { Check, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthHeading } from \"@foundry/parsleyhealth-heading\";\n\n/** true: a check · false: a cross · text: a short word or two */\nexport type ParsleyhealthCompareValue = boolean | string;\n\nexport interface ParsleyhealthCompareRow {\n  /** what is compared */\n  label: string;\n  /** one value per rival, in the order of `rivals` */\n  rivals: ParsleyhealthCompareValue[];\n  /** the company's own value */\n  ours: ParsleyhealthCompareValue;\n}\n\nexport interface ParsleyhealthCompareProps {\n  /** small capitals above the title */\n  eyebrow?: string;\n  /** the title */\n  title: string;\n  /** the rival column headings (three on the original; phones show the first two) */\n  rivals: string[];\n  /** the company's own column heading */\n  ours: string;\n  /** the rows */\n  rows: ParsleyhealthCompareRow[];\n  /** screen-reader words for the marks */\n  yesLabel?: string;\n  noLabel?: string;\n  className?: string;\n}\n\nfunction Value({ value, yes, no }: { value: ParsleyhealthCompareValue; yes?: string; no?: string }) {\n  if (value === true) {\n    return <Check role=\"img\" aria-label={yes} className=\"size-6 text-primary\" strokeWidth={1.25} />;\n  }\n  if (value === false) {\n    return <X role=\"img\" aria-label={no} className=\"size-6 text-muted-foreground/70\" strokeWidth={1} />;\n  }\n  return <span className=\"text-[1.2375rem] leading-[1.455] font-medium text-primary lg:text-[1.4438rem] lg:leading-[1.364]\">{value}</span>;\n}\n\n/** Labels, rivals and a mint \"us\" column. */\nexport function ParsleyhealthCompare({ eyebrow, title, rivals, ours, rows, yesLabel, noLabel, className }: ParsleyhealthCompareProps) {\n  const vars = { \"--rivals\": rivals.length, \"--rivals-phone\": Math.min(rivals.length, 2) } as CSSProperties;\n  const grid =\n    \"grid grid-cols-[repeat(var(--rivals-phone),minmax(0,1fr))_minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_repeat(var(--rivals),8.625rem)_8.625rem]\";\n  const phoneHidden = (i: number) => (i >= 2 ? \"max-lg:hidden\" : \"\");\n  return (\n    <section className={cn(\"bg-background px-gutter py-[calc(var(--section-y)*0.55)] lg:py-section\", className)}>\n      <ParsleyhealthHeading\n        eyebrow={eyebrow}\n        title={title}\n        align=\"center\"\n        className=\"[&>p]:text-primary\"\n        titleClassName=\"mx-auto max-w-[17rem] lg:max-w-[36rem]\"\n      />\n      <div role=\"table\" style={vars} className=\"mx-auto mt-9 max-w-page text-center lg:mt-[4.5rem]\">\n        <div role=\"row\" className={cn(grid, \"border-b border-foreground/15\")}>\n          <span role=\"columnheader\" className=\"max-lg:hidden\" />\n          {rivals.map((rival, i) => (\n            <span\n              role=\"columnheader\"\n              key={rival}\n              className={cn(\"flex items-center justify-center px-2 py-6 text-[1.0312rem] leading-[1.455] text-primary lg:h-35 lg:text-[1.2375rem]\", phoneHidden(i))}\n            >\n              {rival}\n            </span>\n          ))}\n          <span role=\"columnheader\" className=\"flex items-center justify-center bg-accent px-2 py-6 text-[1.0312rem] leading-[1.455] text-accent-foreground lg:h-35 lg:text-[1.2375rem]\">\n            {ours}\n          </span>\n        </div>\n        {rows.map((row) => (\n          <div role=\"row\" key={row.label} className={cn(grid, \"border-b border-foreground/15 last:border-0\")}>\n            <span role=\"rowheader\" className=\"flex items-center justify-center px-4 text-[1.2375rem] leading-[1.455] text-primary max-lg:hidden lg:text-[1.4438rem]\">\n              {row.label}\n            </span>\n            {row.rivals.map((value, i) => (\n              <span role=\"cell\" key={i} className={cn(\"flex min-h-[5.6rem] items-center justify-center px-2 py-4 lg:min-h-[6.125rem]\", phoneHidden(i))}>\n                <Value value={value} yes={yesLabel} no={noLabel} />\n              </span>\n            ))}\n            <span role=\"cell\" className=\"flex min-h-[5.6rem] flex-col items-center justify-center gap-2 bg-accent px-2 py-3 lg:min-h-[6.125rem] lg:py-4\">\n              <span className=\"text-[0.825rem] leading-[1.273] text-foreground lg:hidden\">{row.label}</span>\n              <Value value={row.ours} yes={yesLabel} no={noLabel} />\n            </span>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title"
+    },
+    {
+      "name": "rivals",
+      "type": "string[]",
+      "required": true,
+      "description": "the rival column headings (three on the original; phones show the first two)"
+    },
+    {
+      "name": "ours",
+      "type": "string",
+      "required": true,
+      "description": "the company's own column heading"
+    },
+    {
+      "name": "rows",
+      "type": "ParsleyhealthCompareRow[]",
+      "required": true,
+      "description": "the rows"
+    },
+    {
+      "name": "yesLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader words for the marks"
+    },
+    {
+      "name": "noLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eb82837cb2e534d4ace7f2963e4256e7e9f7f2514661aeef391aab091b50ae6b"
+}

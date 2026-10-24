@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit insights",
+  "description": "Resources on a pale tinted band: on the left a heading, two posts between hairlines (a small book icon, kind and reading time, then a 22px title) and a black pill; on the right two white, square-cornered cards with the same meta line, a title, a rounded picture and a hairline arrow circle in the bottom corner. Pictures ease up 3% on hover. Everything stacks on phones.",
+  "category": "blog",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "resources",
+    "cards",
+    "light",
+    "minimal",
+    "list",
+    "fintech"
+  ],
+  "notes": [
+    "media slot per featured card: a picture (347×229, rounded 8px)",
+    "the cards use bg-background on the muted band"
+  ],
+  "entry": "unit-insights.tsx",
+  "source": "foundry",
+  "name": "unit-insights",
+  "files": [
+    {
+      "path": "unit-insights.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { BookOpen } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitArrowCircle } from \"@foundry/unit-arrow-circle\";\nimport { UnitButton } from \"@foundry/unit-button\";\nimport { UnitPlaceholder } from \"@foundry/unit-placeholder\";\n\nexport interface UnitInsight {\n  /** the kind, e.g. \"Blog\" or \"Guide\" */\n  kind: string;\n  /** reading time, e.g. \"4 min\" */\n  time: string;\n  /** the title */\n  title: string;\n  /** where it links to */\n  href: string;\n  /** the card picture (347×229 on desktop; featured posts only); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface UnitInsightsProps {\n  /** the section heading */\n  heading: string;\n  /** short posts listed under the heading, between hairlines */\n  posts: UnitInsight[];\n  /** featured posts shown as white cards with a picture (two read best) */\n  featured: UnitInsight[];\n  /** the black pill under the list */\n  cta: { label: string; href: string };\n  /** screen-reader label for the cards' arrow */\n  openLabel?: string;\n  className?: string;\n}\n\nfunction Meta({ kind, time }: Pick<UnitInsight, \"kind\" | \"time\">) {\n  return (\n    <p className=\"flex items-center gap-1.5 text-[0.8125rem] leading-none text-muted-foreground\">\n      <BookOpen aria-hidden className=\"size-3\" strokeWidth={1.75} />\n      {kind}\n      <span aria-hidden>·</span>\n      {time}\n    </p>\n  );\n}\n\n/** Resources on a tinted band: a heading, two listed posts and a black pill on the left, two white picture cards on the right. */\nexport function UnitInsights({ heading, posts, featured, cta, className }: UnitInsightsProps) {\n  return (\n    <section className={cn(\"bg-muted font-sans text-foreground\", className)}>\n      <div className=\"mx-auto grid max-w-page gap-12 px-gutter py-16 lg:grid-cols-[minmax(0,21rem)_1fr] lg:gap-x-[5.1875rem] lg:px-[calc(var(--page-gutter)+1.625rem)] lg:py-32\">\n        <div>\n          <h2 className=\"font-display text-[1.640625rem] leading-[1.15] tracking-[-0.02em] lg:text-[2.5rem]\">{heading}</h2>\n          <ul className=\"mt-6 lg:mt-12\">\n            {posts.map((p) => (\n              <li key={p.title} className=\"border-t border-foreground/10\">\n                <a href={p.href} className=\"block py-7 transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] hover:opacity-60 motion-reduce:transition-none lg:pt-9 lg:pb-7\">\n                  <Meta kind={p.kind} time={p.time} />\n                  <h3 className=\"mt-5 max-w-[20rem] text-[1.09375rem] leading-[1.35] tracking-[-0.01em] lg:mt-5 lg:text-[1.375rem] lg:leading-[1.3]\">{p.title}</h3>\n                </a>\n              </li>\n            ))}\n          </ul>\n          <UnitButton href={cta.href} className=\"mt-0 lg:mt-5\">\n            {cta.label}\n          </UnitButton>\n        </div>\n\n        <ul className=\"grid gap-5 sm:grid-cols-2\">\n          {featured.map((p) => (\n            <li key={p.title} className=\"flex\">\n              <a href={p.href} className=\"group/card flex w-full flex-col bg-background px-5 pt-8 pb-6 lg:px-6 lg:pt-9 lg:pb-10\">\n                <Meta kind={p.kind} time={p.time} />\n                <h3 className=\"mt-5 text-[1.09375rem] leading-[1.3] tracking-[-0.01em] lg:mt-6 lg:text-[1.375rem] lg:leading-[1.25]\">{p.title}</h3>\n                <div className=\"mt-4 aspect-[347/229] overflow-clip rounded-lg lg:mt-8\">\n                  {p.media ?? <UnitPlaceholder tone=\"muted\" className=\"size-full transition-transform duration-[1025ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] group-hover/card:scale-[1.03] motion-reduce:transition-none\" />}\n                </div>\n                <UnitArrowCircle className=\"mt-4 self-end lg:mt-auto\" />\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-arrow-circle",
+    "unit-button",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "posts",
+      "type": "UnitInsight[]",
+      "required": true,
+      "description": "short posts listed under the heading, between hairlines"
+    },
+    {
+      "name": "featured",
+      "type": "UnitInsight[]",
+      "required": true,
+      "description": "featured posts shown as white cards with a picture (two read best)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the black pill under the list"
+    },
+    {
+      "name": "openLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the cards' arrow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2f77edacc5f7de15d322252052fc235aef4f3052000e4dae7ed21c7000e4b33d"
+}

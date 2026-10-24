@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reflect device pricing",
+  "description": "Two plans side by side, split by a hairline, over a huge glowing planet of violet light and its blurred reflection below: a small plan name, the price in a pink-to-lilac-to-periwinkle gradient (72px for a word, 32px for a phrase), a muted line and a button, then a line of small print. The planet fades in on entering the window and drifts upward as the section scrolls by. On phones the plans stack and the buttons stretch full width with their labels on the left.",
+  "category": "pricing",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "dark",
+    "glow",
+    "violet",
+    "gradient-text",
+    "planet",
+    "parallax",
+    "scroll",
+    "reveal"
+  ],
+  "notes": [
+    "media is the planet (744×837 in the original); empty, a glow wash rounded at the bottom",
+    "the price gradient is chart-2 → chart-3 → chart-4",
+    "the tall bottom padding is room for the planet; designed for a dark theme"
+  ],
+  "entry": "reflect-pricing.tsx",
+  "source": "foundry",
+  "name": "reflect-pricing",
+  "files": [
+    {
+      "path": "reflect-pricing.css",
+      "content": "/* The planet drifts up a little as the section passes through the window. */\n@keyframes reflect-pricing-drift {\n  from { transform: translateY(4rem); }\n  to { transform: translateY(-4rem); }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .reflect-pricing-drift {\n      animation: reflect-pricing-drift linear both;\n      animation-timeline: view();\n      animation-range: cover;\n    }\n  }\n}\n"
+    },
+    {
+      "path": "reflect-pricing.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectButton } from \"@foundry/reflect-button\";\nimport { ReflectHeading } from \"@foundry/reflect-heading\";\nimport { ReflectMedia } from \"@foundry/reflect-media\";\nimport \"./reflect-pricing.css\";\n\nexport interface ReflectPlan {\n  /** the device or plan name */\n  name: string;\n  /** the price, set in the gradient */\n  price: string;\n  /** big: 72px (a one-word price) · small: 32px (a phrase) */\n  priceSize?: \"big\" | \"small\";\n  /** a muted line under the price */\n  text: string;\n  action: { label: string; href: string };\n  /** primary: violet button · secondary: dark button */\n  actionVariant?: \"primary\" | \"secondary\";\n}\n\nexport interface ReflectPricingProps {\n  eyebrow?: string;\n  title: string;\n  /** two plans, side by side with a hairline between them */\n  plans: ReflectPlan[];\n  /** small print under the plans */\n  note?: string;\n  /** the glowing planet behind the plans (an image in the original); a glow wash when empty */\n  media?: ReactNode;\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Two plans with gradient prices over a rising planet of light and its reflection. */\nexport function ReflectPricing({ eyebrow, title, plans, note, media, mediaLabel, className }: ReflectPricingProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-clip bg-background pt-[5.25rem] pb-[34.5rem] text-foreground lg:pt-[9.25rem] lg:pb-[34.5rem]\", className)}>\n      {/* the planet and its faint reflection */}\n      <div aria-hidden={!media} className=\"absolute inset-0 -z-10\">\n        <ReflectMedia\n          tone=\"rise\"\n          reveal\n          label={mediaLabel}\n          className=\"reflect-pricing-drift absolute top-[4.5rem] left-1/2 h-[52.3rem] w-[46.5rem] -translate-x-1/2 rounded-b-full bg-[radial-gradient(50%_45%_at_50%_100%,color-mix(in_oklab,var(--glow)_75%,transparent),color-mix(in_oklab,var(--glow)_18%,transparent)_70%,transparent)]\"\n        >\n          {media}\n        </ReflectMedia>\n        <span className=\"absolute bottom-0 left-1/2 h-[16rem] w-[42rem] -translate-x-1/2 rounded-t-full bg-[radial-gradient(50%_60%_at_50%_0%,color-mix(in_oklab,var(--glow)_30%,transparent),transparent)] blur-xl\" />\n      </div>\n      <div className=\"px-gutter\">\n        <ReflectHeading eyebrow={eyebrow} title={title} />\n        <ul className=\"mx-auto mt-9 flex max-w-[20rem] flex-col gap-14 sm:max-w-none lg:mt-14 lg:flex-row lg:justify-center lg:gap-0\">\n          {plans.map((plan, i) => (\n            <li\n              key={plan.name}\n              className={cn(\n                \"flex flex-col items-center text-center lg:px-14\",\n                i > 0 && \"lg:border-l lg:border-border\",\n              )}\n            >\n              <p className=\"text-base/6\">{plan.name}</p>\n              <p\n                className={cn(\n                  \"bg-linear-to-r from-chart-2 via-chart-3 to-chart-4 bg-clip-text font-display font-[560] text-transparent\",\n                  plan.priceSize === \"small\"\n                    ? \"mt-5 text-[2.25rem]/[2.5rem] lg:mt-6 lg:text-[2rem]/[2.5rem]\"\n                    : \"text-[4.5rem]/[5rem] lg:mt-2\",\n                )}\n              >\n                {plan.price}\n              </p>\n              <p className=\"mt-5 text-base/6 text-muted-foreground\">{plan.text}</p>\n              <div className=\"mt-9 w-full lg:mt-auto lg:w-auto lg:pt-9\">\n                <ReflectButton href={plan.action.href} variant={plan.actionVariant ?? \"primary\"} className=\"max-lg:w-full max-lg:justify-start\">\n                  {plan.action.label}\n                </ReflectButton>\n              </div>\n            </li>\n          ))}\n        </ul>\n        {note && <p className=\"mx-auto mt-14 max-w-[23rem] text-center lg:mt-16 text-sm/5 text-muted-foreground sm:max-w-none\">{note}</p>}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-button",
+    "reflect-heading",
+    "reflect-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "plans",
+      "type": "ReflectPlan[]",
+      "required": true,
+      "description": "two plans, side by side with a hairline between them"
+    },
+    {
+      "name": "note",
+      "type": "string",
+      "required": false,
+      "description": "small print under the plans"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the glowing planet behind the plans (an image in the original); a glow wash when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3bf082b81538eb675a583cfb56c742705a0afff6d30158f0b01b5d06bad79df5"
+}

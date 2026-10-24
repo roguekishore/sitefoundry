@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Reflect button",
+  "description": "A compact 36px link button with 8px corners at weight 500: a deep violet fill with a lilac rim and an inner glow rising from its bottom edge, or a near-black panel with a faint hairline. On hover the top sheen fades out and a violet glow fades up from below in 450ms on a soft ease-out.",
+  "category": "button",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "dark",
+    "violet",
+    "glow",
+    "inner-glow",
+    "hover"
+  ],
+  "notes": [
+    "the glow is mixed from --highlight, so it follows the theme",
+    "block: stretches to the full width with the label on the left (the original's phone pricing buttons)"
+  ],
+  "entry": "reflect-button.tsx",
+  "source": "foundry",
+  "name": "reflect-button",
+  "files": [
+    {
+      "path": "reflect-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ReflectButtonProps {\n  /** the label (an icon may sit before or after it) */\n  children: ReactNode;\n  href: string;\n  /** primary: deep violet with a lilac rim and inner glow · secondary: near-black panel with a hairline */\n  variant?: \"primary\" | \"secondary\";\n  /** stretch to the container width with the label at the left */\n  block?: boolean;\n  className?: string;\n}\n\n// The original's ease for every hover: a quick start that settles slowly.\nconst ease = \"transition-opacity duration-[450ms] ease-[cubic-bezier(0.6,0.6,0,1)] motion-reduce:transition-none\";\n\nconst variants = {\n  primary:\n    \"border-highlight/35 bg-primary text-primary-foreground shadow-[inset_0_-7px_11px_color-mix(in_oklab,var(--highlight)_16%,transparent)]\",\n  secondary: \"border-foreground/10 bg-secondary text-secondary-foreground\",\n};\n\n/** Reflect's small rounded buttons; the hover is a crossfade between two light layers. */\nexport function ReflectButton({ children, href, variant = \"primary\", block, className }: ReflectButtonProps) {\n  return (\n    <a\n      href={href}\n      className={cn(\n        \"group relative isolate inline-flex h-9 shrink-0 items-center gap-2 overflow-clip rounded-lg border px-[0.9375rem] text-[0.9375rem]/6 font-medium whitespace-nowrap [&_svg]:size-4\",\n        block ? \"w-full justify-start\" : \"justify-center\",\n        variants[variant],\n        className,\n      )}\n    >\n      {/* resting sheen at the top, gone on hover */}\n      <span\n        aria-hidden\n        className={cn(\n          \"absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--foreground)_7%,transparent),transparent_70%)] group-hover:opacity-0\",\n          ease,\n        )}\n      />\n      {/* hover glow from the bottom edge */}\n      <span\n        aria-hidden\n        className={cn(\n          \"absolute inset-0 -z-10 opacity-0 group-hover:opacity-100\",\n          variant === \"primary\"\n            ? \"bg-[radial-gradient(90%_130%_at_50%_100%,color-mix(in_oklab,var(--highlight)_38%,transparent),transparent)]\"\n            : \"bg-foreground/6\",\n          ease,\n        )}\n      />\n      {children}\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label (an icon may sit before or after it)"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "primary",
+      "description": "primary: deep violet with a lilac rim and inner glow · secondary: near-black panel with a hairline"
+    },
+    {
+      "name": "block",
+      "type": "boolean",
+      "required": false,
+      "description": "stretch to the container width with the label at the left"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9d55592371ea9fe293b95157e4fa15fa5397d7c64ea97c51b081b0f2a29eb3ea"
+}

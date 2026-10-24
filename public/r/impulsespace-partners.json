@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Impulse Space partner strip",
+  "description": "A black strip with a small uppercase mono label. Desktop: one row of partner names drifting slowly left in an endless marquee, faded at both edges. Phones: a 2×4 grid where each slot quietly swaps between two names with a soft blur and fade, staggered across the grid.",
+  "category": "logos",
+  "site": "impulsespace",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "partners",
+    "social-proof",
+    "dark",
+    "marquee",
+    "loop",
+    "blur",
+    "crossfade",
+    "mono",
+    "minimal"
+  ],
+  "notes": [
+    "partners are plain-text names (give logos as ReactNode if you have them); sixteen fill both layouts",
+    "a .dark scope: always black with white text",
+    "CSS only; with reduced motion the marquee stands still and each phone slot keeps its first name"
+  ],
+  "entry": "impulsespace-partners.tsx",
+  "source": "foundry",
+  "name": "impulsespace-partners",
+  "files": [
+    {
+      "path": "impulsespace-partners.css",
+      "content": "/* Desktop: the row is printed twice and slides left by one copy, so it loops seamlessly. */\n.impulsespace-partners-track {\n  animation: impulsespace-partners-drift 48s linear infinite;\n}\n@keyframes impulsespace-partners-drift {\n  from { translate: 0 0; }\n  to { translate: -50% 0; }\n}\n\n/* Phones: two names per slot take turns, each blurring in and out. */\n.impulsespace-partners-a,\n.impulsespace-partners-b {\n  animation: impulsespace-partners-swap 9s ease-in-out infinite;\n}\n@keyframes impulsespace-partners-swap {\n  0% { opacity: 0; filter: blur(6px); }\n  8%, 42% { opacity: 1; filter: blur(0); }\n  50%, 100% { opacity: 0; filter: blur(6px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .impulsespace-partners-track,\n  .impulsespace-partners-a {\n    animation: none;\n  }\n  .impulsespace-partners-b {\n    display: none;\n  }\n}\n"
+    },
+    {
+      "path": "impulsespace-partners.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./impulsespace-partners.css\";\n\nexport interface ImpulsespacePartner {\n  /** the partner's name (also read out when a logo is given) */\n  name: string;\n  /** a logo to show instead of the name */\n  logo?: ReactNode;\n}\n\nexport interface ImpulsespacePartnersProps {\n  /** the small mono label over the strip */\n  label: string;\n  /** sixteen work best: the marquee shows all, phones pair n with n+8 in eight slots */\n  partners: ImpulsespacePartner[];\n  className?: string;\n}\n\nfunction Name({ partner }: { partner: ImpulsespacePartner }) {\n  return partner.logo ? (\n    <span role=\"img\" aria-label={partner.name} className=\"flex items-center [&_svg]:h-7 [&_svg]:w-auto\">\n      {partner.logo}\n    </span>\n  ) : (\n    <span className=\"font-display text-xl leading-[1.2] font-semibold tracking-[-0.01em] whitespace-nowrap\">{partner.name}</span>\n  );\n}\n\n/** Black partner strip: a drifting marquee on desktop, a blur-swapping grid on phones. */\nexport function ImpulsespacePartners({ label, partners, className }: ImpulsespacePartnersProps) {\n  const half = Math.ceil(partners.length / 2);\n  const slots = partners.slice(0, Math.min(half, 8)).map((a, i) => [a, partners[i + half]] as const);\n  return (\n    <section className={cn(\"dark bg-background pt-12 pb-14 text-foreground lg:py-[2.8rem]\", className)}>\n      <p className=\"px-gutter text-center font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase\">{label}</p>\n\n      {/* desktop marquee */}\n      <div className=\"mt-8 hidden overflow-clip [mask-image:linear-gradient(90deg,transparent,var(--foreground)_12%,var(--foreground)_88%,transparent)] lg:block\">\n        <ul className=\"impulsespace-partners-track flex w-max\">\n          {[0, 1].map((copy) =>\n            partners.map((p) => (\n              <li key={`${copy}-${p.name}`} aria-hidden={copy === 1 || undefined} className=\"flex h-10 shrink-0 items-center px-10\">\n                <Name partner={p} />\n              </li>\n            )),\n          )}\n        </ul>\n      </div>\n\n      {/* phone grid */}\n      <ul className=\"mt-8 grid grid-cols-2 px-gutter lg:hidden\">\n        {slots.map(([a, b], i) => (\n          <li key={a.name} className=\"grid h-24 place-items-center\">\n            <span className={cn(\"[grid-area:1/1]\", b && \"impulsespace-partners-a\")} style={b ? { animationDelay: `${i * 0.35}s` } : undefined}>\n              <Name partner={a} />\n            </span>\n            {b && (\n              <span className=\"impulsespace-partners-b [grid-area:1/1]\" style={{ animationDelay: `${i * 0.35 - 4.5}s` }}>\n                <Name partner={b} />\n              </span>\n            )}\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small mono label over the strip"
+    },
+    {
+      "name": "partners",
+      "type": "ImpulsespacePartner[]",
+      "required": true,
+      "description": "sixteen work best: the marquee shows all, phones pair n with n+8 in eight slots"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9f7228f900f1832bc3ee78094314499200eea156c9b287be64515ab9c8996f20"
+}

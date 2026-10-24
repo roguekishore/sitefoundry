@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop hero",
+  "description": "A full-bleed campaign banner: one tall image (portrait on phones, wide on desktop) with an optional pale badge panel at the top holding a bold, tracked uppercase line and a big thin wordmark. The page below rises over its bottom edge in a white lip with 30px rounded top corners.",
+  "category": "hero",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "banner",
+    "full-bleed",
+    "image",
+    "campaign",
+    "rounded",
+    "minimal"
+  ],
+  "notes": [
+    "the original's banner text is baked into its image; the badge is optional",
+    "the lip takes the page background colour, so the next block should sit on bg-background"
+  ],
+  "entry": "whoop-hero.tsx",
+  "source": "foundry",
+  "name": "whoop-hero",
+  "files": [
+    {
+      "path": "whoop-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopWordmark } from \"@foundry/whoop-wordmark\";\n\nexport interface WhoopHeroProps {\n  /** the banner image or video, filling the frame (object-cover); a warm placeholder when empty */\n  media?: ReactNode;\n  /** an optional pale panel at the top: a bold uppercase line over a big wordmark */\n  badge?: { title: string; brand: string };\n  /** where the whole banner links (leave out for no link) */\n  href?: string;\n  /** screen-reader name of the banner link */\n  label?: string;\n  className?: string;\n}\n\n/** Whoop's campaign banner with a rounded white lip rising over its foot. */\nexport function WhoopHero({ media, badge, href, label, className }: WhoopHeroProps) {\n  const Frame = href ? \"a\" : \"div\";\n  return (\n    <section className={cn(\"relative bg-background\", className)}>\n      <Frame\n        {...(href ? { href, \"aria-label\": label } : {})}\n        className=\"relative block aspect-[390/693] overflow-clip sm:aspect-[4/3] lg:aspect-[1440/640]\"\n      >\n        <div className=\"absolute inset-0 *:size-full *:object-cover\">\n          {media ?? <WhoopPlaceholder tone=\"warm\" />}\n        </div>\n        {badge && (\n          <div className=\"absolute inset-x-4 top-4 bg-background/75 px-4 pt-4 pb-4 text-foreground sm:right-auto sm:w-[26rem] lg:top-12 lg:left-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))] lg:w-[34rem] lg:px-7 lg:pt-7 lg:pb-8\">\n            <p className=\"text-[1.375rem] leading-[1.2] font-bold tracking-[0.06em] uppercase lg:text-[2rem]\">\n              {badge.title}\n            </p>\n            <WhoopWordmark name={badge.brand} className=\"mt-3 text-[3.5rem] lg:mt-6 lg:text-[4.75rem]\" />\n          </div>\n        )}\n      </Frame>\n      {/* the white lip: overlaps the image's bottom 30px with rounded top corners */}\n      <div aria-hidden className=\"relative -mt-[1.875rem] h-[1.875rem] rounded-t-[1.875rem] bg-background\" />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-placeholder",
+    "whoop-wordmark"
+  ],
+  "props": [
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the banner image or video, filling the frame (object-cover); a warm placeholder when empty"
+    },
+    {
+      "name": "badge",
+      "type": "{ title: string; brand: string; }",
+      "required": false,
+      "description": "an optional pale panel at the top: a bold uppercase line over a big wordmark"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "where the whole banner links (leave out for no link)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader name of the banner link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "da958874a5ad39424cf1d217da427249c310941dadd5cd18e93a3def166c71c6"
+}

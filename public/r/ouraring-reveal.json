@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Oura Ring reveal",
+  "description": "A wrapper that brings its content in as it scrolls into view: fade and a 20px rise (the default), a plain fade, or a blur-to-sharp fade for pictures. Runs over a fixed 200px of scroll; steps stagger it by 40px each. Pure CSS scroll-driven animation.",
+  "category": "text-effect",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "fade",
+    "rise",
+    "blur",
+    "stagger",
+    "css-only"
+  ],
+  "notes": [
+    "browsers without animation-timeline, and reduced motion, show the content in place",
+    "don't put it inside an overflow-hidden box: use overflow-clip, or the timeline freezes"
+  ],
+  "entry": "ouraring-reveal.tsx",
+  "source": "foundry",
+  "name": "ouraring-reveal",
+  "files": [
+    {
+      "path": "ouraring-reveal.css",
+      "content": "/* Entering view: a fixed 200px of scroll (not a % of the element, so tall boxes in the first\n   screen still finish), shifted 40px per stagger step. The original runs these as 500–600ms\n   one-shot tweens; scroll-linked is the closest CSS-only match. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ouraring-reveal {\n      animation: ouraring-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--ouraring-reveal-step, 0) * 40px) entry calc(200px + var(--ouraring-reveal-step, 0) * 40px);\n    }\n    .ouraring-reveal-fade {\n      animation-name: ouraring-reveal-fade;\n    }\n    .ouraring-reveal-blur {\n      animation-name: ouraring-reveal-blur;\n      animation-range: entry calc(var(--ouraring-reveal-step, 0) * 40px) entry calc(320px + var(--ouraring-reveal-step, 0) * 40px);\n    }\n  }\n}\n\n@keyframes ouraring-reveal-rise {\n  from {\n    opacity: 0;\n    translate: 0 20px;\n  }\n  to {\n    opacity: 1;\n    translate: 0 0;\n  }\n}\n@keyframes ouraring-reveal-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes ouraring-reveal-blur {\n  from {\n    opacity: 0;\n    filter: blur(16px);\n  }\n  to {\n    opacity: 1;\n    filter: blur(0);\n  }\n}\n"
+    },
+    {
+      "path": "ouraring-reveal.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ouraring-reveal.css\";\n\nexport interface OuraringRevealProps {\n  children: ReactNode;\n  /** rise: fade + 20px lift (text) · fade: opacity only · blur: blurred to sharp (pictures) */\n  kind?: \"rise\" | \"fade\" | \"blur\";\n  /** stagger position: each step starts 40px of scroll later */\n  step?: number;\n  /** the element to render */\n  as?: \"div\" | \"li\" | \"p\";\n  className?: string;\n}\n\nexport function OuraringReveal({ children, kind = \"rise\", step = 0, as: Tag = \"div\", className }: OuraringRevealProps) {\n  const style = { \"--ouraring-reveal-step\": step } as CSSProperties;\n  return (\n    <Tag className={cn(\"ouraring-reveal\", `ouraring-reveal-${kind}`, className)} style={style}>\n      {children}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "kind",
+      "type": "enum",
+      "required": false,
+      "default": "rise",
+      "description": "rise: fade + 20px lift (text) · fade: opacity only · blur: blurred to sharp (pictures)"
+    },
+    {
+      "name": "step",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "stagger position: each step starts 40px of scroll later"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "div",
+      "description": "the element to render"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9a6a23585e3614a2211c9c2a8bbd64617629b93b1d5eaf6c1c78515e353f4efb"
+}

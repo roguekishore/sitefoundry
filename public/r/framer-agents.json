@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer agent cards",
+  "description": "A section head over a column of tall hairline cards, each a big dark media well with a title, grey copy and an arrow link under it, beside a narrow side panel that stays pinned while the cards scroll past; a wider closing card sits next to a second panel. Each card brightens from 20% and slides in 20px from the left as it scrolls into view.",
+  "category": "features",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "dark",
+    "sticky",
+    "pinned",
+    "scroll",
+    "reveal",
+    "scrubbed"
+  ],
+  "notes": [
+    "media wells and both side panels are slots (`media`, `aside`, `closing.panel`); empty, they show placeholders of the original's size",
+    "side panels are desktop-only; on phones the closing card stacks as a normal card",
+    "the reveal is a CSS scroll-driven animation; browsers without it, and reduced motion, show the cards as they are"
+  ],
+  "entry": "framer-agents.tsx",
+  "name": "framer-agents",
+  "files": [
+    {
+      "path": "framer-agents.css",
+      "content": "/* Each card starts dim (20%) and 20px to the left, and settles over the first 500px of its\n   entry into the window, following the scroll (it reverses on the way back up). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .framer-agents-card {\n      animation: framer-agents-in linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 500px;\n    }\n  }\n}\n\n@keyframes framer-agents-in {\n  from { opacity: 0.2; transform: translateX(-20px); }\n  to { opacity: 1; transform: translateX(0); }\n}\n"
+    },
+    {
+      "path": "framer-agents.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerArrowLink } from \"@foundry/framer-arrow-link\";\nimport { FramerButton } from \"@foundry/framer-button\";\nimport { FramerSectionHead } from \"@foundry/framer-heading\";\nimport { FramerPlaceholder } from \"@foundry/framer-placeholder\";\nimport \"./framer-agents.css\";\n\nexport interface FramerAgentCard {\n  /** short white title under the media */\n  title: string;\n  /** two or three lines of grey copy */\n  body: string;\n  /** the arrow link at the card's bottom right (under the copy on phones) */\n  link: { label: string; href: string };\n  /** the card's media (a screenshot or film); empty shows a placeholder well */\n  media?: ReactNode;\n  /** screen-reader label for the placeholder */\n  mediaLabel?: string;\n}\n\nexport interface FramerAgentsProps {\n  /** section title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** the small dark button at the head's bottom right */\n  action: { label: string; href: string };\n  /** the tall cards beside the pinned panel (three on the original) */\n  cards: FramerAgentCard[];\n  /** the narrow panel pinned beside the cards (desktop only); empty shows a placeholder */\n  aside?: ReactNode;\n  /** screen-reader label for the side panel placeholder */\n  asideLabel?: string;\n  /** the wider closing card and the panel beside it (desktop only) */\n  closing?: { card: FramerAgentCard; panel?: ReactNode; panelLabel?: string };\n  className?: string;\n}\n\nfunction Card({ card, wide, className }: { card: FramerAgentCard; wide?: boolean; className?: string }) {\n  return (\n    <article\n      className={cn(\n        \"framer-agents-card flex flex-col rounded-[calc(var(--radius)*2.5)] border border-border bg-background p-[5px] lg:p-2.5\",\n        className,\n      )}\n    >\n      <div className=\"aspect-[1.56] overflow-clip rounded-[calc(var(--radius)+2px)] lg:aspect-auto lg:h-[29.8rem] lg:rounded-2xl\">\n        {card.media ?? <FramerPlaceholder label={card.mediaLabel} />}\n      </div>\n      <div className=\"flex flex-col items-start gap-4 px-5 pt-5 pb-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8 lg:pt-6\">\n        <div>\n          <h3 className=\"text-lg leading-[1.35] tracking-[-0.01em] text-foreground\">{card.title}</h3>\n          <p className={cn(\"text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground\", wide ? \"max-w-[39rem]\" : \"max-w-[31rem]\")}>{card.body}</p>\n        </div>\n        <FramerArrowLink href={card.link.href} label={card.link.label} className=\"shrink-0\" />\n      </div>\n    </article>\n  );\n}\n\n/** Tall cards scrolling past a pinned side panel. */\nexport function FramerAgents({ title, action, cards, aside, asideLabel, closing, className }: FramerAgentsProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-15 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <FramerSectionHead\n          title={title}\n          actions={\n            <FramerButton href={action.href} variant=\"secondary\">\n              {action.label}\n            </FramerButton>\n          }\n        />\n\n        <div className=\"mt-10 lg:mt-11 lg:grid lg:grid-cols-[1fr_16.25rem] lg:gap-2.5\">\n          <div className=\"flex flex-col gap-10 lg:gap-15\">\n            {cards.map((card) => (\n              <Card key={card.title} card={card} />\n            ))}\n          </div>\n          <div className=\"hidden lg:block\">\n            <div className=\"sticky top-30 h-[40rem] overflow-clip rounded-[calc(var(--radius)*2.5)] border border-border\">\n              {aside ?? <FramerPlaceholder tone=\"panel\" label={asideLabel} />}\n            </div>\n          </div>\n        </div>\n\n        {closing && (\n          <div className=\"mt-10 lg:mt-15 lg:grid lg:grid-cols-[75fr_44fr] lg:gap-2.5\">\n            <Card card={closing.card} wide />\n            <div className=\"framer-agents-card hidden overflow-clip rounded-[calc(var(--radius)*2.5)] border border-border lg:block\">\n              {closing.panel ?? <FramerPlaceholder tone=\"panel\" label={closing.panelLabel} />}\n            </div>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-arrow-link",
+    "framer-button",
+    "framer-heading",
+    "framer-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the small dark button at the head's bottom right"
+    },
+    {
+      "name": "cards",
+      "type": "FramerAgentCard[]",
+      "required": true,
+      "description": "the tall cards beside the pinned panel (three on the original)"
+    },
+    {
+      "name": "aside",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the narrow panel pinned beside the cards (desktop only); empty shows a placeholder"
+    },
+    {
+      "name": "asideLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the side panel placeholder"
+    },
+    {
+      "name": "closing",
+      "type": "{ card: FramerAgentCard; panel?: ReactNode; panelLabel?: string; }",
+      "required": false,
+      "description": "the wider closing card and the panel beside it (desktop only)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e15b6605028c6d2fc7d16b96b31837df71685c2266c71e035f0d3c629ef8832d"
+}

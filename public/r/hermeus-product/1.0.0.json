@@ -1,0 +1,121 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hermeus product stage",
+  "description": "A light grey band: the index label, a short paragraph with a crop-mark button at the right, then a stage where a huge two-line name in pale grey sits behind a wide cut-out render, with small amber + hotspots pinned on it, each sending out a pulsing amber ring. Hovering a hotspot shows its label; on phones the hotspots hide and thin chevrons at the sides step through them.",
+  "category": "features",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "product",
+    "showcase",
+    "hotspots",
+    "amber",
+    "grey",
+    "display",
+    "pulse",
+    "loop",
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "hover"
+  ],
+  "notes": [
+    "the render slot is 2.58:1 across the column; hotspot x/y are percentages of that box",
+    "needs JavaScript (hydrate: visible) for the phone arrows; the desktop hotspots and their hover labels work without it",
+    "the backdrop name uses the secondary colour on the muted band"
+  ],
+  "entry": "hermeus-product.tsx",
+  "hydrate": "visible",
+  "source": "foundry",
+  "name": "hermeus-product",
+  "files": [
+    {
+      "path": "hermeus-product.css",
+      "content": "/* Each hotspot sends out an amber ring that grows and fades, every 2.4s, offset per hotspot. */\n@media (prefers-reduced-motion: no-preference) {\n  .hermeus-product-pulse {\n    animation: hermeus-product-pulse 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;\n    animation-delay: var(--hermeus-product-delay, 0s);\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .hermeus-product-pulse { display: none; }\n}\n\n@keyframes hermeus-product-pulse {\n  from { opacity: 0.55; scale: 1; }\n  to { opacity: 0; scale: 2.4; }\n}\n"
+    },
+    {
+      "path": "hermeus-product.tsx",
+      "content": "import { useState, type CSSProperties, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight, Plus } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HermeusButton } from \"@foundry/hermeus-button\";\nimport { HermeusMedia } from \"@foundry/hermeus-media\";\nimport { HermeusReveal } from \"@foundry/hermeus-reveal\";\nimport { HermeusSectionLabel } from \"@foundry/hermeus-section-label\";\nimport \"./hermeus-product.css\";\n\nexport interface HermeusProductHotspot {\n  /** horizontal position, % of the render's width */\n  x: number;\n  /** vertical position, % of the render's height */\n  y: number;\n  /** what this point is, shown on hover */\n  label: string;\n}\n\nexport interface HermeusProductProps {\n  /** the section's number, e.g. \"02\" */\n  index: string;\n  /** the section's name in the label row */\n  label: string;\n  /** the short paragraph under the label */\n  body: string;\n  /** the button at the right of the paragraph */\n  action: { label: string; href: string };\n  /** the huge pale name behind the render, one entry per line (two short words read best) */\n  backdrop: string[];\n  /** the wide cut-out render (2.58:1); empty: a soft placeholder light */\n  media?: ReactNode;\n  /** what the render shows, for screen readers while it is empty */\n  mediaLabel?: string;\n  /** amber + points pinned on the render */\n  hotspots: HermeusProductHotspot[];\n  /** accessible names of the phone arrows */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** Product band: copy and button, then a render over a huge pale name, with pulsing hotspots. */\nexport function HermeusProduct({\n  index,\n  label,\n  body,\n  action,\n  backdrop,\n  media,\n  mediaLabel,\n  hotspots,\n  prevLabel,\n  nextLabel,\n  className,\n}: HermeusProductProps) {\n  // the hotspot stepped to with the phone arrows (none at first, like the original)\n  const [active, setActive] = useState<number | null>(null);\n  const step = (by: number) =>\n    setActive((a) => (a === null ? (by > 0 ? 0 : hotspots.length - 1) : (a + by + hotspots.length) % hotspots.length));\n\n  const arrow =\n    \"absolute top-1/2 z-10 grid h-10 w-6 -translate-y-1/2 cursor-pointer place-items-center text-muted-foreground transition-colors duration-250 ease-[ease-in-out] hover:text-primary motion-reduce:transition-none lg:hidden\";\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-muted pt-section pb-[clamp(6.25rem,3.93rem+9.52vw,12.5rem)] text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <HermeusSectionLabel index={index} label={label} />\n        <HermeusReveal className=\"mt-[clamp(1.94rem,1.24rem+2.86vw,3.81rem)] flex flex-col items-start gap-[clamp(1.25rem,1rem+1vw,2rem)] lg:flex-row lg:justify-between\">\n          <p className=\"max-w-[38em] text-[clamp(0.79rem,0.667rem+0.509vw,1.125rem)]/[1.3] text-pretty\">{body}</p>\n          <HermeusButton label={action.label} href={action.href} tone=\"secondary\" />\n        </HermeusReveal>\n\n        {/* the stage: the pale name, with the render centred over it */}\n        <div className=\"relative mt-[clamp(0rem,3.3rem-3.8vw,2.5rem)]\">\n          <p\n            aria-hidden\n            className=\"text-center font-display text-[min(19.9vw,17.9rem)]/[0.93] font-normal tracking-[-0.01em] text-secondary select-none\"\n          >\n            {backdrop.map((line) => (\n              <span key={line} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </p>\n\n          <div className=\"absolute inset-x-0 top-1/2 aspect-[2.58/1] -translate-y-[56%]\">\n            <HermeusMedia media={media} label={mediaLabel} look=\"soft\" className=\"size-full\" />\n\n            {hotspots.map((h, i) => (\n              <div\n                key={h.label}\n                className={cn(\n                  \"group absolute -translate-x-1/2 -translate-y-1/2\",\n                  active === i ? \"max-lg:block\" : \"max-lg:hidden\",\n                )}\n                style={{ left: `${h.x}%`, top: `${h.y}%` }}\n              >\n                <span\n                  aria-hidden\n                  className=\"hermeus-product-pulse pointer-events-none absolute inset-0 bg-primary\"\n                  style={{ \"--hermeus-product-delay\": `${i * 0.45}s` } as CSSProperties}\n                />\n                <button\n                  type=\"button\"\n                  aria-label={h.label}\n                  onClick={() => setActive((a) => (a === i ? null : i))}\n                  className=\"relative grid size-[clamp(1.125rem,0.9rem+0.6vw,1.5rem)] cursor-pointer place-items-center bg-primary text-primary-foreground transition-transform duration-250 ease-[ease-in-out] hover:scale-115 motion-reduce:transition-none\"\n                >\n                  <Plus aria-hidden strokeWidth={1.25} className=\"size-3/5\" />\n                </button>\n                <span\n                  className={cn(\n                    \"pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 bg-card px-2 py-1.5 text-[0.6875rem]/none tracking-[0.06em] whitespace-nowrap text-card-foreground uppercase opacity-0 transition-opacity duration-250 ease-[ease-in-out] group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none\",\n                    active === i && \"opacity-100\",\n                  )}\n                >\n                  {h.label}\n                </span>\n              </div>\n            ))}\n\n            {hotspots.length > 0 && (\n              <>\n                <button type=\"button\" aria-label={prevLabel} onClick={() => step(-1)} className={cn(arrow, \"-left-4\")}>\n                  <ChevronLeft aria-hidden strokeWidth={1} className=\"size-8\" />\n                </button>\n                <button type=\"button\" aria-label={nextLabel} onClick={() => step(1)} className={cn(arrow, \"-right-4\")}>\n                  <ChevronRight aria-hidden strokeWidth={1} className=\"size-8\" />\n                </button>\n              </>\n            )}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hermeus-button",
+    "hermeus-media",
+    "hermeus-reveal",
+    "hermeus-section-label"
+  ],
+  "props": [
+    {
+      "name": "index",
+      "type": "string",
+      "required": true,
+      "description": "the section's number, e.g. \"02\""
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the section's name in the label row"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the short paragraph under the label"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the button at the right of the paragraph"
+    },
+    {
+      "name": "backdrop",
+      "type": "string[]",
+      "required": true,
+      "description": "the huge pale name behind the render, one entry per line (two short words read best)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the wide cut-out render (2.58:1); empty: a soft placeholder light"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the render shows, for screen readers while it is empty"
+    },
+    {
+      "name": "hotspots",
+      "type": "HermeusProductHotspot[]",
+      "required": true,
+      "description": "amber + points pinned on the render"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the phone arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "22281def4769834711fc91a5a398dcb3dcf7316011b98645368bf7bf2a555bd5"
+}

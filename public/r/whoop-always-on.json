@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop always on",
+  "description": "A black band with a big light heading and a step-by-step story. On desktop, a list of step titles on the left (the inactive ones dimmed to 40%) where the current step opens its paragraph over a thin line that fills while it plays, then hands over to the next on its own; a square photo on the right crossfades with each step. On phones the photo sits on top and the steps become translucent rounded cards in a snapping track with dots, the photo following the current card.",
+  "category": "features",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "accordion",
+    "steps",
+    "autoplay",
+    "dark",
+    "black",
+    "carousel",
+    "scroll-snap",
+    "crossfade",
+    "progress"
+  ],
+  "notes": [
+    "the band is black in light mode and the card colour in dark mode",
+    "steps advance every few seconds on desktop while the block is in view; never under reduced motion"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-always-on.tsx",
+  "source": "foundry",
+  "name": "whoop-always-on",
+  "files": [
+    {
+      "path": "whoop-always-on.css",
+      "content": "/* The thin line under the open step fills from left to right while the step plays. */\n.whoop-always-on-progress {\n  transform-origin: left;\n  animation: whoop-always-on-fill linear both;\n}\n\n@keyframes whoop-always-on-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .whoop-always-on-progress { display: none; }\n}\n"
+    },
+    {
+      "path": "whoop-always-on.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopSectionHeading } from \"@foundry/whoop-section-heading\";\nimport { WhoopSnapTrack } from \"@foundry/whoop-snap-track\";\nimport \"./whoop-always-on.css\";\n\nexport interface WhoopStep {\n  /** the step's title */\n  title: string;\n  /** its paragraph */\n  body: string;\n  /** its photo, filling the square (object-cover); a faint placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface WhoopAlwaysOnProps {\n  /** the big heading */\n  heading: string;\n  /** the steps, in order */\n  steps: WhoopStep[];\n  /** how long each step plays on desktop before the next opens, in milliseconds */\n  interval?: number;\n  /** screen-reader labels of the phone track and its dots (\"Show step\" → \"Show step 2\") */\n  labels: { track: string; dot: string };\n  className?: string;\n}\n\n/** A black band telling a few steps: a self-advancing accordion on desktop, a card track on phones. */\nexport function WhoopAlwaysOn({ heading, steps, interval = 6000, labels, className }: WhoopAlwaysOnProps) {\n  const [active, setActive] = useState(0);\n  const [playing, setPlaying] = useState(false);\n  const root = useRef<HTMLElement>(null);\n\n  // play only on desktop, while in view, and never under reduced motion\n  useEffect(() => {\n    const el = root.current;\n    if (!el) return;\n    const wide = window.matchMedia(\"(min-width: 64rem)\");\n    const still = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n    let inView = false;\n    const update = () => setPlaying(inView && wide.matches && !still.matches);\n    const io = new IntersectionObserver(([e]) => {\n      inView = e.isIntersecting;\n      update();\n    });\n    io.observe(el);\n    wide.addEventListener(\"change\", update);\n    still.addEventListener(\"change\", update);\n    return () => {\n      io.disconnect();\n      wide.removeEventListener(\"change\", update);\n      still.removeEventListener(\"change\", update);\n    };\n  }, []);\n\n  useEffect(() => {\n    if (!playing) return;\n    const t = window.setTimeout(() => setActive((a) => (a + 1) % steps.length), interval);\n    return () => window.clearTimeout(t);\n  }, [playing, active, interval, steps.length]);\n\n  const photo = (\n    <div className=\"grid aspect-square overflow-clip rounded-[1.0625rem]\">\n      {steps.map((s, i) => (\n        <div\n          key={i}\n          className={cn(\n            \"[grid-area:1/1] transition-opacity duration-300 ease-out motion-reduce:transition-none *:size-full *:object-cover\",\n            i === active ? \"opacity-100\" : \"opacity-0\",\n          )}\n        >\n          {s.media ?? <WhoopPlaceholder tone=\"band\" />}\n        </div>\n      ))}\n    </div>\n  );\n\n  return (\n    <section\n      ref={root}\n      className={cn(\n        \"bg-foreground pt-[3.4rem] pb-20 text-background lg:py-24 dark:bg-card dark:text-card-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <WhoopSectionHeading heading={heading} />\n        <div className=\"mt-[4.5rem] lg:mt-16 lg:grid lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20\">\n          <div className=\"lg:order-2\">{photo}</div>\n          {/* desktop: the accordion */}\n          <ol className=\"hidden lg:block\">\n            {steps.map((s, i) => {\n              const open = i === active;\n              return (\n                <li key={i} className=\"relative border-b border-current/15 py-6 first:pt-0\">\n                  <button\n                    type=\"button\"\n                    aria-expanded={open}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"w-full text-left text-[1.75rem] leading-[1.15] font-semibold tracking-[-0.01em] transition-opacity duration-300 ease-out motion-reduce:transition-none\",\n                      open ? \"opacity-100\" : \"opacity-40 hover:opacity-70\",\n                    )}\n                  >\n                    {s.title}\n                  </button>\n                  <div\n                    className={cn(\n                      \"grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none\",\n                      open ? \"grid-rows-[1fr]\" : \"grid-rows-[0fr]\",\n                    )}\n                  >\n                    <div className=\"min-h-0 overflow-hidden\">\n                      <p className=\"max-w-[32rem] pt-3 text-base leading-[1.6] opacity-80\">{s.body}</p>\n                    </div>\n                  </div>\n                  {/* the step's bottom rule fills while it plays */}\n                  {open && playing && (\n                    <span\n                      key={active}\n                      aria-hidden\n                      className=\"whoop-always-on-progress absolute inset-x-0 -bottom-px h-0.5 bg-current\"\n                      style={{ animationDuration: `${interval}ms` }}\n                    />\n                  )}\n                </li>\n              );\n            })}\n          </ol>\n        </div>\n      </div>\n      {/* phones: the steps as translucent cards; the photo follows the current card */}\n      <WhoopSnapTrack\n        className=\"mt-[3.0625rem] lg:hidden\"\n        slides={steps.map((s, i) => (\n          <article key={i} className=\"h-60 rounded-lg bg-background/10 p-5 dark:bg-foreground/10\">\n            <h3 className=\"text-base leading-[1.2] font-bold\">{s.title}</h3>\n            <p className=\"mt-4 text-base leading-[1.6] opacity-85\">{s.body}</p>\n          </article>\n        ))}\n        slideClassName=\"w-[15.8rem]\"\n        tone=\"dark\"\n        label={labels.track}\n        dotLabel={labels.dot}\n        onActiveChange={setActive}\n        dotsClassName=\"mt-9\"\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-placeholder",
+    "whoop-section-heading",
+    "whoop-snap-track"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big heading"
+    },
+    {
+      "name": "steps",
+      "type": "WhoopStep[]",
+      "required": true,
+      "description": "the steps, in order"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6000",
+      "description": "how long each step plays on desktop before the next opens, in milliseconds"
+    },
+    {
+      "name": "labels",
+      "type": "{ track: string; dot: string; }",
+      "required": true,
+      "description": "screen-reader labels of the phone track and its dots (\"Show step\" → \"Show step 2\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "02a085e5ced45dcd3f510e7e69dc7c0544e0fba76268b49c1fb4a39ef7a2ec14"
+}

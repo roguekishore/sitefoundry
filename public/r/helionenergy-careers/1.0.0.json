@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy careers band",
+  "description": "A one-window call to action that darkens as it scrolls in: the page colour gives way to a near-black ground lit by soft pale spotlights from the bottom corners. A small 1.48 film sits in the middle with a short tight heading to its left and an outlined button to its right; phones stack them centred under a mono eyebrow. The button's outline opens from the middle as it arrives and its label rolls on hover.",
+  "category": "cta",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "careers",
+    "dark",
+    "glow",
+    "spotlight",
+    "scroll",
+    "reveal",
+    "window-height",
+    "minimal",
+    "video"
+  ],
+  "notes": [
+    "always dark (its content and ground carry the `dark` class); the ground fades in with a CSS view timeline and is simply dark without one",
+    "the spotlights use the theme's dark `glow`",
+    "media is the small film; empty, a dark placeholder"
+  ],
+  "entry": "helionenergy-careers.tsx",
+  "source": "foundry",
+  "name": "helionenergy-careers",
+  "files": [
+    {
+      "path": "helionenergy-careers.css",
+      "content": "/* Soft pale spotlights rising from the bottom corners of the dark ground. */\n.helionenergy-careers-glow {\n  background:\n    radial-gradient(ellipse 62% 88% at 86% 100%, color-mix(in oklab, var(--glow) 92%, transparent), transparent 74%),\n    radial-gradient(ellipse 50% 78% at 24% 100%, color-mix(in oklab, var(--glow) 78%, transparent), transparent 74%);\n}\n\n/* The dark ground fades in over the page colour as the section scrolls in (the original\n   turns the page dark here). Without scroll timelines it is simply dark. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .helionenergy-careers-ground {\n      animation: helionenergy-careers-darken linear both;\n      animation-timeline: view();\n      animation-range: entry 40% entry 55%;\n    }\n  }\n}\n\n@keyframes helionenergy-careers-darken {\n  from {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-careers.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HelionenergyButton } from \"@foundry/helionenergy-button\";\nimport { HelionenergyEyebrow } from \"@foundry/helionenergy-eyebrow\";\nimport { HelionenergyPlaceholder } from \"@foundry/helionenergy-placeholder\";\nimport \"./helionenergy-careers.css\";\n\nexport interface HelionenergyCareersProps {\n  /** the small mono label in the top-left corner */\n  eyebrow: ReactNode;\n  /** the heading's lines (two on desktop, one run-on line on phones) */\n  title: ReactNode[];\n  /** the outlined button's text */\n  ctaLabel: ReactNode;\n  /** where the button goes */\n  ctaHref: string;\n  /** the small film in the middle (aspect 1.48); empty, a placeholder */\n  media?: ReactNode;\n  className?: string;\n}\n\n/**\n * A one-window call to action that darkens as it scrolls in: the page colour gives way to a\n * near-black ground lit by soft pale spotlights from below. A small film sits in the middle\n * with the heading to its left and an outlined button to its right (stacked and centred on\n * phones). The button's outline opens from the middle as it arrives.\n */\nexport function HelionenergyCareers({ eyebrow, title, ctaLabel, ctaHref, media, className }: HelionenergyCareersProps) {\n  return (\n    <section className={cn(\"helionenergy-careers relative isolate h-svh overflow-clip\", className)}>\n      <div aria-hidden className=\"helionenergy-careers-ground dark absolute inset-0 -z-10 bg-background\">\n        <div className=\"helionenergy-careers-glow absolute inset-0\" />\n      </div>\n\n      <div className=\"dark relative h-full px-gutter text-foreground\">\n        <div className=\"relative mx-auto h-full max-w-page\">\n          <HelionenergyEyebrow className=\"absolute top-16 left-0\">{eyebrow}</HelionenergyEyebrow>\n\n          <div className=\"flex h-full flex-col items-center justify-center pt-20 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:pt-0\">\n            <h2 className=\"text-center font-display text-[clamp(1.275rem,0.981rem+1.208vw,2.068rem)] leading-[1.1] font-medium tracking-[-0.05em] lg:justify-self-start lg:text-left\">\n              {title.map((line, i) => (\n                <Fragment key={i}>\n                  {i > 0 && (\n                    <>\n                      <br className=\"max-lg:hidden\" />{\" \"}\n                    </>\n                  )}\n                  {line}\n                </Fragment>\n              ))}\n            </h2>\n            <HelionenergyPlaceholder\n              media={media}\n              tone=\"film\"\n              zoom\n              className=\"mt-[5.5rem] aspect-[1.48] w-[20.625rem] max-w-full rounded-md lg:mt-0 lg:w-[23.8rem]\"\n            />\n            <HelionenergyButton href={ctaHref} reveal className=\"mt-[10rem] lg:mt-0 lg:justify-self-center\">\n              {ctaLabel}\n            </HelionenergyButton>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "helionenergy-button",
+    "helionenergy-eyebrow",
+    "helionenergy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small mono label in the top-left corner"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the heading's lines (two on desktop, one run-on line on phones)"
+    },
+    {
+      "name": "ctaLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the outlined button's text"
+    },
+    {
+      "name": "ctaHref",
+      "type": "string",
+      "required": true,
+      "description": "where the button goes"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small film in the middle (aspect 1.48); empty, a placeholder"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b67f32dc7a0cd35a5e408da17436f9bc186b916bd6105a29a8c43ac331be653b"
+}

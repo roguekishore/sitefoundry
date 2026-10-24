@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel footer",
+  "description": "A plain, roomy link directory on the page colour: groups of 14px links in a six-column grid (two columns on phones), each under a medium-weight ink title, with small grey pill badges beside new items. Under it a small ink mark, a blue mono status line with a dot on the left and a compact three-icon appearance switch on the right. Links darken from grey to ink on hover in 100ms.",
+  "category": "footer",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "sitemap",
+    "light",
+    "minimal",
+    "monochrome",
+    "status",
+    "mono"
+  ],
+  "notes": [
+    "groups flow into six columns on desktop (wrapping into rows of six) and two on phones",
+    "the appearance switch is static UI: its buttons have no behaviour until you wire them"
+  ],
+  "entry": "vercel-footer.tsx",
+  "name": "vercel-footer",
+  "files": [
+    {
+      "path": "vercel-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Monitor, Moon, Sun } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelMark } from \"@foundry/vercel-mark\";\n\nexport interface VercelFooterGroup {\n  /** the group's title */\n  title: string;\n  /** its links; badge adds a small grey pill (e.g. \"New\") */\n  links: { label: string; href: string; badge?: string }[];\n}\n\nexport interface VercelFooterProps {\n  /** link groups, in reading order (twelve on the original: two rows of six) */\n  groups: VercelFooterGroup[];\n  /** the company name (read to screen readers next to the mark) */\n  brand: string;\n  /** the mark (an svg or lucide icon) */\n  mark: ReactNode;\n  /** the blue mono status line under the mark */\n  status?: { label: string; href: string };\n  /** screen-reader labels for the appearance switch: system, light, dark */\n  appearanceLabels?: [string, string, string];\n  className?: string;\n}\n\n/** Six-column link directory with a mark, a status line and an appearance switch. */\nexport function VercelFooter({ groups, brand, mark, status, appearanceLabels, className }: VercelFooterProps) {\n  const icons = [Monitor, Sun, Moon];\n  return (\n    <footer className={cn(\"bg-background px-gutter pt-14 pb-11 text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <div className=\"grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-6\">\n          {groups.map((group) => (\n            <div key={group.title}>\n              <h3 className=\"text-sm font-medium\">{group.title}</h3>\n              <ul className=\"mt-4 flex flex-col gap-2 text-sm text-muted-foreground\">\n                {group.links.map((link) => (\n                  <li key={link.label} className=\"flex items-center gap-1.5\">\n                    <a\n                      href={link.href}\n                      className=\"transition-colors duration-100 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none\"\n                    >\n                      {link.label}\n                    </a>\n                    {link.badge ? (\n                      <span className=\"rounded-full bg-muted px-2 text-[0.6875rem] leading-5 font-medium text-foreground\">{link.badge}</span>\n                    ) : null}\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n\n        <VercelMark brand={brand} mark={mark} size=\"sm\" className=\"mt-11\" />\n\n        <div className=\"mt-12 flex items-center justify-between gap-6\">\n          {status ? (\n            <a href={status.href} className=\"inline-flex items-center gap-2 font-mono text-[0.8125rem] text-highlight uppercase\">\n              <span aria-hidden className=\"size-2 rounded-full bg-highlight\" />\n              {status.label}\n            </a>\n          ) : (\n            <span />\n          )}\n          {appearanceLabels ? (\n            <div className=\"flex items-center rounded-full p-0.5 ring-1 ring-border\">\n              {icons.map((Icon, i) => (\n                <button\n                  key={appearanceLabels[i]}\n                  type=\"button\"\n                  aria-label={appearanceLabels[i]}\n                  aria-pressed={i === 0}\n                  className=\"grid size-6 place-items-center rounded-full text-muted-foreground transition-colors duration-100 hover:text-foreground aria-pressed:bg-muted aria-pressed:text-foreground motion-reduce:transition-none\"\n                >\n                  <Icon aria-hidden className=\"size-3.5\" strokeWidth={1.75} />\n                </button>\n              ))}\n            </div>\n          ) : null}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-mark"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "VercelFooterGroup[]",
+      "required": true,
+      "description": "link groups, in reading order (twelve on the original: two rows of six)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name (read to screen readers next to the mark)"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mark (an svg or lucide icon)"
+    },
+    {
+      "name": "status",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the blue mono status line under the mark"
+    },
+    {
+      "name": "appearanceLabels",
+      "type": "[string, string, string]",
+      "required": false,
+      "description": "screen-reader labels for the appearance switch: system, light, dark"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "972ca91c44bce6a9ca2e8fabd9717ce203ecd6c71330e4df339fe36df0c18199"
+}

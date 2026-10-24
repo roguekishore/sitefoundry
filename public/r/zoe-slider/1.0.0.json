@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Zoe slider",
+  "description": "A swipeable card row that snaps card by card and runs off the right edge, with a full-width hairline progress bar whose dark fill grows card by card (0.3s) and two round chevron buttons underneath, flush left.",
+  "category": "gallery",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "slider",
+    "scroll-snap",
+    "progress",
+    "arrows",
+    "swipe"
+  ],
+  "notes": [
+    "native scroll-snap, no carousel library; the progress bar and arrows need JavaScript (hydrate visible)",
+    "tone=\"band\" makes the bar and buttons translucent white, for coloured bands",
+    "hide the controls at a breakpoint with controlsClassName (e.g. lg:hidden when every card fits)"
+  ],
+  "hydrate": "visible",
+  "entry": "zoe-slider.tsx",
+  "name": "zoe-slider",
+  "files": [
+    {
+      "path": "zoe-slider.tsx",
+      "content": "import { useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ZoeSliderProps {\n  /** the cards, in order */\n  slides: ReactNode[];\n  /** classes for each slide wrapper: its width (e.g. \"w-[37.5rem]\") */\n  slideClassName?: string;\n  /** screen-reader name of the row */\n  label: string;\n  /** screen-reader names of the two buttons */\n  prevLabel: string;\n  nextLabel: string;\n  /** light: dark bar and white buttons, for white pages · band: translucent white, for coloured bands */\n  tone?: \"light\" | \"band\";\n  className?: string;\n  /** extra classes for the scrolling row (side padding, gap, centring at a breakpoint) */\n  trackClassName?: string;\n  /** extra classes for the progress bar + buttons (e.g. \"lg:hidden\") */\n  controlsClassName?: string;\n}\n\n/** A snapping card row with a progress bar and round arrows, like the site's sliders. */\nexport function ZoeSlider({\n  slides,\n  slideClassName,\n  label,\n  prevLabel,\n  nextLabel,\n  tone = \"light\",\n  className,\n  trackClassName,\n  controlsClassName,\n}: ZoeSliderProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const [active, setActive] = useState(0);\n  const [atEnd, setAtEnd] = useState(false);\n\n  // where the row has to scroll to for card i to sit at its left padding\n  const targetOf = useCallback((i: number) => {\n    const el = track.current;\n    const card = el?.children[i] as HTMLElement | undefined;\n    if (!el || !card) return 0;\n    return card.offsetLeft - parseFloat(getComputedStyle(el).paddingLeft || \"0\");\n  }, []);\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    let frame = 0;\n    const measure = () => {\n      frame = 0;\n      if (el.clientWidth === 0) return;\n      const end = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;\n      let best = 0;\n      let bestDist = Infinity;\n      for (let i = 0; i < el.children.length; i++) {\n        const d = Math.abs(targetOf(i) - el.scrollLeft);\n        if (d < bestDist) {\n          bestDist = d;\n          best = i;\n        }\n      }\n      // the last cards can't reach the left edge: at the very end the last one counts as current\n      if (end && el.scrollWidth > el.clientWidth) best = el.children.length - 1;\n      setActive(best);\n      setAtEnd(end);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(measure);\n    };\n    measure();\n    el.addEventListener(\"scroll\", onScroll, { passive: true });\n    window.addEventListener(\"resize\", onScroll);\n    return () => {\n      el.removeEventListener(\"scroll\", onScroll);\n      window.removeEventListener(\"resize\", onScroll);\n      cancelAnimationFrame(frame);\n    };\n  }, [targetOf]);\n\n  const go = (i: number) => {\n    const el = track.current;\n    if (!el) return;\n    const still = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollTo({ left: targetOf(Math.max(0, Math.min(slides.length - 1, i))), behavior: still ? \"auto\" : \"smooth\" });\n  };\n\n  const round = cn(\n    \"grid size-12 place-items-center rounded-full transition-opacity duration-300 disabled:opacity-40 motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    tone === \"band\"\n      ? \"bg-current/20\"\n      : \"bg-background shadow-[0_0_10px_0_color-mix(in_oklab,var(--foreground)_12%,transparent)]\",\n  );\n\n  return (\n    <div className={className}>\n      <div\n        ref={track}\n        role=\"region\"\n        aria-label={label}\n        tabIndex={0}\n        className={cn(\n          \"flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [&::-webkit-scrollbar]:hidden\",\n          trackClassName,\n        )}\n      >\n        {slides.map((slide, i) => (\n          <div key={i} className={cn(\"shrink-0 snap-start\", slideClassName)}>\n            {slide}\n          </div>\n        ))}\n      </div>\n\n      <div className={controlsClassName}>\n        <div className={cn(\"relative h-px\", tone === \"band\" ? \"bg-current/40\" : \"bg-foreground/25\")}>\n          <div\n            className=\"absolute top-1/2 left-0 h-0.5 -translate-y-1/2 bg-current transition-[width] duration-300 ease-in-out motion-reduce:transition-none\"\n            style={{ width: `${((active + 1) / Math.max(1, slides.length)) * 100}%` }}\n          />\n        </div>\n        <div className=\"mt-6 flex gap-2\">\n          <button type=\"button\" aria-label={prevLabel} disabled={active === 0} onClick={() => go(active - 1)} className={round}>\n            <ChevronLeft aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} disabled={atEnd} onClick={() => go(active + 1)} className={round}>\n            <ChevronRight aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </button>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "slideClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for each slide wrapper: its width (e.g. \"w-[37.5rem]\")"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the row"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader names of the two buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "light: dark bar and white buttons, for white pages · band: translucent white, for coloured bands"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "trackClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the scrolling row (side padding, gap, centring at a breakpoint)"
+    },
+    {
+      "name": "controlsClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the progress bar + buttons (e.g. \"lg:hidden\")"
+    }
+  ],
+  "hash": "bf4cacb41ffe0bbe1eecc61223b26d43917ef94b28daacc14538220526d756b3"
+}

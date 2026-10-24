@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend dashboard tabs",
+  "description": "A centred icon tile, lit title and lead over three hairline tab cards (icon square + tight grotesk label; the chosen one gets a green icon and a glowing line along its bottom edge) and a wide 16px-radius dashboard screenshot slot that crossfades when the tab changes. Tabs stack on phones.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "dashboard",
+    "dark",
+    "glow",
+    "crossfade",
+    "screenshot"
+  ],
+  "notes": [
+    "each tab's screenshot is a media slot (1232×659, r16): placeholders until filled",
+    "tab state needs JavaScript"
+  ],
+  "hydrate": "visible",
+  "entry": "resend-control.tsx",
+  "source": "foundry",
+  "name": "resend-control",
+  "files": [
+    {
+      "path": "resend-control.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\n\nexport interface ResendControlTab {\n  label: string;\n  /** a small line icon in the tab's square */\n  icon: ReactNode;\n  /** the screenshot shown for this tab; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface ResendControlProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** the lead; a list sets its desktop line breaks */\n  text: string | string[];\n  /** fills the icon slot above the title; empty shows a placeholder tile */\n  media?: ReactNode;\n  /** three tabs */\n  tabs: ResendControlTab[];\n  className?: string;\n}\n\nexport function ResendControl({ title, text, media, tabs, className }: ResendControlProps) {\n  const [active, setActive] = useState(0);\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading tile media={media} title={title} text={text} />\n        <div role=\"tablist\" className=\"mt-8 grid gap-3 lg:mt-16 lg:grid-cols-3 lg:gap-8\">\n          {tabs.map((t, i) => (\n            <button\n              key={t.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"relative flex h-[3.75rem] items-center gap-3 overflow-clip rounded-lg border border-border bg-linear-to-b from-foreground/[0.03] to-transparent px-4 text-left transition-colors duration-200 motion-reduce:transition-none lg:h-[5.625rem] lg:gap-4 lg:px-6\",\n                i !== active && \"hover:border-foreground/30\",\n              )}\n            >\n              <span\n                className={cn(\n                  \"flex size-10 shrink-0 items-center justify-center rounded-lg border border-border bg-accent transition-colors duration-200 [&_svg]:size-4\",\n                  i === active ? \"text-chart-2\" : \"text-foreground\",\n                )}\n              >\n                {t.icon}\n              </span>\n              <span className=\"font-display text-base tracking-[-0.02em] text-foreground\">{t.label}</span>\n              <span\n                aria-hidden\n                className={cn(\n                  \"absolute bottom-0 left-1/2 h-px w-2/5 -translate-x-1/2 bg-linear-to-r from-transparent via-chart-2 to-transparent shadow-[0_0_12px_var(--chart-2)] transition-opacity duration-300\",\n                  i === active ? \"opacity-100\" : \"opacity-0\",\n                )}\n              />\n            </button>\n          ))}\n        </div>\n        <div className=\"mt-3 grid aspect-[1232/659] w-full grid-cols-1 lg:mt-8\">\n          {tabs.map((t, i) => (\n            <div\n              key={t.label}\n              aria-hidden={i !== active}\n              className={cn(\n                \"overflow-clip rounded-lg [grid-area:1/1] transition-opacity duration-300 motion-reduce:transition-none\",\n                i === active ? \"opacity-100\" : \"pointer-events-none opacity-0\",\n              )}\n            >\n              {t.media ?? <ResendPlaceholder className=\"size-full\" />}\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-heading",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "fills the icon slot above the title; empty shows a placeholder tile"
+    },
+    {
+      "name": "tabs",
+      "type": "ResendControlTab[]",
+      "required": true,
+      "description": "three tabs"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "abf81137c761c1c888f855986a173885f8221af6b0e38f43689eacadb3f85060"
+}

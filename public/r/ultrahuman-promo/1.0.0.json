@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman offer banner",
+  "description": "A dark photo banner inset 10px from the window with 16px corners: a light uppercase product name, a huge ultra-condensed italic two-line offer, one line of copy and a white pill. On desktop a thin circular lens floats on the right with three mono HUD readouts in corner-ticked boxes. 90% of the window tall on phones (copy at the bottom), a 2.8:1 strip on desktop.",
+  "category": "hero",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "banner",
+    "promo",
+    "dark",
+    "photo",
+    "condensed",
+    "italic",
+    "hud",
+    "mono",
+    "rounded"
+  ],
+  "notes": [
+    "forces the theme's dark colours with the dark class (white type over a photo)",
+    "the headline asks for --ultrahuman-condensed at font-stretch 50%; other themes use their display face",
+    "static: no motion"
+  ],
+  "entry": "ultrahuman-promo.tsx",
+  "name": "ultrahuman-promo",
+  "files": [
+    {
+      "path": "ultrahuman-promo.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\n\nexport interface UltrahumanPromoReadout {\n  /** the figure shown in brackets above the box, e.g. \"82\" or \"14%\" */\n  value: string;\n  /** the metric's name inside the box, e.g. \"Readiness\" */\n  label: string;\n}\n\nexport interface UltrahumanPromoProps {\n  /** small uppercase product name above the headline */\n  eyebrow: string;\n  /** the headline, one string per line (set in a condensed italic, uppercase) */\n  title: string[];\n  /** one line under the headline */\n  body: string;\n  /** the white pill button */\n  action: { label: string; href: string };\n  /** the photo or video filling the panel (cover); a placeholder when empty */\n  media?: ReactNode;\n  /** describes the photo for screen readers when the placeholder shows */\n  mediaLabel?: string;\n  /** up to three readouts floating around the circular lens (desktop only) */\n  readouts?: UltrahumanPromoReadout[];\n  className?: string;\n}\n\n// where the three readouts sit on the panel (desktop), as % of its width / height\nconst readoutSpots = [\"left-[47.5%] top-[17.5%]\", \"left-[83%] top-[9%]\", \"left-[84.4%] top-[68.5%]\"];\n\n/** A photo banner inset 10px from the window edges with 16px corners: a big condensed italic offer\n *  on the left, and on desktop a thin circular lens with mono HUD readouts on the right. */\nexport function UltrahumanPromo({ eyebrow, title, body, action, media, mediaLabel, readouts = [], className }: UltrahumanPromoProps) {\n  return (\n    <section className={cn(\"bg-background px-2.5 pt-0.5 pb-2.5 lg:pt-0\", className)}>\n      <div className=\"dark relative isolate flex h-[90svh] flex-col justify-end overflow-clip rounded-lg bg-background text-foreground lg:aspect-[1420/503] lg:h-auto lg:justify-center\">\n        <div className=\"absolute inset-0 -z-10\">\n          {media ?? <UltrahumanPlaceholder tone=\"photo\" label={mediaLabel} />}\n        </div>\n        <div aria-hidden className=\"absolute inset-0 -z-10 bg-gradient-to-t from-background/55 via-background/10 to-transparent lg:bg-gradient-to-r lg:from-background/45 lg:via-background/10\" />\n\n        <div aria-hidden className=\"absolute top-1/2 left-[69.7%] hidden aspect-square w-[29.4%] -translate-1/2 rounded-full border border-foreground/25 bg-foreground/[0.03] lg:block\" />\n        {readouts.slice(0, 3).map((readout, i) => (\n          <div key={readout.label} className={cn(\"absolute hidden font-mono uppercase lg:block\", readoutSpots[i])}>\n            <p className=\"text-xs tracking-[0.04em] text-foreground/60\">[{readout.value}]</p>\n            <p className=\"relative mt-1.5 border border-foreground/35 px-3 py-[0.6875rem] text-xs leading-none tracking-[0.06em] text-foreground/85\">\n              {readout.label}\n              {[\"-top-0.5 -left-0.5\", \"-top-0.5 -right-0.5\", \"-bottom-0.5 -left-0.5\", \"-right-0.5 -bottom-0.5\"].map((spot) => (\n                <span key={spot} aria-hidden className={cn(\"absolute size-1 bg-foreground/70\", spot)} />\n              ))}\n            </p>\n          </div>\n        ))}\n\n        <div className=\"px-5 pb-10 lg:px-24 lg:pb-0\">\n          <p className=\"text-base leading-none font-light tracking-[-0.01em] uppercase lg:text-2xl\">{eyebrow}</p>\n          <h2 className=\"mt-5 font-[family-name:var(--ultrahuman-condensed,var(--typeface-display))] text-[3.75rem] leading-[0.92] font-medium tracking-[calc(-0.01em-var(--ultrahuman-squeeze,0em))] uppercase italic [font-stretch:50%] lg:mt-6 lg:text-[6rem] lg:leading-[0.97]\">\n            {title.map((line) => (\n              <span key={line} className=\"block\">\n                {line}\n              </span>\n            ))}\n          </h2>\n          <p className=\"mt-4 text-base leading-[1.375rem] tracking-[-0.0175em] text-foreground/95 lg:mt-5\">{body}</p>\n          <UltrahumanButton href={action.href} variant=\"ink\" size=\"lg\" className=\"mt-6\">\n            {action.label}\n          </UltrahumanButton>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button",
+    "ultrahuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small uppercase product name above the headline"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the headline, one string per line (set in a condensed italic, uppercase)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "one line under the headline"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the white pill button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo or video filling the panel (cover); a placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the photo for screen readers when the placeholder shows"
+    },
+    {
+      "name": "readouts",
+      "type": "UltrahumanPromoReadout[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to three readouts floating around the circular lens (desktop only)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ae1406454aafe37131696e27de4e8b3686ecb42bec64360d7fa578e3b84d2b79"
+}

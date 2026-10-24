@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Reflect footer",
+  "description": "A calm dark footer under a hairline with a faint violet glow at its top centre: the app-icon tile and name with small social icons below them at the left, three link columns at the right (ink titles, muted links on a 40px rhythm), then a newsletter row (24px heading and note on the left, email field and dark button on the right) between hairlines, and a legal line with dot-separated links and the copyright. Links brighten from 60% to 70% ink in 450ms; the field lightens on hover. On phones everything stacks and the form fills the width.",
+  "category": "footer",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "minimal",
+    "newsletter",
+    "hairline",
+    "links",
+    "hover"
+  ],
+  "notes": [
+    "the form is a plain HTML form; give newsletter.action a URL to post to"
+  ],
+  "entry": "reflect-footer.tsx",
+  "source": "foundry",
+  "name": "reflect-footer",
+  "files": [
+    {
+      "path": "reflect-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectIconTile } from \"@foundry/reflect-header\";\n\nexport interface ReflectFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface ReflectFooterColumn {\n  title: string;\n  links: ReflectFooterLink[];\n}\n\nexport interface ReflectFooterProps {\n  /** the product name next to the icon tile */\n  name: string;\n  /** the glyph inside the violet icon tile */\n  icon: ReactNode;\n  homeHref?: string;\n  /** small icon links under the name (on phones, at the right of it) */\n  socials?: (ReflectFooterLink & { icon: ReactNode })[];\n  /** three link columns */\n  columns: ReflectFooterColumn[];\n  /** the sign-up row */\n  newsletter?: {\n    title: string;\n    text?: string;\n    /** placeholder of the email field */\n    placeholder: string;\n    /** accessible name of the email field */\n    fieldLabel: string;\n    button: string;\n    /** where the form posts */\n    action?: string;\n  };\n  /** legal links at the bottom left, separated by dots */\n  legal?: ReflectFooterLink[];\n  /** e.g. \"© 2026 Nocturne Labs\" */\n  copyright?: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[0.9375rem]/6 text-muted-foreground transition-colors duration-[450ms] ease-[cubic-bezier(0.6,0.6,0,1)] hover:text-foreground/70 motion-reduce:transition-none\";\n\n/** Name and socials, three link columns, a newsletter row and the legal line, split by hairlines. */\nexport function ReflectFooter({ name, icon, homeHref = \"#\", socials, columns, newsletter, legal, copyright, className }: ReflectFooterProps) {\n  return (\n    <footer\n      className={cn(\n        \"relative border-t border-border bg-background bg-[radial-gradient(40%_50%_at_50%_0%,color-mix(in_oklab,var(--glow)_8%,transparent),transparent)] text-foreground\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-[70.5rem] px-[2.75rem] pt-10 pb-24 sm:px-gutter lg:px-0 lg:pt-20 lg:pb-[6.5rem]\">\n        <div className=\"flex flex-col gap-8 lg:flex-row lg:justify-between\">\n          <div className=\"flex items-center justify-between lg:flex-col lg:items-start lg:justify-start lg:gap-[7.5rem]\">\n            <a href={homeHref} className=\"flex items-center gap-3 text-[1.0625rem]/6 font-medium\">\n              <ReflectIconTile icon={icon} />\n              {name}\n            </a>\n            {socials && (\n              <ul className=\"flex items-center gap-6\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className={cn(linkClass, \"block [&_svg]:size-5\")}>\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n          <div className=\"flex flex-col gap-8 lg:flex-row lg:gap-0\">\n            {columns.map((col) => (\n              <div key={col.title} className=\"lg:w-[13.1875rem] lg:last:w-[13.5rem]\">\n                <h2 className=\"text-[0.9375rem]/6 font-medium\">{col.title}</h2>\n                <ul className=\"mt-3.5 flex flex-col gap-[0.9375rem] lg:mt-4 lg:gap-4\">\n                  {col.links.map((link) => (\n                    <li key={link.label}>\n                      <a href={link.href} className={linkClass}>\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        {newsletter && (\n          <div className=\"mt-8 flex flex-col gap-8 border-y border-border py-10 lg:mt-[5.5rem] lg:flex-row lg:items-center lg:justify-between lg:py-[4.25rem]\">\n            <div>\n              <h2 className=\"font-display text-2xl/8 font-[560]\">{newsletter.title}</h2>\n              {newsletter.text && <p className=\"mt-2 text-sm/5 text-muted-foreground\">{newsletter.text}</p>}\n            </div>\n            <form action={newsletter.action} className=\"flex flex-col gap-2 lg:flex-row\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                required\n                aria-label={newsletter.fieldLabel}\n                placeholder={newsletter.placeholder}\n                className=\"h-[2.375rem] rounded-lg border border-foreground/10 bg-foreground/[0.02] px-3 text-sm/5 text-foreground transition-colors duration-[450ms] ease-[cubic-bezier(0.6,0.6,0,1)] outline-none placeholder:text-muted-foreground hover:bg-foreground/6 focus:border-highlight/40 motion-reduce:transition-none lg:w-[18.5rem]\"\n              />\n              <button\n                type=\"submit\"\n                className=\"h-[2.375rem] rounded-lg border border-foreground/10 bg-secondary px-4 text-sm/5 font-medium text-secondary-foreground transition-colors duration-[450ms] ease-[cubic-bezier(0.6,0.6,0,1)] hover:bg-accent motion-reduce:transition-none\"\n              >\n                {newsletter.button}\n              </button>\n            </form>\n          </div>\n        )}\n\n        <div className=\"mt-10 flex flex-col gap-7 text-[0.9375rem]/6 text-muted-foreground lg:mt-14 lg:flex-row lg:items-center lg:justify-between\">\n          {legal && (\n            <ul className=\"flex flex-wrap items-center gap-x-4\">\n              {legal.map((link, i) => (\n                <li key={link.label} className=\"flex items-center gap-4\">\n                  {i > 0 && <span aria-hidden className=\"size-0.5 rounded-full bg-muted-foreground\" />}\n                  <a href={link.href} className={linkClass}>\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n          {copyright && <p className=\"lg:pr-4\">{copyright}</p>}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-header"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product name next to the icon tile"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the glyph inside the violet icon tile"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#"
+    },
+    {
+      "name": "socials",
+      "type": "(ReflectFooterLink & { icon: ReactNode; })[]",
+      "required": false,
+      "description": "small icon links under the name (on phones, at the right of it)"
+    },
+    {
+      "name": "columns",
+      "type": "ReflectFooterColumn[]",
+      "required": true,
+      "description": "three link columns"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; text?: string; placeholder: string; fieldLabel: string; button: string; action?: string; } | undefined",
+      "required": false,
+      "description": "the sign-up row"
+    },
+    {
+      "name": "legal",
+      "type": "ReflectFooterLink[]",
+      "required": false,
+      "description": "legal links at the bottom left, separated by dots"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": false,
+      "description": "e.g. \"© 2026 Nocturne Labs\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a9f4b5d0ebd2f965e84548b49a3a51d5f15fe2048c328cb34f5bb7e9f9c05fcf"
+}

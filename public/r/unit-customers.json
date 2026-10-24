@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit customer stories",
+  "description": "Customer stories on a pale tinted band: a centred heading, a row of customer-name tabs on a hairline (inactive names faded to 40%), and one white card holding a lilac picture on the left and a statement, product pills, a quote and an avatar line on the right. The active tab's black underline fills over eight seconds, then the next story crossfades in; clicking a tab jumps to it. On phones the tabs scroll sideways and the picture sits on top.",
+  "category": "testimonials",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "tabs",
+    "case-study",
+    "autoplay",
+    "crossfade",
+    "light",
+    "pastel",
+    "progress"
+  ],
+  "notes": [
+    "media slots: the story picture (522×480) and the 40px avatar",
+    "autoplay runs on the underline's CSS animation; with reduced motion stories only change on click",
+    "the white card sits on the muted band: under themes where card and muted match it still reads through bg-background"
+  ],
+  "hydrate": "visible",
+  "entry": "unit-customers.tsx",
+  "source": "foundry",
+  "name": "unit-customers",
+  "files": [
+    {
+      "path": "unit-customers.css",
+      "content": "/* The active tab's underline fills left to right over one story's time; when it finishes,\n   the block moves to the next story (onAnimationEnd). Without motion it is simply full and\n   the stories wait for a click. */\n.unit-customers-fill {\n  transform-origin: left center;\n  animation: unit-customers-fill var(--unit-customers-time, 8s) linear both;\n}\n.unit-customers:hover .unit-customers-fill {\n  animation-play-state: paused;\n}\n\n@keyframes unit-customers-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .unit-customers-fill { animation: none; }\n}\n"
+    },
+    {
+      "path": "unit-customers.tsx",
+      "content": "import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitChip } from \"@foundry/unit-chip\";\nimport { UnitPlaceholder } from \"@foundry/unit-placeholder\";\nimport \"./unit-customers.css\";\n\nexport interface UnitCustomerStory {\n  /** the customer's name: the tab label, set like a wordmark */\n  company: string;\n  /** what they built, in one or two sentences */\n  statement: string;\n  /** the products they use, as pills */\n  chips: string[];\n  /** a short quote */\n  quote: string;\n  /** who said it */\n  person: { name: string; role: string; avatar?: ReactNode };\n  /** the story's picture (522×480 on desktop); a lilac placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface UnitCustomersProps {\n  /** the centred heading */\n  heading: string;\n  /** two to five stories; four fit the desktop row */\n  stories: UnitCustomerStory[];\n  /** seconds each story stays before the next one comes up */\n  seconds?: number;\n  className?: string;\n}\n\n/** Customer stories on a tinted band: a row of name tabs whose underline fills as each story plays, over one white card. */\nexport function UnitCustomers({ heading, stories, seconds = 8, className }: UnitCustomersProps) {\n  const [active, setActive] = useState(0);\n  const row = useRef<HTMLDivElement>(null);\n  const ease = \"duration-[625ms] ease-[cubic-bezier(0.625,0.05,0,1)] motion-reduce:transition-none\";\n\n  // keep the active tab in view in the phone's sideways row (without scrolling the page)\n  useEffect(() => {\n    const el = row.current;\n    const tab = el?.children[active] as HTMLElement | undefined;\n    if (el && tab && el.scrollWidth > el.clientWidth) {\n      el.scrollTo({ left: Math.max(0, el.scrollLeft + tab.getBoundingClientRect().left - el.getBoundingClientRect().left), behavior: \"smooth\" });\n    }\n  }, [active]);\n\n  return (\n    <section\n      className={cn(\"unit-customers bg-muted font-sans text-foreground\", className)}\n      style={{ \"--unit-customers-time\": `${seconds}s` } as CSSProperties}\n    >\n      <div className=\"mx-auto max-w-page px-gutter py-16 lg:pt-32 lg:pb-36\">\n        <h2 className=\"text-center font-display text-[1.640625rem] leading-[1.15] tracking-[-0.02em] lg:text-[2.5rem]\">{heading}</h2>\n\n        <div ref={row} role=\"tablist\" className=\"relative mt-8 -mr-gutter flex snap-x overflow-x-auto [scrollbar-width:none] lg:mt-16 lg:mr-0 lg:grid lg:grid-cols-[repeat(auto-fit,minmax(0,1fr))] lg:overflow-visible\">\n          {stories.map((s, i) => (\n            <button\n              key={s.company}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"relative flex h-[3.25rem] w-[30%] shrink-0 snap-start items-center justify-center border-b border-foreground/10 text-[0.9375rem] font-semibold tracking-[-0.02em] whitespace-nowrap transition-opacity lg:h-[4.875rem] lg:w-auto lg:text-xl\",\n                ease,\n                i === active ? \"opacity-100\" : \"opacity-40 hover:opacity-70\",\n              )}\n            >\n              {s.company}\n              {i === active && (\n                <span\n                  key={active}\n                  aria-hidden\n                  className=\"unit-customers-fill absolute inset-x-0 -bottom-px h-0.5 bg-foreground\"\n                  onAnimationEnd={() => setActive((a) => (a + 1) % stories.length)}\n                />\n              )}\n            </button>\n          ))}\n        </div>\n\n        <div className=\"mt-8 grid grid-cols-1 rounded-lg bg-background p-3 lg:mt-8\">\n          {stories.map((s, i) => (\n            <article\n              key={s.company}\n              role=\"tabpanel\"\n              aria-hidden={i !== active}\n              className={cn(\n                \"col-start-1 row-start-1 grid min-w-0 grid-cols-1 content-start gap-6 transition-[opacity,visibility] lg:grid-cols-[minmax(0,32.625rem)_1fr] lg:content-stretch lg:gap-12\",\n                ease,\n                i === active ? \"opacity-100\" : \"pointer-events-none invisible opacity-0\",\n              )}\n            >\n              <div className=\"aspect-[326/300] w-full overflow-clip rounded-[0.25rem] lg:aspect-[522/480] lg:self-start\">{s.media ?? <UnitPlaceholder tone=\"accent\" className=\"size-full\" />}</div>\n              <div className=\"flex flex-col px-1 pb-4 lg:px-0 lg:pt-8 lg:pr-10 lg:pb-10\">\n                <p className=\"max-w-[31rem] text-[1.203rem] leading-[1.25] tracking-[-0.01em] lg:text-[1.625rem] lg:leading-[1.2]\">{s.statement}</p>\n                <div className=\"mt-5 flex max-w-[31rem] flex-wrap gap-2 lg:mt-5\">\n                  {s.chips.map((c) => (\n                    <UnitChip key={c}>{c}</UnitChip>\n                  ))}\n                </div>\n                <blockquote className=\"mt-10 max-w-[28rem] text-[0.984rem] leading-[1.4] lg:mt-auto lg:text-lg lg:leading-[1.3]\">{s.quote}</blockquote>\n                <div className=\"mt-5 flex items-center gap-3\">\n                  <div className=\"size-10 shrink-0 overflow-clip rounded-[0.25rem]\">{s.person.avatar ?? <UnitPlaceholder tone=\"muted\" className=\"size-full\" />}</div>\n                  <div className=\"text-sm leading-[1.5]\">\n                    <p>{s.person.name}</p>\n                    <p className=\"text-muted-foreground\">{s.person.role}</p>\n                  </div>\n                </div>\n              </div>\n            </article>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-chip",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the centred heading"
+    },
+    {
+      "name": "stories",
+      "type": "UnitCustomerStory[]",
+      "required": true,
+      "description": "two to five stories; four fit the desktop row"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "8",
+      "description": "seconds each story stays before the next one comes up"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9662811d37a80f92ddac092297d92a0e25044d5c1848cb7bddb47e1a3e6a3b90"
+}

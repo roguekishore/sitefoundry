@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash customer stories",
+  "description": "A left-aligned serif heading with an italic figure over a row of customer video tiles with 12px corners: the first is wide and full colour, the rest narrow, greyed and dimmed, each captioned with a portrait, name and role over a dark fade. Hovering a tile grows it over 700ms and reveals its figures, an industry chip and a story link underneath. Phones get one full-width tile at a time in a swipe row.",
+  "category": "testimonials",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "customers",
+    "video",
+    "dark",
+    "serif",
+    "hover",
+    "expand",
+    "carousel",
+    "swipe"
+  ],
+  "notes": [
+    "CSS only (`:has()` hover logic); the original rotates the large tile on a timer, this grows it on hover/focus",
+    "media and avatar slots take real video or images; dim surfaces stand in when empty"
+  ],
+  "entry": "slash-customers.tsx",
+  "source": "foundry",
+  "name": "slash-customers",
+  "files": [
+    {
+      "path": "slash-customers.css",
+      "content": "/* Desktop: the first tile starts large (flex 2.2) and the others narrow, grey and dimmed.\n   Hovering (or tabbing to) any tile makes it the large one; every change eases over 700ms.\n   The figures under a tile only show while it is the large one. */\n@media (min-width: 64rem) {\n  .slash-customers-item {\n    flex: 1 1 0;\n    opacity: 0.7;\n    filter: grayscale(0.6);\n    transition: flex-grow 0.7s cubic-bezier(0, 0, 0.2, 1), opacity 0.7s cubic-bezier(0, 0, 0.2, 1), filter 0.7s cubic-bezier(0, 0, 0.2, 1);\n  }\n  .slash-customers-item .slash-customers-meta {\n    opacity: 0;\n    visibility: hidden;\n    transition: opacity 0.3s, visibility 0.3s;\n  }\n  .slash-customers-item:first-child,\n  .slash-customers-row:has(.slash-customers-item:hover, .slash-customers-item:focus-within) .slash-customers-item:is(:hover, :focus-within) {\n    flex-grow: 2.2;\n    opacity: 1;\n    filter: none;\n  }\n  .slash-customers-item:first-child .slash-customers-meta,\n  .slash-customers-row:has(.slash-customers-item:hover, .slash-customers-item:focus-within) .slash-customers-item:is(:hover, :focus-within) .slash-customers-meta {\n    opacity: 1;\n    visibility: visible;\n    transition-delay: 0.25s;\n  }\n  .slash-customers-row:has(.slash-customers-item:hover, .slash-customers-item:focus-within) .slash-customers-item:first-child:not(:hover, :focus-within) {\n    flex-grow: 1;\n    opacity: 0.7;\n    filter: grayscale(0.6);\n  }\n  .slash-customers-row:has(.slash-customers-item:hover, .slash-customers-item:focus-within) .slash-customers-item:first-child:not(:hover, :focus-within) .slash-customers-meta {\n    opacity: 0;\n    visibility: hidden;\n    transition-delay: 0s;\n  }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .slash-customers-item,\n  .slash-customers-item .slash-customers-meta { transition: none; }\n}\n"
+    },
+    {
+      "path": "slash-customers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashHeading, type SlashHeadingPart } from \"@foundry/slash-heading\";\nimport { SlashPlaceholder } from \"@foundry/slash-placeholder\";\nimport \"./slash-customers.css\";\n\nexport interface SlashCustomerStory {\n  /** the person in the video */\n  name: string;\n  /** their role and company */\n  role: string;\n  /** their portrait (small circle); a dim circle stands in when empty */\n  avatar?: ReactNode;\n  /** the video or still filling the tile; a dim surface stands in when empty */\n  media?: ReactNode;\n  /** two or three figures shown under the tile (\"24/7\" over \"live support\") */\n  stats: { value: string; label: string }[];\n  /** the industry chip (\"Retail · Homeware\") */\n  tag: string;\n  /** the link to the full story */\n  link: { label: string; href: string };\n}\n\nexport interface SlashCustomersProps {\n  /** the heading, as runs; `{ italic: \"8,000+\" }` sets a run in italic */\n  heading: SlashHeadingPart[];\n  /** the grey line under it */\n  sub?: string;\n  /** the stories, two to four; the first starts large */\n  stories: SlashCustomerStory[];\n  className?: string;\n}\n\n/** Customer video tiles in a row: one large, the rest narrow and dimmed; hovering a tile grows it. */\nexport function SlashCustomers({ heading, sub, stories, className }: SlashCustomersProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-background pt-section text-foreground lg:pt-[8.75rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <SlashHeading parts={heading} sub={sub} size=\"md\" align=\"left\" />\n        <ul className=\"slash-customers-row -mx-gutter mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-gutter px-gutter [scrollbar-width:none] lg:mx-0 lg:mt-16 lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-[4.5rem]\">\n          {stories.map((story) => (\n            <li key={story.name} className=\"slash-customers-item relative w-full shrink-0 snap-start lg:w-auto lg:min-w-0 lg:shrink\">\n              <a href={story.link.href} className=\"group relative block aspect-[350/197] overflow-clip rounded-xl bg-muted lg:aspect-auto lg:h-[21.875rem]\">\n                {story.media ?? <SlashPlaceholder tone=\"dim\" className=\"absolute inset-0\" />}\n                <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-2/3 bg-linear-to-t from-background/95 via-background/70 to-transparent\" />\n                <div className=\"absolute inset-x-4 bottom-4 flex items-center gap-2.5 lg:inset-x-5 lg:bottom-5 lg:gap-3\">\n                  <span className=\"relative size-8 shrink-0 overflow-clip rounded-full\">\n                    {story.avatar ?? <SlashPlaceholder tone=\"chip\" className=\"absolute inset-0 rounded-full\" />}\n                  </span>\n                  <span className=\"min-w-0 flex-1\">\n                    <span className=\"block text-[0.9375rem] leading-tight font-medium tracking-[-0.02em] transition-colors duration-150 group-hover:text-muted-foreground\">{story.name}</span>\n                    <span className=\"block text-[0.8125rem] leading-tight tracking-[-0.01em] text-foreground/85\">{story.role}</span>\n                  </span>\n                  <span className=\"shrink-0 text-sm font-medium tracking-[-0.02em] lg:hidden\">{story.link.label}</span>\n                </div>\n              </a>\n              <div className=\"slash-customers-meta mt-4 flex flex-wrap items-end gap-x-7 gap-y-3 lg:absolute lg:top-full lg:left-0 lg:mt-5 lg:w-[36rem] lg:flex-nowrap\">\n                {story.stats.map((stat) => (\n                  <p key={stat.label} className=\"whitespace-nowrap\">\n                    <span className=\"block font-display text-2xl leading-none lg:text-[1.75rem]\">{stat.value}</span>\n                    <span className=\"mt-1 block text-[0.8125rem] tracking-[-0.01em] text-muted-foreground\">{stat.label}</span>\n                  </p>\n                ))}\n                <span className=\"ml-auto hidden items-center gap-4 lg:flex\">\n                  <span className=\"rounded-full border border-foreground/15 px-3 py-1 text-[0.8125rem] whitespace-nowrap text-muted-foreground\">{story.tag}</span>\n                  <a href={story.link.href} className=\"text-[0.9375rem] font-medium tracking-[-0.02em] whitespace-nowrap text-foreground/85 transition-colors duration-150 hover:text-foreground\">\n                    {story.link.label}\n                  </a>\n                </span>\n              </div>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-heading",
+    "slash-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "SlashHeadingPart[]",
+      "required": true,
+      "description": "the heading, as runs; `{ italic: \"8,000+\" }` sets a run in italic"
+    },
+    {
+      "name": "sub",
+      "type": "string",
+      "required": false,
+      "description": "the grey line under it"
+    },
+    {
+      "name": "stories",
+      "type": "SlashCustomerStory[]",
+      "required": true,
+      "description": "the stories, two to four; the first starts large"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c9672e0eba0e207b5aa799810998da60869185fb39c2f0b367ced8d494429d1d"
+}

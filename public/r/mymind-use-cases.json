@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind use cases",
+  "description": "Tangerine spaced capitals and a one-line serif headline over a row of audience tabs (the active one tangerine with a small dot under it; on phones a single name between two arrows), then a wide pastel card: small capitals, a two-line serif headline whose second line is italic, and a picture band filling the lower half. The card's text rises softly into place as it scrolls into view.",
+  "category": "features",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "audiences",
+    "serif",
+    "italic",
+    "pastel",
+    "light",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "needs JavaScript to switch tabs; without it the first audience shows",
+    "card tones as in mymind-oasis"
+  ],
+  "hydrate": "visible",
+  "entry": "mymind-use-cases.tsx",
+  "source": "foundry",
+  "name": "mymind-use-cases",
+  "files": [
+    {
+      "path": "mymind-use-cases.css",
+      "content": "/* Entering view: the card's capitals and headline rise 30px and fade in over 240px of scroll. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mymind-use-cases-rise {\n      animation: mymind-use-cases-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 240px;\n    }\n  }\n}\n\n@keyframes mymind-use-cases-rise {\n  from { opacity: 0; transform: translateY(30px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "mymind-use-cases.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight, Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindEyebrow } from \"@foundry/mymind-eyebrow\";\nimport { MymindMedia } from \"@foundry/mymind-media\";\nimport \"./mymind-use-cases.css\";\n\n/** pastel surface of the card */\nexport type MymindUseCaseTone = \"beige\" | \"blue\" | \"sage\" | \"teal\" | \"rose\" | \"peach\" | \"grey\";\n\nconst tones: Record<MymindUseCaseTone, string> = {\n  beige: \"bg-secondary\",\n  blue: \"bg-muted\",\n  sage: \"bg-highlight/20\",\n  teal: \"bg-[color-mix(in_oklab,var(--highlight)_16%,var(--muted))]\",\n  rose: \"bg-chart-2/15\",\n  peach: \"bg-primary/10\",\n  grey: \"bg-muted-foreground/15\",\n};\n\nexport interface MymindUseCase {\n  /** tab name, e.g. \"Writers\" */\n  label: string;\n  /** small capitals on the card */\n  eyebrow: string;\n  /** first headline line */\n  title: string;\n  /** second headline line, set in italic */\n  italic: string;\n  /** card colour */\n  tone: MymindUseCaseTone;\n  /** the picture band in the card's lower half; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface MymindUseCasesProps {\n  /** tangerine spaced capitals */\n  eyebrow: string;\n  /** the headline */\n  title: string;\n  /** the audiences */\n  cases: MymindUseCase[];\n  /** screen-reader labels of the phone arrows and the phone play button */\n  labels: { previous: string; next: string; play: string };\n  /** where the phone play button goes */\n  playHref: string;\n  className?: string;\n}\n\n/** Audience tabs over a tinted card with a serif/italic headline. */\nexport function MymindUseCases({ eyebrow, title, cases, labels, playHref, className }: MymindUseCasesProps) {\n  const [active, setActive] = useState(0);\n  const current = cases[active];\n  const step = (d: number) => setActive((active + d + cases.length) % cases.length);\n  return (\n    <section className={cn(\"bg-accent pt-20 pb-16 text-foreground lg:pt-[2.5rem] lg:pb-[6rem]\", className)}>\n      <div className=\"mx-auto flex max-w-[81.25rem] flex-col items-center px-gutter text-center lg:px-0\">\n        <MymindEyebrow tone=\"primary\">{eyebrow}</MymindEyebrow>\n        <h2 className=\"mt-5 max-w-[20rem] font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] lg:mt-4 lg:max-w-none lg:text-[5.25rem] lg:leading-none\">{title}</h2>\n\n        <div className=\"mt-8 flex items-center gap-7 lg:hidden\">\n          <button type=\"button\" aria-label={labels.previous} onClick={() => step(-1)} className=\"text-primary [&_svg]:size-6\">\n            <ArrowLeft strokeWidth={1.75} />\n          </button>\n          <span className=\"min-w-[7rem] text-[1.375rem] text-primary\">{current.label}</span>\n          <button type=\"button\" aria-label={labels.next} onClick={() => step(1)} className=\"text-primary [&_svg]:size-6\">\n            <ArrowRight strokeWidth={1.75} />\n          </button>\n        </div>\n        <div role=\"tablist\" className=\"mt-8 hidden gap-[3.75rem] lg:flex\">\n          {cases.map((c, i) => (\n            <button\n              key={c.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"relative pb-3 text-lg transition-colors duration-200 ease-linear\",\n                i === active ? \"text-primary\" : \"text-muted-foreground/80 hover:text-foreground\",\n              )}\n            >\n              {c.label}\n              <span aria-hidden className={cn(\"absolute bottom-0 left-1/2 size-1 -translate-x-1/2 rounded-full bg-primary transition-opacity duration-200\", i === active ? \"opacity-100\" : \"opacity-0\")} />\n            </button>\n          ))}\n        </div>\n\n        <div role=\"tabpanel\" className={cn(\"relative mt-10 flex h-[24.375rem] w-full flex-col items-center overflow-clip rounded-lg transition-colors duration-500 lg:mt-12 lg:h-[51.25rem]\", tones[current.tone])}>\n          <a href={playHref} aria-label={labels.play} className=\"mt-[3.75rem] grid size-[3.75rem] place-items-center rounded-full bg-foreground text-background lg:hidden [&_svg]:size-6\">\n            <Play className=\"ml-1 fill-current\" strokeWidth={0} />\n          </a>\n          <div className=\"mymind-use-cases-rise mt-9 lg:mt-[5.5rem]\">\n            <MymindEyebrow className=\"hidden text-[0.9375rem] lg:block\">{current.eyebrow}</MymindEyebrow>\n            <h3 className=\"font-display text-[1.75rem] leading-[1.15] tracking-[-0.04em] lg:mt-4 lg:text-[4.5rem] lg:leading-[1]\">\n              <span className=\"block\">{current.title}</span>\n              <span className=\"block italic\">{current.italic}</span>\n            </h3>\n          </div>\n          <MymindMedia key={current.label} className=\"absolute inset-x-3 bottom-0 h-[8rem] rounded-t-[4px] lg:inset-x-[3.125rem] lg:h-[29.25rem]\">\n            {current.media}\n          </MymindMedia>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-eyebrow",
+    "mymind-media"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "tangerine spaced capitals"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "cases",
+      "type": "MymindUseCase[]",
+      "required": true,
+      "description": "the audiences"
+    },
+    {
+      "name": "labels",
+      "type": "{ previous: string; next: string; play: string; }",
+      "required": true,
+      "description": "screen-reader labels of the phone arrows and the phone play button"
+    },
+    {
+      "name": "playHref",
+      "type": "string",
+      "required": true,
+      "description": "where the phone play button goes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "dff3b0452f877c12a58ddbba28f853145deb5d9908d872342c94c229954a0252"
+}

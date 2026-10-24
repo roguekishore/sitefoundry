@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway feature section",
+  "description": "A long-form product feature section: a tinted badge, a two-line book-serif title, a grey lead with a link, a product shot, three icon points and an \"instead of\" row. Stacked (wide near-black window below the text, points in three columns) or split (text and a hairline-divided list beside a tall card with a coloured glow rising from the bottom), optionally inside a framed tinted panel. On desktops a rail runs down the left edge: a station ring pulses beside the badge and a car slides down the track as the section scrolls.",
+  "category": "features",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "serif",
+    "framed",
+    "split",
+    "product-shot",
+    "scroll-driven",
+    "scrubbed",
+    "pulse",
+    "rail",
+    "developer"
+  ],
+  "notes": [
+    "stack several and alternate framed (panel) and open ones, as the original does; the rails line up into one track",
+    "media is a slot; empty ones show a near-black window, a raised card or a tone-tinted card of the original's size",
+    "CSS only: the car rides a view() timeline; the station pulse is a 3s loop; both are off with reduced motion",
+    "the rail shows from lg up; phones get the plain stacked layout"
+  ],
+  "entry": "railway-feature.tsx",
+  "source": "foundry",
+  "name": "railway-feature",
+  "files": [
+    {
+      "path": "railway-feature.css",
+      "content": "/* The rail's car rides down the track while its section crosses the window. The car sits in\n   a full-height wrapper, so translating the wrapper by a percentage moves the car by that share\n   of the section's height. */\n.railway-feature {\n  view-timeline-name: --railway-feature;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .railway-feature-car {\n      animation: railway-feature-ride linear both;\n      animation-timeline: --railway-feature;\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes railway-feature-ride {\n  from { translate: 0 0; }\n  to { translate: 0 60%; }\n}\n\n/* The station beside the badge breathes out a soft ring every 3s. */\n.railway-feature-pulse {\n  animation: railway-feature-pulse 3s ease-out infinite;\n}\n\n@keyframes railway-feature-pulse {\n  0% { scale: 0.4; opacity: 0.9; }\n  70%, 100% { scale: 1.3; opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .railway-feature-pulse { animation: none; }\n}\n"
+    },
+    {
+      "path": "railway-feature.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RailwayPanel } from \"@foundry/railway-panel\";\nimport \"./railway-feature.css\";\n\nexport interface RailwayFeaturePoint {\n  /** a small lucide icon, tinted with the section's tone */\n  icon?: ReactNode;\n  title: string;\n  text: string;\n}\n\nexport interface RailwayFeatureProps {\n  /** the small pill above the title, e.g. \"Build and launch\" */\n  badge: string;\n  /** the serif title, one string per desktop line (phones let it wrap freely) */\n  title: string[];\n  /** the paragraph under the title */\n  lead: string;\n  /** the \"learn more\" link after the paragraph */\n  link?: { label: string; href: string };\n  /** three short points with icons */\n  points: RailwayFeaturePoint[];\n  /** the \"alternative to\" row: a label and the names of tools this replaces */\n  alternatives?: { label: string; icon?: ReactNode; names: string[] };\n  /** the product shot (image or video); a placeholder of the same size and frame when empty */\n  media?: ReactNode;\n  /**\n   * stacked: text, then a wide media below, then the points in three columns ·\n   * split: text and a points list on the left, a tall media card on the right\n   */\n  layout?: \"stacked\" | \"split\";\n  /** stacked media frame: window (near-black, 1160×824) or card (raised, 1160×600) */\n  frame?: \"window\" | \"card\";\n  /** put the section in a framed, tinted panel (and which tint) */\n  panel?: \"none\" | \"chart-5\" | \"chart-2\" | \"highlight\";\n  /** accent colour of the badge, icons and rail */\n  tone?: \"neutral\" | \"chart-2\" | \"chart-3\";\n  /** a full-width hairline above the section */\n  rule?: boolean;\n  /** show the rail (track, pulsing station, a car sliding down with the scroll) on desktops */\n  rail?: boolean;\n  className?: string;\n}\n\nconst tones = {\n  neutral: {\n    badge: \"bg-foreground/10 text-foreground\",\n    icon: \"text-foreground\",\n    track: \"bg-foreground/10\",\n    ring: \"border-foreground/80\",\n    glow: \"from-foreground/10\",\n  },\n  \"chart-2\": {\n    badge: \"bg-chart-2/10 text-chart-2\",\n    icon: \"text-chart-2\",\n    track: \"bg-chart-2/20\",\n    ring: \"border-chart-2\",\n    glow: \"from-chart-2/25\",\n  },\n  \"chart-3\": {\n    badge: \"bg-chart-3/15 text-chart-3\",\n    icon: \"text-chart-3\",\n    track: \"bg-chart-3/20\",\n    ring: \"border-chart-3\",\n    glow: \"from-chart-3/20\",\n  },\n};\n\n/**\n * One feature section of a long product page: badge, two-line serif title, lead and link,\n * a product shot, three points and an \"alternative to\" row. On desktops a rail runs down\n * the left edge with a pulsing station beside the badge and a car that slides down the\n * track as the section scrolls past. Stack several, alternating framed and open ones.\n */\nexport function RailwayFeature({\n  badge,\n  title,\n  lead,\n  link,\n  points,\n  alternatives,\n  media,\n  layout = \"stacked\",\n  frame = \"window\",\n  panel = \"none\",\n  tone = \"neutral\",\n  rule = false,\n  rail = true,\n  className,\n}: RailwayFeatureProps) {\n  const t = tones[tone];\n  const framed = panel !== \"none\";\n  const split = layout === \"split\";\n\n  const text = (\n    <div>\n      <span className={cn(\"inline-flex h-8 items-center rounded-md px-3 text-sm font-medium\", t.badge)}>{badge}</span>\n      <h2 className=\"mt-9 font-display text-[2.25rem] leading-[3rem] tracking-[-0.01em]\">\n        {title.map((line, i) => (\n          <Fragment key={i}>\n            {i > 0 && (\n              <>\n                {\" \"}\n                <br className=\"max-lg:hidden\" />\n              </>\n            )}\n            {line}\n          </Fragment>\n        ))}\n      </h2>\n      <p className={cn(\"mt-2 max-w-[33.75rem] text-lg leading-[1.6] text-muted-foreground\")}>\n        {lead}\n        {link && (\n          <>\n            {\" \"}\n            <a\n              href={link.href}\n              className={cn(\n                \"font-medium whitespace-nowrap text-foreground transition-opacity duration-150 hover:opacity-80 motion-reduce:transition-none\",\n                split && \"mt-1 block w-fit\",\n              )}\n            >\n              {link.label}\n            </a>\n          </>\n        )}\n      </p>\n    </div>\n  );\n\n  const alternativesRow = alternatives && (\n    <div className=\"flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-6\">\n      <span className=\"flex items-center gap-4 text-base font-medium whitespace-nowrap\">\n        <span className={cn(\"[&_svg]:size-5\", t.icon)}>{alternatives.icon}</span>\n        {alternatives.label}\n      </span>\n      <ul className=\"flex flex-wrap gap-x-5 gap-y-1 text-[0.9375rem] font-semibold tracking-[-0.01em] text-foreground/60\">\n        {alternatives.names.map((name) => (\n          <li key={name}>{name}</li>\n        ))}\n      </ul>\n    </div>\n  );\n\n  const mediaSlot = split ? (\n    <div className=\"relative -mx-3 mt-16 lg:mx-0 lg:mt-8\">\n      <div className={cn(\"aspect-[464/509] overflow-clip rounded-xl border border-border bg-linear-to-t to-foreground/[0.03] to-60%\", t.glow)}>\n        {media}\n      </div>\n    </div>\n  ) : (\n    <div\n      className={cn(\n        \"relative mt-12 overflow-clip border border-border lg:mt-20\",\n        frame === \"window\" ? \"aspect-[1160/824] rounded-lg bg-muted\" : \"-mx-3 aspect-[1160/600] rounded-2xl bg-card lg:mx-0\",\n        framed && frame === \"card\" && \"mx-0\",\n      )}\n    >\n      {media}\n    </div>\n  );\n\n  const body = (\n    <div\n      className={cn(\n        \"railway-feature relative mx-auto max-w-page\",\n        framed ? \"px-8 pt-16 pb-16 lg:px-8 lg:pt-32 lg:pb-32 xl:px-0\" : \"px-3 pt-8 pb-20 lg:px-4 lg:pt-28 lg:pb-28 xl:px-0\",\n      )}\n    >\n      {rail && (\n        <div className=\"railway-feature-rail pointer-events-none absolute inset-y-0 left-[1.3125rem] hidden w-[1.125rem] overflow-clip lg:block\" aria-hidden>\n          <div className={cn(\"absolute inset-y-0 left-1/2 w-1.5 -translate-x-1/2\", t.track)} />\n          <div className=\"railway-feature-car absolute inset-0\">\n            <div className={cn(\"absolute inset-x-0 top-0 h-[6.875rem] rounded-full border-[1.5px] bg-background\", t.ring)} />\n          </div>\n        </div>\n      )}\n      {rail && (\n        <div\n          className={cn(\n            \"pointer-events-none absolute left-[1.875rem] hidden -translate-x-1/2 -translate-y-1/2 lg:block\",\n            framed ? \"top-[9rem]\" : \"top-[8rem]\",\n          )}\n          aria-hidden\n        >\n          <span className=\"railway-feature-pulse absolute top-1/2 left-1/2 -mt-[1.625rem] -ml-[1.625rem] size-[3.25rem] rounded-full bg-foreground/5\" />\n          <span className={cn(\"relative block size-[1.125rem] rounded-full border-2 bg-background\", t.ring)} />\n        </div>\n      )}\n\n      {split ? (\n        <div className=\"lg:grid lg:grid-cols-[minmax(0,31.25rem)_29rem] lg:justify-between lg:pl-[7.5rem]\">\n          <div>\n            {text}\n            <ul className=\"mt-16 lg:mt-12\">\n              {points.map((point) => (\n                <li key={point.title} className=\"flex gap-4 border-t border-border py-[1.375rem]\">\n                  <span className={cn(\"mt-3 shrink-0 [&_svg]:size-5\", t.icon)}>{point.icon}</span>\n                  <span>\n                    <span className=\"block text-base font-medium\">{point.title}</span>\n                    <span className=\"block text-base leading-6 text-muted-foreground\">{point.text}</span>\n                  </span>\n                </li>\n              ))}\n            </ul>\n            {alternativesRow && <div className=\"border-t border-border pt-6\">{alternativesRow}</div>}\n          </div>\n          {mediaSlot}\n        </div>\n      ) : (\n        <>\n          <div className=\"lg:pl-[7.5rem]\">{text}</div>\n          {mediaSlot}\n          <div className=\"lg:pl-[7.5rem]\">\n            <ul className=\"mt-12 grid gap-y-14 lg:mt-[5.5rem] lg:grid-cols-3 lg:gap-x-8\">\n              {points.map((point) => (\n                <li key={point.title} className=\"max-w-[17rem] lg:max-w-none\">\n                  <span className={cn(\"block [&_svg]:size-5\", t.icon)}>{point.icon}</span>\n                  <span className=\"mt-5 block text-base font-semibold\">{point.title}</span>\n                  <span className=\"mt-1 block text-base leading-6 text-muted-foreground\">{point.text}</span>\n                </li>\n              ))}\n            </ul>\n            {alternativesRow && <div className=\"mt-8 border-t border-border pt-8 lg:mt-16\">{alternativesRow}</div>}\n          </div>\n        </>\n      )}\n    </div>\n  );\n\n  return (\n    <section className={cn(\"text-foreground\", framed ? \"px-gutter pb-4\" : \"px-gutter\", rule && \"border-t border-border\", className)}>\n      {framed ? <RailwayPanel tint={panel}>{body}</RailwayPanel> : body}\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "railway-panel"
+  ],
+  "props": [
+    {
+      "name": "badge",
+      "type": "string",
+      "required": true,
+      "description": "the small pill above the title, e.g. \"Build and launch\""
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the serif title, one string per desktop line (phones let it wrap freely)"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph under the title"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the \"learn more\" link after the paragraph"
+    },
+    {
+      "name": "points",
+      "type": "RailwayFeaturePoint[]",
+      "required": true,
+      "description": "three short points with icons"
+    },
+    {
+      "name": "alternatives",
+      "type": "{ label: string; icon?: ReactNode; names: string[]; }",
+      "required": false,
+      "description": "the \"alternative to\" row: a label and the names of tools this replaces"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product shot (image or video); a placeholder of the same size and frame when empty"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "default": "stacked",
+      "description": "stacked: text, then a wide media below, then the points in three columns ·\nsplit: text and a points list on the left, a tall media card on the right"
+    },
+    {
+      "name": "frame",
+      "type": "enum",
+      "required": false,
+      "default": "window",
+      "description": "stacked media frame: window (near-black, 1160×824) or card (raised, 1160×600)"
+    },
+    {
+      "name": "panel",
+      "type": "enum",
+      "required": false,
+      "default": "none",
+      "description": "put the section in a framed, tinted panel (and which tint)"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "neutral",
+      "description": "accent colour of the badge, icons and rail"
+    },
+    {
+      "name": "rule",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "a full-width hairline above the section"
+    },
+    {
+      "name": "rail",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the rail (track, pulsing station, a car sliding down with the scroll) on desktops"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "86edda06c0d805dc76191b1636650d835ce6e005321f8b05dbccdb5c49657cfb"
+}

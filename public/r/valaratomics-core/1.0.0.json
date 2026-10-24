@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics technology tabs",
+  "description": "A two-half intro over a wide black panel (4px corners) that grows a short tab down towards the active one of three big labels below it. Every few seconds the next part takes over: the tab slides across with a sharp ease, the panel's media crossfades, the active label turns black with a gold eyebrow and the rest dim to half. On phones the label row runs off the screen and slides to the active one.",
+  "category": "features",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "tabs",
+    "carousel",
+    "autoplay",
+    "dark",
+    "panel",
+    "gold",
+    "labels",
+    "crossfade",
+    "slide",
+    "industrial"
+  ],
+  "notes": [
+    "needs JavaScript for the auto-advance (static HTML shows the first item active); it pauses on hover and under reduced motion, and the labels are buttons",
+    "the panel and tab are one clipped `dark` shape (black on a light page); its media slot is 363×440 on phones and 1270×440 at 1440, tab included",
+    "made for three items; more work but the tab gets crowded"
+  ],
+  "hydrate": "visible",
+  "entry": "valaratomics-core.tsx",
+  "source": "foundry",
+  "name": "valaratomics-core",
+  "files": [
+    {
+      "path": "valaratomics-core.tsx",
+      "content": "import { useEffect, useState, type CSSProperties, type ReactNode } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ValaratomicsIntro } from \"@foundry/valaratomics-intro\";\nimport { ValaratomicsPlaceholder } from \"@foundry/valaratomics-placeholder\";\n\nexport interface ValaratomicsCoreItem {\n  /** the small label above, e.g. \"Fuel\" */\n  eyebrow: string;\n  /** the big word, e.g. \"Pebble\" */\n  name: string;\n  /** the video or image shown in the panel while this item is active; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface ValaratomicsCoreProps {\n  /** the section heading */\n  title: string;\n  /** the paragraph beside it */\n  body: string;\n  /** the parts the panel cycles through (three in the original) */\n  items: ValaratomicsCoreItem[];\n  /** seconds each item stays before the next one takes over */\n  interval?: number;\n  className?: string;\n}\n\nconst TAB_WIDTH = 30; // % of the panel width\nconst NOTCH = \"1.375rem\"; // how far the tab reaches below the panel\nconst EASE = \"ease-[cubic-bezier(0.92,0,0.08,1)]\";\n\n/**\n * Intro, then a wide black panel that grows a short tab down towards the active label below\n * it (the media fills panel and tab, clipped to one shape). The panel auto-advances through the items: the tab slides across, the media\n * crossfades, the active label turns black with a gold eyebrow and the others dim to half.\n * On phones the label row is wider than the screen and slides so the active one shows.\n */\nexport function ValaratomicsCore({ title, body, items, interval = 4, className }: ValaratomicsCoreProps) {\n  const [active, setActive] = useState(0);\n  const [paused, setPaused] = useState(false);\n  const reduce = useReducedMotion();\n  const last = Math.max(items.length - 1, 1);\n  const step = active / last; // 0 at the first item, 1 at the last\n\n  useEffect(() => {\n    if (reduce || paused || items.length < 2) return;\n    const id = setTimeout(() => setActive((a) => (a + 1) % items.length), interval * 1000);\n    return () => clearTimeout(id);\n  }, [active, reduce, paused, interval, items.length]);\n\n  // One shape for panel + tab: the panel's bottom edge sits 22px above the box's bottom, and\n  // the tab (30% wide, bevelled on its inner sides) reaches down to it under the active label.\n  // Same number of points in every state, so the clip-path animates between them.\n  const L = `calc(${100 - TAB_WIDTH}% * ${step})`;\n  const R = `calc(${L} + ${TAB_WIDTH}%)`;\n  const inL = active === 0 ? \"0px\" : \"1.5rem\";\n  const inR = active === items.length - 1 ? \"0px\" : \"1.5rem\";\n  const shape: CSSProperties = {\n    clipPath: `polygon(0 0, 100% 0, 100% calc(100% - ${NOTCH}), ${R} calc(100% - ${NOTCH}), calc(${R} - ${inR}) 100%, calc(${L} + ${inL}) 100%, ${L} calc(100% - ${NOTCH}), 0 calc(100% - ${NOTCH}))`,\n  };\n\n  return (\n    <section className={cn(\"bg-background px-gutter py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <ValaratomicsIntro title={title} body={body} />\n\n        <div className=\"mt-9 lg:mt-section\" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>\n          <div\n            style={shape}\n            className={cn(\n              \"dark relative aspect-[363/440] rounded-sm bg-background lg:aspect-auto lg:h-[27.5rem]\",\n              \"transition-[clip-path] duration-500 motion-reduce:transition-none\",\n              EASE,\n            )}\n          >\n            {items.map((item, i) => (\n              <div\n                key={item.name}\n                aria-hidden={i !== active}\n                className={cn(\n                  \"absolute inset-0 transition-opacity duration-500 ease-in-out motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover\",\n                  i === active ? \"opacity-100\" : \"opacity-0\",\n                )}\n              >\n                {item.media ?? <ValaratomicsPlaceholder tone=\"photo\" />}\n              </div>\n            ))}\n          </div>\n\n          <div className=\"mt-9 overflow-x-clip [container-type:inline-size]\">\n            <ul\n              style={{ \"--valaratomics-core-step\": step } as CSSProperties}\n              className={cn(\n                \"flex w-max gap-12 [translate:calc((100cqw-100%)*var(--valaratomics-core-step))_0] transition-[translate] duration-500 motion-reduce:transition-none\",\n                \"lg:w-full lg:justify-between lg:gap-0 lg:[translate:none]\",\n                EASE,\n              )}\n            >\n              {items.map((item, i) => (\n                <li key={item.name}>\n                  <button\n                    type=\"button\"\n                    aria-pressed={i === active}\n                    onClick={() => setActive(i)}\n                    className={cn(\n                      \"flex flex-col items-start gap-2 text-left transition-[opacity,filter] duration-500 ease-in-out motion-reduce:transition-none\",\n                      i === active ? \"opacity-100\" : \"opacity-50 hover:opacity-70\",\n                    )}\n                  >\n                    <span\n                      className={cn(\n                        \"font-mono text-sm leading-none font-medium uppercase transition-colors duration-500 lg:text-lg lg:leading-none\",\n                        i === active ? \"text-primary\" : \"text-foreground/40\",\n                      )}\n                    >\n                      {item.eyebrow}\n                    </span>\n                    <span className=\"font-sans text-[2rem] leading-none font-semibold tracking-[-0.03em] uppercase lg:text-5xl lg:leading-none\">\n                      {item.name}\n                    </span>\n                  </button>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "valaratomics-intro",
+    "valaratomics-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside it"
+    },
+    {
+      "name": "items",
+      "type": "ValaratomicsCoreItem[]",
+      "required": true,
+      "description": "the parts the panel cycles through (three in the original)"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "4",
+      "description": "seconds each item stays before the next one takes over"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "8e8bcfd9d0b7fa306eeba86ebdb47220ecb3e1a2aad5af1390a4f86ecc131f8d"
+}

@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Vercel case study",
+  "description": "A customer story on a 12-column grid: a big tight heading above a wide 8-column screenshot window, with a narrow 3-column text column beside it holding a two-tone statement (the claim in ink, the rest in grey) and a short list of feature links under a small grey label. The window can stand alone or sit in front of a second window peeking out behind-left; both fade into the page at the bottom. Mirror it with align to alternate stories.",
+  "category": "features",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "case-study",
+    "testimonial",
+    "light",
+    "minimal",
+    "monochrome",
+    "alternating",
+    "screenshot"
+  ],
+  "notes": [
+    "align start puts the window left and the text right; end mirrors it (heading moves over the window)",
+    "phones always stack heading, window(s), statement, features",
+    "media slots: front window (and an optional back window); empty, they are ringed grey windows",
+    "no motion of its own (the original's motion is inside its screenshots)"
+  ],
+  "entry": "vercel-case.tsx",
+  "name": "vercel-case",
+  "files": [
+    {
+      "path": "vercel-case.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VercelHeading } from \"@foundry/vercel-heading\";\nimport { VercelPlaceholder } from \"@foundry/vercel-placeholder\";\n\nexport interface VercelCaseProps {\n  /** the big heading over the window */\n  title: string;\n  /** width of the heading, which sets where it breaks (a Tailwind max-w class) */\n  titleClassName?: string;\n  /** the statement's first words, in ink (e.g. \"Pagewright handles millions\") */\n  lead: string;\n  /** the rest of the statement, in grey */\n  rest: string;\n  /** small grey label over the feature list */\n  featuresLabel?: string;\n  /** feature links */\n  features: { label: string; href: string }[];\n  /** start: window left, text right · end: text left, window right */\n  align?: \"start\" | \"end\";\n  /** the front window's content (screenshot, video); a grey window when empty */\n  media?: ReactNode;\n  /** a second window behind-left of the front one; a grey window when empty and layered */\n  backMedia?: ReactNode;\n  /** always: two windows on every width · phone: two on phones, one wide window on desktop · none: one window */\n  layered?: \"always\" | \"phone\" | \"none\";\n  /** screen-reader label for the window placeholders */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Alternating customer story: heading, window(s), two-tone statement, feature links. */\nexport function VercelCase({\n  title,\n  titleClassName,\n  lead,\n  rest,\n  featuresLabel,\n  features,\n  align = \"start\",\n  media,\n  backMedia,\n  layered = \"always\",\n  mediaLabel,\n  className,\n}: VercelCaseProps) {\n  const end = align === \"end\";\n  return (\n    <section className={cn(\"bg-background px-gutter py-12 text-foreground lg:pt-[16.875rem] lg:pb-0\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 lg:grid-cols-12 lg:gap-x-6\">\n        <VercelHeading className={cn(\"max-w-[8.5em] lg:col-span-8\", end && \"lg:col-start-5\", titleClassName)}>{title}</VercelHeading>\n\n        {/* the window(s) */}\n        <div\n          className={cn(\n            \"relative mt-12 aspect-[1.4] lg:row-start-2 lg:mt-11 lg:aspect-[2.05]\",\n            end ? \"lg:col-span-8 lg:col-start-5\" : \"lg:col-span-8 lg:col-start-1\",\n          )}\n        >\n          {layered !== \"none\" ? (\n            <div className={cn(\"absolute top-[16%] bottom-0 left-0 w-1/2 lg:w-[45%]\", layered === \"phone\" && \"lg:hidden\")}>\n              <VercelPlaceholder label={mediaLabel}>{backMedia}</VercelPlaceholder>\n            </div>\n          ) : null}\n          <div\n            className={cn(\n              \"absolute inset-y-0 right-0\",\n              layered === \"none\" ? \"left-0\" : \"w-3/4 lg:w-[58%]\",\n              layered === \"phone\" && \"lg:w-full\",\n            )}\n          >\n            <VercelPlaceholder label={mediaLabel}>{media}</VercelPlaceholder>\n          </div>\n        </div>\n\n        {/* the statement and features */}\n        <div\n          className={cn(\n            \"mt-14 lg:row-start-2 lg:mt-11 lg:self-center\",\n            end ? \"lg:col-span-3 lg:col-start-1\" : \"lg:col-span-3 lg:col-start-10\",\n          )}\n        >\n          <p className=\"text-2xl font-[450] tracking-[-0.04em] text-muted-foreground\">\n            <span className=\"text-foreground\">{lead}</span> {rest}\n          </p>\n          {features.length ? (\n            <div className=\"mt-12 text-sm\">\n              {featuresLabel ? <p className=\"text-muted-foreground\">{featuresLabel}</p> : null}\n              <ul className=\"mt-1.5 flex flex-col gap-1.5\">\n                {features.map((feature) => (\n                  <li key={feature.label}>\n                    <a\n                      href={feature.href}\n                      className=\"font-medium tracking-[0.015em] text-foreground transition-colors duration-100 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-muted-foreground motion-reduce:transition-none\"\n                    >\n                      {feature.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ) : null}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "vercel-heading",
+    "vercel-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the big heading over the window"
+    },
+    {
+      "name": "titleClassName",
+      "type": "string",
+      "required": false,
+      "description": "width of the heading, which sets where it breaks (a Tailwind max-w class)"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the statement's first words, in ink (e.g. \"Pagewright handles millions\")"
+    },
+    {
+      "name": "rest",
+      "type": "string",
+      "required": true,
+      "description": "the rest of the statement, in grey"
+    },
+    {
+      "name": "featuresLabel",
+      "type": "string",
+      "required": false,
+      "description": "small grey label over the feature list"
+    },
+    {
+      "name": "features",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "feature links"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "start",
+      "description": "start: window left, text right · end: text left, window right"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the front window's content (screenshot, video); a grey window when empty"
+    },
+    {
+      "name": "backMedia",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a second window behind-left of the front one; a grey window when empty and layered"
+    },
+    {
+      "name": "layered",
+      "type": "enum",
+      "required": false,
+      "default": "always",
+      "description": "always: two windows on every width · phone: two on phones, one wide window on desktop · none: one window"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the window placeholders"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c8db645ce5675e527bfc973a7226ca4a119bb229306d95bb255bf02fcbcdc4a0"
+}

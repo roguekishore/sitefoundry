@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health header with announcement bar",
+  "description": "A sticky two-tier header: a mint announcement bar (a short note, a small forest pill and a close ×) over an 82px deep-sea nav with a text wordmark, five medium links, a bone pill and a 'Log in →' link. Phones get a menu icon, a monogram and an outlined pill; the menu opens a deep-sea panel. Links fade to mint over 150ms on hover.",
+  "category": "header",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "announcement",
+    "banner",
+    "dark",
+    "pill",
+    "minimal"
+  ],
+  "notes": [
+    "sticky at the top of its parent; the nav bar is a .dark scope (deep sea in both modes)",
+    "the close × and the phone menu are CSS only (a checkbox and a details element)"
+  ],
+  "entry": "parsleyhealth-header.tsx",
+  "name": "parsleyhealth-header",
+  "files": [
+    {
+      "path": "parsleyhealth-header.tsx",
+      "content": "import { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport { ParsleyhealthWordmark } from \"@foundry/parsleyhealth-wordmark\";\n\nexport interface ParsleyhealthLink {\n  /** the link's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface ParsleyhealthHeaderProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** monogram shown instead of the name on phones */\n  monogram?: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the announcement bar: a short note and a small pill; omit to hide the bar */\n  announcement?: { text: string; action: ParsleyhealthLink };\n  /** screen-reader label of the bar's close × */\n  closeLabel?: string;\n  /** the nav links (five on the original) */\n  links: ParsleyhealthLink[];\n  /** the pill on the right */\n  action: ParsleyhealthLink;\n  /** the quiet \"Log in →\" link after the pill */\n  secondary?: ParsleyhealthLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-[1.1rem] font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none\";\n\n/** Mint announcement bar over a deep-sea nav, both sticky. */\nexport function ParsleyhealthHeader({\n  brand,\n  monogram,\n  brandHref = \"#\",\n  announcement,\n  closeLabel,\n  links,\n  action,\n  secondary,\n  menuLabel,\n  className,\n}: ParsleyhealthHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-40\", className)}>\n      {announcement ? (\n        <div className=\"relative bg-accent text-accent-foreground has-[input:checked]:hidden\">\n          <div className=\"mx-auto flex min-h-[5.375rem] items-center justify-between gap-4 py-3 pr-10 pl-4 lg:min-h-[3.625rem] lg:justify-center lg:gap-10 lg:py-2.5 lg:pr-12\">\n            <p className=\"max-w-[9.5rem] text-[0.825rem] leading-[1.409] tracking-[0.01em] lg:max-w-none lg:text-[1.3063rem] lg:leading-[1.273] lg:tracking-[-0.01em]\">\n              {announcement.text}\n            </p>\n            <ParsleyhealthButton href={announcement.action.href} size=\"xs\" className=\"max-lg:h-[2.375rem] max-lg:px-6 max-lg:text-[1.0312rem]\">\n              {announcement.action.label}\n            </ParsleyhealthButton>\n          </div>\n          <label className=\"absolute top-1.5 right-2 grid size-7 cursor-pointer place-items-center lg:top-2 lg:right-4\">\n            <input type=\"checkbox\" className=\"peer sr-only\" aria-label={closeLabel} />\n            <X aria-hidden className=\"size-4 peer-focus-visible:outline-2 peer-focus-visible:outline-ring\" strokeWidth={1.75} />\n          </label>\n        </div>\n      ) : null}\n\n      <div className=\"dark relative bg-muted text-foreground\">\n        <div className=\"flex h-[5.125rem] items-center gap-4 px-5 lg:gap-0 lg:px-14\">\n          <details className=\"group lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"grid size-9 cursor-pointer list-none place-items-center text-foreground [&::-webkit-details-marker]:hidden\"\n            >\n              <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.25} />\n              <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.25} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full flex h-[calc(100svh-10rem)] flex-col overflow-y-auto border-t border-foreground/10 bg-muted px-5 pt-2 pb-8\">\n              {links.map((link) => (\n                <a key={link.label} href={link.href} className=\"border-b border-foreground/10 py-4 text-[1.2375rem] font-medium\">\n                  {link.label}\n                </a>\n              ))}\n              {secondary ? (\n                <a href={secondary.href} className=\"py-4 text-[1.2375rem] font-medium\">\n                  {secondary.label}\n                </a>\n              ) : null}\n            </nav>\n          </details>\n\n          <ParsleyhealthWordmark brand={brand} short={monogram} href={brandHref} />\n\n          <nav className=\"ml-13 hidden items-center gap-8 lg:flex\">\n            {links.map((link) => (\n              <a key={link.label} href={link.href} className={linkClass}>\n                {link.label}\n              </a>\n            ))}\n          </nav>\n\n          <div className=\"ml-auto flex items-center gap-4\">\n            <ParsleyhealthButton href={action.href} size=\"sm\" className=\"max-lg:hidden\">\n              {action.label}\n            </ParsleyhealthButton>\n            <ParsleyhealthButton href={action.href} size=\"sm\" variant=\"outline\" className=\"px-[1.0625rem] lg:hidden\">\n              {action.label}\n            </ParsleyhealthButton>\n            {secondary ? (\n              <a href={secondary.href} className={cn(linkClass, \"group hidden items-center gap-1.5 px-1 lg:inline-flex\")}>\n                {secondary.label}\n                <span aria-hidden className=\"transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none\">\n                  →\n                </span>\n              </a>\n            ) : null}\n          </div>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button",
+    "parsleyhealth-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "monogram",
+      "type": "string",
+      "required": false,
+      "description": "monogram shown instead of the name on phones"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "announcement",
+      "type": "{ text: string; action: ParsleyhealthLink; }",
+      "required": false,
+      "description": "the announcement bar: a short note and a small pill; omit to hide the bar"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label of the bar's close ×"
+    },
+    {
+      "name": "links",
+      "type": "ParsleyhealthLink[]",
+      "required": true,
+      "description": "the nav links (five on the original)"
+    },
+    {
+      "name": "action",
+      "type": "ParsleyhealthLink",
+      "required": true,
+      "description": "the pill on the right"
+    },
+    {
+      "name": "secondary",
+      "type": "ParsleyhealthLink",
+      "required": false,
+      "description": "the quiet \"Log in →\" link after the pill"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a42632b469f147b97d79506eb640a53beb8dee1f61b6549def4e6c4581c0a3b1"
+}

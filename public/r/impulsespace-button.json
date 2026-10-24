@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Impulse Space light-up pill",
+  "description": "A fully rounded pill button in 16px semibold type: solid (the primary colour) or outline (a 15% hairline). On hover two soft blurred lights, glow on the left and highlight on the right, fade in to 80% and grow to full size inside the pill in 0.4s.",
+  "category": "button",
+  "site": "impulsespace",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "cta",
+    "glow",
+    "gradient",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "CSS only; with reduced motion the lights appear without the grow"
+  ],
+  "entry": "impulsespace-button.tsx",
+  "source": "foundry",
+  "name": "impulsespace-button",
+  "files": [
+    {
+      "path": "impulsespace-button.css",
+      "content": "/* gradient-cta: two blurred lights sit inside the pill, faded out and shrunk; hover brings\n   them to 80% and full size. The label stays above them. */\n.impulsespace-button::before,\n.impulsespace-button::after {\n  content: \"\";\n  position: absolute;\n  top: 50%;\n  z-index: 0;\n  width: 70%;\n  aspect-ratio: 1;\n  border-radius: 9999px;\n  filter: blur(16px);\n  opacity: 0;\n  scale: 0.4;\n  translate: 0 -50%;\n  pointer-events: none;\n  transition:\n    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),\n    scale 0.4s cubic-bezier(0.4, 0, 0.2, 1);\n}\n.impulsespace-button::before {\n  left: -15%;\n  background: var(--glow);\n}\n.impulsespace-button::after {\n  right: -15%;\n  background: var(--highlight);\n}\n.impulsespace-button:hover::before,\n.impulsespace-button:hover::after,\n.impulsespace-button:focus-visible::before,\n.impulsespace-button:focus-visible::after {\n  opacity: 0.8;\n  scale: 1;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .impulsespace-button::before,\n  .impulsespace-button::after {\n    scale: 1;\n    transition: none;\n  }\n}\n"
+    },
+    {
+      "path": "impulsespace-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./impulsespace-button.css\";\n\nexport interface ImpulsespaceButtonProps {\n  /** the label */\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** solid: primary fill · outline: a 15% hairline on the current surface */\n  variant?: \"solid\" | \"outline\";\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst variants = {\n  solid: \"bg-primary text-primary-foreground\",\n  outline: \"border border-foreground/15 text-foreground\",\n};\n\n/** A pill that lights up from inside on hover (two soft blurred lights fade in and grow). */\nexport function ImpulsespaceButton({ children, href, variant = \"solid\", type = \"button\", className }: ImpulsespaceButtonProps) {\n  const classes = cn(\n    \"impulsespace-button relative isolate inline-flex h-11 shrink-0 items-center justify-center overflow-clip rounded-full px-6 font-sans text-base font-semibold whitespace-nowrap\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variants[variant],\n    className,\n  );\n  const inner = <span className=\"relative z-10\">{children}</span>;\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the label"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: primary fill · outline: a 15% hairline on the current surface"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4c69382650a0c44f65a2e114e4e093ec98cb4a634f7df3a20cae3c520fdac21a"
+}

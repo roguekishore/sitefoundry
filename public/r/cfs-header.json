@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs header",
+  "description": "A boxed navigation drawn in 1px white hairlines over the hero photo: a mark and a monospace company name in a wide cell, then equal cells for each link divided by vertical lines. Hovering a cell (or the mark) fills it white with navy text in 150ms. On phones the box holds the name and a menu cell that opens the links below it.",
+  "category": "header",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "boxed",
+    "hairline",
+    "grid",
+    "mono",
+    "overlay",
+    "dark",
+    "hover",
+    "minimal"
+  ],
+  "notes": [
+    "overlay (default) places it absolutely at the top of its positioned parent, over a hero; set overlay={false} to keep it in the flow",
+    "it is a `dark` subtree: white lines and text, meant for a photo or dark backdrop",
+    "the phone menu is a <details> disclosure: no JavaScript"
+  ],
+  "entry": "cfs-header.tsx",
+  "source": "foundry",
+  "name": "cfs-header",
+  "files": [
+    {
+      "path": "cfs-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Menu } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CfsHeaderLink {\n  /** the link's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface CfsHeaderProps {\n  /** the company name, set in monospace beside the mark */\n  name: string;\n  /** where the mark and name go (usually \"/\") */\n  homeHref: string;\n  /** a small square mark (an icon or logo, ~40px) */\n  mark?: ReactNode;\n  /** the navigation links, one cell each on wide screens */\n  links: CfsHeaderLink[];\n  /** accessible name of the phone menu button, e.g. \"Menu\" */\n  menuLabel: string;\n  /** sit absolutely over the top of the parent (a hero); default true */\n  overlay?: boolean;\n  className?: string;\n}\n\nconst ease = \"transition-colors duration-150 ease-[cubic-bezier(0.455,0.03,0.515,0.955)] motion-reduce:transition-none\";\n\n/** Hairline-boxed navigation for the top of a photo hero. */\nexport function CfsHeader({ name, homeHref, mark, links, menuLabel, overlay = true, className }: CfsHeaderProps) {\n  return (\n    <header className={cn(\"dark z-30 px-gutter pt-gutter text-foreground\", overlay ? \"absolute inset-x-0 top-0\" : \"relative\", className)}>\n      <div className=\"relative flex h-[74px] border border-foreground lg:h-[70px]\">\n        <a href={homeHref} className=\"group flex min-w-0 flex-1 items-center gap-3 pr-4 pl-2.5 lg:gap-5\">\n          <span\n            className={cn(\n              \"grid size-[55px] shrink-0 place-items-center group-hover:bg-foreground group-hover:text-card [&_svg]:size-12\",\n              ease,\n            )}\n          >\n            {mark}\n          </span>\n          <span className=\"font-mono text-sm leading-[1.5]\">{name}</span>\n        </a>\n\n        <nav className=\"hidden lg:flex\">\n          {links.map((link) => (\n            <a\n              key={link.label}\n              href={link.href}\n              className={cn(\n                \"grid w-40 place-items-center border-l border-foreground font-mono text-sm hover:bg-foreground hover:text-card\",\n                ease,\n              )}\n            >\n              {link.label}\n            </a>\n          ))}\n        </nav>\n\n        <details className=\"group/menu lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className={cn(\n              \"grid h-full w-[74px] cursor-pointer list-none place-items-center border-l border-foreground hover:bg-foreground hover:text-card [&::-webkit-details-marker]:hidden\",\n              ease,\n            )}\n          >\n            <Menu aria-hidden strokeWidth={1} className=\"size-8\" />\n          </summary>\n          <nav className=\"absolute inset-x-[-1px] top-full flex flex-col border border-t-0 border-foreground bg-card\">\n            {links.map((link) => (\n              <a\n                key={link.label}\n                href={link.href}\n                className={cn(\"border-t border-border px-5 py-4 font-mono text-sm first:border-t-0 hover:bg-foreground hover:text-card\", ease)}\n              >\n                {link.label}\n              </a>\n            ))}\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set in monospace beside the mark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": true,
+      "description": "where the mark and name go (usually \"/\")"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small square mark (an icon or logo, ~40px)"
+    },
+    {
+      "name": "links",
+      "type": "CfsHeaderLink[]",
+      "required": true,
+      "description": "the navigation links, one cell each on wide screens"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button, e.g. \"Menu\""
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "sit absolutely over the top of the parent (a hero); default true"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "cc83627f98ddb9c5acdc1cebaf86a1142963e51b0f69ea2993d47c609ffc0ff4"
+}

@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit header",
+  "description": "A 64px white bar with a hairline under it that stays pinned to the top: a bold lowercase wordmark, four quiet menu links, then a plain text link and a hairline pill button on the right. Links dim to 60% on hover. On phones a 50px bar with the wordmark and a menu icon that opens a full-height list.",
+  "category": "header",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "minimal",
+    "pill",
+    "fintech"
+  ],
+  "notes": [
+    "sticks to the top (position: sticky), so place it directly in the page container",
+    "the phone menu is a native <details>; no JavaScript"
+  ],
+  "entry": "unit-header.tsx",
+  "source": "foundry",
+  "name": "unit-header",
+  "files": [
+    {
+      "path": "unit-header.tsx",
+      "content": "import { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitButton } from \"@foundry/unit-button\";\n\nexport interface UnitHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface UnitHeaderProps {\n  /** the wordmark, set in lowercase type */\n  brand: string;\n  /** where the wordmark links to */\n  brandHref?: string;\n  /** the main menu (left, after the wordmark) */\n  links: UnitHeaderLink[];\n  /** a plain text link before the button (e.g. a sandbox) */\n  secondary?: UnitHeaderLink;\n  /** the outline pill at the far right */\n  cta: UnitHeaderLink;\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** A 64px white bar pinned to the top: wordmark and menu left, a text link and outline pill right. */\nexport function UnitHeader({ brand, brandHref = \"#\", links, secondary, cta, menuLabel, className }: UnitHeaderProps) {\n  const linkClass =\n    \"transition-opacity duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] hover:opacity-60 motion-reduce:transition-none\";\n  return (\n    <header className={cn(\"sticky top-0 z-40 border-b border-border bg-background font-sans text-foreground\", className)}>\n      <div className=\"mx-auto flex h-[3.125rem] max-w-page items-center px-gutter lg:h-16\">\n        <a href={brandHref} className=\"font-display text-[1.875rem] leading-none font-bold tracking-[-0.05em] lg:text-[1.75rem]\">\n          {brand}\n        </a>\n\n        <nav className=\"ml-[4.75rem] hidden items-center gap-8 lg:flex\">\n          {links.map((l) => (\n            <a key={l.label} href={l.href} className={cn(\"text-sm\", linkClass)}>\n              {l.label}\n            </a>\n          ))}\n        </nav>\n\n        <div className=\"ml-auto hidden items-center gap-6 lg:flex\">\n          {secondary && (\n            <a href={secondary.href} className={cn(\"text-sm\", linkClass)}>\n              {secondary.label}\n            </a>\n          )}\n          <UnitButton href={cta.href} variant=\"outline\" size=\"sm\">\n            {cta.label}\n          </UnitButton>\n        </div>\n\n        {/* phones: a native disclosure, no JavaScript */}\n        <details className=\"group ml-auto lg:hidden\">\n          <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-end [&::-webkit-details-marker]:hidden\">\n            <Menu aria-hidden className=\"size-6 group-open:hidden\" strokeWidth={1.75} />\n            <X aria-hidden className=\"hidden size-6 group-open:block\" strokeWidth={1.75} />\n          </summary>\n          <div className=\"absolute inset-x-0 top-full h-[calc(100svh-3.125rem)] overflow-y-auto border-t border-border bg-background px-gutter py-6\">\n            <ul className=\"flex flex-col\">\n              {[...links, ...(secondary ? [secondary] : [])].map((l) => (\n                <li key={l.label} className=\"border-b border-border\">\n                  <a href={l.href} className={cn(\"block py-4 text-lg\", linkClass)}>\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <UnitButton href={cta.href} className=\"mt-6 w-full\">\n              {cta.label}\n            </UnitButton>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set in lowercase type"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links to"
+    },
+    {
+      "name": "links",
+      "type": "UnitHeaderLink[]",
+      "required": true,
+      "description": "the main menu (left, after the wordmark)"
+    },
+    {
+      "name": "secondary",
+      "type": "UnitHeaderLink",
+      "required": false,
+      "description": "a plain text link before the button (e.g. a sandbox)"
+    },
+    {
+      "name": "cta",
+      "type": "UnitHeaderLink",
+      "required": true,
+      "description": "the outline pill at the far right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c9c2c53b0f8cfb1c81fccb53b7d128f540928a92f6d473b85dcadb7bef036632"
+}

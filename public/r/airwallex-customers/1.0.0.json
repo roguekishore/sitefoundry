@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Airwallex customer reel",
+  "description": "A graphite band with a big bold white headline over two rows of wide, 16px-rounded customer photos that drift slowly left forever, the second row offset by half a card. Hovering a card zooms its photo a touch and fades in the customer's quote on a white panel; the row pauses meanwhile. On phones it becomes a sideways swipe row of white quote cards with the photo underneath.",
+  "category": "testimonials",
+  "site": "airwallex",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "marquee",
+    "loop",
+    "photos",
+    "dark",
+    "hover",
+    "carousel"
+  ],
+  "notes": [
+    "always dark: the section carries `dark`",
+    "desktop splits the customers into two rows (odd and even); the lists are drawn twice for a seamless loop",
+    "photos are media slots; with reduced motion the rows stand still"
+  ],
+  "entry": "airwallex-customers.tsx",
+  "source": "foundry",
+  "name": "airwallex-customers",
+  "files": [
+    {
+      "path": "airwallex-customers.css",
+      "content": "/* Each row is its list drawn twice; sliding by half the track loops without a seam. The\n   second row starts a fifth of a lap on, so its cards sit between the first row's. Hovering\n   a row pauses it so a quote can be read. */\n@media (prefers-reduced-motion: no-preference) {\n  .airwallex-customers-track {\n    animation: airwallex-customers-drift 96.8s linear infinite;\n  }\n  .airwallex-customers-row:nth-child(2) .airwallex-customers-track {\n    animation-delay: -19s;\n  }\n  .airwallex-customers-row:hover .airwallex-customers-track {\n    animation-play-state: paused;\n  }\n}\n\n@keyframes airwallex-customers-drift {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n"
+    },
+    {
+      "path": "airwallex-customers.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { AirwallexPlaceholder } from \"@foundry/airwallex-placeholder\";\nimport \"./airwallex-customers.css\";\n\nexport interface AirwallexCustomer {\n  /** the company's name */\n  company: string;\n  /** its wordmark over the quote (styled text, svg or img); the name when empty */\n  logo?: ReactNode;\n  /** what they said */\n  quote: string;\n  /** the photo; empty for a placeholder */\n  media?: ReactNode;\n  /** a link to the story */\n  href?: string;\n}\n\nexport interface AirwallexCustomersProps {\n  /** the headline */\n  title: string;\n  /** six or more keep both desktop rows full */\n  customers: AirwallexCustomer[];\n  className?: string;\n}\n\nfunction Logo({ c }: { c: AirwallexCustomer }) {\n  return <span className=\"flex h-8 items-center text-base font-bold tracking-[0.08em] text-background/55 uppercase\">{c.logo ?? c.company}</span>;\n}\n\n/** Headline and two drifting rows of customer photos (a swipe row on phones). */\nexport function AirwallexCustomers({ title, customers, className }: AirwallexCustomersProps) {\n  const rows = [customers.filter((_, i) => i % 2 === 0), customers.filter((_, i) => i % 2 === 1)];\n  const card = (c: AirwallexCustomer, copy: number) => (\n    <li key={`${copy}-${c.company}`} aria-hidden={copy > 0 || undefined} className=\"w-[28.25rem] shrink-0 pr-8\">\n      <a href={c.href ?? \"#\"} tabIndex={copy > 0 ? -1 : undefined} className=\"group relative grid aspect-[452/314] overflow-clip rounded-[1rem]\">\n        <div className=\"[grid-area:1/1] transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none\">\n          {c.media ?? <AirwallexPlaceholder tone=\"dim\" className=\"size-full\" />}\n        </div>\n        <div className=\"flex flex-col gap-5 bg-foreground p-8 text-background opacity-0 transition-opacity duration-300 ease-out [grid-area:1/1] group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none\">\n          <Logo c={c} />\n          <p className=\"line-clamp-6 text-base leading-[1.6] text-background/80\">{c.quote}</p>\n        </div>\n      </a>\n    </li>\n  );\n  return (\n    <section className={cn(\"dark overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[76rem] px-gutter pt-16 lg:px-12 lg:pt-[3.75rem]\">\n        <h2 className=\"max-w-[22rem] font-display text-[1.75rem] leading-[1.25] font-bold lg:max-w-[38rem] lg:text-[2.375rem] lg:leading-[1.32]\">{title}</h2>\n      </div>\n\n      {/* desktop: two drifting rows */}\n      <div className=\"mt-[4.25rem] hidden flex-col gap-8 pb-[3.75rem] lg:flex\">\n        {rows.map((row, r) => (\n          <div key={r} className=\"airwallex-customers-row\">\n            <ul className={cn(\"airwallex-customers-track flex w-max\", r === 1 && \"-ml-60\")}>\n              {row.map((c) => card(c, 0))}\n              {row.map((c) => card(c, 1))}\n            </ul>\n          </div>\n        ))}\n      </div>\n\n      {/* phones: a swipe row of quote cards */}\n      <ul className=\"mt-11 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-px-12 px-12 pb-[5.75rem] [scrollbar-width:none] lg:hidden\">\n        {customers.map((c) => (\n          <li key={c.company} className=\"w-[18.25rem] shrink-0 snap-start\">\n            <a href={c.href ?? \"#\"} className=\"flex h-full flex-col overflow-clip rounded-md bg-foreground text-background\">\n              <div className=\"px-4 pt-6 pb-8\">\n                <Logo c={c} />\n                <p className=\"mt-5 line-clamp-5 text-sm leading-[1.6] text-background/80\">{c.quote}</p>\n              </div>\n              <div className=\"mt-auto aspect-[293/205]\">{c.media ?? <AirwallexPlaceholder tone=\"soft\" className=\"size-full\" />}</div>\n            </a>\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "airwallex-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "customers",
+      "type": "AirwallexCustomer[]",
+      "required": true,
+      "description": "six or more keep both desktop rows full"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9c68e22737f0d36d64778361b99b600352a774621a43b32bbc41c8db28bbaf06"
+}

@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Impulse Space header",
+  "description": "A fixed, see-through header drawn in white with a difference blend, so it inverts over whatever scrolls under it (copper over a blue sky, black over white). Desktop: one centred cluster, a tracked-capital wordmark then uppercase mono links at 50% that brighten on hover in 0.25s, and a chevron that opens a small menu. Phones: wordmark left, a two-line burger right that opens a full-screen black menu.",
+  "category": "header",
+  "site": "impulsespace",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "transparent",
+    "blend",
+    "difference",
+    "mono",
+    "uppercase",
+    "centered",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "fixed and out of the flow: the page's first section runs under it",
+    "no JavaScript: both menus are <details> elements",
+    "the bar uses the .dark scope's foreground (white) for the difference blend, so it reads on any theme"
+  ],
+  "entry": "impulsespace-header.tsx",
+  "source": "foundry",
+  "name": "impulsespace-header",
+  "files": [
+    {
+      "path": "impulsespace-header.css",
+      "content": "/* The bar is blended (difference); the menus open outside it so they keep their own colours.\n   Each <details> only toggles; the panel it controls is a sibling of the blended bar. */\n.impulsespace-header-panel {\n  display: none;\n}\n/* each menu only on its own side of the 1024px breakpoint */\n@media (min-width: 64rem) {\n  .impulsespace-header:has(.impulsespace-header-more[open]) .impulsespace-header-panel--more {\n    display: block;\n    animation: impulsespace-header-fade 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;\n  }\n}\n@media (max-width: 63.99rem) {\n  .impulsespace-header:has(.impulsespace-header-burger[open]) .impulsespace-header-panel--menu {\n    display: block;\n    animation: impulsespace-header-fade 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;\n  }\n}\n.impulsespace-header-more > summary,\n.impulsespace-header-burger > summary {\n  list-style: none;\n}\n.impulsespace-header-more > summary::-webkit-details-marker,\n.impulsespace-header-burger > summary::-webkit-details-marker {\n  display: none;\n}\n.impulsespace-header-more[open] .impulsespace-header-chevron {\n  rotate: 180deg;\n}\n.impulsespace-header-burger[open] .impulsespace-header-line-a {\n  translate: 0 3.5px;\n  rotate: 45deg;\n}\n.impulsespace-header-burger[open] .impulsespace-header-line-b {\n  translate: 0 -3.5px;\n  rotate: -45deg;\n}\n\n@keyframes impulsespace-header-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .impulsespace-header .impulsespace-header-panel {\n    animation: none !important;\n  }\n}\n"
+    },
+    {
+      "path": "impulsespace-header.tsx",
+      "content": "import { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ImpulsespaceWordmark } from \"@foundry/impulsespace-wordmark\";\nimport \"./impulsespace-header.css\";\n\nexport interface ImpulsespaceHeaderLink {\n  /** the link's text (set in uppercase mono) */\n  label: string;\n  href: string;\n}\n\nexport interface ImpulsespaceHeaderProps {\n  /** the company's name, as the wordmark */\n  name: string;\n  /** where the wordmark goes */\n  homeHref?: string;\n  /** the main links, in the bar on desktop (about six) */\n  links: ImpulsespaceHeaderLink[];\n  /** the links behind the chevron on desktop; on phones they follow the main links */\n  more?: ImpulsespaceHeaderLink[];\n  /** accessible name for the chevron menu */\n  moreLabel: string;\n  /** accessible name for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Fixed header in white with a difference blend; a centred cluster on desktop, burger on phones. */\nexport function ImpulsespaceHeader({ name, homeHref = \"/\", links, more = [], moreLabel, menuLabel, className }: ImpulsespaceHeaderProps) {\n  return (\n    // display: contents, so the bar's blend reaches the page (a positioned wrapper with a\n    // z-index would keep the blend inside itself); the menus are separate fixed layers.\n    <header className={cn(\"impulsespace-header dark contents\", className)}>\n      {/* the blended bar: white drawn with difference over whatever is underneath */}\n      <div className=\"fixed inset-x-0 top-0 z-50 flex h-[4.5rem] items-center justify-between px-gutter text-foreground mix-blend-difference lg:h-[4.3125rem] lg:justify-center lg:gap-[1.3rem]\">\n        <ImpulsespaceWordmark name={name} href={homeHref} />\n        <nav aria-label={name} className=\"hidden lg:block\">\n          <ul className=\"flex items-center gap-[1.3rem]\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a\n                  href={link.href}\n                  className=\"font-mono text-sm leading-[1.5] tracking-[0.08em] uppercase opacity-50 transition-opacity duration-250 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-100 motion-reduce:transition-none\"\n                >\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </nav>\n        {more.length > 0 && (\n          <details className=\"impulsespace-header-more hidden lg:block\">\n            <summary\n              aria-label={moreLabel}\n              className=\"grid size-7 cursor-pointer place-items-center opacity-50 transition-opacity duration-250 hover:opacity-100 motion-reduce:transition-none\"\n            >\n              <ChevronDown aria-hidden className=\"impulsespace-header-chevron size-4 transition-[rotate] duration-200\" strokeWidth={1.5} />\n            </summary>\n          </details>\n        )}\n        <details className=\"impulsespace-header-burger lg:hidden\">\n          <summary aria-label={menuLabel} className=\"grid h-8 w-6 cursor-pointer content-center gap-[5px]\">\n            <span className=\"impulsespace-header-line-a block h-[1.5px] w-6 bg-current transition-[translate,rotate] duration-200\" />\n            <span className=\"impulsespace-header-line-b block h-[1.5px] w-6 bg-current transition-[translate,rotate] duration-200\" />\n          </summary>\n        </details>\n      </div>\n\n      {/* desktop: the small \"more\" menu, under the chevron's end of the cluster */}\n      {more.length > 0 && (\n        <div className=\"impulsespace-header-panel impulsespace-header-panel--more fixed top-[4.3125rem] left-1/2 z-50 translate-x-[calc(-50%+19rem)]\">\n          <ul className=\"min-w-44 rounded-lg border border-border bg-popover p-2 text-popover-foreground\">\n            {more.map((link) => (\n              <li key={link.href}>\n                <a\n                  href={link.href}\n                  className=\"block rounded-md px-3 py-2 text-base leading-[1.4] transition-colors duration-150 hover:bg-accent motion-reduce:transition-none\"\n                >\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      )}\n\n      {/* phones: a full-screen black menu under the bar */}\n      <div className=\"impulsespace-header-panel impulsespace-header-panel--menu fixed inset-x-0 top-0 bottom-0 z-40 bg-background pt-[4.5rem]\">\n        <nav aria-label={menuLabel} className=\"flex h-full flex-col gap-10 overflow-y-auto px-gutter pt-10 pb-12 text-foreground\">\n          <ul className=\"grid gap-4\">\n            {links.map((link) => (\n              <li key={link.href}>\n                <a href={link.href} className=\"font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em] transition-opacity duration-150 hover:opacity-70\">\n                  {link.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {more.length > 0 && (\n            <ul className=\"grid gap-3 border-t border-border pt-6\">\n              {more.map((link) => (\n                <li key={link.href}>\n                  <a href={link.href} className=\"font-mono text-sm tracking-[0.08em] text-muted-foreground uppercase transition-colors duration-150 hover:text-foreground\">\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          )}\n        </nav>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "impulsespace-wordmark"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the company's name, as the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark goes"
+    },
+    {
+      "name": "links",
+      "type": "ImpulsespaceHeaderLink[]",
+      "required": true,
+      "description": "the main links, in the bar on desktop (about six)"
+    },
+    {
+      "name": "more",
+      "type": "ImpulsespaceHeaderLink[]",
+      "required": false,
+      "default": "[]",
+      "description": "the links behind the chevron on desktop; on phones they follow the main links"
+    },
+    {
+      "name": "moreLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name for the chevron menu"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6e5417d36363443ac7d9a6f2d323ac1522210e50837016732c36c29c49c1f9ce"
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle switch-over timeline",
+  "description": "A centred two-line headline, a short paragraph and two buttons (dark with arrow, outline with an icon), then a three-step timeline — white pills over a thin line with small dots, the current step outlined and dotted in violet — and three hairline-bordered cards with a title and a bulleted list; the middle card ends in a full-bleed photo frame. On phones the buttons go full width, the timeline hides and the cards stack.",
+  "category": "features",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "timeline",
+    "steps",
+    "onboarding",
+    "cards",
+    "three-up",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "a card with withMedia shows its media (or a placeholder) flush with its bottom edge"
+  ],
+  "entry": "puzzle-migrate.tsx",
+  "source": "foundry",
+  "name": "puzzle-migrate",
+  "files": [
+    {
+      "path": "puzzle-migrate.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PuzzleButton } from \"@foundry/puzzle-button\";\nimport { PuzzleHeading } from \"@foundry/puzzle-heading\";\nimport { PuzzlePlaceholder } from \"@foundry/puzzle-placeholder\";\n\nexport interface PuzzleMigrateCard {\n  title: string;\n  points: string[];\n  /** ends the card with a photo frame */\n  withMedia?: boolean;\n  /** the photo; empty (with withMedia) shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface PuzzleMigrateProps {\n  /** the headline; may hold <br /> */\n  title: ReactNode;\n  text?: ReactNode;\n  /** the first is dark with an arrow, the second outlined; icon is a small lucide icon */\n  actions: { label: string; href: string; icon?: ReactNode }[];\n  /** the timeline's labels (three read best); hidden on phones */\n  steps?: string[];\n  /** which step is current, counting from 0 */\n  activeStep?: number;\n  /** one card per step */\n  cards: PuzzleMigrateCard[];\n  className?: string;\n}\n\n/** From sign-up to results: buttons, a three-step line, three cards. */\nexport function PuzzleMigrate({ title, text, actions, steps, activeStep = 1, cards, className }: PuzzleMigrateProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[71rem] px-gutter pt-14 pb-11 lg:pt-14 lg:pb-14\">\n        <PuzzleHeading title={title} text={text} className=\"[&_p]:text-foreground lg:max-w-[56rem] [&_p]:max-w-[30rem]\" />\n        <div className=\"mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center lg:mt-6 lg:gap-2.5\">\n          {actions.map((a, i) => (\n            <PuzzleButton key={a.label} href={a.href} variant={i === 0 ? \"card\" : \"outline\"} className=\"h-11 gap-2.5 text-[0.9375rem] lg:h-[3.5625rem] lg:px-8 lg:text-lg\">\n              {a.icon && <span className=\"[&_svg]:size-5\">{a.icon}</span>}\n              {a.label}\n            </PuzzleButton>\n          ))}\n        </div>\n\n        {steps && (\n          <ol className=\"relative mx-auto mt-14 hidden max-w-[56rem] justify-between lg:flex\">\n            <span aria-hidden className=\"absolute inset-x-20 bottom-[0.3125rem] h-px bg-foreground/15\" />\n            {steps.map((s, i) => (\n              <li key={s} className=\"relative flex w-40 flex-col items-center gap-6\">\n                <span\n                  className={cn(\n                    \"rounded-full border bg-card px-[1.125rem] py-3 text-base/none\",\n                    i === activeStep ? \"border-primary text-primary\" : \"border-transparent text-muted-foreground\",\n                  )}\n                >\n                  {s}\n                </span>\n                <span aria-hidden className={cn(\"size-3 rounded-full border\", i === activeStep ? \"border-highlight bg-highlight\" : \"border-foreground/25 bg-card\")} />\n              </li>\n            ))}\n          </ol>\n        )}\n\n        <ul className=\"mt-10 grid gap-3.5 lg:mt-[5.25rem] lg:grid-cols-3 lg:gap-5\">\n          {cards.map((c) => (\n            <li key={c.title} className=\"flex flex-col overflow-clip rounded-lg border border-border lg:min-h-[26.5rem]\">\n              <div className=\"px-6 pt-6 pb-6 lg:px-8 lg:pt-8 lg:pb-9\">\n                <h3 className=\"font-display text-2xl/[1.3] font-medium lg:text-[1.75rem]/[1.3]\">{c.title}</h3>\n                <ul className=\"mt-4 list-disc pl-5 text-[0.9375rem]/[1.55] marker:text-foreground lg:mt-6 lg:text-[0.9375rem]/[1.6]\">\n                  {c.points.map((p) => (\n                    <li key={p}>{p}</li>\n                  ))}\n                </ul>\n              </div>\n              {c.withMedia && <div className=\"mt-auto aspect-[1.68]\">{c.media ?? <PuzzlePlaceholder className=\"size-full\" />}</div>}\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "puzzle-button",
+    "puzzle-heading",
+    "puzzle-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline; may hold <br />"
+    },
+    {
+      "name": "text",
+      "type": "ReactNode",
+      "required": false
+    },
+    {
+      "name": "actions",
+      "type": "{ label: string; href: string; icon?: ReactNode; }[]",
+      "required": true,
+      "description": "the first is dark with an arrow, the second outlined; icon is a small lucide icon"
+    },
+    {
+      "name": "steps",
+      "type": "string[]",
+      "required": false,
+      "description": "the timeline's labels (three read best); hidden on phones"
+    },
+    {
+      "name": "activeStep",
+      "type": "number",
+      "required": false,
+      "default": "1",
+      "description": "which step is current, counting from 0"
+    },
+    {
+      "name": "cards",
+      "type": "PuzzleMigrateCard[]",
+      "required": true,
+      "description": "one card per step"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4b4bebc43b66573898e75d70e8935c6a1eaf75e765a24b4d616e83b59bb3ecb4"
+}

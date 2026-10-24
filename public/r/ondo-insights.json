@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo insights row",
+  "description": "A white editorial band: a two-tone heading with a 'view all' button on the right, then three article cards in a row (stacked on phones), each a 16px-rounded 16:10 image above a small category and date line and a medium-weight title. The cards fade up one after another as they enter view; images ease in slightly on hover.",
+  "category": "blog",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "blog",
+    "articles",
+    "insights",
+    "cards",
+    "grid",
+    "reveal",
+    "stagger",
+    "minimal",
+    "light"
+  ],
+  "notes": [
+    "media slot: one 16:10 image per article; a plain surface when empty",
+    "layout inferred: the original's band was hidden in the capture (its reveal hadn't fired)"
+  ],
+  "entry": "ondo-insights.tsx",
+  "name": "ondo-insights",
+  "files": [
+    {
+      "path": "ondo-insights.css",
+      "content": "/* Cards fade up 40px one after another (each starts a little later in the entry range). */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ondo-insights-card {\n      animation: ondo-insights-rise linear both;\n      animation-timeline: view();\n      animation-range: entry calc(var(--ondo-insights-n, 0) * 12%) entry calc(100% + var(--ondo-insights-n, 0) * 60px);\n    }\n  }\n}\n\n@keyframes ondo-insights-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ondo-insights.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoButton } from \"@foundry/ondo-button\";\nimport { OndoHeading } from \"@foundry/ondo-heading\";\nimport { OndoPlaceholder } from \"@foundry/ondo-placeholder\";\nimport \"./ondo-insights.css\";\n\nexport interface OndoInsight {\n  /** e.g. \"Research\" */\n  category: string;\n  /** the date as shown */\n  date: string;\n  /** the article title */\n  title: string;\n  /** where it links */\n  href: string;\n  /** a 16:10 image. A plain surface when empty */\n  media?: ReactNode;\n}\n\nexport interface OndoInsightsProps {\n  /** heading, first line (ink) */\n  lead: string;\n  /** heading, second line (grey) */\n  trail?: string;\n  /** the button beside the heading */\n  action?: { label: string; href: string };\n  /** the articles, usually three */\n  items: OndoInsight[];\n  className?: string;\n}\n\n/** Heading + \"view all\", then three article cards. */\nexport function OndoInsights({ lead, trail, action, items, className }: OndoInsightsProps) {\n  return (\n    <section className={cn(\"bg-background py-section lg:py-[7.5rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <div className=\"flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between\">\n          <OndoHeading lead={lead} trail={trail} />\n          {action && (\n            <OndoButton href={action.href} size=\"md\" className=\"self-start lg:self-auto\">\n              {action.label}\n            </OndoButton>\n          )}\n        </div>\n        <ul className=\"mt-12 grid gap-8 md:grid-cols-3 md:gap-3 lg:mt-16\">\n          {items.map((item, i) => (\n            <li key={item.title} className=\"ondo-insights-card\" style={{ [\"--ondo-insights-n\" as string]: i }}>\n              <a href={item.href} className=\"group block\">\n                <div className=\"aspect-[16/10] overflow-clip rounded-2xl\">\n                  <div className=\"size-full transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none\">\n                    {item.media ?? <OndoPlaceholder />}\n                  </div>\n                </div>\n                <p className=\"mt-4 flex items-center gap-2.5 text-sm text-muted-foreground\">\n                  <span>{item.category}</span>\n                  <span aria-hidden className=\"size-1 rounded-full bg-muted-foreground\" />\n                  <span>{item.date}</span>\n                </p>\n                <h3 className=\"mt-2 font-display text-xl leading-[1.2] font-medium tracking-[-0.02em] text-foreground lg:text-2xl lg:leading-[1.15]\">{item.title}</h3>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-button",
+    "ondo-heading",
+    "ondo-placeholder"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "heading, first line (ink)"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": false,
+      "description": "heading, second line (grey)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the button beside the heading"
+    },
+    {
+      "name": "items",
+      "type": "OndoInsight[]",
+      "required": true,
+      "description": "the articles, usually three"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2c65303c1d911c3e02ae8e425424c29aabcd042e4edb3a2d08374570177987b9"
+}

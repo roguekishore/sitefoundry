@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Impulse Space footer",
+  "description": "A warm off-white footer: a 40px newsletter heading with a short lede and a pill email field beside a light-up pill, three link columns under uppercase mono titles with 20px links that dim to 70% on hover, a row of mono legal links whose underlines sweep on hover, and an optional wordmark set huge across the full width at the foot.",
+  "category": "footer",
+  "site": "impulsespace",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "newsletter",
+    "links",
+    "mono",
+    "wordmark",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "the form is plain HTML (action/method props); no JavaScript",
+    "the big wordmark is optional; it scales with the window width and is sized for a name of about seven capitals"
+  ],
+  "entry": "impulsespace-footer.tsx",
+  "source": "foundry",
+  "name": "impulsespace-footer",
+  "files": [
+    {
+      "path": "impulsespace-footer.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ImpulsespaceButton } from \"@foundry/impulsespace-button\";\nimport { ImpulsespaceSweepLink } from \"@foundry/impulsespace-sweep-link\";\n\nexport interface ImpulsespaceFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface ImpulsespaceFooterColumn {\n  /** the column's mono title */\n  title: string;\n  links: ImpulsespaceFooterLink[];\n}\n\nexport interface ImpulsespaceFooterProps {\n  /** the newsletter heading */\n  title: string;\n  /** a sentence under it */\n  lede?: string;\n  /** the email field's visible placeholder and accessible label */\n  emailLabel: string;\n  /** the submit pill's label */\n  submitLabel: string;\n  /** where the form posts */\n  action?: string;\n  /** three link columns */\n  columns: ImpulsespaceFooterColumn[];\n  /** the mono legal links at the foot */\n  legal: ImpulsespaceFooterLink[];\n  /** the copyright line */\n  copyright: string;\n  /** the company's name, set huge across the foot; leave empty to skip */\n  wordmark?: string;\n  className?: string;\n}\n\n/** Off-white footer: newsletter, three link columns, legal row and an optional giant wordmark. */\nexport function ImpulsespaceFooter({ title, lede, emailLabel, submitLabel, action, columns, legal, copyright, wordmark, className }: ImpulsespaceFooterProps) {\n  return (\n    <footer className={cn(\"overflow-clip bg-secondary px-gutter pt-section pb-8 text-secondary-foreground\", className)}>\n      <div className=\"grid gap-20 lg:grid-cols-12 lg:gap-2.5\">\n        <div className=\"lg:col-span-5\">\n          <h2 className=\"font-display text-[2.5rem] leading-[1.2] font-semibold tracking-[-0.02em]\">{title}</h2>\n          {lede && <p className=\"mt-4 max-w-[26rem] text-base leading-[1.4] text-muted-foreground\">{lede}</p>}\n          <form action={action} method=\"post\" className=\"mt-8 flex max-w-[28rem] flex-col gap-2.5 sm:flex-row\">\n            <input\n              type=\"email\"\n              name=\"email\"\n              required\n              aria-label={emailLabel}\n              placeholder={emailLabel}\n              className=\"h-11 w-full min-w-0 rounded-full sm:flex-1 border border-input bg-background px-5 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring\"\n            />\n            <ImpulsespaceButton type=\"submit\">{submitLabel}</ImpulsespaceButton>\n          </form>\n        </div>\n        <div className=\"grid grid-cols-2 gap-x-2.5 gap-y-16 sm:grid-cols-3 lg:col-span-6 lg:col-start-7\">\n          {columns.map((col) => (\n            <div key={col.title}>\n              <p className=\"font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase\">{col.title}</p>\n              <ul className=\"mt-5 grid gap-2\">\n                {col.links.map((link) => (\n                  <li key={link.href}>\n                    <a href={link.href} className=\"text-xl leading-[1.2] font-semibold transition-opacity duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:opacity-70 motion-reduce:transition-none\">\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            </div>\n          ))}\n        </div>\n      </div>\n\n      <div className=\"mt-32 flex flex-col gap-6 lg:mt-24 lg:flex-row lg:items-center lg:justify-between\">\n        <ul className=\"flex flex-wrap gap-x-6 gap-y-3\">\n          {legal.map((link) => (\n            <li key={link.href}>\n              <ImpulsespaceSweepLink href={link.href}>{link.label}</ImpulsespaceSweepLink>\n            </li>\n          ))}\n        </ul>\n        <p className=\"font-mono text-sm leading-[1.5] tracking-[0.08em] text-muted-foreground uppercase\">{copyright}</p>\n      </div>\n\n      {wordmark && (\n        <p aria-hidden className=\"mt-16 font-display text-[21vw] leading-[0.8] font-semibold tracking-[-0.05em] whitespace-nowrap uppercase lg:mt-10 lg:text-[24vw]\">\n          {wordmark}\n        </p>\n      )}\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "impulsespace-button",
+    "impulsespace-sweep-link"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the newsletter heading"
+    },
+    {
+      "name": "lede",
+      "type": "string",
+      "required": false,
+      "description": "a sentence under it"
+    },
+    {
+      "name": "emailLabel",
+      "type": "string",
+      "required": true,
+      "description": "the email field's visible placeholder and accessible label"
+    },
+    {
+      "name": "submitLabel",
+      "type": "string",
+      "required": true,
+      "description": "the submit pill's label"
+    },
+    {
+      "name": "action",
+      "type": "string",
+      "required": false,
+      "description": "where the form posts"
+    },
+    {
+      "name": "columns",
+      "type": "ImpulsespaceFooterColumn[]",
+      "required": true,
+      "description": "three link columns"
+    },
+    {
+      "name": "legal",
+      "type": "ImpulsespaceFooterLink[]",
+      "required": true,
+      "description": "the mono legal links at the foot"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": false,
+      "description": "the company's name, set huge across the foot; leave empty to skip"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2c474305a61a2f0f09392b53502b2bc13d6d78e8b33e1c9cee72800754bcd336"
+}

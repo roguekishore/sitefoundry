@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Plaid button",
+  "description": "A pill button in five finishes: near-black or white inside a thin rainbow rim (lime, teal, cyan, periwinkle, pink, yellow), a pale mint wash, a teal-to-blue or cyan-to-periwinkle fill, or a periwinkle outline. Rimmed pills pick up a soft periwinkle glow on hover; the washes shift colour.",
+  "category": "button",
+  "site": "plaid",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "rainbow",
+    "gradient",
+    "glow",
+    "hover"
+  ],
+  "notes": [
+    "the rainbow rim is drawn from chart-4/5, highlight, glow, chart-3 and chart-2"
+  ],
+  "entry": "plaid-button.tsx",
+  "source": "foundry",
+  "name": "plaid-button",
+  "files": [
+    {
+      "path": "plaid-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PlaidButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * ink: near-black inside a rainbow rim · paper: white inside a rainbow rim ·\n   * mint: pale mint wash (on the blue bands) · aqua: teal into bright cyan fill · sky: cyan-to-periwinkle fill ·\n   * outline: periwinkle hairline\n   */\n  variant?: \"ink\" | \"paper\" | \"mint\" | \"aqua\" | \"sky\" | \"outline\";\n  /** md: 38px tall, 16px text (header) · lg: 48px on phones and 56px on desktop, 20px text */\n  size?: \"md\" | \"lg\";\n  /** the button's type when it isn't a link (e.g. \"submit\" inside a form) */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\n// The rim: a conic sweep through the theme's bright colours.\nconst rainbow =\n  \"bg-[conic-gradient(from_210deg,var(--chart-5),var(--chart-4),var(--highlight),var(--glow),var(--chart-3),var(--chart-2),var(--chart-5))]\";\n\nconst faces = {\n  ink: \"bg-primary bg-linear-[77deg] from-primary to-primary/80 text-primary-foreground\",\n  paper: \"bg-card text-primary\",\n  mint: \"bg-card bg-linear-to-r from-highlight/30 to-card text-foreground group-hover/btn:from-chart-4/45\",\n  aqua: \"bg-linear-to-r from-highlight to-glow text-foreground group-hover/btn:brightness-105\",\n  sky: \"bg-linear-to-r from-glow/80 to-chart-3 text-foreground group-hover/btn:brightness-105\",\n  outline: \"border border-chart-3 text-foreground group-hover/btn:bg-card/50\",\n};\n\nconst sizes = {\n  md: \"h-[2.375rem] px-4 text-base\",\n  lg: \"h-12 px-6 text-lg tracking-[-0.03em] lg:h-14 lg:px-8 lg:text-xl\",\n};\n\n/** Plaid's pill: the label sits on a face; rimmed variants wrap that face in a 2px rainbow. */\nexport function PlaidButton({ children, href, variant = \"ink\", size = \"lg\", type = \"button\", className }: PlaidButtonProps) {\n  const rimmed = variant === \"ink\" || variant === \"paper\";\n  const outer = cn(\n    \"group/btn inline-flex shrink-0 rounded-full font-medium whitespace-nowrap\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    rimmed && cn(rainbow, \"p-[2px] transition-shadow duration-100 ease-in-out hover:shadow-[0_0_14px_var(--chart-3)] motion-reduce:transition-none\"),\n    className,\n  );\n  const face = (\n    <span\n      className={cn(\n        \"inline-flex w-full items-center justify-center rounded-full transition-[background-color,filter,--tw-gradient-from] duration-250 ease-in-out motion-reduce:transition-none\",\n        faces[variant],\n        sizes[size],\n        rimmed && size === \"lg\" && \"h-[calc(3rem-4px)] lg:h-[calc(3.5rem-4px)]\",\n        rimmed && size === \"md\" && \"h-[calc(2.375rem-4px)]\",\n      )}\n    >\n      {children}\n    </span>\n  );\n  return href ? (\n    <a href={href} className={outer}>\n      {face}\n    </a>\n  ) : (\n    <button type={type} className={outer}>\n      {face}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "ink",
+      "description": "ink: near-black inside a rainbow rim · paper: white inside a rainbow rim ·\nmint: pale mint wash (on the blue bands) · aqua: teal into bright cyan fill · sky: cyan-to-periwinkle fill ·\noutline: periwinkle hairline"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "md: 38px tall, 16px text (header) · lg: 48px on phones and 56px on desktop, 20px text"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link (e.g. \"submit\" inside a form)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "987518b22d1fedf3eb996d243264f0e09399cfe3ff1df7c1a9a01e21b6a75538"
+}

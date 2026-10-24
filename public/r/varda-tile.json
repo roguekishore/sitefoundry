@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Varda tile",
+  "description": "A flat, square-cornered link tile in one of three colour blocks (navy with orange type, solid orange with navy type, off-white with navy type): a small bold eyebrow and a thin up-right arrow along the top, a medium-weight heading pushed to the bottom, and an optional media cell beside or below. The whole tile shifts one shade on hover in 0.3s and the arrow nudges up-right.",
+  "category": "card",
+  "site": "varda",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "tile",
+    "bento",
+    "flat",
+    "square",
+    "navy",
+    "orange",
+    "hover"
+  ],
+  "notes": [
+    "the tile is a grid; pass its template in className (e.g. lg:grid-cols-[1fr_2fr]) and the media cell's padding/order in mediaClassName",
+    "tones map to background / primary / secondary tokens, hovers to muted / highlight / accent"
+  ],
+  "entry": "varda-tile.tsx",
+  "source": "foundry",
+  "name": "varda-tile",
+  "files": [
+    {
+      "path": "varda-tile.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface VardaTileProps {\n  /** small bold label at the top left */\n  eyebrow: string;\n  /** the tile's heading, sits at the bottom of the text cell */\n  title: string;\n  /** where the whole tile links to */\n  href: string;\n  /** colour block: navy page colour, solid orange, or off-white */\n  tone?: \"navy\" | \"orange\" | \"light\";\n  /** heading scale: \"lg\" for the big tiles, \"sm\" for the short pair */\n  size?: \"lg\" | \"sm\";\n  /** a media cell (usually a VardaPlaceholder) next to or under the text */\n  media?: ReactNode;\n  /** classes for the media cell: padding, order, borders */\n  mediaClassName?: string;\n  /** classes for the text cell */\n  textClassName?: string;\n  className?: string;\n}\n\nconst tones = {\n  navy: \"bg-background text-primary hover:bg-muted\",\n  orange: \"bg-primary text-primary-foreground hover:bg-highlight\",\n  light: \"bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground\",\n} as const;\n\nconst ease = \"duration-300 ease-[cubic-bezier(0.165,0.84,0.44,1)] motion-reduce:transition-none\";\n\n/** A flat colour-block link tile: eyebrow and arrow on top, heading at the bottom, optional media. */\nexport function VardaTile({\n  eyebrow,\n  title,\n  href,\n  tone = \"navy\",\n  size = \"lg\",\n  media,\n  mediaClassName,\n  textClassName,\n  className,\n}: VardaTileProps) {\n  return (\n    <a href={href} className={cn(\"group grid transition-colors\", ease, tones[tone], className)}>\n      <div\n        className={cn(\n          \"flex flex-col justify-between gap-8 p-gutter pt-[calc(var(--page-gutter)+0.25rem)] lg:gap-10\",\n          textClassName,\n        )}\n      >\n        <div className=\"flex items-start justify-between gap-4\">\n          <span className=\"text-base/6 font-bold lg:text-[1.0625rem]/6\">{eyebrow}</span>\n          <ArrowUpRight\n            aria-hidden\n            strokeWidth={3}\n            className={cn(\"mt-0.5 size-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5\", ease)}\n          />\n        </div>\n        <h3\n          className={cn(\n            \"font-display font-[550]\",\n            size === \"lg\"\n              ? \"text-[2rem]/[1.15] tracking-[-0.02em] lg:text-[3.42rem]/[1.15]\"\n              : \"text-xl/6 lg:text-[2.22rem]/[1.2]\",\n          )}\n        >\n          {title}\n        </h3>\n      </div>\n      {media && <div className={cn(\"min-w-0\", mediaClassName)}>{media}</div>}\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small bold label at the top left"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the tile's heading, sits at the bottom of the text cell"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where the whole tile links to"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "navy",
+      "description": "colour block: navy page colour, solid orange, or off-white"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "lg",
+      "description": "heading scale: \"lg\" for the big tiles, \"sm\" for the short pair"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a media cell (usually a VardaPlaceholder) next to or under the text"
+    },
+    {
+      "name": "mediaClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the media cell: padding, order, borders"
+    },
+    {
+      "name": "textClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for the text cell"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6ac2f70cb6b6a8fab4953b8c55315ee5cfadd9b792edf57be903ecb77184c921"
+}

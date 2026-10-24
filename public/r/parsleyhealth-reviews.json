@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health video reviews carousel",
+  "description": "Member video reviews: an eyebrow and a narrow light serif title at the left, a track of tall 9:16 video stills to the right, each framed by a 1px forest line with a thin play ring in the middle, the member's name in sage over a forest rule and a short quote; the first card is framed whole and carries an ochre pill. A small sage arrow pages the track. On phones the title centres, the current card sits in the middle with its neighbours fading out at the edges, and arrows with dots sit below. Stills grow 5% on hover.",
+  "category": "testimonials",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "video",
+    "carousel",
+    "scroll-snap",
+    "dots",
+    "hover",
+    "serif",
+    "light"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows and dots (hydrate: visible); the track still scrolls by touch without it",
+    "each still is a 221×393 slot filled like object-fit: cover; empty, a soft placeholder stands in",
+    "the play ring is decoration; wrap the still in your own player link via media"
+  ],
+  "hydrate": "visible",
+  "entry": "parsleyhealth-reviews.tsx",
+  "name": "parsleyhealth-reviews",
+  "files": [
+    {
+      "path": "parsleyhealth-reviews.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport { ParsleyhealthArrow, useParsleyhealthCarousel } from \"@foundry/parsleyhealth-carousel\";\nimport { ParsleyhealthHeading } from \"@foundry/parsleyhealth-heading\";\nimport { ParsleyhealthPlaceholder } from \"@foundry/parsleyhealth-placeholder\";\n\nexport interface ParsleyhealthReview {\n  /** the member's first name */\n  name: string;\n  /** a short quote, with its quotation marks */\n  quote: string;\n  /** the video still (an img, sized to fill); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface ParsleyhealthReviewsProps {\n  /** small capitals above the title */\n  eyebrow?: string;\n  /** the title */\n  title: string;\n  /** the reviews */\n  items: ParsleyhealthReview[];\n  /** the ochre pill on the first card */\n  action?: { label: string; href: string };\n  /** screen-reader labels of the arrows */\n  prevLabel?: string;\n  nextLabel?: string;\n  className?: string;\n}\n\n/** A narrow title beside a track of framed 9:16 video stills. */\nexport function ParsleyhealthReviews({ eyebrow, title, items, action, prevLabel, nextLabel, className }: ParsleyhealthReviewsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const { prev, next, atStart, atEnd, index } = useParsleyhealthCarousel(track);\n\n  return (\n    <section\n      className={cn(\n        \"overflow-clip bg-background py-[calc(var(--section-y)*1.17)] lg:px-gutter lg:py-[calc(var(--section-y)*1.95)]\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto grid max-w-page grid-cols-[minmax(0,1fr)] items-center gap-16 lg:grid-cols-[17.5rem_minmax(0,1fr)] lg:gap-[4.75rem]\">\n        <ParsleyhealthHeading\n          eyebrow={eyebrow}\n          title={title}\n          align=\"phone-center\"\n          className=\"px-gutter lg:px-0\"\n          titleClassName=\"mx-auto max-w-[21rem] lg:mx-0 lg:max-w-[17.5rem]\"\n        />\n\n        <div className=\"relative lg:flex lg:items-center lg:gap-6\">\n          <ul\n            ref={track}\n            className=\"flex snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain px-[calc(50%-7.3125rem)] [scrollbar-width:none] lg:flex-1 lg:snap-proximity lg:px-0 [&::-webkit-scrollbar]:hidden\"\n          >\n            {items.map((item, i) => {\n              const featured = i === 0;\n              return (\n                <li\n                  key={item.name}\n                  className={cn(\n                    \"group w-[14.625rem] shrink-0 snap-center self-start border lg:snap-start\",\n                    featured ? \"border-primary\" : \"border-transparent\",\n                  )}\n                >\n                  <div className={cn(\"p-1.5\", !featured && \"-m-px border border-primary\")}>\n                    <div className=\"relative aspect-[221/393] overflow-clip\">\n                      <div className=\"size-full transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-105 motion-reduce:transition-none [&>img]:size-full [&>img]:object-cover\">\n                        {item.media ?? <ParsleyhealthPlaceholder />}\n                      </div>\n                      <span\n                        aria-hidden\n                        className=\"absolute top-1/2 left-1/2 grid size-[2.625rem] -translate-1/2 place-items-center rounded-full border-2 border-primary-foreground/90 text-primary-foreground transition-colors duration-300 group-hover:bg-primary-foreground/15 motion-reduce:transition-none\"\n                      >\n                        <Play className=\"ml-0.5 size-5\" strokeWidth={1.5} />\n                      </span>\n                    </div>\n                  </div>\n                  <div className=\"px-3 pb-4 lg:px-3\">\n                    <p className=\"border-b border-primary pt-3 pb-2.5 text-[1.3063rem] leading-[1.273] text-ring lg:text-[1.4438rem]\">{item.name}</p>\n                    <p className=\"mt-3 text-[0.9625rem] leading-[1.455] text-foreground\">{item.quote}</p>\n                    {featured && action ? (\n                      <ParsleyhealthButton href={action.href} variant=\"highlight\" size=\"sm\" className=\"mt-3.5 px-6.5\">\n                        {action.label}\n                      </ParsleyhealthButton>\n                    ) : null}\n                  </div>\n                </li>\n              );\n            })}\n          </ul>\n          {/* phones: neighbours fade out at the edges */}\n          <div aria-hidden className=\"pointer-events-none absolute inset-y-0 left-0 w-14 bg-linear-to-r from-background to-transparent lg:hidden\" />\n          <div aria-hidden className=\"pointer-events-none absolute inset-y-0 right-0 w-14 bg-linear-to-l from-background to-transparent lg:hidden\" />\n          <ParsleyhealthArrow direction=\"next\" label={nextLabel ?? \"\"} variant=\"dot\" disabled={atEnd} onClick={next} className=\"max-lg:hidden\" />\n        </div>\n\n        <div className=\"-mt-6 flex items-center justify-between px-[4.3rem] lg:hidden\">\n          <ParsleyhealthArrow direction=\"prev\" label={prevLabel ?? \"\"} variant=\"solid\" disabled={atStart} onClick={prev} />\n          <div aria-hidden className=\"flex gap-2\">\n            {items.map((item, i) => (\n              <span key={item.name} className={cn(\"size-1.5 rounded-full\", i === index ? \"bg-primary\" : \"bg-primary/25\")} />\n            ))}\n          </div>\n          <ParsleyhealthArrow direction=\"next\" label={nextLabel ?? \"\"} variant=\"solid\" disabled={atEnd} onClick={next} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button",
+    "parsleyhealth-carousel",
+    "parsleyhealth-heading",
+    "parsleyhealth-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title"
+    },
+    {
+      "name": "items",
+      "type": "ParsleyhealthReview[]",
+      "required": true,
+      "description": "the reviews"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the ochre pill on the first card"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader labels of the arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4ec7eb37875b208eb5de98f89f5c955a7327bc09674ccece2c7cd0414ea782e4"
+}

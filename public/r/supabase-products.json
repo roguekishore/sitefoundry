@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase product bento",
+  "description": "A bento of white, hairline-bordered 16px cards in a 4-column grid, two rows 400px tall: a wide first card with grey copy, ink-stressed words and a checked list beside its illustration, then six single cards with text on top and an illustration filling the lower half. A soft shadow appears on hover. Below, a 22px two-tone summary line. Phones get a plain stack of compact text cards without illustrations.",
+  "category": "features",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "cards",
+    "light",
+    "minimal",
+    "hover",
+    "developer"
+  ],
+  "notes": [
+    "illustration slots show only from lg up, as on the original; empty slots are soft grey placeholders",
+    "has no top padding: it is meant to sit right under the hero"
+  ],
+  "entry": "supabase-products.tsx",
+  "name": "supabase-products",
+  "files": [
+    {
+      "path": "supabase-products.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabasePlaceholder } from \"@foundry/supabase-placeholder\";\n\nexport interface SupabaseProduct {\n  /** a small line icon before the title (16px) */\n  icon?: ReactNode;\n  title: string;\n  /** grey text; wrap the words to stress in <strong> and they turn ink */\n  description: ReactNode;\n  /** a short checked list at the bottom of a wide card */\n  points?: string[];\n  /** the illustration (desktop only); an empty slot shows a soft placeholder */\n  media?: ReactNode;\n  /** screen-reader label for the illustration slot */\n  mediaLabel?: string;\n  /** spans two columns on desktop, with text left and the illustration right */\n  wide?: boolean;\n  href?: string;\n}\n\nexport interface SupabaseProductsProps {\n  /** the cards, in reading order; seven fill two rows when the first is wide */\n  products: SupabaseProduct[];\n  /** the line under the grid; wrap the lead-in in <strong> to set it in ink */\n  summary?: ReactNode;\n  className?: string;\n}\n\n/** The product bento: a 4-column grid of 400px white cards on desktop, a plain stack of text cards on phones. */\nexport function SupabaseProducts({ products, summary, className }: SupabaseProductsProps) {\n  return (\n    <section className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content max-w-page px-gutter pb-16 lg:pb-20\">\n        <ul className=\"grid gap-4 lg:grid-cols-4 lg:gap-3\">\n          {products.map((product) => {\n            const Tag = product.href ? \"a\" : \"div\";\n            return (\n              <li key={product.title} className={cn(product.wide && \"lg:col-span-2\")}>\n                <Tag\n                  {...(product.href ? { href: product.href } : {})}\n                  className={cn(\n                    \"relative flex h-full flex-col overflow-clip rounded-xl border border-border bg-card p-4 transition-shadow duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:shadow-md hover:shadow-foreground/8 motion-reduce:transition-none lg:h-[25rem] lg:rounded-2xl lg:p-6\",\n                    product.wide && \"lg:grid lg:grid-cols-2 lg:gap-6\",\n                  )}\n                >\n                  <div className=\"relative z-10 flex flex-col lg:h-full\">\n                    <h3 className=\"flex items-center gap-2.5 text-base font-medium text-foreground lg:text-lg [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[1.5]\">\n                      {product.icon}\n                      {product.title}\n                    </h3>\n                    <p className=\"mt-2 text-sm text-muted-foreground lg:mt-3 lg:text-[0.9375rem] lg:leading-[1.375rem] [&_strong]:font-[450] [&_strong]:text-foreground\">\n                      {product.description}\n                    </p>\n                    {product.points && (\n                      <ul className=\"mt-auto hidden gap-1 pt-6 text-[0.9375rem] lg:grid\">\n                        {product.points.map((point) => (\n                          <li key={point} className=\"flex items-center gap-2\">\n                            <Check className=\"size-3.5 shrink-0\" strokeWidth={2} />\n                            {point}\n                          </li>\n                        ))}\n                      </ul>\n                    )}\n                  </div>\n                  <div\n                    className={cn(\n                      \"hidden lg:block\",\n                      product.wide ? \"lg:relative lg:my-auto lg:aspect-square lg:w-full\" : \"lg:absolute lg:inset-x-0 lg:bottom-0 lg:h-[55%]\",\n                    )}\n                  >\n                    {product.media ?? <SupabasePlaceholder tone=\"soft\" label={product.mediaLabel} />}\n                  </div>\n                </Tag>\n              </li>\n            );\n          })}\n        </ul>\n        {summary && (\n          <p className=\"mt-7 max-w-[34rem] font-display text-[1.375rem] leading-[1.36] font-medium text-muted-foreground lg:max-w-none [&_strong]:font-medium [&_strong]:text-foreground\">\n            {summary}\n          </p>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-placeholder"
+  ],
+  "props": [
+    {
+      "name": "products",
+      "type": "SupabaseProduct[]",
+      "required": true,
+      "description": "the cards, in reading order; seven fill two rows when the first is wide"
+    },
+    {
+      "name": "summary",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the line under the grid; wrap the lead-in in <strong> to set it in ink"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9ede5b2ba97b192806b3f1d44ade51384e3f3054419bcd608b2e2e5163a4b593"
+}

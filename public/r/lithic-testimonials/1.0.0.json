@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Lithic testimonial carousel",
+  "description": "A short intro on the left and a row of large faint-bronze quote cards running off the right edge of the window; arrow buttons under the row slide it one card at a time (also swipeable). Each card: a customer wordmark, a 20px quote with a hanging open-quote, and an avatar with name and role.",
+  "category": "testimonials",
+  "site": "lithic",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "carousel",
+    "quotes",
+    "cards",
+    "light",
+    "warm",
+    "scroll-snap"
+  ],
+  "notes": [
+    "a native scroll-snap track: swipe/scroll works without JavaScript; the arrows need it",
+    "on phones the intro stays beside the track and the first card peeks in from the right, as the original",
+    "the avatar is a media slot (48px circle placeholder); company names are text marks"
+  ],
+  "hydrate": "visible",
+  "entry": "lithic-testimonials.tsx",
+  "source": "foundry",
+  "name": "lithic-testimonials",
+  "files": [
+    {
+      "path": "lithic-testimonials.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LithicPlaceholder } from \"@foundry/lithic-placeholder\";\nimport { LithicTextmark, type LithicTextmarkStyle } from \"@foundry/lithic-textmark\";\n\nexport interface LithicTestimonial {\n  /** the customer's name, set as a text mark at the top */\n  company: string;\n  companyVariant?: LithicTextmarkStyle;\n  /** the quote, without quotation marks */\n  quote: string;\n  /** who said it */\n  name: string;\n  role: string;\n  /** their photo (48px circle). A placeholder when empty */\n  avatar?: ReactNode;\n}\n\nexport interface LithicTestimonialsProps {\n  /** the intro headline */\n  title: string;\n  /** the intro paragraph */\n  text: string;\n  testimonials: LithicTestimonial[];\n  /** accessible names of the arrow buttons */\n  previousLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n// Offset of the page column from the section's edge: the gutter on phones, centred 1184px on desktop.\nconst edge = \"max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)))\";\n// The same offset measured from the window, for boxes narrower than the section.\nconst edgeVw = \"max(var(--page-gutter), calc((100vw - var(--page-width)) / 2 + var(--page-gutter)))\";\n\n/** Client quotes: an intro beside a sliding row of cards. */\nexport function LithicTestimonials({ title, text, testimonials, previousLabel, nextLabel, className }: LithicTestimonialsProps) {\n  const track = useRef<HTMLUListElement>(null);\n  const [atStart, setAtStart] = useState(true);\n  const [atEnd, setAtEnd] = useState(false);\n\n  const update = () => {\n    const el = track.current;\n    if (!el) return;\n    setAtStart(el.scrollLeft <= 4);\n    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);\n  };\n  useEffect(update, []);\n\n  const slide = (dir: 1 | -1) => {\n    const el = track.current;\n    const card = el?.querySelector(\"li\");\n    if (!el || !card) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.getBoundingClientRect().width + 64), behavior: reduce ? \"auto\" : \"smooth\" });\n  };\n\n  const arrow = \"grid size-8 place-items-center transition-colors duration-200 disabled:text-muted-foreground/40 enabled:hover:text-primary motion-reduce:transition-none\";\n\n  return (\n    <section className={cn(\"overflow-clip bg-background pt-20 pb-24 text-foreground lg:pt-40 lg:pb-[9.25rem]\", className)} style={{ paddingLeft: edge }}>\n      <div className=\"flex items-start\">\n        <div className=\"w-[11.9rem] shrink-0 pt-[3.4rem] lg:w-[17.6rem] lg:pt-14\">\n          <h2 className=\"font-display text-2xl/[1.2] font-semibold tracking-[-0.02em] lg:text-[2rem]/[1.2]\">{title}</h2>\n          <p className=\"mt-6 text-sm/[1.4] tracking-[0.01em] lg:mt-8\">{text}</p>\n        </div>\n        <div className=\"ml-[6.1rem] min-w-0 flex-1 lg:ml-[9.4rem]\">\n          <ul\n            ref={track}\n            onScroll={update}\n            className=\"flex snap-x snap-mandatory gap-16 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden\"\n            style={{ paddingRight: edgeVw }}\n          >\n            {testimonials.map((t) => (\n              <li key={t.name} className=\"flex h-[25rem] w-[18.75rem] shrink-0 snap-start flex-col rounded-lg bg-muted p-8 lg:h-96 lg:w-[36rem] lg:p-10\">\n                <LithicTextmark name={t.company} variant={t.companyVariant} className=\"text-2xl\" />\n                <blockquote className=\"mt-10 pl-[0.45em] -indent-[0.45em] text-base/[1.4] lg:mt-[3.75rem] lg:text-xl/[1.4]\">\n                  “{t.quote}”\n                </blockquote>\n                <div className=\"mt-auto flex items-center gap-6\">\n                  <div className=\"size-12 shrink-0 overflow-clip rounded-full\">{t.avatar ?? <LithicPlaceholder tone=\"dim\" className=\"size-full rounded-full\" />}</div>\n                  <div className=\"text-sm/[1.6]\">\n                    <p className=\"font-semibold tracking-[0.01em]\">{t.name}</p>\n                    <p>{t.role}</p>\n                  </div>\n                </div>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n      <div className=\"mt-8 flex justify-end gap-6 lg:mt-12\" style={{ paddingRight: edgeVw }}>\n        <button type=\"button\" aria-label={previousLabel} className={arrow} disabled={atStart} onClick={() => slide(-1)}>\n          <ArrowLeft aria-hidden className=\"size-6\" strokeWidth={2} />\n        </button>\n        <button type=\"button\" aria-label={nextLabel} className={arrow} disabled={atEnd} onClick={() => slide(1)}>\n          <ArrowRight aria-hidden className=\"size-6\" strokeWidth={2} />\n        </button>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "lithic-placeholder",
+    "lithic-textmark"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the intro headline"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the intro paragraph"
+    },
+    {
+      "name": "testimonials",
+      "type": "LithicTestimonial[]",
+      "required": true
+    },
+    {
+      "name": "previousLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible names of the arrow buttons"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "72d3ed0b5367ccf5e02b49a51634199b18d6c230665936caec6cf7541d7ef38e"
+}

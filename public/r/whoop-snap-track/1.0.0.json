@@ -1,0 +1,116 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Whoop snap track",
+  "description": "A full-bleed horizontal card track that snaps card by card (to the start or the centre), lines its first card up with the page column, lets the next card peek, and shows small round dots that follow the scroll and jump to a card when clicked.",
+  "category": "gallery",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "carousel",
+    "scroll-snap",
+    "dots",
+    "swipe",
+    "track",
+    "peek"
+  ],
+  "notes": [
+    "native scroll-snap, no carousel library; the dots need JavaScript (hydrate visible)",
+    "turn it into a grid at a breakpoint with trackClassName (e.g. lg:grid lg:grid-cols-3) and hide the dots with dotsClassName"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-snap-track.tsx",
+  "source": "foundry",
+  "name": "whoop-snap-track",
+  "files": [
+    {
+      "path": "whoop-snap-track.tsx",
+      "content": "import { useCallback, useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface WhoopSnapTrackProps {\n  /** the cards, in order */\n  slides: ReactNode[];\n  /** classes for each slide wrapper: its width (e.g. \"w-[20.8rem]\") */\n  slideClassName?: string;\n  /** start: cards snap to the page column's left edge · center: cards snap to the middle (neighbours peek both sides) */\n  align?: \"start\" | \"center\";\n  /** the card shown first (scrolled to once the page runs) */\n  start?: number;\n  /** screen-reader name of the track */\n  label: string;\n  /** screen-reader name of each dot, followed by its number (\"Show card\" → \"Show card 2\") */\n  dotLabel: string;\n  /** light: black dots for white bands · dark: white dots for black bands */\n  tone?: \"light\" | \"dark\";\n  /** show the dots under the track (default true) */\n  showDots?: boolean;\n  /** told whenever the current card changes */\n  onActiveChange?: (index: number) => void;\n  className?: string;\n  /** extra classes for the scrolling row (gap, or a grid at a breakpoint) */\n  trackClassName?: string;\n  /** extra classes for the dots row (e.g. \"lg:hidden\") */\n  dotsClassName?: string;\n}\n\n// Side padding that lines the first card up with the page column (max-w-page px-gutter),\n// however wide the window is.\nconst edge =\n  \"px-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))] scroll-px-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))]\";\n\n/** A snapping card track with dots that follow it. */\nexport function WhoopSnapTrack({\n  slides,\n  slideClassName,\n  align = \"start\",\n  start = 0,\n  label,\n  dotLabel,\n  tone = \"light\",\n  showDots = true,\n  onActiveChange,\n  className,\n  trackClassName,\n  dotsClassName,\n}: WhoopSnapTrackProps) {\n  const track = useRef<HTMLDivElement>(null);\n  const [active, setActive] = useState(0);\n\n  // where the track has to scroll to for card i to sit at its snap point\n  const targetOf = useCallback(\n    (i: number) => {\n      const el = track.current;\n      const card = el?.children[i] as HTMLElement | undefined;\n      if (!el || !card) return 0;\n      if (align === \"center\") return card.offsetLeft + card.offsetWidth / 2 - el.clientWidth / 2;\n      return card.offsetLeft - parseFloat(getComputedStyle(el).scrollPaddingLeft || \"0\");\n    },\n    [align],\n  );\n\n  useEffect(() => {\n    const el = track.current;\n    if (!el) return;\n    if (start > 0) el.scrollLeft = targetOf(start);\n    let frame = 0;\n    const measure = () => {\n      frame = 0;\n      if (el.clientWidth === 0) return; // hidden at this breakpoint\n      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;\n      let best = 0;\n      let bestDist = Infinity;\n      for (let i = 0; i < el.children.length; i++) {\n        const d = Math.abs(targetOf(i) - el.scrollLeft);\n        if (d < bestDist) {\n          bestDist = d;\n          best = i;\n        }\n      }\n      // the last cards can't reach the start edge: at the very end the last one is current\n      if (atEnd && align === \"start\" && el.scrollWidth > el.clientWidth) best = el.children.length - 1;\n      setActive(best);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(measure);\n    };\n    measure();\n    el.addEventListener(\"scroll\", onScroll, { passive: true });\n    window.addEventListener(\"resize\", onScroll);\n    return () => {\n      el.removeEventListener(\"scroll\", onScroll);\n      window.removeEventListener(\"resize\", onScroll);\n      cancelAnimationFrame(frame);\n    };\n  }, [start, targetOf, align]);\n\n  useEffect(() => {\n    onActiveChange?.(active);\n  }, [active, onActiveChange]);\n\n  const go = (i: number) => {\n    const el = track.current;\n    if (!el) return;\n    const still = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollTo({ left: targetOf(i), behavior: still ? \"auto\" : \"smooth\" });\n  };\n\n  return (\n    <div className={className}>\n      <div\n        ref={track}\n        role=\"region\"\n        aria-label={label}\n        tabIndex={0}\n        className={cn(\n          \"relative flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain [scrollbar-width:none] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring [&::-webkit-scrollbar]:hidden\",\n          edge,\n          trackClassName,\n        )}\n      >\n        {slides.map((slide, i) => (\n          <div key={i} className={cn(\"shrink-0\", align === \"center\" ? \"snap-center\" : \"snap-start\", slideClassName)}>\n            {slide}\n          </div>\n        ))}\n      </div>\n      {showDots && slides.length > 1 && (\n        <div className={cn(\"mt-10 flex justify-center gap-2.5\", dotsClassName)}>\n          {slides.map((_, i) => (\n            <button\n              key={i}\n              type=\"button\"\n              aria-label={`${dotLabel} ${i + 1}`}\n              aria-current={i === active}\n              onClick={() => go(i)}\n              className={cn(\n                \"size-2.5 rounded-full transition-colors duration-300 ease-out motion-reduce:transition-none\",\n                tone === \"light\"\n                  ? i === active\n                    ? \"bg-foreground\"\n                    : \"bg-foreground/10 hover:bg-foreground/30\"\n                  : i === active\n                    ? \"bg-background dark:bg-foreground\"\n                    : \"bg-background/25 hover:bg-background/50 dark:bg-foreground/25\",\n              )}\n            />\n          ))}\n        </div>\n      )}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "slides",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the cards, in order"
+    },
+    {
+      "name": "slideClassName",
+      "type": "string",
+      "required": false,
+      "description": "classes for each slide wrapper: its width (e.g. \"w-[20.8rem]\")"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "start",
+      "description": "start: cards snap to the page column's left edge · center: cards snap to the middle (neighbours peek both sides)"
+    },
+    {
+      "name": "start",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "the card shown first (scrolled to once the page runs)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the track"
+    },
+    {
+      "name": "dotLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of each dot, followed by its number (\"Show card\" → \"Show card 2\")"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "light",
+      "description": "light: black dots for white bands · dark: white dots for black bands"
+    },
+    {
+      "name": "showDots",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the dots under the track (default true)"
+    },
+    {
+      "name": "onActiveChange",
+      "type": "((index: number) => void)",
+      "required": false,
+      "description": "told whenever the current card changes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "trackClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the scrolling row (gap, or a grid at a breakpoint)"
+    },
+    {
+      "name": "dotsClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the dots row (e.g. \"lg:hidden\")"
+    }
+  ],
+  "hash": "a3b637a9a7603e878fbb434e4eac5ccee9534307ccc8dcbee33e75eeba376efb"
+}

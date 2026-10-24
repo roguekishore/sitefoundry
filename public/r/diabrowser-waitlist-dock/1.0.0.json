@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Dia Browser waitlist dock",
+  "description": "A closing serif line and the cream-arc waitlist bar, built to wrap a whole page: on desktop the arc stays docked at the bottom of the window through every section, slips down and shrinks its black pill to 85% once you start scrolling, then grows back to full size, small print and all, as it settles under the closing heading. Phones show the heading and the bar in place.",
+  "category": "cta",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "closer",
+    "sticky",
+    "pinned",
+    "dock",
+    "bottom-bar",
+    "arc",
+    "scrubbed",
+    "pill",
+    "serif",
+    "cream"
+  ],
+  "notes": [
+    "put the page's sections (hero first) inside it as children; the footer goes after it",
+    "pair with diabrowser-hero's docked prop so the hero's own bar hides from lg",
+    "CSS only: a sticky last child plus scroll() and a named view timeline (timeline-scope); without support the bar just docks at full size",
+    "needs the page itself to scroll: no overflow-hidden ancestors"
+  ],
+  "entry": "diabrowser-waitlist-dock.tsx",
+  "source": "foundry",
+  "name": "diabrowser-waitlist-dock",
+  "files": [
+    {
+      "path": "diabrowser-waitlist-dock.css",
+      "content": "/* Desktop: the waitlist bar is the wrapper's last child with position: sticky; bottom: 0, so\n   it rides the bottom of the window across every section it wraps and settles under the\n   closing heading at the end.\n\n   Two pairs of layers make it breathe: the outer layers shrink it once the page starts to\n   move (bar slides 44px down so the small print leaves the window, button scales to 85%)\n   over the first 450px of scroll; the inner layers undo exactly that while the closing\n   heading rises into view (the heading publishes a named view timeline, the wrapper widens\n   its scope so the bar can follow it). */\n.diabrowser-waitlist-dock {\n  timeline-scope: --diabrowser-waitlist-dock-closer;\n}\n.diabrowser-waitlist-dock-heading {\n  view-timeline-name: --diabrowser-waitlist-dock-closer;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .diabrowser-waitlist-dock-fade {\n      animation: diabrowser-waitlist-dock-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 120px;\n    }\n  }\n}\n\n@supports (animation-timeline: scroll()) and (timeline-scope: none) {\n  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {\n    .diabrowser-waitlist-dock-slide-a,\n    .diabrowser-waitlist-dock-scale-a {\n      animation: diabrowser-waitlist-dock-slide-down linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0 450px;\n    }\n    .diabrowser-waitlist-dock-scale-a {\n      animation-name: diabrowser-waitlist-dock-shrink;\n    }\n    .diabrowser-waitlist-dock-slide-b,\n    .diabrowser-waitlist-dock-scale-b {\n      animation: diabrowser-waitlist-dock-slide-up linear both;\n      animation-timeline: --diabrowser-waitlist-dock-closer;\n      animation-range: cover 100px cover 300px;\n    }\n    .diabrowser-waitlist-dock-scale-b {\n      animation-name: diabrowser-waitlist-dock-grow;\n    }\n  }\n}\n\n@keyframes diabrowser-waitlist-dock-fade {\n  from { opacity: 0; }\n}\n@keyframes diabrowser-waitlist-dock-slide-down {\n  to { translate: 0 44px; }\n}\n@keyframes diabrowser-waitlist-dock-shrink {\n  to { scale: 0.85; }\n}\n@keyframes diabrowser-waitlist-dock-slide-up {\n  from { translate: 0 0; }\n  to { translate: 0 -44px; }\n}\n@keyframes diabrowser-waitlist-dock-grow {\n  from { scale: 1; }\n  to { scale: 1.1765; }\n}\n"
+    },
+    {
+      "path": "diabrowser-waitlist-dock.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { DiabrowserHeading } from \"@foundry/diabrowser-heading\";\nimport { DiabrowserWaitlistBar, type DiabrowserWaitlistBarProps } from \"@foundry/diabrowser-waitlist-bar\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-waitlist-dock.css\";\n\nexport interface DiabrowserWaitlistDockProps {\n  /** the page sections the bar rides along with (hero to the last section before the closer) */\n  children?: ReactNode;\n  /** the closing serif line the bar settles under */\n  heading: ReactNode;\n  /** the black CTA on the arc */\n  cta: DiabrowserWaitlistBarProps[\"cta\"];\n  /** small print under the CTA */\n  note?: ReactNode;\n  className?: string;\n}\n\n/**\n * Wraps the page so its waitlist bar stays docked at the bottom of the window on desktop,\n * shrinking once you scroll and growing back as it settles under the closing heading.\n * Phones: the closing heading followed by the bar, in place.\n */\nexport function DiabrowserWaitlistDock({ children, heading, cta, note, className }: DiabrowserWaitlistDockProps) {\n  return (\n    <div className={cn(\"diabrowser-waitlist-dock relative bg-background text-foreground\", className)}>\n      {children}\n      <section className=\"diabrowser-waitlist-dock-fade px-gutter pb-[96px] lg:pt-[30px]\">\n        <DiabrowserHeading className=\"diabrowser-waitlist-dock-heading\">{heading}</DiabrowserHeading>\n      </section>\n      {/* must stay the wrapper's last child: sticky bottom holds only while its own spot is below the fold */}\n      <div className=\"z-40 lg:sticky lg:bottom-0\">\n        <div className=\"diabrowser-waitlist-dock-slide-a\">\n          <div className=\"diabrowser-waitlist-dock-slide-b\">\n            <DiabrowserWaitlistBar cta={cta} note={note} buttonLayers={[\"diabrowser-waitlist-dock-scale-a\", \"diabrowser-waitlist-dock-scale-b\"]} />\n          </div>\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "diabrowser-heading",
+    "diabrowser-waitlist-bar",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the page sections the bar rides along with (hero to the last section before the closer)"
+    },
+    {
+      "name": "heading",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the closing serif line the bar settles under"
+    },
+    {
+      "name": "cta",
+      "type": "DiabrowserWaitlistBarProps",
+      "required": true,
+      "description": "the black CTA on the arc"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small print under the CTA"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1e08277f3009545bc2d655d2fc33ae3984b499ca026205bdf226f5e5357f86d7"
+}

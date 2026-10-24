@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle footer",
+  "description": "A framed footer: a hairline box inset from the page edge with dark corner brackets, a brand column (green-tiled wordmark, tagline, square ink social buttons) beside three link columns split by vertical hairlines, each holding one or two groups with a grey label; a bottom bar carries the copyright and legal links in grey. On phones the groups fold into uppercase accordion rows with chevrons.",
+  "category": "footer",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "framed",
+    "brackets",
+    "accordion",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "the phone accordions are native <details>; no JavaScript"
+  ],
+  "entry": "puzzle-footer.tsx",
+  "source": "foundry",
+  "name": "puzzle-footer",
+  "files": [
+    {
+      "path": "puzzle-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface PuzzleFooterGroup {\n  label: string;\n  links: { label: string; href: string }[];\n}\n\nexport interface PuzzleFooterProps {\n  /** the wordmark: a name with a small icon on a green tile */\n  brand: { name: string; href: string; icon?: ReactNode };\n  /** the line under the wordmark */\n  tagline?: string;\n  /** square ink buttons; icon is a small lucide icon */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** three columns, each one or two groups */\n  columns: PuzzleFooterGroup[][];\n  /** e.g. \"© Oakbook 2026\" */\n  copyright: string;\n  /** the grey links in the bottom bar */\n  legal: { label: string; href: string }[];\n  className?: string;\n}\n\nconst link = \"opacity-90 transition-opacity duration-300 hover:opacity-100 hover:text-highlight motion-reduce:transition-none\";\n\n/** The framed footer with corner brackets. */\nexport function PuzzleFooter({ brand, tagline, socials, columns, copyright, legal, className }: PuzzleFooterProps) {\n  const bracket = \"pointer-events-none absolute size-3.5 border-foreground\";\n  return (\n    <footer className={cn(\"bg-sidebar p-4 text-sidebar-foreground\", className)}>\n      <div className=\"relative border border-foreground/20\">\n        <span aria-hidden className={cn(bracket, \"-top-px -left-px border-t-2 border-l-2\")} />\n        <span aria-hidden className={cn(bracket, \"-top-px -right-px border-t-2 border-r-2\")} />\n        <span aria-hidden className={cn(bracket, \"-bottom-px -left-px border-b-2 border-l-2\")} />\n        <span aria-hidden className={cn(bracket, \"-right-px -bottom-px border-r-2 border-b-2\")} />\n\n        <div className=\"lg:grid lg:grid-cols-[1.2fr_1fr_1fr_1fr]\">\n          <div className=\"px-4 pt-9 pb-9 lg:px-8 lg:pt-8 lg:pb-12\">\n            <a href={brand.href} className=\"flex items-center gap-4 font-display text-[2.25rem]/none font-semibold tracking-[-0.01em] lg:text-[2rem]/none\">\n              {brand.icon && (\n                <span className=\"flex size-14 items-center justify-center rounded-[calc(var(--radius)*0.9)] bg-glow text-foreground dark:text-background [&_svg]:size-7\">{brand.icon}</span>\n              )}\n              {brand.name}\n            </a>\n            {tagline && <p className=\"mt-10 max-w-[19rem] text-[0.9375rem]/[1.55] lg:mt-12\">{tagline}</p>}\n            {socials && (\n              <ul className=\"mt-8 flex gap-4\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a\n                      href={s.href}\n                      aria-label={s.label}\n                      className=\"flex size-8 items-center justify-center rounded-[calc(var(--radius)*0.375)] bg-foreground text-background transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none [&_svg]:size-[1.125rem]\"\n                    >\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            )}\n          </div>\n\n          {/* desktop: three columns between vertical hairlines */}\n          {columns.map((col, i) => (\n            <div key={i} className=\"hidden flex-col gap-12 border-l border-foreground/20 px-8 pt-10 pb-12 lg:flex\">\n              {col.map((g) => (\n                <div key={g.label}>\n                  <p className=\"text-[0.9375rem] text-muted-foreground/80\">{g.label}</p>\n                  <ul className=\"mt-3 flex flex-col gap-[0.9rem] text-[0.9375rem]/[1.5]\">\n                    {g.links.map((l) => (\n                      <li key={l.label}>\n                        <a href={l.href} className={link}>\n                          {l.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ))}\n            </div>\n          ))}\n\n          {/* phones: one accordion row per group */}\n          <div className=\"lg:hidden\">\n            {columns.flat().map((g) => (\n              <details key={g.label} className=\"group border-t border-foreground/20\">\n                <summary className=\"flex cursor-pointer list-none items-center justify-between px-4 py-6 text-[0.9375rem]/none uppercase [&::-webkit-details-marker]:hidden\">\n                  {g.label}\n                  <ChevronDown aria-hidden className=\"size-5 transition-transform duration-300 group-open:rotate-180 motion-reduce:transition-none\" strokeWidth={1.5} />\n                </summary>\n                <ul className=\"flex flex-col gap-4 px-4 pb-6 text-[0.9375rem]\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a href={l.href} className={link}>\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </details>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"flex flex-col-reverse gap-6 border-t border-foreground/20 px-4 pt-8 pb-8 text-[0.9375rem] text-muted-foreground/80 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-6\">\n          <p>{copyright}</p>\n          <ul className=\"flex flex-col gap-3 lg:flex-row lg:gap-6\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"transition-colors duration-300 hover:text-foreground motion-reduce:transition-none\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; icon?: ReactNode; }",
+      "required": true,
+      "description": "the wordmark: a name with a small icon on a green tile"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": false,
+      "description": "the line under the wordmark"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "description": "square ink buttons; icon is a small lucide icon"
+    },
+    {
+      "name": "columns",
+      "type": "PuzzleFooterGroup[][]",
+      "required": true,
+      "description": "three columns, each one or two groups"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "e.g. \"© Oakbook 2026\""
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": true,
+      "description": "the grey links in the bottom bar"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f44a0cde23ef823cb3d855a4b87b3d534eae370bc28f45f700dff1943becbedb"
+}

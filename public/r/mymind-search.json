@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind search band",
+  "description": "A full-bleed tangerine band: dark spaced capitals, a big two-line ink serif headline, a white paragraph and a white play link, then a wide search line drawn as a single white hairline where query chips pop in one by one beside a blinking caret, on a loop.",
+  "category": "features",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "search",
+    "orange",
+    "full-bleed",
+    "serif",
+    "loop",
+    "typing",
+    "chips",
+    "bold"
+  ],
+  "notes": [
+    "the band is bg-primary with ink headline and white body text: best where primary is a strong mid-tone",
+    "CSS-only loop; with reduced motion all chips show and the caret stays still"
+  ],
+  "entry": "mymind-search.tsx",
+  "source": "foundry",
+  "name": "mymind-search",
+  "files": [
+    {
+      "path": "mymind-search.css",
+      "content": "/* An 8s loop: the chips pop in one after another (scale 0 → 1 in ~200ms, like the\n   original's \"pop-out\"), stay, then all fade out together; the caret blinks throughout. */\n@media (prefers-reduced-motion: no-preference) {\n  .mymind-search-chip {\n    animation: mymind-search-pop 8s cubic-bezier(0.165, 0.84, 0.44, 1) infinite both;\n  }\n  .mymind-search-caret {\n    animation: mymind-search-blink 1s steps(1) infinite;\n  }\n}\n\n@keyframes mymind-search-pop {\n  0%, 12% { opacity: 0; transform: scale(0); }\n  15%, 82% { opacity: 1; transform: scale(1); }\n  90%, 100% { opacity: 0; transform: scale(1); }\n}\n\n@keyframes mymind-search-blink {\n  50% { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "mymind-search.tsx",
+      "content": "import { Search } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindEyebrow } from \"@foundry/mymind-eyebrow\";\nimport { MymindPlayLink } from \"@foundry/mymind-play-link\";\nimport \"./mymind-search.css\";\n\nexport interface MymindSearchProps {\n  /** dark spaced capitals */\n  eyebrow: string;\n  /** headline lines (each starts a new line on desktop) */\n  title: string[];\n  /** white paragraph */\n  text: string;\n  /** white play link */\n  link: { label: string; href: string };\n  /** query chips that pop into the search line one by one */\n  chips: string[];\n  /** screen-reader label of the search line */\n  searchLabel: string;\n  className?: string;\n}\n\n/** Tangerine band with a looping search line. */\nexport function MymindSearch({ eyebrow, title, text, link, chips, searchLabel, className }: MymindSearchProps) {\n  return (\n    <section className={cn(\"bg-primary pt-14 pb-24 text-foreground lg:pt-[7rem] lg:pb-[26rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter text-center\">\n        <MymindEyebrow tone=\"inherit\" className=\"text-foreground/80\">{eyebrow}</MymindEyebrow>\n        <h2 className=\"mt-6 font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-foreground lg:mt-5 lg:text-[6rem] lg:leading-[0.92]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"lg:block\">\n              {line}{\" \"}\n            </span>\n          ))}\n        </h2>\n        <p className=\"mt-10 max-w-[20rem] text-lg leading-[1.6] text-primary-foreground lg:mt-9 lg:max-w-[33rem]\">{text}</p>\n        <MymindPlayLink href={link.href} inverse className=\"mt-9 lg:mt-8\">\n          {link.label}\n        </MymindPlayLink>\n\n        <div role=\"img\" aria-label={searchLabel} className=\"relative mt-28 flex h-12 w-full max-w-[13rem] items-center justify-center gap-2 border-b border-primary-foreground/40 lg:mt-[22rem] lg:h-[4.5rem] lg:max-w-[47.25rem] lg:gap-2.5\">\n          {chips.map((c, i) => (\n            <span\n              key={c}\n              className=\"mymind-search-chip hidden h-8 items-center rounded-full bg-card px-3 text-sm text-card-foreground lg:inline-flex\"\n              style={{ animationDelay: `${i * 0.9}s` }}\n            >\n              {c}\n            </span>\n          ))}\n          <span aria-hidden className=\"mymind-search-caret h-8 w-px bg-primary-foreground lg:h-[3.25rem]\" />\n          <Search aria-hidden className=\"absolute right-0 size-4 text-primary-foreground/80 lg:size-6\" strokeWidth={1.25} />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-eyebrow",
+    "mymind-play-link"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "dark spaced capitals"
+    },
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "headline lines (each starts a new line on desktop)"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "white paragraph"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "white play link"
+    },
+    {
+      "name": "chips",
+      "type": "string[]",
+      "required": true,
+      "description": "query chips that pop into the search line one by one"
+    },
+    {
+      "name": "searchLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the search line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6ed234e117283ced388d3500cfe76463d0c2de8cf039dd0ee7bf6beccf88d447"
+}

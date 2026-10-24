@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Paxos sticky header",
+  "description": "A plain white top bar (80px on phones, 102px on desktop): a mark and wordmark on the left, five quiet nav items centred, and a small slate pill on the right; on phones a menu button opens a dropdown list. It sticks to the top, slides up out of view (100px, fading) once you scroll down past ~450px, and comes back as soon as you scroll up.",
+  "category": "header",
+  "site": "paxos",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "hide-on-scroll",
+    "minimal",
+    "light",
+    "pill"
+  ],
+  "notes": [
+    "the hide-on-scroll needs JavaScript (hydrate: load); without it the bar simply stays put",
+    "the phone menu is a native details element"
+  ],
+  "hydrate": "load",
+  "entry": "paxos-header.tsx",
+  "name": "paxos-header",
+  "files": [
+    {
+      "path": "paxos-header.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\nimport { Hexagon, Menu } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PaxosButton } from \"@foundry/paxos-button\";\n\nexport interface PaxosHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface PaxosHeaderProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the centred nav items (five on the original) */\n  links: PaxosHeaderLink[];\n  /** the slate pill on the right */\n  action: PaxosHeaderLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  /** scroll distance in px after which scrolling down hides the bar */\n  hideAfter?: number;\n  className?: string;\n}\n\n/** Sticky white bar that tucks away while you scroll down and returns when you scroll up. */\nexport function PaxosHeader({ brand, brandHref = \"#\", links, action, menuLabel, hideAfter = 450, className }: PaxosHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const lastY = useRef(0);\n\n  useEffect(() => {\n    lastY.current = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      // hide only while moving down and past the threshold; any upward scroll shows it again\n      setHidden(y > hideAfter && y > lastY.current);\n      lastY.current = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [hideAfter]);\n\n  return (\n    <header\n      data-hidden={hidden || undefined}\n      className={cn(\n        \"sticky top-0 z-50 bg-background px-gutter\",\n        \"transition-[translate,opacity] duration-300 ease-[cubic-bezier(0.44,0,0.56,1)] motion-reduce:transition-none\",\n        \"data-hidden:-translate-y-[100px] data-hidden:opacity-0\",\n        className,\n      )}\n    >\n      <div className=\"relative mx-auto flex h-20 max-w-page items-center lg:h-[6.375rem]\">\n        <a href={brandHref} className=\"flex items-center gap-2 text-foreground\">\n          <Hexagon aria-hidden className=\"size-7 text-chart-1\" strokeWidth={2.5} />\n          <span className=\"font-display text-xl tracking-[0.12em] uppercase\">{brand}</span>\n        </a>\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 lg:flex\">\n          {links.map((link) => (\n            <a\n              key={link.label}\n              href={link.href}\n              className=\"text-[0.9375rem] tracking-[-0.01em] text-foreground transition-colors duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-muted-foreground motion-reduce:transition-none\"\n            >\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <PaxosButton href={action.href} className=\"ml-auto max-lg:hidden\">\n          {action.label}\n        </PaxosButton>\n        <details className=\"group ml-auto lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"grid size-9 cursor-pointer list-none place-items-center rounded-full text-foreground [&::-webkit-details-marker]:hidden\"\n          >\n            <Menu aria-hidden className=\"size-5\" strokeWidth={1.5} />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full flex flex-col border-t border-border bg-background py-4\">\n            {links.map((link) => (\n              <a key={link.label} href={link.href} className=\"py-3 font-display text-xl tracking-[-0.01em] text-foreground\">\n                {link.label}\n              </a>\n            ))}\n            <PaxosButton href={action.href} className=\"mt-4 self-start\">\n              {action.label}\n            </PaxosButton>\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "paxos-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "PaxosHeaderLink[]",
+      "required": true,
+      "description": "the centred nav items (five on the original)"
+    },
+    {
+      "name": "action",
+      "type": "PaxosHeaderLink",
+      "required": true,
+      "description": "the slate pill on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "hideAfter",
+      "type": "number",
+      "required": false,
+      "default": "450",
+      "description": "scroll distance in px after which scrolling down hides the bar"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c8c72536a5068f2259fa21b4ed2315b55e776ab27c0775d461fe18e9ac58fb95"
+}

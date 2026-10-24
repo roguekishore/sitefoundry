@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Galaxy code card",
+  "description": "A near-black panel with 14px corners and a faint border holding a few lines of monospace code: a grey file label over a hairline, then syntax-coloured lines (grey comments, blue keys, green strings) ending in a green block cursor that blinks.",
+  "category": "card",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "code",
+    "terminal",
+    "mono",
+    "dark",
+    "blink",
+    "loop"
+  ],
+  "notes": [
+    "CSS-only blink; the cursor stays solid with reduced motion",
+    "key and string colours are --chart-2 and --highlight"
+  ],
+  "entry": "galaxy-code-card.tsx",
+  "name": "galaxy-code-card",
+  "files": [
+    {
+      "path": "galaxy-code-card.css",
+      "content": "/* The block cursor at the end of the last line: on for half of each 1.05s beat, then off. */\n.galaxy-code-card-cursor {\n  animation: galaxy-code-card-blink 1.05s steps(1, end) infinite;\n}\n\n@keyframes galaxy-code-card-blink {\n  0%, 50% { opacity: 1; }\n  50.01%, 100% { opacity: 0; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .galaxy-code-card-cursor { animation: none; }\n}\n"
+    },
+    {
+      "path": "galaxy-code-card.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./galaxy-code-card.css\";\n\nexport interface GalaxyCodeToken {\n  /** the characters, spaces included */\n  text: string;\n  /** comment: grey · key: blue · string: green · muted: dim grey · plain (default): white */\n  kind?: \"comment\" | \"key\" | \"string\" | \"muted\" | \"plain\";\n}\n\nexport interface GalaxyCodeCardProps {\n  /** the grey label over the rule, e.g. \"// ledger.settle\" */\n  label: string;\n  /** the code, one array of tokens per line */\n  lines: GalaxyCodeToken[][];\n  /** indent these line numbers (0-based) by two characters */\n  indented?: number[];\n  /** end the last line with a blinking block cursor */\n  cursor?: boolean;\n  className?: string;\n}\n\nconst kinds = {\n  comment: \"text-muted-foreground/60\",\n  key: \"text-chart-2\",\n  string: \"text-highlight\",\n  muted: \"text-muted-foreground/60\",\n  plain: \"text-foreground/90\",\n};\n\n/** A small, static code listing; it reads as text to screen readers. */\nexport function GalaxyCodeCard({ label, lines, indented = [], cursor = true, className }: GalaxyCodeCardProps) {\n  return (\n    <figure className={cn(\"rounded-2xl border border-muted bg-card p-8 font-mono text-[0.9375rem] leading-[1.85]\", className)}>\n      <figcaption className=\"border-b border-muted pb-4 text-muted-foreground/60 uppercase\">{label}</figcaption>\n      <pre className=\"mt-4 font-mono whitespace-pre-wrap\">\n        {lines.map((line, i) => (\n          <code key={i} className={cn(\"block\", indented.includes(i) && \"pl-[2ch]\")}>\n            {line.map((token, j) => (\n              <span key={j} className={kinds[token.kind ?? \"plain\"]}>\n                {token.text}\n              </span>\n            ))}\n            {cursor && i === lines.length - 1 && (\n              <span aria-hidden className=\"galaxy-code-card-cursor ml-1 inline-block h-[1.1em] w-[0.55em] translate-y-[0.2em] bg-highlight\" />\n            )}\n          </code>\n        ))}\n      </pre>\n    </figure>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the grey label over the rule, e.g. \"// ledger.settle\""
+    },
+    {
+      "name": "lines",
+      "type": "GalaxyCodeToken[][]",
+      "required": true,
+      "description": "the code, one array of tokens per line"
+    },
+    {
+      "name": "indented",
+      "type": "number[]",
+      "required": false,
+      "default": "[]",
+      "description": "indent these line numbers (0-based) by two characters"
+    },
+    {
+      "name": "cursor",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "end the last line with a blinking block cursor"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0960a348517a15d2f44ade11c7e9b1c7a8767c01663ee7a07c08a9b8707238d2"
+}

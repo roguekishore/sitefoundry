@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend SDK showcase",
+  "description": "A centred icon tile and lit title with a violet last word, a row of square hairline SDK tiles (the chosen one brightens, its icon violet), and a wide 24px-radius code panel: framework tabs, a copy button, numbered monospace code with violet strings, and small footer links. A light streak runs along the panel's top edge. On phones the tiles and tabs scroll sideways.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "code",
+    "tabs",
+    "sdk",
+    "dark",
+    "developer",
+    "hairline",
+    "hover"
+  ],
+  "notes": [
+    "choosing a tile or tab swaps the code (React state)",
+    "the icon tile is a media slot (a looping video in the original)"
+  ],
+  "hydrate": "visible",
+  "entry": "resend-integrate.tsx",
+  "source": "foundry",
+  "name": "resend-integrate",
+  "files": [
+    {
+      "path": "resend-integrate.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { Clipboard } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendCode } from \"@foundry/resend-code\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\n\nexport interface ResendSdkTab {\n  label: string;\n  /** a small glyph before the label */\n  icon?: ReactNode;\n  /** the code shown for this tab */\n  code: string;\n}\n\nexport interface ResendSdk {\n  label: string;\n  /** the icon in the square tile */\n  icon: ReactNode;\n  /** framework tabs for this SDK; the first is shown when it's chosen */\n  tabs: ResendSdkTab[];\n}\n\nexport interface ResendIntegrateProps {\n  /** the title before the accent */\n  title: string;\n  /** the last words, in the accent colour */\n  accent?: string;\n  /** the lead; a list sets its desktop line breaks */\n  text: string | string[];\n  /** fills the icon slot above the title; empty shows a placeholder tile */\n  media?: ReactNode;\n  /** the SDK tiles */\n  sdks: ResendSdk[];\n  /** label of the copy button, for screen readers */\n  copyLabel?: string;\n  /** small links in the panel's footer (the first stays on phones) */\n  links?: { label: string; href: string; icon?: ReactNode }[];\n  className?: string;\n}\n\nexport function ResendIntegrate({ title, accent, text, media, sdks, copyLabel = \"Copy\", links = [], className }: ResendIntegrateProps) {\n  const [sdk, setSdk] = useState(0);\n  const [tab, setTab] = useState(0);\n  const tabs = sdks[sdk]?.tabs ?? [];\n  const current = tabs[Math.min(tab, tabs.length - 1)];\n\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading tile media={media} title={title} accent={accent} text={text} />\n\n        <div className=\"-mx-gutter mt-12 overflow-x-auto px-gutter [scrollbar-width:none] lg:mt-12\">\n          <ul className=\"mx-auto flex w-max gap-4\">\n            {sdks.map((s, i) => (\n              <li key={s.label}>\n                <button\n                  type=\"button\"\n                  aria-pressed={i === sdk}\n                  onClick={() => {\n                    setSdk(i);\n                    setTab(0);\n                  }}\n                  className=\"group/sdk flex w-[3.75rem] flex-col items-center gap-3\"\n                >\n                  <span\n                    className={cn(\n                      \"flex h-14 w-[3.75rem] items-center justify-center rounded-sm border transition-colors duration-200 motion-reduce:transition-none [&_svg]:size-5\",\n                      i === sdk\n                        ? \"border-foreground/40 bg-accent text-highlight\"\n                        : \"border-border text-muted-foreground group-hover/sdk:border-foreground/60 group-hover/sdk:text-foreground\",\n                    )}\n                  >\n                    {s.icon}\n                  </span>\n                  <span\n                    className={cn(\n                      \"text-sm whitespace-nowrap transition-colors duration-200 motion-reduce:transition-none\",\n                      i === sdk ? \"text-foreground\" : \"text-muted-foreground group-hover/sdk:text-foreground\",\n                    )}\n                  >\n                    {s.label}\n                  </span>\n                </button>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"relative mx-auto mt-12 max-w-[64rem] overflow-clip rounded-2xl border border-border\">\n          <span aria-hidden className=\"absolute top-0 right-[6%] h-px w-[22%] bg-linear-to-r from-transparent via-foreground/70 to-transparent\" />\n          <div className=\"flex h-16 items-center gap-3 border-b border-border pr-4 pl-4\">\n            <div className=\"flex min-w-0 flex-1 gap-1 overflow-x-auto [scrollbar-width:none]\" role=\"tablist\">\n              {tabs.map((t, i) => (\n                <button\n                  key={t.label}\n                  type=\"button\"\n                  role=\"tab\"\n                  aria-selected={t === current}\n                  onClick={() => setTab(i)}\n                  className={cn(\n                    \"flex h-8 shrink-0 items-center gap-1.5 rounded-md px-2 text-sm whitespace-nowrap transition-colors duration-200 motion-reduce:transition-none [&_svg]:size-3.5\",\n                    t === current ? \"bg-accent text-foreground\" : \"text-muted-foreground hover:text-foreground\",\n                  )}\n                >\n                  {t.icon && <span className=\"flex size-4 items-center justify-center rounded-[4px] border border-border\">{t.icon}</span>}\n                  {t.label}\n                </button>\n              ))}\n            </div>\n            <button\n              type=\"button\"\n              aria-label={copyLabel}\n              onClick={() => current && navigator.clipboard?.writeText(current.code)}\n              className=\"hidden size-8 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors duration-200 hover:text-foreground sm:flex\"\n            >\n              <Clipboard className=\"size-4\" strokeWidth={1.75} />\n            </button>\n          </div>\n          <div className=\"min-h-[29.5rem] px-4 py-5\">{current && <ResendCode code={current.code} />}</div>\n          {links.length > 0 && (\n            <div className=\"flex h-12 items-center gap-6 px-5\">\n              {links.map((l, i) => (\n                <a\n                  key={l.href}\n                  href={l.href}\n                  className={cn(\n                    \"items-center gap-1.5 text-xs text-muted-foreground transition-colors duration-150 hover:text-foreground [&_svg]:size-3.5\",\n                    i === 0 ? \"flex\" : \"hidden sm:flex\",\n                  )}\n                >\n                  {l.icon}\n                  {l.label}\n                </a>\n              ))}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-code",
+    "resend-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title before the accent"
+    },
+    {
+      "name": "accent",
+      "type": "string",
+      "required": false,
+      "description": "the last words, in the accent colour"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "fills the icon slot above the title; empty shows a placeholder tile"
+    },
+    {
+      "name": "sdks",
+      "type": "ResendSdk[]",
+      "required": true,
+      "description": "the SDK tiles"
+    },
+    {
+      "name": "copyLabel",
+      "type": "string",
+      "required": false,
+      "default": "Copy",
+      "description": "label of the copy button, for screen readers"
+    },
+    {
+      "name": "links",
+      "type": "{ label: string; href: string; icon?: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small links in the panel's footer (the first stays on phones)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9f98ce47e6f37601e8be129368fdf30450d064767e2c396d88fc8de7608dabe7"
+}

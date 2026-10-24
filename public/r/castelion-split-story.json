@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion split story",
+  "description": "A full-bleed painted backdrop band with a page-colour text panel standing over its middle third (over its middle on phones, with backdrop strips above and below), holding two stories: a big bold navy title and a justified paragraph each. Two tall, narrow cut-out slots float over the backdrop's left side. While you scroll the backdrop drifts up slowly and the two cut-outs climb much faster, a layered parallax; titles slide out of masks.",
+  "category": "features",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "story",
+    "panel",
+    "backdrop",
+    "parallax",
+    "layered",
+    "scrubbed",
+    "split-lines",
+    "navy",
+    "cream",
+    "poster",
+    "justified"
+  ],
+  "notes": [
+    "slots: backdrop (cover, full-bleed) and objects (two transparent cut-outs, e.g. vehicles; empty they are translucent page-colour panels)",
+    "scroll-driven CSS parallax; static and reduced-motion views show the layers in place"
+  ],
+  "entry": "castelion-split-story.tsx",
+  "source": "foundry",
+  "name": "castelion-split-story",
+  "files": [
+    {
+      "path": "castelion-split-story.css",
+      "content": "/* Layered parallax over the band's cover range: the backdrop drifts up a little, the two\n   cut-outs climb a lot (the left one most). Distances follow the original, smaller on phones. */\n.castelion-split-story-band {\n  view-timeline-name: --castelion-split-story;\n}\n.castelion-split-story-backdrop { --castelion-split-from: 93px; --castelion-split-to: -140px; }\n.castelion-split-story-object-0 { --castelion-split-from: 244px; --castelion-split-to: -153px; }\n.castelion-split-story-object-1 { --castelion-split-from: 316px; --castelion-split-to: -29px; }\n\n@media (min-width: 1024px) {\n  .castelion-split-story-backdrop { --castelion-split-from: 116px; --castelion-split-to: -175px; }\n  .castelion-split-story-object-0 { --castelion-split-from: 611px; --castelion-split-to: -382px; }\n  .castelion-split-story-object-1 { --castelion-split-from: 518px; --castelion-split-to: -47px; }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-split-story-backdrop,\n    .castelion-split-story-object {\n      animation: castelion-split-story-drift linear both;\n      animation-timeline: --castelion-split-story;\n      animation-range: cover 0% cover 100%;\n    }\n    .castelion-split-story-body {\n      animation: castelion-split-story-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 300px;\n    }\n  }\n}\n\n@keyframes castelion-split-story-drift {\n  from { transform: translateY(var(--castelion-split-from)); }\n  to { transform: translateY(var(--castelion-split-to)); }\n}\n@keyframes castelion-split-story-fade {\n  from { opacity: 0; transform: translateY(28px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-split-story.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport { CastelionPlaceholder } from \"@foundry/castelion-placeholder\";\nimport \"./castelion-split-story.css\";\n\nexport interface CastelionStory {\n  /** the story's title, one entry per desktop line */\n  title: string[];\n  /** the justified paragraph under it */\n  body: string;\n}\n\nexport interface CastelionSplitStoryProps {\n  /** the stories in the panel (two in the original) */\n  stories: CastelionStory[];\n  /** the full-bleed painting or photo behind the panel (empty: a dusk wash) */\n  backdrop?: ReactNode;\n  /** what the backdrop shows, for screen readers while the slot is empty */\n  backdropLabel?: string;\n  /** up to two transparent cut-outs floating over the backdrop's left side (empty: translucent panels) */\n  objects?: ReactNode[];\n  className?: string;\n}\n\n/** where each cut-out slot sits and how big it is (phones / desktop) */\nconst objectSlots = [\n  \"left-[30%] top-[-4%] w-[17%] aspect-[0.21] lg:left-[13%] lg:top-[4%] lg:w-[11.5%]\",\n  \"left-[56%] top-[4%] w-[14%] aspect-[0.31] lg:left-[30%] lg:top-[30%] lg:w-[8.5%]\",\n];\n\n/** Backdrop band with a page-colour story panel over its middle and two floating cut-outs. */\nexport function CastelionSplitStory({ stories, backdrop, backdropLabel, objects = [], className }: CastelionSplitStoryProps) {\n  return (\n    <section className={cn(\"bg-background pt-[10.5rem] lg:pt-36 lg:pb-[6.5rem]\", className)}>\n      <div className=\"castelion-split-story-band relative isolate overflow-clip pt-[9.25rem] pb-[7.875rem] lg:py-0\">\n        <div className=\"castelion-split-story-backdrop absolute inset-x-0 -top-48 -bottom-48 -z-20\">\n          <CastelionPlaceholder media={backdrop} tone=\"dusk\" label={backdropLabel} className=\"size-full\" />\n        </div>\n        {objectSlots.map((slot, i) => (\n          <div key={i} aria-hidden className={cn(\"castelion-split-story-object absolute -z-10\", `castelion-split-story-object-${i}`, slot)}>\n            {objects[i] ?? <div className=\"size-full rounded-lg border border-background/60 bg-background/25\" />}\n          </div>\n        ))}\n\n        <div className=\"bg-background px-gutter pt-12 pb-12 text-foreground lg:ml-[45.4%] lg:w-[30.6%] lg:px-[2.625rem] lg:pt-[2.125rem] lg:pb-8\">\n          {stories.map((story, i) => (\n            <div key={i} className={cn(i > 0 && \"mt-9 lg:mt-[4.25rem]\")}>\n              <CastelionLines\n                as=\"h2\"\n                lines={story.title}\n                className=\"font-display text-[clamp(1.8125rem,1.279rem+2.19vw,3.25rem)]/[1.1] font-bold tracking-[0.01em]\"\n              />\n              <p className=\"castelion-split-story-body mt-7 text-justify text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-medium\">\n                {story.body}\n              </p>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-lines",
+    "castelion-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "stories",
+      "type": "CastelionStory[]",
+      "required": true,
+      "description": "the stories in the panel (two in the original)"
+    },
+    {
+      "name": "backdrop",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed painting or photo behind the panel (empty: a dusk wash)"
+    },
+    {
+      "name": "backdropLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the backdrop shows, for screen readers while the slot is empty"
+    },
+    {
+      "name": "objects",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to two transparent cut-outs floating over the backdrop's left side (empty: translucent panels)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "80a5a4b5a440d60ffb26b62680438d4e158aca522093c8af1ccea81a8940c18c"
+}

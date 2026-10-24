@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Form Energy header",
+  "description": "A transparent header laid over a dark hero: a white stacked wordmark at the left and a row of uppercase Roboto Mono links with small solid carets at the right, each turning orange on hover over 0.4s and dropping a black submenu panel. On phones a hamburger opens the whole menu in a black panel under the bar.",
+  "category": "header",
+  "site": "formenergy",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "dark",
+    "overlay",
+    "transparent",
+    "mono",
+    "uppercase",
+    "dropdown",
+    "hover",
+    "orange"
+  ],
+  "notes": [
+    "a .dark scope: white text and a black menu panel under any theme",
+    "overlay (default) sits absolutely at the top of its positioned parent and scrolls away with the page; overlay={false} renders it as a black bar in the flow",
+    "dropdowns open on hover and keyboard focus (CSS); the phone menu is a <details> toggle, so no JavaScript"
+  ],
+  "entry": "formenergy-header.tsx",
+  "source": "foundry",
+  "name": "formenergy-header",
+  "files": [
+    {
+      "path": "formenergy-header.tsx",
+      "content": "import { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FormenergyWordmark } from \"@foundry/formenergy-wordmark\";\n\nexport interface FormenergyNavLink {\n  /** link text (shown uppercase) */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** links in its dropdown; a small caret shows when there are any */\n  children?: { label: string; href: string }[];\n}\n\nexport interface FormenergyHeaderProps {\n  /** wordmark: the larger first word */\n  brand: string;\n  /** wordmark: the smaller tracked word under it */\n  brandSuffix?: string;\n  /** where the wordmark links */\n  homeHref?: string;\n  /** the main links, left to right */\n  links: FormenergyNavLink[];\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  /** true: transparent and absolutely placed over the hero · false: a black bar in the flow */\n  overlay?: boolean;\n  className?: string;\n}\n\nfunction Caret() {\n  return (\n    <span\n      aria-hidden\n      className=\"inline-block size-0 border-x-[4.5px] border-t-[5px] border-x-transparent border-t-current\"\n    />\n  );\n}\n\n/** Transparent overlay header with mono uppercase links, hover dropdowns and a phone menu. */\nexport function FormenergyHeader({\n  brand,\n  brandSuffix,\n  homeHref = \"/\",\n  links,\n  menuLabel,\n  overlay = true,\n  className,\n}: FormenergyHeaderProps) {\n  return (\n    <header\n      className={cn(\n        \"dark z-30 text-foreground\",\n        overlay ? \"absolute inset-x-0 top-0\" : \"relative bg-background\",\n        className,\n      )}\n    >\n      <div className=\"flex items-center justify-between px-5 pt-[1.9rem] pb-4 lg:pt-[2.6rem] lg:pr-[2.8rem] lg:pl-[1.875rem] lg:pb-6\">\n        <FormenergyWordmark\n          name={brand}\n          suffix={brandSuffix}\n          href={homeHref}\n          label={brand}\n          className=\"text-[1.45rem] lg:text-[1.8rem]\"\n        />\n\n        {/* desktop links */}\n        <nav className=\"hidden lg:block\">\n          <ul className=\"flex items-center gap-8\">\n            {links.map((link, i) => (\n              <li key={link.label} className=\"group relative\">\n                <a\n                  href={link.href}\n                  className=\"flex items-center gap-2.5 py-3 font-mono text-sm leading-none font-medium tracking-[0.07em] uppercase transition-colors duration-400 ease-[ease] group-focus-within:text-primary group-hover:text-primary motion-reduce:transition-none\"\n                >\n                  {link.label}\n                  {link.children && link.children.length > 0 && <Caret />}\n                </a>\n                {link.children && link.children.length > 0 && (\n                  <ul\n                    className={cn(\n                      \"invisible absolute top-full min-w-56 bg-background py-2 opacity-0 transition-opacity duration-300 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\",\n                      // the last two open leftwards so they never stick out past the window edge\n                      i >= links.length - 2 ? \"right-0\" : \"left-0\",\n                    )}\n                  >\n                    {link.children.map((child) => (\n                      <li key={child.label}>\n                        <a\n                          href={child.href}\n                          className=\"block px-5 py-2.5 font-mono text-[0.8125rem] leading-tight font-medium tracking-[0.04em] transition-colors duration-300 hover:text-primary focus-visible:text-primary\"\n                        >\n                          {child.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                )}\n              </li>\n            ))}\n          </ul>\n        </nav>\n\n        {/* phone menu */}\n        <details className=\"group/menu lg:hidden\">\n          <summary\n            aria-label={menuLabel}\n            className=\"flex size-10 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\"\n          >\n            <Menu aria-hidden strokeWidth={1.5} className=\"size-8 group-open/menu:hidden\" />\n            <X aria-hidden strokeWidth={1.5} className=\"hidden size-8 group-open/menu:block\" />\n          </summary>\n          <nav className=\"absolute inset-x-0 top-full bg-background px-5 pt-2 pb-6\">\n            <ul>\n              {links.map((link) => (\n                <li key={link.label} className=\"border-b border-border\">\n                  <a\n                    href={link.href}\n                    className=\"block py-3.5 font-mono text-sm leading-none font-medium tracking-[0.07em] uppercase transition-colors duration-300 hover:text-primary\"\n                  >\n                    {link.label}\n                  </a>\n                  {link.children && link.children.length > 0 && (\n                    <ul className=\"pb-3 pl-4\">\n                      {link.children.map((child) => (\n                        <li key={child.label}>\n                          <a\n                            href={child.href}\n                            className=\"block py-1.5 font-mono text-[0.8125rem] leading-tight text-muted-foreground transition-colors duration-300 hover:text-primary\"\n                          >\n                            {child.label}\n                          </a>\n                        </li>\n                      ))}\n                    </ul>\n                  )}\n                </li>\n              ))}\n            </ul>\n          </nav>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "formenergy-wordmark",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "wordmark: the larger first word"
+    },
+    {
+      "name": "brandSuffix",
+      "type": "string",
+      "required": false,
+      "description": "wordmark: the smaller tracked word under it"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "links",
+      "type": "FormenergyNavLink[]",
+      "required": true,
+      "description": "the main links, left to right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "overlay",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "true: transparent and absolutely placed over the hero · false: a black bar in the flow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "928c0af4bc409b03bb10b9ec2b3b8620432e0b5f5adf03b76eb48bdc663f95c7"
+}

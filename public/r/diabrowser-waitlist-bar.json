@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Dia Browser waitlist bar",
+  "description": "A cream arc rising from the bottom edge, a very wide ellipse with a faint upward shadow, carrying a long black pill CTA and one quiet line of small print under it. 200px tall on phones (full-width button), 152px from lg (443px button).",
+  "category": "cta",
+  "site": "diabrowser",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "arc",
+    "curve",
+    "pill",
+    "bottom-bar",
+    "cream",
+    "minimal"
+  ],
+  "notes": [
+    "the arc is filled with the page background, so put it over something else (a hero photo, a docked page) for the curve to show",
+    "buttonLayers wraps the button in extra divs for scroll animations (see diabrowser-waitlist-dock)"
+  ],
+  "entry": "diabrowser-waitlist-bar.tsx",
+  "source": "foundry",
+  "name": "diabrowser-waitlist-bar",
+  "files": [
+    {
+      "path": "diabrowser-waitlist-bar.css",
+      "content": "/* The cream arc: a very wide ellipse rising from below, drawn as a radial gradient so nothing\n   hangs below the bar (a real ellipse would make the page taller when the bar is docked). Its\n   horizontal radius is the bar's width, so the curve's depth stays the same on any screen. */\n.diabrowser-waitlist-bar-arc {\n  background: radial-gradient(100% 270px at 50% 270px, var(--background) calc(100% - 1.5px), transparent 100%);\n  filter: drop-shadow(0 -6px 22px color-mix(in oklab, var(--foreground) 7%, transparent));\n  /* keep the shadow above the curve only: none along the bar's flat bottom edge */\n  clip-path: inset(-80px 0 0 0);\n}\n\n@media (min-width: 64rem) {\n  .diabrowser-waitlist-bar-arc {\n    background: radial-gradient(100% 1060px at 50% 1060px, var(--background) calc(100% - 1.5px), transparent 100%);\n  }\n}\n"
+    },
+    {
+      "path": "diabrowser-waitlist-bar.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { DiabrowserButton } from \"@foundry/diabrowser-button\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./diabrowser-waitlist-bar.css\";\n\nexport interface DiabrowserWaitlistBarProps {\n  /** the black CTA; phoneLabel replaces the label below lg (the original asks for a download link on phones) */\n  cta: { label: string; href: string; phoneLabel?: string };\n  /** one quiet line under the button (platforms) */\n  note?: ReactNode;\n  /** class names of wrappers around the button, outermost first (the dock animates these) */\n  buttonLayers?: string[];\n  className?: string;\n}\n\n/** The cream arc that carries the waitlist CTA: 200px tall on phones, 152px from lg. */\nexport function DiabrowserWaitlistBar({ cta, note, buttonLayers = [], className }: DiabrowserWaitlistBarProps) {\n  let button: ReactNode = (\n    <DiabrowserButton size=\"lg\" href={cta.href} className=\"w-full lg:w-[443px]\">\n      {cta.phoneLabel ? (\n        <>\n          <span className=\"lg:hidden\">{cta.phoneLabel}</span>\n          <span className=\"max-lg:hidden\">{cta.label}</span>\n        </>\n      ) : (\n        cta.label\n      )}\n    </DiabrowserButton>\n  );\n  // wrap from the inside out, so the first class name ends up outermost\n  for (const layer of [...buttonLayers].reverse()) {\n    button = <div className={cn(\"w-full lg:w-auto\", layer)}>{button}</div>;\n  }\n\n  return (\n    <div className={cn(\"relative h-[200px] w-full lg:h-[152px]\", className)}>\n      <div aria-hidden className=\"diabrowser-waitlist-bar-arc pointer-events-none absolute inset-0\" />\n      <div className=\"relative flex flex-col items-center px-4 pt-[74px] lg:pt-[42px]\">\n        {button}\n        {note && <p className=\"mt-[13px] text-[13px] leading-4 tracking-[0.01em] text-foreground/55\">{note}</p>}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "diabrowser-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; phoneLabel?: string | undefined; }",
+      "required": true,
+      "description": "the black CTA; phoneLabel replaces the label below lg (the original asks for a download link on phones)"
+    },
+    {
+      "name": "note",
+      "type": "ReactNode",
+      "required": false,
+      "description": "one quiet line under the button (platforms)"
+    },
+    {
+      "name": "buttonLayers",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "class names of wrappers around the button, outermost first (the dock animates these)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9ec63d894b72704d3c2c3a4a1cbb7d9e3ed2f47bfe95dff7a61bba39976dd8ce"
+}

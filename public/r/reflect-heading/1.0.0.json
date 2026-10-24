@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Reflect section heading",
+  "description": "The centred stack that opens every Reflect section: a pill badge, a big weight-500 heading filled with a top-to-bottom ink-to-70% gradient, a muted 16px lead and an optional row of buttons. Three sizes: hero (44→72px), section (40→56px) and display (40→72px).",
+  "category": "heading",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "section-title",
+    "gradient-text",
+    "centred",
+    "dark",
+    "badge"
+  ],
+  "notes": [
+    "a \\n in the title is a line break on desktop only; phones wrap naturally",
+    "children go under the lead (buttons); they wrap and stack on narrow screens"
+  ],
+  "entry": "reflect-heading.tsx",
+  "source": "foundry",
+  "name": "reflect-heading",
+  "files": [
+    {
+      "path": "reflect-heading.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ReflectBadge } from \"@foundry/reflect-badge\";\n\nexport interface ReflectHeadingProps {\n  /** the pill above the heading */\n  eyebrow?: ReactNode;\n  /** a small icon inside the pill */\n  eyebrowIcon?: ReactNode;\n  /** makes the pill a link */\n  eyebrowHref?: string;\n  /** the heading; \"\\n\" breaks the line on desktop only */\n  title: string;\n  /** the muted paragraph under the heading; \"\\n\" breaks the line on desktop only */\n  lead?: string;\n  /** h1 for the page's opening heading, h2 elsewhere */\n  as?: \"h1\" | \"h2\";\n  /** hero: 44→72px · section: 40→56px · display: 40→72px */\n  size?: \"hero\" | \"section\" | \"display\";\n  /** buttons (or anything) under the lead */\n  children?: ReactNode;\n  /** width of the lead, e.g. \"max-w-[30rem]\" */\n  leadClassName?: string;\n  className?: string;\n}\n\nconst sizes = {\n  hero: \"text-[2.75rem]/[3.25rem] lg:text-[4.5rem]/[5rem]\",\n  section: \"text-[2.5rem]/[3rem] lg:text-[3.5rem]/[4rem]\",\n  display: \"text-[2.5rem]/[3rem] lg:text-[4.5rem]/[5rem]\",\n};\n\n/** A desktop-only line break wherever the text has \"\\n\". */\nfunction lines(text: string) {\n  return text.split(\"\\n\").map((part, i) => (\n    <Fragment key={i}>\n      {i > 0 && <br className=\"max-lg:hidden\" />}\n      {i > 0 && \" \"}\n      {part}\n    </Fragment>\n  ));\n}\n\n/** Badge, gradient heading, lead, actions: centred. */\nexport function ReflectHeading({\n  eyebrow,\n  eyebrowIcon,\n  eyebrowHref,\n  title,\n  lead,\n  as: Tag = \"h2\",\n  size = \"section\",\n  children,\n  leadClassName,\n  className,\n}: ReflectHeadingProps) {\n  return (\n    <div className={cn(\"relative flex flex-col items-center text-center\", className)}>\n      {eyebrow && (\n        <ReflectBadge icon={eyebrowIcon} href={eyebrowHref} className=\"mb-4\">\n          {eyebrow}\n        </ReflectBadge>\n      )}\n      <Tag\n        className={cn(\n          sizes[size],\n          \"max-w-full bg-[linear-gradient(180deg,var(--foreground)_15%,color-mix(in_oklab,var(--foreground)_70%,transparent))] bg-clip-text pb-1 font-display font-[560] text-balance text-transparent\",\n        )}\n      >\n        {lines(title)}\n      </Tag>\n      {lead && (\n        <p className={cn(\"mt-4 max-w-[34rem] text-base/6 text-pretty text-muted-foreground\", leadClassName)}>\n          {lines(lead)}\n        </p>\n      )}\n      {children && <div className=\"mt-8 flex flex-wrap items-center justify-center gap-3\">{children}</div>}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "reflect-badge"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the pill above the heading"
+    },
+    {
+      "name": "eyebrowIcon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon inside the pill"
+    },
+    {
+      "name": "eyebrowHref",
+      "type": "string",
+      "required": false,
+      "description": "makes the pill a link"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading; \"\\n\" breaks the line on desktop only"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "the muted paragraph under the heading; \"\\n\" breaks the line on desktop only"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "h1 for the page's opening heading, h2 elsewhere"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "section",
+      "description": "hero: 44→72px · section: 40→56px · display: 40→72px"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "buttons (or anything) under the lead"
+    },
+    {
+      "name": "leadClassName",
+      "type": "string",
+      "required": false,
+      "description": "width of the lead, e.g. \"max-w-[30rem]\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9af8dd258b0b88577e18b6862759cb3c818326abefcb9f4d4dca62ff730e0aff"
+}

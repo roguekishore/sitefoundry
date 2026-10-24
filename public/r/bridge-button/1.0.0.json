@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Bridge button",
+  "description": "Flat, almost-square buttons with a small up-right arrow: a sky-blue fill that dims slightly on hover, a white button with a 1px ink outline that turns near-white, a see-through outlined one that takes a faint grey wash, and a plain text link whose underline grows from the left on hover.",
+  "category": "button",
+  "site": "bridge",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "flat",
+    "minimal",
+    "outline",
+    "link",
+    "hover",
+    "underline"
+  ],
+  "notes": [
+    "fills fade over 0.25s ease; the link underline grows over 0.4s on an ease-out-quart curve",
+    "the solid hover darkens the primary token with brightness(0.9), so it follows any theme"
+  ],
+  "entry": "bridge-button.tsx",
+  "source": "foundry",
+  "name": "bridge-button",
+  "files": [
+    {
+      "path": "bridge-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowUpRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface BridgeButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /**\n   * solid: sky fill, a touch darker on hover · outline: page-coloured with an ink outline ·\n   * ghost: see-through with an ink outline (over backdrops, e.g. the header) · link: plain\n   * text whose underline grows on hover\n   */\n  variant?: \"solid\" | \"outline\" | \"ghost\" | \"link\";\n  /** show the small up-right arrow after the label (on by default) */\n  arrow?: boolean;\n  /** the button's type when it isn't a link */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst fills = {\n  solid: \"h-10 bg-primary px-4 text-primary-foreground transition-[filter] hover:brightness-90\",\n  outline: \"h-[2.6875rem] border border-foreground bg-background px-[0.8125rem] text-foreground transition-colors hover:bg-secondary\",\n  ghost: \"h-[2.6875rem] border border-foreground bg-transparent px-4 text-foreground transition-colors hover:bg-foreground/5\",\n};\n\n/** Bridge's flat button and underline link. */\nexport function BridgeButton({ children, href, variant = \"solid\", arrow = true, type = \"button\", className }: BridgeButtonProps) {\n  const isLink = variant === \"link\";\n  const classes = cn(\n    \"group/btn inline-flex shrink-0 items-center gap-1 text-[0.9375rem]/none tracking-[-0.02em] whitespace-nowrap\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    isLink\n      ? \"relative pb-1 text-foreground\"\n      : cn(\"justify-center rounded-sm duration-250 ease-[ease] motion-reduce:transition-none\", fills[variant]),\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {arrow && <ArrowUpRight aria-hidden className=\"size-3.5 shrink-0\" strokeWidth={1.5} />}\n      {isLink && (\n        <span\n          aria-hidden\n          className=\"absolute bottom-0 left-0 h-px w-0 bg-current transition-[width] duration-400 ease-[cubic-bezier(0.165,0.84,0.44,1)] group-hover/btn:w-full motion-reduce:transition-none\"\n        />\n      )}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: sky fill, a touch darker on hover · outline: page-coloured with an ink outline ·\nghost: see-through with an ink outline (over backdrops, e.g. the header) · link: plain\ntext whose underline grows on hover"
+    },
+    {
+      "name": "arrow",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "show the small up-right arrow after the label (on by default)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "2cbebcf3132d3a0f81c137cadf671245b54609cbe35d2a0b0661fc3a20a20eee"
+}

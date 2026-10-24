@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit logo grid",
+  "description": "A calm customer grid on white: six wordmarks across two rows on desktop, three across four rows on phones, each cell with a tiny grey chevron dot in its corner when it links to a story. Some cells quietly hand over to a second name and back, blurring out and scaling in from 80%, staggered across the grid. Hovering a cell tints it and turns the dot white.",
+  "category": "logos",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "light",
+    "minimal",
+    "grid",
+    "crossfade",
+    "blur",
+    "loop"
+  ],
+  "notes": [
+    "names are typeset in the theme's fonts (bold, regular, caps, italic, mono) in place of real logos",
+    "CSS only; with reduced motion each cell keeps its first name"
+  ],
+  "entry": "unit-logos.tsx",
+  "source": "foundry",
+  "name": "unit-logos",
+  "files": [
+    {
+      "path": "unit-logos.css",
+      "content": "/* A cell with a second name hands over to it and back on a slow loop: the leaving name blurs\n   and fades, the arriving one fades in from 80% scale with a blur clearing. The delay\n   (set inline per cell) staggers the swaps across the grid. */\n.unit-logos-a,\n.unit-logos-b {\n  animation: 12s cubic-bezier(0.075, 0.82, 0.165, 1) infinite;\n  animation-delay: var(--unit-logos-delay, 0s);\n}\n.unit-logos-a {\n  animation-name: unit-logos-leave;\n}\n.unit-logos-b {\n  animation-name: unit-logos-arrive;\n}\n\n@keyframes unit-logos-leave {\n  0%, 42% { opacity: 1; filter: blur(0); transform: scale(1); }\n  50%, 92% { opacity: 0; filter: blur(6px); transform: scale(0.8); }\n  100% { opacity: 1; filter: blur(0); transform: scale(1); }\n}\n@keyframes unit-logos-arrive {\n  0%, 42% { opacity: 0; filter: blur(6px); transform: scale(0.8); }\n  50%, 92% { opacity: 1; filter: blur(0); transform: scale(1); }\n  100% { opacity: 0; filter: blur(6px); transform: scale(0.8); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .unit-logos-a { animation: none; }\n  .unit-logos-b { display: none; }\n}\n"
+    },
+    {
+      "path": "unit-logos.tsx",
+      "content": "import type { CSSProperties } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./unit-logos.css\";\n\n/** How a customer's name is set, standing in for the variety of real logos. */\nexport type UnitLogoStyle = \"bold\" | \"regular\" | \"caps\" | \"italic\" | \"mono\";\n\nexport interface UnitLogo {\n  /** the customer's name, shown as a typeset wordmark */\n  name: string;\n  /** a second name that takes turns with the first in the same cell */\n  next?: string;\n  /** how the name is set */\n  style?: UnitLogoStyle;\n  /** a case study link: shows the small chevron dot in the cell's corner */\n  href?: string;\n}\n\nexport interface UnitLogosProps {\n  /** twelve cells read best: 6×2 on desktop, 3×4 on phones */\n  logos: UnitLogo[];\n  /** label for the grid (screen readers) */\n  label?: string;\n  className?: string;\n}\n\nconst styles: Record<UnitLogoStyle, string> = {\n  bold: \"font-bold tracking-[-0.03em]\",\n  regular: \"font-normal tracking-[-0.02em]\",\n  caps: \"font-bold uppercase tracking-[0.02em] text-[0.85em]\",\n  italic: \"font-semibold italic tracking-[-0.03em]\",\n  mono: \"font-mono font-normal tracking-[-0.04em] text-[0.9em]\",\n};\n\n/** A quiet grid of customer wordmarks; some cells swap names in place with a blur. */\nexport function UnitLogos({ logos, label, className }: UnitLogosProps) {\n  return (\n    <section aria-label={label} className={cn(\"bg-background font-sans text-foreground\", className)}>\n      <ul className=\"mx-auto grid max-w-page grid-cols-3 gap-y-2.5 px-[calc(var(--page-gutter)-0.5rem)] pt-11 pb-6 lg:grid-cols-6 lg:gap-y-6 lg:px-[calc(var(--page-gutter)-1.25rem)] lg:pt-[3.25rem] lg:pb-10\">\n        {logos.map((logo, i) => {\n          const set = cn(\"block text-[0.8125rem] leading-none whitespace-nowrap lg:text-[1.25rem]\", styles[logo.style ?? \"bold\"]);\n          const Cell = logo.href ? \"a\" : \"div\";\n          return (\n            <li key={`${logo.name}-${i}`}>\n              <Cell\n                {...(logo.href ? { href: logo.href } : {})}\n                className=\"group/logo relative flex h-8 items-center justify-center rounded-lg transition-colors duration-[325ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] hover:bg-foreground/5 motion-reduce:transition-none lg:h-12\"\n              >\n                <span className=\"relative grid place-items-center\" style={{ \"--unit-logos-delay\": `${-((i * 7) % 12) * 0.85}s` } as CSSProperties}>\n                  <span className={cn(set, logo.next && \"unit-logos-a\", \"col-start-1 row-start-1\")}>{logo.name}</span>\n                  {logo.next && (\n                    <span aria-hidden className={cn(set, \"unit-logos-b col-start-1 row-start-1\")}>\n                      {logo.next}\n                    </span>\n                  )}\n                </span>\n                {logo.href && (\n                  <span\n                    aria-hidden\n                    className=\"absolute top-0.5 right-3 flex size-3 items-center justify-center rounded-full bg-foreground/10 transition-colors duration-[325ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] group-hover/logo:bg-background motion-reduce:transition-none lg:top-1 lg:right-8\"\n                  >\n                    <ChevronRight className=\"size-2\" strokeWidth={2.5} />\n                  </span>\n                )}\n              </Cell>\n            </li>\n          );\n        })}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "UnitLogo[]",
+      "required": true,
+      "description": "twelve cells read best: 6×2 on desktop, 3×4 on phones"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "label for the grid (screen readers)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4e53faa36acd41f205a4d8a37f84548461d332063439d3940912807782b6e2b4"
+}

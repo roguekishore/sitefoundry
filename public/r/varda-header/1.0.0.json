@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Varda header",
+  "description": "A fixed header drawn as cells of the hero's grid. Desktop: a 72px row inside the gutter frame, six equal cells (icon + wide wordmark, two empty see-through cells, two labelled link cells with line icons, and Menu with a hamburger) in off-white hairlines. Phones: the right third of the hero's top row, a tall logo cell over a menu cell. After half a screen of scroll it collapses in 0.5s to two solid squares (icon, hamburger) as the labels fade. Cells fill pale with navy text on hover; Menu opens a full-screen list.",
+  "category": "header",
+  "site": "varda",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "grid",
+    "hairline",
+    "square",
+    "collapse",
+    "scroll",
+    "dark",
+    "navy",
+    "hover"
+  ],
+  "notes": [
+    "fixed and out of the flow: the page's first section runs under it (varda-hero leaves room for it)",
+    "needs JavaScript (hydrate: load) for the collapse and the menu; static HTML shows the full header",
+    "best on dark themes: the cells use the page colour with foreground hairlines"
+  ],
+  "entry": "varda-header.tsx",
+  "hydrate": "load",
+  "source": "foundry",
+  "name": "varda-header",
+  "files": [
+    {
+      "path": "varda-header.css",
+      "content": "/* One transition list for every cell: size and fades take 0.5s, hover colours 0.3s, all on the\n   original's ease-out curve. Kept here because Tailwind's transition utilities overwrite each other. */\n.varda-header {\n  --varda-header-ease: cubic-bezier(0.165, 0.84, 0.44, 1);\n}\n.varda-header-cell {\n  transition:\n    height 0.5s var(--varda-header-ease),\n    width 0.5s var(--varda-header-ease),\n    opacity 0.5s var(--varda-header-ease),\n    visibility 0.5s,\n    border-color 0.5s var(--varda-header-ease),\n    background-color 0.3s var(--varda-header-ease),\n    color 0.3s var(--varda-header-ease);\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .varda-header-cell { transition: none; }\n}\n"
+    },
+    {
+      "path": "varda-header.tsx",
+      "content": "import { useEffect, useState, type ReactNode } from \"react\";\nimport { ArrowUpRight, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./varda-header.css\";\n\nexport interface VardaHeaderAction {\n  /** the cell's label */\n  label: string;\n  href: string;\n  /** a line icon at the cell's right (e.g. a lucide icon) */\n  icon: ReactNode;\n}\n\nexport interface VardaHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface VardaHeaderProps {\n  /** the wordmark, set in wide capitals */\n  name: string;\n  /** the brand glyph shown in the logo cell (stays when the header collapses) */\n  icon: ReactNode;\n  /** where the logo cell links to */\n  homeHref?: string;\n  /** the two labelled link cells on desktop (e.g. jobs and contact) */\n  actions: VardaHeaderAction[];\n  /** label of the menu cell */\n  menuLabel: string;\n  /** accessible name of the menu button while the menu is open */\n  closeLabel: string;\n  /** the links listed in the full-screen menu */\n  menu: VardaHeaderLink[];\n  /** pixels scrolled before the header collapses (default: half the window height) */\n  collapseAt?: number;\n  className?: string;\n}\n\n/** pale fill with navy text on hover (timing in varda-header.css) */\nconst hover = \"varda-header-cell hover:bg-accent hover:text-accent-foreground\";\n/** the labels that fade away when the header collapses */\nconst fades = \"varda-header-cell group-data-[compact=true]/header:opacity-0\";\n\n/** Fixed grid-cell header that collapses to two squares after the first screen. */\nexport function VardaHeader({\n  name,\n  icon,\n  homeHref = \"#\",\n  actions,\n  menuLabel,\n  closeLabel,\n  menu,\n  collapseAt,\n  className,\n}: VardaHeaderProps) {\n  const [scrolled, setScrolled] = useState(false);\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    const check = () => setScrolled(window.scrollY > (collapseAt ?? window.innerHeight * 0.5));\n    check();\n    window.addEventListener(\"scroll\", check, { passive: true });\n    window.addEventListener(\"resize\", check);\n    return () => {\n      window.removeEventListener(\"scroll\", check);\n      window.removeEventListener(\"resize\", check);\n    };\n  }, [collapseAt]);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  const compact = scrolled || open;\n\n  return (\n    <header\n      data-compact={compact}\n      className={cn(\"varda-header group/header pointer-events-none fixed inset-x-0 top-0 z-40 text-foreground lg:px-gutter lg:pt-gutter\", className)}\n    >\n      {/* full-screen menu, behind the cells */}\n      <nav\n        aria-hidden={!open}\n        className={cn(\n          \"varda-header-cell pointer-events-auto fixed inset-0 -z-10 overflow-y-auto bg-background px-gutter pt-36 pb-12 lg:pt-40\",\n          open ? \"visible opacity-100\" : \"invisible opacity-0\",\n        )}\n      >\n        <ul className=\"mx-auto max-w-page border-t border-border\">\n          {menu.map((link) => (\n            <li key={link.label} className=\"border-b border-border\">\n              <a\n                href={link.href}\n                tabIndex={open ? undefined : -1}\n                onClick={() => setOpen(false)}\n                className={cn(\"flex items-center justify-between gap-4 px-gutter py-4 font-display text-[2rem]/[1.15] font-medium tracking-[-0.02em] lg:py-6 lg:text-[3.42rem]/[1.15]\", hover)}\n              >\n                {link.label}\n                <ArrowUpRight aria-hidden strokeWidth={1.75} className=\"size-6 shrink-0 lg:size-8\" />\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n\n      <div\n        className={cn(\n          \"varda-header-cell relative ml-auto flex max-w-page flex-col border-l border-border max-lg:w-1/3 lg:mx-auto lg:flex-row lg:border-l-0\",\n          \"max-lg:group-data-[compact=true]/header:w-16 max-lg:group-data-[compact=true]/header:bg-background\",\n        )}\n      >\n        {/* logo cell: icon top right and wordmark bottom left on phones, side by side on desktop */}\n        <a\n          href={homeHref}\n          aria-label={name}\n          className={cn(\n            \"pointer-events-auto relative h-[9.6875rem] shrink-0 overflow-clip border-b border-border lg:flex lg:h-18 lg:w-1/6 lg:items-center lg:gap-3 lg:border lg:border-foreground lg:bg-background lg:px-4.5\",\n            \"max-lg:group-data-[compact=true]/header:h-16 lg:group-data-[compact=true]/header:w-18\",\n            hover,\n          )}\n        >\n          <span aria-hidden className=\"absolute top-3 right-3.5 grid size-9 shrink-0 place-items-center lg:static [&_svg]:size-9\">\n            {icon}\n          </span>\n          <span\n            aria-hidden\n            className={cn(\"absolute bottom-3 left-3 text-base/none font-extrabold tracking-[0.06em] uppercase lg:static lg:text-[clamp(1.125rem,1.67vw,1.5rem)]\", fades)}\n          >\n            {name}\n          </span>\n        </a>\n\n        {/* see-through spacer cells (desktop) */}\n        <span\n          aria-hidden\n          className=\"varda-header-cell hidden flex-1 border-y border-foreground lg:block group-data-[compact=true]/header:border-transparent\"\n        />\n\n        {actions.map((action) => (\n          <a\n            key={action.label}\n            href={action.href}\n            tabIndex={compact ? -1 : undefined}\n            className={cn(\n              \"pointer-events-auto hidden h-18 w-1/6 items-center justify-between gap-3 border-y border-l border-foreground bg-background px-3.5 text-[1.0625rem]/none lg:flex [&_svg]:size-9 [&_svg]:shrink-0 [&_svg]:stroke-[1.25]\",\n              \"group-data-[compact=true]/header:invisible group-data-[compact=true]/header:opacity-0\",\n              hover,\n            )}\n          >\n            {action.label}\n            <span aria-hidden>{action.icon}</span>\n          </a>\n        ))}\n\n        {/* menu cell: hamburger top right and label bottom left on phones, label then icon on desktop */}\n        <button\n          type=\"button\"\n          aria-expanded={open}\n          aria-label={open ? closeLabel : menuLabel}\n          onClick={() => setOpen((o) => !o)}\n          className={cn(\n            \"pointer-events-auto relative h-[6.5625rem] shrink-0 cursor-pointer overflow-clip border-b border-border text-left lg:flex lg:h-18 lg:w-1/6 lg:flex-row-reverse lg:items-center lg:justify-between lg:border lg:border-foreground lg:bg-background lg:pr-4 lg:pl-3.5\",\n            \"max-lg:group-data-[compact=true]/header:h-16 lg:group-data-[compact=true]/header:w-18\",\n            hover,\n          )}\n        >\n          <span aria-hidden className=\"absolute top-4 right-4 lg:static\">\n            {open ? <X strokeWidth={2} className=\"size-8\" /> : <Menu strokeWidth={2.25} className=\"size-8\" />}\n          </span>\n          <span aria-hidden className={cn(\"absolute bottom-3 left-3 text-base/none lg:static lg:text-[1.0625rem]/none\", fades)}>\n            {menuLabel}\n          </span>\n        </button>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the wordmark, set in wide capitals"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the brand glyph shown in the logo cell (stays when the header collapses)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the logo cell links to"
+    },
+    {
+      "name": "actions",
+      "type": "VardaHeaderAction[]",
+      "required": true,
+      "description": "the two labelled link cells on desktop (e.g. jobs and contact)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "label of the menu cell"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the menu button while the menu is open"
+    },
+    {
+      "name": "menu",
+      "type": "VardaHeaderLink[]",
+      "required": true,
+      "description": "the links listed in the full-screen menu"
+    },
+    {
+      "name": "collapseAt",
+      "type": "number",
+      "required": false,
+      "description": "pixels scrolled before the header collapses (default: half the window height)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a8e85124156c60c2f3ecef73efb6c385866781d530d0fd942ec123f872de3794"
+}

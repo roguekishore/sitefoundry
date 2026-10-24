@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Arc header",
+  "description": "A 100px pinned header on the hero's pale grey: a bold lowercase wordmark left, three medium-weight warm-grey links centred, a log-in link and a 2px outlined button right. Over the first 100px of scroll it turns to the page colour and gains a wide soft shadow; links darken and the button floods with the primary colour on hover. On phones: wordmark and a menu icon that opens a full-width panel.",
+  "category": "header",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "light",
+    "minimal",
+    "scrubbed",
+    "shadow",
+    "hover",
+    "fintech"
+  ],
+  "notes": [
+    "sticks to the top of the page (position: sticky), so it needs to sit directly in the page container",
+    "the grey-to-white change follows the page scroll (CSS scroll timeline); without support or with reduced motion it stays grey",
+    "the phone menu is a native <details>; no JavaScript"
+  ],
+  "entry": "arc-header.tsx",
+  "source": "foundry",
+  "name": "arc-header",
+  "files": [
+    {
+      "path": "arc-header.css",
+      "content": "/* Over the first 100px of page scroll the pinned header goes from the hero's grey to the page\n   colour and picks up a wide, faint shadow, as the original does once you scroll. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .arc-header {\n      animation: arc-header-settle linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 100px;\n    }\n  }\n}\n\n@keyframes arc-header-settle {\n  from {\n    background-color: var(--muted);\n    box-shadow: 0 0 0 transparent;\n  }\n  to {\n    background-color: var(--background);\n    box-shadow: 0 10px 60px color-mix(in oklab, var(--foreground) 9%, transparent);\n  }\n}\n"
+    },
+    {
+      "path": "arc-header.tsx",
+      "content": "import { Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ArcButton } from \"@foundry/arc-button\";\nimport \"./arc-header.css\";\n\nexport interface ArcHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface ArcHeaderProps {\n  /** the wordmark, set bold in the display face */\n  brand: { name: string; href: string };\n  /** the centred nav links */\n  links: ArcHeaderLink[];\n  /** the plain link on the right, e.g. \"Log in\" */\n  login: ArcHeaderLink;\n  /** the outlined button on the right */\n  cta: ArcHeaderLink;\n  /** screen-reader label for the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/** Arc's pinned header: wordmark left, links centred, a log-in link and an outlined button right. */\nexport function ArcHeader({ brand, links, login, cta, menuLabel, className }: ArcHeaderProps) {\n  const linkClass =\n    \"text-base font-medium text-muted-foreground transition-colors duration-200 ease-[ease] hover:text-foreground motion-reduce:transition-none\";\n  return (\n    <header className={cn(\"arc-header sticky top-0 z-40 bg-muted text-foreground\", className)}>\n      <nav className=\"relative mx-auto grid h-[4.5rem] max-w-page grid-cols-[1fr_auto] items-center px-gutter lg:h-[6.25rem] lg:grid-cols-[1fr_auto_1fr]\">\n        <a href={brand.href} className=\"justify-self-start font-display text-[1.75rem]/none font-bold tracking-[-0.05em] lg:text-[2.25rem]\">\n          {brand.name}\n        </a>\n\n        <ul className=\"hidden items-center gap-10 lg:flex\">\n          {links.map((l) => (\n            <li key={l.label}>\n              <a href={l.href} className={linkClass}>\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n\n        <div className=\"hidden items-center justify-self-end gap-[2.375rem] lg:flex\">\n          <a href={login.href} className={linkClass}>\n            {login.label}\n          </a>\n          <ArcButton href={cta.href} variant=\"outline\" size=\"sm\" className=\"mr-[1.0625rem]\">\n            {cta.label}\n          </ArcButton>\n        </div>\n\n        <details className=\"group justify-self-end lg:hidden\">\n          <summary aria-label={menuLabel} className=\"-mr-1 flex size-9 cursor-pointer list-none items-center justify-center [&::-webkit-details-marker]:hidden\">\n            <Menu aria-hidden className=\"size-7 group-open:hidden\" strokeWidth={1.5} />\n            <X aria-hidden className=\"hidden size-7 group-open:block\" strokeWidth={1.5} />\n          </summary>\n          <div className=\"absolute inset-x-0 top-full max-h-[calc(100svh-4.5rem)] overflow-y-auto border-y border-border bg-background px-gutter pt-2 pb-6\">\n            <ul className=\"divide-y divide-border\">\n              {[...links, login].map((l) => (\n                <li key={l.label}>\n                  <a href={l.href} className=\"block py-4 text-lg font-medium\">\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <ArcButton href={cta.href} variant=\"outline\" size=\"sm\" className=\"mt-4 w-full\">\n              {cta.label}\n            </ArcButton>\n          </div>\n        </details>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "arc-button",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; }",
+      "required": true,
+      "description": "the wordmark, set bold in the display face"
+    },
+    {
+      "name": "links",
+      "type": "ArcHeaderLink[]",
+      "required": true,
+      "description": "the centred nav links"
+    },
+    {
+      "name": "login",
+      "type": "ArcHeaderLink",
+      "required": true,
+      "description": "the plain link on the right, e.g. \"Log in\""
+    },
+    {
+      "name": "cta",
+      "type": "ArcHeaderLink",
+      "required": true,
+      "description": "the outlined button on the right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e7d1c448440bf47e309abdce0d525e3874c9b6e05e3ee3f48f3a5de26ed123e6"
+}

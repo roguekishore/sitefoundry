@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman science scatter",
+  "description": "A window-tall white section with a centred intro (title, grey line, dark pill) ringed by six rounded photo tiles: two overlapping pairs and two singles near the corners, bleeding off the edges on phones. As the section scrolls in, the tiles fly out from the middle to their spots and grow from 60% to full size while the intro rises in.",
+  "category": "features",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "intro",
+    "scatter",
+    "collage",
+    "light",
+    "minimal",
+    "scroll-driven",
+    "scale",
+    "reveal",
+    "full-height"
+  ],
+  "notes": [
+    "CSS scroll-driven (view timeline on the section); without support or with reduced motion the tiles sit in place",
+    "the tile layout is fixed at six slots"
+  ],
+  "entry": "ultrahuman-science.tsx",
+  "name": "ultrahuman-science",
+  "files": [
+    {
+      "path": "ultrahuman-science.css",
+      "content": "/* The tiles follow the section's own view timeline: while it scrolls up into the window they move\n   from near the middle (offsets set per tile) to their spots, growing from 60% to full size.\n   Static HTML and reduced motion show them in place. */\n.ultrahuman-science {\n  view-timeline-name: --ultrahuman-science;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-science-tile {\n      animation: ultrahuman-science-fly cubic-bezier(0.25, 0.8, 0.35, 1) both;\n      animation-timeline: --ultrahuman-science;\n      animation-range: entry 15% entry 95%;\n    }\n  }\n}\n\n@keyframes ultrahuman-science-fly {\n  from {\n    opacity: 0;\n    transform: translate(var(--ultrahuman-science-dx, 0), var(--ultrahuman-science-dy, 0)) scale(0.6);\n  }\n  30% {\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-science.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport { UltrahumanHeading } from \"@foundry/ultrahuman-heading\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport \"./ultrahuman-science.css\";\n\nexport interface UltrahumanScienceProps {\n  /** the centred title */\n  title: string;\n  /** one line under it */\n  body: string;\n  /** the dark pill button */\n  action: { label: string; href: string };\n  /** six photos for the tiles around the copy, in this order: top-left back, top-left front,\n   *  top-right, bottom-left, bottom-right back, bottom-right front. Placeholders fill gaps. */\n  photos?: ReactNode[];\n  /** describes the placeholder tiles for screen readers */\n  photoLabels?: string[];\n  className?: string;\n}\n\n// Each tile: its place and size at 390 and at 1440 (as % of the section), its aspect ratio, and\n// how far toward the middle it starts (vw / svh) before flying out to its place.\nconst tiles = [\n  { spot: \"left-[6.7%] top-[22.5%] w-[29.2%] lg:left-[9%] lg:top-[29.3%] lg:w-[12.85%]\", ratio: \"aspect-[185/202]\", dx: 19, dy: 5 },\n  { spot: \"left-0 top-[19.7%] w-[40.5%] lg:left-[14.2%] lg:top-[26%] lg:w-[18%]\", ratio: \"aspect-[259/133]\", dx: 15, dy: 9 },\n  { spot: \"left-[61.8%] top-[16.6%] w-[35.9%] lg:left-[67.9%] lg:top-[20%] lg:w-[16%]\", ratio: \"aspect-square\", dx: -14, dy: 9.5 },\n  { spot: \"left-0 top-[71.2%] w-[38.7%] lg:left-[10.3%] lg:top-[66%] lg:w-[18.9%]\", ratio: \"aspect-[272/173]\", dx: 16.5, dy: -14 },\n  { spot: \"left-[60.8%] top-[78.3%] w-[28.5%] lg:left-[74.4%] lg:top-[65.3%] lg:w-[12.85%]\", ratio: \"aspect-[185/176]\", dx: -17, dy: -14 },\n  { spot: \"left-[68.5%] top-[74.8%] w-[31.5%] lg:left-[77.4%] lg:top-[61.1%] lg:w-[17.9%]\", ratio: \"aspect-[258/133]\", dx: -20, dy: -10 },\n];\n\n/** A window-tall white section: a centred intro with a dark pill, ringed by six photo tiles in\n *  two overlapping pairs and two singles. As the section scrolls in, the tiles fly out from the\n *  middle to their corners and grow to full size. */\nexport function UltrahumanScience({ title, body, action, photos = [], photoLabels = [], className }: UltrahumanScienceProps) {\n  return (\n    <section className={cn(\"ultrahuman-science relative flex h-svh items-center justify-center overflow-clip bg-background text-foreground\", className)}>\n      {tiles.map((tile, i) => (\n        <div\n          key={tile.spot}\n          className={cn(\"ultrahuman-science-tile absolute overflow-clip rounded-lg bg-background lg:rounded-xl\", tile.spot, tile.ratio)}\n          style={{ \"--ultrahuman-science-dx\": `${tile.dx}vw`, \"--ultrahuman-science-dy\": `${tile.dy}svh` } as CSSProperties}\n        >\n          {photos[i] ?? <UltrahumanPlaceholder tone=\"photo\" label={photoLabels[i]} />}\n        </div>\n      ))}\n      <UltrahumanHeading\n        className=\"relative\"\n        title={title}\n        body={body}\n        actions={\n          <UltrahumanButton href={action.href} variant=\"ink\" className=\"lg:min-w-[9.375rem]\">\n            {action.label}\n          </UltrahumanButton>\n        }\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button",
+    "ultrahuman-heading",
+    "ultrahuman-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred title"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "one line under it"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the dark pill button"
+    },
+    {
+      "name": "photos",
+      "type": "ReactNode[]",
+      "required": false,
+      "default": "[]",
+      "description": "six photos for the tiles around the copy, in this order: top-left back, top-left front,\ntop-right, bottom-left, bottom-right back, bottom-right front. Placeholders fill gaps."
+    },
+    {
+      "name": "photoLabels",
+      "type": "string[]",
+      "required": false,
+      "default": "[]",
+      "description": "describes the placeholder tiles for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4b6d221594afe374192e0884a210fbf51300cf128475b01e93d7b35a19f16206"
+}

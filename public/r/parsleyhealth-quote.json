@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Parsley Health pull quote",
+  "description": "A centred member quote on a pale mint-to-seafoam wash: a tiny row of stars, a large light serif quote (34px phones, 48px desktop) in forest, the member's name in small bold italics and a forest pill. As it scrolls into view the band fades in and the quote rises 20px.",
+  "category": "testimonials",
+  "site": "parsleyhealth",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "serif",
+    "gradient",
+    "light",
+    "reveal",
+    "fade",
+    "rise",
+    "scroll"
+  ],
+  "notes": [
+    "the reveal is a CSS view timeline; without support, or with reduced motion, it shows in place"
+  ],
+  "entry": "parsleyhealth-quote.tsx",
+  "name": "parsleyhealth-quote",
+  "files": [
+    {
+      "path": "parsleyhealth-quote.css",
+      "content": "/* The band's content fades in as it enters, and the quote rises 20px a little behind it. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .parsleyhealth-quote-fade {\n      animation: parsleyhealth-quote-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 260px;\n    }\n    .parsleyhealth-quote-rise {\n      animation: parsleyhealth-quote-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 40px entry 320px;\n    }\n  }\n}\n\n@keyframes parsleyhealth-quote-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@keyframes parsleyhealth-quote-rise {\n  from { opacity: 0; translate: 0 1.25rem; }\n  to { opacity: 1; translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "parsleyhealth-quote.tsx",
+      "content": "import { Star } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ParsleyhealthButton } from \"@foundry/parsleyhealth-button\";\nimport \"./parsleyhealth-quote.css\";\n\nexport interface ParsleyhealthQuoteProps {\n  /** the quote, with its quotation marks */\n  quote: string;\n  /** the member's name */\n  author: string;\n  /** how many stars above the quote (0 hides them) */\n  stars?: number;\n  /** screen-reader text for the stars (e.g. \"Rated 5 out of 5\") */\n  starsLabel?: string;\n  /** the pill under the name */\n  action?: { label: string; href: string };\n  className?: string;\n}\n\n/** A large serif quote on a pale wash, fading and rising in. */\nexport function ParsleyhealthQuote({ quote, author, stars = 5, starsLabel, action, className }: ParsleyhealthQuoteProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-background bg-linear-to-b from-accent/65 via-muted/70 to-muted px-gutter py-[calc(var(--section-y)*0.55)] text-center lg:py-[calc(var(--section-y)*0.8)]\",\n        className,\n      )}\n    >\n      <figure className=\"parsleyhealth-quote-fade mx-auto flex max-w-[52rem] flex-col items-center\">\n        {stars > 0 ? (\n          <div role=\"img\" aria-label={starsLabel} className=\"flex gap-0.5 text-primary\">\n            {Array.from({ length: stars }, (_, i) => (\n              <Star key={i} aria-hidden className=\"size-2.5 fill-current\" strokeWidth={0} />\n            ))}\n          </div>\n        ) : null}\n        <blockquote className=\"parsleyhealth-quote-rise mt-6 font-display text-[2.125rem] leading-[1.18] font-light tracking-[-0.02em] text-primary lg:mt-7 lg:text-5xl lg:leading-[1.2]\">\n          <p>{quote}</p>\n        </blockquote>\n        <figcaption className=\"mt-10 text-[0.9625rem] font-semibold text-foreground italic lg:mt-11\">{author}</figcaption>\n        {action ? (\n          <ParsleyhealthButton href={action.href} size=\"md\" className=\"mt-10 lg:mt-11\">\n            {action.label}\n          </ParsleyhealthButton>\n        ) : null}\n      </figure>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "parsleyhealth-button"
+  ],
+  "props": [
+    {
+      "name": "quote",
+      "type": "string",
+      "required": true,
+      "description": "the quote, with its quotation marks"
+    },
+    {
+      "name": "author",
+      "type": "string",
+      "required": true,
+      "description": "the member's name"
+    },
+    {
+      "name": "stars",
+      "type": "number",
+      "required": false,
+      "default": "5",
+      "description": "how many stars above the quote (0 hides them)"
+    },
+    {
+      "name": "starsLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader text for the stars (e.g. \"Rated 5 out of 5\")"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the pill under the name"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e144ef60d4b36b284a8b37a847612267365e55ff483025a99102b71bd8bd80b0"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Railway header",
+  "description": "A sticky, solid dark top bar: a bold wordmark on the left, a centred nav whose items light up with a soft surface on hover and drop down small menus, and two quiet ghost links on the right. Phones get a two-line menu button that opens a full-width list.",
+  "category": "header",
+  "site": "railway",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "sticky",
+    "dark",
+    "minimal",
+    "dropdown",
+    "developer"
+  ],
+  "notes": [
+    "dropdowns open on hover and keyboard focus (CSS only); the phone menu is a <details>, so no JavaScript is needed"
+  ],
+  "entry": "railway-header.tsx",
+  "source": "foundry",
+  "name": "railway-header",
+  "files": [
+    {
+      "path": "railway-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { RailwayButton } from \"@foundry/railway-button\";\n\nexport interface RailwayNavLink {\n  label: string;\n  href: string;\n}\n\nexport interface RailwayNavItem {\n  label: string;\n  /** a plain link when set */\n  href?: string;\n  /** a dropdown (with a chevron) when set */\n  links?: RailwayNavLink[];\n}\n\nexport interface RailwayHeaderProps {\n  /** the brand: a mark (svg or lucide icon) and a wordmark */\n  brand: { name: string; mark?: ReactNode; href: string };\n  /** the centred navigation */\n  nav: RailwayNavItem[];\n  /** the right-hand links (e.g. sign in, book a demo) */\n  actions: RailwayNavLink[];\n  /** screen-reader label of the phone menu button */\n  menuLabel: string;\n  className?: string;\n}\n\n/**\n * Sticky dark top bar: wordmark left, centred nav with chevron dropdowns, two quiet links\n * right. Phones get a two-line menu button that opens a full-width list (a <details>, so it\n * works without JavaScript).\n */\nexport function RailwayHeader({ brand, nav, actions, menuLabel, className }: RailwayHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-40 bg-background text-foreground\", className)}>\n      <div className=\"mx-auto flex h-[4.125rem] max-w-page items-center justify-between px-gutter lg:h-[4.5rem] xl:px-0\">\n        <a href={brand.href} className=\"flex items-center gap-2 text-[1.375rem] font-semibold tracking-[-0.02em] [&_svg]:size-6\">\n          {brand.mark}\n          <span>{brand.name}</span>\n        </a>\n\n        <nav className=\"hidden items-center gap-3 lg:flex\">\n          {nav.map((item) =>\n            item.links ? (\n              <div key={item.label} className=\"group relative\">\n                <button\n                  type=\"button\"\n                  className=\"flex h-9 items-center gap-1.5 rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 group-focus-within:bg-card group-hover:bg-card group-hover:text-foreground motion-reduce:transition-none\"\n                >\n                  {item.label}\n                  <ChevronDown className=\"size-3.5 text-muted-foreground\" strokeWidth={2} />\n                </button>\n                <div className=\"invisible absolute top-full left-0 pt-2 opacity-0 transition-opacity duration-150 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\">\n                  <ul className=\"min-w-48 rounded-lg border border-border bg-popover p-1.5 text-popover-foreground shadow-lg\">\n                    {item.links.map((link) => (\n                      <li key={link.label}>\n                        <a href={link.href} className=\"block rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors duration-150 hover:bg-card hover:text-foreground\">\n                          {link.label}\n                        </a>\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              </div>\n            ) : (\n              <a\n                key={item.label}\n                href={item.href}\n                className=\"flex h-9 items-center rounded-md px-3 text-sm font-medium text-foreground/90 transition-colors duration-150 hover:text-foreground motion-reduce:transition-none\"\n              >\n                {item.label}\n              </a>\n            ),\n          )}\n        </nav>\n\n        <div className=\"hidden items-center gap-2 lg:flex\">\n          {actions.map((action) => (\n            <RailwayButton key={action.label} href={action.href} variant=\"ghost\" size=\"sm\">\n              {action.label}\n            </RailwayButton>\n          ))}\n        </div>\n\n        <details className=\"group lg:hidden\">\n          <summary aria-label={menuLabel} className=\"flex size-10 cursor-pointer list-none items-center justify-center rounded-md [&::-webkit-details-marker]:hidden\">\n            <span className=\"flex w-3.5 flex-col gap-[3px]\">\n              <span className=\"h-px w-full bg-foreground transition-transform duration-150 group-open:translate-y-[2px] group-open:rotate-45 motion-reduce:transition-none\" />\n              <span className=\"h-px w-full bg-foreground transition-transform duration-150 group-open:-translate-y-[2px] group-open:-rotate-45 motion-reduce:transition-none\" />\n            </span>\n          </summary>\n          <div className=\"absolute inset-x-0 top-full border-b border-border bg-background px-gutter pt-2 pb-6\">\n            <ul className=\"divide-y divide-border\">\n              {nav.map((item) => (\n                <li key={item.label}>\n                  <a href={item.href ?? item.links?.[0]?.href} className=\"flex items-center justify-between py-3.5 text-base font-medium\">\n                    {item.label}\n                    {item.links && <ChevronDown className=\"size-4 -rotate-90 text-muted-foreground\" />}\n                  </a>\n                </li>\n              ))}\n            </ul>\n            <div className=\"mt-4 grid grid-cols-2 gap-2\">\n              {actions.map((action, i) => (\n                <RailwayButton key={action.label} href={action.href} variant={i === actions.length - 1 ? \"primary\" : \"dark\"}>\n                  {action.label}\n                </RailwayButton>\n              ))}\n            </div>\n          </div>\n        </details>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "railway-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; mark?: ReactNode; href: string; }",
+      "required": true,
+      "description": "the brand: a mark (svg or lucide icon) and a wordmark"
+    },
+    {
+      "name": "nav",
+      "type": "RailwayNavItem[]",
+      "required": true,
+      "description": "the centred navigation"
+    },
+    {
+      "name": "actions",
+      "type": "RailwayNavLink[]",
+      "required": true,
+      "description": "the right-hand links (e.g. sign in, book a demo)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label of the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0bb2a1c3ecef5caf13375994bc5567ac377530007af46990f00418ddcb610841"
+}

@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend editor window",
+  "description": "A centred icon tile, lit title and lead over a wide editor window: a toolbar (styles button, the draft's name, a timestamp, a quiet test button and a bright send button) with a violet light on its top edge, then a message sheet with From/To/Subject rows, a banner slot and a blank white page with a hint. The window's frame fades into the black page while the sheet stays crisp.",
+  "category": "features",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "editor",
+    "window",
+    "dark",
+    "glow",
+    "fade",
+    "minimal"
+  ],
+  "notes": [
+    "the email page is bg-foreground (white on the dark theme); on light themes it turns dark",
+    "banner and icon tile are media slots: placeholders until filled"
+  ],
+  "entry": "resend-editor.tsx",
+  "source": "foundry",
+  "name": "resend-editor",
+  "files": [
+    {
+      "path": "resend-editor.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Clock } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendHeading } from \"@foundry/resend-heading\";\nimport { ResendPlaceholder } from \"@foundry/resend-placeholder\";\n\nexport interface ResendEditorField {\n  label: string;\n  value: string;\n  /** shows the value as a rounded chip (an audience) */\n  chip?: boolean;\n  /** an icon inside the chip */\n  icon?: ReactNode;\n}\n\nexport interface ResendEditorProps {\n  /** the title; a list sets its desktop line breaks */\n  title: string | string[];\n  /** the lead; a list sets its desktop line breaks */\n  text: string | string[];\n  /** fills the icon slot above the title; empty shows a placeholder tile */\n  media?: ReactNode;\n  /** the toolbar: styles button (label + icon), the draft's name, when it was saved, test and send labels */\n  toolbar: { styles: string; stylesIcon?: ReactNode; name: string; saved: string; test: string; send: string };\n  /** the rows at the top of the message (From, To, Subject) */\n  fields: ResendEditorField[];\n  /** the banner image at the top of the message; empty shows a placeholder */\n  banner?: ReactNode;\n  /** the hint on the empty page */\n  hint: string;\n  className?: string;\n}\n\nexport function ResendEditor({ title, text, media, toolbar, fields, banner, hint, className }: ResendEditorProps) {\n  return (\n    <section className={cn(\"bg-background py-[calc(var(--section-y)*0.5)] text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ResendHeading tile media={media} title={title} text={text} />\n\n        <div className=\"relative mx-4 mt-16 lg:mx-auto lg:max-w-[69.25rem]\">\n          {/* the frame: background and hairline fade out downwards; the sheet above it doesn't */}\n          <div aria-hidden className=\"absolute inset-0 rounded-lg border border-border bg-card/60 mask-b-from-45% mask-b-to-80%\" />\n          <span aria-hidden className=\"absolute -top-px left-1/2 h-px w-1/2 -translate-x-1/2 bg-linear-to-r from-transparent via-highlight to-transparent\" />\n          <div className=\"relative flex h-16 items-center gap-3 px-6 lg:border-b lg:border-border\">\n            <span className=\"flex h-8 items-center gap-2 rounded-md border border-border bg-accent px-2.5 text-sm text-muted-foreground [&_svg]:size-4\">\n              {toolbar.stylesIcon}\n              {toolbar.styles}\n            </span>\n            <span className=\"hidden flex-1 text-center text-sm text-muted-foreground lg:block\">{toolbar.name}</span>\n            <span className=\"ml-auto flex items-center gap-4 lg:ml-0\">\n              <span className=\"hidden items-center gap-2 text-sm text-muted-foreground lg:flex\">\n                <Clock aria-hidden className=\"size-4\" strokeWidth={1.75} />\n                {toolbar.saved}\n              </span>\n              <span className=\"flex h-8 items-center rounded-md border border-border bg-background px-3 text-sm text-foreground\">{toolbar.test}</span>\n              <span className=\"flex h-8 items-center rounded-md bg-primary px-3 text-sm text-primary-foreground\">{toolbar.send}</span>\n            </span>\n          </div>\n\n          <div className=\"relative lg:px-[13.75rem] lg:pt-10\">\n            <div className=\"overflow-clip rounded-t-lg border border-b-0 border-border bg-background\">\n              <dl className=\"px-8\">\n                {fields.map((f, i) => (\n                  <div key={f.label} className={cn(\"flex h-[3.3rem] items-center\", i < fields.length - 1 && \"border-b border-border\")}>\n                    <dt className=\"w-24 shrink-0 text-sm text-muted-foreground\">{f.label}</dt>\n                    <dd className=\"min-w-0 truncate text-sm text-foreground\">\n                      {f.chip ? (\n                        <span className=\"-ml-1 inline-flex h-7 items-center gap-1.5 rounded-full bg-accent px-2.5 [&_svg]:size-4\">\n                          {f.icon}\n                          {f.value}\n                        </span>\n                      ) : (\n                        f.value\n                      )}\n                    </dd>\n                  </div>\n                ))}\n              </dl>\n            </div>\n            <div className=\"aspect-[662/214]\">{banner ?? <ResendPlaceholder className=\"size-full rounded-none border-x-0\" />}</div>\n            <div className=\"h-[26.75rem] bg-foreground px-12 pt-6 lg:h-[19.7rem]\">\n              <p className=\"text-base text-background/40\">{hint}</p>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-heading",
+    "resend-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the title; a list sets its desktop line breaks"
+    },
+    {
+      "name": "text",
+      "type": "string | string[]",
+      "required": true,
+      "description": "the lead; a list sets its desktop line breaks"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "fills the icon slot above the title; empty shows a placeholder tile"
+    },
+    {
+      "name": "toolbar",
+      "type": "{ styles: string; stylesIcon?: ReactNode; name: string; saved: string; test: string; send: string; }",
+      "required": true,
+      "description": "the toolbar: styles button (label + icon), the draft's name, when it was saved, test and send labels"
+    },
+    {
+      "name": "fields",
+      "type": "ResendEditorField[]",
+      "required": true,
+      "description": "the rows at the top of the message (From, To, Subject)"
+    },
+    {
+      "name": "banner",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the banner image at the top of the message; empty shows a placeholder"
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "required": true,
+      "description": "the hint on the empty page"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c9cf552e81bddfac9cd72903ccfe7ceeb718cb7cd69d81570f76f73592e114e5"
+}

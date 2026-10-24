@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Resend glow frame",
+  "description": "A page-wide frame that opens a section: a hairline top edge with 24px rounded corners whose sides fade away downwards, and a soft grey light pooled under the top edge (centred or towards the end). Or a straight full-width hairline with the light under its middle.",
+  "category": "background",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "frame",
+    "glow",
+    "hairline",
+    "dark",
+    "minimal"
+  ],
+  "notes": [
+    "the light uses the theme's glow colour at low strength: strongest on dark themes"
+  ],
+  "entry": "resend-frame.tsx",
+  "source": "foundry",
+  "name": "resend-frame",
+  "files": [
+    {
+      "path": "resend-frame.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ResendFrameProps {\n  /** the section's content */\n  children: ReactNode;\n  /** where the light pools under the top edge */\n  glow?: \"center\" | \"end\" | \"none\";\n  /** rounded: a page-wide frame with rounded top corners · line: a straight full-width hairline (footer) */\n  edge?: \"rounded\" | \"line\";\n  className?: string;\n}\n\nexport function ResendFrame({ children, glow = \"center\", edge = \"rounded\", className }: ResendFrameProps) {\n  return (\n    <div className={cn(\"relative mx-auto\", edge === \"rounded\" && \"max-w-page\", className)}>\n      {edge === \"rounded\" ? (\n        <div\n          aria-hidden\n          className=\"pointer-events-none absolute inset-x-0 top-0 h-48 rounded-t-2xl border border-b-0 border-border mask-b-from-0% mask-b-to-100%\"\n        />\n      ) : (\n        <div aria-hidden className=\"pointer-events-none absolute inset-x-0 top-0 h-px bg-border\" />\n      )}\n      {glow !== \"none\" && (\n        <div\n          aria-hidden\n          className={cn(\n            \"pointer-events-none absolute top-px h-36 bg-radial-[ellipse_at_50%_0%] from-glow/14 to-transparent to-70%\",\n            edge === \"line\"\n              ? \"left-1/2 w-[min(64rem,100%)] -translate-x-1/2 from-glow/10\"\n              : glow === \"center\"\n                ? \"left-1/2 w-[min(28rem,100%)] -translate-x-1/2\"\n                : \"right-[10%] w-[min(26rem,70%)]\",\n          )}\n        />\n      )}\n      <div className=\"relative\">{children}</div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section's content"
+    },
+    {
+      "name": "glow",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "where the light pools under the top edge"
+    },
+    {
+      "name": "edge",
+      "type": "enum",
+      "required": false,
+      "default": "rounded",
+      "description": "rounded: a page-wide frame with rounded top corners · line: a straight full-width hairline (footer)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b130b4cb0388db07801e34b2e0016fc41b098772a7c1fcd3fe3e1cc930981124"
+}

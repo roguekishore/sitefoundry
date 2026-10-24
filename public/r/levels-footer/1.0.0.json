@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels footer",
+  "description": "A near-black footer: a hairline, then the wordmark with a tracked 'mailing list' label, a line of text and a round white email field with a round white join button on the left, three columns of quiet links under tracked grey headings on the right, another hairline, the copyright with legal links, and a paragraph of grey small print. Phones stack it all, with the join button full width under the field.",
+  "category": "footer",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "newsletter",
+    "links",
+    "minimal"
+  ],
+  "notes": [
+    "a .dark scope: dark in both modes",
+    "the form is plain HTML; point action at your own endpoint"
+  ],
+  "entry": "levels-footer.tsx",
+  "name": "levels-footer",
+  "files": [
+    {
+      "path": "levels-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsWordmark } from \"@foundry/levels-wordmark\";\n\nexport interface LevelsFooterColumn {\n  /** tracked grey heading */\n  title: string;\n  /** the column's links */\n  links: { label: string; href: string }[];\n}\n\nexport interface LevelsFooterProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** the mailing-list form */\n  newsletter?: {\n    /** tracked label */\n    title: string;\n    /** one line of text */\n    text?: ReactNode;\n    /** placeholder inside the field */\n    placeholder?: string;\n    /** the button's text */\n    button: string;\n    /** screen-reader label for the field */\n    fieldLabel?: string;\n    /** form action URL */\n    action?: string;\n  };\n  /** the link columns (three on the original) */\n  columns: LevelsFooterColumn[];\n  /** copyright line */\n  copyright?: ReactNode;\n  /** small links beside the copyright */\n  legal?: { label: string; href: string }[];\n  /** the grey small print at the bottom */\n  disclaimer?: ReactNode;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm leading-6 text-foreground/80 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none\";\n\n/** Dark footer with a mailing-list form, link columns and small print. */\nexport function LevelsFooter({ brand, newsletter, columns, copyright, legal, disclaimer, className }: LevelsFooterProps) {\n  return (\n    <footer className={cn(\"dark bg-background px-gutter pt-16 pb-16 text-foreground lg:pt-20 lg:pb-20\", className)}>\n      <div className=\"mx-auto max-w-page border-t border-border pt-16 lg:pt-14\">\n        <div className=\"flex flex-col gap-16 lg:flex-row lg:justify-between lg:gap-12\">\n          <div className=\"lg:max-w-[28rem] lg:grow\">\n            <LevelsWordmark brand={brand} size=\"lg\" />\n            {newsletter ? (\n              <form action={newsletter.action} className=\"mt-8\">\n                <p className=\"text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase\">{newsletter.title}</p>\n                {newsletter.text ? <p className=\"mt-3 text-sm leading-7 text-foreground/80\">{newsletter.text}</p> : null}\n                <div className=\"mt-6 flex flex-col gap-3 sm:flex-row\">\n                  <input\n                    type=\"email\"\n                    name=\"email\"\n                    aria-label={newsletter.fieldLabel}\n                    placeholder={newsletter.placeholder}\n                    className=\"h-12 min-w-0 grow rounded-full bg-foreground px-4 text-sm text-background outline-none placeholder:text-background/50 focus-visible:ring-2 focus-visible:ring-ring lg:max-w-[22.5rem]\"\n                  />\n                  <button\n                    type=\"submit\"\n                    className=\"h-12 rounded-full bg-foreground px-6 text-sm font-semibold text-background transition-colors duration-150 hover:bg-foreground/90 motion-reduce:transition-none\"\n                  >\n                    {newsletter.button}\n                  </button>\n                </div>\n              </form>\n            ) : null}\n          </div>\n\n          <div className=\"grid gap-12 lg:w-[38.75rem] lg:grid-cols-3 lg:gap-6\">\n            {columns.map((column) => (\n              <div key={column.title}>\n                <p className=\"text-sm leading-5 font-semibold tracking-[0.16em] text-muted-foreground uppercase\">{column.title}</p>\n                <ul className=\"mt-5 flex flex-col gap-5 lg:mt-6\">\n                  {column.links.map((link) => (\n                    <li key={link.label}>\n                      <a href={link.href} className={linkClass}>\n                        {link.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-16 border-t border-border pt-10 lg:mt-14 lg:pt-8\">\n          <div className=\"flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between\">\n            {copyright ? <p className=\"text-sm leading-6 text-foreground/70\">{copyright}</p> : null}\n            {legal?.length ? (\n              <ul className=\"flex gap-6\">\n                {legal.map((link) => (\n                  <li key={link.label}>\n                    <a href={link.href} className={cn(linkClass, \"text-foreground/70\")}>\n                      {link.label}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ) : null}\n          </div>\n          {disclaimer ? <p className=\"mt-6 max-w-[64rem] text-sm leading-7 text-muted-foreground lg:mt-8\">{disclaimer}</p> : null}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; text?: ReactNode; placeholder?: string; button: string; fieldLabel?: string; action?: string | undefined; } | undefined",
+      "required": false,
+      "description": "the mailing-list form"
+    },
+    {
+      "name": "columns",
+      "type": "LevelsFooterColumn[]",
+      "required": true,
+      "description": "the link columns (three on the original)"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": false,
+      "description": "copyright line"
+    },
+    {
+      "name": "legal",
+      "type": "{ label: string; href: string; }[]",
+      "required": false,
+      "description": "small links beside the copyright"
+    },
+    {
+      "name": "disclaimer",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the grey small print at the bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4e122424388c56a7ee6bf4f7ea3009f0766e0e739f6a4a39f7f1604a8738006c"
+}

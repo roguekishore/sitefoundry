@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman store footer",
+  "description": "A white store footer: four link columns split by pale vertical rules, each holding two groups with small uppercase grey titles and 16px black links (with an optional tiny 'New' badge); a three-cell row for contact, social icons and black app badges; small grey legal lines with two rounded pills; and the company name set huge in pale black italic across the full width. On phones the groups become an accordion.",
+  "category": "footer",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "columns",
+    "accordion",
+    "light",
+    "minimal",
+    "wordmark",
+    "rules"
+  ],
+  "notes": [
+    "the phone accordion is native details elements: no JavaScript",
+    "the giant wordmark is SVG text stretched to the full width (textLength), so any name fills it"
+  ],
+  "entry": "ultrahuman-footer.tsx",
+  "name": "ultrahuman-footer",
+  "files": [
+    {
+      "path": "ultrahuman-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface UltrahumanFooterLink {\n  /** the link's text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** a tiny grey badge after the text, e.g. \"New\" */\n  badge?: string;\n}\n\nexport interface UltrahumanFooterGroup {\n  /** the small uppercase group title */\n  title: string;\n  links: UltrahumanFooterLink[];\n}\n\nexport interface UltrahumanFooterIconLink {\n  /** the name, read to screen readers */\n  label: string;\n  href: string;\n  /** the icon (about 20px) */\n  icon: ReactNode;\n}\n\nexport interface UltrahumanFooterBadge {\n  /** the small top line, e.g. \"Get it on\" */\n  small: string;\n  /** the big line, e.g. \"Google Play\" */\n  label: string;\n  href: string;\n  /** the store icon */\n  icon: ReactNode;\n}\n\nexport interface UltrahumanFooterProps {\n  /** four columns, each a stack of link groups split by a hairline (desktop); one accordion list on phones */\n  columns: UltrahumanFooterGroup[][];\n  /** the contact cell: a title and lines such as an email and a phone number */\n  contact: { title: string; links: UltrahumanFooterLink[] };\n  /** the social icons cell */\n  follow: { title: string; links: UltrahumanFooterIconLink[] };\n  /** the app cell: black store badges */\n  apps: { title: string; badges: UltrahumanFooterBadge[] };\n  /** small grey legal lines (copyright, address…) */\n  legal: string[];\n  /** small rounded pills under the legal lines (region, store finder) */\n  pills?: { label: string; href: string; icon?: ReactNode }[];\n  /** the company name, set huge and pale across the bottom */\n  brand: string;\n  /** which phone accordion group starts open (index in reading order), or -1 for none */\n  openGroup?: number;\n  className?: string;\n}\n\nconst groupTitle = \"text-[0.8125rem] leading-none font-medium tracking-[0.01em] text-foreground/50 uppercase\";\nconst linkText = \"text-base leading-[1.375rem] tracking-[-0.0175em] text-foreground transition-colors duration-200 hover:text-foreground/60\";\n\nfunction FooterLink({ link }: { link: UltrahumanFooterLink }) {\n  return (\n    <a href={link.href} className={cn(linkText, \"flex w-fit items-center gap-2\")}>\n      {link.label}\n      {link.badge && (\n        <span className=\"rounded-[3px] bg-foreground/8 px-1.5 py-0.5 text-[0.5625rem] leading-none font-medium tracking-[0.04em] text-foreground/60 uppercase\">\n          {link.badge}\n        </span>\n      )}\n    </a>\n  );\n}\n\n/** A white store footer: four link columns split by pale vertical rules (an accordion on phones),\n *  a three-cell row for contact, socials and app badges, small legal lines with two pills, and the\n *  company name set huge in pale italic across the bottom. */\nexport function UltrahumanFooter({ columns, contact, follow, apps, legal, pills = [], brand, openGroup = 0, className }: UltrahumanFooterProps) {\n  const groups = columns.flat();\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-4 pt-10 pb-12 lg:px-0 lg:pt-0 lg:pb-14\">\n        {/* phones: one accordion list */}\n        <div className=\"lg:hidden\">\n          {groups.map((group, i) => (\n            <details key={group.title} open={i === openGroup} className=\"group\">\n              <summary className={cn(groupTitle, \"flex cursor-pointer list-none items-center justify-between py-[1.6rem] [&::-webkit-details-marker]:hidden\")}>\n                {group.title}\n                <ChevronDown aria-hidden className=\"size-4 text-foreground/60 transition-transform duration-200 group-open:rotate-180\" strokeWidth={1.75} />\n              </summary>\n              <ul className=\"-mt-2 grid gap-4 pb-6\">\n                {group.links.map((link) => (\n                  <li key={link.label}>\n                    <FooterLink link={link} />\n                  </li>\n                ))}\n              </ul>\n            </details>\n          ))}\n        </div>\n\n        {/* desktop: four ruled columns */}\n        <div className=\"hidden grid-cols-4 lg:grid\">\n          {columns.map((column, c) => (\n            <div key={c} className={cn(\"flex flex-col\", c > 0 && \"border-l border-foreground/6\")}>\n              {column.map((group, g) => (\n                <div key={group.title} className={cn(\"pt-[3.75rem] pb-8\", c > 0 && \"pl-7\", g > 0 && \"border-t border-foreground/6 pt-7\", g === column.length - 1 && \"flex-1\")}>\n                  <p className={groupTitle}>{group.title}</p>\n                  <ul className=\"mt-[1.4rem] grid gap-5\">\n                    {group.links.map((link) => (\n                      <li key={link.label}>\n                        <FooterLink link={link} />\n                      </li>\n                    ))}\n                  </ul>\n                </div>\n              ))}\n            </div>\n          ))}\n        </div>\n\n        <div className=\"mt-2 grid gap-8 border-t border-foreground/10 pt-8 lg:mt-0 lg:grid-cols-3 lg:gap-0 lg:pt-0\">\n          <div className=\"lg:pt-9 lg:pb-7\">\n            <p className={groupTitle}>{contact.title}</p>\n            <ul className=\"mt-4 grid gap-2\">\n              {contact.links.map((link) => (\n                <li key={link.label}>\n                  <FooterLink link={link} />\n                </li>\n              ))}\n            </ul>\n          </div>\n          <div className=\"lg:border-l lg:border-foreground/6 lg:pt-9 lg:pb-7 lg:pl-7\">\n            <p className={groupTitle}>{follow.title}</p>\n            <ul className=\"mt-4 flex gap-6\">\n              {follow.links.map((link) => (\n                <li key={link.label}>\n                  <a href={link.href} aria-label={link.label} className=\"flex text-foreground transition-opacity duration-200 hover:opacity-60 [&_svg]:size-5\">\n                    {link.icon}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n          <div className=\"lg:border-l lg:border-foreground/6 lg:pt-9 lg:pb-7 lg:pl-7\">\n            <p className={groupTitle}>{apps.title}</p>\n            <ul className=\"mt-4 flex gap-2\">\n              {apps.badges.map((badge) => (\n                <li key={badge.label}>\n                  <a\n                    href={badge.href}\n                    className=\"flex h-[2.0625rem] items-center gap-1.5 rounded-[5px] bg-foreground px-2.5 text-background transition-opacity duration-200 hover:opacity-85 [&_svg]:size-5\"\n                  >\n                    {badge.icon}\n                    <span className=\"flex flex-col leading-none\">\n                      <span className=\"text-[0.5rem] tracking-[0.02em]\">{badge.small}</span>\n                      <span className=\"text-[0.9375rem] font-medium tracking-[-0.02em]\">{badge.label}</span>\n                    </span>\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </div>\n        </div>\n\n        <div className=\"mt-8 border-t border-foreground/10 pt-5 lg:mt-0 lg:pt-6\">\n          {legal.map((line, i) => (\n            <p key={line} className={cn(\"text-xs leading-[1.125rem] tracking-[-0.005em] text-foreground/55\", i === 1 && \"mt-2 lg:mt-3\")}>\n              {line}\n            </p>\n          ))}\n          {pills.length > 0 && (\n            <div className=\"mt-4 flex gap-2 lg:mt-5\">\n              {pills.map((pill) => (\n                <a\n                  key={pill.label}\n                  href={pill.href}\n                  className=\"flex h-[1.6875rem] items-center gap-1.5 rounded-full border border-foreground/10 px-2.5 text-[0.8125rem] font-medium tracking-[-0.01em] transition-colors duration-200 hover:bg-foreground/4 [&_svg]:size-4\"\n                >\n                  {pill.icon}\n                  {pill.label}\n                </a>\n              ))}\n            </div>\n          )}\n        </div>\n\n        <div className=\"mt-5 border-t border-foreground/10 pt-10 lg:mt-5 lg:pt-11\">\n          {/* the name stretched to the full width: SVG text fitted with textLength (a little short of\n              1280, leaving room for the slant of the italic's top-right corner) */}\n          <svg aria-hidden viewBox=\"0 0 1280 124\" className=\"block h-auto w-full overflow-visible text-muted\">\n            <text\n              x=\"-8\"\n              y=\"118\"\n              textLength=\"1244\"\n              lengthAdjust=\"spacingAndGlyphs\"\n              fill=\"currentColor\"\n              className=\"font-display font-black uppercase italic\"\n              style={{ fontSize: \"164px\" }}\n            >\n              {brand}\n            </text>\n          </svg>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "UltrahumanFooterGroup[][]",
+      "required": true,
+      "description": "four columns, each a stack of link groups split by a hairline (desktop); one accordion list on phones"
+    },
+    {
+      "name": "contact",
+      "type": "{ title: string; links: UltrahumanFooterLink[]; }",
+      "required": true,
+      "description": "the contact cell: a title and lines such as an email and a phone number"
+    },
+    {
+      "name": "follow",
+      "type": "{ title: string; links: UltrahumanFooterIconLink[]; }",
+      "required": true,
+      "description": "the social icons cell"
+    },
+    {
+      "name": "apps",
+      "type": "{ title: string; badges: UltrahumanFooterBadge[]; }",
+      "required": true,
+      "description": "the app cell: black store badges"
+    },
+    {
+      "name": "legal",
+      "type": "string[]",
+      "required": true,
+      "description": "small grey legal lines (copyright, address…)"
+    },
+    {
+      "name": "pills",
+      "type": "{ label: string; href: string; icon?: ReactNode; }[]",
+      "required": false,
+      "default": "[]",
+      "description": "small rounded pills under the legal lines (region, store finder)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set huge and pale across the bottom"
+    },
+    {
+      "name": "openGroup",
+      "type": "number",
+      "required": false,
+      "default": "0",
+      "description": "which phone accordion group starts open (index in reading order), or -1 for none"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b59fc683f5ae233849a8e37e00cafee339ccfbec3de644a5181088f03384a08d"
+}

@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Paxos footer",
+  "description": "A quiet light footer under a single hairline: five narrow columns of small link groups (grey 12px heads, slate 12px links) and a newsletter on the right with a rounded email field, fine print and a bold slate pill; below, a large mark and spaced wordmark, social icons and tiny legal links. On phones the newsletter comes first, then the groups in two columns. Links fade on hover.",
+  "category": "footer",
+  "site": "paxos",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "newsletter",
+    "minimal",
+    "light",
+    "hover"
+  ],
+  "notes": [
+    "the email form is plain markup: wire the action prop to your own endpoint"
+  ],
+  "entry": "paxos-footer.tsx",
+  "name": "paxos-footer",
+  "files": [
+    {
+      "path": "paxos-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PaxosButton } from \"@foundry/paxos-button\";\n\nexport interface PaxosFooterLink {\n  /** the link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface PaxosFooterGroup {\n  /** the grey group head */\n  title: string;\n  /** the group's links */\n  links: PaxosFooterLink[];\n}\n\nexport interface PaxosFooterProps {\n  /** desktop columns, each holding one or more stacked groups (on phones all groups flow in two columns) */\n  columns: PaxosFooterGroup[][];\n  /** the newsletter on the right */\n  newsletter: {\n    /** the line above the field */\n    label: ReactNode;\n    /** the field's placeholder */\n    placeholder: string;\n    /** fine print under the field */\n    note?: ReactNode;\n    /** the submit pill's text */\n    submit: string;\n    /** where the form posts */\n    action?: string;\n  };\n  /** the large mark before the wordmark (e.g. a lucide icon) */\n  mark?: ReactNode;\n  /** the company name, set spaced and large */\n  brand: string;\n  /** small icon links (social) */\n  socials?: { label: string; href: string; icon: ReactNode }[];\n  /** tiny legal links */\n  legal?: PaxosFooterLink[];\n  /** the copyright line */\n  copyright?: ReactNode;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-xs/[1.85] tracking-[0.01em] text-foreground transition-colors duration-[400ms] ease-[cubic-bezier(0.44,0,0.56,1)] hover:text-muted-foreground motion-reduce:transition-none\";\n\nfunction Group({ group }: { group: PaxosFooterGroup }) {\n  return (\n    <div>\n      <p className=\"text-xs/[1.85] font-medium tracking-[0.01em] text-muted-foreground\">{group.title}</p>\n      <ul className=\"mt-0.5\">\n        {group.links.map((link) => (\n          <li key={link.label} className=\"text-xs/[1.85]\">\n            <a href={link.href} className={linkClass}>\n              {link.label}\n            </a>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\n/** Link columns, newsletter, wordmark and legal row. */\nexport function PaxosFooter({ columns, newsletter, mark, brand, socials, legal, copyright, className }: PaxosFooterProps) {\n  return (\n    <footer className={cn(\"bg-background px-gutter pt-12 pb-8 lg:pt-[6.25rem] lg:pb-10\", className)}>\n      <div className=\"mx-auto max-w-page lg:border-t lg:border-border lg:pt-6\">\n        <div className=\"flex flex-col gap-12 lg:flex-row lg:justify-between lg:gap-10\">\n          <div className=\"grid grid-cols-2 gap-x-6 gap-y-8 lg:order-none lg:flex lg:gap-10 xl:gap-[2.4rem]\">\n            {columns.map((column, i) => (\n              <div key={i} className=\"flex flex-col gap-5\">\n                {column.map((group) => (\n                  <Group key={group.title} group={group} />\n                ))}\n              </div>\n            ))}\n          </div>\n          <form action={newsletter.action} className=\"-order-1 w-full lg:order-none lg:w-[17.5rem] lg:shrink-0\">\n            <label className=\"block text-xs/[1.15] font-medium tracking-[0.01em] text-muted-foreground\">\n              {newsletter.label}\n              <input\n                type=\"email\"\n                name=\"email\"\n                placeholder={newsletter.placeholder}\n                className=\"mt-[1.375rem] h-10 w-full rounded-2xl border border-input bg-secondary px-4 text-base text-foreground placeholder:text-muted-foreground/70 focus-visible:outline-2 focus-visible:outline-ring\"\n              />\n            </label>\n            {newsletter.note ? <p className=\"mt-3 text-[0.625rem]/[1] text-foreground\">{newsletter.note}</p> : null}\n            <PaxosButton variant=\"bold\" type=\"submit\" className=\"mt-9\">\n              {newsletter.submit}\n            </PaxosButton>\n          </form>\n        </div>\n        <div className=\"mt-14 flex flex-col gap-6 lg:mt-12 lg:flex-row lg:items-end lg:justify-between\">\n          <p className=\"flex items-center gap-3 text-foreground [&>svg]:size-10\">\n            {mark}\n            <span className=\"font-display text-2xl tracking-[0.12em] uppercase\">{brand}</span>\n          </p>\n          <div className=\"flex items-center gap-6 lg:gap-5\">\n            {socials?.length ? (\n              <ul className=\"flex items-center gap-4\">\n                {socials.map((s) => (\n                  <li key={s.label}>\n                    <a href={s.href} aria-label={s.label} className=\"text-muted-foreground transition-colors duration-[400ms] hover:text-foreground [&>svg]:size-4\">\n                      {s.icon}\n                    </a>\n                  </li>\n                ))}\n              </ul>\n            ) : null}\n            <div className=\"text-[0.625rem]/[1.7] text-muted-foreground\">\n              {legal?.length ? (\n                <p className=\"flex gap-1.5\">\n                  {legal.map((link, i) => (\n                    <span key={link.label} className=\"flex gap-1.5\">\n                      {i > 0 ? <span aria-hidden>|</span> : null}\n                      <a href={link.href} className=\"underline underline-offset-2 hover:text-foreground\">\n                        {link.label}\n                      </a>\n                    </span>\n                  ))}\n                </p>\n              ) : null}\n              {copyright ? <p className=\"mt-1.5\">{copyright}</p> : null}\n            </div>\n          </div>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "paxos-button"
+  ],
+  "props": [
+    {
+      "name": "columns",
+      "type": "PaxosFooterGroup[][]",
+      "required": true,
+      "description": "desktop columns, each holding one or more stacked groups (on phones all groups flow in two columns)"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ label: ReactNode; placeholder: string; note?: ReactNode; submit: string; action?: string | undefined; }",
+      "required": true,
+      "description": "the newsletter on the right"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the large mark before the wordmark (e.g. a lucide icon)"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set spaced and large"
+    },
+    {
+      "name": "socials",
+      "type": "{ label: string; href: string; icon: ReactNode; }[]",
+      "required": false,
+      "description": "small icon links (social)"
+    },
+    {
+      "name": "legal",
+      "type": "PaxosFooterLink[]",
+      "required": false,
+      "description": "tiny legal links"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the copyright line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "fb04153f7a8a81176d61c3795aaacdf9be851a3412d25b03f2a8bb892bb2d7a3"
+}

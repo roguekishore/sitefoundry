@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Arc button",
+  "description": "A square-cornered (4px) button in medium weight: a solid primary fill with a small trailing chevron, or a 2px faint outline that floods with the primary colour and turns its label light on hover, over 0.2s.",
+  "category": "button",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "cta",
+    "outline",
+    "flat",
+    "minimal",
+    "hover",
+    "fintech"
+  ],
+  "notes": [
+    "inside a `dark` wrapper the solid fill takes the theme's dark primary (mint in the arc theme)"
+  ],
+  "entry": "arc-button.tsx",
+  "source": "foundry",
+  "name": "arc-button",
+  "files": [
+    {
+      "path": "arc-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface ArcButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** solid: primary fill with a trailing chevron · outline: 2px hairline outline that fills with the primary colour on hover */\n  variant?: \"solid\" | \"outline\";\n  /** sm: 44px (header) · md: 56px (hero and closing band) · full: 36px, stretches to its box (newsletter form) */\n  size?: \"sm\" | \"md\" | \"full\";\n  /** shows the small chevron after the label (solid buttons show it by default) */\n  chevron?: boolean;\n  /** the button's type when it isn't a link (e.g. \"submit\" inside a form) */\n  type?: \"button\" | \"submit\";\n  className?: string;\n}\n\nconst sizes = {\n  sm: \"h-11 px-[1.25rem] text-[0.875rem]\",\n  md: \"h-14 px-8 text-base\",\n  full: \"h-9 w-full px-4 text-[0.875rem]\",\n};\n\n/** Arc's square-cornered button: 4px corners, medium weight, colours ease over 0.2s on hover. */\nexport function ArcButton({ children, href, variant = \"solid\", size = \"md\", chevron, type = \"button\", className }: ArcButtonProps) {\n  const showChevron = chevron ?? (variant === \"solid\" && size !== \"full\");\n  const classes = cn(\n    \"inline-flex shrink-0 items-center justify-center gap-2 rounded-sm border-2 font-medium whitespace-nowrap\",\n    \"transition-[color,background-color,border-color,filter] duration-200 ease-[ease] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    variant === \"solid\"\n      ? \"border-primary bg-primary text-primary-foreground hover:brightness-[0.92]\"\n      : \"border-foreground/15 bg-transparent text-foreground hover:border-primary hover:bg-primary hover:text-primary-foreground\",\n    sizes[size],\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {showChevron && <ChevronRight aria-hidden className=\"-mr-1 size-4\" strokeWidth={2} />}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes}>\n      {inner}\n    </a>\n  ) : (\n    <button type={type} className={classes}>\n      {inner}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "solid",
+      "description": "solid: primary fill with a trailing chevron · outline: 2px hairline outline that fills with the primary colour on hover"
+    },
+    {
+      "name": "size",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "sm: 44px (header) · md: 56px (hero and closing band) · full: 36px, stretches to its box (newsletter form)"
+    },
+    {
+      "name": "chevron",
+      "type": "boolean",
+      "required": false,
+      "description": "shows the small chevron after the label (solid buttons show it by default)"
+    },
+    {
+      "name": "type",
+      "type": "enum",
+      "required": false,
+      "default": "button",
+      "description": "the button's type when it isn't a link (e.g. \"submit\" inside a form)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b2ccf330615d257983799790c4239cabd5a0afb8aab9f1429377a9b1337dc0f0"
+}

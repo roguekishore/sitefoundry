@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Puzzle pixel squares",
+  "description": "A faint cluster of rounded squares set on a grid, a few slightly brighter than the rest: the decoration in the corners of the deep violet bands. Purely decorative; place it with absolute positioning.",
+  "category": "background",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "decoration",
+    "pixels",
+    "squares",
+    "subtle",
+    "dark"
+  ],
+  "notes": [
+    "made for primary-coloured bands: the squares are primary-foreground at 4–8%",
+    "pass position classes (absolute, top/right…) through className"
+  ],
+  "entry": "puzzle-pixels.tsx",
+  "source": "foundry",
+  "name": "puzzle-pixels",
+  "files": [
+    {
+      "path": "puzzle-pixels.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\n/** Each pattern lists its squares as [column, row, brightness 1–3] on a 4 × 5 grid. */\nconst patterns = {\n  /** a staircase falling to the right */\n  stair: [\n    [0, 0, 1], [1, 0, 2], [1, 1, 1], [2, 1, 1], [2, 2, 3], [3, 2, 1], [2, 3, 1], [3, 3, 2], [3, 4, 1],\n  ],\n  /** a squat block with a notch */\n  block: [\n    [0, 0, 2], [1, 0, 1], [0, 1, 1], [1, 1, 3], [2, 1, 1], [1, 2, 1], [2, 2, 2], [0, 3, 1], [2, 3, 1],\n  ],\n  /** a short climbing step */\n  step: [\n    [1, 0, 1], [2, 0, 2], [0, 1, 1], [1, 1, 1], [0, 2, 2], [1, 2, 1], [2, 2, 3],\n  ],\n} as const;\n\nconst brightness = [\"\", \"bg-primary-foreground/[0.03]\", \"bg-primary-foreground/[0.045]\", \"bg-highlight/12\"];\n\nexport interface PuzzlePixelsProps {\n  /** which cluster */\n  pattern?: keyof typeof patterns;\n  /** position (absolute, top/right…) and size; the cell size is --pixel (default 4.25rem) */\n  className?: string;\n}\n\n/** Decorative squares for the violet bands. */\nexport function PuzzlePixels({ pattern = \"stair\", className }: PuzzlePixelsProps) {\n  return (\n    <div\n      aria-hidden\n      className={cn(\"pointer-events-none grid grid-cols-[repeat(4,var(--pixel,4.25rem))] grid-rows-[repeat(5,var(--pixel,4.25rem))]\", className)}\n    >\n      {patterns[pattern].map(([col, row, b]) => (\n        <span\n          key={`${col}-${row}`}\n          className={cn(\"rounded-[calc(var(--radius)*0.6)]\", brightness[b])}\n          style={{ gridColumnStart: col + 1, gridRowStart: row + 1 }}\n        />\n      ))}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "pattern",
+      "type": "enum",
+      "required": false,
+      "default": "stair",
+      "description": "which cluster"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "position (absolute, top/right…) and size; the cell size is --pixel (default 4.25rem)"
+    }
+  ],
+  "hash": "d1f866f487276d767045774b3951c6eabebf798504f9b8bcc6d5853539574873"
+}

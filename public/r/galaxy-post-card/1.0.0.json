@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Galaxy post card",
+  "description": "An editorial card on black: a 2:1 image with 5px corners, an uppercase grey kicker (category • date), a 20–24px title and optional outlined topic chips. The whole card is one link; on hover the title greys out. A row layout puts a square cover beside the text (podcasts).",
+  "category": "card",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "card",
+    "blog",
+    "news",
+    "editorial",
+    "dark",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "the image slot shows a muted placeholder until media is passed"
+  ],
+  "entry": "galaxy-post-card.tsx",
+  "name": "galaxy-post-card",
+  "files": [
+    {
+      "path": "galaxy-post-card.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { GalaxyPlaceholder } from \"@foundry/galaxy-placeholder\";\n\nexport interface GalaxyPostCardProps {\n  /** the headline */\n  title: string;\n  /** where the card links */\n  href: string;\n  /** the image (an <img> or <video>); a muted placeholder at the same ratio when empty */\n  media?: ReactNode;\n  /** screen-reader text for the placeholder */\n  mediaLabel?: string;\n  /** a category before the date, e.g. \"Research\" */\n  category?: string;\n  /** the date, as shown */\n  date?: string;\n  /** topic chips under the title */\n  tags?: string[];\n  /** stack: image above the text (2:1) · row: a square cover beside the text */\n  layout?: \"stack\" | \"row\";\n  /** give the image a hairline border (the footer's cards have one) */\n  framed?: boolean;\n  className?: string;\n}\n\n/** One article, podcast or announcement. */\nexport function GalaxyPostCard({ title, href, media, mediaLabel, category, date, tags, layout = \"stack\", framed, className }: GalaxyPostCardProps) {\n  const row = layout === \"row\";\n  return (\n    <article className={cn(\"group relative\", row ? \"flex items-start gap-3 lg:gap-6\" : \"flex flex-col\", className)}>\n      <div\n        className={cn(\n          \"overflow-clip rounded-lg\",\n          row ? \"aspect-square w-[6.5rem] shrink-0 lg:w-[12.125rem]\" : \"aspect-[2/1] w-full\",\n          framed && \"border border-border\",\n        )}\n      >\n        {media ?? <GalaxyPlaceholder label={mediaLabel} />}\n      </div>\n      <div className={cn(\"flex flex-col\", row ? \"pt-0.5\" : \"pt-6\")}>\n        {(category || date) && (\n          <p className=\"text-xs leading-[1.5] tracking-[0.1em] text-muted-foreground/80 uppercase lg:text-sm lg:leading-5\">\n            {category && <span>{category}</span>}\n            {category && date && <span aria-hidden> • </span>}\n            {date && <span>{date}</span>}\n          </p>\n        )}\n        <h3 className=\"mt-2 text-xl leading-7 tracking-[-0.01em] text-foreground lg:text-2xl lg:leading-8\">\n          <a\n            href={href}\n            className=\"transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] after:absolute after:inset-0 group-hover:text-muted-foreground motion-reduce:transition-none\"\n          >\n            {title}\n          </a>\n        </h3>\n        {tags && tags.length > 0 && (\n          <ul className=\"mt-4 flex flex-wrap gap-1\">\n            {tags.map((tag) => (\n              <li key={tag} className=\"rounded-md border border-foreground/75 px-2 py-0.5 text-base leading-6 text-foreground/80\">\n                {tag}\n              </li>\n            ))}\n          </ul>\n        )}\n      </div>\n    </article>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "galaxy-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where the card links"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the image (an <img> or <video>); a muted placeholder at the same ratio when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader text for the placeholder"
+    },
+    {
+      "name": "category",
+      "type": "string",
+      "required": false,
+      "description": "a category before the date, e.g. \"Research\""
+    },
+    {
+      "name": "date",
+      "type": "string",
+      "required": false,
+      "description": "the date, as shown"
+    },
+    {
+      "name": "tags",
+      "type": "string[]",
+      "required": false,
+      "description": "topic chips under the title"
+    },
+    {
+      "name": "layout",
+      "type": "enum",
+      "required": false,
+      "default": "stack",
+      "description": "stack: image above the text (2:1) · row: a square cover beside the text"
+    },
+    {
+      "name": "framed",
+      "type": "boolean",
+      "required": false,
+      "description": "give the image a hairline border (the footer's cards have one)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d7fdba615762cc751eb116755bba4b814596a4cfd0bbf0ba5c2b83f039ba51da"
+}

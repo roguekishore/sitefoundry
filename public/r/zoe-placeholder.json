@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Zoe placeholder",
+  "description": "A plain stand-in for media: a warm cream-to-grey wash for photos, a faint ink tint for product shots on cream cards, a navy surface, a pale glass panel for composites on yellow, or a flat yellow. Can fade in as it enters view, like the site's lazily loaded pictures.",
+  "category": "card",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "placeholder",
+    "media",
+    "warm",
+    "fade",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "decorative and aria-hidden: never draws the subject it replaces",
+    "size, aspect ratio and radius come from className",
+    "fade uses a CSS view timeline; without support (or with reduced motion) it simply shows"
+  ],
+  "entry": "zoe-placeholder.tsx",
+  "name": "zoe-placeholder",
+  "files": [
+    {
+      "path": "zoe-placeholder.css",
+      "content": "/* The site's pictures load lazily and fade in as they come into view. The placeholder does the\n   same on a view timeline: from transparent as it starts entering to fully shown by the time\n   most of it is in. Browsers without scroll-driven animations show it straight away. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zoe-placeholder-fade {\n      animation: zoe-placeholder-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 80%;\n    }\n  }\n}\n\n@keyframes zoe-placeholder-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "zoe-placeholder.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./zoe-placeholder.css\";\n\nconst tones = {\n  /** a warm cream-to-grey wash: photos */\n  photo: \"bg-accent bg-linear-to-br from-accent via-muted-foreground/15 to-muted-foreground/35\",\n  /** a faint ink tint: product shots sitting on cream cards */\n  soft: \"bg-foreground/[0.05]\",\n  /** a navy surface with a soft sheen: photos shot on navy */\n  ink: \"bg-foreground bg-linear-to-br from-foreground via-foreground to-background/15 dark:bg-card dark:from-card dark:via-card dark:to-foreground/10\",\n  /** a pale glass panel: composites on the yellow band */\n  glass: \"bg-background/30 ring-1 ring-background/50 ring-inset\",\n  /** flat yellow: covers that are the brand colour */\n  sun: \"bg-primary bg-linear-to-b from-primary to-glow\",\n} as const;\n\nexport interface ZoePlaceholderProps {\n  /** the surface */\n  tone?: keyof typeof tones;\n  /** fade in as it enters view, like the site's lazily loaded pictures */\n  fade?: boolean;\n  /** size, aspect ratio and radius */\n  className?: string;\n}\n\n/** Stands in for media. Decorative: it never draws the thing it replaces. */\nexport function ZoePlaceholder({ tone = \"photo\", fade = false, className }: ZoePlaceholderProps) {\n  return <div aria-hidden className={cn(tones[tone], fade && \"zoe-placeholder-fade\", className)} />;\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "photo",
+      "description": "the surface"
+    },
+    {
+      "name": "fade",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "fade in as it enters view, like the site's lazily loaded pictures"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, aspect ratio and radius"
+    }
+  ],
+  "hash": "4c1a819727387843c21ca032783baad8fa90a2dcdef3d79b1120b636233c68d7"
+}

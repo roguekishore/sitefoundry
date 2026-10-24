@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Framer heading",
+  "description": "The site's tight geometric heading (36→54px titles, 28→44px section heads), plus a section head that puts the heading on the left and small actions at its bottom right (below it on phones).",
+  "category": "heading",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "heading",
+    "typography",
+    "geometric",
+    "tight",
+    "minimal"
+  ],
+  "notes": [
+    "needs a display font; desktop line breaks in titles come in as \\n and are dropped on phones"
+  ],
+  "entry": "framer-heading.tsx",
+  "name": "framer-heading",
+  "files": [
+    {
+      "path": "framer-heading.tsx",
+      "content": "import { Fragment, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface FramerHeadingProps {\n  /** the text; a \"\\n\" marks a line break used on desktop only */\n  children: string;\n  /** the element: h1 for the page title, h2 for sections */\n  as?: \"h1\" | \"h2\";\n  /** title: 36px → 54px · section: 28px → 44px */\n  size?: \"title\" | \"section\";\n  className?: string;\n}\n\nconst sizes = {\n  title: \"text-4xl leading-[1.02] tracking-[-0.025em] lg:text-[3.375rem]\",\n  section: \"text-[1.75rem] leading-[1.1] tracking-[-0.025em] lg:text-[2.75rem]\",\n};\n\n/** Splits on \"\\n\" and breaks there only from lg up, so phone lines wrap naturally. */\nexport function DesktopLines({ text }: { text: string }) {\n  const lines = text.split(\"\\n\");\n  return (\n    <>\n      {lines.map((line, i) => (\n        <Fragment key={i}>\n          {i > 0 && (\n            <>\n              <br className=\"max-lg:hidden\" />{\" \"}\n            </>\n          )}\n          {line}\n        </Fragment>\n      ))}\n    </>\n  );\n}\n\n/** The site's tight geometric heading. */\nexport function FramerHeading({ children, as: Tag = \"h2\", size = \"section\", className }: FramerHeadingProps) {\n  return (\n    <Tag className={cn(\"font-display font-[450] text-balance text-foreground\", sizes[size], className)}>\n      <DesktopLines text={children} />\n    </Tag>\n  );\n}\n\nexport interface FramerSectionHeadProps {\n  /** the section title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** one line of copy under the title */\n  subtitle?: string;\n  /** small actions (buttons, a count) at the bottom right; below the title on phones */\n  actions?: ReactNode;\n  /** keep the actions beside the title on phones too (the showcase head does this) */\n  actionsInline?: boolean;\n  /** extra classes for the subtitle (e.g. its measure) */\n  subtitleClassName?: string;\n  className?: string;\n}\n\n/** Heading on the left, small actions pinned to its bottom right. */\nexport function FramerSectionHead({ title, subtitle, actions, actionsInline, subtitleClassName, className }: FramerSectionHeadProps) {\n  return (\n    <div\n      className={cn(\n        \"flex gap-4 lg:flex-row lg:items-end lg:justify-between\",\n        actionsInline ? \"flex-row items-end justify-between\" : \"flex-col items-start\",\n        className,\n      )}\n    >\n      <div>\n        <FramerHeading>{title}</FramerHeading>\n        {subtitle && (\n          <p\n            className={cn(\n              \"mt-3 max-w-[26rem] text-lg leading-[1.35] tracking-[-0.01em] text-muted-foreground lg:mt-4\",\n              subtitleClassName,\n            )}\n          >\n            {subtitle}\n          </p>\n        )}\n      </div>\n      {actions && <div className=\"flex shrink-0 items-center gap-4\">{actions}</div>}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "subtitle",
+      "type": "string",
+      "required": false,
+      "description": "one line of copy under the title"
+    },
+    {
+      "name": "actions",
+      "type": "ReactNode",
+      "required": false,
+      "description": "small actions (buttons, a count) at the bottom right; below the title on phones"
+    },
+    {
+      "name": "actionsInline",
+      "type": "boolean",
+      "required": false,
+      "description": "keep the actions beside the title on phones too (the showcase head does this)"
+    },
+    {
+      "name": "subtitleClassName",
+      "type": "string",
+      "required": false,
+      "description": "extra classes for the subtitle (e.g. its measure)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "517c45725bfd612e40fd1796698325c7b0bc2981834975c18b810efe8c6cc14f"
+}

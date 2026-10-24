@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase dashboard showcase",
+  "description": "A two-tone title (ink over grey), a row of rounded pill tabs where the active one gets an ink border, and a wide white browser window with three grey dots that runs off the section's bottom edge, holding a 16:9 screenshot or video slot. Clicking a tab swaps the media; hovering a tab greys its border.",
+  "category": "features",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "showcase",
+    "tabs",
+    "browser-frame",
+    "light",
+    "minimal",
+    "developer"
+  ],
+  "notes": [
+    "needs JavaScript for the tabs (hydrate visible); without it the first tab shows",
+    "the window is cropped by the section bottom (aspect ratio), so the media's lower part is hidden on purpose"
+  ],
+  "hydrate": "visible",
+  "entry": "supabase-dashboard.tsx",
+  "name": "supabase-dashboard",
+  "files": [
+    {
+      "path": "supabase-dashboard.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseHeading, type SupabaseHeadingPart } from \"@foundry/supabase-heading\";\nimport { SupabasePlaceholder } from \"@foundry/supabase-placeholder\";\n\nexport interface SupabaseDashboardTab {\n  /** the pill's label */\n  label: string;\n  /** the screenshot or looping video shown in the window for this tab */\n  media?: ReactNode;\n  /** screen-reader label for the empty slot */\n  mediaLabel?: string;\n}\n\nexport interface SupabaseDashboardProps {\n  /** the two-tone title (ink phrase, then grey) */\n  title: SupabaseHeadingPart[];\n  /** the pill tabs; each swaps what the window shows */\n  tabs: SupabaseDashboardTab[];\n  className?: string;\n}\n\n/** A two-tone title, a row of pill tabs, and a wide browser window that runs off the bottom of the section. */\nexport function SupabaseDashboard({ title, tabs, className }: SupabaseDashboardProps) {\n  const [active, setActive] = useState(0);\n  const current = tabs[active] ?? tabs[0];\n  return (\n    <section className={cn(\"border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content max-w-page px-gutter pt-section lg:pt-[5.5rem]\">\n        <SupabaseHeading parts={title} />\n        <div role=\"tablist\" className=\"mt-6 flex flex-wrap gap-2 lg:mt-8\">\n          {tabs.map((tab, i) => (\n            <button\n              key={tab.label}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"h-[2.125rem] rounded-full border px-3.5 text-sm text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none lg:h-[2.375rem] lg:px-8 lg:text-[0.9375rem]\",\n                i === active ? \"border-foreground bg-card\" : \"border-border hover:border-muted-foreground\",\n              )}\n            >\n              {tab.label}\n            </button>\n          ))}\n        </div>\n\n        {/* the window is cut off by the section's bottom edge, as on the original */}\n        <div className=\"mt-8 aspect-[2/1] min-h-0 overflow-clip rounded-t-xl border border-b-0 border-border bg-card lg:aspect-[1088/596] lg:rounded-t-2xl\">\n          <div className=\"flex h-6 items-center gap-1.5 px-3 lg:h-8 lg:px-4\" aria-hidden>\n            <span className=\"size-1.5 rounded-full bg-foreground/12 lg:size-2\" />\n            <span className=\"size-1.5 rounded-full bg-foreground/12 lg:size-2\" />\n            <span className=\"size-1.5 rounded-full bg-foreground/12 lg:size-2\" />\n          </div>\n          <div key={active} className=\"mx-1.5 aspect-video overflow-clip rounded-t-md lg:mx-2\">\n            {current?.media ?? <SupabasePlaceholder label={current?.mediaLabel} />}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-heading",
+    "supabase-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "SupabaseHeadingPart[]",
+      "required": true,
+      "description": "the two-tone title (ink phrase, then grey)"
+    },
+    {
+      "name": "tabs",
+      "type": "SupabaseDashboardTab[]",
+      "required": true,
+      "description": "the pill tabs; each swaps what the window shows"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "46d44a20cd648215257bba66dd32755684228f55037ceb617f359c0963d6128e"
+}

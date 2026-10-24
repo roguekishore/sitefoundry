@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Cursor post row",
+  "description": "A section title, a row of four small paper link cards (a muted date or meta line, a title, an optional byline with a 24px avatar) and an orange link under them. Cards darken one step on hover; on phones the row becomes a sideways scroller with the next card peeking in from the right edge.",
+  "category": "features",
+  "site": "cursor",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "changelog",
+    "blog",
+    "light",
+    "flat",
+    "scroller",
+    "snap",
+    "hover"
+  ],
+  "notes": [
+    "used by cursor-changelog and cursor-highlights; up to four cards look right on desktop"
+  ],
+  "entry": "cursor-post-row.tsx",
+  "source": "foundry",
+  "name": "cursor-post-row",
+  "files": [
+    {
+      "path": "cursor-post-row.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CursorArrowLink } from \"@foundry/cursor-arrow-link\";\nimport { CursorMedia } from \"@foundry/cursor-media\";\nimport { CursorSectionTitle } from \"@foundry/cursor-section-title\";\n\nexport interface CursorPost {\n  /** where the card links to */\n  href: string;\n  /** the muted first line: a date, or \"date · category\" */\n  meta: string;\n  /** the post's title */\n  title: string;\n  /** optional byline: \"name · 3 min read\" */\n  byline?: string;\n  /** the byline's 24px avatar (an img); a muted circle when empty */\n  avatar?: ReactNode;\n}\n\nexport interface CursorPostRowProps {\n  /** the section title */\n  title: string;\n  /** up to four cards */\n  posts: CursorPost[];\n  /** the orange link under the cards */\n  more?: { label: string; href: string };\n  className?: string;\n}\n\n/** Title, four small link cards, a \"see more\" link. A sideways scroller on phones. */\nexport function CursorPostRow({ title, posts, more, className }: CursorPostRowProps) {\n  return (\n    <section className={cn(\"bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[calc(var(--page-width)+2*var(--page-gutter))] px-gutter\">\n        <CursorSectionTitle>{title}</CursorSectionTitle>\n        <ul className=\"-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-2.5 overflow-x-auto px-gutter [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-4 lg:overflow-visible lg:px-0\">\n          {posts.map((post) => (\n            <li key={post.href + post.title} className=\"w-[16.5rem] shrink-0 snap-start lg:w-auto\">\n              <a\n                href={post.href}\n                className=\"flex h-full min-h-[6.75rem] flex-col rounded-lg border border-border bg-card px-4 py-3.5 text-[0.9375rem] leading-6 transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-muted motion-reduce:transition-none lg:py-4 lg:text-base\"\n              >\n                <span className=\"text-muted-foreground\">{post.meta}</span>\n                <span className=\"text-foreground\">{post.title}</span>\n                {post.byline && (\n                  <span className=\"mt-auto flex items-center gap-2 pt-2.5 lg:pt-3 text-muted-foreground\">\n                    <CursorMedia tone=\"plain\" className=\"size-6 shrink-0 rounded-full\">{post.avatar}</CursorMedia>\n                    {post.byline}\n                  </span>\n                )}\n              </a>\n            </li>\n          ))}\n        </ul>\n        {more && (\n          <CursorArrowLink href={more.href} className=\"mt-4 text-[0.9375rem] leading-6 lg:text-base\">\n            {more.label}\n          </CursorArrowLink>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "cursor-arrow-link",
+    "cursor-media",
+    "cursor-section-title",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "posts",
+      "type": "CursorPost[]",
+      "required": true,
+      "description": "up to four cards"
+    },
+    {
+      "name": "more",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the orange link under the cards"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "34dfd65c0531bfc2e429197d8a50548ed058efaaa73387ef055ab7fa36677ba8"
+}

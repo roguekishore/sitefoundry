@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Puzzle story carousel",
+  "description": "A centred headline and one-line intro over a row of tall rounded photo cards that runs off the right edge; each photo sits under a soft dark scrim with a small caps tag and a white three-line title at the bottom, and zooms slightly on hover. Two arrow buttons slide the row one card at a time; a 'see all' arrow link sits opposite. On phones one card shows with the next peeking in, arrows and link centred.",
+  "category": "testimonials",
+  "site": "puzzle",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "case-studies",
+    "carousel",
+    "slider",
+    "photo",
+    "hover",
+    "zoom",
+    "light"
+  ],
+  "notes": [
+    "needs JavaScript for the arrows (hydrate visible); the row also scrolls and snaps by swipe or trackpad without it",
+    "each card's media slot takes a photo; empty, it shows a muted placeholder"
+  ],
+  "hydrate": "visible",
+  "entry": "puzzle-stories.tsx",
+  "source": "foundry",
+  "name": "puzzle-stories",
+  "files": [
+    {
+      "path": "puzzle-stories.tsx",
+      "content": "import { useRef, type ReactNode } from \"react\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { PuzzleHeading } from \"@foundry/puzzle-heading\";\nimport { PuzzlePlaceholder } from \"@foundry/puzzle-placeholder\";\n\nexport interface PuzzleStory {\n  /** the small caps tag, e.g. \"Agency\" */\n  tag: string;\n  /** the story's headline */\n  title: string;\n  href: string;\n  /** the photo; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface PuzzleStoriesProps {\n  title: string;\n  /** the line under the headline */\n  text?: string;\n  stories: PuzzleStory[];\n  /** the link opposite the arrows */\n  link?: { label: string; href: string };\n  /** screen-reader labels for the two arrows */\n  prevLabel: string;\n  nextLabel: string;\n  className?: string;\n}\n\n/** Tall photo cards in a sideways row with arrow buttons. */\nexport function PuzzleStories({ title, text, stories, link, prevLabel, nextLabel, className }: PuzzleStoriesProps) {\n  const track = useRef<HTMLUListElement>(null);\n\n  function slide(dir: 1 | -1) {\n    const el = track.current;\n    const card = el?.firstElementChild as HTMLElement | null;\n    if (!el || !card) return;\n    const reduce = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n    el.scrollBy({ left: dir * (card.offsetWidth + 20), behavior: reduce ? \"auto\" : \"smooth\" });\n  }\n\n  const arrow = \"flex size-10 items-center justify-center rounded-full transition-colors duration-300 hover:text-highlight motion-reduce:transition-none\";\n\n  return (\n    <section className={cn(\"overflow-x-clip bg-background py-14 text-foreground lg:pt-[4.25rem] lg:pb-24\", className)}>\n      <PuzzleHeading title={title} className=\"max-w-[24rem] px-gutter sm:max-w-[48rem] lg:max-w-none\" />\n      {text && <p className=\"mt-4 px-gutter text-center text-base/[1.5] lg:mt-5\">{text}</p>}\n\n      <ul\n        ref={track}\n        className=\"mt-8 flex snap-x snap-mandatory gap-5 overflow-x-auto pr-gutter pl-[max(var(--page-gutter),calc((100%-var(--page-width))/2+var(--page-gutter)))] [scrollbar-width:none] lg:mt-10 [&::-webkit-scrollbar]:hidden\"\n        style={{ scrollPaddingInlineStart: \"max(var(--page-gutter), calc((100% - var(--page-width)) / 2 + var(--page-gutter)))\" }}\n      >\n        {stories.map((s) => (\n          <li key={s.title} className=\"w-[14.5rem] shrink-0 snap-start lg:w-[18.6875rem]\">\n            <a href={s.href} className=\"group relative block aspect-[0.64] overflow-clip rounded-[calc(var(--radius)*0.9)] lg:aspect-[0.79] lg:rounded-[calc(var(--radius)+2px)]\">\n              <div className=\"absolute inset-0 transition-transform duration-400 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100\">\n                {s.media ?? <PuzzlePlaceholder tone=\"photo\" className=\"size-full\" />}\n              </div>\n              <div className=\"absolute inset-0 flex flex-col justify-end bg-foreground/30 p-5 text-background lg:px-[1.6875rem] lg:pb-7 dark:bg-background/45 dark:text-foreground\">\n                <p className=\"font-mono text-sm/none tracking-[0.02em] uppercase\">{s.tag}</p>\n                <p className=\"mt-4 text-lg/[1.75] font-medium lg:text-lg/[1.65]\">{s.title}</p>\n              </div>\n            </a>\n          </li>\n        ))}\n      </ul>\n\n      <div className=\"mx-auto mt-6 flex max-w-page flex-col items-center gap-4 px-gutter lg:mt-12 lg:flex-row lg:justify-between\">\n        <div className=\"flex gap-4 lg:-ml-2.5 lg:gap-5\">\n          <button type=\"button\" aria-label={prevLabel} onClick={() => slide(-1)} className={arrow}>\n            <ArrowLeft aria-hidden className=\"size-5 lg:size-6\" strokeWidth={1.5} />\n          </button>\n          <button type=\"button\" aria-label={nextLabel} onClick={() => slide(1)} className={arrow}>\n            <ArrowRight aria-hidden className=\"size-5 lg:size-6\" strokeWidth={1.5} />\n          </button>\n        </div>\n        {link && (\n          <a href={link.href} className=\"group inline-flex items-center gap-4 text-base font-medium transition-colors duration-300 hover:text-highlight motion-reduce:transition-none lg:mr-6\">\n            {link.label}\n            <ArrowRight aria-hidden className=\"size-5 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none lg:size-6\" strokeWidth={1.5} />\n          </a>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "puzzle-heading",
+    "puzzle-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": false,
+      "description": "the line under the headline"
+    },
+    {
+      "name": "stories",
+      "type": "PuzzleStory[]",
+      "required": true
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the link opposite the arrows"
+    },
+    {
+      "name": "prevLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader labels for the two arrows"
+    },
+    {
+      "name": "nextLabel",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4d8f6ed569d198a6aae6a5d08096f391fa4047fc37bece29b837a573b480de24"
+}

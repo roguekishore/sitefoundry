@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hermeus hero",
+  "description": "A window-tall flat grey ground with a full-bleed render slot (the original's cut-out aircraft) and one short plain headline at the left. On load each letter blurs and skews into focus at a scattered moment, and afterwards single letters keep briefly blurring out and back, like a signal flickering.",
+  "category": "hero",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "fullscreen",
+    "minimal",
+    "light",
+    "grey",
+    "blur",
+    "glitch",
+    "split-text",
+    "load",
+    "loop"
+  ],
+  "notes": [
+    "100svh tall; the header sits over its top (page.tsx pulls it up under the sticky header)",
+    "the empty media slot is a soft light pooled on the grey ground; a real cut-out image fills it like object-fit: cover",
+    "CSS only; with reduced motion the headline is simply shown"
+  ],
+  "entry": "hermeus-hero.tsx",
+  "source": "foundry",
+  "name": "hermeus-hero",
+  "files": [
+    {
+      "path": "hermeus-hero.css",
+      "content": "/* Load: each letter comes into focus from a 10px blur, skewed and nudged left, at a scattered\n   moment over the first ~1s. Loop: once in, every letter takes a short turn blurring out and\n   back during an 8s cycle, each at its own offset, so a few letters are always flickering. */\n@media (prefers-reduced-motion: no-preference) {\n  .hermeus-hero-char {\n    display: inline-block;\n    animation:\n      hermeus-hero-char-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both,\n      hermeus-hero-char-flicker 8s ease-in-out infinite;\n    animation-delay: var(--hermeus-hero-in), var(--hermeus-hero-flicker);\n  }\n}\n\n@keyframes hermeus-hero-char-in {\n  from { opacity: 0; filter: blur(10px); transform: translateX(-0.12em) skewX(-14deg); }\n  to { opacity: 1; filter: blur(0); transform: none; }\n}\n@keyframes hermeus-hero-char-flicker {\n  0%, 88%, 100% { opacity: 1; filter: blur(0); transform: none; }\n  91% { opacity: 0.45; filter: blur(5px); transform: skewX(-10deg); }\n  95% { opacity: 0.8; filter: blur(2px); transform: none; }\n}\n"
+    },
+    {
+      "path": "hermeus-hero.tsx",
+      "content": "import { Fragment, type CSSProperties, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HermeusMedia } from \"@foundry/hermeus-media\";\nimport \"./hermeus-hero.css\";\n\nexport interface HermeusHeroProps {\n  /** the one short headline; each letter flickers into focus */\n  headline: string;\n  /** the full-bleed render behind everything (an image or video); empty: a soft placeholder light */\n  media?: ReactNode;\n  /** what the media slot shows, for screen readers while it is empty */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Scattered but fixed per-letter delays (no randomness, so server and browser agree). */\nfunction delays(i: number): CSSProperties {\n  return {\n    \"--hermeus-hero-in\": `${150 + ((i * 37) % 17) * 50}ms`,\n    \"--hermeus-hero-flicker\": `${1400 + ((i * 53) % 29) * 270}ms`,\n  } as CSSProperties;\n}\n\n/** Window-tall grey hero with a full-bleed render slot and a flickering headline. */\nexport function HermeusHero({ headline, media, mediaLabel, className }: HermeusHeroProps) {\n  let n = 0;\n  const words = headline.split(\" \").map((word) => Array.from(word).map((ch) => ({ ch, i: n++ })));\n\n  return (\n    <section className={cn(\"relative h-svh overflow-clip bg-secondary text-foreground\", className)}>\n      <HermeusMedia media={media} label={mediaLabel} look=\"soft\" className=\"absolute inset-0\" />\n      <div className=\"absolute inset-x-0 top-[47%] lg:top-auto lg:bottom-[25%]\">\n        <div className=\"mx-auto max-w-page px-gutter\">\n          <h1\n            className=\"max-w-[8.5em] text-[clamp(1.3125rem,1.196rem+0.476vw,1.625rem)]/[1.15] font-normal text-secondary-foreground lg:max-w-none\"\n          >\n            <span className=\"sr-only\">{headline}</span>\n            {words.map((chars, w) => (\n              <Fragment key={w}>\n                <span aria-hidden className=\"inline-block whitespace-nowrap\">\n                  {chars.map(({ ch, i }) => (\n                    <span key={i} className=\"hermeus-hero-char\" style={delays(i)}>\n                      {ch}\n                    </span>\n                  ))}\n                </span>\n                {w < words.length - 1 && \" \"}\n              </Fragment>\n            ))}\n          </h1>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hermeus-media"
+  ],
+  "props": [
+    {
+      "name": "headline",
+      "type": "string",
+      "required": true,
+      "description": "the one short headline; each letter flickers into focus"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed render behind everything (an image or video); empty: a soft placeholder light"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the media slot shows, for screen readers while it is empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9ae9e6a2468be8c7723d43ba8ba27122ece63afcfe581aed8b36940cb3d59014"
+}

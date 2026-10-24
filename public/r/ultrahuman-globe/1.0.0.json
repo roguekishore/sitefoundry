@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman globe and figures",
+  "description": "A white section: a 48px two-line headline, grey copy, an outline pill and two big figures split by a hairline on the left, a large round globe on the right that fades into the page at the bottom. On phones the copy is centred and the globe, wider than the screen, rises from below and is cut by the section. Two dark glass score cards with mono labels float over the globe, fading in and then shrinking as the section scrolls past.",
+  "category": "stats",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "globe",
+    "figures",
+    "light",
+    "glass",
+    "blur",
+    "mono",
+    "scroll-driven",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "the glass cards force the theme's dark colours with the dark class",
+    "CSS-only motion; the original's live-ticking counter is static here"
+  ],
+  "entry": "ultrahuman-globe.tsx",
+  "name": "ultrahuman-globe",
+  "files": [
+    {
+      "path": "ultrahuman-globe.css",
+      "content": "/* The glass cards fade in as they scroll into view, then shrink toward 80% as the section moves\n   on up the window. Static HTML and reduced motion show them at full size. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-globe-card {\n      transform-origin: center;\n      animation: ultrahuman-globe-card linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 85%;\n    }\n  }\n}\n\n@keyframes ultrahuman-globe-card {\n  0% { opacity: 0; transform: scale(1); }\n  30% { opacity: 1; transform: scale(1); }\n  100% { opacity: 1; transform: scale(0.82); }\n}\n"
+    },
+    {
+      "path": "ultrahuman-globe.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport { UltrahumanReveal } from \"@foundry/ultrahuman-reveal\";\nimport \"./ultrahuman-globe.css\";\n\nexport interface UltrahumanGlobeStat {\n  /** the figure, e.g. \"98,417,302\" */\n  value: string;\n  /** what it counts */\n  label: string;\n}\n\nexport interface UltrahumanGlobeCard {\n  /** the small mono label, e.g. \"Average sleep score\" */\n  label: string;\n  /** the figure */\n  value: string;\n  /** the place it belongs to */\n  place: string;\n}\n\nexport interface UltrahumanGlobeProps {\n  /** the headline (two lines on desktop) */\n  title: string;\n  /** one or two lines under it */\n  body: string;\n  /** the outline button */\n  action: { label: string; href: string };\n  /** the figures under the copy, split by a hairline (two on the original) */\n  stats: UltrahumanGlobeStat[];\n  /** small glass cards floating over the globe (desktop, two on the original) */\n  cards?: UltrahumanGlobeCard[];\n  /** the globe (a round render or canvas); a round placeholder when empty */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n  className?: string;\n}\n\n// where the glass cards sit over the globe (desktop), as % of the globe box\nconst cardSpots = [\"left-[39%] top-[12%]\", \"left-[34%] top-[29.5%]\"];\n\n/** Copy and two big figures beside a round globe that fades into the page at the bottom; on\n *  phones the copy is centred and the globe, wider than the screen, rises from below. Two dark\n *  glass score cards float over it, fading in and then shrinking as the section scrolls past. */\nexport function UltrahumanGlobe({ title, body, action, stats, cards = [], media, mediaLabel, className }: UltrahumanGlobeProps) {\n  return (\n    <section className={cn(\"relative overflow-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto flex h-[52.75rem] max-w-[90rem] flex-col items-center pt-[4.75rem] text-center lg:h-auto lg:min-h-[51.25rem] lg:flex-row lg:items-center lg:px-[4.75rem] lg:pt-0 lg:text-left\">\n        <div className=\"relative z-10 px-gutter lg:w-[41%] lg:px-0\">\n          <UltrahumanReveal as=\"h2\" className=\"mx-auto max-w-[15ch] text-2xl leading-[1.18] tracking-[-0.03em] lg:mx-0 lg:max-w-[12ch] lg:text-5xl lg:leading-[3.625rem] lg:tracking-[-0.045em]\">\n            {title}\n          </UltrahumanReveal>\n          <p className=\"mx-auto mt-3 max-w-[16.5rem] text-sm leading-[1.25rem] tracking-[-0.01em] text-foreground/60 lg:mx-0 lg:max-w-[26.5rem] lg:text-base lg:leading-5\">{body}</p>\n          <UltrahumanButton href={action.href} variant=\"outline\" className=\"mt-6 lg:mt-6\">\n            {action.label}\n          </UltrahumanButton>\n          <dl className=\"mt-14 grid grid-cols-2 lg:mt-[4.5rem] lg:flex\">\n            {stats.map((stat, i) => (\n              <div key={stat.label} className={cn(\"flex flex-col-reverse px-3 lg:px-0\", i > 0 && \"border-l border-foreground/15 lg:ml-7 lg:pl-7\")}>\n                <dt className=\"mx-auto mt-2.5 max-w-[10rem] text-sm leading-[1.125rem] tracking-[-0.01em] text-foreground/60 lg:mx-0 lg:mt-5 lg:max-w-none lg:text-base\">{stat.label}</dt>\n                <dd className=\"text-xl leading-none tracking-[-0.03em] lg:text-[2.5rem] lg:tracking-[-0.04em]\">{stat.value}</dd>\n              </div>\n            ))}\n          </dl>\n        </div>\n\n        <div className=\"relative mt-11 aspect-square w-[150%] max-w-none shrink-0 lg:mt-0 lg:ml-auto lg:w-[40.75%] lg:translate-x-[-1.5rem]\">\n          <div className=\"size-full overflow-clip rounded-full [mask-image:linear-gradient(black_55%,transparent_100%)] lg:[mask-image:linear-gradient(black_45%,transparent_98%)]\">\n            {media ?? <UltrahumanPlaceholder tone=\"photo\" label={mediaLabel} className=\"bg-[color-mix(in_oklab,var(--muted-foreground)_55%,var(--foreground))]\" />}\n          </div>\n          {cards.slice(0, 2).map((card, i) => (\n            <div\n              key={card.place}\n              className={cn(\n                \"ultrahuman-globe-card dark absolute hidden w-[27%] rounded-xl border border-foreground/20 bg-background/45 px-4 pt-3.5 pb-3 text-foreground backdrop-blur-md lg:block\",\n                cardSpots[i],\n              )}\n            >\n              <p className=\"font-mono text-[0.5625rem] leading-none tracking-[0.12em] text-foreground/60 uppercase\">{card.label}</p>\n              <p className=\"mt-3.5 text-base leading-none tracking-[-0.02em]\">{card.value}</p>\n              <p className=\"mt-1 text-[0.6875rem] leading-tight\">{card.place}</p>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button",
+    "ultrahuman-placeholder",
+    "ultrahuman-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline (two lines on desktop)"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "one or two lines under it"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outline button"
+    },
+    {
+      "name": "stats",
+      "type": "UltrahumanGlobeStat[]",
+      "required": true,
+      "description": "the figures under the copy, split by a hairline (two on the original)"
+    },
+    {
+      "name": "cards",
+      "type": "UltrahumanGlobeCard[]",
+      "required": false,
+      "default": "[]",
+      "description": "small glass cards floating over the globe (desktop, two on the original)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the globe (a round render or canvas); a round placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a719544a080cc7355471eda176b026ccb7f6217441d7d34a71e4be8968d31f04"
+}

@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe explore + newsletter",
+  "description": "A deep plum band: a small uppercase eyebrow over a hairline, then a light serif 'stay in touch' title with a hairline-bordered email field holding a white submit button, beside a row of white 16px-rounded link cards (square picture with a small navy tag, two lines of text). Below 1280px the cards come first as a sideways-scrolling row, the sign-up under them.",
+  "category": "cta",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "newsletter",
+    "email",
+    "cards",
+    "plum",
+    "dark",
+    "band",
+    "serif"
+  ],
+  "notes": [
+    "the band is the secondary colour; pair it with zoe-footer straight after, which carries on the same band",
+    "the form is plain HTML: give it an action"
+  ],
+  "entry": "zoe-explore.tsx",
+  "name": "zoe-explore",
+  "files": [
+    {
+      "path": "zoe-explore.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZoeButton } from \"@foundry/zoe-button\";\nimport { ZoePlaceholder } from \"@foundry/zoe-placeholder\";\n\nexport interface ZoeExploreCard {\n  /** the small navy tag on the picture */\n  tag: string;\n  /** one or two lines under the picture */\n  text: string;\n  href: string;\n  /** the square picture (object-cover); a placeholder when empty */\n  media?: ReactNode;\n  /** placeholder surface when there's no media: photo, or sun for a yellow cover */\n  placeholder?: \"photo\" | \"sun\";\n}\n\nexport interface ZoeExploreProps {\n  /** the small uppercase line at the top */\n  eyebrow: string;\n  /** the newsletter sign-up */\n  newsletter: {\n    title: string;\n    /** where the form posts */\n    action?: string;\n    /** the field's accessible name and its placeholder */\n    inputLabel: string;\n    placeholder: string;\n    submitLabel: string;\n    /** the small print under the field */\n    note: string;\n  };\n  /** link cards to other parts of the site */\n  cards: ZoeExploreCard[];\n  className?: string;\n}\n\n/** Zoe's plum explore band with the newsletter sign-up. */\nexport function ZoeExplore({ eyebrow, newsletter, cards, className }: ZoeExploreProps) {\n  return (\n    <section className={cn(\"bg-secondary pt-24 pb-8 text-secondary-foreground xl:pt-[8.5rem] xl:pb-[4.75rem]\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <p className=\"text-sm font-medium uppercase\">{eyebrow}</p>\n        <div className=\"mt-8 hidden border-t border-secondary-foreground/25 xl:block\" />\n\n        <div className=\"mt-10 flex flex-col gap-20 xl:mt-[3.375rem] xl:grid xl:grid-cols-[27rem_1fr] xl:gap-0\">\n          <div className=\"max-w-[26rem] xl:max-w-[20.25rem]\">\n            <h2 className=\"font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[1.75rem] leading-[1.15] font-light tracking-[-0.01em] lg:text-[1.875rem]\">\n              {newsletter.title}\n            </h2>\n            <form\n              action={newsletter.action}\n              className=\"mt-4 flex h-[3.75rem] items-center gap-2 rounded-[calc(var(--radius)/2)] border border-secondary-foreground/80 py-2.5 pr-2.5 pl-4 focus-within:border-secondary-foreground\"\n            >\n              <input\n                type=\"email\"\n                name=\"email\"\n                required\n                aria-label={newsletter.inputLabel}\n                placeholder={newsletter.placeholder}\n                className=\"min-w-0 flex-1 bg-transparent text-lg outline-none placeholder:text-secondary-foreground/80\"\n              />\n              <ZoeButton type=\"submit\" variant=\"light\" size=\"sm\" className=\"text-lg\">\n                {newsletter.submitLabel}\n              </ZoeButton>\n            </form>\n            <p className=\"mt-4 text-sm leading-[1.2] opacity-90\">{newsletter.note}</p>\n          </div>\n\n          <ul className=\"-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-6 overflow-x-auto px-gutter [scrollbar-width:none] max-xl:order-first xl:mx-0 xl:overflow-visible xl:px-0 [&::-webkit-scrollbar]:hidden\">\n            {cards.map((c) => (\n              <li key={c.tag} className=\"flex w-[15.625rem] shrink-0 snap-start\">\n                <a\n                  href={c.href}\n                  className=\"group flex w-full flex-col overflow-clip rounded-lg bg-background text-foreground transition-transform duration-300 ease-in-out hover:-translate-y-1 motion-reduce:transition-none\"\n                >\n                  <div className=\"relative aspect-square overflow-clip rounded-lg\">\n                    <div className=\"absolute inset-0 *:size-full *:object-cover\">\n                      {c.media ?? <ZoePlaceholder tone={c.placeholder ?? \"photo\"} />}\n                    </div>\n                    <span className=\"absolute top-4 left-4 rounded-[calc(var(--radius)/3)] bg-foreground px-2 py-1 text-sm leading-none text-background dark:bg-card dark:text-card-foreground\">\n                      {c.tag}\n                    </span>\n                  </div>\n                  <p className=\"min-h-[5.5rem] px-4 pt-4 pb-6 text-base leading-[1.2]\">{c.text}</p>\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zoe-button",
+    "zoe-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "the small uppercase line at the top"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; action?: string | undefined; inputLabel: string; placeholder: string; submitLabel: string; note: string; }",
+      "required": true,
+      "description": "the newsletter sign-up"
+    },
+    {
+      "name": "cards",
+      "type": "ZoeExploreCard[]",
+      "required": true,
+      "description": "link cards to other parts of the site"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c67e21b8536c60eeeba69a20d6d4c31de4b490280b1863a2a00b991289ebc7cc"
+}

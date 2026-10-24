@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop header",
+  "description": "A thin periwinkle announcement strip over a solid black 80px bar: a light, wide capital wordmark on the left, plain links in the middle on desktop, account and bag icons on the right. The bar sticks to the top while the strip scrolls away; on phones a menu icon slides a black drawer in from the left over a fading backdrop.",
+  "category": "header",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "black",
+    "dark",
+    "minimal",
+    "drawer",
+    "announcement"
+  ],
+  "notes": [
+    "the bar is position: sticky, so put the block first, directly in the page (not inside a short wrapper)",
+    "the bar is black in light mode and the card colour in dark mode"
+  ],
+  "hydrate": "load",
+  "entry": "whoop-header.tsx",
+  "source": "foundry",
+  "name": "whoop-header",
+  "files": [
+    {
+      "path": "whoop-header.tsx",
+      "content": "import { useEffect, useState } from \"react\";\nimport { Menu, ShoppingBag, UserRound, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopWordmark } from \"@foundry/whoop-wordmark\";\n\nexport interface WhoopHeaderLink {\n  label: string;\n  href: string;\n}\n\nexport interface WhoopHeaderProps {\n  /** brand name for the wordmark, and where it links */\n  brand: { name: string; href: string };\n  /** one line in the thin strip above the bar (leave out for no strip) */\n  announcement?: { label: string; href: string };\n  /** the links: in the middle of the bar on desktop, in the drawer on phones */\n  links: WhoopHeaderLink[];\n  /** the account icon link (desktop) */\n  account: { label: string; href: string };\n  /** the bag icon link */\n  bag: { label: string; href: string };\n  /** screen-reader labels of the drawer's open and close buttons */\n  menuLabels: { open: string; close: string };\n  className?: string;\n}\n\nconst band = \"bg-foreground text-background dark:bg-card dark:text-card-foreground\";\nconst iconLink =\n  \"grid size-10 place-items-center rounded-full transition-opacity duration-125 ease-in-out hover:opacity-60 motion-reduce:transition-none\";\n\n/** Whoop's black sticky bar with an announcement strip and a phone drawer. */\nexport function WhoopHeader({ brand, announcement, links, account, bag, menuLabels, className }: WhoopHeaderProps) {\n  const [open, setOpen] = useState(false);\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <>\n      {announcement && (\n        <a\n          href={announcement.href}\n          className=\"block bg-highlight text-center text-[0.73rem] leading-[0.9375rem] text-highlight-foreground lg:text-xs lg:leading-6\"\n        >\n          {announcement.label}\n        </a>\n      )}\n      <header className={cn(\"sticky top-0 z-40\", band, className)}>\n        <div className=\"mx-auto flex h-20 max-w-page items-center px-gutter\">\n          <WhoopWordmark name={brand.name} href={brand.href} className=\"text-[1.75rem]\" />\n          <nav className=\"mx-auto hidden lg:block\">\n            <ul className=\"flex items-center gap-9\">\n              {links.map((l) => (\n                <li key={l.label}>\n                  <a\n                    href={l.href}\n                    className=\"text-base underline decoration-transparent underline-offset-[6px] transition-[text-decoration-color,color] duration-125 ease-in-out hover:decoration-current motion-reduce:transition-none\"\n                  >\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n          <div className=\"ml-auto flex items-center gap-1 lg:ml-0\">\n            <button\n              type=\"button\"\n              aria-label={menuLabels.open}\n              aria-expanded={open}\n              onClick={() => setOpen(true)}\n              className={cn(iconLink, \"lg:hidden\")}\n            >\n              <Menu aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            </button>\n            <a href={account.href} aria-label={account.label} className={cn(iconLink, \"hidden lg:grid\")}>\n              <UserRound aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            </a>\n            <a href={bag.href} aria-label={bag.label} className={iconLink}>\n              <ShoppingBag aria-hidden className=\"size-[1.375rem]\" strokeWidth={1.75} />\n            </a>\n          </div>\n        </div>\n      </header>\n\n      {/* phone drawer: slides in from the left, the backdrop fades (0.5s, like the original) */}\n      <div className={cn(\"fixed inset-0 z-50 lg:hidden\", !open && \"pointer-events-none\")} aria-hidden={!open}>\n        <div\n          onClick={() => setOpen(false)}\n          className={cn(\n            \"absolute inset-0 bg-foreground/40 transition-[opacity,visibility] duration-500 ease-in-out motion-reduce:transition-none\",\n            open ? \"visible opacity-100\" : \"invisible opacity-0\",\n          )}\n        />\n        <div\n          className={cn(\n            \"absolute inset-y-0 left-0 flex w-[min(25rem,88%)] flex-col transition-[translate,visibility] duration-500 ease-in-out motion-reduce:transition-none\",\n            band,\n            open ? \"visible translate-x-0\" : \"invisible -translate-x-full\",\n          )}\n        >\n          <div className=\"flex h-20 items-center justify-between px-gutter\">\n            <WhoopWordmark name={brand.name} className=\"text-[1.65rem]\" />\n            <button type=\"button\" aria-label={menuLabels.close} onClick={() => setOpen(false)} className={iconLink}>\n              <X aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            </button>\n          </div>\n          <ul className=\"flex flex-col px-gutter pt-4\">\n            {links.map((l) => (\n              <li key={l.label}>\n                <a\n                  href={l.href}\n                  tabIndex={open ? 0 : -1}\n                  className=\"block border-b border-current/15 py-4 text-2xl tracking-[-0.02em] transition-opacity duration-125 hover:opacity-60\"\n                >\n                  {l.label}\n                </a>\n              </li>\n            ))}\n            <li>\n              <a href={account.href} tabIndex={open ? 0 : -1} className=\"block py-4 text-base opacity-60\">\n                {account.label}\n              </a>\n            </li>\n          </ul>\n        </div>\n      </div>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; }",
+      "required": true,
+      "description": "brand name for the wordmark, and where it links"
+    },
+    {
+      "name": "announcement",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "one line in the thin strip above the bar (leave out for no strip)"
+    },
+    {
+      "name": "links",
+      "type": "WhoopHeaderLink[]",
+      "required": true,
+      "description": "the links: in the middle of the bar on desktop, in the drawer on phones"
+    },
+    {
+      "name": "account",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the account icon link (desktop)"
+    },
+    {
+      "name": "bag",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the bag icon link"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": true,
+      "description": "screen-reader labels of the drawer's open and close buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d5ea51c5062cd8e8e711823d1f5e99945e389de7c0c96bb2aed173e3a6727c3e"
+}

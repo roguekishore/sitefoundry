@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer logo grid",
+  "description": "Customer names as quiet white wordmarks: a compact centred 4×2 grid on desktop, a single slowly scrolling ticker row on phones.",
+  "category": "logos",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "social-proof",
+    "dark",
+    "minimal",
+    "marquee",
+    "ticker"
+  ],
+  "notes": [
+    "names are plain text in the display face (pass your own logos via `logos[].mark`)",
+    "the phone ticker is CSS; with reduced motion it becomes a wrapped row"
+  ],
+  "entry": "framer-logos.tsx",
+  "name": "framer-logos",
+  "files": [
+    {
+      "path": "framer-logos.css",
+      "content": "/* Phone ticker: the list is rendered twice, so moving it by half its width loops seamlessly. */\n.framer-logos-track {\n  animation: framer-logos-slide 28s linear infinite;\n}\n\n@keyframes framer-logos-slide {\n  from { transform: translateX(0); }\n  to { transform: translateX(-50%); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .framer-logos-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }\n  .framer-logos-copy { display: none; }\n}\n"
+    },
+    {
+      "path": "framer-logos.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./framer-logos.css\";\n\nexport interface FramerLogo {\n  /** the customer's name (shown as a wordmark, or read to screen readers when `mark` is set) */\n  name: string;\n  /** a real logo to show instead of the text wordmark */\n  mark?: ReactNode;\n}\n\nexport interface FramerLogosProps {\n  /** eight on the original (4×2 on desktop) */\n  logos: FramerLogo[];\n  /** screen-reader label for the list */\n  label?: string;\n  className?: string;\n}\n\nfunction Wordmark({ logo }: { logo: FramerLogo }) {\n  return logo.mark ? (\n    <span role=\"img\" aria-label={logo.name} className=\"flex h-8 items-center\">\n      {logo.mark}\n    </span>\n  ) : (\n    <span className=\"font-display text-[1.375rem] leading-8 font-semibold tracking-[-0.03em] whitespace-nowrap text-foreground\">\n      {logo.name}\n    </span>\n  );\n}\n\n/** Centred 4×2 wordmark grid; a ticker on phones. */\nexport function FramerLogos({ logos, label, className }: FramerLogosProps) {\n  return (\n    <section aria-label={label} className={cn(\"bg-background py-12 text-foreground lg:py-[6.25rem]\", className)}>\n      {/* phones: ticker */}\n      <div className=\"overflow-x-clip lg:hidden\">\n        <div className=\"framer-logos-track flex w-max\">\n          {[0, 1].map((copy) => (\n            <ul key={copy} aria-hidden={copy === 1 || undefined} className={cn(\"flex shrink-0 items-center gap-12 pr-12\", copy === 1 && \"framer-logos-copy\")}>\n              {logos.map((logo) => (\n                <li key={logo.name}>\n                  <Wordmark logo={logo} />\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n      {/* desktop: grid */}\n      <ul className=\"mx-auto hidden max-w-[39rem] grid-cols-4 gap-y-9 px-gutter lg:grid\">\n        {logos.map((logo) => (\n          <li key={logo.name} className=\"flex justify-center\">\n            <Wordmark logo={logo} />\n          </li>\n        ))}\n      </ul>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logos",
+      "type": "FramerLogo[]",
+      "required": true,
+      "description": "eight on the original (4×2 on desktop)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the list"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9f081a064c9d92ad892ef7131bf0b6fcd185583c24ab48c00929de13a3dcc3c1"
+}

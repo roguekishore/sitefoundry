@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Arc accounts",
+  "description": "A big left-aligned regular-weight heading over three pastel cards (blue-grey, sage, sand) with 20px corners: an illustration across the top, then a pill badge, a 30px title, a warm-grey paragraph and a bold link pinned to the foot. Stacked on phones. The heading and then each card fade and rise 15px in turn as they scroll into view; a card's contents dim slightly on hover.",
+  "category": "features",
+  "site": "arc",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "pastel",
+    "light",
+    "grid",
+    "minimal",
+    "fintech",
+    "reveal",
+    "stagger",
+    "scroll",
+    "hover"
+  ],
+  "notes": [
+    "card tints come from the theme's accent and secondary colours and its highlight at 30%",
+    "the reveal needs CSS scroll-driven animations; elsewhere the cards simply show",
+    "illustration slots are faint wash placeholders until you pass media"
+  ],
+  "entry": "arc-accounts.tsx",
+  "source": "foundry",
+  "name": "arc-accounts",
+  "files": [
+    {
+      "path": "arc-accounts.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ArcFeatureCopy } from \"@foundry/arc-feature-copy\";\nimport { ArcHeading } from \"@foundry/arc-heading\";\nimport { ArcPlaceholder } from \"@foundry/arc-placeholder\";\nimport { ArcReveal } from \"@foundry/arc-reveal\";\n\nconst tones = {\n  /** blue-grey */\n  accent: \"bg-accent\",\n  /** sage */\n  secondary: \"bg-secondary\",\n  /** sand: the highlight colour at 30%, so themes with a strong highlight still get a pastel */\n  highlight: \"bg-highlight/30\",\n} as const;\n\nexport interface ArcAccount {\n  /** the pill above the title */\n  badge: string;\n  title: string;\n  body: string;\n  /** the bold link label at the foot, e.g. \"Learn more\" */\n  linkLabel: string;\n  href: string;\n  /** the card's pastel tint */\n  tone: keyof typeof tones;\n  /** the illustration across the card's top (363×221); empty: a faint wash placeholder */\n  media?: ReactNode;\n}\n\nexport interface ArcAccountsProps {\n  /** the big left-aligned section heading */\n  heading: string;\n  /** the cards, three to a row on desktop */\n  accounts: ArcAccount[];\n  className?: string;\n}\n\n/** Arc's account cards: a big heading, then three pastel 20px-radius cards, each an illustration over badge, title, copy and link. */\nexport function ArcAccounts({ heading, accounts, className }: ArcAccountsProps) {\n  return (\n    <section className={cn(\"bg-background pt-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <ArcHeading title={heading} />\n        <ul className=\"mt-[2.1rem] grid gap-6 lg:mt-[4.25rem] lg:grid-cols-3\">\n          {accounts.map((a, i) => (\n            <li key={a.title} className=\"flex\">\n              <ArcReveal step={i} className=\"flex w-full\">\n                <a\n                  href={a.href}\n                  className={cn(\"group flex w-full flex-col overflow-clip rounded-[calc(var(--radius)+12px)] text-foreground\", tones[a.tone])}\n                >\n                  <div className=\"aspect-[363/221] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none\">\n                    {a.media ?? <ArcPlaceholder tone=\"wash\" className=\"size-full\" />}\n                  </div>\n                  <ArcFeatureCopy\n                    badge={a.badge}\n                    title={a.title}\n                    body={a.body}\n                    linkLabel={a.linkLabel}\n                    className=\"flex-1 px-6 pt-1 pb-[2.125rem] transition-opacity duration-200 group-hover:opacity-90 motion-reduce:transition-none lg:px-10 lg:pb-10\"\n                  />\n                </a>\n              </ArcReveal>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "arc-feature-copy",
+    "arc-heading",
+    "arc-placeholder",
+    "arc-reveal",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big left-aligned section heading"
+    },
+    {
+      "name": "accounts",
+      "type": "ArcAccount[]",
+      "required": true,
+      "description": "the cards, three to a row on desktop"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "47698f6ac17093f67064cd4df7935250d57f6812665949f194e059f9ec6c1f25"
+}

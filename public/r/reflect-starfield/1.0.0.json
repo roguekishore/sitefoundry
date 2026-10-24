@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Reflect starfield",
+  "description": "A decorative field of tiny ink-coloured dots that slowly turns (one turn every 70s) while a second set twinkles in and out over 11s, fading out towards its edges. Drop it into any positioned box behind content.",
+  "category": "background",
+  "site": "reflect",
+  "license": "proprietary",
+  "tags": [
+    "background",
+    "stars",
+    "space",
+    "dark",
+    "loop",
+    "rotate",
+    "twinkle",
+    "decorative"
+  ],
+  "notes": [
+    "stars come from a fixed seed, so server and browser render the same field; change seed for a different sky",
+    "fills its nearest positioned parent; CSS only, still under reduced motion"
+  ],
+  "entry": "reflect-starfield.tsx",
+  "source": "foundry",
+  "name": "reflect-starfield",
+  "files": [
+    {
+      "path": "reflect-starfield.css",
+      "content": "/* The whole field turns slowly about its centre; the second layer breathes. */\n.reflect-starfield-turn {\n  animation: reflect-starfield-turn 70s linear infinite;\n}\n.reflect-starfield-twinkle {\n  animation: reflect-starfield-twinkle 11s ease-in-out infinite alternate;\n}\n.reflect-starfield-fade {\n  mask-image: radial-gradient(closest-side, var(--foreground) 35%, transparent);\n}\n\n@keyframes reflect-starfield-turn {\n  to { transform: rotate(360deg); }\n}\n@keyframes reflect-starfield-twinkle {\n  0%, 20% { opacity: 1; }\n  60%, 100% { opacity: 0.15; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .reflect-starfield-turn,\n  .reflect-starfield-twinkle { animation: none; }\n}\n"
+    },
+    {
+      "path": "reflect-starfield.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport \"./reflect-starfield.css\";\n\nexport interface ReflectStarfieldProps {\n  /** how many stars (half steady, half twinkling) */\n  count?: number;\n  /** side of the square field in px; it is centred on the parent and cropped by it */\n  size?: number;\n  /** another seed gives another sky */\n  seed?: number;\n  /** star brightness, 0–100 (% of the ink colour) */\n  strength?: number;\n  className?: string;\n}\n\n/** A small seeded random generator (mulberry32), so the same seed always draws the same sky. */\nfunction random(seed: number) {\n  let a = seed >>> 0;\n  return () => {\n    a = (a + 0x6d2b79f5) >>> 0;\n    let t = a;\n    t = Math.imul(t ^ (t >>> 15), t | 1);\n    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);\n    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;\n  };\n}\n\n/** Every star is one box-shadow of a 1px dot, like a pin-hole sky. */\nfunction stars(count: number, size: number, seed: number, strength: number) {\n  const next = random(seed);\n  const shadows: string[] = [];\n  for (let i = 0; i < count; i++) {\n    const x = Math.round(next() * size);\n    const y = Math.round(next() * size);\n    const big = next() > 0.8 ? 0.5 : 0;\n    const alpha = Math.round(strength * (0.35 + next() * 0.65));\n    shadows.push(`${x}px ${y}px 0 ${big}px color-mix(in oklab, var(--foreground) ${alpha}%, transparent)`);\n  }\n  return shadows.join(\",\");\n}\n\n/** Slowly turning, twinkling stars behind a section. */\nexport function ReflectStarfield({ count = 90, size = 1400, seed = 7, strength = 70, className }: ReflectStarfieldProps) {\n  const half = Math.round(count / 2);\n  const layer = \"absolute top-0 left-0 size-px rounded-full\";\n  return (\n    <div aria-hidden className={cn(\"pointer-events-none absolute inset-0 overflow-clip\", className)}>\n      <div\n        className=\"reflect-starfield-fade absolute top-1/2 left-1/2\"\n        style={{ width: size, height: size, marginLeft: -size / 2, marginTop: -size / 2 }}\n      >\n        <div className=\"reflect-starfield-turn absolute inset-0\">\n          <span className={layer} style={{ boxShadow: stars(half, size, seed, strength) }} />\n          <span\n            className={cn(layer, \"reflect-starfield-twinkle\")}\n            style={{ boxShadow: stars(count - half, size, seed + 101, strength) }}\n          />\n        </div>\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "count",
+      "type": "number",
+      "required": false,
+      "default": "90",
+      "description": "how many stars (half steady, half twinkling)"
+    },
+    {
+      "name": "size",
+      "type": "number",
+      "required": false,
+      "default": "1400",
+      "description": "side of the square field in px; it is centred on the parent and cropped by it"
+    },
+    {
+      "name": "seed",
+      "type": "number",
+      "required": false,
+      "default": "7",
+      "description": "another seed gives another sky"
+    },
+    {
+      "name": "strength",
+      "type": "number",
+      "required": false,
+      "default": "70",
+      "description": "star brightness, 0–100 (% of the ink colour)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "9512c32f38a78cd463b2308233f5a715e6f183fc1508b11ab1142d3bef4ac5b7"
+}

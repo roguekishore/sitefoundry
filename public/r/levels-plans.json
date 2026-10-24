@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels plan cards",
+  "description": "A warm off-white section: a big heading and lead, a pale green bordered strip with a green tracked eyebrow, a sentence and an ink button with an arrow, then three equal-height plan cards — white, pale green with a green border and soft shadow, and near-black — each with a small icon and pill badge, a title, grey text, a large price with a small period, a full-width button, tracked group labels over check lists, and a hairline footer with a link and a small perk line.",
+  "category": "pricing",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "pricing",
+    "plans",
+    "cards",
+    "featured",
+    "dark-card",
+    "light",
+    "minimal",
+    "checklist"
+  ],
+  "notes": [
+    "tone picks each card's look: plain, featured (recommended) or dark (a .dark scope)",
+    "footers line up because each card's list grows to fill"
+  ],
+  "entry": "levels-plans.tsx",
+  "name": "levels-plans",
+  "files": [
+    {
+      "path": "levels-plans.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { BadgePercent, Check } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsButton } from \"@foundry/levels-button\";\nimport { LevelsHeading } from \"@foundry/levels-heading\";\nimport { LevelsLink } from \"@foundry/levels-link\";\n\nexport interface LevelsPlanGroup {\n  /** tracked label over the list, e.g. \"Included\" */\n  label: string;\n  /** the ticked lines; note is a small grey line under one */\n  items: { text: ReactNode; note?: ReactNode }[];\n}\n\nexport interface LevelsPlan {\n  /** plain: white · featured: pale green with a green border · dark: near-black */\n  tone?: \"plain\" | \"featured\" | \"dark\";\n  /** small icon before the badge, e.g. a lucide icon element */\n  icon?: ReactNode;\n  /** the pill badge's text */\n  badge?: string;\n  /** the plan's name */\n  name: string;\n  /** grey text under the name */\n  description?: ReactNode;\n  /** the big price, e.g. \"$19\" */\n  price: string;\n  /** the small text after the price, e.g. \"/mo\" */\n  period?: string;\n  /** small grey line under the price */\n  billing?: ReactNode;\n  /** the full-width button */\n  action: { label: string; href: string };\n  /** the check lists */\n  groups: LevelsPlanGroup[];\n  /** the footer row above the perk: grey label and an ink arrow link */\n  footer?: { label: string; link?: { label: string; href: string } };\n  /** the small perk line at the very bottom */\n  perk?: { title: string; text: string; link?: { label: string; href: string } };\n}\n\nexport interface LevelsPlansProps {\n  /** small tracked capitals above the title */\n  eyebrow?: string;\n  /** the section title */\n  title: ReactNode;\n  /** grey text under the title */\n  lead?: ReactNode;\n  /** the pale green strip above the cards */\n  recommend?: { eyebrow?: string; text: ReactNode; action?: { label: string; href: string } };\n  /** the plan cards (three on the original) */\n  plans: LevelsPlan[];\n  /** id for in-page links */\n  id?: string;\n  className?: string;\n}\n\nconst tones = {\n  plain: \"border border-border bg-card text-card-foreground\",\n  featured:\n    \"border border-highlight/35 bg-accent text-foreground shadow-[0_24px_60px_-42px_color-mix(in_oklab,var(--highlight)_35%,transparent)]\",\n  dark: \"dark border border-transparent bg-background text-foreground\",\n};\n\n/** Heading, a recommendation strip and three plan cards. */\nexport function LevelsPlans({ eyebrow, title, lead, recommend, plans, id, className }: LevelsPlansProps) {\n  return (\n    <section id={id} className={cn(\"bg-secondary px-gutter py-[calc(var(--section-y)*0.75)] lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <LevelsHeading eyebrow={eyebrow} title={title} lead={lead} />\n\n        {recommend ? (\n          <div className=\"mt-12 flex flex-col items-start gap-5 rounded-lg border border-foreground/10 bg-accent px-6 py-7 lg:flex-row lg:items-center lg:justify-between lg:px-8\">\n            <div className=\"max-w-[40rem]\">\n              {recommend.eyebrow ? (\n                <p className=\"text-sm leading-5 font-semibold tracking-[0.16em] text-highlight uppercase\">{recommend.eyebrow}</p>\n              ) : null}\n              <p className=\"mt-3 text-base leading-7 text-foreground\">{recommend.text}</p>\n            </div>\n            {recommend.action ? (\n              <LevelsButton href={recommend.action.href} arrow>\n                {recommend.action.label}\n              </LevelsButton>\n            ) : null}\n          </div>\n        ) : null}\n\n        <ul className=\"mt-12 grid gap-6 lg:grid-cols-3\">\n          {plans.map((plan) => {\n            const tone = plan.tone ?? \"plain\";\n            return (\n              <li key={plan.name} className={cn(\"flex flex-col rounded-lg p-8\", tones[tone])}>\n                <div className=\"flex items-center gap-3\">\n                  {plan.icon ? (\n                    <span aria-hidden className={cn(\"[&_svg]:size-5\", tone === \"featured\" ? \"text-highlight\" : \"text-muted-foreground\")}>\n                      {plan.icon}\n                    </span>\n                  ) : null}\n                  {plan.badge ? (\n                    <span\n                      className={cn(\n                        \"rounded-full border px-3 text-[0.6875rem] leading-6 font-semibold tracking-[0.16em] uppercase\",\n                        tone === \"featured\"\n                          ? \"border-highlight/35 bg-background/60 text-highlight\"\n                          : \"border-border bg-muted text-muted-foreground\",\n                      )}\n                    >\n                      {plan.badge}\n                    </span>\n                  ) : null}\n                </div>\n                <h3 className=\"mt-6 font-display text-[2rem] leading-[1.3] font-[550] tracking-[-0.04em]\">{plan.name}</h3>\n                {plan.description ? <p className=\"mt-3 text-base leading-8 text-muted-foreground\">{plan.description}</p> : null}\n                <p className=\"mt-6 flex items-baseline gap-1.5\">\n                  <span className=\"font-display text-[3.3rem] leading-none font-medium tracking-[-0.05em]\">{plan.price}</span>\n                  {plan.period ? <span className=\"text-xl leading-none font-medium\">{plan.period}</span> : null}\n                </p>\n                {plan.billing ? <p className=\"mt-3 text-sm leading-5 text-muted-foreground\">{plan.billing}</p> : null}\n                <LevelsButton href={plan.action.href} block className=\"mt-6\">\n                  {plan.action.label}\n                </LevelsButton>\n\n                <div className=\"mt-9 flex grow flex-col gap-8\">\n                  {plan.groups.map((group) => (\n                    <div key={group.label}>\n                      <p\n                        className={cn(\n                          \"text-[0.6875rem] leading-4 font-semibold tracking-[0.16em] uppercase\",\n                          tone === \"featured\" ? \"text-highlight\" : \"text-muted-foreground\",\n                        )}\n                      >\n                        {group.label}\n                      </p>\n                      <ul className=\"mt-4 flex flex-col gap-3\">\n                        {group.items.map((item, i) => (\n                          <li key={i} className=\"flex gap-3.5 text-sm leading-6\">\n                            <Check aria-hidden className=\"mt-1 size-4 shrink-0 text-highlight/70\" strokeWidth={1.5} />\n                            <span>\n                              {item.text}\n                              {item.note ? <span className=\"block text-xs leading-5 text-muted-foreground\">{item.note}</span> : null}\n                            </span>\n                          </li>\n                        ))}\n                      </ul>\n                    </div>\n                  ))}\n                </div>\n\n                {plan.footer || plan.perk ? (\n                  <div className=\"mt-10 border-t border-border pt-6\">\n                    {plan.footer ? (\n                      <div className=\"flex items-center justify-between gap-4\">\n                        <span className=\"text-sm text-muted-foreground\">{plan.footer.label}</span>\n                        {plan.footer.link ? (\n                          <LevelsLink href={plan.footer.link.href} size=\"sm\" tone=\"ink\">\n                            {plan.footer.link.label}\n                          </LevelsLink>\n                        ) : null}\n                      </div>\n                    ) : null}\n                    {plan.perk ? (\n                      <div className=\"mt-4 text-xs leading-6\">\n                        <p className=\"flex flex-wrap items-center gap-x-2\">\n                          <span className=\"font-semibold\">{plan.perk.title}</span>\n                          <BadgePercent aria-hidden className=\"size-3.5 text-highlight\" strokeWidth={1.75} />\n                          <span>{plan.perk.text}</span>\n                        </p>\n                        {plan.perk.link ? (\n                          <a href={plan.perk.link.href} className=\"font-semibold underline underline-offset-2 hover:opacity-80\">\n                            {plan.perk.link.label}\n                          </a>\n                        ) : null}\n                      </div>\n                    ) : null}\n                  </div>\n                ) : null}\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-button",
+    "levels-heading",
+    "levels-link"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small tracked capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "grey text under the title"
+    },
+    {
+      "name": "recommend",
+      "type": "{ eyebrow?: string; text: ReactNode; action?: { label: string; href: string; }; } | undefined",
+      "required": false,
+      "description": "the pale green strip above the cards"
+    },
+    {
+      "name": "plans",
+      "type": "LevelsPlan[]",
+      "required": true,
+      "description": "the plan cards (three on the original)"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bba68d1de513cee509ad63e362d9e1f5d65f53a22cacf31cbe7580a8a48fbded"
+}

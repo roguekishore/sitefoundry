@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo rolling stats",
+  "description": "A quiet white band of three giant figures: a two-tone heading on the left half, and in the right half three rows each holding a 150px tightly tracked numeral with a two-line grey serif label beside its foot, divided by hairlines. As each row scrolls into view its digits roll up through 0–9 to their value, like an odometer. On phones the heading sits on top and the numerals drop to 96px.",
+  "category": "stats",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "odometer",
+    "counter",
+    "scroll",
+    "reveal",
+    "minimal",
+    "light",
+    "serif"
+  ],
+  "notes": [
+    "the roll is a CSS scroll-driven animation: browsers without it, and reduced motion, show the final figures",
+    "labels read var(--ondo-serif) and fall back to the display face in other themes"
+  ],
+  "entry": "ondo-stats.tsx",
+  "name": "ondo-stats",
+  "files": [
+    {
+      "path": "ondo-stats.css",
+      "content": "/* Each digit is a 0–9 strip in a one-digit window. The strip rests on its digit (so static\n   HTML shows the value); while the row enters view it rolls up from 0 to there. */\n.ondo-stats-strip {\n  transform: translateY(calc(var(--ondo-stats-digit) * -10%));\n}\n\n.ondo-stats-row {\n  view-timeline-name: --ondo-stats-row;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ondo-stats-strip {\n      animation: ondo-stats-roll cubic-bezier(0.3, 0, 0.2, 1) both;\n      animation-timeline: --ondo-stats-row;\n      animation-range: entry 10% entry calc(100% + 180px);\n    }\n  }\n}\n\n@keyframes ondo-stats-roll {\n  from { transform: translateY(0); }\n}\n"
+    },
+    {
+      "path": "ondo-stats.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { OndoHeading } from \"@foundry/ondo-heading\";\nimport \"./ondo-stats.css\";\n\nexport interface OndoStat {\n  /** the figure as shown, e.g. \"$2.84B\" (digits roll, other characters stay put) */\n  value: string;\n  /** the label beside it; use a line break (\"Live\\nnetworks\") for two lines */\n  label: string;\n}\n\nexport interface OndoStatsProps {\n  /** heading, first line (ink) */\n  lead: string;\n  /** heading, second line (grey) */\n  trail?: string;\n  /** the figures, usually three */\n  stats: OndoStat[];\n  className?: string;\n}\n\nconst serif = \"font-[family-name:var(--ondo-serif,var(--typeface-display))]\";\nconst digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];\n\n/** One figure: each digit in a window over a rolling 0–9 strip. */\nfunction Figure({ value }: { value: string }) {\n  return (\n    <span aria-hidden className=\"flex\">\n      {[...value].map((ch, i) =>\n        /\\d/.test(ch) ? (\n          <span key={i} className=\"relative inline-block h-[1em] overflow-clip\">\n            {/* the final digit, invisible, sizes the window; the strip rolls inside it */}\n            <span className=\"invisible\">{ch}</span>\n            <span className=\"ondo-stats-strip absolute inset-x-0 top-0 flex flex-col items-center\" style={{ [\"--ondo-stats-digit\" as string]: ch }}>\n              {digits.map((d) => (\n                <span key={d} className=\"block h-[1em]\">\n                  {d}\n                </span>\n              ))}\n            </span>\n          </span>\n        ) : (\n          <span key={i} className=\"inline-block h-[1em]\">\n            {ch}\n          </span>\n        ),\n      )}\n    </span>\n  );\n}\n\n/** Heading left, three odometer figures right. */\nexport function OndoStats({ lead, trail, stats, className }: OndoStatsProps) {\n  return (\n    <section className={cn(\"bg-background py-section lg:pt-[7.5rem] lg:pb-[7.5rem]\", className)}>\n      <div className=\"mx-auto grid max-w-page grid-cols-1 gap-14 [&>*]:min-w-0 px-gutter lg:grid-cols-2 lg:gap-0 lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <OndoHeading size=\"title\" lead={lead} trail={trail} />\n        <dl>\n          {stats.map((stat) => (\n            <div key={stat.label} className=\"ondo-stats-row flex items-end gap-4 border-b border-border pt-4 pb-6 lg:gap-8 lg:pt-[2.6rem] lg:pb-[3.1rem]\">\n              <dt className={cn(\"order-2 pb-1 text-lg leading-[1.05] whitespace-pre-line text-muted-foreground shrink-0 lg:pb-2 lg:text-2xl lg:leading-[1.05]\", serif)}>{stat.label}</dt>\n              <dd className=\"order-1 font-display text-[clamp(4.25rem,22vw,6rem)] leading-none font-medium tracking-[-0.03em] text-foreground lg:text-[7rem] xl:text-[9.375rem] xl:tracking-[-0.027em]\">\n                <span className=\"sr-only\">{stat.value}</span>\n                <Figure value={stat.value} />\n              </dd>\n            </div>\n          ))}\n        </dl>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-heading"
+  ],
+  "props": [
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "heading, first line (ink)"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": false,
+      "description": "heading, second line (grey)"
+    },
+    {
+      "name": "stats",
+      "type": "OndoStat[]",
+      "required": true,
+      "description": "the figures, usually three"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "7a7c49603db8c5406a062f6ad268e015ce332f427986dbf5766b3477d2752c02"
+}

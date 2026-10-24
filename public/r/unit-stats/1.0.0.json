@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit stats",
+  "description": "Proof figures under a full-width hairline: a small heading, then four big regular-weight numbers with grey captions (2×2 on phones), the last one an underlined live link with a mint status dot. Below, a strip of small black network tiles, a line of grey text with a dark lead-in, and solid black certification pills.",
+  "category": "stats",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "numbers",
+    "light",
+    "minimal",
+    "badges",
+    "fintech",
+    "trust"
+  ],
+  "notes": [
+    "media slots: the network marks (52×38 dark tiles); pass your own marks or leave the placeholders",
+    "the status dot uses the highlight token"
+  ],
+  "entry": "unit-stats.tsx",
+  "source": "foundry",
+  "name": "unit-stats",
+  "files": [
+    {
+      "path": "unit-stats.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitChip } from \"@foundry/unit-chip\";\nimport { UnitPlaceholder } from \"@foundry/unit-placeholder\";\n\nexport interface UnitStat {\n  /** the big figure, e.g. \"$40B+\" */\n  value: string;\n  /** what it counts */\n  label: string;\n  /** a footnote marker after the label, e.g. \"1\" */\n  footnote?: string;\n  /** makes the label an underlined link with a live status dot before it */\n  href?: string;\n}\n\nexport interface UnitStatsProps {\n  /** the small heading over the figures */\n  heading: string;\n  /** four figures read best (2×2 on phones) */\n  stats: UnitStat[];\n  /** the access statement: a dark lead-in, then the rest in grey */\n  statement?: { lead: string; rest: string };\n  /** small dark tiles before the statement (network marks); placeholders when empty */\n  marks?: ReactNode[];\n  /** how many mark tiles to show when no marks are given */\n  markCount?: number;\n  /** solid black badges (certifications) */\n  badges?: string[];\n  className?: string;\n}\n\n/** A hairline, a small heading, a row of big regular-weight figures, then network tiles, a line of proof and black badges. */\nexport function UnitStats({ heading, stats, statement, marks, markCount = 3, badges, className }: UnitStatsProps) {\n  const tiles = marks ?? Array.from({ length: markCount }, () => null);\n  return (\n    <section className={cn(\"bg-background font-sans text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-6 lg:pt-10\">\n        <div className=\"border-t border-border pt-[3.25rem] lg:pt-20\">\n          <h2 className=\"text-[1.09375rem] leading-[1.2] tracking-[-0.01em] lg:text-[1.375rem]\">{heading}</h2>\n          <dl className=\"mt-8 grid grid-cols-2 gap-x-5 gap-y-7 lg:mt-10 lg:grid-cols-4 lg:gap-x-6\">\n            {stats.map((s) => (\n              <div key={s.label} className=\"flex flex-col-reverse lg:pl-0.5\">\n                <dd className=\"mt-1.5 text-[1.09375rem] leading-[1.3] text-muted-foreground lg:mt-3 lg:text-lg\">\n                  {s.href ? (\n                    <a href={s.href} className=\"inline-flex items-center gap-3 text-foreground transition-opacity duration-[325ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] hover:opacity-50 motion-reduce:transition-none\">\n                      <span aria-hidden className=\"size-2 rounded-full bg-highlight\" />\n                      <span className=\"underline decoration-1 underline-offset-[0.2em]\">{s.label}</span>\n                    </a>\n                  ) : (\n                    <>\n                      {s.label}\n                      {s.footnote && <sup className=\"ml-0.5 text-[0.6em]\">{s.footnote}</sup>}\n                    </>\n                  )}\n                </dd>\n                <dt className=\"text-[1.75rem] leading-none tracking-[-0.02em] lg:text-5xl\">{s.value}</dt>\n              </div>\n            ))}\n          </dl>\n\n          {(statement || badges) && (\n            <div className=\"mt-10 grid gap-6 lg:mt-24 lg:grid-cols-4 lg:items-center lg:gap-x-6\">\n              {statement && (\n                <div className=\"flex flex-col gap-3 lg:col-span-2 lg:flex-row lg:items-center lg:gap-6 lg:pl-0.5\">\n                  <div className=\"flex shrink-0 gap-0.5\">\n                    {tiles.map((m, i) => (\n                      <div key={i} className=\"h-[2.4375rem] w-[3.25rem] overflow-clip rounded-[0.1875rem]\">\n                        {m ?? <UnitPlaceholder tone=\"solid\" className=\"size-full\" />}\n                      </div>\n                    ))}\n                  </div>\n                  <p className=\"max-w-[23.5rem] text-[0.875rem] leading-[1.45] text-muted-foreground lg:text-base lg:leading-[1.4]\">\n                    <span className=\"text-foreground\">{statement.lead}</span> {statement.rest}\n                  </p>\n                </div>\n              )}\n              {badges && (\n                <div className=\"flex flex-wrap gap-3 lg:col-span-2\">\n                  {badges.map((b) => (\n                    <UnitChip key={b} tone=\"solid\">\n                      {b}\n                    </UnitChip>\n                  ))}\n                </div>\n              )}\n            </div>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-chip",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the small heading over the figures"
+    },
+    {
+      "name": "stats",
+      "type": "UnitStat[]",
+      "required": true,
+      "description": "four figures read best (2×2 on phones)"
+    },
+    {
+      "name": "statement",
+      "type": "{ lead: string; rest: string; }",
+      "required": false,
+      "description": "the access statement: a dark lead-in, then the rest in grey"
+    },
+    {
+      "name": "marks",
+      "type": "ReactNode[]",
+      "required": false,
+      "description": "small dark tiles before the statement (network marks); placeholders when empty"
+    },
+    {
+      "name": "markCount",
+      "type": "number",
+      "required": false,
+      "default": "3",
+      "description": "how many mark tiles to show when no marks are given"
+    },
+    {
+      "name": "badges",
+      "type": "string[]",
+      "required": false,
+      "description": "solid black badges (certifications)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6c8d25d87c9799b808caa0538f8627773151930a92289e609d12def3c13319f9"
+}

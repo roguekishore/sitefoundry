@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics header",
+  "description": "A fixed, transparent bar in difference blend (white over black bands, black over light ones): a mark and a two-line extra-wide caps wordmark on the left, six mono caps links on the right. The wordmark and links fade away over the first few hundred pixels of scroll, leaving only the mark; on phones a wave-icon button opens a full-screen black link panel.",
+  "category": "header",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "fixed",
+    "transparent",
+    "blend",
+    "mono",
+    "wide",
+    "fade-on-scroll",
+    "scroll-driven",
+    "menu",
+    "minimal"
+  ],
+  "notes": [
+    "fixed to the top and transparent: the first section runs under it (76px phones, 106px desktop)",
+    "the fade is a CSS scroll timeline (no JS); the phone menu needs JavaScript",
+    "mix-blend-difference needs white ink, so the bar is a `dark` scope: it reads on any theme's light and dark bands"
+  ],
+  "hydrate": "load",
+  "entry": "valaratomics-header.tsx",
+  "source": "foundry",
+  "name": "valaratomics-header",
+  "files": [
+    {
+      "path": "valaratomics-header.css",
+      "content": "/* The wordmark and the desktop links fade out over the first 360px of scrolling, leaving the\n   mark (and the phone menu button) alone in the corner. Scrubbed by the page scroll, so it\n   comes back on the way up. Browsers without scroll timelines keep everything visible. */\n@supports (animation-timeline: scroll()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .valaratomics-header-fade {\n      animation: valaratomics-header-fade linear both;\n      animation-timeline: scroll(root);\n      animation-range: 0px 360px;\n    }\n  }\n}\n\n@keyframes valaratomics-header-fade {\n  from { opacity: 1; }\n  to { opacity: 0; visibility: hidden; }\n}\n"
+    },
+    {
+      "path": "valaratomics-header.tsx",
+      "content": "import { useEffect, useId, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./valaratomics-header.css\";\n\nexport interface ValaratomicsHeaderLink {\n  /** link text (shown uppercase in the mono face) */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface ValaratomicsHeaderProps {\n  /** the company name as two short lines, e.g. [\"Tallgrass\", \"Fission\"]: set in the wide caps face */\n  wordmark: [string, string] | [string];\n  /** the brand mark beside it (an svg, img or lucide icon); it stays when the rest fades */\n  mark: ReactNode;\n  /** accessible name of the home link, e.g. \"Tallgrass Fission home\" */\n  homeLabel: string;\n  /** where the mark links (usually \"/\") */\n  homeHref?: string;\n  /** the links: in a row from 1024px, in the menu panel on phones */\n  links: ValaratomicsHeaderLink[];\n  /** the phone menu button's icon when closed (e.g. lucide WavesHorizontal) */\n  menuIcon: ReactNode;\n  /** the phone menu button's icon when open (e.g. lucide X) */\n  closeIcon: ReactNode;\n  /** accessible name of the phone menu button, e.g. \"Menu\" */\n  menuLabel: string;\n  className?: string;\n}\n\n/**\n * A fixed, transparent bar in difference blend: white over the black bands, black over the\n * light ones. Mark + two-line wide wordmark on the left, mono caps links on the right; the\n * wordmark and links fade out as soon as the page scrolls, the mark stays.\n */\nexport function ValaratomicsHeader({\n  wordmark,\n  mark,\n  homeLabel,\n  homeHref = \"/\",\n  links,\n  menuIcon,\n  closeIcon,\n  menuLabel,\n  className,\n}: ValaratomicsHeaderProps) {\n  const [open, setOpen] = useState(false);\n  const panelId = useId();\n\n  useEffect(() => {\n    if (!open) return;\n    const onKey = (e: KeyboardEvent) => e.key === \"Escape\" && setOpen(false);\n    window.addEventListener(\"keydown\", onKey);\n    return () => window.removeEventListener(\"keydown\", onKey);\n  }, [open]);\n\n  return (\n    <>\n      <header\n        className={cn(\n          \"dark pointer-events-none fixed inset-x-0 top-0 z-50 text-foreground mix-blend-difference\",\n          className,\n        )}\n      >\n        <div className=\"mx-auto flex h-[4.75rem] max-w-page items-center justify-between px-gutter lg:h-[6.625rem]\">\n          <a href={homeHref} aria-label={homeLabel} className=\"pointer-events-auto flex items-center gap-2.5\">\n            <span className=\"grid size-[3.125rem] place-items-center [&_svg]:size-full\" aria-hidden>\n              {mark}\n            </span>\n            <span\n              aria-hidden\n              className=\"valaratomics-header-fade font-display text-lg leading-[0.82] font-black tracking-[-0.01em] uppercase [font-stretch:var(--valaratomics-stretch,100%)]\"\n            >\n              {wordmark.map((line) => (\n                <span key={line} className=\"block\">\n                  {line}\n                </span>\n              ))}\n            </span>\n          </a>\n          <nav className=\"valaratomics-header-fade pointer-events-auto hidden lg:block\">\n            <ul className=\"flex gap-9\">\n              {links.map((l) => (\n                <li key={l.href}>\n                  <a\n                    href={l.href}\n                    className=\"font-mono text-base leading-none uppercase transition-opacity duration-150 hover:opacity-70 motion-reduce:transition-none\"\n                  >\n                    {l.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            aria-controls={panelId}\n            onClick={() => setOpen((v) => !v)}\n            className=\"pointer-events-auto -mr-1 grid size-8 place-items-center lg:hidden [&_svg]:size-6 [&_svg]:stroke-[1.5]\"\n          >\n            {open ? closeIcon : menuIcon}\n          </button>\n        </div>\n      </header>\n      <nav\n        id={panelId}\n        hidden={!open}\n        className=\"dark fixed inset-0 z-40 bg-background pt-[6.5rem] text-foreground lg:hidden\"\n      >\n        <ul className=\"flex flex-col px-gutter\">\n          {links.map((l) => (\n            <li key={l.href} className=\"border-b border-border\">\n              <a\n                href={l.href}\n                onClick={() => setOpen(false)}\n                className=\"block py-4 font-mono text-[1.375rem] leading-none uppercase transition-colors duration-150 hover:text-primary\"\n              >\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "wordmark",
+      "type": "[string, string] | [string]",
+      "required": true,
+      "description": "the company name as two short lines, e.g. [\"Tallgrass\", \"Fission\"]: set in the wide caps face"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the brand mark beside it (an svg, img or lucide icon); it stays when the rest fades"
+    },
+    {
+      "name": "homeLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the home link, e.g. \"Tallgrass Fission home\""
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the mark links (usually \"/\")"
+    },
+    {
+      "name": "links",
+      "type": "ValaratomicsHeaderLink[]",
+      "required": true,
+      "description": "the links: in a row from 1024px, in the menu panel on phones"
+    },
+    {
+      "name": "menuIcon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the phone menu button's icon when closed (e.g. lucide WavesHorizontal)"
+    },
+    {
+      "name": "closeIcon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the phone menu button's icon when open (e.g. lucide X)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "accessible name of the phone menu button, e.g. \"Menu\""
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f302fa1a4fbfc668fc678b17b519fac566fa7c903d24f2858e4866117546eb9c"
+}

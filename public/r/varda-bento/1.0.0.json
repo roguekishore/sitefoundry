@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Varda bento",
+  "description": "A gapless bento of flat colour blocks on a three-column grid: a wide navy tile with an orange heading and a 2.1:1 video slot (play button) beside it, a tall orange tile with a photo slot filling its foot, a short navy and a short off-white tile, and a wide off-white tile with a photo beside it. Square corners, no shadows; every tile shifts one shade on hover. Phones stack it: video over text, the short pair side by side.",
+  "category": "features",
+  "site": "varda",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "bento",
+    "grid",
+    "flat",
+    "square",
+    "navy",
+    "orange",
+    "hover",
+    "industrial"
+  ],
+  "notes": [
+    "made for the varda theme's navy/orange/off-white roles; other themes keep the three-tone contrast through background, primary and secondary",
+    "media slots are empty placeholders until you pass images or video"
+  ],
+  "entry": "varda-bento.tsx",
+  "source": "foundry",
+  "name": "varda-bento",
+  "files": [
+    {
+      "path": "varda-bento.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Play } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { VardaPlaceholder } from \"@foundry/varda-placeholder\";\nimport { VardaTile } from \"@foundry/varda-tile\";\n\nexport interface VardaBentoTile {\n  /** small bold label at the top */\n  eyebrow: string;\n  /** the tile's heading */\n  title: string;\n  /** where the tile links to */\n  href: string;\n  /** image or video for the tile's media slot (empty: a placeholder) */\n  media?: ReactNode;\n  /** what the media slot shows, for screen readers while it is empty */\n  mediaLabel?: string;\n}\n\nexport interface VardaBentoProps {\n  /** wide navy tile at the top, with a video slot beside it */\n  feature: VardaBentoTile;\n  /** tall orange tile on the left, with a photo slot at its foot */\n  tall: VardaBentoTile;\n  /** the two short tiles: navy, then off-white */\n  pair: [VardaBentoTile, VardaBentoTile];\n  /** wide off-white tile at the bottom right, with a photo slot beside it */\n  wide: VardaBentoTile;\n  className?: string;\n}\n\n/** Gapless three-column bento of flat navy, orange and off-white link tiles with media slots. */\nexport function VardaBento({ feature, tall, pair, wide, className }: VardaBentoProps) {\n  return (\n    <section className={cn(\"grid grid-cols-2 bg-background lg:grid-cols-3\", className)}>\n      {/* feature: video on top on phones, text left + video over two columns on desktop */}\n      <VardaTile\n        {...feature}\n        tone=\"navy\"\n        className=\"col-span-2 border-b border-border lg:col-span-3 lg:row-start-1 lg:grid-cols-3 lg:border-b-0\"\n        textClassName=\"lg:col-start-1 lg:row-start-1\"\n        mediaClassName=\"max-lg:order-first border-b border-border p-gutter lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:border-b-0 lg:border-l\"\n        media={\n          <VardaPlaceholder media={feature.media} label={feature.mediaLabel} className=\"aspect-[2.2/1] w-full lg:aspect-[2.1/1]\">\n            <span\n              aria-hidden\n              className=\"grid size-12 place-items-center rounded-full bg-background text-primary\"\n            >\n              <Play aria-hidden className=\"ml-0.5 size-5 fill-current\" />\n            </span>\n          </VardaPlaceholder>\n        }\n      />\n      {/* the short pair: side by side on phones, middle and right of row two on desktop */}\n      <VardaTile {...pair[0]} tone=\"navy\" size=\"sm\" className=\"col-start-1 lg:col-start-2 lg:row-start-2\" />\n      <VardaTile {...pair[1]} tone=\"light\" size=\"sm\" className=\"col-start-2 lg:col-start-3 lg:row-start-2\" />\n      {/* tall orange tile: photo inset on the left, flush right and bottom */}\n      <VardaTile\n        {...tall}\n        tone=\"orange\"\n        className=\"col-span-2 grid-rows-[auto_1fr] lg:col-span-1 lg:col-start-1 lg:row-span-2 lg:row-start-2\"\n        textClassName=\"justify-start pb-8\"\n        mediaClassName=\"pl-gutter\"\n        media={<VardaPlaceholder media={tall.media} label={tall.mediaLabel} className=\"aspect-[2/1] h-full w-full lg:aspect-auto\" />}\n      />\n      {/* wide off-white tile: text and photo side by side on desktop */}\n      <VardaTile\n        {...wide}\n        tone=\"light\"\n        className=\"col-span-2 lg:col-start-2 lg:row-start-3 lg:grid-cols-2\"\n        mediaClassName=\"pl-gutter lg:pt-gutter lg:pl-0\"\n        media={<VardaPlaceholder media={wide.media} label={wide.mediaLabel} className=\"aspect-[2/1] w-full lg:aspect-[1.04/1]\" />}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "varda-placeholder",
+    "varda-tile"
+  ],
+  "props": [
+    {
+      "name": "feature",
+      "type": "VardaBentoTile",
+      "required": true,
+      "description": "wide navy tile at the top, with a video slot beside it"
+    },
+    {
+      "name": "tall",
+      "type": "VardaBentoTile",
+      "required": true,
+      "description": "tall orange tile on the left, with a photo slot at its foot"
+    },
+    {
+      "name": "pair",
+      "type": "[VardaBentoTile, VardaBentoTile]",
+      "required": true,
+      "description": "the two short tiles: navy, then off-white"
+    },
+    {
+      "name": "wide",
+      "type": "VardaBentoTile",
+      "required": true,
+      "description": "wide off-white tile at the bottom right, with a photo slot beside it"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4710dd145bc8796fd494c9064d4fe20a194fdf9875d52199892e12de88926e61"
+}

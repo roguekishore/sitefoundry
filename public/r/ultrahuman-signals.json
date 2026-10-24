@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman signals carousel",
+  "description": "A centred intro over a sliding photo carousel. Desktop: a black band, a row of five pill tabs, a wide 16:9 card centred between peeking neighbours, caption under it and a dot row whose active dot stretches into a bar that fills as a timer before the track slides on. Phones: a white band with tall portrait cards from the left, the next one peeking. Intro and carousel rise in on scroll; tabs and dots jump, phones swipe.",
+  "category": "features",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "carousel",
+    "slider",
+    "tabs",
+    "autoplay",
+    "dark",
+    "light",
+    "photo",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "white on phones and black on desktop like the original: built by inverting foreground/background at lg, so under a dark theme it inverts the other way",
+    "needs JavaScript for the slider (hydrate: visible); static HTML shows the first slide; reduced motion turns off autoplay and the slide transition"
+  ],
+  "entry": "ultrahuman-signals.tsx",
+  "hydrate": "visible",
+  "name": "ultrahuman-signals",
+  "files": [
+    {
+      "path": "ultrahuman-signals.css",
+      "content": "/* The active dot's bar fills from the left over the slide's interval (set inline); when it ends,\n   the component moves to the next slide. Under reduced motion it shows full and nothing advances. */\n.ultrahuman-signals-fill {\n  transform-origin: left center;\n  animation: ultrahuman-signals-fill linear both;\n}\n\n@keyframes ultrahuman-signals-fill {\n  from { transform: scaleX(0); }\n  to { transform: scaleX(1); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ultrahuman-signals-fill {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-signals.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { useReducedMotion } from \"motion/react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanHeading } from \"@foundry/ultrahuman-heading\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport { UltrahumanReveal } from \"@foundry/ultrahuman-reveal\";\nimport \"./ultrahuman-signals.css\";\n\nexport interface UltrahumanSignal {\n  /** the short tab name, e.g. \"Rest\" (also the dot's screen-reader label) */\n  tab: string;\n  /** the caption title under the photo */\n  title: string;\n  /** one or two sentences under the caption title */\n  body: string;\n  /** the photo or video in the card (cover); a placeholder when empty */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n}\n\nexport interface UltrahumanSignalsProps {\n  /** the centred section title */\n  title: string;\n  /** one line under it */\n  body: string;\n  /** the slides (five on the original) */\n  items: UltrahumanSignal[];\n  /** seconds each slide stays before the next one slides in */\n  interval?: number;\n  className?: string;\n}\n\n/**\n * A centred intro over a sliding photo carousel: on desktop a black band with a row of tabs and a\n * wide card centred between peeking neighbours; on phones a white band with tall cards from the\n * left. Captions sit under each card; the active dot stretches into a bar that fills as a timer,\n * then the track slides on. Tabs and dots jump to a slide; phones can swipe.\n */\nexport function UltrahumanSignals({ title, body, items, interval = 6, className }: UltrahumanSignalsProps) {\n  const n = items.length;\n  const reduce = useReducedMotion();\n  const [pos, setPos] = useState(n); // index into three copies of the list; the middle copy is \"home\"\n  const [animate, setAnimate] = useState(true);\n  const touchX = useRef<number | null>(null);\n  const active = ((pos % n) + n) % n;\n\n  // after a jump back to the middle copy (done without a transition), turn transitions back on\n  useEffect(() => {\n    if (animate) return;\n    let id = requestAnimationFrame(() => {\n      id = requestAnimationFrame(() => setAnimate(true));\n    });\n    return () => cancelAnimationFrame(id);\n  }, [animate]);\n\n  const normalise = (p: number) => (p >= 2 * n ? p - n : p < n ? p + n : p);\n  const go = (next: number) => {\n    setAnimate(!reduce);\n    setPos(reduce ? normalise(next) : next);\n  };\n  const onTrackEnd = () => {\n    const home = normalise(pos);\n    if (home !== pos) {\n      setAnimate(false);\n      setPos(home);\n    }\n  };\n\n  const slides = [...items, ...items, ...items];\n\n  return (\n    <section className={cn(\"bg-background pt-[5.75rem] pb-8 text-foreground lg:bg-foreground lg:pt-[8.5rem] lg:pb-32 lg:text-background\", className)}>\n      <UltrahumanHeading title={title} body={body} bodyWidth=\"sm\" />\n\n      <UltrahumanReveal className=\"mt-12 lg:mt-[5.75rem]\">\n        <div role=\"tablist\" className=\"mx-auto hidden w-fit lg:flex\">\n          {items.map((item, i) => (\n            <button\n              key={item.tab}\n              type=\"button\"\n              role=\"tab\"\n              aria-selected={i === active}\n              onClick={() => go(n + i)}\n              className={cn(\n                \"h-[2.3125rem] w-[9.75rem] rounded-full text-[0.8125rem] tracking-[-0.01em] transition-[color,background-color] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none\",\n                i === active ? \"bg-current/10 text-current\" : \"text-current/60 hover:text-current\",\n              )}\n            >\n              {item.tab}\n            </button>\n          ))}\n        </div>\n\n        <div\n          className=\"overflow-clip lg:mt-10\"\n          onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}\n          onTouchEnd={(e) => {\n            if (touchX.current === null) return;\n            const dx = e.changedTouches[0].clientX - touchX.current;\n            if (Math.abs(dx) > 40) go(pos + (dx < 0 ? 1 : -1));\n            touchX.current = null;\n          }}\n        >\n          <div\n            className={cn(\n              \"ultrahuman-signals-track flex gap-[var(--gap)] pl-6 [--gap:1rem] [--w:18.125rem] lg:[--gap:2.5rem] lg:[--w:53.4vw] lg:pl-[calc(50%-var(--w)/2)]\",\n              animate && \"transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none\",\n            )}\n            style={{ transform: `translateX(calc(${-pos} * (var(--w) + var(--gap))))` }}\n            onTransitionEnd={onTrackEnd}\n          >\n            {slides.map((item, i) => {\n              const home = i >= n && i < 2 * n;\n              return (\n                <article key={i} aria-hidden={home ? undefined : true} className=\"w-[var(--w)] shrink-0\">\n                  <div className=\"aspect-[290/392] overflow-clip rounded-lg bg-current/10 lg:aspect-[769/432] lg:rounded-xl\">\n                    {item.media ?? <UltrahumanPlaceholder tone=\"photo\" label={home ? item.mediaLabel : undefined} />}\n                  </div>\n                  <h3 className=\"mt-6 text-base leading-tight font-medium tracking-[-0.03em] lg:mt-9 lg:text-[1.375rem] lg:tracking-[-0.04em]\">{item.title}</h3>\n                  <p className=\"mt-2 max-w-[31.25rem] text-[0.8125rem] leading-[1.0625rem] tracking-[-0.005em] text-current/60 lg:mt-4 lg:text-[0.9375rem] lg:leading-[1.3125rem]\">\n                    {item.body}\n                  </p>\n                </article>\n              );\n            })}\n          </div>\n        </div>\n\n        <div className=\"mt-12 flex items-center justify-center gap-2.5 lg:mt-[4.25rem]\">\n          {items.map((item, i) => (\n            <button\n              key={item.tab}\n              type=\"button\"\n              aria-label={item.tab}\n              aria-current={i === active}\n              onClick={() => go(n + i)}\n              className={cn(\n                \"relative h-1 overflow-clip rounded-full transition-[width] duration-[220ms] ease-in-out motion-reduce:transition-none\",\n                i === active ? \"w-10 bg-current/25 lg:w-12\" : \"w-1 bg-current/40\",\n              )}\n            >\n              {i === active && (\n                <span\n                  key={active}\n                  className=\"ultrahuman-signals-fill absolute inset-y-0 left-0 w-full rounded-full bg-current\"\n                  style={{ animationDuration: `${interval}s` }}\n                  onAnimationEnd={() => go(pos + 1)}\n                />\n              )}\n            </button>\n          ))}\n        </div>\n      </UltrahumanReveal>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "motion": "^14.3.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-heading",
+    "ultrahuman-placeholder",
+    "ultrahuman-reveal"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the centred section title"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "one line under it"
+    },
+    {
+      "name": "items",
+      "type": "UltrahumanSignal[]",
+      "required": true,
+      "description": "the slides (five on the original)"
+    },
+    {
+      "name": "interval",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each slide stays before the next one slides in"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eb82d8bbc556171c9ca5d9829e8e29be6c2c99e19c9993dd2fd3a90a97e160f4"
+}

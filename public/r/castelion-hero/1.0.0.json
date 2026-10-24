@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion hero",
+  "description": "A three-window-tall hero over a full-window film that stays pinned while you scroll: a darkened dusk wash until a video fills it. Further down, a huge bold cream mission title and a bold lead slide up line by line out of masks, then a one-line motto. Cream venetian-blind stripes rise from the bottom edge, thickening and spreading as you scroll until they close over the film and hand over to the cream page.",
+  "category": "hero",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "video",
+    "pinned",
+    "sticky",
+    "scrubbed",
+    "blinds",
+    "stripes",
+    "split-lines",
+    "reveal",
+    "dark",
+    "cream",
+    "poster",
+    "full-window"
+  ],
+  "notes": [
+    "300svh tall: the film is pinned for the first two windows, the text scrolls over it",
+    "the blinds use the page background token, so they close onto whatever colour the next section has",
+    "made to sit under castelion-header (the first window shows only the film and the header)",
+    "scroll-driven CSS (view timeline); without support, or with reduced motion, the blinds stay as hairlines and the text shows in place"
+  ],
+  "entry": "castelion-hero.tsx",
+  "source": "foundry",
+  "name": "castelion-hero",
+  "files": [
+    {
+      "path": "castelion-hero.css",
+      "content": "/* The blinds: a stack of cream stripes anchored to the bottom of the pinned frame. At rest the\n   stack is squeezed into the bottom 8% as hairlines; scrolling the section stretches the stack\n   (scaleY) and thickens each stripe (lower stripes thicker) until they close over the film,\n   half a window after the frame unpins. */\n.castelion-hero {\n  view-timeline-name: --castelion-hero;\n}\n.castelion-hero-blinds {\n  transform: scaleY(0.08);\n  transform-origin: bottom;\n}\n.castelion-hero-blind {\n  transform: scaleY(var(--castelion-blind-from));\n  transform-origin: bottom;\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-hero-blinds,\n    .castelion-hero-blind {\n      animation: castelion-hero-stack linear both;\n      animation-timeline: --castelion-hero;\n      animation-range: contain 0% exit 50%;\n    }\n    .castelion-hero-blind {\n      animation-name: castelion-hero-blind;\n    }\n  }\n}\n\n@keyframes castelion-hero-stack {\n  0% { transform: scaleY(0.08); }\n  80% { transform: scaleY(0.42); }\n  100% { transform: scaleY(1); }\n}\n@keyframes castelion-hero-blind {\n  0% { transform: scaleY(var(--castelion-blind-from)); }\n  80% { transform: scaleY(var(--castelion-blind-mid)); }\n  100% { transform: scaleY(1.02); }\n}\n"
+    },
+    {
+      "path": "castelion-hero.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport { CastelionPlaceholder } from \"@foundry/castelion-placeholder\";\nimport \"./castelion-hero.css\";\n\nexport interface CastelionHeroProps {\n  /** the big title of the mission row, one entry per desktop line */\n  title: string[];\n  /** the bold lead beside it (under it on phones), one entry per desktop line */\n  lead: string[];\n  /** the motto further down, one entry per desktop line */\n  motto: string[];\n  /** a video or image that fills the window and stays pinned (empty: a darkened dusk wash) */\n  media?: ReactNode;\n  /** what the film shows, for screen readers while the slot is empty */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** how many blind stripes close over the film */\nconst BLINDS = 12;\n\nconst pageTitle = \"font-display text-[clamp(2.625rem,1.6rem+4.19vw,5.375rem)]/[1.31] font-bold tracking-[0.02em]\";\n\n/** Pinned-film hero: mission and motto scroll over it, cream blinds close it off. */\nexport function CastelionHero({ title, lead, motto, media, mediaLabel, className }: CastelionHeroProps) {\n  return (\n    <section className={cn(\"castelion-hero relative h-[300svh]\", className)}>\n      {/* the film, pinned for the whole section */}\n      <div className=\"absolute inset-0\">\n        <div className=\"dark sticky top-0 h-svh overflow-clip bg-background\">\n          <CastelionPlaceholder media={media} tone=\"dusk\" label={mediaLabel} className=\"absolute inset-0\" />\n          <div aria-hidden className=\"absolute inset-0 bg-linear-to-b from-card/55 via-card/20 to-card/10\" />\n        </div>\n      </div>\n\n      {/* the text, scrolling over the film */}\n      <div className=\"dark relative h-full text-foreground\">\n        <div className=\"absolute inset-x-0 top-[158svh] lg:top-[155svh]\">\n          <div className=\"mx-auto grid max-w-page gap-11 px-gutter lg:grid-cols-[47.4%_1fr] lg:items-center lg:gap-0\">\n            <CastelionLines as=\"h2\" lines={title} className={pageTitle} />\n            <CastelionLines\n              lines={lead}\n              variant=\"fade\"\n              startIndex={1}\n              className=\"max-w-[37.5rem] text-[clamp(1.125rem,1.032rem+0.381vw,1.375rem)]/[1.26] font-bold tracking-[0.02em]\"\n            />\n          </div>\n        </div>\n        <div className=\"absolute inset-x-0 top-[256svh] lg:top-[242svh]\">\n          <div className=\"mx-auto max-w-page px-gutter\">\n            <CastelionLines as=\"h2\" lines={motto} className={pageTitle} />\n          </div>\n        </div>\n      </div>\n\n      {/* the blinds, pinned with the film, in the page colour */}\n      <div aria-hidden className=\"pointer-events-none absolute inset-0\">\n        <div className=\"sticky top-0 h-svh overflow-clip\">\n          <div className=\"castelion-hero-blinds flex h-full flex-col\">\n            {Array.from({ length: BLINDS }, (_, i) => {\n              const t = i / (BLINDS - 1);\n              return (\n                <div key={i} className=\"flex-1\">\n                  <div\n                    className=\"castelion-hero-blind size-full bg-background\"\n                    style={\n                      {\n                        \"--castelion-blind-from\": (0.14 + 0.26 * t).toFixed(3),\n                        \"--castelion-blind-mid\": (0.42 + 0.4 * t).toFixed(3),\n                      } as CSSProperties\n                    }\n                  />\n                </div>\n              );\n            })}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-lines",
+    "castelion-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the big title of the mission row, one entry per desktop line"
+    },
+    {
+      "name": "lead",
+      "type": "string[]",
+      "required": true,
+      "description": "the bold lead beside it (under it on phones), one entry per desktop line"
+    },
+    {
+      "name": "motto",
+      "type": "string[]",
+      "required": true,
+      "description": "the motto further down, one entry per desktop line"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a video or image that fills the window and stays pinned (empty: a darkened dusk wash)"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the film shows, for screen readers while the slot is empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0f9cea0747a24a95296ef08a38f6446cd63bd9088b4ef5fe754ae42e3a43adf9"
+}

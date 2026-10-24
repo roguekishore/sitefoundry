@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Oura Ring footer",
+  "description": "A warm near-black footer on a soft diagonal gradient: a large light wordmark and a row of small white payment chips, a stone-grey editorial-serif newsletter line with a rounded email field, four link columns (stone headings, cream links, small arrows on outside links), then a hairline, small legal links, the copyright and a round outlined language pill. On phones the payment chips take turns in two groups with a caption, crossfading in a loop.",
+  "category": "footer",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "dark",
+    "warm",
+    "gradient",
+    "newsletter",
+    "links",
+    "payments",
+    "serif",
+    "crossfade",
+    "loop"
+  ],
+  "notes": [
+    "dark-scoped (class dark): stays a near-black footer under any theme",
+    "overlap tucks it 40px under a block with rounded bottom corners (the press band)",
+    "payment chips take any icon; use plain icons or text, not third-party logos you don't have rights to",
+    "CSS only; with reduced motion the phone payment groups sit one above the other"
+  ],
+  "entry": "ouraring-footer.tsx",
+  "source": "foundry",
+  "name": "ouraring-footer",
+  "files": [
+    {
+      "path": "ouraring-footer.css",
+      "content": "/* Phones: the two payment groups share one cell and take turns, each held for ~45% of an 8s\n   loop with a short crossfade and a wipe. Desktop shows every chip in one row. */\n@media (max-width: 63.999rem) and (prefers-reduced-motion: no-preference) {\n  .ouraring-footer-pay-a,\n  .ouraring-footer-pay-b {\n    animation: ouraring-footer-pay 8s ease-in-out infinite;\n  }\n  .ouraring-footer-pay-b {\n    animation-delay: -4s;\n  }\n}\n\n@media (max-width: 63.999rem) and (prefers-reduced-motion: reduce) {\n  .ouraring-footer-pay {\n    gap: 0.75rem;\n  }\n  .ouraring-footer-pay-b {\n    grid-area: 2 / 1;\n  }\n}\n\n@keyframes ouraring-footer-pay {\n  0% { opacity: 0; clip-path: inset(0 100% 0 0); }\n  6%, 44% { opacity: 1; clip-path: inset(0 0 0 0); }\n  50%, 100% { opacity: 0; clip-path: inset(0 0 0 100%); }\n}\n"
+    },
+    {
+      "path": "ouraring-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight, ArrowUpRight, Globe } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ouraring-footer.css\";\n\nexport interface OuraringFooterLink {\n  label: ReactNode;\n  href: string;\n  /** leaves the site: shows a small up-right arrow */\n  external?: boolean;\n}\n\nexport interface OuraringPaymentGroup {\n  /** shown beside the chips on phones only, e.g. \"Instant checkout\" */\n  caption: string;\n  /** small white chips: an icon (or short text) and its name for screen readers */\n  methods: { icon: ReactNode; label: string }[];\n}\n\nexport interface OuraringFooterProps {\n  /** the wordmark, set large and light */\n  logo: ReactNode;\n  /** one or two payment groups; on phones two groups crossfade in turn */\n  payments?: OuraringPaymentGroup[];\n  /** the newsletter line */\n  newsletter: {\n    title: ReactNode;\n    /** the field's placeholder and label */\n    placeholder: string;\n    /** the arrow button's label for screen readers */\n    submitLabel: string;\n    /** where the form posts */\n    action?: string;\n    /** small print under the field */\n    note?: ReactNode;\n  };\n  /** up to four link columns */\n  columns: { title: string; links: OuraringFooterLink[] }[];\n  /** small links in the bottom row */\n  legal: OuraringFooterLink[];\n  /** the copyright line */\n  copyright: ReactNode;\n  /** the language pill */\n  language?: { label: string; href: string };\n  /** tuck 40px under the block before it (one with rounded bottom corners) */\n  overlap?: boolean;\n  className?: string;\n}\n\nfunction FooterLink({ link, className }: { link: OuraringFooterLink; className?: string }) {\n  return (\n    <a href={link.href} className={cn(\"inline-flex items-center gap-2 transition-colors duration-150 hover:text-muted-foreground\", className)}>\n      {link.label}\n      {link.external && <ArrowUpRight aria-hidden strokeWidth={1.5} className=\"size-4\" />}\n    </a>\n  );\n}\n\nexport function OuraringFooter({ logo, payments, newsletter, columns, legal, copyright, language, overlap, className }: OuraringFooterProps) {\n  const rotate = payments && payments.length > 1;\n  return (\n    <footer\n      className={cn(\n        \"dark bg-linear-to-br from-card via-background via-60% to-background text-foreground\",\n        overlap ? \"-mt-10 pt-[100px] lg:pt-[105px]\" : \"pt-[60px] lg:pt-[65px]\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter pb-16 lg:pb-[70px]\">\n        <div className=\"flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between\">\n          <span className=\"text-[46px] leading-[0.85] font-light tracking-[0.04em] text-muted-foreground uppercase\">{logo}</span>\n          {payments && (\n            <div className={cn(\"grid lg:flex lg:gap-2\", rotate && \"ouraring-footer-pay\")}>\n              {payments.map((group, g) => (\n                <div key={g} className={cn(\"flex items-center gap-2 [grid-area:1/1]\", rotate && `ouraring-footer-pay-${g === 0 ? \"a\" : \"b\"}`)}>\n                  {group.methods.map((m, i) => (\n                    <span\n                      key={i}\n                      role=\"img\"\n                      aria-label={m.label}\n                      className=\"flex h-[34px] min-w-[46px] items-center justify-center rounded-sm bg-foreground px-2.5 text-[11px] font-bold text-background [&_svg]:size-5\"\n                    >\n                      {m.icon}\n                    </span>\n                  ))}\n                  <span className=\"ml-2 text-[15px] lg:hidden\">{group.caption}</span>\n                </div>\n              ))}\n            </div>\n          )}\n        </div>\n\n        <div className=\"mt-11 flex flex-col gap-14 lg:mt-[70px] lg:grid lg:grid-cols-[432px_1fr] lg:gap-0\">\n          <div className=\"order-2 lg:order-1\">\n            <p className=\"max-w-[22rem] font-display text-[32px] leading-[1.15] text-muted-foreground lg:text-[40px] lg:leading-[1.25]\">\n              {newsletter.title}\n            </p>\n            <form action={newsletter.action} className=\"mt-14 flex h-10 w-full items-center rounded-md bg-secondary/70 pr-3 pl-5 lg:mt-[60px] lg:w-[320px]\">\n              <label className=\"sr-only\" htmlFor=\"ouraring-footer-email\">\n                {newsletter.placeholder}\n              </label>\n              <input\n                id=\"ouraring-footer-email\"\n                type=\"email\"\n                name=\"email\"\n                placeholder={newsletter.placeholder}\n                className=\"h-full min-w-0 flex-1 bg-transparent text-[16px] text-foreground outline-none placeholder:text-foreground\"\n              />\n              <button type=\"submit\" aria-label={newsletter.submitLabel} className=\"flex size-8 items-center justify-center text-foreground/80 hover:text-foreground\">\n                <ArrowRight aria-hidden strokeWidth={1.25} className=\"size-5\" />\n              </button>\n            </form>\n            {newsletter.note && (\n              <p className=\"mt-9 max-w-[20rem] text-[12px] leading-[1.5] tracking-[0.02em] text-muted-foreground lg:max-w-[16rem] [&_a]:underline\">{newsletter.note}</p>\n            )}\n          </div>\n\n          <div className=\"order-1 columns-2 gap-x-4 lg:order-2 lg:grid lg:grid-cols-4 lg:gap-x-0\">\n            {columns.map((col) => (\n              <div key={col.title} className=\"mb-12 break-inside-avoid lg:mb-0 lg:pr-6\">\n                <p className=\"text-[16px] leading-6 font-medium text-muted-foreground\">{col.title}</p>\n                <ul className=\"mt-2 flex flex-col gap-2 text-[16px] leading-6 tracking-[0.02em]\">\n                  {col.links.map((link, i) => (\n                    <li key={i}>\n                      <FooterLink link={link} />\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </div>\n        </div>\n\n        <div className=\"mt-14 flex flex-col gap-6 border-t border-border pt-7 lg:mt-[56px] lg:flex-row lg:items-start lg:justify-between\">\n          <div>\n            <ul className=\"flex flex-wrap gap-x-4 gap-y-2 text-[12px] leading-[1.5] tracking-[0.02em] text-muted-foreground\">\n              {legal.map((link, i) => (\n                <li key={i}>\n                  <FooterLink link={link} className=\"hover:text-foreground\" />\n                </li>\n              ))}\n            </ul>\n            <p className=\"mt-5 text-[12px] leading-[1.5] tracking-[0.02em] text-muted-foreground\">{copyright}</p>\n          </div>\n          {language && (\n            <a\n              href={language.href}\n              className=\"order-first inline-flex h-[42px] items-center gap-2 self-start rounded-full border border-foreground px-4 text-[16px] transition-colors duration-150 hover:bg-foreground/10 lg:order-none lg:mt-[3px]\"\n            >\n              <Globe aria-hidden strokeWidth={1.25} className=\"size-5\" />\n              {language.label}\n            </a>\n          )}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark, set large and light"
+    },
+    {
+      "name": "payments",
+      "type": "OuraringPaymentGroup[]",
+      "required": false,
+      "description": "one or two payment groups; on phones two groups crossfade in turn"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: ReactNode; placeholder: string; submitLabel: string; action?: string | undefined; note?: ReactNode; }",
+      "required": true,
+      "description": "the newsletter line"
+    },
+    {
+      "name": "columns",
+      "type": "{ title: string; links: OuraringFooterLink[]; }[]",
+      "required": true,
+      "description": "up to four link columns"
+    },
+    {
+      "name": "legal",
+      "type": "OuraringFooterLink[]",
+      "required": true,
+      "description": "small links in the bottom row"
+    },
+    {
+      "name": "copyright",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "language",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the language pill"
+    },
+    {
+      "name": "overlap",
+      "type": "boolean",
+      "required": false,
+      "description": "tuck 40px under the block before it (one with rounded bottom corners)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "eca334ac9f0515e1ca80582d79b8f2df5a3bd2d3f573365adb391f74c7b57772"
+}

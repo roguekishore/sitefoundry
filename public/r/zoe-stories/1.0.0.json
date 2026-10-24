@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe member stories",
+  "description": "A full-bleed deep-teal band: a small eyebrow and a big white semibold heading over a row of pale-mint quote cards (16px radius), each with a large faint serif quote mark at the top and the quote and name at the bottom. A centred row on desktop; on phones a swipeable slider with a progress bar and translucent round arrows. The quote marks fade in as they enter view.",
+  "category": "testimonials",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "band",
+    "teal",
+    "dark",
+    "cards",
+    "slider",
+    "fade",
+    "reveal"
+  ],
+  "notes": [
+    "the band is the highlight colour with highlight-foreground text; cards are the muted colour",
+    "four cards fit in one row from 1280px; below that they slide (hydrate visible)"
+  ],
+  "hydrate": "visible",
+  "entry": "zoe-stories.tsx",
+  "name": "zoe-stories",
+  "files": [
+    {
+      "path": "zoe-stories.css",
+      "content": "/* The quote marks are pictures on the original that fade in once loaded, as they come into\n   view. Ours fade in on a view timeline. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .zoe-stories-mark {\n      animation: zoe-stories-mark linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes zoe-stories-mark {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n"
+    },
+    {
+      "path": "zoe-stories.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\nimport { ZoeHeading } from \"@foundry/zoe-heading\";\nimport { ZoeSlider } from \"@foundry/zoe-slider\";\nimport \"./zoe-stories.css\";\n\nexport interface ZoeStory {\n  /** the member's words */\n  quote: string;\n  /** their first name */\n  name: string;\n}\n\nexport interface ZoeStoriesProps {\n  /** the small line above the heading */\n  eyebrow?: string;\n  /** the heading */\n  title: string;\n  /** the quote cards, in order */\n  stories: ZoeStory[];\n  /** screen-reader names for the row and its buttons */\n  labels: { region: string; prev: string; next: string };\n  className?: string;\n}\n\n/** Zoe's teal band of member quotes. */\nexport function ZoeStories({ eyebrow, title, stories, labels, className }: ZoeStoriesProps) {\n  return (\n    <section className={cn(\"bg-highlight py-24 text-highlight-foreground\", className)}>\n      <ZoeHeading eyebrow={eyebrow} title={title} className=\"mx-auto max-w-page px-gutter\" />\n      <ZoeSlider\n        tone=\"band\"\n        className=\"mt-12\"\n        label={labels.region}\n        prevLabel={labels.prev}\n        nextLabel={labels.next}\n        slideClassName=\"w-[17.25rem]\"\n        trackClassName=\"px-8 scroll-px-8 xl:justify-center\"\n        controlsClassName=\"mt-12 xl:hidden\"\n        slides={stories.map((s) => (\n          <figure key={s.name} className=\"flex h-[21.5rem] flex-col rounded-lg bg-muted p-6 text-foreground\">\n            {/* foundry-allow-text: a decorative opening quote mark */}\n            <span\n              aria-hidden\n              className=\"zoe-stories-mark block h-16 font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[9.5rem] leading-[0.85] font-medium text-foreground/15\"\n            >\n              “\n            </span>\n            <blockquote className=\"mt-auto text-base leading-[1.35]\">{s.quote}</blockquote>\n            <figcaption className=\"mt-4 font-semibold\">{s.name}</figcaption>\n          </figure>\n        ))}\n      />\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zoe-heading",
+    "zoe-slider"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "the small line above the heading"
+    },
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the heading"
+    },
+    {
+      "name": "stories",
+      "type": "ZoeStory[]",
+      "required": true,
+      "description": "the quote cards, in order"
+    },
+    {
+      "name": "labels",
+      "type": "{ region: string; prev: string; next: string; }",
+      "required": true,
+      "description": "screen-reader names for the row and its buttons"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "87cebc1b069aaa690a16f76c565be7e57af9329b3b3f9aba578e09ec5d01669a"
+}

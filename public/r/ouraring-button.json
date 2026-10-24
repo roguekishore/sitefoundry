@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Oura Ring button",
+  "description": "A soft, fully round 48px pill with a 16px label: warm dark grey (the default), electric blue for the one main CTA, or cream on dark bands. Also a 45px round arrow button, filled or bare. Darkens on hover in 0.15s.",
+  "category": "button",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "pill",
+    "cta",
+    "round",
+    "arrow",
+    "warm",
+    "minimal"
+  ],
+  "notes": [
+    "tone solid = primary, blue = highlight, inverse = foreground on background (meant for dark-scoped bands)",
+    "hover darkens with a brightness filter, so it works for any theme colour"
+  ],
+  "entry": "ouraring-button.tsx",
+  "source": "foundry",
+  "name": "ouraring-button",
+  "files": [
+    {
+      "path": "ouraring-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OuraringButtonProps {\n  children: ReactNode;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** solid: dark-grey pill · blue: the one main CTA · inverse: cream pill for dark bands */\n  tone?: \"solid\" | \"blue\" | \"inverse\";\n  /** small icon after the label (e.g. an up-right arrow) */\n  icon?: ReactNode;\n  onClick?: () => void;\n  className?: string;\n}\n\nconst tones = {\n  solid: \"bg-primary text-primary-foreground tracking-[0.02em] hover:brightness-[0.4] dark:hover:brightness-[0.55]\",\n  blue: \"bg-highlight text-highlight-foreground font-semibold hover:brightness-[0.78]\",\n  inverse: \"bg-foreground text-background tracking-[0.02em] hover:brightness-[0.55]\",\n};\n\n/** The site's pill button. */\nexport function OuraringButton({ children, href, tone = \"solid\", icon, onClick, className }: OuraringButtonProps) {\n  const classes = cn(\n    \"inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full px-6 text-[16px] leading-none whitespace-nowrap\",\n    \"transition-[filter] duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    tones[tone],\n    className,\n  );\n  const inner = (\n    <>\n      {children}\n      {icon && <span className=\"flex size-4 items-center justify-center [&_svg]:size-4\">{icon}</span>}\n    </>\n  );\n  return href ? (\n    <a href={href} className={classes} onClick={onClick}>\n      {inner}\n    </a>\n  ) : (\n    <button type=\"button\" className={classes} onClick={onClick}>\n      {inner}\n    </button>\n  );\n}\n\nexport interface OuraringRoundButtonProps {\n  /** the icon inside (an arrow) */\n  icon: ReactNode;\n  /** what it does, for screen readers */\n  label: string;\n  /** renders a link when set, a button otherwise */\n  href?: string;\n  /** filled: dark circle · quiet: the secondary surface (arrow chips on cream cards) · bare: icon only */\n  tone?: \"filled\" | \"quiet\" | \"bare\";\n  onClick?: () => void;\n  disabled?: boolean;\n  className?: string;\n}\n\nconst roundTones = {\n  filled: \"bg-primary text-primary-foreground hover:brightness-[0.4] dark:hover:brightness-[0.55]\",\n  quiet: \"bg-secondary text-secondary-foreground hover:brightness-[0.6]\",\n  bare: \"text-foreground/60 hover:text-foreground\",\n};\n\n/** A 45px round icon button (carousel arrows, card arrows). */\nexport function OuraringRoundButton({ icon, label, href, tone = \"filled\", onClick, disabled, className }: OuraringRoundButtonProps) {\n  const classes = cn(\n    \"inline-flex size-[45px] shrink-0 items-center justify-center rounded-full [&_svg]:size-5\",\n    \"transition-[filter,color,opacity] duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none disabled:opacity-40\",\n    \"focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\",\n    roundTones[tone],\n    className,\n  );\n  return href ? (\n    <a href={href} aria-label={label} className={classes} onClick={onClick}>\n      {icon}\n    </a>\n  ) : (\n    <button type=\"button\" aria-label={label} className={classes} onClick={onClick} disabled={disabled}>\n      {icon}\n    </button>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the icon inside (an arrow)"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "what it does, for screen readers"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": false,
+      "description": "renders a link when set, a button otherwise"
+    },
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "filled",
+      "description": "filled: dark circle · quiet: the secondary surface (arrow chips on cream cards) · bare: icon only"
+    },
+    {
+      "name": "onClick",
+      "type": "(() => void)",
+      "required": false
+    },
+    {
+      "name": "disabled",
+      "type": "boolean",
+      "required": false
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e0958fbeab9eecd01b1fe6f75a8e69f03ed6f0b109249096660e1d1d15fa5c9f"
+}

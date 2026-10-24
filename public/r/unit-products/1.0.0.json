@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit product grid",
+  "description": "A big regular-weight two-line heading over a 2×2 grid of pale, nearly square-cornered cards with hairline borders: a title with a hairline arrow circle, a grey line, tinted capability pills and a product illustration at the foot. Each card warms to its own pastel (lilac, aqua, lime, mint) over 0.6s on hover. Cards stack on phones.",
+  "category": "features",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "grid",
+    "light",
+    "pastel",
+    "hover",
+    "minimal",
+    "fintech",
+    "pills"
+  ],
+  "notes": [
+    "media slot per card: a product illustration (626×398, contain) flush with the card's foot",
+    "hover tints come from chart-1…4"
+  ],
+  "entry": "unit-products.tsx",
+  "source": "foundry",
+  "name": "unit-products",
+  "files": [
+    {
+      "path": "unit-products.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitArrowCircle } from \"@foundry/unit-arrow-circle\";\nimport { UnitChip } from \"@foundry/unit-chip\";\nimport { UnitPlaceholder } from \"@foundry/unit-placeholder\";\n\nexport interface UnitProduct {\n  /** the card's title, e.g. \"Hold funds\" */\n  title: string;\n  /** one or two lines under it */\n  description: string;\n  /** capability pills */\n  chips: string[];\n  /** where the card links to */\n  href: string;\n  /** the product illustration at the card's foot (626×398 on desktop); a placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface UnitProductsProps {\n  /** the big two-line heading */\n  heading: string;\n  /** four cards read best (2×2) */\n  products: UnitProduct[];\n  className?: string;\n}\n\n/** Each card warms to its own pastel on hover: lilac, aqua, lime, mint. */\nconst tints = [\"hover:bg-chart-1/20\", \"hover:bg-chart-2/25\", \"hover:bg-chart-3/35\", \"hover:bg-chart-4/30\"];\n\n/** A big heading over a 2×2 grid of pale, nearly square-cornered product cards, each with pills and an illustration at its foot. */\nexport function UnitProducts({ heading, products, className }: UnitProductsProps) {\n  return (\n    <section className={cn(\"bg-background font-sans text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-[4.25rem] pb-16 lg:pt-40 lg:pb-36\">\n        <h2 className=\"max-w-[22rem] font-display text-[1.75rem] leading-[1.12] tracking-[-0.02em] lg:max-w-[42rem] lg:text-5xl lg:leading-[1.1]\">{heading}</h2>\n        <ul className=\"mt-10 grid gap-6 lg:mt-20 lg:grid-cols-2\">\n          {products.map((p, i) => (\n            <li key={p.title} className=\"flex\">\n              <a\n                href={p.href}\n                className={cn(\n                  \"group/card flex w-full flex-col overflow-clip rounded-[0.25rem] border border-border bg-card transition-colors duration-600 ease-[cubic-bezier(0.165,0.84,0.44,1)] motion-reduce:transition-none\",\n                  tints[i % tints.length],\n                )}\n              >\n                <div className=\"px-5 pt-5 lg:px-8 lg:pt-7\">\n                  <div className=\"flex items-start justify-between gap-4\">\n                    <h3 className=\"pt-1 text-[1.203rem] leading-[1.2] tracking-[-0.01em] lg:text-[1.625rem]\">{p.title}</h3>\n                    <UnitArrowCircle />\n                  </div>\n                  <p className=\"mt-3 max-w-[28rem] text-[0.984rem] leading-[1.4] text-muted-foreground lg:mt-3.5 lg:text-lg lg:leading-[1.45]\">{p.description}</p>\n                  <div className=\"mt-4 flex flex-wrap gap-2 lg:mt-5\">\n                    {p.chips.map((c) => (\n                      <UnitChip key={c}>{c}</UnitChip>\n                    ))}\n                  </div>\n                </div>\n                <div className=\"mt-auto pt-8 lg:pt-3\">\n                  <div className=\"aspect-[626/398] w-full overflow-clip\">{p.media ?? <UnitPlaceholder tone=\"fade\" className=\"size-full\" />}</div>\n                </div>\n              </a>\n            </li>\n          ))}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-arrow-circle",
+    "unit-chip",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big two-line heading"
+    },
+    {
+      "name": "products",
+      "type": "UnitProduct[]",
+      "required": true,
+      "description": "four cards read best (2×2)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bc671e16460f90dd00b0add63d7b2576313b6a5ce77725d5499202f438dc95f2"
+}

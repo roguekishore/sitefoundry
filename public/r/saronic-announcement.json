@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Saronic announcement strip",
+  "description": "A sonar-lime strip above the header: mono capital caption, a dimmer news line clipped at the window edge on phones, a small ink-tinted button and a close X at the far right. 48px tall on phones, 64px on desktop; closing removes it.",
+  "category": "banner",
+  "site": "saronic",
+  "license": "proprietary",
+  "tags": [
+    "banner",
+    "announcement",
+    "lime",
+    "mono",
+    "uppercase",
+    "dismissible"
+  ],
+  "notes": [
+    "needs JavaScript for the close button",
+    "sits above saronic-header; the hero's `belowBar` keeps the hero ending at the window bottom"
+  ],
+  "hydrate": "load",
+  "entry": "saronic-announcement.tsx",
+  "source": "foundry",
+  "name": "saronic-announcement",
+  "files": [
+    {
+      "path": "saronic-announcement.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SaronicButton } from \"@foundry/saronic-button\";\n\nexport interface SaronicAnnouncementProps {\n  /** the bold caption at the start (\"Announcement\") */\n  label: ReactNode;\n  /** the news line; clipped at the window edge on phones */\n  message: ReactNode;\n  /** the small button after the message (desktop only) */\n  cta?: { label: ReactNode; href: string };\n  /** a small icon before the caption (desktop only) */\n  icon?: ReactNode;\n  /** screen-reader label for the close button */\n  closeLabel: string;\n  className?: string;\n}\n\n/**\n * The lime announcement strip above the header: mono caption, a dimmer news line and a small\n * ink-tinted button, with a close X at the far right (in its own hairline cell on phones).\n * 48px tall on phones, 64px on desktop. Closing removes it.\n */\nexport function SaronicAnnouncement({ label, message, cta, icon, closeLabel, className }: SaronicAnnouncementProps) {\n  const [open, setOpen] = useState(true);\n  if (!open) return null;\n  return (\n    <div\n      className={cn(\n        \"relative flex h-12 items-stretch bg-primary font-mono text-base/none tracking-[0.025em] text-primary-foreground uppercase lg:h-16\",\n        className,\n      )}\n    >\n      <div className=\"flex min-w-0 flex-1 items-center overflow-clip pl-4 whitespace-nowrap lg:pl-6\">\n        {icon && <span className=\"mr-6 hidden shrink-0 lg:inline-flex [&>svg]:size-7\">{icon}</span>}\n        <span className=\"shrink-0\">{label}</span>\n        <span className=\"ml-4 shrink-0 text-primary-foreground/70\">{message}</span>\n        {cta && (\n          <SaronicButton href={cta.href} variant=\"tint\" size=\"sm\" icon=\"none\" className=\"ml-6 max-lg:hidden\">\n            {cta.label}\n          </SaronicButton>\n        )}\n      </div>\n      <button\n        type=\"button\"\n        aria-label={closeLabel}\n        onClick={() => setOpen(false)}\n        className=\"flex w-12 shrink-0 items-center justify-center border-l border-primary-foreground/10 transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none lg:w-16 lg:border-l-0\"\n      >\n        <X aria-hidden strokeWidth={1.5} className=\"size-6\" />\n      </button>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "saronic-button"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the bold caption at the start (\"Announcement\")"
+    },
+    {
+      "name": "message",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the news line; clipped at the window edge on phones"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the small button after the message (desktop only)"
+    },
+    {
+      "name": "icon",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small icon before the caption (desktop only)"
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader label for the close button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1d79f61e2d742edfa0439752ef3e917cb541e81fe1e09dd40181d6964fae6ec8"
+}

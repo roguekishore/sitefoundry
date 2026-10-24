@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Helion Energy outline button",
+  "description": "A 48px outlined rectangle with small 4px corners and a 13px label. On hover a faint wash fills it and the label rolls up as a copy rolls in from below; optionally the outline opens from the middle and the label rises as it scrolls into view.",
+  "category": "button",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "button",
+    "outline",
+    "minimal",
+    "hover",
+    "text-roll",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "takes the text colour of its parent; the outline is that colour at 80%",
+    "the reveal is a CSS view timeline, off under reduced motion"
+  ],
+  "entry": "helionenergy-button.tsx",
+  "source": "foundry",
+  "name": "helionenergy-button",
+  "files": [
+    {
+      "path": "helionenergy-button.css",
+      "content": "/* With `reveal`: the outline opens out from the middle and the label rises 20px while the\n   button scrolls into the window. Static HTML shows both in place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .helionenergy-button-frame,\n    .helionenergy-button-label {\n      animation-timing-function: linear;\n      animation-fill-mode: both;\n      animation-timeline: view();\n      animation-range: entry 100% cover 30%;\n    }\n    .helionenergy-button-frame {\n      animation-name: helionenergy-button-open;\n    }\n    .helionenergy-button-label {\n      animation-name: helionenergy-button-rise;\n    }\n  }\n}\n\n@keyframes helionenergy-button-open {\n  from {\n    clip-path: inset(0 50% 0 50%);\n  }\n  to {\n    clip-path: inset(0 0 0 0);\n  }\n}\n\n@keyframes helionenergy-button-rise {\n  from {\n    transform: translateY(20px);\n    opacity: 0;\n  }\n  to {\n    transform: translateY(0);\n    opacity: 1;\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-button.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./helionenergy-button.css\";\n\nexport interface HelionenergyButtonProps {\n  /** the button text */\n  children: ReactNode;\n  /** where it goes */\n  href: string;\n  /** draw the outline in from the middle and lift the label as the button scrolls into view */\n  reveal?: boolean;\n  className?: string;\n}\n\n/**\n * A 48px outlined rectangle with a 13px label, 4px corners. On hover a faint wash fills it and\n * the label rolls up while a copy rolls in from below (0.4s). With `reveal`, the outline opens\n * from the middle and the label rises 20px as it scrolls into view.\n */\nexport function HelionenergyButton({ children, href, reveal = false, className }: HelionenergyButtonProps) {\n  return (\n    <a\n      href={href}\n      className={cn(\n        \"group relative inline-flex h-12 items-center justify-center px-[1.875rem] text-[0.8125rem]/none tracking-[-0.01em]\",\n        className,\n      )}\n    >\n      <span\n        aria-hidden\n        className={cn(\n          \"absolute inset-0 rounded-sm border border-current/80 transition-colors duration-200 ease-out group-hover:bg-foreground/8 motion-reduce:transition-none\",\n          reveal && \"helionenergy-button-frame\",\n        )}\n      />\n      <span className={cn(\"relative block overflow-clip py-0.5\", reveal && \"helionenergy-button-label\")}>\n        <span className=\"block transition-transform duration-[400ms] ease-[cubic-bezier(.6,0,.2,1)] group-hover:-translate-y-full motion-reduce:transition-none\">\n          {children}\n        </span>\n        <span\n          aria-hidden\n          className=\"absolute inset-x-0 top-0 block translate-y-full py-0.5 transition-transform duration-[400ms] ease-[cubic-bezier(.6,0,.2,1)] group-hover:translate-y-0 motion-reduce:transition-none\"\n        >\n          {children}\n        </span>\n      </span>\n    </a>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the button text"
+    },
+    {
+      "name": "href",
+      "type": "string",
+      "required": true,
+      "description": "where it goes"
+    },
+    {
+      "name": "reveal",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "draw the outline in from the middle and lift the label as the button scrolls into view"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6c71b9a36cbc467702658cc5e3d3d4d24e514b4ab65893e9afc0187353687e44"
+}

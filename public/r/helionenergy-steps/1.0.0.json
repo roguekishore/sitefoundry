@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Helion Energy pinned explainer",
+  "description": "A pinned stage four and a half windows tall: a mono eyebrow and uppercase heading at the top over a navy-to-pale backdrop, and low down captions that take turns as you scroll, each fading out with a blur before the next fades in. A white pill button with a soft halo rises in, unblurring, as the stage arrives and its surface closes in as the stage leaves; a small Skip link sits under it.",
+  "category": "features",
+  "site": "helionenergy",
+  "license": "proprietary",
+  "tags": [
+    "steps",
+    "explainer",
+    "pinned",
+    "sticky",
+    "scroll",
+    "scrubbed",
+    "crossfade",
+    "blur",
+    "pill",
+    "gradient",
+    "storytelling"
+  ],
+  "notes": [
+    "pure CSS scroll timelines; without them (or with reduced motion) the captions are listed one under another",
+    "media is a full-stage animation or film; empty it is a gradient from `secondary` (top) to `background` with a soft `glow` in the middle",
+    "the top text uses secondary-foreground, so `secondary` should be dark (it is in the Helion theme)"
+  ],
+  "entry": "helionenergy-steps.tsx",
+  "source": "foundry",
+  "name": "helionenergy-steps",
+  "files": [
+    {
+      "path": "helionenergy-steps.css",
+      "content": "/* The section (450svh) publishes its own view timeline; the stage inside it is sticky, so the\n   `contain` range of that timeline is exactly the stretch while the stage is pinned.\n\n   Plain layout (no scroll timelines, or reduced motion): every caption is listed, one under\n   the other, and nothing moves. */\n.helionenergy-steps {\n  view-timeline: --helionenergy-steps block;\n}\n\n/* The empty stage: navy at the top easing into the page colour at the bottom, with one soft,\n   round glow in the middle. A plain stand-in for the original's animated scene. */\n.helionenergy-steps-backdrop {\n  background:\n    radial-gradient(ellipse 34% 30% at 50% 54%, color-mix(in oklab, var(--glow) 34%, transparent), transparent 72%),\n    linear-gradient(\n      to bottom,\n      var(--secondary) 0%,\n      color-mix(in oklab, var(--secondary) 82%, var(--background)) 30%,\n      color-mix(in oklab, var(--secondary) 48%, var(--background)) 64%,\n      var(--background) 100%\n    );\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    /* captions stack in one place and take turns (ranges set inline per caption) */\n    .helionenergy-steps-captions {\n      display: grid;\n    }\n    .helionenergy-steps-caption {\n      grid-area: 1 / 1;\n      animation-name: var(--hs-anim);\n      animation-range: var(--hs-range);\n      animation-fill-mode: var(--hs-fill);\n      animation-timing-function: linear;\n      animation-timeline: --helionenergy-steps;\n    }\n\n    /* the heading drifts up 20px over the whole stretch */\n    .helionenergy-steps-title {\n      animation: helionenergy-steps-drift linear both;\n      animation-timeline: --helionenergy-steps;\n      animation-range: entry 50% exit 100%;\n    }\n\n    /* the button block rises in, unblurring, as the stage arrives */\n    .helionenergy-steps-cta {\n      animation: helionenergy-steps-cta-in linear both;\n      animation-timeline: --helionenergy-steps;\n      animation-range: entry 50% entry 100%;\n    }\n\n    /* the pill's surface closes in from the sides as the stage leaves */\n    .helionenergy-steps-surface {\n      animation: helionenergy-steps-surface-out linear both;\n      animation-timeline: --helionenergy-steps;\n      animation-range: exit 40% exit 90%;\n    }\n  }\n}\n\n@keyframes helionenergy-steps-in {\n  from {\n    opacity: 0;\n    filter: blur(8px);\n  }\n}\n\n@keyframes helionenergy-steps-out {\n  to {\n    opacity: 0;\n    filter: blur(8px);\n  }\n}\n\n@keyframes helionenergy-steps-drift {\n  from {\n    transform: translateY(10px);\n  }\n  to {\n    transform: translateY(-10px);\n  }\n}\n\n@keyframes helionenergy-steps-cta-in {\n  from {\n    opacity: 0;\n    transform: translateY(30px);\n    filter: blur(6px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n    filter: blur(0);\n  }\n}\n\n@keyframes helionenergy-steps-surface-out {\n  from {\n    clip-path: inset(-0.5rem -0.5rem -0.5rem -0.5rem round 999px);\n  }\n  to {\n    clip-path: inset(50% 50% 50% 50% round 999px);\n  }\n}\n"
+    },
+    {
+      "path": "helionenergy-steps.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HelionenergyEyebrow } from \"@foundry/helionenergy-eyebrow\";\nimport { HelionenergyHeading } from \"@foundry/helionenergy-heading\";\nimport \"./helionenergy-steps.css\";\n\nexport interface HelionenergyStepsProps {\n  /** the small mono label over the heading */\n  eyebrow: ReactNode;\n  /** the heading's lines (broken on desktop only) */\n  title: ReactNode[];\n  /** one short caption per step; they take turns in the same place while the stage is pinned */\n  steps: ReactNode[];\n  /** the pill button's text */\n  ctaLabel: ReactNode;\n  /** where the pill button goes */\n  ctaHref: string;\n  /** the small link under it, to jump past the section */\n  skipLabel?: ReactNode;\n  /** where that link goes (e.g. the next section's #id) */\n  skipHref?: string;\n  /** a full-stage animation or film behind everything; empty, a navy-to-page gradient with a soft glow */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** The scroll ranges (inside the pinned stretch) where caption k fades in and out. */\nfunction captionMotion(k: number, n: number): CSSProperties {\n  const slice = 100 / n;\n  const at = (v: number) => `${v.toFixed(2)}%`;\n  const names: string[] = [];\n  const ranges: string[] = [];\n  const fills: string[] = [];\n  if (k > 0) {\n    names.push(\"helionenergy-steps-in\");\n    ranges.push(`contain ${at(k * slice)} contain ${at(k * slice + 6)}`);\n    fills.push(\"backwards\");\n  }\n  if (k < n - 1) {\n    names.push(\"helionenergy-steps-out\");\n    ranges.push(`contain ${at((k + 1) * slice - 6)} contain ${at((k + 1) * slice)}`);\n    fills.push(\"forwards\");\n  }\n  return {\n    \"--hs-anim\": names.join(\", \") || \"none\",\n    \"--hs-range\": ranges.join(\", \") || \"normal\",\n    \"--hs-fill\": fills.join(\", \") || \"none\",\n  } as CSSProperties;\n}\n\n/**\n * A pinned explainer four and a half windows tall. Its one-window stage holds still while the\n * page scrolls: a mono eyebrow and an uppercase heading at the top (drifting up 20px over the\n * whole stretch), and low down a caption that changes step by step, each fading out with a blur\n * before the next fades in. Under the captions a white pill button with a soft halo rises in\n * as the stage arrives and loses its surface as the stage leaves; a small Skip link sits below.\n */\nexport function HelionenergySteps({\n  eyebrow,\n  title,\n  steps,\n  ctaLabel,\n  ctaHref,\n  skipLabel,\n  skipHref,\n  media,\n  className,\n}: HelionenergyStepsProps) {\n  return (\n    <section className={cn(\"helionenergy-steps relative h-[450svh]\", className)}>\n      <div className=\"sticky top-0 isolate h-svh overflow-clip\">\n        <div aria-hidden={media ? undefined : true} className=\"helionenergy-steps-backdrop absolute inset-0 -z-10 [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n          {media}\n        </div>\n\n        <div className=\"flex h-full flex-col items-center px-gutter text-center\">\n          <div className=\"helionenergy-steps-title pt-[6.9rem] text-secondary-foreground lg:pt-[7.5rem]\">\n            <HelionenergyEyebrow>{eyebrow}</HelionenergyEyebrow>\n            <HelionenergyHeading lines={title} className=\"mt-[1.1rem]\" />\n          </div>\n\n          <div className=\"mt-auto flex flex-col items-center pb-4 lg:pb-6\">\n            <div className=\"helionenergy-steps-captions flex flex-col items-center gap-3\">\n              {steps.map((step, k) => (\n                <p\n                  key={k}\n                  className=\"helionenergy-steps-caption max-w-[21rem] text-[clamp(1rem,0.86rem+0.556vw,1.366rem)] leading-[1.3] tracking-[-0.02em] text-balance text-secondary-foreground/90 lg:max-w-[21rem]\"\n                  style={captionMotion(k, steps.length)}\n                >\n                  {step}\n                </p>\n              ))}\n            </div>\n\n            <div className=\"helionenergy-steps-cta mt-[5rem] flex flex-col items-center lg:mt-[4.5rem]\">\n              <a\n                href={ctaHref}\n                className=\"group relative inline-flex h-[3.125rem] items-center gap-5 px-6 text-sm/none tracking-[-0.01em] text-foreground lg:h-[3.625rem]\"\n              >\n                <span\n                  aria-hidden\n                  className=\"helionenergy-steps-surface absolute inset-0 rounded-full bg-background ring-8 ring-background/35 transition-colors duration-200 ease-out group-hover:bg-card motion-reduce:transition-none\"\n                />\n                <span aria-hidden className=\"relative size-1 rounded-full bg-current\" />\n                <span className=\"relative\">{ctaLabel}</span>\n                <span aria-hidden className=\"relative size-1 rounded-full bg-current\" />\n              </a>\n              {skipLabel && skipHref && (\n                <a\n                  href={skipHref}\n                  className=\"mt-5 text-[0.8125rem]/none text-muted-foreground transition-colors duration-200 ease-out hover:text-foreground motion-reduce:transition-none\"\n                >\n                  {skipLabel}\n                </a>\n              )}\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "helionenergy-eyebrow",
+    "helionenergy-heading"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the small mono label over the heading"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "the heading's lines (broken on desktop only)"
+    },
+    {
+      "name": "steps",
+      "type": "ReactNode[]",
+      "required": true,
+      "description": "one short caption per step; they take turns in the same place while the stage is pinned"
+    },
+    {
+      "name": "ctaLabel",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the pill button's text"
+    },
+    {
+      "name": "ctaHref",
+      "type": "string",
+      "required": true,
+      "description": "where the pill button goes"
+    },
+    {
+      "name": "skipLabel",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the small link under it, to jump past the section"
+    },
+    {
+      "name": "skipHref",
+      "type": "string",
+      "required": false,
+      "description": "where that link goes (e.g. the next section's #id)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a full-stage animation or film behind everything; empty, a navy-to-page gradient with a soft glow"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d0d1ce595a6a50424ea44d9eb02e3e70ed5ebcbfaf115fd88de0f54ea7a4c318"
+}

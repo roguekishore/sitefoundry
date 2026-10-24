@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Supabase open-source counter",
+  "description": "An open-source band: a 34px title, a grey paragraph and a small white button on the left, and on the right a field of tiny square dots (green-tinted in the middle, fading to nothing at the edges) in which a figure such as a star count is spelled in lit green dots. The lit dots switch on column by column, left to right, as the band scrolls into view. Phones centre the text and put the field below.",
+  "category": "stats",
+  "site": "supabase",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "stats",
+    "counter",
+    "dot-matrix",
+    "pixel",
+    "reveal",
+    "scroll",
+    "green",
+    "light",
+    "open-source"
+  ],
+  "notes": [
+    "the dot field is a CSS mask pattern; only the figure's lit dots are elements (a built-in 5×7 dot font: digits, . , K M +)",
+    "the reveal is a named CSS view timeline on the field (inside @supports); with reduced motion or without support the figure is simply lit"
+  ],
+  "entry": "supabase-open-source.tsx",
+  "name": "supabase-open-source",
+  "files": [
+    {
+      "path": "supabase-open-source.css",
+      "content": "/* The dot field: a grid of small squares drawn with a mask (two stripe gradients intersected),\n   tinted green in the middle and fading to nothing at the edges. Only the lit dots of the\n   figure are real elements. --supabase-os-pitch is the distance between dots. */\n.supabase-os-field {\n  /* 5.25px, or less where 65 dots would not fit the phone's width */\n  --supabase-os-pitch: min(5.25px, calc((100vw - 3rem) / 65));\n  --supabase-os-dot: calc(var(--supabase-os-pitch) * 0.78);\n  grid-template-columns: repeat(65, var(--supabase-os-pitch));\n  grid-template-rows: repeat(34, var(--supabase-os-pitch));\n  view-timeline-name: --supabase-os-field;\n}\n@media (min-width: 64rem) {\n  .supabase-os-field {\n    --supabase-os-pitch: 11px;\n  }\n}\n\n.supabase-os-field::before {\n  content: \"\";\n  position: absolute;\n  inset: 0;\n  background: radial-gradient(\n    closest-side,\n    color-mix(in oklab, var(--highlight) 20%, transparent) 0%,\n    color-mix(in oklab, var(--muted-foreground) 12%, transparent) 45%,\n    transparent 100%\n  );\n  -webkit-mask:\n    linear-gradient(90deg, var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch),\n    linear-gradient(var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch);\n  -webkit-mask-composite: source-in;\n  mask:\n    linear-gradient(90deg, var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch),\n    linear-gradient(var(--foreground) var(--supabase-os-dot), transparent var(--supabase-os-dot)) 0 0 / var(--supabase-os-pitch) var(--supabase-os-pitch);\n  mask-composite: intersect;\n}\n\n.supabase-os-dot {\n  width: var(--supabase-os-dot);\n  height: var(--supabase-os-dot);\n  border-radius: calc(var(--supabase-os-dot) * 0.22);\n}\n\n/* lit dots switch on column by column as the field scrolls into view (on the field's own\n   view timeline, so the range spans the field's height, not one dot's) */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .supabase-os-dot {\n      animation: supabase-os-light linear both;\n      animation-timeline: --supabase-os-field;\n      animation-range: cover calc(8% + var(--supabase-os-at) * 22%) cover calc(18% + var(--supabase-os-at) * 22%);\n    }\n  }\n}\n\n@keyframes supabase-os-light {\n  from {\n    opacity: 0;\n    scale: 0.4;\n  }\n  to {\n    opacity: 1;\n    scale: 1;\n  }\n}\n"
+    },
+    {
+      "path": "supabase-open-source.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SupabaseButton } from \"@foundry/supabase-button\";\nimport { SupabaseHeading } from \"@foundry/supabase-heading\";\nimport \"./supabase-open-source.css\";\n\nexport interface SupabaseOpenSourceProps {\n  title: string;\n  /** the grey paragraph under the title */\n  body: string;\n  /** the white button (icon + label) */\n  cta?: { label: ReactNode; href: string };\n  /** the figure spelled in lit dots, e.g. \"48.2K\"; digits, \".\", \",\", \"K\", \"M\" and \"+\" are drawn */\n  figure: string;\n  /** what the figure means, read to screen readers (e.g. \"48.2 thousand stars\") */\n  figureLabel?: string;\n  className?: string;\n}\n\n// a 5 × 7 dot font: one string per row, \"#\" is a lit dot (narrow glyphs are 1–3 wide)\nconst GLYPHS: Record<string, string[]> = {\n  \"0\": [\".###.\", \"#...#\", \"#..##\", \"#.#.#\", \"##..#\", \"#...#\", \".###.\"],\n  \"1\": [\"..#..\", \".##..\", \"..#..\", \"..#..\", \"..#..\", \"..#..\", \".###.\"],\n  \"2\": [\".###.\", \"#...#\", \"....#\", \"...#.\", \"..#..\", \".#...\", \"#####\"],\n  \"3\": [\".###.\", \"#...#\", \"....#\", \"..##.\", \"....#\", \"#...#\", \".###.\"],\n  \"4\": [\"...#.\", \"..##.\", \".#.#.\", \"#..#.\", \"#####\", \"...#.\", \"...#.\"],\n  \"5\": [\"#####\", \"#....\", \"####.\", \"....#\", \"....#\", \"#...#\", \".###.\"],\n  \"6\": [\"..##.\", \".#...\", \"#....\", \"####.\", \"#...#\", \"#...#\", \".###.\"],\n  \"7\": [\"#####\", \"....#\", \"...#.\", \"..#..\", \".#...\", \".#...\", \".#...\"],\n  \"8\": [\".###.\", \"#...#\", \"#...#\", \".###.\", \"#...#\", \"#...#\", \".###.\"],\n  \"9\": [\".###.\", \"#...#\", \"#...#\", \".####\", \"....#\", \"...#.\", \".##..\"],\n  K: [\"#...#\", \"#..#.\", \"#.#..\", \"##...\", \"#.#..\", \"#..#.\", \"#...#\"],\n  M: [\"#...#\", \"##.##\", \"#.#.#\", \"#.#.#\", \"#...#\", \"#...#\", \"#...#\"],\n  \"+\": [\".....\", \"..#..\", \"..#..\", \"#####\", \"..#..\", \"..#..\", \".....\"],\n  \".\": [\".\", \".\", \".\", \".\", \".\", \".\", \"#\"],\n  \",\": [\"..\", \"..\", \"..\", \"..\", \"..\", \".#\", \"#.\"],\n};\n\nconst COLS = 65;\nconst ROWS = 34;\n\n/** The lit dots of a figure, centred in the 65 × 34 field: [column, row] pairs, 1-based. */\nfunction litDots(figure: string) {\n  const glyphs = [...figure.toUpperCase()].map((ch) => GLYPHS[ch]).filter(Boolean) as string[][];\n  const width = glyphs.reduce((sum, g) => sum + g[0]!.length, 0) + Math.max(glyphs.length - 1, 0);\n  let x = Math.floor((COLS - width) / 2) + 1;\n  const y = Math.floor((ROWS - 7) / 2) + 1;\n  const dots: [number, number][] = [];\n  for (const glyph of glyphs) {\n    glyph.forEach((row, r) => [...row].forEach((cell, c) => cell === \"#\" && dots.push([x + c, y + r])));\n    x += glyph[0]!.length + 1;\n  }\n  return dots;\n}\n\n/** An open-source band: title, grey paragraph and button beside a fading field of dots spelling a figure. */\nexport function SupabaseOpenSource({ title, body, cta, figure, figureLabel, className }: SupabaseOpenSourceProps) {\n  const dots = litDots(figure);\n  return (\n    <section className={cn(\"relative overflow-x-clip border-b border-border bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content grid max-w-page grid-cols-1 px-gutter py-24 lg:grid-cols-2\">\n        <div className=\"text-center lg:text-left\">\n          <SupabaseHeading parts={[{ text: title }]} size=\"large\" className=\"mx-auto max-w-[13ch] lg:mx-0 lg:max-w-none\" />\n          <p className=\"mt-6 text-[0.9375rem] leading-[1.5] text-muted-foreground lg:mt-5 lg:max-w-[30rem]\">{body}</p>\n          {cta && (\n            <SupabaseButton href={cta.href} variant=\"outline\" className=\"mt-6 h-[2.125rem] px-3 text-[0.9375rem]\">\n              {cta.label}\n            </SupabaseButton>\n          )}\n        </div>\n\n        <div className=\"mt-8 flex justify-center lg:absolute lg:inset-y-0 lg:right-0 lg:left-1/2 lg:mt-0 lg:items-center\">\n          <div role=\"img\" aria-label={figureLabel ?? figure} className=\"supabase-os-field relative grid\">\n            {dots.map(([col, row], i) => (\n              <span\n                key={i}\n                className={cn(\"supabase-os-dot relative\", i % 3 === 1 ? \"bg-highlight\" : \"bg-primary\")}\n                style={{ gridColumn: col, gridRow: row, \"--supabase-os-at\": ((col - 1) / COLS).toFixed(3) } as CSSProperties}\n              />\n            ))}\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "supabase-button",
+    "supabase-heading"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the grey paragraph under the title"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: ReactNode; href: string; }",
+      "required": false,
+      "description": "the white button (icon + label)"
+    },
+    {
+      "name": "figure",
+      "type": "string",
+      "required": true,
+      "description": "the figure spelled in lit dots, e.g. \"48.2K\"; digits, \".\", \",\", \"K\", \"M\" and \"+\" are drawn"
+    },
+    {
+      "name": "figureLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the figure means, read to screen readers (e.g. \"48.2 thousand stars\")"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a38678e1e230189b1cb9ea0ea0b876e1f31a4eb50ec57e6e3cc9fbfe362e0b51"
+}

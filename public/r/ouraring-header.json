@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Oura Ring header",
+  "description": "A quiet cream announcement strip over a 90px bar that floats on the hero: a light, widely tracked wordmark left, four nav links with small chevrons centred, a round outlined cart right, on a sand-to-clear wash. On phones the bar becomes a frosted pill floating at the top of the screen once the hero has scrolled away (wordmark, cart, menu). Once scrolled a solid backdrop fades in; the bar slides away while you scroll down and comes back when you scroll up.",
+  "category": "header",
+  "site": "ouraring",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "hide-on-scroll",
+    "announcement",
+    "floating",
+    "frosted",
+    "pill",
+    "warm",
+    "light"
+  ],
+  "notes": [
+    "sticky: its root is display:contents, so the bar sticks within the page wrapper; the bar takes no height (it overlays the block after it, e.g. the hero)",
+    "phones: the nav is a pill fixed 12px from the top that appears after 70% of the first screen is scrolled; without JavaScript it stays hidden",
+    "needs JavaScript for the scroll states and the phone menu (hydrate load); static HTML shows the bar"
+  ],
+  "hydrate": "load",
+  "entry": "ouraring-header.tsx",
+  "source": "foundry",
+  "name": "ouraring-header",
+  "files": [
+    {
+      "path": "ouraring-header.tsx",
+      "content": "import { useEffect, useRef, useState, type ReactNode } from \"react\";\nimport { ChevronDown, Menu, ShoppingCart, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface OuraringNavItem {\n  label: string;\n  href: string;\n  /** shows a small chevron (the original opens a menu from it) */\n  hasMenu?: boolean;\n}\n\nexport interface OuraringHeaderProps {\n  /** one line in the cream strip above the bar (links inside are underlined); omit to hide the strip */\n  announcement?: ReactNode;\n  /** the wordmark, set light and widely tracked */\n  logo: ReactNode;\n  /** where the wordmark links */\n  logoHref?: string;\n  /** the centred links */\n  nav: OuraringNavItem[];\n  /** the round cart button */\n  cart: { href: string; label: string };\n  /** screen-reader labels for the phone menu button */\n  menuLabels?: { open: string; close: string };\n  className?: string;\n}\n\nexport function OuraringHeader({ announcement, logo, logoHref = \"/\", nav, cart, menuLabels = { open: \"Menu\", close: \"Close\" }, className }: OuraringHeaderProps) {\n  const [scrolled, setScrolled] = useState(false);\n  const [hidden, setHidden] = useState(false);\n  const [pastHero, setPastHero] = useState(false);\n  const [open, setOpen] = useState(false);\n  const last = useRef(0);\n\n  useEffect(() => {\n    const onScroll = () => {\n      const y = window.scrollY;\n      setScrolled(y > 8);\n      // phones: the pill only appears once the first screen is mostly scrolled away\n      setPastHero(y > window.innerHeight * 0.7);\n      // slide away going down (past the first screen's top), come back going up\n      setHidden(y > 240 && y > last.current);\n      last.current = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, []);\n\n  const wordmark = <span className=\"block text-[26px] leading-none font-light tracking-[0.09em] uppercase\">{logo}</span>;\n\n  return (\n    <div className={cn(\"contents\", className)}>\n      {announcement && (\n        <div className=\"relative z-50 flex min-h-[52px] items-center justify-center bg-background px-gutter py-3 text-center text-[13px] leading-[1.3] font-semibold text-foreground lg:text-[14px] [&_a]:underline [&_a]:underline-offset-2\">\n          <p>{announcement}</p>\n        </div>\n      )}\n\n      {/* desktop bar: sticky, takes no height, so it floats over the hero */}\n      <header\n        className={cn(\n          \"sticky top-0 z-40 -mb-[90px] hidden h-[90px] text-foreground lg:block\",\n          \"transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n          hidden && !open && \"-translate-y-full\",\n        )}\n      >\n        <div aria-hidden className=\"absolute inset-0 -z-10 bg-linear-to-b from-card from-45% to-transparent\" />\n        <div\n          aria-hidden\n          className={cn(\n            \"absolute inset-0 -z-10 bg-background/90 backdrop-blur-md transition-opacity duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\",\n            scrolled ? \"opacity-100\" : \"opacity-0\",\n          )}\n        />\n        <div className=\"mx-auto grid h-full max-w-page grid-cols-[1fr_auto_1fr] items-center px-gutter\">\n          <a href={logoHref} className=\"justify-self-start\">\n            {wordmark}\n          </a>\n          <nav className=\"flex items-center gap-[50px]\">\n            {nav.map((item) => (\n              <a key={item.label} href={item.href} className=\"group flex items-center gap-2 text-[16px] tracking-[0.03em] transition-colors duration-150 hover:text-foreground/70\">\n                {item.label}\n                {item.hasMenu && (\n                  <ChevronDown aria-hidden strokeWidth={1.5} className=\"size-4 transition-transform duration-150 group-hover:translate-y-0.5 motion-reduce:transition-none\" />\n                )}\n              </a>\n            ))}\n          </nav>\n          <a\n            href={cart.href}\n            aria-label={cart.label}\n            className=\"flex size-12 items-center justify-center justify-self-end rounded-full border border-border transition-colors duration-300 hover:border-foreground hover:bg-foreground/10 motion-reduce:transition-none\"\n          >\n            <ShoppingCart aria-hidden strokeWidth={1.5} className=\"size-5\" />\n          </a>\n        </div>\n      </header>\n\n      {/* phones: a frosted pill floating at the top, shown once the hero is scrolled away */}\n      <div\n        className={cn(\n          \"fixed inset-x-3 top-3 z-40 transition-[translate,opacity] duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none lg:hidden\",\n          pastHero || open ? \"translate-y-0 opacity-100\" : \"pointer-events-none -translate-y-[calc(100%+0.75rem)] opacity-0\",\n        )}\n      >\n        <div className=\"flex h-16 items-center justify-between rounded-xl bg-foreground/60 pr-3 pl-4 text-background backdrop-blur-md\">\n          <a href={logoHref}>{wordmark}</a>\n          <div className=\"flex items-center gap-2\">\n            <a href={cart.href} aria-label={cart.label} className=\"flex size-10 items-center justify-center rounded-full border border-background/30\">\n              <ShoppingCart aria-hidden strokeWidth={1.5} className=\"size-5\" />\n            </a>\n            <button\n              type=\"button\"\n              aria-expanded={open}\n              aria-label={open ? menuLabels.close : menuLabels.open}\n              onClick={() => setOpen((v) => !v)}\n              className=\"flex size-10 items-center justify-center rounded-full border border-background/30\"\n            >\n              {open ? <X aria-hidden strokeWidth={1.5} className=\"size-5\" /> : <Menu aria-hidden strokeWidth={1.5} className=\"size-5\" />}\n            </button>\n          </div>\n        </div>\n        {open && (\n          <nav className=\"mt-2 flex flex-col rounded-xl bg-background p-3 text-foreground shadow-[0_0_18px_0] shadow-foreground/20\">\n            {nav.map((item) => (\n              <a key={item.label} href={item.href} className=\"flex h-12 items-center justify-between rounded-md px-3 text-[18px] hover:bg-card\">\n                {item.label}\n                {item.hasMenu && <ChevronDown aria-hidden strokeWidth={1.5} className=\"size-4 -rotate-90\" />}\n              </a>\n            ))}\n          </nav>\n        )}\n      </div>\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "announcement",
+      "type": "ReactNode",
+      "required": false,
+      "description": "one line in the cream strip above the bar (links inside are underlined); omit to hide the strip"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark, set light and widely tracked"
+    },
+    {
+      "name": "logoHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "nav",
+      "type": "OuraringNavItem[]",
+      "required": true,
+      "description": "the centred links"
+    },
+    {
+      "name": "cart",
+      "type": "{ href: string; label: string; }",
+      "required": true,
+      "description": "the round cart button"
+    },
+    {
+      "name": "menuLabels",
+      "type": "{ open: string; close: string; }",
+      "required": false,
+      "default": "{ open: \"Menu\", close: \"Close\" }",
+      "description": "screen-reader labels for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "5c0b334991338d41186c4d49089d30d6b12af572f5e323c3acebfb30a683b589"
+}

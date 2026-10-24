@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Pilot footer",
+  "description": "A plain white footer in a narrower column: the lowercase wordmark with a contact email opposite, five link columns under semibold group titles (one group can run over two columns), a hairline, a row of legal links in monospace and a small grey monospace disclaimer. On phones the groups sit two across and the legal links stack.",
+  "category": "footer",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "links",
+    "columns",
+    "mono",
+    "minimal",
+    "light"
+  ],
+  "notes": [],
+  "entry": "pilot-footer.tsx",
+  "source": "foundry",
+  "name": "pilot-footer",
+  "files": [
+    {
+      "path": "pilot-footer.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\nexport interface PilotFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface PilotFooterGroup {\n  /** the group's title */\n  title: string;\n  /** its links */\n  links: PilotFooterLink[];\n  /** 2 to split a long group over two columns (the second has no title) */\n  columns?: 1 | 2;\n}\n\nexport interface PilotFooterProps {\n  /** the lowercase wordmark */\n  brand: { name: string; href: string };\n  /** the contact email at the top right */\n  email: string;\n  /** the link groups */\n  groups: PilotFooterGroup[];\n  /** the copyright line, first in the legal row */\n  copyright: string;\n  /** the legal links */\n  legal: PilotFooterLink[];\n  /** the small grey disclaimer; \\n starts a new line */\n  disclaimer?: string;\n  className?: string;\n}\n\nfunction LinkList({ links }: { links: PilotFooterLink[] }) {\n  return (\n    <ul className=\"mt-6 space-y-5\">\n      {links.map((l) => (\n        <li key={l.label}>\n          <a href={l.href} className=\"text-base leading-[1.6] transition-colors duration-150 hover:text-primary motion-reduce:transition-none\">\n            {l.label}\n          </a>\n        </li>\n      ))}\n    </ul>\n  );\n}\n\n/** Pilot's footer: wordmark and email, five link columns, mono legal row and disclaimer. */\nexport function PilotFooter({ brand, email, groups, copyright, legal, disclaimer, className }: PilotFooterProps) {\n  return (\n    <footer className={cn(\"bg-background text-foreground\", className)}>\n      <div className=\"mx-auto max-w-[73.5rem] px-5 pt-14 pb-12 lg:px-gutter lg:pt-20\">\n        <div className=\"flex items-center justify-between gap-6\">\n          <a href={brand.href} className=\"font-display text-[1.875rem] leading-none font-medium tracking-[-0.04em] text-foreground/90 lowercase\">\n            {brand.name}\n          </a>\n          <a href={`mailto:${email}`} className=\"text-base transition-colors duration-150 hover:text-primary motion-reduce:transition-none\">\n            {email}\n          </a>\n        </div>\n\n        <div className=\"mt-12 grid grid-cols-2 gap-x-6 gap-y-20 lg:mt-20 lg:grid-cols-5 lg:gap-x-10\">\n          {groups.map((g) => {\n            const half = Math.ceil(g.links.length / 2);\n            return g.columns === 2 ? (\n              <div key={g.title} className=\"col-span-2 grid grid-cols-2 gap-x-6 lg:gap-x-10\">\n                <div>\n                  <h3 className=\"text-xl leading-[1.3] font-bold text-foreground/90\">{g.title}</h3>\n                  <LinkList links={g.links.slice(0, half)} />\n                </div>\n                <div className=\"pt-[1.625rem]\">\n                  <LinkList links={g.links.slice(half)} />\n                </div>\n              </div>\n            ) : (\n              <div key={g.title}>\n                <h3 className=\"text-xl leading-[1.3] font-bold text-foreground/90\">{g.title}</h3>\n                <LinkList links={g.links} />\n              </div>\n            );\n          })}\n        </div>\n\n        <div className=\"mt-8 border-t border-border pt-8 lg:mt-6 lg:pt-12\">\n          <ul className=\"flex flex-col gap-6 font-mono text-sm leading-none lg:flex-row lg:flex-wrap lg:gap-10\">\n            <li>{copyright}</li>\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"transition-colors duration-150 hover:text-primary motion-reduce:transition-none\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n          {disclaimer && <p className=\"mt-8 font-mono text-sm leading-[1.25] whitespace-pre-line text-muted-foreground/80 lg:mt-14\">{disclaimer}</p>}\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "{ name: string; href: string; }",
+      "required": true,
+      "description": "the lowercase wordmark"
+    },
+    {
+      "name": "email",
+      "type": "string",
+      "required": true,
+      "description": "the contact email at the top right"
+    },
+    {
+      "name": "groups",
+      "type": "PilotFooterGroup[]",
+      "required": true,
+      "description": "the link groups"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line, first in the legal row"
+    },
+    {
+      "name": "legal",
+      "type": "PilotFooterLink[]",
+      "required": true,
+      "description": "the legal links"
+    },
+    {
+      "name": "disclaimer",
+      "type": "string",
+      "required": false,
+      "description": "the small grey disclaimer; \\n starts a new line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "6b9af7db82f2866b793b56cc846e42d7f144aad8145c994a4d48fbb7a09d30d5"
+}

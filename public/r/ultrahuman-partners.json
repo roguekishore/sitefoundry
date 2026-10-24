@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman partner strip",
+  "description": "A quiet partner strip on white: a hairline rule, a centred uppercase mono label and a row of pale grey wordmarks (or logos) fading out at both edges. The row loops sideways very slowly and drifts a little further as the page scrolls past.",
+  "category": "logos",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "logos",
+    "partners",
+    "marquee",
+    "loop",
+    "scroll-driven",
+    "light",
+    "minimal",
+    "mono"
+  ],
+  "notes": [
+    "CSS only: a 140s loop plus a scroll-driven drift; both off under reduced motion"
+  ],
+  "entry": "ultrahuman-partners.tsx",
+  "name": "ultrahuman-partners",
+  "files": [
+    {
+      "path": "ultrahuman-partners.css",
+      "content": "/* Two copies of the row loop sideways very slowly (one copy's width per cycle), and the whole strip\n   drifts a further 72px left while it crosses the window. Both stop under reduced motion. */\n.ultrahuman-partners-track {\n  animation: ultrahuman-partners-loop 140s linear infinite;\n}\n\n@keyframes ultrahuman-partners-loop {\n  to { transform: translateX(-50%); }\n}\n\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ultrahuman-partners-drift {\n      animation: ultrahuman-partners-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes ultrahuman-partners-drift {\n  from { transform: translateX(36px); }\n  to { transform: translateX(-36px); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .ultrahuman-partners-track {\n    animation: none;\n  }\n}\n"
+    },
+    {
+      "path": "ultrahuman-partners.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./ultrahuman-partners.css\";\n\nexport interface UltrahumanPartner {\n  /** the institution's name (shown as a grey wordmark when there's no logo, and read to screen readers) */\n  name: string;\n  /** a logo to show instead of the name (svg or img, greyed) */\n  logo?: ReactNode;\n}\n\nexport interface UltrahumanPartnersProps {\n  /** the small mono label over the row */\n  label: string;\n  /** the partners (six on the original) */\n  partners: UltrahumanPartner[];\n  /** draw the hairline rule above the section */\n  rule?: boolean;\n  className?: string;\n}\n\n/** A quiet partner strip: a hairline, a centred mono label and a row of grey wordmarks that loops\n *  very slowly sideways and drifts a little further as the page scrolls. */\nexport function UltrahumanPartners({ label, partners, rule = true, className }: UltrahumanPartnersProps) {\n  const row = (copy: number) =>\n    partners.map((partner) => (\n      <li\n        key={`${copy}-${partner.name}`}\n        aria-hidden={copy > 0 ? true : undefined}\n        className=\"flex w-[10rem] shrink-0 items-center justify-center px-3 text-center text-[0.9375rem] leading-tight font-medium tracking-[-0.02em] text-foreground/45 lg:w-[15.625rem] lg:text-lg [&_img]:max-h-12 [&_svg]:max-h-12\"\n      >\n        {partner.logo ?? partner.name}\n      </li>\n    ));\n  return (\n    <section className={cn(\"overflow-clip bg-background text-foreground\", className)}>\n      {rule && <div aria-hidden className=\"mx-auto h-px max-w-[80.5rem] bg-foreground/10 max-lg:mx-gutter\" />}\n      <div className=\"pt-16 pb-20 lg:pt-[6.5rem] lg:pb-28\">\n        <p className=\"text-center font-mono text-[0.8125rem] leading-none tracking-[0.06em] text-foreground/60 uppercase lg:text-base\">{label}</p>\n        <div className=\"ultrahuman-partners-drift mt-10 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] lg:mt-14\">\n          <ul className=\"ultrahuman-partners-track flex h-14 w-max\">\n            {row(0)}\n            {row(1)}\n          </ul>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "the small mono label over the row"
+    },
+    {
+      "name": "partners",
+      "type": "UltrahumanPartner[]",
+      "required": true,
+      "description": "the partners (six on the original)"
+    },
+    {
+      "name": "rule",
+      "type": "boolean",
+      "required": false,
+      "default": "true",
+      "description": "draw the hairline rule above the section"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0a204b6ddfe4ab81f07119a30f81daaa7a3c0c8c415e274aed6c883bb3203ffe"
+}

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs breakthrough",
+  "description": "An editorial feature on a flat tan field: a big light title with an orange edge tick, then numbered figures on a four-column grid (a wide 3:2 photo over three columns and a small one in the fourth, both with a 3px orange bottom rule, and a frameless line drawing bleeding off the right edge), a long paragraph set in two columns under the big photo, and a ring-arrow link. On phones the text comes first and the figures pair up below it.",
+  "category": "features",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "editorial",
+    "grid",
+    "numbered",
+    "photo",
+    "columns",
+    "light-type",
+    "mono",
+    "bleed",
+    "flat",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "three media slots: figure 1 and 2 are photos (3:2), figure 3 is line art (1.37:1) that bleeds past the right edge",
+    "the section clips sideways (overflow-x-clip) so the bleeding figure never makes the page scroll"
+  ],
+  "entry": "cfs-breakthrough.tsx",
+  "source": "foundry",
+  "name": "cfs-breakthrough",
+  "files": [
+    {
+      "path": "cfs-breakthrough.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CfsMedia } from \"@foundry/cfs-media\";\nimport { CfsRingLink } from \"@foundry/cfs-ring-link\";\nimport { CfsSectionTitle } from \"@foundry/cfs-section-title\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CfsFigure {\n  /** the small monospace number above it, e.g. \"01\" */\n  label: string;\n  /** the photo or drawing. Empty: a placeholder */\n  media?: ReactNode;\n}\n\nexport interface CfsBreakthroughProps {\n  /** the section title */\n  title: string;\n  /** the long paragraph; it flows into two columns on wide screens */\n  body: string;\n  /** exactly three figures: the wide photo, the small photo, the bleeding drawing */\n  figures: [CfsFigure, CfsFigure, CfsFigure];\n  /** the ring-arrow link under the text */\n  link: { label: string; href: string };\n  className?: string;\n}\n\nfunction FigureLabel({ children }: { children: string }) {\n  return <p className=\"mb-[5px] font-mono text-sm leading-[1.2]\">{children}</p>;\n}\n\n/** Title, numbered figures on a 4-column grid, two-column text and a ring link. */\nexport function CfsBreakthrough({ title, body, figures, link, className }: CfsBreakthroughProps) {\n  const [wide, small, drawing] = figures;\n  return (\n    <section className={cn(\"overflow-x-clip bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <CfsSectionTitle>{title}</CfsSectionTitle>\n\n        <div className=\"mt-[1.875rem] grid grid-cols-1 lg:mt-14 lg:grid-cols-4 lg:gap-x-5\">\n          {/* the paragraph comes first on phones, under the wide photo on wide screens */}\n          <p className=\"order-first max-w-[57rem] text-base leading-[1.5] lg:order-none lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:mt-14 lg:columns-2 lg:gap-12\">\n            {body}\n          </p>\n\n          <figure className=\"mt-[1.875rem] lg:col-span-3 lg:col-start-1 lg:row-start-1 lg:mt-0\">\n            <FigureLabel>{wide.label}</FigureLabel>\n            <CfsMedia media={wide.media} rule className=\"aspect-[3/2]\" />\n          </figure>\n\n          <div className=\"mt-5 grid grid-cols-2 items-start gap-x-[15px] lg:col-start-4 lg:row-span-3 lg:row-start-1 lg:mt-0 lg:self-start lg:grid-cols-1 lg:gap-y-[1.375rem]\">\n            <figure>\n              <FigureLabel>{small.label}</FigureLabel>\n              <CfsMedia media={small.media} rule className=\"aspect-[3/2]\" />\n            </figure>\n            <figure>\n              <FigureLabel>{drawing.label}</FigureLabel>\n              <CfsMedia media={drawing.media} tone=\"drawing\" className=\"aspect-[1.37] w-[117%] lg:w-[250%]\" />\n            </figure>\n          </div>\n\n          <CfsRingLink {...link} className=\"mt-10 justify-self-start lg:col-span-3 lg:col-start-1 lg:row-start-3 lg:mt-[2.625rem]\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "cfs-media",
+    "cfs-ring-link",
+    "cfs-section-title",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the long paragraph; it flows into two columns on wide screens"
+    },
+    {
+      "name": "figures",
+      "type": "[CfsFigure, CfsFigure, CfsFigure]",
+      "required": true,
+      "description": "exactly three figures: the wide photo, the small photo, the bleeding drawing"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ring-arrow link under the text"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "45c3947657b326813a5d9d54a136052393447efb930712cc52d959ab1ce7ad6e"
+}

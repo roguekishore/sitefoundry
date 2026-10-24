@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Vercel media placeholder",
+  "description": "Plain token-coloured stand-ins for media: a ringed pale-grey window that fades into the page at its bottom (screenshots), a soft grey haze (hero art), a light-to-bright blue wash (small artwork) or a grey panel fading out towards one side (art beside text). Nothing is drawn.",
+  "category": "media",
+  "site": "vercel",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "placeholder",
+    "media",
+    "minimal",
+    "fade"
+  ],
+  "notes": [
+    "fills the box it is given; size and position come from the parent or className",
+    "pass children to put real media inside the window frame"
+  ],
+  "entry": "vercel-placeholder.tsx",
+  "name": "vercel-placeholder",
+  "files": [
+    {
+      "path": "vercel-placeholder.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface VercelPlaceholderProps {\n  /** window: ringed grey frame fading out at the bottom · haze: soft grey glow in the middle ·\n   *  wash: light-to-bright blue · side: grey panel fading out to the left */\n  tone?: \"window\" | \"haze\" | \"wash\" | \"side\";\n  /** what the slot will hold, read to screen readers (e.g. \"Product screenshot\") */\n  label?: string;\n  /** real media to show inside the frame instead of the empty surface */\n  children?: ReactNode;\n  className?: string;\n}\n\nconst tones = {\n  window:\n    \"rounded-t-lg bg-muted shadow-xs shadow-foreground/5 ring-1 ring-foreground/8 mask-b-from-55% mask-b-to-100%\",\n  haze: \"bg-radial-[closest-side] from-foreground/12 to-transparent\",\n  wash: \"bg-linear-to-br from-glow/60 to-highlight\",\n  side: \"bg-muted mask-l-from-40% mask-l-to-100%\",\n};\n\n/** Stands in for media: a plain surface in the theme's colours, no drawing. */\nexport function VercelPlaceholder({ tone = \"window\", label, children, className }: VercelPlaceholderProps) {\n  return (\n    <div\n      role={label ? \"img\" : undefined}\n      aria-label={label}\n      aria-hidden={label ? undefined : true}\n      className={cn(\"size-full overflow-clip\", tones[tone], className)}\n    >\n      {children}\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "window",
+      "description": "window: ringed grey frame fading out at the bottom · haze: soft grey glow in the middle ·\nwash: light-to-bright blue · side: grey panel fading out to the left"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": false,
+      "description": "what the slot will hold, read to screen readers (e.g. \"Product screenshot\")"
+    },
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": false,
+      "description": "real media to show inside the frame instead of the empty surface"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "32f8a4c819b66ffa9268a7daeb9fe3ca75bcf77e82417953207ff5588a8c6a26"
+}

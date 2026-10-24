@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ultrahuman product band",
+  "description": "A product band with a 40px name over a grey tagline, then on desktop a sticky left column (rounded media, the name in 32px and two pills) beside a stack of 16px-radius cards: a big statement, a centred figure (\"Up to / 40 Days\" or a ~150px bare number), and a mono-titled feature list with icons and hairline rules. On phones it stacks, and the name with its two buttons rides as a bar pinned to the bottom of the window for the length of the band. Cards and list rows rise in on scroll. Black with charcoal cards, or white with pale grey cards.",
+  "category": "features",
+  "site": "ultrahuman",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "product",
+    "sticky",
+    "pinned",
+    "cards",
+    "stats",
+    "list",
+    "dark",
+    "light",
+    "reveal",
+    "minimal"
+  ],
+  "notes": [
+    "tone dark forces the theme's dark colours with the dark class; tone light uses the page colours",
+    "two bands in a row hand the phone bar over from one to the next as they scroll",
+    "CSS only (sticky + scroll-driven reveals)"
+  ],
+  "entry": "ultrahuman-product.tsx",
+  "name": "ultrahuman-product",
+  "files": [
+    {
+      "path": "ultrahuman-product.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UltrahumanButton } from \"@foundry/ultrahuman-button\";\nimport { UltrahumanPlaceholder } from \"@foundry/ultrahuman-placeholder\";\nimport { UltrahumanReveal } from \"@foundry/ultrahuman-reveal\";\n\nexport interface UltrahumanProductFeature {\n  /** a small icon (lucide or svg), about 24px */\n  icon: ReactNode;\n  /** the feature's title */\n  title: string;\n  /** one or two lines under it */\n  body: string;\n}\n\nexport interface UltrahumanProductStat {\n  /** small line above the figure, e.g. \"Up to\" */\n  before?: string;\n  /** the figure, e.g. \"40 Days\" or \"2.6\" */\n  value: string;\n  /** line under the figure, e.g. \"grams\" */\n  after?: string;\n  /** md: an 88px figure (a figure with a word) · xl: a ~150px figure (a bare number) */\n  scale?: \"md\" | \"xl\";\n}\n\nexport interface UltrahumanProductProps {\n  /** dark: the black band with charcoal cards · light: white with pale grey cards */\n  tone?: \"dark\" | \"light\";\n  /** the product's name (heading, desktop row and phone bar) */\n  name: string;\n  /** a grey line under the name */\n  tagline: string;\n  /** the large statement in the first card */\n  statement: string;\n  /** the big figure in the second card */\n  stat: UltrahumanProductStat;\n  /** the mono eyebrow over the feature list, e.g. \"Inside Halo Max\" */\n  featuresTitle: string;\n  /** the list in the third card (four on the original) */\n  features: UltrahumanProductFeature[];\n  /** the blue buy button */\n  primary: { label: string; href: string };\n  /** the outline second button */\n  secondary: { label: string; href: string };\n  /** the product video or render beside the cards; a placeholder when empty */\n  media?: ReactNode;\n  /** describes the placeholder for screen readers */\n  mediaLabel?: string;\n  /** art behind the big figure (rings, ripples); a faint wash when empty */\n  statArt?: ReactNode;\n  className?: string;\n}\n\n/**\n * A product band: name and grey tagline, then on desktop a sticky left column (media, name, two\n * buttons) beside a stack of cards (statement, big figure, feature list). On phones everything\n * stacks and the name with its buttons rides along as a bar pinned to the bottom of the window\n * (the bar is the band's last child, so sticky bottom-0 holds it there while the band is on screen).\n */\nexport function UltrahumanProduct({\n  tone = \"dark\",\n  name,\n  tagline,\n  statement,\n  stat,\n  featuresTitle,\n  features,\n  primary,\n  secondary,\n  media,\n  mediaLabel,\n  statArt,\n  className,\n}: UltrahumanProductProps) {\n  const xl = stat.scale === \"xl\";\n  return (\n    <section className={cn(tone === \"dark\" && \"dark\", \"bg-background text-foreground\", className)}>\n      <div className=\"px-gutter pt-[6.25rem] pb-[6.5rem] lg:pt-[5.5rem] lg:pb-36\">\n        <div className=\"mx-auto max-w-page\">\n          <UltrahumanReveal as=\"h2\" className=\"text-[1.625rem] leading-[2rem] tracking-[-0.03em] lg:text-[2.5rem] lg:leading-[3rem] lg:tracking-[-0.025em]\">\n            {name}\n            <span className=\"block text-foreground/40\">{tagline}</span>\n          </UltrahumanReveal>\n\n          <div className=\"mt-10 grid gap-8 lg:mt-[4.5rem] lg:grid-cols-2 lg:items-start lg:gap-4\">\n            <div className=\"lg:sticky lg:top-[8.375rem]\">\n              <UltrahumanReveal className=\"aspect-[350/359] overflow-clip rounded-lg bg-background lg:aspect-[632/462]\">\n                {media ?? <UltrahumanPlaceholder tone={tone === \"dark\" ? \"photo\" : \"soft\"} label={mediaLabel} />}\n              </UltrahumanReveal>\n              <div className=\"mt-8 hidden items-center gap-3 lg:flex\">\n                <p className=\"flex-1 text-[2rem] leading-none tracking-[-0.03em]\">{name}</p>\n                <UltrahumanButton href={primary.href} className=\"min-w-36\">\n                  {primary.label}\n                </UltrahumanButton>\n                <UltrahumanButton href={secondary.href} variant=\"outline\" className=\"min-w-36\">\n                  {secondary.label}\n                </UltrahumanButton>\n              </div>\n            </div>\n\n            <div className=\"grid gap-4\">\n              <UltrahumanReveal className=\"rounded-lg bg-muted p-6 text-foreground lg:h-[28.875rem] lg:p-12\">\n                <p className=\"text-lg leading-[1.875rem] tracking-[-0.025em] lg:text-2xl lg:leading-[2.8125rem]\">{statement}</p>\n              </UltrahumanReveal>\n\n              <UltrahumanReveal className=\"relative isolate flex h-[21.25rem] flex-col items-center overflow-clip rounded-lg bg-muted px-6 pt-12 text-center text-foreground lg:h-[28.875rem] lg:pt-[5.5rem]\">\n                <div aria-hidden={statArt ? undefined : true} className={cn(\"absolute inset-x-0 -z-10\", xl ? \"inset-y-0 opacity-70\" : \"bottom-0 h-1/2 opacity-25\")}>\n                  {statArt ?? <UltrahumanPlaceholder tone={xl ? \"soft\" : \"glow\"} />}\n                </div>\n                {stat.before && (\n                  <p className={cn(\"text-base leading-none tracking-[-0.02em] uppercase lg:text-xl\", xl ? \"text-foreground\" : \"text-foreground/50\", xl && \"lg:mt-1\")}>\n                    {stat.before}\n                  </p>\n                )}\n                <UltrahumanReveal\n                  as=\"p\"\n                  className={cn(\n                    \"leading-none whitespace-nowrap\",\n                    xl ? \"mt-3 text-[4.25rem] tracking-[-0.04em] lg:text-[9.5rem] lg:tracking-[-0.05em]\" : \"mt-5 text-5xl tracking-[-0.03em] lg:mt-7 lg:text-[5.5rem]\",\n                  )}\n                >\n                  {stat.value}\n                </UltrahumanReveal>\n                {stat.after && (\n                  <p className={cn(\"max-w-[19rem] text-lg leading-[1.375rem] tracking-[-0.025em] lg:text-[1.375rem] lg:leading-[2.0625rem]\", xl ? \"mt-2 lg:mt-1\" : \"mt-6 lg:mt-7\")}>\n                    {stat.after}\n                  </p>\n                )}\n              </UltrahumanReveal>\n\n              <UltrahumanReveal className=\"rounded-lg bg-muted p-6 text-foreground lg:px-12 lg:pt-14 lg:pb-12\">\n                <p className=\"font-mono text-[0.8125rem] leading-none tracking-[0.1em] text-foreground/60 uppercase lg:text-base\">{featuresTitle}</p>\n                <ul className=\"mt-3 lg:mt-5\">\n                  {features.map((feature, i) => (\n                    <UltrahumanReveal\n                      as=\"li\"\n                      rise=\"sm\"\n                      step={i}\n                      key={feature.title}\n                      className=\"flex items-center border-b border-foreground/10 py-6 last:border-0 last:pb-0 lg:py-10\"\n                    >\n                      <span aria-hidden className=\"flex w-11 shrink-0 [&_svg]:size-5 lg:w-[3.875rem] lg:[&_svg]:size-6\">\n                        {feature.icon}\n                      </span>\n                      <span>\n                        <span className=\"block text-lg leading-tight font-medium tracking-[-0.04em] lg:text-[1.375rem]\">{feature.title}</span>\n                        <span className=\"mt-2 block text-[0.8125rem] leading-[1.125rem] tracking-[0.005em] text-foreground/60 lg:mt-3 lg:text-sm lg:leading-[1.1875rem] lg:tracking-[0.01em]\">\n                          {feature.body}\n                        </span>\n                      </span>\n                    </UltrahumanReveal>\n                  ))}\n                </ul>\n              </UltrahumanReveal>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <div className=\"sticky bottom-0 z-10 flex h-[4.1875rem] items-center gap-2 border-t border-foreground/10 bg-background px-4 lg:hidden\">\n        <p className=\"min-w-0 flex-1 truncate text-sm tracking-[-0.01em]\">{name}</p>\n        <UltrahumanButton href={primary.href} className=\"h-10 w-32 min-w-0 px-0\">\n          {primary.label}\n        </UltrahumanButton>\n        <UltrahumanButton href={secondary.href} variant=\"outline\" className=\"h-10 w-32 min-w-0 px-0\">\n          {secondary.label}\n        </UltrahumanButton>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ultrahuman-button",
+    "ultrahuman-placeholder",
+    "ultrahuman-reveal"
+  ],
+  "props": [
+    {
+      "name": "tone",
+      "type": "enum",
+      "required": false,
+      "default": "dark",
+      "description": "dark: the black band with charcoal cards · light: white with pale grey cards"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "required": true,
+      "description": "the product's name (heading, desktop row and phone bar)"
+    },
+    {
+      "name": "tagline",
+      "type": "string",
+      "required": true,
+      "description": "a grey line under the name"
+    },
+    {
+      "name": "statement",
+      "type": "string",
+      "required": true,
+      "description": "the large statement in the first card"
+    },
+    {
+      "name": "stat",
+      "type": "UltrahumanProductStat",
+      "required": true,
+      "description": "the big figure in the second card"
+    },
+    {
+      "name": "featuresTitle",
+      "type": "string",
+      "required": true,
+      "description": "the mono eyebrow over the feature list, e.g. \"Inside Halo Max\""
+    },
+    {
+      "name": "features",
+      "type": "UltrahumanProductFeature[]",
+      "required": true,
+      "description": "the list in the third card (four on the original)"
+    },
+    {
+      "name": "primary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the blue buy button"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the outline second button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the product video or render beside the cards; a placeholder when empty"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "describes the placeholder for screen readers"
+    },
+    {
+      "name": "statArt",
+      "type": "ReactNode",
+      "required": false,
+      "description": "art behind the big figure (rings, ripples); a faint wash when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "bae6d85d22759bf95fe966bf8f249a2b5f98c5a11bdfe4e5156b0f4498c7a3b1"
+}

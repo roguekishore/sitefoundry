@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Whoop styles",
+  "description": "A big display heading over a row of bold pill tabs (the current one filled black, the rest outlined in grey) that scrolls sideways on phones. Each tab shows a large square photo with 30px corners and a semibold title, a paragraph and a black pill button; panels crossfade (0.3s) when the tab changes. The photo sits above the text on phones and beside it on desktop.",
+  "category": "features",
+  "site": "whoop",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "tabs",
+    "pills",
+    "crossfade",
+    "product",
+    "image",
+    "light",
+    "rounded",
+    "minimal"
+  ],
+  "notes": [
+    "all panels are in the static HTML; only the first is visible until JavaScript runs"
+  ],
+  "hydrate": "visible",
+  "entry": "whoop-styles.tsx",
+  "source": "foundry",
+  "name": "whoop-styles",
+  "files": [
+    {
+      "path": "whoop-styles.tsx",
+      "content": "import { useId, useState, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { WhoopButton } from \"@foundry/whoop-button\";\nimport { WhoopPlaceholder } from \"@foundry/whoop-placeholder\";\nimport { WhoopSectionHeading } from \"@foundry/whoop-section-heading\";\n\nexport interface WhoopStyle {\n  /** the tab's label */\n  tab: string;\n  /** the panel's title */\n  title: string;\n  /** the panel's paragraph */\n  body: string;\n  /** the panel's button */\n  cta: { label: string; href: string };\n  /** the photo, filling the square (object-cover); a grey placeholder when empty */\n  media?: ReactNode;\n}\n\nexport interface WhoopStylesProps {\n  /** the big heading */\n  heading: string;\n  /** one tab and panel per style */\n  styles: WhoopStyle[];\n  /** screen-reader name of the tab row */\n  label: string;\n  className?: string;\n}\n\n/** Heading, pill tabs and a crossfading photo-and-text panel per tab. */\nexport function WhoopStyles({ heading, styles, label, className }: WhoopStylesProps) {\n  const [active, setActive] = useState(0);\n  const id = useId();\n\n  return (\n    <section className={cn(\"bg-background pt-[3.4rem] pb-14 text-foreground lg:py-24\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <WhoopSectionHeading heading={heading} />\n      </div>\n      <div\n        role=\"tablist\"\n        aria-label={label}\n        className=\"mt-10 flex gap-2.5 overflow-x-auto px-[max(var(--page-gutter),calc((100%_-_var(--page-width))/2_+_var(--page-gutter)))] [scrollbar-width:none] lg:mt-14 [&::-webkit-scrollbar]:hidden\"\n      >\n        {styles.map((s, i) => (\n          <button\n            key={s.tab}\n            type=\"button\"\n            role=\"tab\"\n            id={`${id}-tab-${i}`}\n            aria-selected={i === active}\n            aria-controls={`${id}-panel-${i}`}\n            onClick={() => setActive(i)}\n            className={cn(\n              \"h-[3.125rem] shrink-0 rounded-full border-2 px-[1.375rem] text-base font-bold whitespace-nowrap\",\n              \"transition-colors duration-125 ease-in-out motion-reduce:transition-none\",\n              i === active\n                ? \"border-primary bg-primary text-primary-foreground\"\n                : \"border-foreground/40 text-foreground/40 hover:border-foreground hover:text-foreground\",\n            )}\n          >\n            {s.tab}\n          </button>\n        ))}\n      </div>\n      <div className=\"mx-auto mt-6 grid max-w-page px-gutter lg:mt-12\">\n        {styles.map((s, i) => (\n          <div\n            key={s.tab}\n            role=\"tabpanel\"\n            id={`${id}-panel-${i}`}\n            aria-labelledby={`${id}-tab-${i}`}\n            className={cn(\n              \"[grid-area:1/1] transition-[opacity,visibility] duration-300 ease-out motion-reduce:transition-none lg:grid lg:grid-cols-2 lg:items-center lg:gap-20\",\n              i === active ? \"visible opacity-100\" : \"invisible opacity-0\",\n            )}\n          >\n            <div className=\"aspect-square overflow-clip rounded-[1.875rem] *:size-full *:object-cover\">\n              {s.media ?? <WhoopPlaceholder tone=\"photo\" />}\n            </div>\n            <div className=\"mt-10 lg:mt-0 lg:max-w-[30rem]\">\n              <h3 className=\"text-[1.875rem] leading-[1.2] font-semibold tracking-[-0.01em] lg:text-[2.5rem]\">{s.title}</h3>\n              <p className=\"mt-4 text-base leading-[1.85] lg:text-lg\">{s.body}</p>\n              <WhoopButton href={s.cta.href} className=\"mt-5 lg:mt-8\">\n                {s.cta.label}\n              </WhoopButton>\n            </div>\n          </div>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "whoop-button",
+    "whoop-placeholder",
+    "whoop-section-heading"
+  ],
+  "props": [
+    {
+      "name": "heading",
+      "type": "string",
+      "required": true,
+      "description": "the big heading"
+    },
+    {
+      "name": "styles",
+      "type": "WhoopStyle[]",
+      "required": true,
+      "description": "one tab and panel per style"
+    },
+    {
+      "name": "label",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the tab row"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e2148c10ace4839fdd58734d0f99b8c2750af6f5a3d639e2c510b25be0d37796"
+}

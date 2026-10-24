@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Unit footer",
+  "description": "A calm white footer: grey-labelled link columns (four per row on desktop, two on phones) beside a right column with a tinted email field and arrow, a social row and a row of two round seals between hairlines. Then a bar between hairlines with a big bold lowercase wordmark and grey legal links (centred on phones), and grey fine-print paragraphs with the copyright.",
+  "category": "footer",
+  "site": "unit",
+  "license": "proprietary",
+  "tags": [
+    "footer",
+    "light",
+    "minimal",
+    "newsletter",
+    "links",
+    "fintech",
+    "legal"
+  ],
+  "notes": [
+    "social icons come in as props (the demo uses Tabler brand icons)",
+    "media slots: the certification seals (48px circles)",
+    "the submit button tints with the highlight colour on hover"
+  ],
+  "entry": "unit-footer.tsx",
+  "source": "foundry",
+  "name": "unit-footer",
+  "files": [
+    {
+      "path": "unit-footer.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ArrowRight } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { UnitPlaceholder } from \"@foundry/unit-placeholder\";\n\nexport interface UnitFooterLink {\n  label: string;\n  href: string;\n}\n\nexport interface UnitFooterProps {\n  /** link groups: four per row on desktop, two on phones */\n  groups: { title: string; links: UnitFooterLink[] }[];\n  /** the newsletter field at the top of the right column */\n  newsletter: { title: string; placeholder: string; submitLabel: string; action?: string };\n  /** the social row */\n  social: { title: string; links: (UnitFooterLink & { icon: ReactNode })[] };\n  /** the certifications row: seals are small round badges; placeholders when empty */\n  certified?: { title: string; seals?: ReactNode[]; count?: number };\n  /** the big wordmark in the bottom bar */\n  brand: string;\n  /** legal links at the right of the bottom bar */\n  legal: UnitFooterLink[];\n  /** fine-print paragraphs under the bottom bar */\n  notes?: string[];\n  /** the copyright line */\n  copyright: string;\n  className?: string;\n}\n\nconst rowClass = \"flex items-center justify-between gap-4 border-t border-border py-5 lg:py-[1.3rem]\";\nconst smallClass = \"text-[0.875rem] leading-[1.3] text-muted-foreground/80\";\n\n/** A white footer: link columns, a right column with newsletter, social and seals, then a wordmark bar and grey fine print. */\nexport function UnitFooter({ groups, newsletter, social, certified, brand, legal, notes, copyright, className }: UnitFooterProps) {\n  const seals = certified ? (certified.seals ?? Array.from({ length: certified.count ?? 2 }, () => null)) : [];\n  return (\n    <footer className={cn(\"bg-background font-sans text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter pt-16 pb-16 lg:pt-32 lg:pb-24\">\n        <div className=\"grid gap-12 lg:grid-cols-[minmax(0,1fr)_25.8rem] lg:gap-16\">\n          <nav className=\"grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-20\">\n            {groups.map((g) => (\n              <div key={g.title}>\n                <p className={smallClass}>{g.title}</p>\n                <ul className=\"mt-4 flex flex-col gap-2 leading-[1.25] lg:mt-5 lg:gap-[0.6875rem]\">\n                  {g.links.map((l) => (\n                    <li key={l.label}>\n                      <a\n                        href={l.href}\n                        className=\"text-[0.9375rem] leading-[1.25] transition-opacity duration-300 hover:opacity-60 motion-reduce:transition-none lg:text-base\"\n                      >\n                        {l.label}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            ))}\n          </nav>\n\n          <div>\n            <p className={smallClass}>{newsletter.title}</p>\n            <form action={newsletter.action} className=\"mt-6 flex h-14 items-center rounded-[0.25rem] bg-muted pl-5\">\n              <input\n                type=\"email\"\n                name=\"email\"\n                aria-label={newsletter.placeholder}\n                placeholder={newsletter.placeholder}\n                className=\"min-w-0 flex-1 bg-transparent text-[0.9375rem] text-foreground placeholder:text-muted-foreground focus:outline-none lg:text-sm\"\n              />\n              <button\n                type=\"submit\"\n                aria-label={newsletter.submitLabel}\n                className=\"flex h-full w-14 items-center justify-center rounded-r-[0.25rem] transition-colors duration-[325ms] ease-[cubic-bezier(0.075,0.82,0.165,1)] hover:bg-highlight/40 motion-reduce:transition-none\"\n              >\n                <ArrowRight aria-hidden className=\"size-4\" strokeWidth={2} />\n              </button>\n            </form>\n            <div className=\"mt-9\">\n              <div className={rowClass}>\n                <p className={smallClass}>{social.title}</p>\n                <ul className=\"flex gap-3\">\n                  {social.links.map((l) => (\n                    <li key={l.label}>\n                      <a\n                        href={l.href}\n                        aria-label={l.label}\n                        className=\"flex size-7 items-center justify-center rounded-[0.25rem] transition-colors duration-[325ms] hover:bg-foreground/10 motion-reduce:transition-none [&_svg]:size-5\"\n                      >\n                        {l.icon}\n                      </a>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n              {certified && (\n                <div className={cn(rowClass, \"border-b\")}>\n                  <p className={smallClass}>{certified.title}</p>\n                  <div className=\"flex gap-5\">\n                    {seals.map((s, i) => (\n                      <div key={i} className=\"size-12 overflow-clip rounded-full\">\n                        {s ?? <UnitPlaceholder tone={i % 2 ? \"chart-5\" : \"chart-4\"} className=\"size-full opacity-80\" />}\n                      </div>\n                    ))}\n                  </div>\n                </div>\n              )}\n            </div>\n          </div>\n        </div>\n\n        <div className=\"mt-4 flex flex-col items-center gap-6 border-b border-border py-8 lg:border-t lg:mt-[5.5rem] lg:flex-row lg:justify-between lg:py-7\">\n          <p className=\"font-display text-[2.75rem] leading-[0.85] font-bold tracking-[-0.05em] lg:text-[3rem]\">{brand}</p>\n          <ul className=\"flex flex-wrap justify-center gap-x-4 gap-y-2 lg:gap-x-5\">\n            {legal.map((l) => (\n              <li key={l.label}>\n                <a href={l.href} className=\"text-[0.9375rem] text-muted-foreground transition-colors duration-300 hover:text-foreground motion-reduce:transition-none lg:text-base\">\n                  {l.label}\n                </a>\n              </li>\n            ))}\n          </ul>\n        </div>\n\n        <div className=\"mt-9 flex flex-col gap-7 lg:mt-20\">\n          {notes?.map((n) => (\n            <p key={n} className={cn(smallClass, \"leading-[1.38]\")}>\n              {n}\n            </p>\n          ))}\n          <p className={smallClass}>{copyright}</p>\n        </div>\n      </div>\n    </footer>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "unit-placeholder"
+  ],
+  "props": [
+    {
+      "name": "groups",
+      "type": "{ title: string; links: UnitFooterLink[]; }[]",
+      "required": true,
+      "description": "link groups: four per row on desktop, two on phones"
+    },
+    {
+      "name": "newsletter",
+      "type": "{ title: string; placeholder: string; submitLabel: string; action?: string | undefined; }",
+      "required": true,
+      "description": "the newsletter field at the top of the right column"
+    },
+    {
+      "name": "social",
+      "type": "{ title: string; links: (UnitFooterLink & { icon: ReactNode; })[]; }",
+      "required": true,
+      "description": "the social row"
+    },
+    {
+      "name": "certified",
+      "type": "{ title: string; seals?: ReactNode[]; count?: number; } | undefined",
+      "required": false,
+      "description": "the certifications row: seals are small round badges; placeholders when empty"
+    },
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the big wordmark in the bottom bar"
+    },
+    {
+      "name": "legal",
+      "type": "UnitFooterLink[]",
+      "required": true,
+      "description": "legal links at the right of the bottom bar"
+    },
+    {
+      "name": "notes",
+      "type": "string[]",
+      "required": false,
+      "description": "fine-print paragraphs under the bottom bar"
+    },
+    {
+      "name": "copyright",
+      "type": "string",
+      "required": true,
+      "description": "the copyright line"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "b4442d40bde33d48feee6eda44ee733a142debf9bb814142dc409996b55974f3"
+}

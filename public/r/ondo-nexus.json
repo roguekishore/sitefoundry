@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ondo centred dark statement",
+  "description": "A pure-black band built around a centred two-tone heading (white first line, grey second) under a small label, a long pause of empty black, then a centred serif paragraph and a pale button, followed by a tall visual area 80% of the window high. The heading, paragraph and button each fade up 40px as they enter view.",
+  "category": "cta",
+  "site": "ondo",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "dark",
+    "centered",
+    "statement",
+    "minimal",
+    "reveal",
+    "scroll",
+    "serif",
+    "window-height"
+  ],
+  "notes": [
+    "media slot: the tall visual under the button (a diagram or video on the original); a faint surface when empty",
+    "forces the theme's dark colours with the dark class",
+    "the reveals are CSS scroll-driven: browsers without them show everything in place"
+  ],
+  "entry": "ondo-nexus.tsx",
+  "name": "ondo-nexus",
+  "files": [
+    {
+      "path": "ondo-nexus.css",
+      "content": "/* Paragraph, button and visual fade up 40px as their tops enter the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ondo-nexus-reveal {\n      animation: ondo-nexus-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% entry 100%;\n    }\n  }\n}\n\n@keyframes ondo-nexus-rise {\n  from { opacity: 0; transform: translateY(40px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "ondo-nexus.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { OndoButton } from \"@foundry/ondo-button\";\nimport { OndoHeading } from \"@foundry/ondo-heading\";\nimport { OndoPlaceholder } from \"@foundry/ondo-placeholder\";\nimport \"./ondo-nexus.css\";\n\nexport interface OndoNexusProps {\n  /** small label above the heading */\n  eyebrow?: string;\n  /** heading, first line (white) */\n  lead: string;\n  /** heading, second line (grey) */\n  trail?: string;\n  /** the serif paragraph */\n  text: string;\n  /** the pale button */\n  action: { label: string; href: string };\n  /** the tall visual under the button. A faint surface when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\nconst serif = \"font-[family-name:var(--ondo-serif,var(--typeface-display))]\";\n\n/** Black band: centred two-tone heading, a pause, a paragraph and button, then a tall visual. */\nexport function OndoNexus({ eyebrow, lead, trail, text, action, media, className }: OndoNexusProps) {\n  return (\n    <section className={cn(\"dark bg-background pt-16 pb-section text-foreground lg:pt-[10.5rem] lg:pb-[11rem]\", className)}>\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter lg:px-[calc(var(--page-gutter)*2.75)]\">\n        <OndoHeading eyebrow={eyebrow} lead={lead} trail={trail} align=\"center\" />\n        <p className={cn(\"ondo-nexus-reveal mt-[10rem] max-w-[29rem] text-center text-lg leading-[1.32] text-foreground/80 lg:mt-[19rem] lg:text-xl lg:leading-[1.32]\", serif)}>\n          {text}\n        </p>\n        <OndoButton href={action.href} size=\"md\" className=\"ondo-nexus-reveal mt-12\">\n          {action.label}\n        </OndoButton>\n        <div className=\"ondo-nexus-reveal mt-40 h-[80svh] w-full overflow-clip rounded-3xl\">{media ?? <OndoPlaceholder tone=\"muted\" className=\"bg-card\" />}</div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "ondo-button",
+    "ondo-heading",
+    "ondo-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small label above the heading"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "heading, first line (white)"
+    },
+    {
+      "name": "trail",
+      "type": "string",
+      "required": false,
+      "description": "heading, second line (grey)"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the serif paragraph"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the pale button"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall visual under the button. A faint surface when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "595992d8753e8b976c82e3c98dc5e0821f39bad5a2ac23e3ebe52f3aff127dbf"
+}

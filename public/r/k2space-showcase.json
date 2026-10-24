@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "K2 Space showcase",
+  "description": "A two-line title on black with deep air above it, then one full-bleed render (2:1 on desktop, tall portrait on phones) with small corner-bracket hotspot markers placed over it, each with a centre dot and a label that appears on hover. The title reveals line by line, the render settles from 115% and blurred to sharp, and the markers fade in once it is in view.",
+  "category": "features",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "showcase",
+    "dark",
+    "full-bleed",
+    "render",
+    "hotspots",
+    "brackets",
+    "reveal",
+    "scrubbed",
+    "scale",
+    "blur"
+  ],
+  "notes": [
+    "markers are placed in percent of the frame, so they stay on their subject at every width",
+    "CSS only: without scroll-timeline support or under reduced motion everything simply shows"
+  ],
+  "entry": "k2space-showcase.tsx",
+  "source": "foundry",
+  "name": "k2space-showcase",
+  "files": [
+    {
+      "path": "k2space-showcase.css",
+      "content": "/* Markers fade in once the frame is well into view, a little apart. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-showcase-marker {\n      animation: k2space-showcase-marker-in linear both;\n      animation-timeline: --k2space-showcase;\n      animation-range: cover calc(22% + var(--k2space-showcase-i, 0) * 2%) cover calc(28% + var(--k2space-showcase-i, 0) * 2%);\n    }\n  }\n}\n\n@keyframes k2space-showcase-marker-in {\n  from {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "k2space-showcase.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { K2spaceLineReveal } from \"@foundry/k2space-line-reveal\";\nimport { K2spaceMedia } from \"@foundry/k2space-media\";\nimport \"./k2space-showcase.css\";\n\nexport interface K2spaceMarker {\n  /** horizontal position, percent of the frame width (0–100) */\n  x: number;\n  /** vertical position, percent of the frame height (0–100) */\n  y: number;\n  /** what the marker points at (shown on hover and read by screen readers) */\n  label: string;\n}\n\nexport interface K2spaceShowcaseProps {\n  /** the title; \"\\n\" breaks the line */\n  title: string;\n  /** the full-bleed render or photo */\n  media?: ReactNode;\n  /** bracket markers over the media */\n  markers?: K2spaceMarker[];\n  className?: string;\n}\n\nconst corner = \"absolute size-2.5 border-foreground/90 lg:size-[0.8vw]\";\n\n/** A title over one full-bleed render with bracket hotspots placed on it. */\nexport function K2spaceShowcase({ title, media, markers = [], className }: K2spaceShowcaseProps) {\n  return (\n    <section\n      className={cn(\n        \"bg-background pt-[150px] text-foreground [font-stretch:var(--k2space-stretch,100%)] lg:pt-[14.6vw]\",\n        className,\n      )}\n    >\n      <K2spaceLineReveal text={title} className=\"px-gutter font-display text-[34px]/none font-[560] lg:text-[3.307vw]/none\" />\n      <div className=\"relative mt-[70px] aspect-[390/760] [view-timeline:--k2space-showcase_block] sm:aspect-[4/3] lg:mt-[4.86vw] lg:aspect-[2/1]\">\n        <K2spaceMedia media={media} scrub className=\"absolute inset-0\" />\n        {markers.map((marker, i) => (\n          <button\n            key={i}\n            type=\"button\"\n            aria-label={marker.label}\n            className=\"k2space-showcase-marker group dark absolute size-14 -translate-x-1/2 -translate-y-1/2 text-foreground lg:size-[3.7vw]\"\n            style={{ left: `${marker.x}%`, top: `${marker.y}%`, \"--k2space-showcase-i\": i } as CSSProperties}\n          >\n            <span aria-hidden className={cn(corner, \"top-0 left-0 border-t border-l\")} />\n            <span aria-hidden className={cn(corner, \"top-0 right-0 border-t border-r\")} />\n            <span aria-hidden className={cn(corner, \"bottom-0 left-0 border-b border-l\")} />\n            <span aria-hidden className={cn(corner, \"right-0 bottom-0 border-r border-b\")} />\n            <span aria-hidden className=\"absolute top-1/2 left-1/2 size-1.5 -translate-1/2 bg-foreground lg:size-[0.45vw]\" />\n            <span\n              aria-hidden\n              className=\"pointer-events-none absolute top-full left-1/2 mt-2 -translate-x-1/2 bg-primary px-3 py-2 text-sm/none font-[560] whitespace-nowrap text-primary-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none lg:text-[max(0.875rem,0.93vw)]/none\"\n            >\n              {marker.label}\n            </span>\n          </button>\n        ))}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "k2space-line-reveal",
+    "k2space-media"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the title; \"\\n\" breaks the line"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed render or photo"
+    },
+    {
+      "name": "markers",
+      "type": "K2spaceMarker[]",
+      "required": false,
+      "default": "[]",
+      "description": "bracket markers over the media"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4dc7e5cb24a5f75630dc763dc8a3193351ab1bf544d2c6be595f103198d99a6d"
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hadrian platform panel",
+  "description": "A spec-sheet panel framed in a 1px gold hairline: a wide media strip across the top, then a row split one to three by a gold rule, a small gold mono label on the left and a large, tight grotesk paragraph on the right (stacked on phones). The panel fades up as it enters view.",
+  "category": "features",
+  "site": "hadrian",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "dark",
+    "navy",
+    "gold",
+    "hairline",
+    "spec-sheet",
+    "media",
+    "reveal",
+    "scroll-driven",
+    "industrial"
+  ],
+  "notes": [
+    "opaque (bg-background) so it slides over a pinned hero",
+    "media strip is 16:9 on phones and 2.75:1 from 1024px; pass a video or image (object-cover)",
+    "the reveal is a CSS view() timeline; without support it simply shows"
+  ],
+  "entry": "hadrian-platform.tsx",
+  "source": "foundry",
+  "name": "hadrian-platform",
+  "files": [
+    {
+      "path": "hadrian-platform.css",
+      "content": "/* The panel fades up 32px over the first 360px of scroll after its top edge enters the window. */\n@supports (animation-timeline: view()) {\n  .hadrian-platform-reveal {\n    animation: hadrian-platform-rise linear both;\n    animation-timeline: view();\n    animation-range: entry 0px entry 360px;\n  }\n}\n\n@keyframes hadrian-platform-rise {\n  from { opacity: 0; transform: translateY(2rem); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .hadrian-platform-reveal { animation: none; }\n}\n"
+    },
+    {
+      "path": "hadrian-platform.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HadrianEyebrow } from \"@foundry/hadrian-eyebrow\";\nimport { HadrianPlaceholder } from \"@foundry/hadrian-placeholder\";\nimport \"./hadrian-platform.css\";\n\nexport interface HadrianPlatformProps {\n  /** anchor id, so buttons can scroll here */\n  id?: string;\n  /** small gold label on the left of the text row */\n  eyebrow: string;\n  /** the large paragraph (around 70–90 words reads like the original) */\n  text: string;\n  /** media strip across the top (video or image, object-cover); a placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Gold-framed panel: media strip on top, label and large paragraph below. */\nexport function HadrianPlatform({ id, eyebrow, text, media, className }: HadrianPlatformProps) {\n  return (\n    <section\n      id={id}\n      className={cn(\"relative bg-background pt-[6.5rem] pb-20 text-foreground lg:pt-[8.75rem] lg:pb-28\", className)}\n    >\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"hadrian-platform-reveal border border-primary\">\n          <div className=\"aspect-video overflow-clip lg:aspect-[1318/480] [&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover\">\n            {media ?? <HadrianPlaceholder />}\n          </div>\n          <div className=\"border-t border-primary lg:grid lg:grid-cols-4\">\n            <div className=\"border-b border-primary px-5 pt-7 pb-6 lg:border-r lg:border-b-0 lg:p-8 lg:pt-10\">\n              <HadrianEyebrow label={eyebrow} className=\"lg:max-w-[16rem]\" />\n            </div>\n            <p className=\"px-5 pt-7 pb-6 text-lg leading-[1.2] tracking-[-0.02em] lg:col-span-3 lg:px-8 lg:pt-8 lg:pb-9 lg:text-[1.875rem] lg:leading-[1.07] lg:[word-spacing:-0.04em]\">\n              {text}\n            </p>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "hadrian-eyebrow",
+    "hadrian-placeholder"
+  ],
+  "props": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "anchor id, so buttons can scroll here"
+    },
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": true,
+      "description": "small gold label on the left of the text row"
+    },
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the large paragraph (around 70–90 words reads like the original)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "media strip across the top (video or image, object-cover); a placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a7a4d07b4c1840da0264b2511ee3f58cf0bbecae89d4fe544c62ca364c2beeb8"
+}

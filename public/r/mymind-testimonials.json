@@ -1,0 +1,72 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind testimonials",
+  "description": "A blush band lit by a soft rose-and-peach glow, with a big centred white serif line and five white pill-shaped speech bubbles scattered around it, each trailing two little thought dots to a round avatar. As the page scrolls, each bubble drifts upward at its own speed. On phones the bubbles stack, nudged left and right, with the line between them.",
+  "category": "testimonials",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quotes",
+    "bubbles",
+    "glow",
+    "gradient",
+    "serif",
+    "parallax",
+    "scroll",
+    "light",
+    "pink"
+  ],
+  "notes": [
+    "the white headline needs the glow (chart-2 and primary over accent) behind it",
+    "the scattered layout holds five quotes; more are stacked on desktop too",
+    "parallax is a CSS view timeline; without it the bubbles sit still"
+  ],
+  "entry": "mymind-testimonials.tsx",
+  "source": "foundry",
+  "name": "mymind-testimonials",
+  "files": [
+    {
+      "path": "mymind-testimonials.css",
+      "content": "/* Scrubbed with the scroll: each bubble drifts up by its own --mymind-drift (40–100px) over\n   the time the band crosses the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mymind-testimonials-drift {\n      animation: mymind-testimonials-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes mymind-testimonials-drift {\n  from { transform: translateY(0); }\n  to { transform: translateY(var(--mymind-drift, -60px)); }\n}\n"
+    },
+    {
+      "path": "mymind-testimonials.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindMedia } from \"@foundry/mymind-media\";\nimport { MymindPlayLink } from \"@foundry/mymind-play-link\";\nimport \"./mymind-testimonials.css\";\n\nexport interface MymindQuote {\n  /** what they said */\n  text: string;\n  /** who said it (for screen readers and the avatar's alt) */\n  name: string;\n  /** a round photo; empty shows a placeholder */\n  avatar?: ReactNode;\n}\n\nexport interface MymindTestimonialsProps {\n  /** the big white line in the middle */\n  title: string[];\n  /** the quotes; the first five get the scattered layout */\n  quotes: MymindQuote[];\n  /** arrow link under the bubbles */\n  link: { label: string; href: string };\n  className?: string;\n}\n\n/** Desktop spots (stage 1440×1608) and phone nudges for five bubbles, plus each drift. */\nconst spots = [\n  { desk: \"lg:left-[30.3%] lg:top-[17.25rem] lg:w-[29.6rem]\", phone: \"ml-[18%]\", side: \"right\", drift: -40 },\n  { desk: \"lg:left-[12.6%] lg:top-[26.6rem] lg:w-[29.6rem]\", phone: \"ml-[6%]\", side: \"left\", drift: -85 },\n  { desk: \"lg:left-[55.7%] lg:top-[29.6rem] lg:w-[28.5rem]\", phone: \"ml-[20%]\", side: \"right\", drift: -100 },\n  { desk: \"lg:left-[46.1%] lg:top-[60.5rem] lg:w-[29.6rem]\", phone: \"ml-[23%]\", side: \"right\", drift: -42 },\n  { desk: \"lg:left-[23%] lg:top-[70.75rem] lg:w-[36.25rem]\", phone: \"ml-[6%]\", side: \"left\", drift: -68 },\n] as const;\n\nfunction Bubble({ quote, i }: { quote: MymindQuote; i: number }) {\n  const spot = spots[i];\n  const right = spot ? spot.side === \"right\" : i % 2 === 0;\n  return (\n    <figure\n      className={cn(\"mymind-testimonials-drift relative w-[68%] pb-[5.5rem] lg:pb-0\", spot ? cn(spot.phone, \"lg:absolute lg:ml-0\", spot.desk) : \"mx-auto lg:mt-10\")}\n      style={{ \"--mymind-drift\": `${spot ? spot.drift : -50}px` } as CSSProperties}\n    >\n      <blockquote className=\"rounded-full bg-card px-6 py-3.5 text-[0.6875rem] leading-[1.35] text-card-foreground lg:px-12 lg:py-[1.375rem] lg:text-lg lg:leading-[1.4]\">\n        {quote.text}\n      </blockquote>\n      <figcaption className={cn(\"absolute bottom-0 flex flex-col lg:-bottom-[5.25rem]\", right ? \"right-[4%] items-end lg:-right-[1%]\" : \"left-[6%] items-start lg:left-[8%]\")}>\n        <span aria-hidden className={cn(\"size-2.5 rounded-full bg-card lg:size-4\", right ? \"mr-8 lg:mr-14\" : \"ml-8 lg:ml-12\")} />\n        <span aria-hidden className={cn(\"mt-0.5 size-1.5 rounded-full bg-card lg:size-2.5\", right ? \"mr-6 lg:mr-10\" : \"ml-10 lg:ml-[3.75rem]\")} />\n        <MymindMedia className=\"mt-1 size-8 rounded-full lg:size-[3.75rem]\">{quote.avatar}</MymindMedia>\n        <span className=\"sr-only\">{quote.name}</span>\n      </figcaption>\n    </figure>\n  );\n}\n\n/** Scattered speech bubbles that drift around a big white line. */\nexport function MymindTestimonials({ title, quotes, link, className }: MymindTestimonialsProps) {\n  return (\n    <section\n      className={cn(\n        \"relative isolate overflow-x-clip bg-accent pt-40 pb-16 text-foreground lg:pt-0 lg:pb-[9.5rem]\",\n        className,\n      )}\n    >\n      <div\n        aria-hidden\n        className=\"absolute inset-0 -z-10 bg-[radial-gradient(ellipse_48%_36%_at_50%_42%,color-mix(in_oklab,var(--chart-2)_70%,var(--accent))_0%,color-mix(in_oklab,var(--chart-2)_30%,var(--accent))_55%,transparent_100%),radial-gradient(ellipse_42%_26%_at_50%_70%,color-mix(in_oklab,var(--primary)_45%,var(--accent))_0%,transparent_100%)] blur-[20px] max-lg:bg-[radial-gradient(ellipse_90%_40%_at_50%_45%,color-mix(in_oklab,var(--chart-2)_65%,var(--accent))_0%,transparent_100%),radial-gradient(ellipse_80%_25%_at_50%_68%,color-mix(in_oklab,var(--primary)_40%,var(--accent))_0%,transparent_100%)]\"\n      />\n      <div className=\"relative mx-auto flex max-w-[90rem] flex-col lg:block lg:h-[90.75rem]\">\n        {quotes.slice(0, 3).map((q, i) => (\n          <Bubble key={q.name} quote={q} i={i} />\n        ))}\n        <h2 className=\"mt-6 mb-20 text-center font-display text-[3rem] leading-[1.06] font-[350] tracking-[-0.045em] text-primary-foreground lg:absolute lg:inset-x-0 lg:top-[43.75rem] lg:my-0 lg:text-[5.75rem] lg:leading-[0.92]\">\n          {title.map((line, i) => (\n            <span key={i} className=\"block\">\n              {line}\n            </span>\n          ))}\n        </h2>\n        {quotes.slice(3).map((q, i) => (\n          <Bubble key={q.name} quote={q} i={i + 3} />\n        ))}\n      </div>\n      <div className=\"mt-4 flex justify-center lg:mt-0\">\n        <MymindPlayLink href={link.href} icon=\"arrow\">\n          {link.label}\n        </MymindPlayLink>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-media",
+    "mymind-play-link"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the big white line in the middle"
+    },
+    {
+      "name": "quotes",
+      "type": "MymindQuote[]",
+      "required": true,
+      "description": "the quotes; the first five get the scattered layout"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "arrow link under the bubbles"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "4704845fcc510c9838df70f6496c84859590f8649b70331525f0fb4d76eeee22"
+}

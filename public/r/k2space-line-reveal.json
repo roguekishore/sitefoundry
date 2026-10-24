@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "K2 Space line reveal",
+  "description": "A heading or statement whose lines fade in and rise as they scroll up the window, scrubbed with the scroll, one line after another. Every word carries its own view timeline, so words on the same line share a position and reveal together without measuring lines.",
+  "category": "text-effect",
+  "site": "k2space",
+  "license": "proprietary",
+  "tags": [
+    "text-effect",
+    "reveal",
+    "scrubbed",
+    "scroll-driven",
+    "split-text",
+    "line-by-line",
+    "css-only"
+  ],
+  "notes": [
+    "a \"\\n\" in the text is a line break; with desktopBreaksOnly the breaks apply from 1024px only",
+    "CSS only: without scroll-timeline support or under reduced motion the text simply shows",
+    "rise sets the distance: sm 17px (phones' 34px type), md 24px, lg 36px (72px display type)"
+  ],
+  "entry": "k2space-line-reveal.tsx",
+  "source": "foundry",
+  "name": "k2space-line-reveal",
+  "files": [
+    {
+      "path": "k2space-line-reveal.css",
+      "content": ".k2space-line-reveal-word {\n  display: inline-block;\n}\n.k2space-line-reveal-sm { --k2space-line-reveal-rise: 17px; }\n.k2space-line-reveal-md { --k2space-line-reveal-rise: 17px; }\n.k2space-line-reveal-lg { --k2space-line-reveal-rise: 24px; }\n@media (min-width: 64rem) {\n  .k2space-line-reveal-md { --k2space-line-reveal-rise: 24px; }\n  .k2space-line-reveal-lg { --k2space-line-reveal-rise: 37px; }\n}\n\n/* Scrubbed: a line starts at ~75% of the window and is in place by ~47%. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .k2space-line-reveal-word {\n      animation: k2space-line-reveal-in linear both;\n      animation-timeline: view();\n      animation-range: cover 24% cover 48%;\n    }\n  }\n}\n\n@keyframes k2space-line-reveal-in {\n  from {\n    opacity: 0;\n    transform: translateY(var(--k2space-line-reveal-rise, 24px));\n  }\n  to {\n    opacity: 1;\n    transform: none;\n  }\n}\n"
+    },
+    {
+      "path": "k2space-line-reveal.tsx",
+      "content": "import { Fragment } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./k2space-line-reveal.css\";\n\nexport interface K2spaceLineRevealProps {\n  /** the words; \"\\n\" starts a new line */\n  text: string;\n  /** the element to render */\n  as?: \"h1\" | \"h2\" | \"h3\" | \"p\" | \"div\";\n  /** how far each line rises while it fades in */\n  rise?: \"sm\" | \"md\" | \"lg\";\n  /** apply the \"\\n\" breaks on desktop (1024px+) only; phones wrap naturally */\n  desktopBreaksOnly?: boolean;\n  /** size, weight, colour */\n  className?: string;\n}\n\n/**\n * Text that reveals line by line while it scrolls up the window (opacity 0 → 1, rising 17–36px),\n * scrubbed with the scroll like a GSAP split-lines reveal. Each word is an inline-block with its\n * own view timeline; words that share a line share a position, so the line moves as one.\n */\nexport function K2spaceLineReveal({ text, as: Tag = \"h2\", rise = \"md\", desktopBreaksOnly = false, className }: K2spaceLineRevealProps) {\n  const lines = text.split(\"\\n\");\n  return (\n    <Tag className={cn(\"k2space-line-reveal\", `k2space-line-reveal-${rise}`, className)}>\n      {lines.map((line, li) => (\n        <Fragment key={li}>\n          {li > 0 && (desktopBreaksOnly ? <><br className=\"max-lg:hidden\" /><span className=\"lg:hidden\">{\" \"}</span></> : <br />)}\n          {line\n            .split(/\\s+/)\n            .filter(Boolean)\n            .map((word, wi, words) => (\n              <Fragment key={wi}>\n                <span className=\"k2space-line-reveal-word\">{word}</span>\n                {wi < words.length - 1 && \" \"}\n              </Fragment>\n            ))}\n        </Fragment>\n      ))}\n    </Tag>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the words; \"\\n\" starts a new line"
+    },
+    {
+      "name": "as",
+      "type": "enum",
+      "required": false,
+      "default": "h2",
+      "description": "the element to render"
+    },
+    {
+      "name": "rise",
+      "type": "enum",
+      "required": false,
+      "default": "md",
+      "description": "how far each line rises while it fades in"
+    },
+    {
+      "name": "desktopBreaksOnly",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "apply the \"\\n\" breaks on desktop (1024px+) only; phones wrap naturally"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false,
+      "description": "size, weight, colour"
+    }
+  ],
+  "hash": "5f2c89c208d04b10ae2f0e8cad208606b345d89a66b007ef73cebbc3a87726d6"
+}

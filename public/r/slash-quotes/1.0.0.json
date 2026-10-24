@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Slash rotating quote",
+  "description": "One large centred serif quote at a time (52px on desktop, part of it in italic) with a small portrait, name and company under it. Quotes take turns on a loop, fading in with a 16px rise and sinking out, while a row of dots stretches the active one into a short bar.",
+  "category": "testimonials",
+  "site": "slash",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "serif",
+    "italic",
+    "dark",
+    "minimal",
+    "crossfade",
+    "loop"
+  ],
+  "notes": [
+    "CSS only (keyframes written per instance for the quote count); reduced motion shows the first quote"
+  ],
+  "entry": "slash-quotes.tsx",
+  "source": "foundry",
+  "name": "slash-quotes",
+  "files": [
+    {
+      "path": "slash-quotes.css",
+      "content": "/* The quotes share one grid cell; each fades in with a 16px rise for its turn, then sinks out\n   (keyframes are written by the component, since they depend on the count). The active dot\n   stretches into a short bar while its quote shows. */\n@media (prefers-reduced-motion: reduce) {\n  .slash-quotes-item,\n  .slash-quotes-dot { animation: none !important; }\n  .slash-quotes-later { visibility: hidden; }\n}\n"
+    },
+    {
+      "path": "slash-quotes.tsx",
+      "content": "import { useId, type ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SlashHeadingText, type SlashHeadingPart } from \"@foundry/slash-heading\";\nimport { SlashPlaceholder } from \"@foundry/slash-placeholder\";\nimport \"./slash-quotes.css\";\n\nexport interface SlashQuote {\n  /** the quote, as runs; `{ italic: \"…\" }` sets a run in italic (quote marks included in the text) */\n  quote: SlashHeadingPart[];\n  /** who said it */\n  name: string;\n  /** their company */\n  company: string;\n  /** their portrait (40px circle); a dim circle stands in when empty */\n  avatar?: ReactNode;\n}\n\nexport interface SlashQuotesProps {\n  /** the quotes that take turns (one to five) */\n  quotes: SlashQuote[];\n  /** seconds each quote stays */\n  seconds?: number;\n  className?: string;\n}\n\n/** One large centred serif quote at a time; they cross-fade with a small rise, and the dots below follow. */\nexport function SlashQuotes({ quotes, seconds = 6, className }: SlashQuotesProps) {\n  const id = useId().replace(/[^a-zA-Z0-9]/g, \"\");\n  const n = quotes.length;\n  const slot = 100 / n;\n  // Keyframes depend on how many quotes there are, so they are written per instance.\n  const fadeIn = slot * 0.12;\n  const fadeOut = slot * 0.9;\n  const css =\n    n > 1\n      ? `@keyframes slash-quotes-${id}-show{0%{opacity:0;transform:translateY(16px)}${fadeIn}%{opacity:1;transform:translateY(0)}${fadeOut}%{opacity:1;transform:translateY(0)}${slot}%,100%{opacity:0;transform:translateY(16px)}}` +\n        `@keyframes slash-quotes-${id}-dot{0%{width:.25rem;opacity:.4}${fadeIn}%,${fadeOut}%{width:1.5rem;opacity:1}${slot}%,100%{width:.25rem;opacity:.4}}`\n      : \"\";\n  const timing = (i: number, name: string) =>\n    n > 1 ? { animation: `slash-quotes-${id}-${name} ${n * seconds}s ease-out ${i * seconds}s infinite both` } : undefined;\n\n  return (\n    <section className={cn(\"bg-background py-20 text-foreground lg:pt-[7.5rem] lg:pb-28\", className)}>\n      {css && <style>{css}</style>}\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"grid\">\n          {quotes.map((q, i) => (\n            <figure\n              key={q.name}\n              aria-hidden={i > 0 || undefined}\n              style={timing(i, \"show\")}\n              className={cn(\"slash-quotes-item col-start-1 row-start-1 flex flex-col items-center text-center\", i > 0 && \"slash-quotes-later\")}\n            >\n              <blockquote className=\"max-w-[21.5rem] font-display text-2xl leading-[1.375] tracking-[-0.02em] text-balance lg:max-w-[52rem] lg:text-[3.25rem] lg:leading-[1.15]\">\n                <SlashHeadingText parts={q.quote} />\n              </blockquote>\n              <figcaption className=\"mt-8 flex items-center gap-3 text-[0.9375rem] tracking-[-0.02em] lg:mt-12\">\n                <span className=\"relative size-10 shrink-0 overflow-clip rounded-full\">\n                  {q.avatar ?? <SlashPlaceholder tone=\"chip\" className=\"absolute inset-0 rounded-full\" />}\n                </span>\n                <span className=\"font-medium\">{q.name}</span>\n                <span className=\"-ml-1 text-muted-foreground\">{q.company}</span>\n              </figcaption>\n            </figure>\n          ))}\n        </div>\n        {n > 1 && (\n          <div aria-hidden className=\"mt-7 flex justify-center gap-1.5\">\n            {quotes.map((q, i) => (\n              <span key={q.name} style={timing(i, \"dot\")} className={cn(\"slash-quotes-dot h-1 rounded-full bg-foreground\", i === 0 ? \"w-6\" : \"w-1 opacity-40\")} />\n            ))}\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "slash-heading",
+    "slash-placeholder"
+  ],
+  "props": [
+    {
+      "name": "quotes",
+      "type": "SlashQuote[]",
+      "required": true,
+      "description": "the quotes that take turns (one to five)"
+    },
+    {
+      "name": "seconds",
+      "type": "number",
+      "required": false,
+      "default": "6",
+      "description": "seconds each quote stays"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "a388eac041f11e131cdf12c004d9b23387c26591f57a531c39124d6155e4c587"
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Pilot brush note",
+  "description": "A closing line for a band: either a big handwritten script line or a medium sans statement, with a thin tapered brush stroke of colour underneath (cyan, pink, violet, yellow or the text colour).",
+  "category": "text-effect",
+  "site": "pilot",
+  "license": "proprietary",
+  "tags": [
+    "text",
+    "script",
+    "handwritten",
+    "underline",
+    "brush",
+    "pastel"
+  ],
+  "notes": [
+    "the script face is the theme's --typeface-script, falling back to cursive"
+  ],
+  "entry": "pilot-brush-note.tsx",
+  "source": "foundry",
+  "name": "pilot-brush-note",
+  "files": [
+    {
+      "path": "pilot-brush-note.tsx",
+      "content": "import { cn } from \"@foundry/foundry-utils\";\n\nconst strokes = {\n  accent: \"via-accent to-accent/50\",\n  glow: \"via-glow to-glow/50\",\n  primary: \"via-primary to-primary/50\",\n  highlight: \"via-highlight to-highlight/50\",\n  current: \"via-current to-current/40\",\n};\n\nexport interface PilotBrushNoteProps {\n  /** the line itself; use \\n in sans notes to start a new paragraph */\n  text: string;\n  /** script: the big handwritten face · sans: a medium statement */\n  variant?: \"script\" | \"sans\";\n  /** the colour of the brush stroke under it */\n  stroke?: keyof typeof strokes;\n  /** centred (default) or flush left */\n  align?: \"center\" | \"left\";\n  className?: string;\n}\n\n/** A band's closing line with a thin tapered brush stroke underneath. */\nexport function PilotBrushNote({ text, variant = \"sans\", stroke = \"current\", align = \"center\", className }: PilotBrushNoteProps) {\n  return (\n    <div className={cn(\"flex flex-col\", align === \"center\" ? \"items-center text-center\" : \"items-start text-left\", className)}>\n      {variant === \"script\" ? (\n        <p className=\"font-[family-name:var(--typeface-script,cursive)] text-[1.625rem] leading-[1.2] lg:text-[2.5rem]\">{text}</p>\n      ) : (\n        <div className=\"space-y-6 text-xl leading-[1.3] font-medium tracking-[0.01em] lg:text-2xl lg:leading-[1.3]\">\n          {text.split(\"\\n\").map((line) => (\n            <p key={line}>{line}</p>\n          ))}\n        </div>\n      )}\n      <span\n        aria-hidden\n        className={cn(\n          \"mt-2 block h-[3px] w-full -rotate-[0.4deg] rounded-full bg-linear-to-r from-transparent\",\n          align === \"center\" && \"max-w-[min(100%,36rem)]\",\n          strokes[stroke],\n        )}\n      />\n    </div>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "text",
+      "type": "string",
+      "required": true,
+      "description": "the line itself; use \\n in sans notes to start a new paragraph"
+    },
+    {
+      "name": "variant",
+      "type": "enum",
+      "required": false,
+      "default": "sans",
+      "description": "script: the big handwritten face · sans: a medium statement"
+    },
+    {
+      "name": "stroke",
+      "type": "enum",
+      "required": false,
+      "default": "current",
+      "description": "the colour of the brush stroke under it"
+    },
+    {
+      "name": "align",
+      "type": "enum",
+      "required": false,
+      "default": "center",
+      "description": "centred (default) or flush left"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "59ba31fc17952f8e58047eeef95e355229aa8860f202de5dcb93f292fed7a4d2"
+}

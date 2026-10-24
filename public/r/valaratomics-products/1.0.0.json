@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Valar Atomics product cards",
+  "description": "On a white band, a two-half intro over a row of four tall dark picture cards (4px corners; stacked wide cards on phones), each with a mono caps title at the top and a short paragraph lower down. On desktop a spotlight: the first card is lit at rest, the hovered card otherwise, and the others sink under a black veil while the lit picture scales up slightly.",
+  "category": "features",
+  "site": "valaratomics",
+  "license": "proprietary",
+  "tags": [
+    "cards",
+    "products",
+    "dark",
+    "media",
+    "hover",
+    "spotlight",
+    "veil",
+    "scale",
+    "grid",
+    "four-up"
+  ],
+  "notes": [
+    "the cards are `dark` scopes (black film with white text) on the band's card colour",
+    "the spotlight is pure CSS (:has); phones show every card lit"
+  ],
+  "entry": "valaratomics-products.tsx",
+  "source": "foundry",
+  "name": "valaratomics-products",
+  "files": [
+    {
+      "path": "valaratomics-products.css",
+      "content": "/* Desktop spotlight: one card is lit at a time. At rest it is the first; while the pointer is\n   over a card, that one is lit and the others go dark under a veil. Phones show all lit. */\n@media (min-width: 64rem) {\n  .valaratomics-products-grid > li:not(:first-child) .valaratomics-products-veil {\n    opacity: 1;\n  }\n  .valaratomics-products-grid:has(> li:hover) > li .valaratomics-products-veil {\n    opacity: 1;\n  }\n  .valaratomics-products-grid:has(> li:hover) > li:hover .valaratomics-products-veil {\n    opacity: 0;\n  }\n}\n"
+    },
+    {
+      "path": "valaratomics-products.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ValaratomicsIntro } from \"@foundry/valaratomics-intro\";\nimport { ValaratomicsPlaceholder } from \"@foundry/valaratomics-placeholder\";\nimport \"./valaratomics-products.css\";\n\nexport interface ValaratomicsProduct {\n  /** the card's mono caps title, e.g. \"Steam heat\" */\n  name: string;\n  /** two to four lines about it */\n  body: string;\n  /** the card's background image or video (cropped like object-fit: cover); empty shows a placeholder */\n  media?: ReactNode;\n  /** optional link for the whole card */\n  href?: string;\n}\n\nexport interface ValaratomicsProductsProps {\n  /** the section heading */\n  title: string;\n  /** the paragraph beside it */\n  body: string;\n  /** the product cards (four in the original) */\n  items: ValaratomicsProduct[];\n  className?: string;\n}\n\n/**\n * On a white band: a two-half intro, then a row of four tall dark picture cards (stacked\n * wide cards on phones) with a mono caps title at the top and a short paragraph lower down.\n * On desktop one card is lit at a time: the first at rest, the hovered one otherwise, while\n * the rest sit under a black veil.\n */\nexport function ValaratomicsProducts({ title, body, items, className }: ValaratomicsProductsProps) {\n  return (\n    <section className={cn(\"bg-card px-gutter py-section text-card-foreground\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <ValaratomicsIntro title={title} body={body} />\n        <ul className=\"valaratomics-products-grid mt-9 grid gap-5 lg:mt-section lg:grid-cols-4\">\n          {items.map((item) => {\n            const Tag = item.href ? \"a\" : \"div\";\n            return (\n              <li key={item.name} className=\"group/card\">\n                <Tag\n                  {...(item.href ? { href: item.href } : {})}\n                  className=\"dark relative isolate flex min-h-[14.375rem] flex-col overflow-clip rounded-sm bg-background p-[0.9375rem] text-foreground lg:aspect-[303/410]\"\n                >\n                  <div className=\"absolute inset-0 -z-10 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover/card:scale-[1.04] motion-reduce:transition-none [&>*]:size-full [&_img]:object-cover [&_video]:object-cover\">\n                    {item.media ?? <ValaratomicsPlaceholder tone=\"photo\" />}\n                  </div>\n                  <h3 className=\"font-mono text-2xl leading-none font-medium uppercase\">{item.name}</h3>\n                  <p className=\"mt-[4.5rem] text-[1.375rem] leading-[1.06] tracking-[-0.02em] lg:mt-[10.75rem]\">\n                    {item.body}\n                  </p>\n                  <div\n                    aria-hidden\n                    className=\"valaratomics-products-veil pointer-events-none absolute inset-0 bg-background/75 opacity-0 transition-opacity duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none\"\n                  />\n                </Tag>\n              </li>\n            );\n          })}\n        </ul>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "valaratomics-intro",
+    "valaratomics-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section heading"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the paragraph beside it"
+    },
+    {
+      "name": "items",
+      "type": "ValaratomicsProduct[]",
+      "required": true,
+      "description": "the product cards (four in the original)"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "86b26f41a9c00cb93643aad203ef6cfdb86d9d4ff4b668b2a4ad83396e2fcd52"
+}

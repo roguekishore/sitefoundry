@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion header",
+  "description": "A fixed, transparent bar in cream over the hero film: an italic wordmark left, four plain nav links right (a 3-line menu button on phones), and under them a full-width 2px rule ending in a small dart tip. On load the rule draws itself left to right as the dart flies to its end, the wordmark fades in and the links rise in one by one. It slides up out of view when you scroll down and drops back, on the navy band colour, when you scroll up.",
+  "category": "header",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "fixed",
+    "transparent",
+    "rule",
+    "dart",
+    "cream",
+    "navy",
+    "load-in",
+    "hide-on-scroll",
+    "menu",
+    "poster"
+  ],
+  "notes": [
+    "fixed to the top and transparent at first: made to sit over castelion-hero's film (66px tall on phones, 110px on desktop)",
+    "always dark-scoped (cream text); once scrolled it takes the navy band colour (bg-secondary)",
+    "needs JavaScript for hide-on-scroll and the phone menu; the load-in is CSS and off with reduced motion"
+  ],
+  "hydrate": "load",
+  "entry": "castelion-header.tsx",
+  "source": "foundry",
+  "name": "castelion-header",
+  "files": [
+    {
+      "path": "castelion-header.css",
+      "content": "/* Load-in: the rule draws left to right while its dart flies along it (2.2s); the wordmark\n   fades in (1s); the nav links rise in one after another (0.7s, 0.1s apart). */\n.castelion-header-rule {\n  animation: castelion-header-draw 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) both;\n}\n.castelion-header-dart {\n  animation: castelion-header-fly 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) both;\n}\n.castelion-header-brand {\n  animation: castelion-header-fade 1s ease 0.2s both;\n}\n.castelion-header-link {\n  animation: castelion-header-rise 0.7s ease both;\n  animation-delay: calc(0.4s + var(--castelion-header-i, 0) * 0.1s);\n}\n\n@keyframes castelion-header-draw {\n  from { clip-path: inset(0 100% 0 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n@keyframes castelion-header-fly {\n  from { transform: translateX(calc(-100cqw + 100%)); }\n  to { transform: none; }\n}\n@keyframes castelion-header-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n@keyframes castelion-header-rise {\n  from { opacity: 0; transform: translateY(12px); }\n  to { opacity: 1; transform: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .castelion-header-rule,\n  .castelion-header-dart,\n  .castelion-header-brand,\n  .castelion-header-link { animation: none; }\n}\n"
+    },
+    {
+      "path": "castelion-header.tsx",
+      "content": "import { useEffect, useId, useState, type CSSProperties } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./castelion-header.css\";\n\nexport interface CastelionHeaderLink {\n  /** link text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface CastelionHeaderProps {\n  /** the company name, set as an italic wordmark */\n  brand: string;\n  /** where the wordmark links (usually \"/\") */\n  homeHref?: string;\n  /** the nav links (a drop-down panel on phones) */\n  links: CastelionHeaderLink[];\n  /** screen-reader name of the phone menu button, e.g. \"Menu\" */\n  menuLabel: string;\n  /** how far down (in window heights) the page must scroll before the bar slides away */\n  hideAfter?: number;\n  className?: string;\n}\n\nconst ease = \"duration-500 ease-[ease] motion-reduce:transition-none\";\n\n/** Fixed cream-on-film bar with a wordmark, nav links and a full-width rule ending in a dart. */\nexport function CastelionHeader({ brand, homeHref = \"/\", links, menuLabel, hideAfter = 0.4, className }: CastelionHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [scrolled, setScrolled] = useState(false);\n  const [open, setOpen] = useState(false);\n  const panelId = useId();\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (y > window.innerHeight * hideAfter && y > last) setHidden(true);\n      else if (y < last) setHidden(false);\n      setScrolled(y > 8);\n      last = y;\n    };\n    onScroll();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [hideAfter]);\n\n  return (\n    <header\n      className={cn(\n        \"dark fixed inset-x-0 top-0 z-50 text-foreground transition-[background-color,transform]\",\n        ease,\n        (scrolled || open) && \"bg-secondary\",\n        hidden && !open && \"-translate-y-full\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto max-w-page px-gutter pt-2.5 lg:pt-4\">\n        <div className=\"flex h-10 items-center justify-between lg:h-[4.875rem]\">\n          <a\n            href={homeHref}\n            className=\"castelion-header-brand -mt-1 font-display text-[1.75rem]/none font-semibold tracking-[-0.03em] italic lg:-mt-2 lg:text-[2.875rem]\"\n          >\n            {brand}\n          </a>\n          <nav className=\"hidden lg:block\">\n            <ul className=\"flex items-center gap-[4.375rem]\">\n              {links.map((link, i) => (\n                <li key={link.href + link.label} className=\"castelion-header-link\" style={{ \"--castelion-header-i\": i } as CSSProperties}>\n                  <a\n                    href={link.href}\n                    className={cn(\n                      \"text-base/none font-medium underline decoration-transparent decoration-2 underline-offset-6 transition-[text-decoration-color] hover:decoration-current\",\n                      ease,\n                    )}\n                  >\n                    {link.label}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          </nav>\n          <button\n            type=\"button\"\n            aria-label={menuLabel}\n            aria-expanded={open}\n            aria-controls={panelId}\n            onClick={() => setOpen((v) => !v)}\n            className=\"castelion-header-brand grid h-10 w-[3.375rem] content-center gap-[0.4375rem] lg:hidden\"\n          >\n            {[0, 1, 2].map((n) => (\n              <span\n                key={n}\n                aria-hidden\n                className={cn(\n                  \"block h-0.5 w-full bg-current transition-[transform,opacity]\",\n                  ease,\n                  open && n === 0 && \"translate-y-[0.5625rem] rotate-12\",\n                  open && n === 1 && \"opacity-0\",\n                  open && n === 2 && \"-translate-y-[0.5625rem] -rotate-12\",\n                )}\n              />\n            ))}\n          </button>\n        </div>\n\n        {/* the full-width rule with its dart tip */}\n        <div aria-hidden className=\"relative mt-1 h-2.5 [container-type:inline-size] lg:mt-1.5\">\n          <span className=\"castelion-header-rule absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-current\" />\n          <svg\n            viewBox=\"0 0 24 10\"\n            className=\"castelion-header-dart absolute top-0 right-0 h-2.5 w-6 fill-current\"\n          >\n            <path d=\"M0 4h14l-3-4h2.5l4.5 4h2.5c1.5 0 3.5.6 3.5 1s-2 1-3.5 1H18l-4.5 4H11l3-4H0z\" />\n          </svg>\n        </div>\n      </div>\n\n      {/* phone menu panel */}\n      <nav id={panelId} className={cn(\"px-gutter pb-6 lg:hidden\", open ? \"block\" : \"hidden\")}>\n        <ul className=\"grid gap-4 pt-4\">\n          {links.map((link) => (\n            <li key={link.href + link.label}>\n              <a href={link.href} className=\"font-display text-[1.75rem]/[1.2] font-bold tracking-[0.02em]\" onClick={() => setOpen(false)}>\n                {link.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as an italic wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links (usually \"/\")"
+    },
+    {
+      "name": "links",
+      "type": "CastelionHeaderLink[]",
+      "required": true,
+      "description": "the nav links (a drop-down panel on phones)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "screen-reader name of the phone menu button, e.g. \"Menu\""
+    },
+    {
+      "name": "hideAfter",
+      "type": "number",
+      "required": false,
+      "default": "0.4",
+      "description": "how far down (in window heights) the page must scroll before the bar slides away"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "3805b7dfdd9c64143b5317f408ead856612ef44540df6c9b9411457452be7b5b"
+}

@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion feature card",
+  "description": "A page-wide photo card with 4px corners, cream type laid straight onto the picture: a bold four-line title top left and a justified lead top right (stacked on phones). The card rises into place as it scrolls in, its title lines slide out of masks and the lead fades up; behind its foot a navy band starts, opened by two thin page-colour hairlines.",
+  "category": "features",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "card",
+    "photo",
+    "overlay",
+    "navy",
+    "cream",
+    "parallax",
+    "scrubbed",
+    "split-lines",
+    "reveal",
+    "poster"
+  ],
+  "notes": [
+    "the empty card is a sky wash (navy into the highlight blue) in a dark scope so the cream text stays legible; pass media for a real photo",
+    "the navy band behind the card's foot uses bg-secondary and flows into castelion-statement",
+    "scroll-driven CSS; static and reduced-motion views show everything in place"
+  ],
+  "entry": "castelion-feature-card.tsx",
+  "source": "foundry",
+  "name": "castelion-feature-card",
+  "files": [
+    {
+      "path": "castelion-feature-card.css",
+      "content": "/* The card climbs 100px (227px on desktop) into place while it scrolls in; the lead fades up 32px. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-feature-card-card {\n      --castelion-feature-card-rise: 100px;\n      animation: castelion-feature-card-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0% cover 45%;\n    }\n    .castelion-feature-card-lead {\n      animation: castelion-feature-card-fade linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 320px;\n    }\n  }\n  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {\n    .castelion-feature-card-card { --castelion-feature-card-rise: 227px; }\n  }\n}\n\n@keyframes castelion-feature-card-rise {\n  from { transform: translateY(var(--castelion-feature-card-rise)); }\n  to { transform: none; }\n}\n@keyframes castelion-feature-card-fade {\n  from { opacity: 0; transform: translateY(32px); }\n  to { opacity: 1; transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-feature-card.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport { CastelionPlaceholder } from \"@foundry/castelion-placeholder\";\nimport \"./castelion-feature-card.css\";\n\nexport interface CastelionFeatureCardProps {\n  /** the card's title, one entry per desktop line */\n  title: string[];\n  /** the justified lead beside the title */\n  lead: string;\n  /** the photo that fills the card (empty: a sky wash) */\n  media?: ReactNode;\n  /** what the photo shows, for screen readers while the slot is empty */\n  mediaLabel?: string;\n  className?: string;\n}\n\n/** Page-wide photo card with title and lead set on the picture, over the start of a navy band. */\nexport function CastelionFeatureCard({ title, lead, media, mediaLabel, className }: CastelionFeatureCardProps) {\n  return (\n    <section className={cn(\"relative bg-background pb-5 lg:pb-[4.5rem]\", className)}>\n      {/* the navy band behind the card's foot, opened by two page-colour hairlines */}\n      <div aria-hidden className=\"absolute inset-x-0 bottom-0 h-[7.625rem] bg-secondary lg:h-[16.625rem]\">\n        <span className=\"absolute inset-x-0 top-[3px] h-px bg-background\" />\n        <span className=\"absolute inset-x-0 top-[13px] h-px bg-background\" />\n      </div>\n\n      <div className=\"relative mx-auto max-w-page px-gutter\">\n        <div className=\"castelion-feature-card-card dark relative isolate aspect-[0.6] overflow-clip rounded-lg text-foreground sm:aspect-[1.1] lg:aspect-[1.168]\">\n          <CastelionPlaceholder media={media} tone=\"sky\" label={mediaLabel} className=\"absolute inset-0 -z-10\" />\n          <div className=\"grid gap-3.5 p-6 lg:grid-cols-[1fr_23.75rem] lg:gap-10 lg:pt-[4.75rem] lg:pr-[5.5rem] lg:pl-[4.5rem]\">\n            <CastelionLines\n              as=\"h2\"\n              lines={title}\n              className=\"font-display text-[clamp(1.8125rem,1.279rem+2.19vw,3.25rem)]/[1.29] font-bold tracking-[0.02em]\"\n            />\n            <p className=\"castelion-feature-card-lead text-justify text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-medium\">\n              {lead}\n            </p>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-lines",
+    "castelion-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the card's title, one entry per desktop line"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": true,
+      "description": "the justified lead beside the title"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the photo that fills the card (empty: a sky wash)"
+    },
+    {
+      "name": "mediaLabel",
+      "type": "string",
+      "required": false,
+      "description": "what the photo shows, for screen readers while the slot is empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "005a1bae540f564406927019f0503cf063ef152539145da72aacfd5f8bc24162"
+}

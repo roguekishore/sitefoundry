@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Zoe bento",
+  "description": "An edge-to-edge bento of 16px-rounded square tiles on a 6-column grid (3 rows on desktop, 2 columns on phones): big and small photos, figure tiles with a large light serif number and a small uppercase caption on navy or sage, and feature tiles with a title over a composite on yellow or cream. Pictures fade in as the grid enters view.",
+  "category": "features",
+  "site": "zoe",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "bento",
+    "grid",
+    "stats",
+    "photos",
+    "full-bleed",
+    "tiles",
+    "fade",
+    "reveal",
+    "scroll"
+  ],
+  "notes": [
+    "eight fixed slots, in this order: big, small, small, big, big, small, small, wide (the wide one is hidden on phones)",
+    "figure numbers use the theme-only --zoe-serif face, falling back to the display face",
+    "the fade is a CSS view timeline; without support everything shows at once"
+  ],
+  "entry": "zoe-bento.tsx",
+  "name": "zoe-bento",
+  "files": [
+    {
+      "path": "zoe-bento.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ZoePlaceholder } from \"@foundry/zoe-placeholder\";\n\nexport interface ZoeBentoTile {\n  /** photo: a picture · figure: a big number and caption · feature: a title over a composite image */\n  kind: \"photo\" | \"figure\" | \"feature\";\n  /** figure: the number (\"90+\") · feature: the title */\n  title?: string;\n  /** figure: the small uppercase caption at the bottom */\n  caption?: string;\n  /** figure tiles: ink (navy, yellow number) or sage · feature tiles: sun (yellow) or cream */\n  tone?: \"ink\" | \"sage\" | \"sun\" | \"cream\";\n  /** the picture (object-cover); a placeholder when empty */\n  media?: ReactNode;\n  /** makes the tile a link */\n  href?: string;\n}\n\nexport interface ZoeBentoProps {\n  /** up to eight tiles, filling the slots big, small, small, big, big, small, small, wide */\n  tiles: ZoeBentoTile[];\n  className?: string;\n}\n\n// Where each slot sits. Phones: 2 columns, auto-placed in order. Desktop: a 6 × 3 grid of squares.\nconst slots = [\n  \"col-span-2 row-span-2 lg:col-start-1 lg:row-start-1\",\n  \"lg:col-start-3 lg:row-start-1\",\n  \"lg:col-start-4 lg:row-start-1\",\n  \"col-span-2 row-span-2 lg:col-start-5 lg:row-start-1\",\n  \"col-span-2 row-span-2 lg:col-start-3 lg:row-start-2\",\n  \"lg:col-start-1 lg:row-start-3\",\n  \"lg:col-start-2 lg:row-start-3\",\n  \"hidden lg:block lg:col-span-2 lg:col-start-5 lg:row-start-3\",\n];\n\nconst tones = {\n  ink: \"bg-foreground text-background dark:bg-card dark:text-card-foreground\",\n  sage: \"bg-chart-1 text-foreground\",\n  sun: \"bg-primary text-primary-foreground\",\n  cream: \"bg-card text-card-foreground\",\n};\n\nfunction Tile({ tile }: { tile: ZoeBentoTile }) {\n  if (tile.kind === \"photo\") {\n    return (\n      <div className=\"size-full *:size-full *:object-cover\">{tile.media ?? <ZoePlaceholder tone=\"photo\" fade />}</div>\n    );\n  }\n  if (tile.kind === \"figure\") {\n    return (\n      <div className={cn(\"flex size-full flex-col justify-between p-3 lg:p-[1.125rem]\", tones[tile.tone ?? \"ink\"])}>\n        <p\n          className={cn(\n            \"font-[family-name:var(--zoe-serif,var(--typeface-display))] text-[3rem] leading-none font-light tracking-[-0.03em] lg:text-[4rem]\",\n            (tile.tone ?? \"ink\") === \"ink\" && \"text-primary\",\n          )}\n        >\n          {tile.title}\n        </p>\n        <p className=\"max-w-[12rem] text-[0.8125rem] leading-[1.15] tracking-[0.06em] uppercase lg:text-base\">\n          {tile.caption}\n        </p>\n      </div>\n    );\n  }\n  return (\n    <div className={cn(\"relative isolate size-full\", tones[tile.tone ?? \"sun\"])}>\n      {tile.media ? (\n        <div className=\"absolute inset-0 -z-10 *:size-full *:object-cover\">{tile.media}</div>\n      ) : (\n        <ZoePlaceholder\n          tone={tile.tone === \"cream\" ? \"soft\" : \"glass\"}\n          fade\n          className=\"absolute inset-x-[14%] top-[38%] bottom-0 -z-10 rounded-t-2xl\"\n        />\n      )}\n      <p className=\"max-w-[16rem] p-5 text-xl leading-[1.15] tracking-[-0.01em] lg:p-7 lg:text-[1.875rem]\">{tile.title}</p>\n    </div>\n  );\n}\n\n/** Zoe's edge-to-edge bento of photos and figures. */\nexport function ZoeBento({ tiles, className }: ZoeBentoProps) {\n  return (\n    <section className={cn(\"@container px-6 lg:px-0\", className)}>\n      <div className=\"grid auto-rows-[calc((100cqw-0.5rem)/2)] grid-cols-2 gap-2 lg:auto-rows-[calc((100cqw-5rem)/6)] lg:grid-cols-6 lg:gap-4\">\n        {tiles.slice(0, 8).map((tile, i) => {\n          const cls = cn(\"overflow-clip rounded-lg\", slots[i]);\n          return tile.href ? (\n            <a key={i} href={tile.href} className={cls}>\n              <Tile tile={tile} />\n            </a>\n          ) : (\n            <div key={i} className={cls}>\n              <Tile tile={tile} />\n            </div>\n          );\n        })}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "zoe-placeholder"
+  ],
+  "props": [
+    {
+      "name": "tiles",
+      "type": "ZoeBentoTile[]",
+      "required": true,
+      "description": "up to eight tiles, filling the slots big, small, small, big, big, small, small, wide"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "55e1c0f0890cc8a13d888e9f111c389cf46fba3684b85667fe542df35e02dca5"
+}

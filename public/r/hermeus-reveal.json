@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "component",
+  "title": "Hermeus scroll reveal",
+  "description": "A wrapper that fades its content in and lifts it 16px as it scrolls into view, tied to the scroll position (it runs backwards when you scroll back up).",
+  "category": "text-effect",
+  "site": "hermeus",
+  "license": "proprietary",
+  "tags": [
+    "reveal",
+    "scroll",
+    "scrubbed",
+    "fade",
+    "rise",
+    "css"
+  ],
+  "notes": [
+    "CSS scroll-driven animation: browsers without it, and reduced motion, show the content in place",
+    "finishes 80% of a window height after the wrapper's top enters the window"
+  ],
+  "entry": "hermeus-reveal.tsx",
+  "source": "foundry",
+  "name": "hermeus-reveal",
+  "files": [
+    {
+      "path": "hermeus-reveal.css",
+      "content": "/* Scrubbed with the scroll: from the moment the wrapper's top enters the window, over 80% of\n   the window's height of scroll, it fades from 0 to 1 and rises 16px into place. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .hermeus-reveal {\n      animation: hermeus-reveal-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 80vh;\n    }\n  }\n}\n\n@keyframes hermeus-reveal-rise {\n  from { opacity: 0; translate: 0 16px; }\n  to { opacity: 1; translate: 0 0; }\n}\n"
+    },
+    {
+      "path": "hermeus-reveal.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport \"./hermeus-reveal.css\";\n\nexport interface HermeusRevealProps {\n  /** what fades and rises in */\n  children: ReactNode;\n  className?: string;\n}\n\n/** Fades and lifts its content in as it scrolls into view (scrubbed, CSS only). */\nexport function HermeusReveal({ children, className }: HermeusRevealProps) {\n  return <div className={cn(\"hermeus-reveal\", className)}>{children}</div>;\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "children",
+      "type": "ReactNode",
+      "required": true,
+      "description": "what fades and rises in"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f37264450e20a0e5f97349e6363d6fa825c73cc14d87e1c794c442328636ee5c"
+}

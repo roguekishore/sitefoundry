@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer header",
+  "description": "A fixed 64px black bar: wordmark and five quiet nav items (some with chevrons and small hover menus) on the left, a grey Log in link and a small white Sign up button on the right. On phones: wordmark, Log in, Sign up and a two-line menu button that opens a full-height list. The two actions fade in on load.",
+  "category": "header",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "navigation",
+    "fixed",
+    "dark",
+    "minimal",
+    "fade-in"
+  ],
+  "notes": [
+    "fixed to the top with its own 64px spacer, so the next block starts below it",
+    "the phone menu is a <details> element: no JavaScript"
+  ],
+  "entry": "framer-header.tsx",
+  "name": "framer-header",
+  "files": [
+    {
+      "path": "framer-header.css",
+      "content": "/* Log in and Sign up fade in once the page loads, as the original's do (400ms). */\n.framer-header-action {\n  animation: framer-header-fade 400ms ease-out 150ms both;\n}\n\n@keyframes framer-header-fade {\n  from { opacity: 0; }\n  to { opacity: 1; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .framer-header-action { animation: none; }\n}\n"
+    },
+    {
+      "path": "framer-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { ChevronDown, Equal } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerButton } from \"@foundry/framer-button\";\nimport { FramerMark } from \"@foundry/framer-mark\";\nimport \"./framer-header.css\";\n\nexport interface FramerHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n  /** sub-links: adds a chevron and a small hover menu */\n  items?: { label: string; href: string }[];\n}\n\nexport interface FramerHeaderProps {\n  /** the company name next to the mark */\n  brand: string;\n  /** the mark (an svg or lucide icon) */\n  mark: ReactNode;\n  /** nav items after the wordmark (five on the original) */\n  links: FramerHeaderLink[];\n  /** the quiet text link before the button (e.g. log in) */\n  login: { label: string; href: string };\n  /** the small white button on the far right */\n  action: { label: string; href: string };\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkClass =\n  \"text-sm tracking-[-0.01em] text-foreground/80 transition-colors duration-150 ease-linear hover:text-foreground motion-reduce:transition-none\";\n\n/** Fixed black bar with nav on the left and log in / sign up on the right. */\nexport function FramerHeader({ brand, mark, links, login, action, menuLabel, className }: FramerHeaderProps) {\n  return (\n    <>\n      <header className={cn(\"fixed inset-x-0 top-0 z-50 bg-background px-gutter text-foreground\", className)}>\n        <div className=\"relative mx-auto flex h-16 max-w-page items-center\">\n          <FramerMark brand={brand} mark={mark} />\n\n          <nav className=\"ml-7 hidden items-center gap-6 lg:flex\">\n            {links.map((link) =>\n              link.items?.length ? (\n                <div key={link.label} className=\"group relative\">\n                  <a href={link.href} className={cn(linkClass, \"inline-flex items-center gap-1 py-5 group-hover:text-foreground\")}>\n                    {link.label}\n                    <ChevronDown aria-hidden className=\"size-3\" strokeWidth={2} />\n                  </a>\n                  <div className=\"pointer-events-none invisible absolute top-full -left-3 w-52 rounded-xl bg-popover p-1.5 opacity-0 ring-1 ring-border transition-opacity duration-200 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 motion-reduce:transition-none\">\n                    {link.items.map((item) => (\n                      <a key={item.label} href={item.href} className={cn(linkClass, \"block rounded-lg px-3 py-2 hover:bg-accent\")}>\n                        {item.label}\n                      </a>\n                    ))}\n                  </div>\n                </div>\n              ) : (\n                <a key={link.label} href={link.href} className={linkClass}>\n                  {link.label}\n                </a>\n              ),\n            )}\n          </nav>\n\n          <div className=\"framer-header-action ml-auto flex items-center gap-3.5\">\n            <a\n              href={login.href}\n              className=\"text-sm tracking-[-0.01em] text-muted-foreground transition-colors duration-150 ease-linear hover:text-foreground motion-reduce:transition-none\"\n            >\n              {login.label}\n            </a>\n            <FramerButton href={action.href} size=\"sm\">\n              {action.label}\n            </FramerButton>\n          </div>\n\n          <details className=\"group ml-4 lg:hidden\">\n            <summary\n              aria-label={menuLabel}\n              className=\"grid size-8 cursor-pointer list-none place-items-center text-foreground [&::-webkit-details-marker]:hidden\"\n            >\n              <Equal aria-hidden className=\"size-6\" strokeWidth={1.5} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full -mx-gutter flex h-[calc(100svh-4rem)] flex-col overflow-y-auto bg-background px-gutter pt-2 pb-8\">\n              {links.flatMap((link) => [link, ...(link.items ?? [])]).map((link) => (\n                <a key={link.label} href={link.href} className=\"border-b border-border py-3.5 text-lg text-foreground\">\n                  {link.label}\n                </a>\n              ))}\n            </nav>\n          </details>\n        </div>\n      </header>\n      <div aria-hidden className=\"h-16\" />\n    </>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-button",
+    "framer-mark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name next to the mark"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mark (an svg or lucide icon)"
+    },
+    {
+      "name": "links",
+      "type": "FramerHeaderLink[]",
+      "required": true,
+      "description": "nav items after the wordmark (five on the original)"
+    },
+    {
+      "name": "login",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the quiet text link before the button (e.g. log in)"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the small white button on the far right"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "c3f67963622de992e829a23f657c603fc63ae7103e4ce3352fc1072ac872b3b3"
+}

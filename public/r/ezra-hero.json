@@ -1,0 +1,95 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Ezra hero",
+  "description": "A centred cream hero: a light 88px display-serif headline whose last words turn terracotta italic, a short 18px line, one terracotta pill, then a white hairline notice card (co-brand lockup, two lines, outline pill) and a tall portrait cut-out anchored to the bottom edge. A terracotta wash opens down over the cut-out as the page scrolls.",
+  "category": "hero",
+  "site": "ezra",
+  "license": "proprietary",
+  "tags": [
+    "hero",
+    "light",
+    "cream",
+    "serif",
+    "italic",
+    "centered",
+    "editorial",
+    "scrubbed",
+    "scroll-driven"
+  ],
+  "notes": [
+    "content-sized, not window-sized, as the original: the cut-out sits under the first screen",
+    "the cut-out is a media slot (portrait, aspect 366/662); the scrubbed wash stands in for the original's rings drawing in around it",
+    "scroll wash is CSS scroll-driven, off without support or under reduced motion"
+  ],
+  "entry": "ezra-hero.tsx",
+  "source": "foundry",
+  "name": "ezra-hero",
+  "files": [
+    {
+      "path": "ezra-hero.css",
+      "content": "/* The wash over the cut-out opens from the top down while the slot scrolls into view,\n   standing in for the original's rings drawing in one by one. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .ezra-hero-wash {\n      animation: ezra-hero-wash linear both;\n      animation-timeline: view();\n      animation-range: cover 30% cover 90%;\n    }\n  }\n}\n\n@keyframes ezra-hero-wash {\n  from { clip-path: inset(0 0 100% 0); }\n  to { clip-path: inset(0 0 0 0); }\n}\n"
+    },
+    {
+      "path": "ezra-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { EzraButton } from \"@foundry/ezra-button\";\nimport { EzraPlaceholder } from \"@foundry/ezra-placeholder\";\nimport \"./ezra-hero.css\";\n\nexport interface EzraLink {\n  label: string;\n  href: string;\n}\n\nexport interface EzraHeroProps {\n  /** the headline's first line on desktop (\"Full-body MRI that\") */\n  title: string;\n  /** plain words that start the second desktop line, before the accent */\n  lead?: string;\n  /** the italic terracotta words that end the headline */\n  accent: string;\n  /** the short line under the headline */\n  body: string;\n  /** the terracotta pill */\n  action: EzraLink;\n  /** the white notice card under the pill */\n  notice?: {\n    /** a wordmark at the top of the card (e.g. an EzraLockup) */\n    logo?: ReactNode;\n    /** one or two lines of text */\n    text: string;\n    /** the outline pill */\n    link: EzraLink;\n  };\n  /** the tall portrait cut-out at the bottom (an <img>); a placeholder when empty */\n  media?: ReactNode;\n  className?: string;\n}\n\n/** Centred serif headline with an italic accent, pill, notice card and a bottom-anchored cut-out. */\nexport function EzraHero({ title, lead, accent, body, action, notice, media, className }: EzraHeroProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-background text-foreground\", className)}>\n      <div className=\"mx-auto box-content flex max-w-page flex-col items-center px-gutter pt-[calc(var(--section-y)*0.65)] pb-14 text-center lg:pt-[calc(var(--section-y)*1.35)] lg:pb-0\">\n        <h1 className=\"font-display text-[2rem] leading-[1.1] font-light tracking-[-0.01em] lg:text-[5.5rem] lg:leading-none\">\n          {title}\n          <br className=\"hidden lg:block\" /> {lead}{\" \"}\n          <em className=\"text-highlight max-lg:block\">{accent}</em>\n        </h1>\n        <p className=\"mt-6 max-w-[27rem] text-base leading-[1.6] lg:mt-6 lg:text-lg\">{body}</p>\n        <EzraButton href={action.href} className=\"mt-11 lg:mt-12\">\n          {action.label}\n        </EzraButton>\n        {notice && (\n          <div className=\"mt-22 flex w-full max-w-[36rem] flex-col items-center rounded-lg border border-border bg-card px-6 pt-8 pb-8 text-card-foreground\">\n            {notice.logo && <div className=\"text-[1.5rem] lg:text-[1.65rem]\">{notice.logo}</div>}\n            <p className=\"mt-6 max-w-[24rem] text-base leading-[1.6]\">{notice.text}</p>\n            <EzraButton href={notice.link.href} variant=\"outline\" className=\"mt-4\">\n              {notice.link.label}\n            </EzraButton>\n          </div>\n        )}\n        <div className=\"relative mt-34 aspect-[366/662] w-[17rem] lg:mt-36 lg:w-[23rem]\">\n          {media ?? (\n            <>\n              <EzraPlaceholder tone=\"wash\" className=\"absolute inset-0\" />\n              <div aria-hidden className=\"ezra-hero-wash absolute inset-0 bg-highlight/12\" />\n            </>\n          )}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "ezra-button",
+    "ezra-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the headline's first line on desktop (\"Full-body MRI that\")"
+    },
+    {
+      "name": "lead",
+      "type": "string",
+      "required": false,
+      "description": "plain words that start the second desktop line, before the accent"
+    },
+    {
+      "name": "accent",
+      "type": "string",
+      "required": true,
+      "description": "the italic terracotta words that end the headline"
+    },
+    {
+      "name": "body",
+      "type": "string",
+      "required": true,
+      "description": "the short line under the headline"
+    },
+    {
+      "name": "action",
+      "type": "EzraLink",
+      "required": true,
+      "description": "the terracotta pill"
+    },
+    {
+      "name": "notice",
+      "type": "{ logo?: ReactNode; text: string; link: EzraLink; }",
+      "required": false,
+      "description": "the white notice card under the pill"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the tall portrait cut-out at the bottom (an <img>); a placeholder when empty"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "732aabe8a7bbee53a71e704ee3d166ee01b891d024f15c8b18eaa213917aa9e6"
+}

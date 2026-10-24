@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "mymind closing",
+  "description": "A blush band under a huge, hair-thin arc that fades out as it falls away: a small brand mark at its crown, then short centred serif paragraphs in large type that drift gently downward as you scroll past, a tangerine pill in spaced capitals, a row of install tiles and a small grey line with a link.",
+  "category": "cta",
+  "site": "mymind",
+  "license": "proprietary",
+  "tags": [
+    "cta",
+    "closing",
+    "manifesto",
+    "serif",
+    "arc",
+    "blush",
+    "parallax",
+    "scroll",
+    "install",
+    "light",
+    "minimal"
+  ],
+  "notes": [
+    "install tiles are hidden on phones, as in the original",
+    "text drift is a CSS view timeline"
+  ],
+  "entry": "mymind-closing.tsx",
+  "source": "foundry",
+  "name": "mymind-closing",
+  "files": [
+    {
+      "path": "mymind-closing.css",
+      "content": "/* Scrubbed with the scroll: the paragraphs drift from 20px up to 20px down while the block\n   crosses the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .mymind-closing-drift {\n      animation: mymind-closing-drift linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n  }\n}\n\n@keyframes mymind-closing-drift {\n  from { transform: translateY(-20px); }\n  to { transform: translateY(20px); }\n}\n"
+    },
+    {
+      "path": "mymind-closing.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { MymindInstallRow, type MymindInstallTarget } from \"@foundry/mymind-install-row\";\nimport { MymindPill } from \"@foundry/mymind-pill\";\n\nexport interface MymindClosingProps {\n  /** a small brand mark at the crown of the arc (an icon or picture) */\n  mark?: ReactNode;\n  /** short centred paragraphs */\n  paragraphs: string[];\n  /** the tangerine pill */\n  cta: { label: string; href: string };\n  /** install tiles under the pill (tablet and up) */\n  targets?: MymindInstallTarget[];\n  /** the small grey line at the bottom, and its link */\n  note?: { text: string; href: string };\n  className?: string;\n}\n\n/** Closing words under a fading arc, then the call to action. */\nexport function MymindClosing({ mark, paragraphs, cta, targets, note, className }: MymindClosingProps) {\n  return (\n    <section className={cn(\"relative isolate overflow-x-clip bg-accent pt-20 pb-20 text-foreground lg:pt-[9rem] lg:pb-14\", className)}>\n      {/* the arc: the top of a very large thin circle, fading into the band */}\n      <div aria-hidden className=\"absolute top-[9.5rem] left-1/2 -z-10 h-[18rem] w-[44rem] -translate-x-1/2 overflow-clip lg:top-[11.5rem] lg:h-[32rem] lg:w-[76rem]\">\n        <div className=\"aspect-square w-full rounded-full border border-foreground/35\" />\n        <div className=\"absolute inset-0 bg-gradient-to-b from-transparent from-45% to-accent\" />\n      </div>\n\n      <div className=\"mx-auto flex max-w-page flex-col items-center px-gutter text-center\">\n        {mark && <div className=\"grid h-[4.5rem] w-12 place-items-center text-foreground [&_svg]:size-full\">{mark}</div>}\n        <div className=\"mymind-closing-drift mt-12 max-w-[22rem] space-y-10 font-display text-[1.75rem] leading-10 tracking-[-0.03em] lg:mt-[8.5rem] lg:max-w-[49rem] lg:space-y-[3.75rem] lg:text-[3.25rem] lg:leading-[3.75rem]\">\n          {paragraphs.map((p) => (\n            <p key={p}>{p}</p>\n          ))}\n        </div>\n        <MymindPill href={cta.href} size=\"sm\" caps className=\"mt-16 h-11 px-8 lg:mt-[4.5rem]\">\n          {cta.label}\n        </MymindPill>\n        {targets && targets.length > 0 && <MymindInstallRow targets={targets} className=\"mt-16 hidden md:flex lg:mt-[4.5rem]\" />}\n        {note && (\n          <a href={note.href} className=\"mt-6 hidden text-[0.9375rem] text-muted-foreground transition-colors duration-200 ease-linear hover:text-foreground md:block\">\n            {note.text}\n          </a>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "mymind-install-row",
+    "mymind-pill"
+  ],
+  "props": [
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "a small brand mark at the crown of the arc (an icon or picture)"
+    },
+    {
+      "name": "paragraphs",
+      "type": "string[]",
+      "required": true,
+      "description": "short centred paragraphs"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the tangerine pill"
+    },
+    {
+      "name": "targets",
+      "type": "MymindInstallTarget[]",
+      "required": false,
+      "description": "install tiles under the pill (tablet and up)"
+    },
+    {
+      "name": "note",
+      "type": "{ text: string; href: string; }",
+      "required": false,
+      "description": "the small grey line at the bottom, and its link"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "d6bf549a69e3c0d51c00feeb467a323eb04a672089453f111ef32751e5f40ad8"
+}

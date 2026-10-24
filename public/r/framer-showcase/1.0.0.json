@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Framer site showcase",
+  "description": "A one-line title with a small button at its right over two rows of tall rounded site shots, wide landscape tiles mixed with narrow phone-shaped ones, cropped at the column edges. As the page scrolls the two rows drift sideways in opposite directions.",
+  "category": "gallery",
+  "site": "framer",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "gallery",
+    "showcase",
+    "dark",
+    "parallax",
+    "scrubbed",
+    "scroll",
+    "horizontal"
+  ],
+  "notes": [
+    "tiles are media slots: landscape 700×450 and portrait 220×450 (404×260 / 127×260 on phones)",
+    "the drift is a CSS scroll-driven animation (80px each way); without support or with reduced motion the rows stay put"
+  ],
+  "entry": "framer-showcase.tsx",
+  "name": "framer-showcase",
+  "files": [
+    {
+      "path": "framer-showcase.css",
+      "content": "/* The two rows drift sideways in opposite directions while the section crosses the window. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .framer-showcase-row {\n      animation: framer-showcase-left linear both;\n      animation-timeline: view();\n      animation-range: cover 0% cover 100%;\n    }\n    .framer-showcase-row:nth-child(even) {\n      animation-name: framer-showcase-right;\n    }\n  }\n}\n\n@keyframes framer-showcase-left {\n  from { transform: translateX(0); }\n  to { transform: translateX(-80px); }\n}\n\n@keyframes framer-showcase-right {\n  from { transform: translateX(-80px); }\n  to { transform: translateX(0); }\n}\n"
+    },
+    {
+      "path": "framer-showcase.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { FramerButton } from \"@foundry/framer-button\";\nimport { FramerSectionHead } from \"@foundry/framer-heading\";\nimport { FramerPlaceholder } from \"@foundry/framer-placeholder\";\nimport \"./framer-showcase.css\";\n\nexport interface FramerShowcaseTile {\n  /** the site's name, read to screen readers */\n  name: string;\n  /** landscape: 700×450 desktop shot · portrait: 220×450 phone shot */\n  shape: \"landscape\" | \"portrait\";\n  /** link to the live site */\n  href?: string;\n  /** the screenshot or film; empty shows a placeholder */\n  media?: ReactNode;\n}\n\nexport interface FramerShowcaseProps {\n  /** section title; \"\\n\" breaks on desktop only */\n  title: string;\n  /** the small dark button on the right */\n  action: { label: string; href: string };\n  /** rows of tiles (two on the original); each row is cropped at the column edges */\n  rows: FramerShowcaseTile[][];\n  className?: string;\n}\n\nconst shapes = {\n  landscape: \"w-[25.25rem] lg:w-[43.75rem]\",\n  portrait: \"w-[7.9375rem] lg:w-[13.75rem]\",\n};\n\n/** Two drifting rows of site shots. */\nexport function FramerShowcase({ title, action, rows, className }: FramerShowcaseProps) {\n  return (\n    <section className={cn(\"bg-background px-gutter py-15 text-foreground lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <FramerSectionHead\n          title={title}\n          actionsInline\n          actions={\n            <FramerButton href={action.href} variant=\"secondary\">\n              {action.label}\n            </FramerButton>\n          }\n        />\n\n        <div className=\"mt-9 flex flex-col gap-2.5 overflow-x-clip lg:mt-11\">\n          {rows.map((row, i) => (\n            <ul key={i} className=\"framer-showcase-row flex w-max gap-2.5\">\n              {row.map((tile) => (\n                <li\n                  key={tile.name}\n                  className={cn(\n                    \"h-65 shrink-0 overflow-clip rounded-md lg:h-[28.125rem] lg:rounded-2xl\",\n                    shapes[tile.shape],\n                  )}\n                >\n                  <a href={tile.href} aria-label={tile.name} className=\"block size-full\">\n                    {tile.media ?? <FramerPlaceholder tone=\"well\" />}\n                  </a>\n                </li>\n              ))}\n            </ul>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "framer-button",
+    "framer-heading",
+    "framer-placeholder"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "section title; \"\\n\" breaks on desktop only"
+    },
+    {
+      "name": "action",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the small dark button on the right"
+    },
+    {
+      "name": "rows",
+      "type": "FramerShowcaseTile[][]",
+      "required": true,
+      "description": "rows of tiles (two on the original); each row is cropped at the column edges"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e656b437898e88473891cfeaf1775b08b90c976ad35ecf16abe1a4b9ee208737"
+}

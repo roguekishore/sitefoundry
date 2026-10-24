@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Saronic hero",
+  "description": "A window-tall hero over full-bleed footage under a slate wash. Desktop spreads a giant stretched wordmark across the top and sets a mono eyebrow, a three-line 450-weight headline and two buttons (lime + translucent) in a column from 60% of the width; phones put the copy at the bottom. The copy rises in on load; while the hero scrolls away the footage stays pinned and dims to 20% and the wordmark and copy fade out.",
+  "category": "hero",
+  "site": "saronic",
+  "tags": [
+    "hero",
+    "dark",
+    "full-bleed",
+    "video",
+    "window-height",
+    "wordmark",
+    "pinned",
+    "scrubbed",
+    "fade",
+    "load-rise",
+    "mono"
+  ],
+  "license": "proprietary",
+  "notes": [
+    "always dark (it carries the `dark` class): light text over footage in either mode",
+    "media fills the whole hero; empty it is a muted placeholder",
+    "use `belowBar` when saronic-announcement sits above it, and saronic-header with `overlay` so the bar floats over it",
+    "CSS only: load rise and the scroll-driven pin/fade are off under reduced motion; without scroll-timeline support everything stays in place"
+  ],
+  "entry": "saronic-hero.tsx",
+  "source": "foundry",
+  "name": "saronic-hero",
+  "files": [
+    {
+      "path": "saronic-hero.css",
+      "content": "/* Slate wash over the footage: darker at the bottom on phones (the copy sits there), a lighter\n   top-and-bottom wash on desktop. Built from the theme's ink (card in a dark scope). */\n.saronic-hero-wash {\n  background: linear-gradient(\n    color-mix(in oklab, var(--card) 50%, transparent) 0%,\n    color-mix(in oklab, var(--card) 20%, transparent) 30%,\n    color-mix(in oklab, var(--card) 20%, transparent) 45%,\n    color-mix(in oklab, var(--card) 90%, transparent) 70%,\n    var(--card) 90%\n  );\n}\n@media (min-width: 64rem) {\n  .saronic-hero-wash {\n    background: linear-gradient(\n      color-mix(in oklab, var(--card) 50%, transparent) 0%,\n      color-mix(in oklab, var(--card) 20%, transparent) 35%,\n      color-mix(in oklab, var(--card) 20%, transparent) 60%,\n      color-mix(in oklab, var(--card) 65%, transparent) 100%\n    );\n  }\n}\n\n/* Load: eyebrow, headline and buttons fade in and rise 24px (1s / 1.1s / 1.2s). */\n@media (prefers-reduced-motion: no-preference) {\n  .saronic-hero-rise {\n    animation: saronic-hero-rise 1s cubic-bezier(0.25, 0.25, 0, 1) both;\n  }\n  h1.saronic-hero-rise { animation-duration: 1.1s; }\n  div.saronic-hero-rise { animation-duration: 1.2s; }\n}\n\n@keyframes saronic-hero-rise {\n  from { opacity: 0; transform: translateY(24px); }\n  to { opacity: 1; transform: none; }\n}\n\n/* Leaving: the footage stays put (it moves down exactly as fast as the hero moves up, inside\n   the hero's clip) and dims to 20% over the second half; wordmark and copy fade out then. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .saronic-hero {\n      view-timeline-name: --saronic-hero;\n    }\n    .saronic-hero-media {\n      animation: saronic-hero-pin linear both;\n      animation-timeline: --saronic-hero;\n      animation-range: exit 0% exit 100%;\n    }\n    .saronic-hero-fade {\n      animation: saronic-hero-fade linear both;\n      animation-timeline: --saronic-hero;\n      animation-range: exit 50% exit 100%;\n    }\n  }\n}\n\n@keyframes saronic-hero-pin {\n  0% { transform: translateY(0); opacity: 1; }\n  50% { opacity: 1; }\n  100% { transform: translateY(100%); opacity: 0.2; }\n}\n\n@keyframes saronic-hero-fade {\n  from { opacity: 1; }\n  to { opacity: 0; }\n}\n"
+    },
+    {
+      "path": "saronic-hero.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { SaronicButton, type SaronicButtonProps } from \"@foundry/saronic-button\";\nimport { SaronicPlaceholder } from \"@foundry/saronic-placeholder\";\nimport \"./saronic-hero.css\";\n\nexport interface SaronicHeroAction {\n  /** the button text */\n  label: ReactNode;\n  /** a shorter text for phones */\n  shortLabel?: ReactNode;\n  href: string;\n  /** the icon after the label */\n  icon?: SaronicButtonProps[\"icon\"];\n  /** primary (lime) or secondary (veil) */\n  variant?: \"primary\" | \"secondary\";\n}\n\nexport interface SaronicHeroProps {\n  /** the mono line above the headline */\n  eyebrow: ReactNode;\n  /** the headline (about three lines on desktop) */\n  title: ReactNode;\n  /** up to two buttons */\n  actions?: SaronicHeroAction[];\n  /** a giant wordmark spread across the top on desktop (the company name) */\n  wordmark?: string;\n  /** the full-bleed video or photo behind everything */\n  media?: ReactNode;\n  /** the hero sits under a 48/64px bar (the announcement strip): it is that much shorter so it still ends at the window bottom */\n  belowBar?: boolean;\n  className?: string;\n}\n\n/**\n * A window-tall hero over full-bleed footage with a slate wash. Desktop spreads a giant\n * stretched wordmark across the top and sets the copy in a column from 60% of the width,\n * 80px off the bottom; phones put the copy at the bottom. On load the eyebrow, headline and\n * buttons rise in, staggered. As the hero scrolls away the footage stays pinned and dims to\n * 20% while the wordmark and copy fade out.\n */\nexport function SaronicHero({ eyebrow, title, actions = [], wordmark, media, belowBar = false, className }: SaronicHeroProps) {\n  return (\n    <section\n      className={cn(\n        \"saronic-hero dark relative isolate flex overflow-clip bg-background text-foreground\",\n        belowBar ? \"h-[calc(100svh-3rem)] lg:h-[calc(100svh-4rem)]\" : \"h-svh\",\n        className,\n      )}\n    >\n      <div className=\"saronic-hero-media absolute inset-0 -z-10\">\n        <SaronicPlaceholder media={media} className=\"absolute inset-0\" />\n        <div aria-hidden className=\"saronic-hero-wash absolute inset-0\" />\n      </div>\n\n      {wordmark && (\n        <div className=\"saronic-hero-fade absolute inset-x-6 top-[calc(4rem+2.5vw)] hidden lg:block\">\n          <svg viewBox=\"0 0 1392 132\" className=\"block h-auto w-full\" role=\"img\" aria-label={wordmark}>\n            <text\n              x=\"0\"\n              y=\"130\"\n              textLength=\"1392\"\n              lengthAdjust=\"spacingAndGlyphs\"\n              fill=\"currentColor\"\n              className=\"font-display text-[180px] font-extrabold uppercase\"\n            >\n              {wordmark}\n            </text>\n          </svg>\n        </div>\n      )}\n\n      <div className=\"saronic-hero-fade mt-auto w-full px-gutter pb-10 lg:pr-20 lg:pb-20 lg:pl-[60%]\">\n        <p className=\"saronic-hero-rise font-mono text-base/[1.5] tracking-[0.04em] uppercase lg:text-[1.49vw]/[1.5]\">{eyebrow}</p>\n        <h1 className=\"saronic-hero-rise mt-3 font-display text-2xl/[1.2] font-medium tracking-[-0.02em] [word-spacing:-0.08em] [animation-delay:0.1s] lg:mt-4 lg:text-[2.43vw]/[1.2]\">\n          {title}\n        </h1>\n        {actions.length > 0 && (\n          <div className=\"saronic-hero-rise mt-10 flex flex-wrap gap-4 [animation-delay:0.2s] lg:mt-16\">\n            {actions.map((action, i) => (\n              <SaronicButton\n                key={i}\n                href={action.href}\n                shortLabel={action.shortLabel}\n                icon={action.icon ?? (i === 0 ? \"down\" : \"arrow\")}\n                variant={action.variant ?? (i === 0 ? \"primary\" : \"secondary\")}\n                className={i === 0 ? \"min-w-45\" : undefined}\n              >\n                {action.label}\n              </SaronicButton>\n            ))}\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "saronic-button",
+    "saronic-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the mono line above the headline"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the headline (about three lines on desktop)"
+    },
+    {
+      "name": "actions",
+      "type": "SaronicHeroAction[]",
+      "required": false,
+      "default": "[]",
+      "description": "up to two buttons"
+    },
+    {
+      "name": "wordmark",
+      "type": "string",
+      "required": false,
+      "description": "a giant wordmark spread across the top on desktop (the company name)"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the full-bleed video or photo behind everything"
+    },
+    {
+      "name": "belowBar",
+      "type": "boolean",
+      "required": false,
+      "default": "false",
+      "description": "the hero sits under a 48/64px bar (the announcement strip): it is that much shorter so it still ends at the window bottom"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "ac405f0ed668ff74f839d5d747b7e5404778d7663b74c886c7183257d234f7f6"
+}

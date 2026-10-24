@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Galaxy header",
+  "description": "A sticky black top bar, 54px on phones and 80px on desktop: mark and lowercase wordmark on the left, four plain nav links centred, a search icon and a login link on the right. Links fade to grey on hover; the wordmark dims to 60%. Phones get a search icon and a menu that drops the links below the bar.",
+  "category": "header",
+  "site": "galaxy",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "nav",
+    "sticky",
+    "dark",
+    "minimal",
+    "hover"
+  ],
+  "notes": [
+    "the phone menu is a <details> element, so it works without JavaScript"
+  ],
+  "entry": "galaxy-header.tsx",
+  "name": "galaxy-header",
+  "files": [
+    {
+      "path": "galaxy-header.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { Hexagon, Menu, Search } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface GalaxyHeaderLink {\n  /** the item's text */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface GalaxyHeaderProps {\n  /** the company name, set as a lowercase wordmark */\n  brand: string;\n  /** where the wordmark links */\n  brandHref?: string;\n  /** the mark before the wordmark; a lucide hexagon when empty */\n  mark?: ReactNode;\n  /** the centred nav items (four on the original) */\n  links: GalaxyHeaderLink[];\n  /** the text link on the right (e.g. a login) */\n  action: GalaxyHeaderLink;\n  /** where the search icon goes */\n  searchHref?: string;\n  /** screen-reader label for the search icon */\n  searchLabel?: string;\n  /** screen-reader label for the phone menu button */\n  menuLabel?: string;\n  className?: string;\n}\n\nconst linkHover = \"transition-colors duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:text-muted-foreground/70 motion-reduce:transition-none\";\n\nexport function GalaxyHeader({ brand, brandHref = \"#\", mark, links, action, searchHref = \"#\", searchLabel, menuLabel, className }: GalaxyHeaderProps) {\n  return (\n    <header className={cn(\"sticky top-0 z-50 bg-background text-foreground\", className)}>\n      <div className=\"relative mx-auto flex h-[3.375rem] max-w-page items-center px-gutter lg:h-20\">\n        <a href={brandHref} className=\"flex items-center gap-2.5 transition-opacity duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] hover:opacity-60 motion-reduce:transition-none\">\n          <span aria-hidden className=\"grid size-[1.875rem] place-items-center [&_svg]:size-full\">\n            {mark ?? <Hexagon strokeWidth={2.25} />}\n          </span>\n          <span className=\"text-[1.375rem] leading-none tracking-[-0.02em] lowercase\">{brand}</span>\n        </a>\n        <nav className=\"absolute left-1/2 hidden -translate-x-1/2 items-center gap-16 lg:flex\">\n          {links.map((link) => (\n            <a key={link.label} href={link.href} className={cn(\"text-base leading-none\", linkHover)}>\n              {link.label}\n            </a>\n          ))}\n        </nav>\n        <div className=\"ml-auto flex items-center gap-7 lg:gap-14\">\n          <a href={searchHref} aria-label={searchLabel} className={linkHover}>\n            <Search aria-hidden className=\"size-[1.125rem]\" strokeWidth={1.75} />\n          </a>\n          <a href={action.href} className={cn(\"hidden text-base leading-none lg:inline lg:mr-8\", linkHover)}>\n            {action.label}\n          </a>\n          <details className=\"group lg:hidden\">\n            <summary aria-label={menuLabel} className=\"grid size-6 cursor-pointer list-none place-items-center [&::-webkit-details-marker]:hidden\">\n              <Menu aria-hidden className=\"size-5\" strokeWidth={1.5} />\n            </summary>\n            <nav className=\"absolute inset-x-0 top-full flex flex-col border-t border-border bg-background px-gutter py-4\">\n              {[...links, action].map((link) => (\n                <a key={link.label} href={link.href} className={cn(\"py-3 text-lg\", linkHover)}>\n                  {link.label}\n                </a>\n              ))}\n            </nav>\n          </details>\n        </div>\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0"
+  },
+  "registryDependencies": [
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as a lowercase wordmark"
+    },
+    {
+      "name": "brandHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the wordmark links"
+    },
+    {
+      "name": "mark",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the mark before the wordmark; a lucide hexagon when empty"
+    },
+    {
+      "name": "links",
+      "type": "GalaxyHeaderLink[]",
+      "required": true,
+      "description": "the centred nav items (four on the original)"
+    },
+    {
+      "name": "action",
+      "type": "GalaxyHeaderLink",
+      "required": true,
+      "description": "the text link on the right (e.g. a login)"
+    },
+    {
+      "name": "searchHref",
+      "type": "string",
+      "required": false,
+      "default": "#",
+      "description": "where the search icon goes"
+    },
+    {
+      "name": "searchLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the search icon"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "description": "screen-reader label for the phone menu button"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "774d5e3f24ff822eed42af6d30a70af4bfd949d2124633a9b29efa7aadfef240"
+}

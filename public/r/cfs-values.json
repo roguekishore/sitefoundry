@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "cfs values",
+  "description": "A people-and-values section: a big light title, a large team photo with a navy quote card overlapping its right side (orange left rule, an orange quote mark, a centred light quote, a short orange vertical rule, monospace name and role), then four values in columns (monospace label over a small paragraph indented behind a hairline) and a ring-arrow link. On phones the photo runs edge to edge and the card overlaps its bottom with an orange top rule.",
+  "category": "testimonials",
+  "site": "cfs",
+  "license": "proprietary",
+  "tags": [
+    "testimonials",
+    "quote",
+    "values",
+    "team",
+    "photo",
+    "overlap",
+    "card",
+    "navy",
+    "light-type",
+    "mono",
+    "grid",
+    "hairline",
+    "flat",
+    "hover"
+  ],
+  "notes": [
+    "the quote card is a `dark` subtree on the theme's card colour (navy in cfs-theme)",
+    "one media slot: the team photo (about 1.12:1 on wide screens, 0.92:1 on phones)"
+  ],
+  "entry": "cfs-values.tsx",
+  "source": "foundry",
+  "name": "cfs-values",
+  "files": [
+    {
+      "path": "cfs-values.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { CfsMedia } from \"@foundry/cfs-media\";\nimport { CfsRingLink } from \"@foundry/cfs-ring-link\";\nimport { CfsSectionTitle } from \"@foundry/cfs-section-title\";\nimport { cn } from \"@foundry/foundry-utils\";\n\nexport interface CfsValue {\n  /** the value's name, set in monospace */\n  label: string;\n  /** a sentence or two about it */\n  text: string;\n}\n\nexport interface CfsValuesProps {\n  /** the section title */\n  title: string;\n  /** the team photo. Empty: a placeholder */\n  media?: ReactNode;\n  /** the quote in the navy card */\n  quote: {\n    /** the quote itself (no quotation marks) */\n    text: string;\n    /** who said it */\n    name: string;\n    /** their role */\n    role: string;\n    /** the decorative quote mark above it (an icon) */\n    mark?: ReactNode;\n  };\n  /** the values, one per column on wide screens (four in the original) */\n  values: CfsValue[];\n  /** the ring-arrow link at the end */\n  link: { label: string; href: string };\n  className?: string;\n}\n\n/** Title, team photo with an overlapping navy quote card, four values and a ring link. */\nexport function CfsValues({ title, media, quote, values, link, className }: CfsValuesProps) {\n  return (\n    <section className={cn(\"overflow-x-clip bg-background py-section text-foreground\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <CfsSectionTitle>{title}</CfsSectionTitle>\n\n        {/* wide screens: photo over the first two tracks, card over the last two, so the card\n            overlaps the photo and still grows with a long quote */}\n        <div className=\"relative mt-[1.625rem] lg:mt-[4.375rem] lg:grid lg:grid-cols-[50.95%_10.65%_1fr]\">\n          <CfsMedia media={media} className=\"-mx-gutter aspect-[390/422] lg:col-span-2 lg:col-start-1 lg:row-start-1 lg:mx-0 lg:aspect-[844/755] lg:self-start\" />\n\n          <figure className=\"dark relative -mt-[2.2rem] flex flex-col items-center justify-center border-t-[3px] border-primary bg-card px-[1.875rem] py-10 text-center text-foreground lg:col-span-2 lg:col-start-2 lg:row-start-1 lg:my-[51px] lg:border-t-0 lg:border-l-[3px] lg:px-20\">\n            {quote.mark && <span className=\"text-primary [&_svg]:size-12 lg:[&_svg]:size-[3.25rem]\">{quote.mark}</span>}\n            <blockquote className=\"mt-7 max-w-[31rem] font-display text-2xl leading-[1.5] font-[350] lg:mt-10 lg:text-[1.9rem]\">\n              {quote.text}\n            </blockquote>\n            <span aria-hidden className=\"mt-7 h-10 w-px bg-primary lg:mt-12 lg:h-20\" />\n            <figcaption className=\"mt-[1.375rem] font-mono text-sm leading-[1.5] lg:mt-7\">\n              <span className=\"block\">{quote.name}</span>\n              <span className=\"block\">{quote.role}</span>\n            </figcaption>\n          </figure>\n        </div>\n\n        <ul className=\"mt-9 grid gap-y-10 lg:mt-[4.125rem] lg:grid-cols-4 lg:gap-x-5\">\n          {values.map((value) => (\n            <li key={value.label}>\n              <p className=\"font-mono text-sm leading-[1.2]\">{value.label}</p>\n              <p className=\"mt-4 ml-5 max-w-[19rem] border-l border-border pl-5 text-base leading-[1.5]\">{value.text}</p>\n            </li>\n          ))}\n        </ul>\n\n        <CfsRingLink {...link} className=\"mt-10 lg:mt-20\" />\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "cfs-media",
+    "cfs-ring-link",
+    "cfs-section-title",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "media",
+      "type": "ReactNode",
+      "required": false,
+      "description": "the team photo. Empty: a placeholder"
+    },
+    {
+      "name": "quote",
+      "type": "{ text: string; name: string; role: string; mark?: ReactNode; }",
+      "required": true,
+      "description": "the quote in the navy card"
+    },
+    {
+      "name": "values",
+      "type": "CfsValue[]",
+      "required": true,
+      "description": "the values, one per column on wide screens (four in the original)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": true,
+      "description": "the ring-arrow link at the end"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "1ea3a73fab8f76309472ccbbde425605459d3a5a85635c358d6da2dee778a733"
+}

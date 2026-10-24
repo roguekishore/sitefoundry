@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Hadrian header",
+  "description": "A fixed navy bar: a wide uppercase wordmark left, a centred strip of hairline-boxed mono cells showing local times at each plant, and a square MENU box right that opens a full-width link panel. It slides up out of view once you scroll down past half a screen and drops back in when you scroll up.",
+  "category": "header",
+  "site": "hadrian",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "fixed",
+    "dark",
+    "navy",
+    "mono",
+    "hairline",
+    "clock",
+    "hide-on-scroll",
+    "menu"
+  ],
+  "notes": [
+    "fixed to the top: the first section needs its own top padding (76px phones, 100px desktop)",
+    "the clock strip shows from 768px; each cell with a timeZone ticks every 30s once hydrated, the static HTML shows the given times",
+    "needs JavaScript for the hide-on-scroll, the clocks and the menu"
+  ],
+  "hydrate": "load",
+  "entry": "hadrian-header.tsx",
+  "source": "foundry",
+  "name": "hadrian-header",
+  "files": [
+    {
+      "path": "hadrian-header.tsx",
+      "content": "import { useEffect, useId, useState } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { HadrianButton } from \"@foundry/hadrian-button\";\nimport { HadrianWordmark } from \"@foundry/hadrian-wordmark\";\n\nexport interface HadrianClock {\n  /** short place code, e.g. \"OH\" */\n  code: string;\n  /** the time shown before JavaScript runs, e.g. \"06:14AM EDT\" */\n  time: string;\n  /** IANA time zone; when given, the cell keeps itself current, e.g. \"America/New_York\" */\n  timeZone?: string;\n}\n\nexport interface HadrianHeaderLink {\n  /** link text (shown uppercase) */\n  label: string;\n  /** where it goes */\n  href: string;\n}\n\nexport interface HadrianHeaderProps {\n  /** the company name, set as the wordmark */\n  brand: string;\n  /** where the wordmark links (usually \"/\") */\n  homeHref?: string;\n  /** the centred strip of local times (hidden on phones) */\n  clocks?: HadrianClock[];\n  /** text of the menu toggle when closed, e.g. \"Menu\" */\n  menuLabel: string;\n  /** text of the menu toggle when open, e.g. \"Close\" */\n  closeLabel: string;\n  /** links in the menu panel */\n  links: HadrianHeaderLink[];\n  /** how far down (in window heights) the page must scroll before the bar slides away */\n  hideAfter?: number;\n  className?: string;\n}\n\nfunction formatTime(timeZone: string) {\n  const parts = new Intl.DateTimeFormat(\"en-US\", {\n    hour: \"2-digit\",\n    minute: \"2-digit\",\n    hour12: true,\n    timeZone,\n    timeZoneName: \"short\",\n  }).formatToParts(new Date());\n  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? \"\";\n  return `${get(\"hour\")}:${get(\"minute\")}${get(\"dayPeriod\").toUpperCase()} ${get(\"timeZoneName\")}`;\n}\n\nfunction Clock({ code, time, timeZone }: HadrianClock) {\n  const [now, setNow] = useState(time);\n  useEffect(() => {\n    if (!timeZone) return;\n    const tick = () => setNow(formatTime(timeZone));\n    tick();\n    const id = setInterval(tick, 30_000);\n    return () => clearInterval(id);\n  }, [timeZone]);\n  return (\n    <>\n      <span className=\"px-2\">{code}</span>\n      <span className=\"px-2\">{now}</span>\n    </>\n  );\n}\n\n/** Fixed bar with wordmark, local-time strip and a MENU box; hides while scrolling down. */\nexport function HadrianHeader({\n  brand,\n  homeHref = \"/\",\n  clocks = [],\n  menuLabel,\n  closeLabel,\n  links,\n  hideAfter = 0.4,\n  className,\n}: HadrianHeaderProps) {\n  const [hidden, setHidden] = useState(false);\n  const [open, setOpen] = useState(false);\n  const panelId = useId();\n\n  useEffect(() => {\n    let last = window.scrollY;\n    const onScroll = () => {\n      const y = window.scrollY;\n      if (y > window.innerHeight * hideAfter && y > last) setHidden(true);\n      else if (y < last) setHidden(false);\n      last = y;\n    };\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => window.removeEventListener(\"scroll\", onScroll);\n  }, [hideAfter]);\n\n  return (\n    <header\n      className={cn(\n        \"fixed inset-x-0 top-0 z-50 bg-background text-foreground transition-[background-color,transform] duration-200 ease-in-out motion-reduce:transition-none\",\n        hidden && !open && \"-translate-y-full\",\n        className,\n      )}\n    >\n      <div className=\"mx-auto grid h-[4.75rem] max-w-page grid-cols-[1fr_auto] items-center px-gutter md:grid-cols-[1fr_auto_1fr] lg:h-[6.25rem]\">\n        <HadrianWordmark name={brand} href={homeHref} className=\"text-[1.625rem] lg:text-[2.25rem]\" />\n        {clocks.length > 0 && (\n          <p className=\"hidden h-[1.625rem] items-center divide-x divide-foreground border border-foreground font-mono text-xs leading-[1.5] whitespace-nowrap uppercase md:flex [&>span]:flex [&>span]:h-full [&>span]:items-center\">\n            {clocks.map((c) => (\n              <Clock key={c.code} {...c} />\n            ))}\n          </p>\n        )}\n        <HadrianButton\n          label={open ? closeLabel : menuLabel}\n          size=\"sm\"\n          onClick={() => setOpen((v) => !v)}\n          expanded={open}\n          controls={panelId}\n          className=\"justify-self-end\"\n        />\n      </div>\n      <nav\n        id={panelId}\n        hidden={!open}\n        className=\"border-t border-foreground bg-background\"\n      >\n        <ul className=\"mx-auto flex max-w-page flex-col px-gutter py-6 lg:flex-row lg:gap-10 lg:py-8\">\n          {links.map((l) => (\n            <li key={l.href}>\n              <a\n                href={l.href}\n                onClick={() => setOpen(false)}\n                className=\"block py-2 font-mono text-base uppercase transition-colors duration-150 hover:text-primary lg:text-lg\"\n              >\n                {l.label}\n              </a>\n            </li>\n          ))}\n        </ul>\n      </nav>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "hadrian-button",
+    "hadrian-wordmark"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the company name, set as the wordmark"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/",
+      "description": "where the wordmark links (usually \"/\")"
+    },
+    {
+      "name": "clocks",
+      "type": "HadrianClock[]",
+      "required": false,
+      "default": "[]",
+      "description": "the centred strip of local times (hidden on phones)"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": true,
+      "description": "text of the menu toggle when closed, e.g. \"Menu\""
+    },
+    {
+      "name": "closeLabel",
+      "type": "string",
+      "required": true,
+      "description": "text of the menu toggle when open, e.g. \"Close\""
+    },
+    {
+      "name": "links",
+      "type": "HadrianHeaderLink[]",
+      "required": true,
+      "description": "links in the menu panel"
+    },
+    {
+      "name": "hideAfter",
+      "type": "number",
+      "required": false,
+      "default": "0.4",
+      "description": "how far down (in window heights) the page must scroll before the bar slides away"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "0a2803bd13b170865bfd10caf3b8482ff74442e0631ac56ce7e9fb10e8b8b605"
+}

@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Levels feature cards",
+  "description": "A cool-grey section: a big left-aligned heading, three tall white cards with hairline borders and 10px corners (a 4:3 media frame on top, then a title, grey paragraph and green-dotted list), six smaller white cards with a pale green icon tile, title and short text in a 3×2 grid, and a centred green arrow link. The card media zooms slightly on hover.",
+  "category": "features",
+  "site": "levels",
+  "source": "foundry",
+  "license": "proprietary",
+  "tags": [
+    "features",
+    "cards",
+    "grid",
+    "icons",
+    "light",
+    "minimal",
+    "hover",
+    "zoom"
+  ],
+  "notes": [
+    "each big card's media fills a 4:3 frame like object-fit: cover; empty, a dark app-screen placeholder stands in"
+  ],
+  "entry": "levels-patterns.tsx",
+  "name": "levels-patterns",
+  "files": [
+    {
+      "path": "levels-patterns.tsx",
+      "content": "import type { ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { LevelsHeading } from \"@foundry/levels-heading\";\nimport { LevelsIconTile } from \"@foundry/levels-icon-tile\";\nimport { LevelsLink } from \"@foundry/levels-link\";\nimport { LevelsPlaceholder } from \"@foundry/levels-placeholder\";\n\nexport interface LevelsPatternsCard {\n  /** the card title */\n  title: ReactNode;\n  /** grey paragraph */\n  body: ReactNode;\n  /** green-dotted points */\n  points: ReactNode[];\n  /** media on top; fills a 4:3 frame. Empty: a placeholder */\n  media?: ReactNode;\n  /** screen-reader label for the placeholder */\n  mediaLabel?: string;\n}\n\nexport interface LevelsPatternsFeature {\n  /** icon in the pale green tile, e.g. a lucide icon element */\n  icon: ReactNode;\n  /** short title */\n  title: ReactNode;\n  /** one or two lines of grey text */\n  body: ReactNode;\n}\n\nexport interface LevelsPatternsProps {\n  /** small tracked capitals above the title */\n  eyebrow?: string;\n  /** the section title */\n  title: ReactNode;\n  /** grey text under the title */\n  lead?: ReactNode;\n  /** the tall cards with media (three on the original) */\n  cards: LevelsPatternsCard[];\n  /** the small icon cards (six on the original) */\n  features?: LevelsPatternsFeature[];\n  /** the centred green link at the end */\n  link?: { label: string; href: string };\n  /** id for in-page links */\n  id?: string;\n  className?: string;\n}\n\n/** Heading, three media cards, six icon cards and a link. */\nexport function LevelsPatterns({ eyebrow, title, lead, cards, features, link, id, className }: LevelsPatternsProps) {\n  return (\n    <section id={id} className={cn(\"bg-muted px-gutter py-[calc(var(--section-y)*0.75)] lg:py-section\", className)}>\n      <div className=\"mx-auto max-w-page\">\n        <LevelsHeading eyebrow={eyebrow} title={title} lead={lead} />\n\n        <ul className=\"mt-16 grid gap-6 lg:grid-cols-3\">\n          {cards.map((card, i) => (\n            <li key={i} className=\"group overflow-clip rounded-lg border border-border bg-card\">\n              <div className=\"aspect-[1.33] overflow-clip\">\n                <div className=\"size-full transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:scale-[1.02] motion-reduce:transition-none [&>*]:size-full [&>img]:object-cover\">\n                  {card.media ?? <LevelsPlaceholder tone=\"film\" label={card.mediaLabel} />}\n                </div>\n              </div>\n              <div className=\"px-8 pt-8 pb-9\">\n                <h3 className=\"font-display text-[1.75rem] leading-[1.55] font-[550] tracking-[-0.03em] text-card-foreground\">\n                  {card.title}\n                </h3>\n                <p className=\"mt-4 text-base leading-7 text-muted-foreground\">{card.body}</p>\n                <ul className=\"mt-6 flex flex-col gap-3\">\n                  {card.points.map((point, j) => (\n                    <li key={j} className=\"flex gap-3 text-sm leading-6 text-secondary-foreground\">\n                      <span aria-hidden className=\"mt-[0.5625rem] size-1.5 shrink-0 rounded-full bg-highlight\" />\n                      <span>{point}</span>\n                    </li>\n                  ))}\n                </ul>\n              </div>\n            </li>\n          ))}\n        </ul>\n\n        {features?.length ? (\n          <ul className=\"mt-6 grid gap-[1.125rem] sm:grid-cols-2 lg:grid-cols-3\">\n            {features.map((feature, i) => (\n              <li key={i} className=\"rounded-lg border border-border bg-card p-6\">\n                <LevelsIconTile>{feature.icon}</LevelsIconTile>\n                <h3 className=\"mt-7 font-display text-xl leading-7 font-[550] tracking-[-0.02em] text-card-foreground\">\n                  {feature.title}\n                </h3>\n                <p className=\"mt-2 text-sm leading-7 text-muted-foreground\">{feature.body}</p>\n              </li>\n            ))}\n          </ul>\n        ) : null}\n\n        {link ? (\n          <div className=\"mt-12 flex justify-center\">\n            <LevelsLink href={link.href}>{link.label}</LevelsLink>\n          </div>\n        ) : null}\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "foundry-utils",
+    "levels-heading",
+    "levels-icon-tile",
+    "levels-link",
+    "levels-placeholder"
+  ],
+  "props": [
+    {
+      "name": "eyebrow",
+      "type": "string",
+      "required": false,
+      "description": "small tracked capitals above the title"
+    },
+    {
+      "name": "title",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the section title"
+    },
+    {
+      "name": "lead",
+      "type": "ReactNode",
+      "required": false,
+      "description": "grey text under the title"
+    },
+    {
+      "name": "cards",
+      "type": "LevelsPatternsCard[]",
+      "required": true,
+      "description": "the tall cards with media (three on the original)"
+    },
+    {
+      "name": "features",
+      "type": "LevelsPatternsFeature[]",
+      "required": false,
+      "description": "the small icon cards (six on the original)"
+    },
+    {
+      "name": "link",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the centred green link at the end"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": false,
+      "description": "id for in-page links"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "e4e6e2c31fe427cde908c574d3611c29a96394856dce22a49b95206493672c96"
+}

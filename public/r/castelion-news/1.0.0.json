@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Castelion news",
+  "description": "A newsroom on the page colour: a big bold navy title with a red button at the right, then a page-wide 16:9 banner picture with a page-colour text box inset on its left (date, two-line headline, justified summary). Under a 2px navy rule, two rows of square picture + headline + two-column justified text on the left, and a tall card with a square picture on the right behind a vertical rule. Phones stack every post as square picture, date, headline and text between rules, with the button centred at the end. Posts rise into place as they scroll in.",
+  "category": "features",
+  "site": "castelion",
+  "license": "proprietary",
+  "tags": [
+    "news",
+    "blog",
+    "posts",
+    "editorial",
+    "rules",
+    "navy",
+    "cream",
+    "red",
+    "justified",
+    "reveal",
+    "scrubbed",
+    "split-lines",
+    "hover"
+  ],
+  "notes": [
+    "slots: one banner picture (16:9 on desktop, square on phones) and a square picture per post; empty they are muted surfaces",
+    "headlines are clamped to two lines, like the original",
+    "the aside card spans the left rows on desktop and sits after the first row on phones"
+  ],
+  "entry": "castelion-news.tsx",
+  "source": "foundry",
+  "name": "castelion-news",
+  "files": [
+    {
+      "path": "castelion-news.css",
+      "content": "/* Posts rise 64px into place as they enter. */\n@supports (animation-timeline: view()) {\n  @media (prefers-reduced-motion: no-preference) {\n    .castelion-news-rise {\n      animation: castelion-news-rise linear both;\n      animation-timeline: view();\n      animation-range: entry 0px entry 320px;\n    }\n  }\n}\n\n@keyframes castelion-news-rise {\n  from { transform: translateY(64px); }\n  to { transform: none; }\n}\n"
+    },
+    {
+      "path": "castelion-news.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { CastelionButton } from \"@foundry/castelion-button\";\nimport { CastelionLines } from \"@foundry/castelion-lines\";\nimport { CastelionPlaceholder } from \"@foundry/castelion-placeholder\";\nimport \"./castelion-news.css\";\n\nexport interface CastelionPost {\n  /** the date line, e.g. \"October 2, 2026\" */\n  date: string;\n  /** the headline (clamped to two lines) */\n  title: string;\n  /** the summary */\n  summary: string;\n  /** link to the post */\n  href: string;\n  /** the post's picture (empty: a muted surface) */\n  image?: ReactNode;\n  /** what the picture shows, for screen readers while the slot is empty */\n  imageLabel?: string;\n}\n\nexport interface CastelionNewsProps {\n  /** the section title, one entry per desktop line */\n  title: string[];\n  /** the lead story, shown as a banner with an inset text box on desktop */\n  featured: CastelionPost;\n  /** the rows on the left (picture beside text) */\n  posts: CastelionPost[];\n  /** the tall card on the right */\n  aside: CastelionPost;\n  /** the button's text */\n  ctaLabel: string;\n  /** where the button goes */\n  ctaHref: string;\n  className?: string;\n}\n\nconst body = \"text-justify text-[clamp(0.875rem,0.829rem+0.19vw,1rem)]/[1.4] font-medium\";\nconst date = \"text-sm/[1.4] font-bold tracking-[0.02em]\";\nconst headline =\n  \"line-clamp-2 font-display text-[clamp(1.375rem,1.143rem+0.952vw,2rem)]/[1.27] font-bold tracking-[0.02em] underline decoration-transparent decoration-2 underline-offset-4 transition-[text-decoration-color] duration-500 ease-[ease] group-hover:decoration-current motion-reduce:transition-none\";\n\n/** Date, headline and summary of one post. */\nfunction PostText({ post, columns }: { post: CastelionPost; columns?: boolean }) {\n  return (\n    <>\n      <p className={date}>{post.date}</p>\n      <h3 className={cn(headline, \"mt-3.5\")}>\n        <a href={post.href}>{post.title}</a>\n      </h3>\n      <p className={cn(body, \"mt-4\", columns && \"xl:columns-2 xl:gap-[1.625rem]\")}>{post.summary}</p>\n    </>\n  );\n}\n\n/** Newsroom: title and button, a banner story, rows of posts and a tall aside card. */\nexport function CastelionNews({ title, featured, posts, aside, ctaLabel, ctaHref, className }: CastelionNewsProps) {\n  const items: { post: CastelionPost; kind: \"row\" | \"aside\"; row: number }[] = [\n    ...posts.slice(0, 1).map((post) => ({ post, kind: \"row\" as const, row: 1 })),\n    { post: aside, kind: \"aside\" as const, row: 1 },\n    ...posts.slice(1).map((post, i) => ({ post, kind: \"row\" as const, row: i + 2 })),\n  ];\n\n  return (\n    <section className={cn(\"bg-background pt-section pb-14 text-foreground lg:pb-36\", className)}>\n      <div className=\"mx-auto max-w-page px-gutter\">\n        <div className=\"flex items-center justify-between gap-6\">\n          <CastelionLines\n            as=\"h2\"\n            lines={title}\n            className=\"font-display text-[clamp(1.8125rem,1.279rem+2.19vw,3.25rem)]/[1.29] font-bold tracking-[0.02em]\"\n          />\n          <CastelionButton label={ctaLabel} href={ctaHref} className=\"hidden w-[16.3rem] shrink-0 lg:inline-flex\" />\n        </div>\n\n        {/* the banner story */}\n        <article className=\"castelion-news-rise group relative mt-4 lg:mt-12\">\n          <CastelionPlaceholder\n            media={featured.image}\n            label={featured.imageLabel}\n            className=\"aspect-square rounded-lg lg:aspect-[16/9]\"\n          />\n          <div className=\"mt-7 lg:absolute lg:top-[14.1%] lg:left-[6.65%] lg:mt-0 lg:w-[41%] lg:rounded-sm lg:bg-background lg:p-[2.625rem]\">\n            <PostText post={featured} />\n          </div>\n        </article>\n\n        {/* the rows and the aside card */}\n        <div\n          className=\"lg:mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_36.4%] lg:border-t-2 lg:border-border lg:pt-10\"\n          style={{ \"--castelion-news-rows\": Math.max(posts.length, 1) } as CSSProperties}\n        >\n          {items.map(({ post, kind, row }) => (\n            <article\n              key={post.href + post.title}\n              className={cn(\n                \"castelion-news-rise group mt-8 border-t-2 border-border pt-8 lg:mt-0 lg:border-t-0 lg:pt-0\",\n                kind === \"row\" && \"lg:col-start-1 lg:grid lg:grid-cols-[43.4%_minmax(0,1fr)] lg:items-start lg:gap-[2.375rem] lg:[grid-row:var(--castelion-news-row)]\",\n                kind === \"row\" && row > 1 && \"lg:mt-10 lg:border-t-2 lg:pt-10\",\n                kind === \"aside\" &&\n                  \"lg:col-start-2 lg:ml-10 lg:border-l-2 lg:pl-[2.375rem] lg:[grid-row:1/span_var(--castelion-news-rows)]\",\n              )}\n              style={{ \"--castelion-news-row\": row } as CSSProperties}\n            >\n              <CastelionPlaceholder media={post.image} label={post.imageLabel} className=\"aspect-square rounded-lg\" />\n              <div className={cn(\"mt-7\", kind === \"row\" ? \"lg:mt-3\" : \"lg:mt-11\")}>\n                <PostText post={post} columns={kind === \"row\"} />\n              </div>\n            </article>\n          ))}\n        </div>\n\n        <div className=\"mt-14 flex justify-center lg:hidden\">\n          <CastelionButton label={ctaLabel} href={ctaHref} className=\"w-[16.25rem]\" />\n        </div>\n      </div>\n    </section>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {},
+  "registryDependencies": [
+    "castelion-button",
+    "castelion-lines",
+    "castelion-placeholder",
+    "foundry-utils"
+  ],
+  "props": [
+    {
+      "name": "title",
+      "type": "string[]",
+      "required": true,
+      "description": "the section title, one entry per desktop line"
+    },
+    {
+      "name": "featured",
+      "type": "CastelionPost",
+      "required": true,
+      "description": "the lead story, shown as a banner with an inset text box on desktop"
+    },
+    {
+      "name": "posts",
+      "type": "CastelionPost[]",
+      "required": true,
+      "description": "the rows on the left (picture beside text)"
+    },
+    {
+      "name": "aside",
+      "type": "CastelionPost",
+      "required": true,
+      "description": "the tall card on the right"
+    },
+    {
+      "name": "ctaLabel",
+      "type": "string",
+      "required": true,
+      "description": "the button's text"
+    },
+    {
+      "name": "ctaHref",
+      "type": "string",
+      "required": true,
+      "description": "where the button goes"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "f690120b08c823dfed985aecce26818f8505e0492321d8ee6790e1fea025863d"
+}

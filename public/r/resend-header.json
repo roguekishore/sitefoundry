@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "version": "1.0.0",
+  "type": "block",
+  "title": "Resend header",
+  "description": "A slim sticky bar on black: wordmark left, seven quiet grey links centred (most with a small chevron that dips on hover), log in and a graphite button right. It drops in from above on load, and gains a hairline and a blurred dark backdrop once the page scrolls. Phones get a menu button that opens a full-width link list.",
+  "category": "header",
+  "site": "resend",
+  "license": "proprietary",
+  "tags": [
+    "header",
+    "sticky",
+    "dark",
+    "minimal",
+    "blur",
+    "load-in",
+    "scroll-driven"
+  ],
+  "notes": [
+    "the hairline/backdrop fade is a CSS scroll() timeline; browsers without it show the solid bar from the start",
+    "needs JavaScript only for the phone menu"
+  ],
+  "hydrate": "load",
+  "entry": "resend-header.tsx",
+  "source": "foundry",
+  "name": "resend-header",
+  "files": [
+    {
+      "path": "resend-header.css",
+      "content": "/* On load the bar drops in from above and fades in (the original's 1s slide-down-fade). */\n.resend-header {\n  animation: resend-header-drop 1s cubic-bezier(0.16, 1, 0.3, 1) both;\n}\n\n/* Transparent over the hero; the hairline and dark blur fade in over the first 120px of scroll. */\n@supports (animation-timeline: scroll()) {\n  .resend-header-bar {\n    animation: resend-header-solid linear both;\n    animation-timeline: scroll(root);\n    animation-range: 0 120px;\n  }\n}\n\n@keyframes resend-header-drop {\n  from { transform: translateY(-100%); opacity: 0; }\n  to { transform: none; opacity: 1; }\n}\n\n@keyframes resend-header-solid {\n  from { border-color: transparent; background-color: transparent; backdrop-filter: none; }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .resend-header,\n  .resend-header-bar { animation: none; }\n}\n"
+    },
+    {
+      "path": "resend-header.tsx",
+      "content": "import { useState, type ReactNode } from \"react\";\nimport { ChevronDown, Menu, X } from \"lucide-react\";\nimport { cn } from \"@foundry/foundry-utils\";\nimport { ResendButton } from \"@foundry/resend-button\";\nimport \"./resend-header.css\";\n\nexport interface ResendHeaderLink {\n  label: string;\n  href: string;\n  /** shows a small chevron (a menu in the original) */\n  hasMenu?: boolean;\n}\n\nexport interface ResendHeaderProps {\n  /** the brand's name: the home link's label for screen readers */\n  brand: string;\n  /** the wordmark (an svg, img or styled text) */\n  logo: ReactNode;\n  homeHref?: string;\n  /** the centred links */\n  links: ResendHeaderLink[];\n  /** the quiet text link before the button (log in) */\n  secondary?: { label: string; href: string };\n  /** the graphite button at the right end */\n  cta?: { label: string; href: string };\n  /** label of the phone menu button, for screen readers */\n  menuLabel?: string;\n  className?: string;\n}\n\nexport function ResendHeader({ brand, logo, homeHref = \"/\", links, secondary, cta, menuLabel = \"Menu\", className }: ResendHeaderProps) {\n  const [open, setOpen] = useState(false);\n  return (\n    <header className={cn(\"resend-header sticky top-0 z-40\", className)}>\n      <div className=\"resend-header-bar border-b border-border bg-background/80 backdrop-blur-md\">\n        <div className=\"mx-auto flex h-[4.625rem] max-w-page items-center px-gutter lg:h-[3.625rem]\">\n          <a href={homeHref} aria-label={brand} className=\"flex shrink-0 items-center text-foreground lg:flex-1 [&_svg]:h-5 [&_svg]:w-auto\">\n            {logo}\n          </a>\n          <nav className=\"hidden items-center lg:flex\">\n            {links.map((link) => (\n              <a\n                key={link.href}\n                href={link.href}\n                className=\"group/link flex h-9 items-center gap-1 px-3 text-sm text-muted-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground motion-reduce:transition-none\"\n              >\n                {link.label}\n                {link.hasMenu && (\n                  <ChevronDown\n                    aria-hidden\n                    className=\"size-3.5 opacity-70 transition-transform duration-150 group-hover/link:translate-y-0.5 motion-reduce:transition-none\"\n                    strokeWidth={1.75}\n                  />\n                )}\n              </a>\n            ))}\n          </nav>\n          <div className=\"ml-auto flex items-center gap-4 lg:flex-1 lg:justify-end\">\n            {secondary && (\n              <a\n                href={secondary.href}\n                className=\"hidden px-3 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground motion-reduce:transition-none lg:block\"\n              >\n                {secondary.label}\n              </a>\n            )}\n            {cta && (\n              <ResendButton href={cta.href} size=\"sm\" className=\"hidden lg:inline-flex\">\n                {cta.label}\n              </ResendButton>\n            )}\n            <button\n              type=\"button\"\n              aria-label={menuLabel}\n              aria-expanded={open}\n              onClick={() => setOpen((o) => !o)}\n              className=\"-mr-2 flex size-10 items-center justify-center rounded-md text-foreground hover:bg-accent lg:hidden\"\n            >\n              {open ? <X className=\"size-5\" strokeWidth={1.5} /> : <Menu className=\"size-5\" strokeWidth={1.5} />}\n            </button>\n          </div>\n        </div>\n        {open && (\n          <nav className=\"border-t border-border px-gutter pt-2 pb-6 lg:hidden\">\n            {links.map((link) => (\n              <a key={link.href} href={link.href} className=\"flex h-12 items-center border-b border-border text-base text-foreground\">\n                {link.label}\n              </a>\n            ))}\n            <div className=\"mt-6 flex flex-col gap-3\">\n              {cta && <ResendButton href={cta.href}>{cta.label}</ResendButton>}\n              {secondary && (\n                <ResendButton href={secondary.href} variant=\"ghost\">\n                  {secondary.label}\n                </ResendButton>\n              )}\n            </div>\n          </nav>\n        )}\n      </div>\n    </header>\n  );\n}\n"
+    }
+  ],
+  "dependencies": {
+    "lucide-react": "^1.59.0",
+    "react": "^19.3.1"
+  },
+  "registryDependencies": [
+    "foundry-utils",
+    "resend-button"
+  ],
+  "props": [
+    {
+      "name": "brand",
+      "type": "string",
+      "required": true,
+      "description": "the brand's name: the home link's label for screen readers"
+    },
+    {
+      "name": "logo",
+      "type": "ReactNode",
+      "required": true,
+      "description": "the wordmark (an svg, img or styled text)"
+    },
+    {
+      "name": "homeHref",
+      "type": "string",
+      "required": false,
+      "default": "/"
+    },
+    {
+      "name": "links",
+      "type": "ResendHeaderLink[]",
+      "required": true,
+      "description": "the centred links"
+    },
+    {
+      "name": "secondary",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the quiet text link before the button (log in)"
+    },
+    {
+      "name": "cta",
+      "type": "{ label: string; href: string; }",
+      "required": false,
+      "description": "the graphite button at the right end"
+    },
+    {
+      "name": "menuLabel",
+      "type": "string",
+      "required": false,
+      "default": "Menu",
+      "description": "label of the phone menu button, for screen readers"
+    },
+    {
+      "name": "className",
+      "type": "string",
+      "required": false
+    }
+  ],
+  "hash": "556395d77520dc0207a8c3b25b9106ecc66ff0ed7f50173ae4badb803e257a5b"
+}
