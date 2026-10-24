@@ -20,7 +20,7 @@ export const caseAgentsSample: VercelCaseProps = {
 
 export const caseAppsSample: VercelCaseProps = {
   title: "Launch apps that grow from one user to every user",
-  titleClassName: "lg:max-w-[10.5em]",
+  titleClassName: "lg:max-w-[11.5em]",
   lead: "Relaylane serves 90 million",
   rest: "monthly page views on Halyard.",
   featuresLabel: "Built with",

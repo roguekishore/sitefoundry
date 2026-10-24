@@ -36,7 +36,7 @@ export function VercelCta({ title, primary, copy, icons = [], className }: Verce
   return (
     <section className={cn("bg-background px-gutter py-52 text-center text-foreground lg:py-[17rem]", className)}>
       <div className="mx-auto flex max-w-page flex-col items-center">
-        <VercelHeading className="max-w-[7em] lg:max-w-none">{title}</VercelHeading>
+        <VercelHeading className="max-w-[9.5em] lg:max-w-none">{title}</VercelHeading>
         <div className="mt-11 flex flex-col items-center gap-3 lg:mt-10 lg:flex-row">
           <VercelButton href={primary.href}>{primary.label}</VercelButton>
           {copy ? (

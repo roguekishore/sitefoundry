@@ -105,3 +105,20 @@ header sticky with the scroll-linked hairline; marquee and phone line cycle runn
 | CTA | ok (674 vs content) | 680 vs 688 | copy label fade ✓ | — |
 | footer | ok (1955 vs 1958) | 871 vs 846 | link hover ✓ | close enough |
 | placeholders | case windows read as grey windows where the original shows white screenshots | same | — | kept: a placeholder must read as one |
+
+## Comparison round 2
+
+Section tops at 1440 now land on the original's: first case heading at 1108 (orig 1108),
+second at 2039 (orig 2038); page 6041px vs 5986. Header 64px. Phone line cycle visible and
+staggered; marquee running; overflow fits at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| case 2 | ok | heading 3 lines vs 2 (pushed the rest 56px down) | — | yes: heading width 11.5em (measured: 112px = 2 lines) |
+| CTA | heading 3 lines vs 2 | ok | — | yes: phone width 9.5em (measured: 80px = 2 lines) |
+| hero | haze still pale on phones (it is a placeholder; the original's art is a black shape) | ok | ✓ | kept |
+| shipped | ok | ok | ✓ | — |
+| footer | ok | +25px taller (longer fictional link lists) | ✓ | kept (content) |
+
+Re-theme: `vercel-shipped` and `vercel-case` under `sample-ember` take its serif, cream and
+greens cleanly; `vercel-hero` in the dark sibling reads well (haze turns into a soft light).
