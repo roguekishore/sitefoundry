@@ -60,7 +60,7 @@ Encode Sans Expanded (wordmark, marquee, footer company name only).
 | hero words | scrubbed with scroll | opacity 1 → 0, translateY 0 → 15px (390) / 36px (1440) | scroll 47svh → 97svh (390) / 147svh (1440) | CSS `animation-timeline: scroll(root)` with ranges set per breakpoint |
 | hero | pinned | hero stays fixed behind the page for its whole length | – | `position: sticky; top: 0` on the hero; later blocks are `relative bg-background` and slide over |
 | hero buttons | hover | faint white wash | 150ms | `hover:bg-foreground/5` |
-| platform box | entering view (inferred) | opacity 0 → 1, rise 32px | entry 0% → entry 60% | CSS `view()` |
+| platform box | entering view (inferred) | opacity 0 → 1, rise 32px | entry 0px → entry 360px | CSS `view()` |
 | careers marquee | loop | translateX 0 → −50% | ~28s linear infinite | CSS `@keyframes` |
 | careers button | hover | gold dims slightly | 150ms | `hover:bg-primary/85` |
 | page | smooth scrolling | Lenis seen | – | `hadrian-smooth-scroll` component (Lenis), `hydrate: load` |
@@ -92,3 +92,38 @@ by scroll velocity). Built as a plain CSS loop.
   static HTML shows the sample times.
 - **Gutters**: `--page-gutter` 1rem on phones, 3.75rem from 1024px (theme media query); the
   hero frame uses its own 1rem / 1.5rem as the original does.
+
+## Comparison round 1
+
+Page height 3462 vs 3459 (1440), 3393 vs 3417 (390). Sections line up within a few px apart
+from those below.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | wordmark 147px wide vs 130 | 194 vs 175, a touch heavy | hides at 814/868px vs 396/423 (threshold 0.47 window missed the first half-screen sample) | yes: smaller wordmark, semibold, hides past 0.4 window |
+| hero | – | Hanken's word spaces wider than Söhne's; subtitle wrapped to 2 lines (copy longer) | words start fading at 814/868 vs 396/423; subtitle (desktop) half-gone at 420 vs gone | yes: −0.035em tracking, −0.06em word spacing; shorter subtitle; fade from 25svh, subtitle 10–40svh |
+| hero | pinned 5 half-screens vs 7–8 | same | sticky ends with `main`, the original's fixed layer lasts to the footer; looks the same (all later sections are opaque) | no (no visible difference) |
+| platform | 815 vs 805 tall | 1028 vs 1028 | reveal 0→1, 32px, 394–814 | – |
+| model | 844 vs 839 | 661 vs 692: card copy one line shorter each | – | yes: card copy lengthened to the original's 3/3/4 lines |
+| careers | 485 vs 543: 48px padding vs 64; heading is medium (500) on phones; body narrower (5 lines); button 40px tall; marquee caps ~10% narrower than Breit | 597 vs 591 | marquee loop ✓ | yes: py-16, medium heading on phones, narrower body, taller button, marquee 15px / 20px |
+| footer | 405 vs 386; mono links are 16px on phones; wordmark too big/heavy | 277 vs 248: 13px too low, rows 13px too far apart | hover gold ✓ | yes: padding and gaps, 16px links, wordmark 2.25rem semibold |
+
+## Comparison round 2
+
+Section heights now (ours / original): 390: hero 844/844 (window), platform 815/805, model
+851/839, careers 546/543, footer 390/386 · 1440: hero 900/900 (window), platform 1028/1028,
+model 683/692, careers 599/591, footer 247/248. No sideways overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | ✓ | ✓ | hides at 394/420 vs 396/423 ✓ | – |
+| hero | ✓ (window-sized, frame and buttons in place) | ✓ | words fade+sink 394→/420–1320 vs 396–817/423–1322 ✓; desktop subtitle gone by 420 vs 423 ✓; load stagger ✓ | – |
+| platform | box 30px lower in the mid-scroll frame (Lenis glide + reveal) | ✓ | reveal (inferred) | no (artifact) |
+| model | ✓ | 9px short (copy wraps one word earlier in Söhne) | – | no (content) |
+| careers | ✓ (5-line body, medium heading) | ✓ | marquee loop ✓, edge fades ✓ | – |
+| footer | ✓ | ✓ | hover gold ✓ | – |
+| re-theme | hero and careers under `sample-ember` read correctly (sand page, ember button, green frame hairline); light sibling of the hadrian theme keeps the model band dark | | | ✓ |
+
+Remaining, by choice: Hanken Grotesk is still a little wider and rounder than Söhne (its
+`a`, `g` and `y` differ); Encode Sans Expanded is ~10% narrower than Söhne Breit; the hero
+stays pinned until `main` ends rather than the whole page (no visible difference).

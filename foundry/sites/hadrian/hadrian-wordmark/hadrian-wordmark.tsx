@@ -11,7 +11,7 @@ export interface HadrianWordmarkProps {
 
 /** Wide, heavy uppercase text standing in for a logo. */
 export function HadrianWordmark({ name, href, className }: HadrianWordmarkProps) {
-  const classes = cn("inline-block font-display font-bold leading-none tracking-[-0.01em] uppercase", className);
+  const classes = cn("inline-block font-display font-semibold leading-none tracking-[-0.01em] uppercase", className);
   return href ? (
     <a href={href} className={classes}>
       {name}

@@ -33,10 +33,10 @@ const link = "transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] ho
 export function HadrianFooter({ brand, homeHref = "/", company, links, legal, place, placeIcon, className }: HadrianFooterProps) {
   return (
     <footer className={cn("relative border-t border-foreground bg-background text-foreground", className)}>
-      <div className="mx-auto max-w-page px-gutter pt-[3.75rem] pb-[4.25rem]">
-        <div className="flex flex-col items-center gap-[1.625rem] lg:flex-row lg:justify-between">
-          <HadrianWordmark name={brand} href={homeHref} className="text-[2.5rem] lg:text-[2.5rem]" />
-          <ul className="flex gap-8 font-mono text-sm leading-none uppercase lg:text-base">
+      <div className="mx-auto max-w-page px-gutter pt-12 pb-16 lg:pt-12 lg:pb-[4.25rem]">
+        <div className="flex flex-col items-center gap-3 lg:flex-row lg:justify-between">
+          <HadrianWordmark name={brand} href={homeHref} className="text-[2.25rem]" />
+          <ul className="flex gap-8 font-mono text-base leading-none uppercase">
             {links.map((l) => (
               <li key={l.href}>
                 <a href={l.href} className={link}>
@@ -46,9 +46,9 @@ export function HadrianFooter({ brand, homeHref = "/", company, links, legal, pl
             ))}
           </ul>
         </div>
-        <div className="mt-[4.25rem] flex flex-col items-center gap-[2.25rem] lg:flex-row lg:justify-between">
-          <p className="font-display text-sm leading-none font-semibold uppercase lg:text-base">{company}</p>
-          <div className="flex flex-col items-center gap-[1.875rem] font-mono text-sm leading-none uppercase lg:flex-row lg:gap-8 lg:text-base">
+        <div className="mt-[4.5rem] flex flex-col items-center gap-10 lg:mt-14 lg:flex-row lg:justify-between">
+          <p className="font-display text-[0.9375rem] leading-none font-semibold uppercase lg:text-base">{company}</p>
+          <div className="flex flex-col items-center gap-9 font-mono text-base leading-none uppercase lg:flex-row lg:gap-8">
             <ul className="flex gap-8 text-muted-foreground">
               {legal.map((l) => (
                 <li key={l.href}>

@@ -8,15 +8,15 @@ export const modelSample: HadrianModelProps = {
   items: [
     {
       title: "Machined Parts",
-      text: "Tight-tolerance parts for aerospace and energy programs, from first article to full-rate runs.",
+      text: "We machine tight-tolerance parts for aerospace and energy programs, holding drawing and date from first article to full-rate runs.",
     },
     {
       title: "Dedicated Cells",
-      text: "Reserved machining and inspection cells, run by our crews in our plants or on your floor.",
+      text: "Reserved machining or inspection cells, run by our own crews inside a Kestrel plant or on your floor.",
     },
     {
       title: "Turnkey Plants",
-      text: "Whole part, assembly and component plants that we design, build and run around your hardest programs.",
+      text: "Whole part, assembly and component plants that Kestrel designs, builds and runs around the country's toughest and most urgent production programs.",
     },
   ],
 };
