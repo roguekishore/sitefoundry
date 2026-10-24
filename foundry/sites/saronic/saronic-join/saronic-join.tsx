@@ -27,9 +27,9 @@ export function SaronicJoin({ eyebrow, title, cta, media, className }: SaronicJo
       <div className="relative flex flex-col bg-primary px-4 pt-10 pb-10 text-primary-foreground lg:absolute lg:right-10 lg:bottom-10 lg:min-h-[23.25rem] lg:w-[32vw] lg:rounded-lg lg:p-10">
         <div className="flex items-center gap-2 lg:justify-between">
           <span aria-hidden className="order-first size-1 shrink-0 rounded-full bg-current lg:order-last lg:size-2" />
-          <p className="font-mono text-xs/[1.5] tracking-[0.025em] uppercase">{eyebrow}</p>
+          <p className="font-mono text-xs/[1.5] tracking-[0.06em] uppercase">{eyebrow}</p>
         </div>
-        <h2 className="mt-11 font-display text-xl/[1.25] font-normal tracking-[-0.02em] lg:mt-12 lg:max-w-[23vw] lg:text-[min(1.96vw,2.25rem)]/[1.25]">
+        <h2 className="mt-11 font-display text-xl/[1.25] font-normal tracking-[-0.02em] [word-spacing:-0.08em] lg:mt-12 lg:max-w-[23vw] lg:text-[min(1.96vw,2.25rem)]/[1.25]">
           {title}
         </h2>
         {cta && (

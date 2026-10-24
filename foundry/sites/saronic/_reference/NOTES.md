@@ -108,3 +108,23 @@ footer's bottom-right; it moves with the footer in the frames, so it's built sta
   switches "SPECIFICATIONS" → "SPECS"): buttons take an optional `shortLabel`.
 - Social icons in the footer are lucide generics passed in as props (lucide 1.x has no brand
   icons, and theirs aren't ours to copy).
+
+## Comparison round 1
+
+Heights already matched within a few px at both widths (hero 796/836 under the bar, news
+676/700, fleet 1351/1651, shipyard 679/1332, software 715/1368, film 520/960, join 540/960,
+footer 1308/805). The capture marks our hero "sized by the window" (94%: it sits below the
+in-flow announcement and ends at the window bottom, as the original's does). Motion list shows
+the hero pin (translateY 0→836, opacity →.2 at 450–900), the copy/wordmark fade, the load rise,
+the sticky header, the header logo appearing at 900, the button/card label rolls and the 1.02
+hover grow. No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all mono captions + button labels | 12px mono ~7.2px/char vs the original's 8px/char | same | — | yes: tracking .025em → .06em |
+| all display text | Host Grotesk's word spaces read ~50% wider than Suisse's | same | — | yes: word-spacing −0.08em on titles, leads, names, links; −0.05em on news bodies |
+| leads, hero headline, footer texts | read a step lighter than the original's 450 | same | — | yes: 450 → 500 |
+| fleet | title wrapped to 2 lines and lead to 4 (our copy was longer) | lead line lengths off | — | yes: shorter demo copy |
+| footer | first link 6px high; © 17px tight to the bottom | matches | hover ✓ | yes: mt-5, pb-10 |
+| hero | matches (bottom copy, two buttons, short "Specs" label) | wordmark spans the full width (no mark: ours is text only) | rise ✓ pin ✓ fade ✓ | — (by design) |
+| news ×2, shipyard, software, film, join | match in place, size and frame | match | — | — |

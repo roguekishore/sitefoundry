@@ -5,8 +5,8 @@ import { SaronicFleet } from "./saronic-fleet";
 export const fleetSample: SaronicFleetProps = {
   id: "fleet",
   eyebrow: "The hulls",
-  title: "Built for two kinds of work",
-  lead: "Every hull we launch is designed to patrol for coast guards and to haul for shipping lines, with the same autopilot aboard.",
+  title: "Made for two missions",
+  lead: "Every hull we launch can patrol for a coast guard or haul for a shipping line, on the same autopilot.",
   action: <SaronicButton href="#">Compare the hulls</SaronicButton>,
   vessels: [
     { name: "Petrel", linkLabel: "Hull details", href: "#" },

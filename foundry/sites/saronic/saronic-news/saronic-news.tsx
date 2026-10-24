@@ -28,12 +28,12 @@ export function SaronicNews({ eyebrow, title, body, cta, media, className }: Sar
       <article className="grid lg:grid-cols-2">
         <div className="flex flex-col rounded-t-lg border border-border p-6 lg:justify-between lg:rounded-l-lg lg:rounded-tr-none lg:border-r-0 lg:p-10">
           <div className="flex items-center justify-between gap-6">
-            <p className="font-mono text-xs/[1.5] tracking-[0.025em] uppercase">{eyebrow}</p>
+            <p className="font-mono text-xs/[1.5] tracking-[0.06em] uppercase">{eyebrow}</p>
             <span aria-hidden className="size-2 shrink-0 rounded-full bg-primary" />
           </div>
           <div className="mt-16 lg:mt-24">
-            <h3 className="font-display text-2xl/[1.2] font-normal tracking-[-0.02em] text-balance lg:text-[2.5rem]/[1.2]">{title}</h3>
-            {body && <p className="mt-4 text-base/[1.4] text-foreground/80 lg:mt-3 lg:max-w-[36rem] lg:text-lg/[1.4]">{body}</p>}
+            <h3 className="font-display text-2xl/[1.2] font-normal tracking-[-0.02em] [word-spacing:-0.08em] text-balance lg:text-[2.5rem]/[1.2]">{title}</h3>
+            {body && <p className="mt-4 text-base/[1.4] text-foreground/80 [word-spacing:-0.05em] lg:mt-3 lg:max-w-[36rem] lg:text-lg/[1.4]">{body}</p>}
             {cta && (
               <SaronicButton href={cta.href} icon={cta.icon ?? "external"} external={cta.external} className="mt-6">
                 {cta.label}

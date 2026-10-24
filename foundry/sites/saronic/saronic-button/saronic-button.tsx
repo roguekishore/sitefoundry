@@ -54,7 +54,7 @@ export function SaronicButton({
 }: SaronicButtonProps) {
   const Icon = icon === "none" ? null : icons[icon];
   const classes = cn(
-    "saronic-button group inline-flex shrink-0 items-center justify-between rounded-lg font-mono leading-none tracking-[0.025em] whitespace-nowrap uppercase",
+    "saronic-button group inline-flex shrink-0 items-center justify-between rounded-lg font-mono leading-none tracking-[0.06em] whitespace-nowrap uppercase",
     "transition-transform duration-250 ease-[ease] hover:scale-[1.02] motion-reduce:transition-none motion-reduce:hover:scale-100",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     size === "md" ? "h-12 gap-5 px-6 text-xs" : "h-8 gap-3 px-3 text-xs",

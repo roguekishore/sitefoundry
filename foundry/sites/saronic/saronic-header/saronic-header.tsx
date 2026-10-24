@@ -85,7 +85,7 @@ export function SaronicHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 h-16 border-b font-mono text-xs/none tracking-[0.025em] uppercase",
+        "sticky top-0 z-40 h-16 border-b font-mono text-xs/none tracking-[0.06em] uppercase",
         "transition-[background-color,border-color,color] duration-300 ease-[ease] motion-reduce:transition-none",
         overlay && "-mb-16",
         solid ? "border-border bg-background text-foreground" : "dark border-transparent bg-transparent text-foreground",
@@ -152,9 +152,9 @@ export function SaronicHeader({
                   href={item.href}
                   className="group flex h-full flex-col gap-3 p-6 opacity-70 transition-opacity duration-300 hover:opacity-100 focus:opacity-100 motion-reduce:transition-none lg:p-10"
                 >
-                  <span className="font-display text-[2rem]/[1.12] tracking-[-0.02em]">{item.title}</span>
+                  <span className="font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em]">{item.title}</span>
                   {item.description && (
-                    <span className="font-mono text-xs/[1.5] tracking-[0.025em] text-muted-foreground uppercase">{item.description}</span>
+                    <span className="font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase">{item.description}</span>
                   )}
                 </a>
               </li>

@@ -33,10 +33,10 @@ export function SaronicConditions({ eyebrow, title, lead, cta, media, id, classN
       <SaronicPlaceholder media={media} className="absolute inset-0 -z-10" />
       <span aria-hidden className="absolute inset-0 -z-10 bg-linear-to-r from-card/80 via-card/55 via-45% to-card/15" />
       <div className="w-full px-gutter py-16 lg:px-20">
-        {eyebrow && <p className="font-mono text-xs/[1.5] tracking-[0.025em] text-muted-foreground uppercase">{eyebrow}</p>}
-        <h2 className="mt-3 font-display text-[2rem]/[1.12] font-normal tracking-[-0.02em] lg:text-[min(3.75vw,4.5rem)]/[1.12]">{title}</h2>
+        {eyebrow && <p className="font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase">{eyebrow}</p>}
+        <h2 className="mt-3 font-display text-[2rem]/[1.12] font-normal tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]">{title}</h2>
         {lead && (
-          <p className="mt-6 text-xl/[1.25] font-[450] tracking-[-0.02em] lg:mt-8 lg:max-w-[40vw] lg:text-[min(1.96vw,2.25rem)]/[1.25]">{lead}</p>
+          <p className="mt-6 text-xl/[1.25] font-medium tracking-[-0.02em] [word-spacing:-0.08em] lg:mt-8 lg:max-w-[40vw] lg:text-[min(1.96vw,2.25rem)]/[1.25]">{lead}</p>
         )}
         {cta && (
           <SaronicButton href={cta.href} icon={cta.icon ?? "external"} external={cta.external} className="mt-9 lg:mt-10">
