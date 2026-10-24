@@ -27,8 +27,8 @@ export interface ParsleyhealthInsuranceProps {
 
 const styles = {
   serif: "font-display text-[1.6rem] font-normal tracking-[-0.02em] lg:text-[2.6rem]",
-  sans: "font-sans text-[1.35rem] font-semibold tracking-[-0.03em] lg:text-[2rem]",
-  italic: "font-sans text-[1.35rem] font-medium italic tracking-[-0.02em] lg:text-[2rem]",
+  sans: "font-sans text-[1.485rem] font-semibold tracking-[-0.03em] lg:text-[2.2rem]",
+  italic: "font-sans text-[1.485rem] font-medium italic tracking-[-0.02em] lg:text-[2.2rem]",
 };
 
 /** Copy and pills beside a wall of insurer names. */
@@ -50,7 +50,7 @@ export function ParsleyhealthInsurance({ eyebrow, title, body, primary, secondar
             </li>
           ))}
         </ul>
-        <div className="mx-auto flex max-w-[21.5rem] flex-col gap-6 text-center text-base leading-[1.7] text-foreground lg:col-start-1 lg:row-start-2 lg:mx-0 lg:mt-9 lg:max-w-[27.5rem] lg:gap-8 lg:text-left lg:text-lg lg:leading-8">
+        <div className="mx-auto flex max-w-[21.5rem] flex-col gap-6 text-center text-[1.1rem] leading-[1.545] text-foreground lg:col-start-1 lg:row-start-2 lg:mx-0 lg:mt-9 lg:max-w-[27.5rem] lg:gap-8 lg:text-left lg:text-[1.2375rem] lg:leading-8">
           {body.map((p) => (
             <p key={p}>{p}</p>
           ))}

@@ -50,13 +50,13 @@ export interface ParsleyhealthFooterProps {
 }
 
 const linkClass =
-  "text-[0.9375rem] font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none";
+  "text-[1.0312rem] font-medium text-foreground transition-colors duration-150 ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-accent-foreground motion-reduce:transition-none";
 
 function Group({ group }: { group: ParsleyhealthFooterGroup }) {
   return (
-    <div className="break-inside-avoid pb-8 lg:pb-11">
-      <p className="text-base font-medium text-glow lg:text-lg">{group.title}</p>
-      <ul className="mt-3.5 flex flex-col gap-3.5 lg:mt-4 lg:gap-3">
+    <div className="break-inside-avoid pb-7 lg:pb-9">
+      <p className="text-[1.1rem] font-medium text-glow lg:text-[1.2375rem]">{group.title}</p>
+      <ul className="mt-3 flex flex-col gap-2 lg:mt-3.5 lg:gap-2">
         {group.links.map((link) => (
           <li key={link.label}>
             <a href={link.href} className={linkClass}>
@@ -108,21 +108,21 @@ export function ParsleyhealthFooter({
     <>
       {newsletter ? (
         <form className="mt-10 lg:mt-11" action="#">
-          <p className="text-base font-medium text-glow lg:text-lg">{newsletter.title}</p>
+          <p className="text-[1.1rem] font-medium text-glow lg:text-[1.2375rem]">{newsletter.title}</p>
           <div className="mt-3 flex h-12 w-full overflow-clip rounded-full lg:mt-4 lg:w-[20.625rem]">
             <input
               type="email"
               aria-label={newsletter.inputLabel}
               placeholder={newsletter.placeholder}
-              className="min-w-0 flex-1 bg-primary px-4 text-base text-primary-foreground placeholder:text-primary-foreground/80 focus:outline-none"
+              className="min-w-0 flex-1 bg-primary px-4 text-[1.1rem] text-primary-foreground placeholder:text-primary-foreground/80 focus:outline-none"
             />
-            <button type="submit" className="w-[5.5rem] shrink-0 bg-glow text-base font-medium text-foreground transition-colors duration-150 hover:bg-glow/85">
+            <button type="submit" className="w-[5.5rem] shrink-0 bg-glow text-[1.1rem] font-medium text-foreground transition-colors duration-150 hover:bg-glow/85">
               {newsletter.button}
             </button>
           </div>
         </form>
       ) : null}
-      {shareTitle ? <p className="mt-9 text-base font-medium text-glow lg:mt-10 lg:text-lg">{shareTitle}</p> : null}
+      {shareTitle ? <p className="mt-9 text-[1.1rem] font-medium text-glow lg:mt-10 lg:text-[1.2375rem]">{shareTitle}</p> : null}
       {social?.length || badge ? (
         <div className="mt-5 flex items-center gap-6 lg:mt-6 lg:gap-5">
           {social?.map((s) => (
@@ -131,7 +131,7 @@ export function ParsleyhealthFooter({
             </a>
           ))}
           {badge ? (
-            <span className="ml-auto flex items-center gap-1.5 text-[0.6875rem] leading-tight font-medium tracking-[0.04em] uppercase lg:ml-4">
+            <span className="ml-auto flex items-center gap-1.5 text-[0.7563rem] leading-tight font-medium tracking-[0.04em] uppercase lg:ml-4">
               <ShieldCheck aria-hidden className="size-7" strokeWidth={1.25} />
               <span className="max-w-[5.5rem]">{badge}</span>
             </span>
@@ -145,7 +145,7 @@ export function ParsleyhealthFooter({
     <footer className={cn("dark bg-background px-gutter pt-10 pb-8 text-foreground lg:pt-30 lg:pb-32", className)}>
       <div className="mx-auto max-w-page">
         {handle || follow ? (
-          <div className="flex items-center justify-between text-sm font-medium text-accent-foreground">
+          <div className="flex items-center justify-between text-[0.9625rem] font-medium text-accent-foreground">
             {handle ? <span>{handle}</span> : <span />}
             {follow ? (
               <a href={follow.href} className="group inline-flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export function ParsleyhealthFooter({
         </div>
 
         {legal || legalLinks?.length ? (
-          <div className="mt-14 border-t border-border pt-8 text-center text-xs leading-[1.6] font-medium lg:mt-6 lg:pt-7 lg:text-right lg:text-[0.8125rem]">
+          <div className="mt-14 border-t border-border pt-8 text-center text-[0.825rem] leading-[1.455] font-medium lg:mt-6 lg:pt-7 lg:text-right lg:text-[0.8938rem]">
             {legal ? <p>{legal}</p> : null}
             {legalLinks?.length ? (
               <ul className="mt-1 flex flex-wrap justify-center gap-y-1 lg:mt-2 lg:justify-end">

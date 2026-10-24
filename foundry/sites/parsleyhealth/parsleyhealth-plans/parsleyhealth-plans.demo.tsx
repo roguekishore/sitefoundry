@@ -24,7 +24,7 @@ export const plansSample: ParsleyhealthPlansProps = {
       ],
       price: "$140/month or $1,400/year (covered)",
       priceAside: "· $260/month without insurance",
-      note: "Most plans accepted, HSA/FSA welcome",
+      note: "Covered by most plans, HSA/FSA ok",
       fineprint: "Twelve-month commitment",
       action: { label: "Become a member", href: "#" },
     },

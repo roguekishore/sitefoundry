@@ -31,13 +31,13 @@ export function ParsleyhealthFaq({ title, items, openIndex, group = "parsleyheal
           {items.map((item, i) => (
             <details key={item.question} name={group} open={i === openIndex} className="group border-b border-border">
               <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-6 lg:py-9 [&::-webkit-details-marker]:hidden">
-                <span className="text-[1.0625rem] leading-[1.35] font-medium text-primary lg:text-[1.3125rem] lg:leading-[1.4]">
+                <span className="text-[1.1688rem] leading-[1.227] font-medium text-primary lg:text-[1.4438rem] lg:leading-[1.273]">
                   {item.question}
                 </span>
                 <Plus aria-hidden className="mt-1 size-4 shrink-0 text-muted-foreground group-open:hidden" strokeWidth={1} />
                 <Minus aria-hidden className="mt-1 hidden size-4 shrink-0 text-muted-foreground group-open:block" strokeWidth={1} />
               </summary>
-              <div className="flex flex-col gap-6 pb-7 text-base leading-[1.6] text-muted-foreground lg:-mt-2 lg:gap-7 lg:text-lg">
+              <div className="flex flex-col gap-6 pb-7 text-[1.1rem] leading-[1.455] text-muted-foreground lg:-mt-2 lg:gap-7 lg:text-[1.2375rem]">
                 {item.answer.map((p) => (
                   <p key={p}>{p}</p>
                 ))}

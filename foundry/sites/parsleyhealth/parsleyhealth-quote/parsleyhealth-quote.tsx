@@ -37,7 +37,7 @@ export function ParsleyhealthQuote({ quote, author, stars = 5, starsLabel, actio
         <blockquote className="parsleyhealth-quote-rise mt-6 font-display text-[2.125rem] leading-[1.18] font-light tracking-[-0.02em] text-primary lg:mt-7 lg:text-5xl lg:leading-[1.2]">
           <p>{quote}</p>
         </blockquote>
-        <figcaption className="mt-10 text-sm font-semibold text-foreground italic lg:mt-11">{author}</figcaption>
+        <figcaption className="mt-10 text-[0.9625rem] font-semibold text-foreground italic lg:mt-11">{author}</figcaption>
         {action ? (
           <ParsleyhealthButton href={action.href} size="md" className="mt-10 lg:mt-11">
             {action.label}

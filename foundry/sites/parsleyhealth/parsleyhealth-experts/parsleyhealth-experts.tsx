@@ -28,14 +28,14 @@ export function ParsleyhealthExperts({ title, lead, points, person, media, media
       <div className="mx-auto max-w-[calc(var(--page-width)+10rem)]">
         <div className="parsleyhealth-experts-text">
           <ParsleyhealthHeading title={title} titleClassName="max-w-[20rem] lg:max-w-none" />
-          <div className="mt-6 max-w-[56rem] border-b border-foreground/15 pb-9 text-base leading-[1.65] text-foreground lg:mt-8 lg:border-0 lg:pb-0 lg:text-[1.3125rem] lg:leading-[1.6] [&_a]:text-secondary [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
+          <div className="mt-6 max-w-[56rem] border-b border-foreground/15 pb-9 text-[1.1rem] leading-[1.5] text-foreground lg:mt-8 lg:border-0 lg:pb-0 lg:text-[1.4438rem] lg:leading-[1.455] [&_a]:text-secondary [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-4">
             {lead}
           </div>
         </div>
 
         <div className="grid grid-cols-[minmax(0,1fr)_9.5rem] gap-x-4 lg:grid-cols-2 lg:gap-x-16">
           <div className="parsleyhealth-experts-text flex flex-col pt-8 pb-10 lg:pt-14 lg:pb-20">
-            <ul className="flex flex-col gap-6 text-[0.9375rem] leading-[1.55] text-primary lg:max-w-[32rem] lg:gap-4 lg:text-base lg:leading-[1.65]">
+            <ul className="flex flex-col gap-6 text-[1.0312rem] leading-[1.409] text-primary lg:max-w-[32rem] lg:gap-4 lg:text-[1.1rem] lg:leading-[1.5]">
               {points.map((point) => (
                 <li key={point} className="flex gap-2.5 lg:gap-3">
                   <Check aria-hidden className="mt-1 size-3.5 shrink-0 text-secondary" strokeWidth={1.5} />
@@ -44,9 +44,9 @@ export function ParsleyhealthExperts({ title, lead, points, person, media, media
               ))}
             </ul>
             {person ? (
-              <p className="mt-10 text-sm leading-tight text-primary lg:mt-auto lg:pt-16">
+              <p className="mt-10 text-[0.9625rem] leading-tight text-primary lg:mt-auto lg:pt-16">
                 <span className="block font-semibold uppercase">{person.name}</span>
-                <span className="mt-0.5 block text-[0.8125rem] lg:text-sm">{person.role}</span>
+                <span className="mt-0.5 block text-[0.8938rem] lg:text-[0.9625rem]">{person.role}</span>
               </p>
             ) : null}
           </div>

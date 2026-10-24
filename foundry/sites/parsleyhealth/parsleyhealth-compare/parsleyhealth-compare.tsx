@@ -39,7 +39,7 @@ function Value({ value, yes, no }: { value: ParsleyhealthCompareValue; yes?: str
   if (value === false) {
     return <X role="img" aria-label={no} className="size-6 text-muted-foreground/70" strokeWidth={1} />;
   }
-  return <span className="text-lg leading-[1.6] font-medium text-primary lg:text-[1.3125rem] lg:leading-[1.5]">{value}</span>;
+  return <span className="text-[1.2375rem] leading-[1.455] font-medium text-primary lg:text-[1.4438rem] lg:leading-[1.364]">{value}</span>;
 }
 
 /** Labels, rivals and a mint "us" column. */
@@ -64,18 +64,18 @@ export function ParsleyhealthCompare({ eyebrow, title, rivals, ours, rows, yesLa
             <span
               role="columnheader"
               key={rival}
-              className={cn("flex items-center justify-center px-2 py-6 text-[0.9375rem] leading-[1.6] text-primary lg:h-35 lg:text-lg", phoneHidden(i))}
+              className={cn("flex items-center justify-center px-2 py-6 text-[1.0312rem] leading-[1.455] text-primary lg:h-35 lg:text-[1.2375rem]", phoneHidden(i))}
             >
               {rival}
             </span>
           ))}
-          <span role="columnheader" className="flex items-center justify-center bg-accent px-2 py-6 text-[0.9375rem] leading-[1.6] text-accent-foreground lg:h-35 lg:text-lg">
+          <span role="columnheader" className="flex items-center justify-center bg-accent px-2 py-6 text-[1.0312rem] leading-[1.455] text-accent-foreground lg:h-35 lg:text-[1.2375rem]">
             {ours}
           </span>
         </div>
         {rows.map((row) => (
           <div role="row" key={row.label} className={cn(grid, "border-b border-foreground/15 last:border-0")}>
-            <span role="rowheader" className="flex items-center justify-center px-4 text-lg leading-[1.6] text-primary max-lg:hidden lg:text-[1.3125rem]">
+            <span role="rowheader" className="flex items-center justify-center px-4 text-[1.2375rem] leading-[1.455] text-primary max-lg:hidden lg:text-[1.4438rem]">
               {row.label}
             </span>
             {row.rivals.map((value, i) => (
@@ -84,7 +84,7 @@ export function ParsleyhealthCompare({ eyebrow, title, rivals, ours, rows, yesLa
               </span>
             ))}
             <span role="cell" className="flex min-h-[5.6rem] flex-col items-center justify-center gap-2 bg-accent px-2 py-3 lg:min-h-[6.125rem] lg:py-4">
-              <span className="text-xs leading-[1.4] text-foreground lg:hidden">{row.label}</span>
+              <span className="text-[0.825rem] leading-[1.273] text-foreground lg:hidden">{row.label}</span>
               <Value value={row.ours} yes={yesLabel} no={noLabel} />
             </span>
           </div>

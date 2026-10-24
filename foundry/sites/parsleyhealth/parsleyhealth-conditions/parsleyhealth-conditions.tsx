@@ -51,7 +51,7 @@ export function ParsleyhealthConditions({ title, action, items, prevLabel, nextL
         className,
       )}
     >
-      <div className="grid items-stretch gap-10 lg:grid-cols-[24.25rem_minmax(0,1fr)] lg:gap-12">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-stretch gap-10 lg:grid-cols-[24.25rem_minmax(0,1fr)] lg:gap-12">
         <div className="flex flex-col px-gutter lg:px-0 lg:pt-12">
           <ParsleyhealthHeading title={title} align="phone-center" titleClassName="mx-auto max-w-[18rem] lg:mx-0 lg:max-w-[24rem]" />
           {action ? (
@@ -77,11 +77,11 @@ export function ParsleyhealthConditions({ title, action, items, prevLabel, nextL
                     {item.media ?? <ParsleyhealthPlaceholder />}
                   </div>
                 </div>
-                <h3 className="mt-6 text-lg leading-[1.4] font-medium text-primary lg:mt-7 lg:text-[1.3125rem]">{item.title}</h3>
-                <p className="mt-4 text-[1.0625rem] leading-[1.55] text-foreground/75 lg:text-lg lg:leading-[1.6]">{item.text}</p>
+                <h3 className="mt-6 text-[1.2375rem] leading-[1.273] font-medium text-primary lg:mt-7 lg:text-[1.4438rem]">{item.title}</h3>
+                <p className="mt-4 text-[1.1688rem] leading-[1.409] text-foreground/75 lg:text-[1.2375rem] lg:leading-[1.455]">{item.text}</p>
                 <a
                   href={item.link.href}
-                  className="group/link mt-auto inline-flex items-center gap-2.5 self-start pl-0.5 text-sm text-secondary"
+                  className="group/link mt-auto inline-flex items-center gap-2.5 self-start pl-0.5 text-[0.9625rem] text-secondary"
                 >
                   <span className="underline decoration-1 underline-offset-[0.3rem]">{item.link.label}</span>
                   <ArrowRight

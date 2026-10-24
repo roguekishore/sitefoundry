@@ -40,8 +40,8 @@ export function ParsleyhealthHero({ title, body, primary, secondary, media, medi
       />
 
       <div className="flex h-full flex-col justify-end px-gutter pb-6 lg:justify-center lg:px-20 lg:pt-4 lg:pb-0">
-        <ParsleyhealthHeading as="h1" size="hero" title={title} titleClassName="max-w-[21rem] lg:max-w-[33rem]" />
-        <p className="mt-4 max-w-[22rem] text-base leading-[1.6] text-foreground lg:mt-8 lg:max-w-[27.5rem] lg:text-xl lg:leading-8">
+        <ParsleyhealthHeading as="h1" size="hero" title={title} titleClassName="max-w-[21rem] lg:max-w-[27rem]" />
+        <p className="mt-4 max-w-[22rem] text-[1.1rem] leading-[1.455] text-foreground lg:mt-8 lg:max-w-[27.5rem] lg:text-[1.375rem] lg:leading-8">
           {body}
         </p>
         <div className="mt-6 flex gap-5 lg:mt-9 lg:gap-6">

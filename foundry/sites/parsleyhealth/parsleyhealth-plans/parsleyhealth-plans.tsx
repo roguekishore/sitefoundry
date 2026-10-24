@@ -50,7 +50,7 @@ function Steps({ steps }: { steps: string[] }) {
             )}
           />
           <span aria-hidden className="relative block size-2.5 shrink-0 rounded-full bg-glow lg:mb-4 lg:size-[0.6875rem]" />
-          <span className="text-sm leading-[1.55] lg:block lg:text-[0.9375rem]">{step}</span>
+          <span className="text-[0.9625rem] leading-[1.409] lg:block lg:text-[1.0312rem]">{step}</span>
         </li>
       ))}
     </ol>
@@ -60,12 +60,12 @@ function Steps({ steps }: { steps: string[] }) {
 function Price({ plan }: { plan: ParsleyhealthPlan }) {
   return (
     <div>
-      <p className="text-[1.1875rem] leading-[1.6] text-primary lg:text-[1.3125rem]">
+      <p className="text-[1.3063rem] leading-[1.455] text-primary lg:text-[1.4438rem]">
         {plan.price}
-        {plan.priceAside ? <span className="text-sm text-muted-foreground"> {plan.priceAside}</span> : null}
+        {plan.priceAside ? <span className="text-[0.9625rem] text-muted-foreground"> {plan.priceAside}</span> : null}
       </p>
-      {plan.note ? <p className="mt-1 text-base leading-[1.6] text-highlight lg:text-[1.0625rem]">{plan.note}</p> : null}
-      {plan.fineprint ? <p className="mt-1 text-sm leading-[1.6] text-muted-foreground">{plan.fineprint}</p> : null}
+      {plan.note ? <p className="mt-1 text-[1.1rem] leading-[1.455] text-highlight lg:text-[1.1688rem]">{plan.note}</p> : null}
+      {plan.fineprint ? <p className="mt-1 text-[0.9625rem] leading-[1.455] text-muted-foreground">{plan.fineprint}</p> : null}
     </div>
   );
 }
@@ -88,7 +88,7 @@ export function ParsleyhealthPlans({ eyebrow, title, plans, className }: Parsley
               key={plan.title}
               className={cn(
                 "flex flex-col bg-background p-6 text-foreground",
-                wide ? "lg:grid lg:grid-cols-2 lg:gap-x-12 lg:p-14" : "lg:p-10",
+                wide ? "lg:grid lg:grid-cols-[1.2fr_1fr] lg:gap-x-12 lg:p-14" : "lg:p-10",
               )}
             >
               <ParsleyhealthHeading
@@ -101,14 +101,14 @@ export function ParsleyhealthPlans({ eyebrow, title, plans, className }: Parsley
               />
               <div
                 className={cn(
-                  "mt-8 text-base leading-[1.5] [&_a]:text-secondary [&_a]:underline [&_a]:underline-offset-4",
-                  wide ? "lg:col-start-2 lg:row-start-3 lg:mt-0 lg:self-end lg:pb-1" : "lg:mt-11 lg:text-[0.9375rem] lg:leading-[1.45]",
+                  "mt-8 text-[1.1rem] leading-[1.364] [&_a]:text-secondary [&_a]:underline [&_a]:underline-offset-4",
+                  wide ? "lg:col-start-2 lg:row-start-3 lg:mt-0 lg:self-end lg:pb-1" : "lg:mt-11 lg:text-[1.0312rem] lg:leading-[1.318]",
                 )}
               >
                 {plan.description}
               </div>
               {wide ? (
-                <div className="mt-8 lg:col-span-2 lg:row-start-2 lg:mt-14 lg:mb-24">
+                <div className="mt-8 lg:col-span-2 lg:row-start-2 lg:mt-14 lg:mb-16">
                   <Steps steps={plan.steps ?? []} />
                 </div>
               ) : null}

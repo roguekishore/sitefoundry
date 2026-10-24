@@ -33,7 +33,7 @@ export function ParsleyhealthTrust({ items, className }: ParsleyhealthTrustProps
             >
               {item.icon}
             </span>
-            <span className="text-base leading-[1.6] text-foreground lg:text-lg">{item.label}</span>
+            <span className="text-[1.1rem] leading-[1.455] text-foreground lg:text-[1.2375rem]">{item.label}</span>
           </li>
         ))}
       </ul>

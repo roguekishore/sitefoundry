@@ -2,7 +2,7 @@ import type { ParsleyhealthConditionsProps } from "./parsleyhealth-conditions";
 import { ParsleyhealthConditions } from "./parsleyhealth-conditions";
 
 export const conditionsSample: ParsleyhealthConditionsProps = {
-  title: "We look for the cause of long-running conditions",
+  title: "We find the source of stubborn, lasting conditions",
   action: { label: "Browse conditions", href: "#" },
   prevLabel: "Previous conditions",
   nextLabel: "More conditions",

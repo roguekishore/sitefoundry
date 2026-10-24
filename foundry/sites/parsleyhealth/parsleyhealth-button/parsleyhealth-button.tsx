@@ -27,10 +27,10 @@ const variants = {
 };
 
 const sizes = {
-  xs: "h-[2.375rem] px-6 text-sm",
-  sm: "h-[3.125rem] px-6 text-sm lg:text-[0.9375rem]",
-  md: "h-14 px-8 text-base",
-  lg: "h-15 px-[2.125rem] text-base",
+  xs: "h-[2.375rem] px-6 text-[0.9625rem]",
+  sm: "h-[3.125rem] px-6 text-[0.9625rem] lg:text-[1.0312rem]",
+  md: "h-14 px-8 text-[1.1rem]",
+  lg: "h-15 px-[2.125rem] text-[1.1rem]",
 };
 
 /** The site's pill: medium label, colour changes over 150ms, arrow nudges right on hover. */
