@@ -50,27 +50,27 @@ export function HelionenergyPillars({ title, items, id, className }: Helionenerg
   return (
     <section
       id={id}
-      className={cn("helionenergy-pillars relative bg-background px-gutter pt-[4.5rem] pb-[5.25rem] text-foreground lg:pt-0 lg:pb-[18rem]", className)}
+      className={cn("helionenergy-pillars relative bg-background px-gutter pt-[4.5rem] pb-[5.25rem] text-foreground lg:pt-[calc(114.4svh-16.875rem)] lg:pb-[31.9svh]", className)}
     >
-      <div className="lg:absolute lg:inset-x-0 lg:top-[7.5rem] lg:bottom-[50rem] lg:px-gutter">
+      <div className="lg:absolute lg:inset-x-0 lg:top-[7.5rem] lg:bottom-[88.9svh] lg:px-gutter">
         <HelionenergyHeading lines={title} className="text-center lg:sticky lg:top-[5.9rem]" />
       </div>
 
       <div
         role="list"
-        className="helionenergy-pillars-list relative mx-auto mt-[5.2rem] flex max-w-page flex-col gap-[5.4rem] lg:mt-[47.5rem] lg:block"
+        className="helionenergy-pillars-list relative mx-auto mt-[5.2rem] flex max-w-page flex-col gap-[5.4rem] lg:mt-0 lg:block"
         style={{ "--hp-scope": items.map((_, i) => `--helionenergy-pillars-${i}`).join(", ") } as CSSProperties}
       >
         {items.map((item, i) => (
           <Fragment key={i}>
             <span
               aria-hidden
-              className="helionenergy-pillars-sensor absolute inset-x-0 h-[43.125rem] max-lg:hidden"
-              style={{ top: `${i * 43.125}rem`, "--hp-name": `--helionenergy-pillars-${i}` } as CSSProperties}
+              className="helionenergy-pillars-sensor absolute inset-x-0 h-[76.67svh] max-lg:hidden"
+              style={{ top: `${(i * 76.67).toFixed(2)}svh`, "--hp-name": `--helionenergy-pillars-${i}` } as CSSProperties}
             />
             <div
               role="listitem"
-              className="grid justify-items-center text-center lg:sticky lg:top-[calc(50svh-8.75rem)] lg:mb-[20.25rem] lg:h-[22.875rem] lg:grid-cols-[1fr_minmax(0,40.5rem)_1fr] lg:items-center lg:justify-items-stretch lg:text-left lg:last:mb-0"
+              className="grid justify-items-center text-center lg:sticky lg:top-[calc(50svh-8.75rem)] lg:mb-[calc(76.67svh-22.875rem)] lg:h-[22.875rem] lg:grid-cols-[1fr_minmax(0,40.5rem)_1fr] lg:items-center lg:justify-items-stretch lg:text-left lg:last:mb-0"
               style={rowMotion(i, n)}
             >
               <div className="helionenergy-pillars-text flex flex-col items-center lg:items-start lg:pl-[3.56rem]">

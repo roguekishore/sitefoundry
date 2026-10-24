@@ -102,3 +102,38 @@ a strip artefact to captures and this page reads fine without it; skipped (decis
   survives without it.
 - The original's mobile social row orders links in two rows (YouTube/Instagram, then ©/X/LinkedIn);
   ours wraps in source order.
+
+## Comparison round 1
+
+Sections, sized-by-window marks and overflow: hero 100%, steps 450%, careers 100% at both widths,
+matching the original; 360/768/1024 fit. Scroll frames have a ~25px Lenis offset in the
+original (its frames are taken mid-glide), so vertical offsets under that were ignored.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| pillars | ok | section started 760px late and was 2034 tall, not 2796: the list's `mt` collapsed through the section's zero top padding | stack, shrink and label fades all present (pinned rows, scale 1→0.92, rise 20px) | yes: the space is now the section's `lg:pt` |
+| steps captions | wrapped narrower than the original (2 lines at ~240px) | ok | captions cross-fade with blur, heading drifts 10→−10px, button rises 30px, surface clips on exit: all in our Motion list | yes: max width 21rem |
+| careers | spotlights too dim (grey smudges vs pale steel-blue cones) | same | darkening on entry and button reveal present | yes: glow 55/42% → 80/65% |
+| news | ok (shorter only by copy length) | 1350 vs 1303: 80px bottom padding where the original has ~40 | picture zoom and arrow sweep present | yes: `lg:pb-10` |
+| footer | ok | 655 vs 728: socials row 70px too high; wordmark strokes lighter than the original's | link hovers | yes: row `lg:mt-[12.4rem]`, wordmark semibold |
+| placeholders | the light frames' magenta wash read pink | same | — | yes: wash 20% → 12% |
+| hero, header, machines | ok | ok (header pill wider only because our link names are longer) | header mark fades by 300px | — |
+
+## Comparison round 2
+
+All sections now match by height and rule: hero 100%, steps 450%, **pillars 310% (original 311%,
+desktop)**, careers 100%; footer 726 vs 728, news 1310 vs 1303 at 1440. 360/768/1024 fit.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| pillars | ok | right height (2793 vs 2796) but not window-sized: rem spacing | stack, shrink, fades unchanged | yes: spacing in svh (pt `calc(114.4svh-16.875rem)`, rows 76.67svh apart, pb 31.9svh), so it scales like the original (2119px at a 675px window vs 2121) |
+| careers | closer; still greyer than the original's cyan-white cones | same | ok | yes: bigger, stronger ellipses (92/78%) and a lighter dark `glow` #bcd9df |
+| footer | ok | row and wordmark now in place | ok | — |
+| everything else | matches at a glance (copy and placeholders aside) | same | Motion lists agree: pinned stage, cross-fades with blur, drift, rise, clip, sticky stack, scale-down, darkening, zooms, sweeps | — |
+
+Re-theme check: `helionenergy-news` and `helionenergy-machines` under sample-ember pick up its
+serif headings, warm palette, radii and dark band cleanly. Dark mode of the whole page reads as
+one near-black page with the navy stage gradient.
+
+Left as is: the careers spotlights are soft radial glows, not the original's two hard-edged
+beams (that's the WebGL canvas showing through, i.e. media); the hero/stage art is a placeholder.
