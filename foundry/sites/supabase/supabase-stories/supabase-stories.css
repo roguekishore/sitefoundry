@@ -1,0 +1,52 @@
+/* A CSS-only accordion: every story shares the row (flex-grow 1, basis 0) and the open one
+   takes --supabase-stories-grow shares. Hovering or focusing another story opens it instead.
+   Phones stack the stories in a column of fixed height, so 5.5 shares give 64px strips;
+   desktop's 10 shares give 76px strips beside a 752px card in a 1088px row. */
+.supabase-stories-row {
+  --supabase-stories-grow: 5.5;
+}
+@media (min-width: 64rem) {
+  .supabase-stories-row {
+    --supabase-stories-grow: 10;
+  }
+}
+
+.supabase-stories-item {
+  flex: 1 1 0;
+  transition: flex-grow 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.supabase-stories-item[data-open] {
+  flex-grow: var(--supabase-stories-grow);
+}
+.supabase-stories-row:hover .supabase-stories-item,
+.supabase-stories-row:focus-within .supabase-stories-item {
+  flex-grow: 1;
+}
+.supabase-stories-row .supabase-stories-item:hover,
+.supabase-stories-row .supabase-stories-item:focus-within {
+  flex-grow: var(--supabase-stories-grow);
+}
+
+/* the story text shows only in the open item */
+.supabase-stories-body {
+  opacity: 0;
+  transition: opacity 300ms ease 100ms;
+}
+.supabase-stories-item[data-open] .supabase-stories-body {
+  opacity: 1;
+}
+.supabase-stories-row:hover .supabase-stories-body,
+.supabase-stories-row:focus-within .supabase-stories-body {
+  opacity: 0;
+}
+.supabase-stories-row .supabase-stories-item:hover .supabase-stories-body,
+.supabase-stories-row .supabase-stories-item:focus-within .supabase-stories-body {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .supabase-stories-item,
+  .supabase-stories-body {
+    transition: none;
+  }
+}
