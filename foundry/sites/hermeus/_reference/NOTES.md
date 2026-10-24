@@ -115,3 +115,25 @@ recent 534→564 (561), footer 467→436 (416); 1440 mission 440→431 (429), pr
 | footer | link rows 24px apart (inherited leading), original 19 | columns spread from 944px, original 975/1115/1255; legal row and giant name ~35px high | hover amber | yes: leading 2 on the lists, fixed column widths (140/140/110), gaps re-measured |
 | all hovers | Tailwind's ease-in-out is (0.4,0,0.2,1) | | original `ease-in-out` keyword | yes: `ease-[ease-in-out]` |
 | news feature | headline 2 lines vs original 3 (our copy is shorter), so band 30px shorter | 17px taller | — | no: content length |
+
+## Comparison round 2
+
+Heights after round 1 (original in brackets): 390 hero+film 1156 (1156), mission 267 (266),
+product 493 (489), news 532 (562), recent 564 (561), footer 436 (416); 1440 hero+film 1710
+(1710), mission 431 (429), product 972 (973), news 1267 (1250), recent 834 (833), footer
+525 (520). No horizontal overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| footer | brand block ~11px low (address and flag gaps), links 17px low, legal 26px low | wordmark 10px low, legal and giant name ~11px low | — | yes: top padding to 2.9rem max, address/flag/legal gaps re-fitted |
+| section labels + reveals | — | — | ours finished in 400–450px, so the capture saw a jump ("reveal"); the original's runs over ~3 half-screen samples ("scrubbed") | yes: ranges now 80% of the window (line 100%); capture lists them as scrubbed (some samples still read as reveal, as some of the original's do) |
+| header | sticky over hero + film at 390 and 1440 (2 half-screens; original 2–3) | same | pinned | ok |
+| Mission word | letters rise ~1.2em staggered on entering view | same (1319–1768 vs original 1161–1560) | reveal | ok |
+| hero headline | blur-in and flicker loop listed | same | load + loop | ok |
+| re-theme | `hermeus-mission`, `hermeus-news-grid`, `hermeus-product` under sample-ember light: tokens, display serif and accent all follow; hermeus dark: footer and mission read as graphite bands | | | ok |
+
+Still different, by choice: media are placeholders (hero render, film, aircraft cut-out,
+news photos, flag); the wordmarks are plain Arimo capitals instead of the winged logo, and
+the footer's giant name is set type rather than the logo's custom letters; the product
+stage's two edge hotspots are plain hotspots (the original's may be slider controls); copy
+is ours, so the news headline wraps to 2 lines instead of 3 at 390.
