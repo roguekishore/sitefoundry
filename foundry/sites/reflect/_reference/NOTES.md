@@ -137,3 +137,33 @@ frames, where they play.
 | academy | ✓ | lead 3 lines vs 2 | panel fade ✓ | yes: shorter lead with a desktop break |
 | CTA | lead 2 lines vs 1 | ✓ | glow fade ✓ | yes: shorter lead |
 | footer | ✓ | ✓ | link hover ✓ | — |
+
+## Comparison round 2
+
+Heights (original → ours) at 1440: hero 1463→1474, features 392→409, AI 1311→1307,
+connected 1265→1302, research 1086→1070, privacy 844→868, pricing 1184→1182, migrate
+480→498, testimonials 868→858, about 824→826, academy 916→916, CTA 600→610, footer
+723→739. At 390 after the fixes below: hero 1268→1282, AI 1824→1881, connected
+1632→1622, research 1250→1220, privacy 622→586, pricing 1380→1342, testimonials 852→878,
+CTA 538→538, footer 1203→1184. Fits at 360/768/1024. Every inventory row appears in ours'
+Motion list: header sticky; orbit 100s, stars 70s + twinkle 11s, AI hue 2s and 5s streaks,
+marquee 200s, ring sway 5s, globe rim 70s (loops); media fades and globe scale .5→1 (view
+timeline reveals); planet drift ±64px (scrubbed); hovers on nav (.9→.6 in .3s), buttons,
+badge glow (.14→.28), play button, footer links (.6→.7 in .45s).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| connected | 120px of empty padding under the second card (original ends right after its text) | ✓ (one-line title now) | ✓ | yes: no bottom padding on phones |
+| research | ~50px extra at the bottom | ✓ | ✓ | yes: phone bottom padding cut |
+| CTA | glow area ~28px taller | ✓ | ✓ | yes: 13rem on phones |
+| pricing | ✓ gaps now within a few px | ✓ planet top at 72px; plans start where the original's do | drift ✓ | — |
+| hero | ✓ | glow brighter; play button clean | ✓ | — |
+| AI | still ~57px taller (lead one line longer at 390) | ✓ | ✓ | left: copy length only |
+
+Re-theme check: `reflect-hero`, `reflect-pricing` and `reflect-testimonials` under
+`sample-ember` (light) pick up its paper, ink, rust buttons and orange glow cleanly; the
+site's own light sibling reads as lavender paper with indigo ink.
+
+Left as is: media slots are placeholders (glow washes and muted panels), so the
+original's bright black-hole, light-cone, planet and globe artwork is only suggested by
+the glow; Figtree sets a touch wider than AeonikPro, so headings run ~5% longer.

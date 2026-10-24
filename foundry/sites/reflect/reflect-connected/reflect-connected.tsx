@@ -33,7 +33,7 @@ export interface ReflectConnectedProps {
 /** A cone of light, the heading at its base, then two hairline-framed cards. */
 export function ReflectConnected({ eyebrow, title, lead, media, mediaLabel, cards, className }: ReflectConnectedProps) {
   return (
-    <section className={cn("relative isolate overflow-clip bg-background pb-[7.5rem] text-foreground lg:pb-[9rem]", className)}>
+    <section className={cn("relative isolate overflow-clip bg-background text-foreground lg:pb-[9rem]", className)}>
       <ReflectStarfield size={1000} count={70} seed={23} className="h-[34rem]" />
       <ReflectMedia
         tone="glow"

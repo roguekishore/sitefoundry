@@ -27,7 +27,7 @@ export function ReflectCta({ eyebrow, title, lead, action, media, mediaLabel, cl
           <ReflectButton href={action.href}>{action.label}</ReflectButton>
         </ReflectHeading>
       </div>
-      <div className="relative h-[14.75rem] lg:h-[20.25rem]">
+      <div className="relative h-[13rem] lg:h-[20.25rem]">
         <ReflectMedia
           tone="rise"
           reveal

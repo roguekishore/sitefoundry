@@ -29,7 +29,7 @@ export interface ReflectResearchProps {
 /** A glowing half-disc on a horizon line, an emblem on it, then heading and two centred items. */
 export function ReflectResearch({ eyebrow, title, lead, media, mediaLabel, emblem, emblemLabel, items, className }: ReflectResearchProps) {
   return (
-    <section className={cn("relative isolate overflow-clip bg-background pt-[4.25rem] pb-[6rem] text-foreground lg:pb-[9rem]", className)}>
+    <section className={cn("relative isolate overflow-clip bg-background pt-[4.25rem] pb-4 text-foreground lg:pb-[9rem]", className)}>
       {/* the horizon: a half disc standing on a full-width hairline */}
       <div className="relative h-[27.5rem]">
         <ReflectMedia
