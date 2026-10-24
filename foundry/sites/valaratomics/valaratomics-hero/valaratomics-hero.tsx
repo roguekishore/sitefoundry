@@ -4,7 +4,7 @@ import { ValaratomicsButton } from "@foundry/valaratomics-button";
 import { ValaratomicsPlaceholder } from "@foundry/valaratomics-placeholder";
 
 export interface ValaratomicsHeroProps {
-  /** the giant caps title, one string per line (e.g. ["Power from", "the prairie"]) */
+  /** the giant caps title, one string per line (e.g. ["Heat for", "the plains"]) */
   title: string[];
   /** the sentence on the right */
   body: string;
@@ -27,7 +27,7 @@ export function ValaratomicsHero({ title, body, cta, media, className }: Valarat
         {media ?? <ValaratomicsPlaceholder />}
       </div>
       <div className="mx-auto mt-auto grid w-full max-w-page gap-y-[1.375rem] px-gutter pt-[8rem] pb-[4.5rem] lg:grid-cols-12 lg:gap-x-[2vw] lg:pb-[4.5rem]">
-        <h1 className="font-display text-[2.625rem] leading-[0.9] font-black uppercase [font-stretch:var(--valaratomics-stretch,100%)] lg:col-span-7 lg:text-[5rem] lg:leading-[0.9]">
+        <h1 className="font-display text-[2rem] leading-[0.9] font-black uppercase [font-stretch:var(--valaratomics-stretch,100%)] lg:col-span-7 lg:text-[5rem] lg:leading-[0.9]">
           {title.map((line) => (
             <span key={line} className="block">
               {line}
@@ -35,7 +35,7 @@ export function ValaratomicsHero({ title, body, cta, media, className }: Valarat
           ))}
         </h1>
         <div className="flex flex-col items-start gap-9 lg:col-span-5 lg:col-start-8 lg:gap-[4.5rem]">
-          <p className="text-lg leading-[1.1] tracking-[-0.01em] lg:text-[1.375rem] lg:leading-[1.1]">{body}</p>
+          <p className="text-lg leading-[1.1] tracking-[-0.02em] lg:text-[1.375rem] lg:leading-[1.1]">{body}</p>
           {cta && <ValaratomicsButton label={cta.label} href={cta.href} />}
         </div>
       </div>

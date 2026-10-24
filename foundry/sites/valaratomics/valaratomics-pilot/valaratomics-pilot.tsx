@@ -26,12 +26,12 @@ export function ValaratomicsPilot({ title, partners = [], body, cta, media, clas
   return (
     <section className={cn("dark relative isolate flex min-h-svh items-center bg-background text-foreground", className)}>
       <div className="absolute inset-0 -z-10 overflow-clip [&>*]:size-full [&_img]:object-cover [&_video]:object-cover">
-        {media ?? <ValaratomicsPlaceholder />}
+        {media ?? <ValaratomicsPlaceholder tone="photo" />}
       </div>
       <div aria-hidden className="absolute inset-0 -z-10 bg-linear-to-b from-background/70 via-transparent to-background/80" />
       <div className="mx-auto grid w-full max-w-page gap-y-12 px-gutter py-section lg:grid-cols-2 lg:gap-x-[2vw]">
         <div>
-          <h2 className="font-sans text-[2.625rem] leading-[0.9] font-medium tracking-[-0.02em] lg:text-[3.75rem] lg:leading-[0.9]">
+          <h2 className="font-sans text-[2.625rem] leading-[0.9] font-semibold tracking-[-0.03em] lg:text-[3.75rem] lg:leading-[0.9]">
             {title}
           </h2>
           {partners.length > 0 && (
@@ -48,7 +48,7 @@ export function ValaratomicsPilot({ title, partners = [], body, cta, media, clas
           )}
         </div>
         <div className="flex flex-col items-start gap-6 lg:gap-12">
-          <p className="text-lg leading-[1.1] tracking-[-0.01em] lg:pt-1 lg:text-[1.375rem] lg:leading-[1.1]">{body}</p>
+          <p className="text-lg leading-[1.1] tracking-[-0.02em] lg:pt-1 lg:text-[1.375rem] lg:leading-[1.1]">{body}</p>
           {cta && <ValaratomicsButton label={cta.label} href={cta.href} />}
         </div>
       </div>

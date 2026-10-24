@@ -78,7 +78,7 @@ export function ValaratomicsFooter({
         )}
       </div>
 
-      <div className="mx-auto grid w-full max-w-page flex-1 grid-rows-[auto_auto_1fr] gap-y-12 px-gutter pt-[1.75rem] pb-5 lg:grid-cols-12 lg:grid-rows-none lg:flex-none lg:gap-x-[2vw] lg:pt-[6.625rem]">
+      <div className="mx-auto grid w-full max-w-page flex-1 grid-rows-[auto_auto_1fr] gap-y-12 px-gutter pt-[1.75rem] pb-5 lg:grid-cols-12 lg:grid-rows-none lg:flex-none lg:gap-x-[2vw] lg:pt-10">
         <div className="max-lg:contents lg:col-span-7 lg:flex lg:flex-col">
           <h2 className="font-display text-[2.625rem] leading-[0.88] font-black uppercase [font-stretch:var(--valaratomics-stretch,100%)] lg:col-span-7 lg:text-[5.3125rem] lg:leading-[0.88]">
             {title.map((line) => (
@@ -114,7 +114,7 @@ export function ValaratomicsFooter({
               </li>
             ))}
           </ul>
-          <ul className="mt-12 flex justify-between font-mono text-base leading-none uppercase lg:mt-[5.75rem]">
+          <ul className="mt-12 flex justify-between font-mono text-base leading-none uppercase lg:mt-[5.25rem]">
             {links.map((l) => (
               <li key={l.href}>
                 <a href={l.href} className="transition-colors duration-150 hover:text-primary">

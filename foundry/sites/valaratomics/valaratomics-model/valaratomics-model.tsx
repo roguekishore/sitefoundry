@@ -28,7 +28,7 @@ export function ValaratomicsModel({ title, body, cta, media, className }: Valara
     <section className={cn("bg-background px-gutter", className)}>
       <div className="valaratomics-model-card dark relative isolate mx-auto max-w-page overflow-clip rounded-lg bg-background text-foreground ring-1 ring-border/40 ring-inset lg:h-[85svh] lg:min-h-[36rem]">
         <div className="valaratomics-model-media absolute inset-0 -z-10 origin-bottom [&>*]:size-full [&_img]:object-cover [&_video]:object-cover">
-          {media ?? <ValaratomicsPlaceholder />}
+          {media ?? <ValaratomicsPlaceholder tone="photo" />}
         </div>
         <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-2/3 bg-linear-to-b from-background to-transparent" />
         <div className="px-[1.6875rem] pt-[8.75rem] pb-[25rem] lg:px-[5.9vw] lg:pt-[9rem] lg:pb-section">

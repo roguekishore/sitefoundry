@@ -73,7 +73,7 @@ export function ValaratomicsCore({ title, body, items, interval = 4, className }
                     i === active ? "opacity-100" : "opacity-0",
                   )}
                 >
-                  {item.media ?? <ValaratomicsPlaceholder />}
+                  {item.media ?? <ValaratomicsPlaceholder tone="photo" />}
                 </div>
               ))}
             </div>
@@ -117,7 +117,7 @@ export function ValaratomicsCore({ title, body, items, interval = 4, className }
                     >
                       {item.eyebrow}
                     </span>
-                    <span className="font-sans text-[2rem] leading-none font-medium tracking-[-0.02em] uppercase lg:text-5xl lg:leading-none">
+                    <span className="font-sans text-[2rem] leading-none font-semibold tracking-[-0.03em] uppercase lg:text-5xl lg:leading-none">
                       {item.name}
                     </span>
                   </button>
