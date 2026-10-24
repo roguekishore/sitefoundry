@@ -122,3 +122,30 @@ on the scroll frames and the Motion list.
 | news | 2909 vs 2976 | 1942 vs 1943 | posts rise 64px | — |
 | news / footer at 1024 | — | page overflowed to 1127px at 1024 (fixed rem columns) | — | yes: percentage columns, post text columns from 1280 |
 | footer | 658 vs 693 | 553 vs 554 | link hovers | — |
+
+## Comparison round 2
+
+Captured with a copy of capture.mjs that stubs the gallery's live-reload socket (plain runs
+died 4/4 on other sessions' reloads), after a warm-up visit.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | 64 vs 65 | 110 vs 110 | load-in, hide on scroll down (≈0.47 window) match | — |
+| hero | 300svh both; lead flows like the original | 300svh both | film pinned 4 half-screens; blinds now 350px of thick stripes at the end of the pin (original ≈390) | close enough |
+| feature card | 610 vs 552 | 1182 vs 1104 | rise 227px matches | kept (no overlap, see decisions) |
+| statement | 214 vs 223, 4 lines | 319 vs 323 | mask rise | — |
+| split story | 961 vs 976; backdrop strips above/below the panel as in the original | 1095 vs 1108 | parallax 93→−140, 244→−153, 316→−29 (phones) / 116→−175, 611→−382, 518→−47 (desktop) match | — |
+| careers call | 551 vs 550 | 630 vs 625 | phrases light up in turn; aside rises 83px | — |
+| roles | 455 vs 471 | 429 vs 429 | dart follows the list | — |
+| notice | 250 vs 285 (our title still one line on phones: copy length) | 275 vs 275 | rise 34px | — |
+| news | 2909 vs 2976 | 1942 vs 1943 | posts rise 64px | — |
+| footer | 658 vs 693 | 553 vs 554 | — | — |
+| overflow | 360 fits | 768 / 1024 fit | — | — |
+
+Re-theme check: castelion-careers-call and castelion-news under sample-ember (light) take the
+ember palette, serif display and radius cleanly (a wider display face wraps "Hands on / Metal").
+Dark mode (ink-navy page, navy bands, cream stripes in the footer) checked at four scroll points.
+
+Still different, by choice: the feature card doesn't tuck 78px under the hero blinds; the hero
+film, painted backdrop, cut-outs and news art are placeholders; the brush-script logo is a plain
+Jost italic wordmark; the roles list is a native scroll box instead of a Splide slider.
