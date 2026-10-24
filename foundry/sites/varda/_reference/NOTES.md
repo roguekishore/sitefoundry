@@ -85,3 +85,29 @@ capture are the fixed header squares).
   so the header hydrates on load. Static HTML shows the full header.
 - Socials in the footer are lucide generic icons (lucide has no brand icons; also no logos).
 - The tile arrow nudge on hover is inferred, not observed.
+
+## Comparison round 1
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| header | the cell column sat centred (130→260), not in the right third | doubled hairline at the first link cell (negative margins pushed cells 2px right of the hero frame line) | collapse to two squares at ~1 screen, labels fade: matches (both widths) | yes: `ml-auto` on phones; cells use border-y/border-l instead of −1px margins |
+| hero | H1 4 lines, 260px top row, lead row, 63px link rows: match | H1 ~9px lower than the original's | 300s backdrop loop present | yes: H1 aligned to the top of row 2 |
+| hero links | arrows thinner than the original's | same | hover → off-white with navy text (same colours, 0.3s) | yes: stroke 2.25 |
+| announcement | 136 vs 136 | 129 vs 128 | — | — |
+| bento | stacking order, video first, pair side by side, insets: match; shorter because our headings wrap to fewer lines | 1198 vs 1193; same 3×480 grid, placements, insets, play button | tile hovers match (navy→blue-700, light→neutral-300) | — |
+| footer | 693 vs 665 (spacing under the logo and before the columns) | 482 vs 448 (links had 1.5 line boxes, columns 13px right) | link hover | yes: links `block`, gaps tightened, columns start at the half |
+
+## Comparison round 2
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| footer | 669 vs 665 | 462 vs 448: detail blocks 8px further apart | — | yes: gap 3.5 (now 456) |
+| type weight | Manrope 500 reads a touch lighter than MT Everyday 500 in tile headings and footer links | same | — | yes: tile headings 550, footer links and details 600 |
+| hero under other themes | — | with sample-ember (72rem page width, serif display) the H1 sized from the viewport overflowed the frame | — | yes: H1 sized from the frame (`cqw` container units) |
+| all | fits at 360 / 768 / 1024 | | header fixed + fade at 844–1266 (390) / 900–1350 (1440), original 844 / 900; hero loop 300s | — |
+
+Still different, on purpose: the backdrop, video and photos are placeholders; the hero links
+don't wrap ("Research labs" is shorter than the original's label); bento heights follow our
+shorter copy. Re-theme check: `varda-bento` (sample-ember light) and `varda-hero`
+(sample-ember dark) both re-theme; wide serif display faces wrap the hero headline to more
+lines (noted in the hero's meta).

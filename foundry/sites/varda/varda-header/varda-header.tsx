@@ -108,7 +108,7 @@ export function VardaHeader({
 
       <div
         className={cn(
-          "varda-header-cell relative mx-auto flex max-w-page flex-col border-l border-border max-lg:ml-auto max-lg:w-1/3 lg:flex-row lg:border-l-0",
+          "varda-header-cell relative ml-auto flex max-w-page flex-col border-l border-border max-lg:w-1/3 lg:mx-auto lg:flex-row lg:border-l-0",
           "max-lg:group-data-[compact=true]/header:w-16 max-lg:group-data-[compact=true]/header:bg-background",
         )}
       >
@@ -145,7 +145,7 @@ export function VardaHeader({
             href={action.href}
             tabIndex={compact ? -1 : undefined}
             className={cn(
-              "pointer-events-auto -ml-px hidden h-18 w-1/6 items-center justify-between gap-3 border border-foreground bg-background px-3.5 text-[1.0625rem]/none lg:flex [&_svg]:size-9 [&_svg]:shrink-0 [&_svg]:stroke-[1.25]",
+              "pointer-events-auto hidden h-18 w-1/6 items-center justify-between gap-3 border-y border-l border-foreground bg-background px-3.5 text-[1.0625rem]/none lg:flex [&_svg]:size-9 [&_svg]:shrink-0 [&_svg]:stroke-[1.25]",
               "group-data-[compact=true]/header:invisible group-data-[compact=true]/header:opacity-0",
               hover,
             )}
@@ -162,7 +162,7 @@ export function VardaHeader({
           aria-label={open ? closeLabel : menuLabel}
           onClick={() => setOpen((o) => !o)}
           className={cn(
-            "pointer-events-auto relative h-[6.5625rem] shrink-0 cursor-pointer overflow-clip border-b border-border text-left lg:-ml-px lg:flex lg:h-18 lg:w-1/6 lg:flex-row-reverse lg:items-center lg:justify-between lg:border lg:border-foreground lg:bg-background lg:pr-4 lg:pl-3.5",
+            "pointer-events-auto relative h-[6.5625rem] shrink-0 cursor-pointer overflow-clip border-b border-border text-left lg:flex lg:h-18 lg:w-1/6 lg:flex-row-reverse lg:items-center lg:justify-between lg:border lg:border-foreground lg:bg-background lg:pr-4 lg:pl-3.5",
             "max-lg:group-data-[compact=true]/header:h-16 lg:group-data-[compact=true]/header:w-18",
             hover,
           )}
