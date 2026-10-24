@@ -13,7 +13,7 @@ export interface CastelionPlaceholderProps {
 
 const tones = {
   muted: "bg-muted",
-  dusk: "bg-muted bg-[linear-gradient(180deg,var(--muted)_0%,color-mix(in_oklab,var(--glow)_45%,var(--muted))_100%)]",
+  dusk: "bg-muted bg-[linear-gradient(180deg,var(--muted)_0%,color-mix(in_oklab,var(--glow)_60%,var(--muted))_100%)]",
   sky: "bg-secondary bg-[linear-gradient(180deg,var(--secondary)_0%,var(--highlight)_100%)]",
 };
 

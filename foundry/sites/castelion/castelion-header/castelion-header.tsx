@@ -56,7 +56,7 @@ export function CastelionHeader({ brand, homeHref = "/", links, menuLabel, hideA
         className,
       )}
     >
-      <div className="mx-auto max-w-page px-gutter pt-3 pb-1 lg:pt-4 lg:pb-1">
+      <div className="mx-auto max-w-page px-gutter pt-2.5 lg:pt-4">
         <div className="flex h-10 items-center justify-between lg:h-[4.875rem]">
           <a
             href={homeHref}
@@ -106,7 +106,7 @@ export function CastelionHeader({ brand, homeHref = "/", links, menuLabel, hideA
         </div>
 
         {/* the full-width rule with its dart tip */}
-        <div aria-hidden className="relative mt-1.5 h-2.5 [container-type:inline-size] lg:mt-3">
+        <div aria-hidden className="relative mt-1 h-2.5 [container-type:inline-size] lg:mt-1.5">
           <span className="castelion-header-rule absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-current" />
           <svg
             viewBox="0 0 24 10"

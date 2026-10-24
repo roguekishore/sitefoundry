@@ -49,7 +49,7 @@ function PostText({ post, columns }: { post: CastelionPost; columns?: boolean })
       <h3 className={cn(headline, "mt-3.5")}>
         <a href={post.href}>{post.title}</a>
       </h3>
-      <p className={cn(body, "mt-4", columns && "lg:columns-2 lg:gap-[1.625rem]")}>{post.summary}</p>
+      <p className={cn(body, "mt-4", columns && "xl:columns-2 xl:gap-[1.625rem]")}>{post.summary}</p>
     </>
   );
 }
@@ -88,7 +88,7 @@ export function CastelionNews({ title, featured, posts, aside, ctaLabel, ctaHref
 
         {/* the rows and the aside card */}
         <div
-          className="lg:mt-10 lg:grid lg:grid-cols-[1fr_29.5rem] lg:border-t-2 lg:border-border lg:pt-10"
+          className="lg:mt-10 lg:grid lg:grid-cols-[minmax(0,1fr)_36.4%] lg:border-t-2 lg:border-border lg:pt-10"
           style={{ "--castelion-news-rows": Math.max(posts.length, 1) } as CSSProperties}
         >
           {items.map(({ post, kind, row }) => (
@@ -96,7 +96,7 @@ export function CastelionNews({ title, featured, posts, aside, ctaLabel, ctaHref
               key={post.href + post.title}
               className={cn(
                 "castelion-news-rise group mt-8 border-t-2 border-border pt-8 lg:mt-0 lg:border-t-0 lg:pt-0",
-                kind === "row" && "lg:col-start-1 lg:grid lg:grid-cols-[22.375rem_1fr] lg:items-start lg:gap-[2.375rem] lg:[grid-row:var(--castelion-news-row)]",
+                kind === "row" && "lg:col-start-1 lg:grid lg:grid-cols-[43.4%_minmax(0,1fr)] lg:items-start lg:gap-[2.375rem] lg:[grid-row:var(--castelion-news-row)]",
                 kind === "row" && row > 1 && "lg:mt-10 lg:border-t-2 lg:pt-10",
                 kind === "aside" &&
                   "lg:col-start-2 lg:ml-10 lg:border-l-2 lg:pl-[2.375rem] lg:[grid-row:1/span_var(--castelion-news-rows)]",

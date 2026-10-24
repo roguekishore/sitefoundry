@@ -3,7 +3,7 @@ import type { CastelionNoticeProps } from "./castelion-notice";
 import { CastelionNotice } from "./castelion-notice";
 
 export const noticeSample: CastelionNoticeProps = {
-  title: "Watch Out for Fake Job Offers",
+  title: "How to Spot a Fake Pellworth Job Offer",
   body: (
     <p>
       Pellworth never reaches out to applicants from free webmail addresses. Every real message comes from the{" "}

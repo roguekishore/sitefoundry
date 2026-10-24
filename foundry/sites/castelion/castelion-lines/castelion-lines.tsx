@@ -26,10 +26,11 @@ export function CastelionLines({ lines, as: Tag = "p", variant = "mask", startIn
             className={cn(
               "castelion-lines-line inline-block align-top",
               variant === "mask" && "-mb-[0.14em] overflow-clip pb-[0.14em]",
+              variant === "fade" && "max-lg:inline",
             )}
             style={{ "--castelion-line-i": startIndex + i } as CSSProperties}
           >
-            <span className="castelion-lines-inner block">{line}</span>
+            <span className={cn("castelion-lines-inner block", variant === "fade" && "max-lg:inline")}>{line}</span>
           </span>
         </Fragment>
       ))}
