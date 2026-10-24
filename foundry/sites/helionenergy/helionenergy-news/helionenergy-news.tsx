@@ -48,7 +48,7 @@ export interface HelionenergyNewsProps {
  */
 export function HelionenergyNews({ eyebrow, title, intro, ctaLabel, ctaHref, items, className }: HelionenergyNewsProps) {
   return (
-    <section className={cn("bg-background px-gutter pt-section pb-20 text-foreground", className)}>
+    <section className={cn("bg-background px-gutter pt-section pb-20 text-foreground lg:pb-10", className)}>
       <div className="mx-auto max-w-page">
         <HelionenergyEyebrow bracket>{eyebrow}</HelionenergyEyebrow>
         <div className="mt-[1.4rem] grid grid-cols-2 gap-x-5 border-b border-border pb-8 lg:mt-[1.25rem] lg:grid-cols-12 lg:pb-10">

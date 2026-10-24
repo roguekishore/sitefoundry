@@ -27,7 +27,7 @@ export function HelionenergyPlaceholder({ media, tone = "light", zoom = false, c
       <div
         className={cn(
           "absolute inset-0",
-          !media && "bg-linear-to-t from-glow/20 via-glow/5 to-transparent",
+          !media && "bg-linear-to-t from-glow/12 to-transparent",
           "[&>img]:size-full [&>img]:object-cover [&>video]:size-full [&>video]:object-cover",
           zoom && "helionenergy-placeholder-zoom",
         )}

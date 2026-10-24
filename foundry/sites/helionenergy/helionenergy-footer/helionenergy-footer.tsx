@@ -87,7 +87,7 @@ export function HelionenergyFooter({
           </nav>
         </div>
 
-        <div className="mt-[10rem] flex flex-wrap justify-between gap-x-8 gap-y-3 font-mono text-sm/none tracking-[-0.01em] uppercase lg:mt-32">
+        <div className="mt-[10rem] flex flex-wrap justify-between gap-x-8 gap-y-3 font-mono text-sm/none tracking-[-0.01em] uppercase lg:mt-[12.4rem]">
           <p>{copyright}</p>
           {socials.map((link, i) => (
             <a key={i} href={link.href} className="transition-opacity duration-200 ease-out hover:opacity-60 motion-reduce:transition-none">
@@ -97,7 +97,7 @@ export function HelionenergyFooter({
         </div>
 
         <svg aria-hidden viewBox="0 0 1000 142" className="mt-4 block w-full overflow-visible fill-muted lg:mt-[1.1rem]">
-          <text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs" className="font-mono text-[200px] font-medium">
+          <text x="0" y="142" textLength="1000" lengthAdjust="spacingAndGlyphs" className="font-mono text-[200px] font-semibold">
             {wordmark}
           </text>
         </svg>

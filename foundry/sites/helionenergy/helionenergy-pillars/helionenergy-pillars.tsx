@@ -50,7 +50,7 @@ export function HelionenergyPillars({ title, items, id, className }: Helionenerg
   return (
     <section
       id={id}
-      className={cn("helionenergy-pillars relative bg-background px-gutter pt-[4.5rem] pb-[5.25rem] text-foreground lg:pt-0 lg:pb-[18rem]", className)}
+      className={cn("helionenergy-pillars relative bg-background px-gutter pt-[4.5rem] pb-[5.25rem] text-foreground lg:pt-[47.5rem] lg:pb-[18rem]", className)}
     >
       <div className="lg:absolute lg:inset-x-0 lg:top-[7.5rem] lg:bottom-[50rem] lg:px-gutter">
         <HelionenergyHeading lines={title} className="text-center lg:sticky lg:top-[5.9rem]" />
@@ -58,7 +58,7 @@ export function HelionenergyPillars({ title, items, id, className }: Helionenerg
 
       <div
         role="list"
-        className="helionenergy-pillars-list relative mx-auto mt-[5.2rem] flex max-w-page flex-col gap-[5.4rem] lg:mt-[47.5rem] lg:block"
+        className="helionenergy-pillars-list relative mx-auto mt-[5.2rem] flex max-w-page flex-col gap-[5.4rem] lg:mt-0 lg:block"
         style={{ "--hp-scope": items.map((_, i) => `--helionenergy-pillars-${i}`).join(", ") } as CSSProperties}
       >
         {items.map((item, i) => (

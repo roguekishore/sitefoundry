@@ -84,7 +84,7 @@ export function HelionenergySteps({
               {steps.map((step, k) => (
                 <p
                   key={k}
-                  className="helionenergy-steps-caption max-w-[19rem] text-[clamp(1rem,0.86rem+0.556vw,1.366rem)] leading-[1.3] tracking-[-0.02em] text-balance text-secondary-foreground/90 lg:max-w-[21rem]"
+                  className="helionenergy-steps-caption max-w-[21rem] text-[clamp(1rem,0.86rem+0.556vw,1.366rem)] leading-[1.3] tracking-[-0.02em] text-balance text-secondary-foreground/90 lg:max-w-[21rem]"
                   style={captionMotion(k, steps.length)}
                 >
                   {step}
