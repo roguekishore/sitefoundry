@@ -116,3 +116,25 @@ scrollY = NN × window height).
 | CTA | 37px short; glow rim far dimmer than the original's bright blue bloom | matches (prompt box, chips, link) | typing ✓ (JS) | yes: pt-24 pb-14, stronger glow tone |
 | footer | groups flow into 2 balanced columns (original regroups them differently) | matches (6 columns, 27px rows, bottom row) | hover ✓ | no: grouping is content order |
 | overflow | fits at 360/768/1024 | — | — | ✓ |
+
+## Comparison round 2
+
+Page heights now 11096 / 10927 px (original 11076 / 10865). Section heading tops at 1440, ours
+vs original: agents 1463 / 1465, platform 4608 / 4585, showcase 6496 / 6460, stories 7739 / 7700.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| headings | weight 450 / −0.025em now reads like the original's medium geometric | same | — | ✓ |
+| logos → agents | ✓ | agents head within 2px | — | ✓ |
+| agents | ✓ | section 20px taller (our copy wraps a little later) | reveal + pinned panel ✓ | no: content-driven |
+| platform | narrow subtitle measure and 240px compact cells now match | 2-line subtitle ✓, bento 1440px ✓ | — | ✓ |
+| showcase | ✓ | one-line title ✓ | drift ✓ | ✓ |
+| stories | ✓ | 26px taller | ticker ✓ | yes: lg:py-[6.75rem] |
+| community | ✓ | 840px window ✓ | — | ✓ |
+| CTA | the glow was clipped by the fade mask (box-shadow is masked too) | ✓ | typing ✓ | yes: padded the masked wrapper; 34px button |
+| re-theme | framer-agents and framer-platform under sample-ember (dark/light) and framer-hero under sample-midnight keep their structure; only colours and fonts change | | | ✓ |
+| overflow | fits at 360/768/1024 | | | ✓ |
+
+Left as is: the footer's phone grouping (CSS columns balance our groups rather than
+reproducing the original's hand-made phone order), and a ~20–40px drift in where lower sections
+start at 1440, all from copy length.

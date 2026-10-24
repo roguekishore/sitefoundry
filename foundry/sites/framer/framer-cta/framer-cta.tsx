@@ -91,10 +91,11 @@ export function FramerCta({
         <FramerHeading size="title">{title}</FramerHeading>
 
         {/* phones: a button and a glowing panel */}
-        <FramerButton href={action.href} className="mt-4 h-8 px-3.5 text-sm lg:hidden">
+        <FramerButton href={action.href} className="mt-4 h-[2.125rem] px-3.5 text-sm lg:hidden">
           {action.label}
         </FramerButton>
-        <div className="mt-12 h-48 w-full max-w-[19.5rem] mask-b-from-50% mask-b-to-100% p-1 lg:hidden">
+        {/* the padding leaves room for the glow, which the fade mask would otherwise cut off */}
+        <div className="mt-6 h-56 w-full max-w-[23.5rem] mask-b-from-55% mask-b-to-100% px-6 pt-8 lg:hidden">
           {media ?? <FramerPlaceholder tone="glow" label={mediaLabel} className="rounded-2xl" />}
         </div>
 
