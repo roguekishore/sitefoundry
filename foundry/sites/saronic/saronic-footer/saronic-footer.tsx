@@ -84,7 +84,7 @@ export function SaronicFooter({
     return () => window.removeEventListener("pointermove", onMove);
   }, [readout]);
 
-  const caption = "font-mono text-xs/[1.5] tracking-[0.025em] text-muted-foreground uppercase";
+  const caption = "font-mono text-xs/[1.5] tracking-[0.06em] text-muted-foreground uppercase";
   const fade = "opacity-50 transition-opacity duration-200 hover:opacity-75 motion-reduce:transition-none";
 
   return (
@@ -100,15 +100,15 @@ export function SaronicFooter({
                 key={i}
                 className={cn(
                   "lg:relative lg:row-span-3 lg:row-start-1 lg:border-l lg:border-border lg:p-10 lg:pb-32",
-                  i === 0 ? "mt-4 lg:col-start-2" : "mt-2 lg:col-start-3",
+                  i === 0 ? "mt-5 lg:col-start-2" : "mt-2 lg:col-start-3",
                   "lg:mt-0",
                 )}
               >
                 <p className={cn(caption, "max-lg:hidden")}>{group.title}</p>
-                <ul className="space-y-2 lg:mt-20 lg:space-y-6">
+                <ul className="space-y-2 lg:mt-[4.625rem] lg:space-y-6">
                   {group.links.map((link, j) => (
                     <li key={j}>
-                      <a href={link.href} className={cn("font-display text-[2rem]/[1.12] tracking-[-0.02em] lg:text-[min(3.75vw,4.5rem)]/[1.12]", fade)}>
+                      <a href={link.href} className={cn("font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]", fade)}>
                         {link.label}
                       </a>
                     </li>
@@ -131,7 +131,7 @@ export function SaronicFooter({
                 {last && (readout || cornerGlyph) && (
                   <div className="absolute inset-x-10 bottom-10 hidden items-end justify-between lg:flex">
                     {readout ? (
-                      <p aria-hidden className="flex gap-1 font-mono text-xs/none tracking-[0.025em] text-muted-foreground uppercase tabular-nums">
+                      <p aria-hidden className="flex gap-1 font-mono text-xs/none tracking-[0.06em] text-muted-foreground uppercase tabular-nums">
                         <span className="bg-accent px-2 py-1.5">
                           {readout.x} = {pointer ? pointer.x : "—"}
                         </span>
@@ -154,7 +154,7 @@ export function SaronicFooter({
         {join && (
           <div className="order-2 border-t border-border px-4 py-10 lg:col-start-1 lg:row-start-2 lg:p-10">
             <p className={caption}>{join.eyebrow}</p>
-            <p className="mt-4 max-w-[13.5rem] text-lg/[1.33] font-[450] tracking-[-0.02em] lg:mt-5 lg:max-w-[17rem] lg:text-[1.375rem]/[1.33]">{join.text}</p>
+            <p className="mt-4 max-w-[13.5rem] text-lg/[1.33] font-medium tracking-[-0.02em] [word-spacing:-0.08em] lg:mt-5 lg:max-w-[17rem] lg:text-[1.375rem]/[1.33]">{join.text}</p>
             <SaronicButton href={join.cta.href} icon="external" external={join.cta.external} className="mt-10 min-w-55">
               {join.cta.label}
             </SaronicButton>
@@ -164,7 +164,7 @@ export function SaronicFooter({
         {/* address and legal */}
         {(place || legal.length > 0 || copyright) && (
           <div className="order-3 border-t border-border px-4 py-10 lg:col-start-1 lg:row-start-3 lg:p-10">
-            {place && <p className="text-lg/[1.33] font-[450] tracking-[-0.02em] lg:text-[1.375rem]/[1.33]">{place}</p>}
+            {place && <p className="text-lg/[1.33] font-medium tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[1.375rem]/[1.33]">{place}</p>}
             {legal.length > 0 && (
               <ul className="mt-6 space-y-2 lg:mt-7">
                 {legal.map((link, i) => (
@@ -191,7 +191,7 @@ export function SaronicFooter({
           </a>
         )}
 
-        {copyright && <p className="order-5 px-4 pb-8 text-center text-base/[1.5] opacity-70 lg:hidden">{copyright}</p>}
+        {copyright && <p className="order-5 px-4 pb-10 text-center text-base/[1.5] opacity-70 lg:hidden">{copyright}</p>}
       </div>
     </footer>
   );

@@ -72,7 +72,7 @@ export function SaronicHero({ eyebrow, title, actions = [], wordmark, media, bel
 
       <div className="saronic-hero-fade mt-auto w-full px-gutter pb-10 lg:pr-20 lg:pb-20 lg:pl-[60%]">
         <p className="saronic-hero-rise font-mono text-base/[1.5] tracking-[0.04em] uppercase lg:text-[1.49vw]/[1.5]">{eyebrow}</p>
-        <h1 className="saronic-hero-rise mt-3 font-display text-2xl/[1.2] font-[450] tracking-[-0.02em] [animation-delay:0.1s] lg:mt-4 lg:text-[2.43vw]/[1.2]">
+        <h1 className="saronic-hero-rise mt-3 font-display text-2xl/[1.2] font-medium tracking-[-0.02em] [word-spacing:-0.08em] [animation-delay:0.1s] lg:mt-4 lg:text-[2.43vw]/[1.2]">
           {title}
         </h1>
         {actions.length > 0 && (

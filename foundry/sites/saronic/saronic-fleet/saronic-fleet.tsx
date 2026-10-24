@@ -59,10 +59,10 @@ export function SaronicFleet({ eyebrow, title, lead, action, vessels, id, classN
                   className="absolute inset-0 transition-transform duration-400 ease-[cubic-bezier(0.25,0.25,0,1)] group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                 />
                 <span aria-hidden className="absolute inset-0 bg-linear-to-b from-transparent from-45% to-card/55" />
-                <span className="relative font-display text-[2rem]/[1.12] tracking-[-0.02em] lg:text-[min(3.75vw,4.5rem)]/[1.12]">
+                <span className="relative font-display text-[2rem]/[1.12] tracking-[-0.02em] [word-spacing:-0.08em] lg:text-[min(3.75vw,4.5rem)]/[1.12]">
                   {vessel.name}
                 </span>
-                <span className="relative mt-3 flex items-center gap-2 font-mono text-xs/[1.5] tracking-[0.025em] uppercase">
+                <span className="relative mt-3 flex items-center gap-2 font-mono text-xs/[1.5] tracking-[0.06em] uppercase">
                   <CornerDownRight aria-hidden strokeWidth={1.5} className="size-3.5 shrink-0 -translate-y-0.5" />
                   <span className="saronic-fleet-link inline-flex overflow-clip">
                     <span>{vessel.linkLabel}</span>

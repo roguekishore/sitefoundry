@@ -108,3 +108,59 @@ footer's bottom-right; it moves with the footer in the frames, so it's built sta
   switches "SPECIFICATIONS" → "SPECS"): buttons take an optional `shortLabel`.
 - Social icons in the footer are lucide generics passed in as props (lucide 1.x has no brand
   icons, and theirs aren't ours to copy).
+
+## Comparison round 1
+
+Heights already matched within a few px at both widths (hero 796/836 under the bar, news
+676/700, fleet 1351/1651, shipyard 679/1332, software 715/1368, film 520/960, join 540/960,
+footer 1308/805). The capture marks our hero "sized by the window" (94%: it sits below the
+in-flow announcement and ends at the window bottom, as the original's does). Motion list shows
+the hero pin (translateY 0→836, opacity →.2 at 450–900), the copy/wordmark fade, the load rise,
+the sticky header, the header logo appearing at 900, the button/card label rolls and the 1.02
+hover grow. No overflow at 360/768/1024.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| all mono captions + button labels | 12px mono ~7.2px/char vs the original's 8px/char | same | — | yes: tracking .025em → .06em |
+| all display text | Host Grotesk's word spaces read ~50% wider than Suisse's | same | — | yes: word-spacing −0.08em on titles, leads, names, links; −0.05em on news bodies |
+| leads, hero headline, footer texts | read a step lighter than the original's 450 | same | — | yes: 450 → 500 |
+| fleet | title wrapped to 2 lines and lead to 4 (our copy was longer) | lead line lengths off | — | yes: shorter demo copy |
+| footer | first link 6px high; © 17px tight to the bottom | matches | hover ✓ | yes: mt-5, pb-10 |
+| hero | matches (bottom copy, two buttons, short "Specs" label) | wordmark spans the full width (no mark: ours is text only) | rise ✓ pin ✓ fade ✓ | — (by design) |
+| news ×2, shipyard, software, film, join | match in place, size and frame | match | — | — |
+
+## Comparison round 2
+
+After round 1 every section pair reads as the same layout at both widths; the mono captions
+and display word spacing now track the original's line lengths. Remaining differences:
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| fleet / shipyard / software headings | caption → title 5px tight (title and everything under it sat 4px high) | matches | — | yes: caption mb-3 at all widths |
+| fleet lead | 3 lines ✓ | 2 lines vs 3 (our tighter copy) → section 1616 vs 1647 | — | yes: lead copy lengthened to the original's ~110 characters |
+| software lead | ✓ | 3 lines vs 4 → 1332 vs 1364 | — | yes: lead copy lengthened |
+| news (rescue) | body 3 lines vs 2 → 676 vs 661 | ✓ | — | yes: shorter body copy |
+| footer | ✓ | links started 6px low | ✓ | yes: lg:mt-[4.625rem] |
+| header | solid pale bar + centre hairline after the hero ✓ | same; wordmark appears at 900 ✓ | ✓ | — |
+
+## Comparison round 3 (verification)
+
+Section heights, ours vs original. At 390: hero 796 (below the 48px bar, ends at the window
+bottom) · 654/661 · 1294/1294 · 655/662 · 683/683 · 719/719 · 520/520 · 540/536 · 1320/1325.
+At 1440: 836 (below the 64px bar) · 700/700 · 1651/1647 · 700/700 · 1332/1328 · 1368/1364 ·
+960/960 · 960/960 · 805/803. No horizontal overflow at 360/768/1024. Motion list matches the
+inventory: sticky header plus the solid switch at the hero's end, hero pin and dim
+(translateY 0→836, opacity →.2, 450–900), wordmark and copy fade, the load rise
+(1s/1.1s/1.2s), the label rolls, the 1.02 hover grow on buttons, and the card shadow and zoom.
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| news (contract) | its picture is 16:9 on phones (350×197), ours was 4:3 → 721 vs 662 | ✓ | — | yes: `mobileAspect` prop, the demo uses 16:9 |
+
+Still different, on purpose: the hero lockup is a text-only wordmark (no logo mark), so it spans
+the full width. Host Grotesk is a little rounder than Suisse. Media are placeholders.
+
+**Re-theme check:** `saronic-fleet` under sample-ember (light) and `saronic-news` under
+sample-ember (dark) take that theme's serif display face, warm palette, larger radius and
+orange primary; the `dark` scopes give its dark card tones. Our own dark mode is a coherent
+slate page with the ink footer.
