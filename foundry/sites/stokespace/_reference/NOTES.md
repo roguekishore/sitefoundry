@@ -92,3 +92,22 @@ image hotspots over the engine photo (`group/hotspot` glow: part of the media).
 - Accent colours: orange = `primary` (it is the hover colour of every link), magenta =
   `highlight`, violet = `glow`. Section labels take a `tone` prop picking one of the three.
 - Logo replaced by a plain "ORRERY" wordmark in the display face.
+
+## Comparison round 1
+
+Section heights (content, without our shared `py-section`): 390 — hero 693/693, reusability
+1143/1169, nova 693/680, work 796/779, footer 622/617; 1440 — hero 826/826, reusability
+1739/1741, nova 1118/1155 (our copy is two lines shorter), work 817/794, footer 548/544.
+No horizontal overflow at 360/768/1024. Motion list matches: header sticky, work images
+fade 0→1 on entry (450px range in both), footer glow translateY ~250px→0 as the page bottoms
+out; plus our shimmer loop (paused until hover, like the original's `border-shimmer`).
+
+| section | 390 | 1440 | motion | fixed? |
+|---|---|---|---|---|
+| hero | heading 4 lines vs 6 (copy length), bottom offset matches | heading sat ~65px too low (8.5% vs ~14% from the frame bottom) and ran 3 lines vs 4 | none in either | yes: `md:bottom-[14%]`, demo copy a few words longer so it breaks into 4 lines |
+| eyebrows | bar→label gap 12px vs ~8px | 14px vs ~10px | – | yes: `gap-2 lg:gap-2.5` |
+| reusability rows | 68px rows match | rows 109px vs 102px: the title span was inline, so the button's 24px strut line set the line box | hover 30%→100% matches | yes: title span is `block` |
+| nova | heading 4 lines vs 3 (copy) | heading/para/link gaps match (link 90px under text vs 92px); sky placeholder reads like the original frame's dusk gradient | link hover matches | – (copy) |
+| work | matches | +23px overall, within the label→heading rounding | fade matches | – |
+| footer | link grid, contact row, badge, small wordmark + address all in the original's order and place | wordmark's "O" starts ~8px in (glyph side bearing) vs the original's 10px edge | rise matches | – (glyph-dependent) |
+| header | bar 76px, glowing plus matches | pill 64px tall at y=31, frosted over media while scrolling | sticky matches | – |

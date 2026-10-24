@@ -79,7 +79,7 @@ export function StokespaceReusability({
                     isOpen ? "text-foreground" : "text-foreground/30 hover:text-foreground",
                   )}
                 >
-                  <span className="text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:leading-[1.2]">
+                  <span className="block text-[length:clamp(0.875rem,0.7625rem+0.462vw,1.178rem)] leading-[1.35] font-light lg:leading-[1.2]">
                     {item.title}
                   </span>
                   <span aria-hidden className="relative mt-px size-4 shrink-0 lg:-mt-1 lg:size-8">
