@@ -2,7 +2,7 @@
 import { SupabaseCta, type SupabaseCtaProps } from "./supabase-cta";
 
 export const ctaSample: SupabaseCtaProps = {
-  title: [{ text: "Start on a Sunday,", tone: "muted" }, { text: "serve a whole country" }],
+  title: [{ text: "Start on a Sunday,", tone: "muted" }, { text: "serve a nation" }],
   primary: { label: "Open a pool", href: "#" },
   secondary: { label: "Book a walkthrough", href: "#" },
 };

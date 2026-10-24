@@ -26,7 +26,7 @@ export function SupabaseDashboard({ title, tabs, className }: SupabaseDashboardP
   const current = tabs[active] ?? tabs[0];
   return (
     <section className={cn("border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content max-w-page px-gutter pt-section lg:pt-24">
+      <div className="mx-auto box-content max-w-page px-gutter pt-section lg:pt-[5.5rem]">
         <SupabaseHeading parts={title} />
         <div role="tablist" className="mt-6 flex flex-wrap gap-2 lg:mt-8">
           {tabs.map((tab, i) => (
@@ -47,7 +47,7 @@ export function SupabaseDashboard({ title, tabs, className }: SupabaseDashboardP
         </div>
 
         {/* the window is cut off by the section's bottom edge, as on the original */}
-        <div className="mt-8 aspect-[2/1] overflow-clip rounded-t-xl border border-b-0 border-border bg-card lg:aspect-[1088/596] lg:rounded-t-2xl">
+        <div className="mt-8 aspect-[2/1] min-h-0 overflow-clip rounded-t-xl border border-b-0 border-border bg-card lg:aspect-[1088/596] lg:rounded-t-2xl">
           <div className="flex h-6 items-center gap-1.5 px-3 lg:h-8 lg:px-4" aria-hidden>
             <span className="size-1.5 rounded-full bg-foreground/12 lg:size-2" />
             <span className="size-1.5 rounded-full bg-foreground/12 lg:size-2" />

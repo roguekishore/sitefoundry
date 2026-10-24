@@ -48,7 +48,7 @@ function CardText({ icon, title, description }: Pick<SupabaseTemplate, "icon" | 
 export function SupabaseTemplates({ title, link, featured, templates, className }: SupabaseTemplatesProps) {
   return (
     <section className={cn("border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content max-w-page px-gutter py-section lg:py-24">
+      <div className="mx-auto box-content max-w-page px-gutter py-24">
         <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
           <SupabaseHeading parts={title} stack="always" />
           {link && (

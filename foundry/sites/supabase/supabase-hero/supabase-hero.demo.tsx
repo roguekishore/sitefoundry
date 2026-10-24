@@ -2,8 +2,8 @@
 import { SupabaseHero, type SupabaseHeroProps } from "./supabase-hero";
 
 export const heroSample: SupabaseHeroProps = {
-  title: [{ text: "Start on a Sunday" }, { text: "Serve a whole country", tone: "brand" }],
-  lead: "Every pool begins as a dedicated SQL database. Switch on sign-in, an instant API, workers, live sync, file storage and embeddings as you need them.",
+  title: [{ text: "Start on a Sunday" }, { text: "Serve a nation", tone: "brand" }],
+  lead: "Every pool starts as a dedicated SQL database. Switch on sign-in, an instant API, workers, live sync, files and embeddings.",
   primary: { label: "Open a pool", href: "#" },
   secondary: { label: "Book a walkthrough", href: "#" },
 };

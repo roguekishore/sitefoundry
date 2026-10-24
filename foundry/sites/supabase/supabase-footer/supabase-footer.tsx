@@ -106,7 +106,7 @@ export function SupabaseFooter({ logo, trust, socials, newsletter, columns, copy
                 <ul className="mt-4 grid gap-2">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <a href={link.href} className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground">
+                      <a href={link.href} className="block text-sm leading-5 text-muted-foreground transition-colors duration-150 hover:text-foreground">
                         {link.label}
                       </a>
                     </li>

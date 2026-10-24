@@ -17,7 +17,7 @@ export interface SupabaseStory {
   person: { name: string; avatar?: ReactNode };
   /** the link at the very bottom */
   link: { label: string; href: string };
-  /** the card's colour: sunset (pink→orange gradient), ink, deep (teal), night (near black), glow (blue) */
+  /** the card's colour: sunset (pink→orange gradient), ink (navy), deep (teal), night (near black), glow (blue) */
   tone?: "sunset" | "ink" | "deep" | "night" | "glow";
 }
 
@@ -34,9 +34,9 @@ export interface SupabaseStoriesProps {
 // every tone is a dark scope, so text and borders inside use the theme's dark tokens
 const tones = {
   sunset: "bg-linear-to-b from-chart-4 to-chart-5",
-  ink: "bg-background",
+  ink: "bg-background bg-linear-to-b from-glow/25 to-glow/20",
   deep: "bg-secondary",
-  night: "bg-card",
+  night: "bg-background",
   glow: "bg-linear-to-bl from-glow/80 to-glow",
 };
 
@@ -44,7 +44,7 @@ const tones = {
 export function SupabaseStories({ title, link, stories, className }: SupabaseStoriesProps) {
   return (
     <section className={cn("border-b border-border bg-background text-foreground", className)}>
-      <div className="mx-auto box-content max-w-page px-gutter py-section lg:py-24">
+      <div className="mx-auto box-content max-w-page px-gutter py-24">
         <div className="lg:flex lg:items-end lg:justify-between lg:gap-8">
           <SupabaseHeading parts={title} stack="always" />
           {link && (
