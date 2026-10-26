@@ -12,7 +12,7 @@ say "pull"
 clone_or_pull foundry "$REPO_DIR"
 AFTER=$(as foundry "git -C $REPO_DIR rev-parse --short HEAD")
 echo "$BEFORE -> $AFTER"
-as foundry "git -C $REPO_DIR log --oneline $BEFORE..$AFTER" | head -n 20
+as foundry "git -C $REPO_DIR log --oneline -n 20 $BEFORE..$AFTER"
 
 say "install and build"
 quiet as foundry "cd $REPO_DIR && pnpm install --frozen-lockfile"
