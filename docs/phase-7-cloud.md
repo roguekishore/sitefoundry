@@ -330,11 +330,12 @@ The user chose "the run instance shoots them" over the laptop uploading its own 
   laptop's thumbnails minus one item): one item shot in 3 min (2.5 of them building the gallery),
   27 MB sent and served; a job with nothing new; Stop while queued and while building (no
   processes left); `/thumbs/..%2Ffoundry.db` refused. Packing 27 MB took about 30 s on Windows.
-- **Not known yet:** how long the first full shoot takes on the t4g.large (2 vCPUs, 4 tabs at a
-  time), and whether it runs out of CPU credits on the way (the instance uses standard credits,
-  which slow it to its baseline when spent).
+- **Seen since:** the first full shoot of our gallery (job #1, 2026-10-20) shot 568 items in
+  21 min on the t4g.large (2 vCPUs, 4 tabs at a time); the vault's took about 3 h (see below).
+  **Not known yet:** whether a shoot runs out of CPU credits on the way (the instance uses
+  standard credits, which slow it to its baseline when spent).
 
-## The vault in the cloud: **DONE** (2026-10-21), live; its thumbnails not shot yet
+## The vault in the cloud: **DONE** (2026-10-21), live; thumbnails shot 2026-10-26
 
 The vault is its own repo since 2026-10-21 (PLAN.md, "The vault split"). In the cloud:
 
@@ -360,8 +361,13 @@ The vault is its own repo since 2026-10-21 (PLAN.md, "The vault split"). In the 
   each start) refused to move. Fixed once by hand: fetch, check that HEAD is inside a value
   `origin/main` had there (nothing of the instance's own), `reset --hard origin/main`. Any
   future rewrite of main needs the same on both instances.
-- **Not seen yet:** the first thumbnails job with the vault (press **Shoot now** on the Runs
-  page): how long the vault's several thousand items take on the run instance.
+- **First thumbnails job with the vault (job #4, 2026-10-26)**, queued by the deploy of
+  `98cafce`: our gallery, then the vault at `e43dd0c`, `done` in 179 min 36 s. The vault:
+  2,458 items shot (9,829 stills, 103.9 MB sent), 205 failed, 108 with warnings (in that run's
+  `public/thumbs/manifest.json`). The failures seen in the log are all
+  `phone-dark: page.waitForFunction: Timeout 30000ms exceeded` (smoothui-, ui-layouts-,
+  uiception- items among them). Not retried, by the user's choice: the next job (when the vault
+  moves, or **Shoot now**) tries them again, since `build:thumbs` skips only what it already has.
 
 ## Known gaps and risks
 
