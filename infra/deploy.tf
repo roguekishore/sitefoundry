@@ -21,6 +21,7 @@ locals {
   deploy_units = {
     foundry = {
       repo      = "sitefoundry"
+      repo_id   = "1425923755"
       services  = ["foundry.service", "foundry-runner.service"]
       instances = "preview=${aws_instance.preview.id},run=${aws_instance.run.id}"
       status = [
@@ -32,6 +33,7 @@ locals {
     }
     foundry-vault = {
       repo      = "sitefoundry-vault"
+      repo_id   = "1428748130"
       services  = ["foundry.service"]
       instances = "preview=${aws_instance.preview.id}"
       status = [
@@ -96,10 +98,12 @@ data "aws_iam_policy_document" "github_trust" {
       variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
     }
+    # The repositories use GitHub's immutable subjects: owner and repository
+    # carry their ids (gh api repos/<owner>/<repo>/actions/oidc/customization/sub).
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:roguekishore/${each.value.repo}:ref:refs/heads/deploy"]
+      values   = ["repo:roguekishore@179220785/${each.value.repo}@${each.value.repo_id}:ref:refs/heads/deploy"]
     }
   }
 }
