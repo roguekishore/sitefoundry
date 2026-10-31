@@ -13,7 +13,10 @@ is the point of this directory.
 - **Independent of MaverickCloud.** Nothing in `..\MAVERICKCLOUD\` constrains this repo.
 - **Private.** Remote `roguekishore/sitefoundry` (private); push only when the user says.
   The cloud (a login-gated preview instance and an on-demand run instance) is phase 7 of
-  [`PLAN.md`](PLAN.md). No public registries, no S3.
+  [`PLAN.md`](PLAN.md). No public registries; S3 holds only the release tarballs.
+- **Shipping is `./ops ship`** (the workspace-wide deploy pipeline, `infra/README.md`):
+  push to the `deploy` branch, GitHub Actions builds, the preview switches to the release.
+  `infra/deploy.sh` is gone; the runner no longer updates itself from git at start.
 
 ## Read first
 

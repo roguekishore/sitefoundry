@@ -1,5 +1,4 @@
 # The preview instance (t4g.small, 10.20.0.10): Caddy → the foundry server. After common.sh.
-# First run: makes the deploy key, prints it, stops. Add the key (read-only), run it again.
 RUN_INSTANCE_ID=i-0ab154c93b3356c22
 REPO_DIR=/home/foundry/sitefoundry
 VAULT_DIR=/home/foundry/sitefoundry-vault
@@ -7,10 +6,8 @@ DATA_DIR=/var/lib/foundry
 
 base_packages
 
-say "user and deploy key"
+say "user"
 make_user foundry
-deploy_key foundry "foundry-preview (read only)" ro
-vault_key foundry "foundry-preview vault (read only)"
 
 install_node
 chromium_libs
@@ -21,25 +18,6 @@ if ! swapon --show | grep -q /swapfile; then
   swapon /swapfile
   grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
-
-say "the repository"
-clone_or_pull foundry "$REPO_DIR"
-as foundry "git -C $REPO_DIR config user.name '$GIT_NAME' && git -C $REPO_DIR config user.email '$GIT_EMAIL'"
-
-say "install and build (a few minutes the first time)"
-quiet as foundry "cd $REPO_DIR && pnpm install --frozen-lockfile"
-quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm build:server"
-quiet as foundry "cd $REPO_DIR && NODE_OPTIONS=--max-old-space-size=1536 pnpm --filter gallery build"
-
-if [[ -n "$VAULT_REPO_URL" ]]; then
-  say "the vault repository and its gallery"
-  clone_or_pull foundry "$VAULT_DIR" "$VAULT_REPO_URL"
-  vault_gallery "$REPO_DIR" "$VAULT_DIR"
-fi
-
-say "Chromium for the MCP's screenshots (the server closes it after 5 idle minutes)"
-quiet as foundry "cd $REPO_DIR && pnpm exec playwright install chromium"
-chromium_check foundry "$REPO_DIR"
 
 say "data folders"
 install -d -o foundry -g foundry -m 750 "$DATA_DIR" /var/lib/warden-runs

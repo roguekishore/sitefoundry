@@ -27,7 +27,8 @@ resource "aws_instance" "preview" {
     tags        = { Name = "foundry-preview", "warden:app" = "foundry" }
   }
 
-  tags = { Name = "foundry-preview" }
+  # Both units ship here (`./ops ship` in sitefoundry and in sitefoundry-vault).
+  tags = { Name = "foundry-preview", "deploy-foundry" = "true", "deploy-foundry-vault" = "true" }
 
   lifecycle {
     ignore_changes = [ami, user_data]
@@ -62,7 +63,8 @@ resource "aws_instance" "run" {
     tags        = { Name = "foundry-run", "warden:app" = "foundry" }
   }
 
-  tags = { Name = "foundry-run" }
+  # Never shipped to: it switches to the live release at boot (D12).
+  tags = { Name = "foundry-run", "deploy-foundry" = "boot" }
 
   lifecycle {
     # The public IP is released while the instance is stopped, so Terraform would read

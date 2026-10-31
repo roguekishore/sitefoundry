@@ -200,23 +200,6 @@ SCRIPT
   chmod 755 /usr/local/bin/foundry-env
 }
 
-# vault_gallery <repo dir> <vault dir>: builds the vault gallery (apps/gallery/dist-vault, served at
-# /vault/) when the vault or the gallery's code moved since the last build: a marker in the folder
-# says what it was built from. Built into a side folder and swapped in, like the sites gallery.
-vault_gallery() {
-  local repo=$1 vault=$2 from
-  [[ -d "$vault/.git" ]] || return 0
-  from="$(as foundry "git -C $vault rev-parse HEAD"):$(as foundry "git -C $repo rev-parse HEAD:apps/gallery")"
-  if [[ -f "$repo/apps/gallery/dist-vault/.built-from" && "$(cat "$repo/apps/gallery/dist-vault/.built-from")" == "$from" ]]; then
-    say "vault gallery up to date"
-    return 0
-  fi
-  say "vault: install and build its gallery (a while: thousands of items)"
-  quiet as foundry "cd $vault && pnpm install --frozen-lockfile"
-  quiet as foundry "cd $repo/apps/gallery && rm -rf dist-vault.next && FOUNDRY_VAULT=$vault NODE_OPTIONS=--max-old-space-size=1536 pnpm exec vite build --mode vault --outDir dist-vault.next --emptyOutDir"
-  as foundry "cd $repo/apps/gallery && echo '$from' > dist-vault.next/.built-from && rm -rf dist-vault.old && { [[ ! -d dist-vault ]] || mv dist-vault dist-vault.old; } && mv dist-vault.next dist-vault && rm -rf dist-vault.old"
-}
-
 # Waits for a URL to answer, for the checks at the end of a script.
 wait_for() { # wait_for <url> <seconds>
   local i

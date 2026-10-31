@@ -326,17 +326,23 @@ function thumbsReceivedAt(): string | null {
  */
 function thumbsAfterDeploy() {
   if (machine.kind !== "ec2" || db.activeThumbs()) return;
-  const head = spawnSync("git", ["-C", REPO, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim();
+  const commitOf = (dir: string) =>
+    existsSync(join(dir, ".release-commit"))
+      ? readFileSync(join(dir, ".release-commit"), "utf8").trim()
+      : spawnSync("git", ["-C", dir, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim();
+  const head = commitOf(REPO);
   if (!head) return log("thumbnails: no git commit here, not queueing any");
   // a job shoots both galleries; the vault's are due when its repo moved since they were shot
-  const vaultHead = VAULT ? spawnSync("git", ["-C", VAULT, "rev-parse", "HEAD"], { encoding: "utf8" }).stdout?.trim() : undefined;
+  const vaultHead = VAULT ? commitOf(VAULT) : undefined;
   const vaultShot = existsSync(VAULT_THUMBS_COMMIT) ? readFileSync(VAULT_THUMBS_COMMIT, "utf8").trim() : undefined;
   const vaultDue = !!vaultHead && vaultHead !== vaultShot;
   const last = db.latestThumbs("done")?.commit;
   if (last && thumbsReceivedAt() && !vaultDue) {
     if (last === head) return;
-    const diff = spawnSync("git", ["-C", REPO, "diff", "--quiet", last, head, "--", "foundry", "apps/gallery", "public/r", "tools/build-thumbs.ts"]);
-    if (diff.status === 0) return log(`thumbnails: nothing the gallery shows changed since ${last.slice(0, 7)}`);
+    if (existsSync(join(REPO, ".git"))) {
+      const diff = spawnSync("git", ["-C", REPO, "diff", "--quiet", last, head, "--", "foundry", "apps/gallery", "public/r", "tools/build-thumbs.ts"]);
+      if (diff.status === 0) return log(`thumbnails: nothing the gallery shows changed since ${last.slice(0, 7)}`);
+    }
   }
   db.addThumbs(vaultDue && last === head ? `vault at ${vaultHead!.slice(0, 7)}` : `deployed ${head.slice(0, 7)}`);
   log(`thumbnails queued for ${head.slice(0, 7)}${vaultDue ? ` and the vault at ${vaultHead!.slice(0, 7)}` : ""}`);
